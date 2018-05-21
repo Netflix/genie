@@ -36,6 +36,8 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
@@ -311,8 +313,12 @@ public final class EntityDtoConverters {
      *
      * @param jobSpecificationProjection The entity values to convert
      * @return An immutable Job Specification instance
-     * @throws GenieRuntimeException All input should be valid at this point so if we can't create a job spec dto
-     *                               something has become corrupted in the db
+     * @throws GenieClusterNotFoundException When the cluster isn't found in the database which it should be at this
+     *                                       point given the input to the db was valid at the time of persistence
+     * @throws GenieCommandNotFoundException When the command isn't found in the database which it should be at this
+     *                                       point given the input to the db was valid at the time of persistence
+     * @throws GenieRuntimeException         All input should be valid at this point so if we can't create a job spec
+     *                                       dto something has become corrupted in the db
      */
     public static JobSpecification toJobSpecificationDto(final JobSpecificationProjection jobSpecificationProjection) {
         final String id = jobSpecificationProjection.getUniqueId();
@@ -321,12 +327,12 @@ public final class EntityDtoConverters {
         final ClusterEntity clusterEntity = jobSpecificationProjection
             .getCluster()
             .orElseThrow(
-                () -> new GenieRuntimeException("No cluster found for job " + id + ". Was expected to exist.")
+                () -> new GenieClusterNotFoundException("No cluster found for job " + id + ". Was expected to exist.")
             );
         final CommandEntity commandEntity = jobSpecificationProjection
             .getCommand()
             .orElseThrow(
-                () -> new GenieRuntimeException("No command found for job " + id + ". Was expected to exist.")
+                () -> new GenieCommandNotFoundException("No command found for job " + id + ". Was expected to exist.")
             );
 
         final File jobDirectoryLocation = jobSpecificationProjection
