@@ -121,31 +121,33 @@ public class ClusterCheckerTask extends LeadershipTask {
             .filter(host -> !this.hostName.equals(host))
             .forEach(this::validateHostAndUpdateErrorCount);
 
-        this.errorCounts.entrySet().removeIf(entry -> {
-            final String host = entry.getKey();
-            boolean result = true;
-            if (entry.getValue() >= properties.getLostThreshold()) {
-                try {
-                    updateJobsToFailedOnHost(host);
-                } catch (Exception e) {
-                    log.error("Unable to update jobs on host {} due to exception", host, e);
-                    unableToUpdateJobCounter.increment();
+        this.errorCounts.entrySet().removeIf(
+            entry -> {
+                final String host = entry.getKey();
+                boolean result = true;
+                if (entry.getValue() >= this.properties.getLostThreshold()) {
+                    try {
+                        this.updateJobsToFailedOnHost(host);
+                    } catch (Exception e) {
+                        log.error("Unable to update jobs on host {} due to exception", host, e);
+                        this.unableToUpdateJobCounter.increment();
+                        result = false;
+                    }
+                } else {
                     result = false;
                 }
-            } else {
-                result = false;
+                return result;
             }
-            return result;
-        });
+        );
         log.info("Finished checking for cluster node health.");
     }
 
     private void updateJobsToFailedOnHost(final String host) {
-        final Set<Job> jobs = jobSearchService.getAllActiveJobsOnHost(host);
+        final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(host);
         jobs.forEach(
             job -> {
                 try {
-                    jobPersistenceService.setJobCompletionInformation(
+                    this.jobPersistenceService.setJobCompletionInformation(
                         job.getId().orElseThrow(IllegalArgumentException::new),
                         JobExecution.LOST_EXIT_CODE,
                         JobStatus.FAILED,
@@ -153,10 +155,10 @@ public class ClusterCheckerTask extends LeadershipTask {
                         null,
                         null
                     );
-                    lostJobsCounter.increment();
+                    this.lostJobsCounter.increment();
                 } catch (final GenieException ge) {
                     log.error("Unable to update job {} to failed due to exception", job.getId(), ge);
-                    unableToUpdateJobCounter.increment();
+                    this.unableToUpdateJobCounter.increment();
                 }
             }
         );
@@ -167,10 +169,8 @@ public class ClusterCheckerTask extends LeadershipTask {
         // If node is healthy, remove the entry from the errorCounts.
         // If node is not healthy, update the entry in errorCounts
         //
-        if (isNodeHealthy(host)) {
-            if (errorCounts.containsKey(host)) {
-                errorCounts.remove(host);
-            }
+        if (this.isNodeHealthy(host)) {
+            this.errorCounts.remove(host);
         } else {
             if (this.errorCounts.containsKey(host)) {
                 this.errorCounts.put(host, this.errorCounts.get(host) + 1);
@@ -187,7 +187,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         //
         boolean result = true;
         try {
-            restTemplate.getForObject(this.scheme + host + this.healthEndpoint, String.class);
+            this.restTemplate.getForObject(this.scheme + host + this.healthEndpoint, String.class);
         } catch (final HttpStatusCodeException e) {
             log.error("Failed validating host {}", host, e);
             try {
@@ -198,7 +198,7 @@ public class ClusterCheckerTask extends LeadershipTask {
                     );
                 for (Map.Entry<String, Object> responseEntry : responseMap.entrySet()) {
                     if (responseEntry.getValue() instanceof Map
-                        && !healthIndicatorsToIgnore.contains(responseEntry.getKey())
+                        && !this.healthIndicatorsToIgnore.contains(responseEntry.getKey())
                         && !Status.UP.getCode().equals(((Map) responseEntry.getValue()).get(PROPERTY_STATUS))) {
                         result = false;
                         break;
