@@ -113,7 +113,8 @@ import java.util.Set;
         "requestedJobDirectoryLocation",
         "jobDirectoryLocation",
         "resolved",
-        "claimed"
+        "claimed",
+        "v4"
     },
     doNotUseGetters = true
 )
@@ -307,6 +308,10 @@ public class JobEntity extends BaseEntity implements
     @Basic(optional = false)
     @Column(name = "claimed", nullable = false)
     private boolean claimed;
+
+    @Basic(optional = false)
+    @Column(name = "v4", nullable = false)
+    private boolean v4;
 
     @Basic
     @Column(name = "requested_job_directory_location", length = 1024, updatable = false)

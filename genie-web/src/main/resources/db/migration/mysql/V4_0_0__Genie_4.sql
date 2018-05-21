@@ -164,7 +164,8 @@ ALTER TABLE `jobs`
   ADD COLUMN    `resolved`                                   BOOLEAN       DEFAULT FALSE NOT NULL,
   ADD COLUMN    `agent_version`                              VARCHAR(255)  DEFAULT NULL,
   ADD COLUMN    `agent_pid`                                  INT(11)       DEFAULT NULL,
-  ADD COLUMN    `claimed`                                    BOOLEAN       DEFAULT FALSE NOT NULL;
+  ADD COLUMN    `claimed`                                    BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN    `v4`                                         BOOLEAN       DEFAULT FALSE NOT NULL;
 
 ALTER TABLE `job_applications_requested` RENAME TO `job_requested_applications`;
 ALTER TABLE `job_requested_applications`
