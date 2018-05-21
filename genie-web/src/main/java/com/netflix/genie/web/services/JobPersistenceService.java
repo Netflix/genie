@@ -202,8 +202,12 @@ public interface JobPersistenceService {
      *
      * @param id The id of the job
      * @return The job specification if one is present else an empty {@link Optional}
-     * @throws GenieJobNotFoundException If no job with {@code id} exists
-     * @throws GenieRuntimeException     on unexpected error
+     * @throws GenieJobNotFoundException     If no job with {@code id} exists
+     * @throws GenieClusterNotFoundException When the cluster isn't found in the database which it should be at this
+     *                                       point given the input to the db was valid at the time of persistence
+     * @throws GenieCommandNotFoundException When the command isn't found in the database which it should be at this
+     *                                       point given the input to the db was valid at the time of persistence
+     * @throws GenieRuntimeException         on unexpected error
      */
     Optional<JobSpecification> getJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id

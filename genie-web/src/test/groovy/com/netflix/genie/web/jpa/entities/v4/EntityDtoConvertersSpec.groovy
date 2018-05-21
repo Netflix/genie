@@ -32,6 +32,8 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
@@ -713,5 +715,37 @@ class EntityDtoConvertersSpec extends Specification {
                         )
                 )
         )
+    }
+
+    def "Invalid Job Specification throws exceptions"() {
+        def id = UUID.randomUUID().toString()
+        def jobSpecificationProjection = Mock(JobSpecificationProjection)
+
+        when:
+        EntityDtoConverters.toJobSpecificationDto(jobSpecificationProjection)
+
+        then:
+        1 * jobSpecificationProjection.getUniqueId() >> id
+        1 * jobSpecificationProjection.getCluster() >> Optional.empty()
+        thrown(GenieClusterNotFoundException)
+
+        when:
+        EntityDtoConverters.toJobSpecificationDto(jobSpecificationProjection)
+
+        then:
+        1 * jobSpecificationProjection.getUniqueId() >> id
+        1 * jobSpecificationProjection.getCluster() >> Optional.of(Mock(ClusterEntity))
+        1 * jobSpecificationProjection.getCommand() >> Optional.empty()
+        thrown(GenieCommandNotFoundException)
+
+        when:
+        EntityDtoConverters.toJobSpecificationDto(jobSpecificationProjection)
+
+        then:
+        1 * jobSpecificationProjection.getUniqueId() >> id
+        1 * jobSpecificationProjection.getCluster() >> Optional.of(Mock(ClusterEntity))
+        1 * jobSpecificationProjection.getCommand() >> Optional.of(Mock(CommandEntity))
+        1 * jobSpecificationProjection.getJobDirectoryLocation() >> Optional.empty()
+        thrown(GenieRuntimeException)
     }
 }
