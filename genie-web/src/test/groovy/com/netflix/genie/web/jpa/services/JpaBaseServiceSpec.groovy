@@ -19,6 +19,9 @@ package com.netflix.genie.web.jpa.services
 
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository
+import com.netflix.genie.web.jpa.repositories.JpaClusterRepository
+import com.netflix.genie.web.jpa.repositories.JpaCommandRepository
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -38,7 +41,10 @@ class JpaBaseServiceSpec extends Specification {
         }
         def service = new JpaBaseService(
                 Mock(JpaTagPersistenceService),
-                fileService
+                fileService,
+                Mock(JpaApplicationRepository),
+                Mock(JpaClusterRepository),
+                Mock(JpaCommandRepository)
         )
 
         when:
@@ -55,7 +61,10 @@ class JpaBaseServiceSpec extends Specification {
         }
         def service = new JpaBaseService(
                 tagService,
-                Mock(JpaFilePersistenceService)
+                Mock(JpaFilePersistenceService),
+                Mock(JpaApplicationRepository),
+                Mock(JpaClusterRepository),
+                Mock(JpaCommandRepository)
         )
 
         when:

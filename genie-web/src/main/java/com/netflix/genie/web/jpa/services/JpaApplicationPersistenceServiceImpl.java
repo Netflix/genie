@@ -41,6 +41,7 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.web.jpa.specifications.JpaCommandSpecs;
@@ -61,7 +62,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -83,26 +83,29 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JpaApplicationPersistenceServiceImpl extends JpaBaseService implements ApplicationPersistenceService {
 
-    private final JpaApplicationRepository applicationRepository;
-    private final JpaCommandRepository commandRepository;
-
     /**
      * Default constructor.
      *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param applicationRepository  The application repository to use
-     * @param commandRepository      The command repository to use
+     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
+     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
+     * @param applicationRepository  The {@link JpaApplicationRepository} to use
+     * @param clusterRepository      The {@link JpaClusterRepository} to use
+     * @param commandRepository      The {@link JpaCommandRepository} to use
      */
     public JpaApplicationPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
         final JpaApplicationRepository applicationRepository,
+        final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository
     ) {
-        super(tagPersistenceService, filePersistenceService);
-        this.applicationRepository = applicationRepository;
-        this.commandRepository = commandRepository;
+        super(
+            tagPersistenceService,
+            filePersistenceService,
+            applicationRepository,
+            clusterRepository,
+            commandRepository
+        );
     }
 
     /**
@@ -116,7 +119,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         log.debug("Called to create new application with request metadata {}", applicationRequest);
         final ApplicationEntity applicationEntity = this.createApplicationEntity(applicationRequest);
         try {
-            this.applicationRepository.save(applicationEntity);
+            this.getApplicationRepository().save(applicationEntity);
         } catch (final DataIntegrityViolationException e) {
             throw new GenieConflictException(
                 "An application with id " + applicationEntity.getUniqueId() + " already exists",
@@ -165,7 +168,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
             tagEntities = null;
         }
 
-        @SuppressWarnings("unchecked") final Page<ApplicationEntity> applicationEntities = this.applicationRepository
+        final Page<ApplicationEntity> applicationEntities = this.getApplicationRepository()
             .findAll(
                 JpaApplicationSpecs.find(name, user, statuses, tagEntities, type),
                 page
@@ -183,7 +186,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         @NotNull(message = "No application information entered. Unable to update.")
         @Valid final Application updateApp
     ) throws GenieException {
-        if (!this.applicationRepository.existsByUniqueId(id)) {
+        if (!this.getApplicationRepository().existsByUniqueId(id)) {
             throw new GenieNotFoundException("No application with id " + id + " exists. Unable to update.");
         }
         final String updateId = updateApp.getId();
@@ -222,10 +225,10 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
     public void deleteAllApplications() throws GenieException {
         log.debug("Called");
         // Check to make sure the application isn't tied to any existing commands
-        for (final ApplicationEntity applicationEntity : this.applicationRepository.findAll()) {
+        for (final ApplicationEntity applicationEntity : this.getApplicationRepository().findAll()) {
             this.checkCommands(applicationEntity);
         }
-        this.applicationRepository.deleteAll();
+        this.getApplicationRepository().deleteAll();
     }
 
     /**
@@ -238,7 +241,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         log.debug("Called with id {}", id);
         final ApplicationEntity applicationEntity = this.findApplication(id);
         this.checkCommands(applicationEntity);
-        this.applicationRepository.delete(applicationEntity);
+        this.getApplicationRepository().delete(applicationEntity);
     }
 
     /**
@@ -416,13 +419,11 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         @NotBlank(message = "No application id entered. Unable to get commands.") final String id,
         @Nullable final Set<CommandStatus> statuses
     ) throws GenieException {
-        if (!this.applicationRepository.existsByUniqueId(id)) {
+        if (!this.getApplicationRepository().existsByUniqueId(id)) {
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
-        @SuppressWarnings("unchecked") final List<CommandEntity> commandEntities = this.commandRepository.findAll(
-            JpaCommandSpecs.findCommandsForApplication(id, statuses)
-        );
-        return commandEntities
+        return this.getCommandRepository()
+            .findAll(JpaCommandSpecs.findCommandsForApplication(id, statuses))
             .stream()
             .map(EntityDtoConverters::toV4CommandDto)
             .collect(Collectors.toSet());
@@ -436,7 +437,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
      * @throws GenieNotFoundException If no application is found
      */
     private ApplicationEntity findApplication(final String id) throws GenieNotFoundException {
-        return this.applicationRepository
+        return this.getApplicationRepository()
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No application with id " + id));
     }

@@ -105,10 +105,10 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService = new JpaJobPersistenceServiceImpl(
             this.tagPersistenceService,
             this.filePersistenceService,
-            this.jobRepository,
             this.applicationRepository,
             this.clusterRepository,
-            this.commandRepository
+            this.commandRepository,
+            this.jobRepository
         );
     }
 

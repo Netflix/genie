@@ -30,5 +30,5 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @since 3.3.0
  */
 @NoRepositoryBean
-interface JpaIdRepository<E extends IdEntity> extends JpaRepository<E, Long>, JpaSpecificationExecutor {
+interface JpaIdRepository<E extends IdEntity> extends JpaRepository<E, Long>, JpaSpecificationExecutor<E> {
 }

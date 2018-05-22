@@ -100,34 +100,32 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
     private final JpaJobRepository jobRepository;
 
-    // TODO: Switch to services
-    private final JpaApplicationRepository applicationRepository;
-    private final JpaClusterRepository clusterRepository;
-    private final JpaCommandRepository commandRepository;
-
     /**
      * Constructor.
      *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param jobRepository          The job repository to use
-     * @param applicationRepository  The application repository to use
-     * @param clusterRepository      The cluster repository to use
-     * @param commandRepository      The command repository to use
+     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
+     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
+     * @param applicationRepository  The {@link JpaApplicationRepository} to use
+     * @param clusterRepository      The {@link JpaClusterRepository} to use
+     * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param jobRepository          The {@link JpaJobRepository} to use
      */
     public JpaJobPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaJobRepository jobRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
+        final JpaCommandRepository commandRepository,
+        final JpaJobRepository jobRepository
     ) {
-        super(tagPersistenceService, filePersistenceService);
+        super(
+            tagPersistenceService,
+            filePersistenceService,
+            applicationRepository,
+            clusterRepository,
+            commandRepository
+        );
         this.jobRepository = jobRepository;
-        this.applicationRepository = applicationRepository;
-        this.clusterRepository = clusterRepository;
-        this.commandRepository = commandRepository;
     }
 
     /**
@@ -818,21 +816,19 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final String commandId,
         final List<String> applicationIds
     ) {
-        final ClusterEntity cluster = this.clusterRepository
-            .findByUniqueId(clusterId)
-            .orElseThrow(() -> new GenieClusterNotFoundException("Cannot find cluster with ID " + clusterId));
+        final ClusterEntity cluster = this.getClusterEntity(clusterId).orElseThrow(
+            () -> new GenieClusterNotFoundException("Cannot find cluster with ID " + clusterId)
+        );
 
-        final CommandEntity command = this.commandRepository
-            .findByUniqueId(commandId)
-            .orElseThrow(() -> new GenieCommandNotFoundException("Cannot find command with ID " + commandId));
+        final CommandEntity command = this.getCommandEntity(commandId).orElseThrow(
+            () -> new GenieCommandNotFoundException("Cannot find command with ID " + commandId)
+        );
 
         final List<ApplicationEntity> applications = Lists.newArrayList();
         for (final String applicationId : applicationIds) {
-            final ApplicationEntity application = this.applicationRepository
-                .findByUniqueId(applicationId)
-                .orElseThrow(
-                    () -> new GenieApplicationNotFoundException("Cannot find application with ID + " + applicationId)
-                );
+            final ApplicationEntity application = this.getApplicationEntity(applicationId).orElseThrow(
+                () -> new GenieApplicationNotFoundException("Cannot find application with ID + " + applicationId)
+            );
             applications.add(application);
         }
 

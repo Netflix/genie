@@ -87,30 +87,30 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements CommandPersistenceService {
-    private final JpaCommandRepository commandRepository;
-    private final JpaApplicationRepository applicationRepository;
-    private final JpaClusterRepository clusterRepo;
 
     /**
      * Default constructor.
      *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param commandRepository      the command repository to use
-     * @param applicationRepository  the application repository to use
-     * @param clusterRepository      the cluster repository to use
+     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
+     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
+     * @param applicationRepository  The {@link JpaApplicationRepository} to use
+     * @param clusterRepository      The {@link JpaClusterRepository} to use
+     * @param commandRepository      The {@link JpaCommandRepository} to use
      */
     public JpaCommandPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaCommandRepository commandRepository,
         final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
-        super(tagPersistenceService, filePersistenceService);
-        this.commandRepository = commandRepository;
-        this.applicationRepository = applicationRepository;
-        this.clusterRepo = clusterRepository;
+        super(
+            tagPersistenceService,
+            filePersistenceService,
+            applicationRepository,
+            clusterRepository,
+            commandRepository
+        );
     }
 
     /**
@@ -124,7 +124,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         log.debug("Called to create command {}", request);
         final CommandEntity commandEntity = this.createCommandEntity(request);
         try {
-            this.commandRepository.save(commandEntity);
+            this.getCommandRepository().save(commandEntity);
         } catch (final DataIntegrityViolationException e) {
             throw new GenieConflictException(
                 "A command with id " + commandEntity.getUniqueId() + " already exists",
@@ -172,7 +172,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
             tagEntities = null;
         }
 
-        @SuppressWarnings("unchecked") final Page<CommandEntity> commandEntities = this.commandRepository.findAll(
+        final Page<CommandEntity> commandEntities = this.getCommandRepository().findAll(
             JpaCommandSpecs.find(
                 name,
                 user,
@@ -194,7 +194,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotNull(message = "No command information entered. Unable to update.")
         @Valid final Command updateCommand
     ) throws GenieException {
-        if (!this.commandRepository.existsByUniqueId(id)) {
+        if (!this.getCommandRepository().existsByUniqueId(id)) {
             throw new GenieNotFoundException("No command exists with the given id. Unable to update.");
         }
         final String updateId = updateCommand.getId();
@@ -233,7 +233,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
     @Override
     public void deleteAllCommands() throws GenieException {
         log.debug("Called to delete all commands");
-        for (final CommandEntity commandEntity : this.commandRepository.findAll()) {
+        for (final CommandEntity commandEntity : this.getCommandRepository().findAll()) {
             this.deleteCommand(commandEntity.getUniqueId());
         }
     }
@@ -260,7 +260,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
             final Set<ClusterEntity> clusterEntities = Sets.newHashSet(originalClusters);
             clusterEntities.forEach(clusterEntity -> clusterEntity.removeCommand(commandEntity));
         }
-        this.commandRepository.delete(commandEntity);
+        this.getCommandRepository().delete(commandEntity);
     }
 
     /**
@@ -434,15 +434,14 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotEmpty(message = "No application ids entered. Unable to add applications.") final List<String> applicationIds
     ) throws GenieException {
         if (applicationIds.size()
-            != applicationIds.stream().filter(this.applicationRepository::existsByUniqueId).count()) {
+            != applicationIds.stream().filter(this.getApplicationRepository()::existsByUniqueId).count()) {
             throw new GeniePreconditionException("All applications need to exist to add to a command");
         }
 
         final CommandEntity commandEntity = this.findCommand(id);
         for (final String appId : applicationIds) {
             commandEntity.addApplication(
-                this.applicationRepository
-                    .findByUniqueId(appId)
+                this.getApplicationEntity(appId)
                     .orElseThrow(() -> new GenieNotFoundException("No application with id " + appId + " found"))
             );
         }
@@ -457,7 +456,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotNull(message = "No application ids entered. Unable to set applications.") final List<String> applicationIds
     ) throws GenieException {
         if (applicationIds.size()
-            != applicationIds.stream().filter(this.applicationRepository::existsByUniqueId).count()) {
+            != applicationIds.stream().filter(this.getApplicationRepository()::existsByUniqueId).count()) {
             throw new GeniePreconditionException("All applications need to exist to add to a command");
         }
 
@@ -465,11 +464,9 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         final List<ApplicationEntity> applicationEntities = new ArrayList<>();
         for (final String appId : applicationIds) {
             applicationEntities.add(
-                this.applicationRepository
-                    .findByUniqueId(appId)
-                    .orElseThrow(
-                        () -> new GenieNotFoundException("Couldn't find application with unique id " + appId)
-                    )
+                this.getApplicationEntity(appId).orElseThrow(
+                    () -> new GenieNotFoundException("Couldn't find application with unique id " + appId)
+                )
             );
         }
 
@@ -510,7 +507,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No command id entered. Unable to remove application.") final String id,
         @NotBlank(message = "No application id entered. Unable to remove application.") final String appId
     ) throws GenieException {
-        this.applicationRepository.findByUniqueId(appId).ifPresent(this.findCommand(id).getApplications()::remove);
+        this.getApplicationRepository().findByUniqueId(appId).ifPresent(this.findCommand(id).getApplications()::remove);
     }
 
     /**
@@ -522,17 +519,11 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No command id entered. Unable to get clusters.") final String id,
         @Nullable final Set<ClusterStatus> statuses
     ) throws GenieException {
-        if (!this.commandRepository.existsByUniqueId(id)) {
+        if (!this.getCommandRepository().existsByUniqueId(id)) {
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
-        @SuppressWarnings("unchecked") final List<ClusterEntity> clusterEntities = this.clusterRepo.findAll(
-            JpaClusterSpecs.findClustersForCommand(
-                id,
-                statuses
-            )
-        );
-
-        return clusterEntities
+        return this.getClusterRepository()
+            .findAll(JpaClusterSpecs.findClustersForCommand(id, statuses))
             .stream()
             .map(EntityDtoConverters::toV4ClusterDto)
             .collect(Collectors.toSet());
@@ -546,7 +537,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
      * @throws GenieNotFoundException When the command doesn't exist
      */
     private CommandEntity findCommand(final String id) throws GenieNotFoundException {
-        return this.commandRepository
+        return this.getCommandRepository()
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No command with id " + id + " exists."));
     }

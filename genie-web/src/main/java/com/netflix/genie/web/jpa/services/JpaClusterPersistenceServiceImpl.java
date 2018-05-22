@@ -47,6 +47,7 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
+import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.specifications.JpaClusterSpecs;
@@ -90,26 +91,30 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements ClusterPersistenceService {
-    private final JpaClusterRepository clusterRepository;
-    private final JpaCommandRepository commandRepository;
 
     /**
-     * Default constructor - initialize all required dependencies.
+     * Default constructor.
      *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param clusterRepository      The cluster repository to use.
-     * @param commandRepository      The command repository to use.
+     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
+     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
+     * @param applicationRepository  The {@link JpaApplicationRepository} to use
+     * @param clusterRepository      The {@link JpaClusterRepository} to use
+     * @param commandRepository      The {@link JpaCommandRepository} to use
      */
     public JpaClusterPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
+        final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository
     ) {
-        super(tagPersistenceService, filePersistenceService);
-        this.clusterRepository = clusterRepository;
-        this.commandRepository = commandRepository;
+        super(
+            tagPersistenceService,
+            filePersistenceService,
+            applicationRepository,
+            clusterRepository,
+            commandRepository
+        );
     }
 
     /**
@@ -123,7 +128,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         log.debug("Called to create cluster with request {}", request);
         final ClusterEntity clusterEntity = this.createClusterEntity(request);
         try {
-            this.clusterRepository.save(clusterEntity);
+            this.getClusterRepository().save(clusterEntity);
         } catch (final DataIntegrityViolationException e) {
             throw new GenieConflictException(
                 "A cluster with id " + clusterEntity.getUniqueId() + " already exists",
@@ -172,7 +177,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
             tagEntities = null;
         }
 
-        @SuppressWarnings("unchecked") final Page<ClusterEntity> clusterEntities = this.clusterRepository.findAll(
+        final Page<ClusterEntity> clusterEntities = this.getClusterRepository().findAll(
             JpaClusterSpecs.find(name, statuses, tagEntities, minUpdateTime, maxUpdateTime),
             page
         );
@@ -228,7 +233,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         @Valid final Cluster updateCluster
     ) throws GenieException {
         log.debug("Called with id {} and cluster {}", id, updateCluster);
-        if (!this.clusterRepository.existsByUniqueId(id)) {
+        if (!this.getClusterRepository().existsByUniqueId(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
         final String updateId = updateCluster.getId();
@@ -265,7 +270,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
     @Override
     public void deleteAllClusters() throws GenieException {
         log.debug("Called to delete all clusters");
-        for (final ClusterEntity clusterEntity : this.clusterRepository.findAll()) {
+        for (final ClusterEntity clusterEntity : this.getClusterRepository().findAll()) {
             this.deleteCluster(clusterEntity.getUniqueId());
         }
     }
@@ -288,7 +293,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
                 }
             }
         }
-        this.clusterRepository.delete(clusterEntity);
+        this.getClusterRepository().delete(clusterEntity);
     }
 
     /**
@@ -453,18 +458,16 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No cluster id entered. Unable to add commands.") final String id,
         @NotEmpty(message = "No command ids entered. Unable to add commands.") final List<String> commandIds
     ) throws GenieException {
-        if (commandIds.size() != commandIds.stream().filter(this.commandRepository::existsByUniqueId).count()) {
+        if (commandIds.size() != commandIds.stream().filter(this.getCommandRepository()::existsByUniqueId).count()) {
             throw new GeniePreconditionException("All commands need to exist to add to a cluster");
         }
 
         final ClusterEntity clusterEntity = this.findCluster(id);
         for (final String commandId : commandIds) {
             clusterEntity.addCommand(
-                this.commandRepository
-                    .findByUniqueId(commandId)
-                    .orElseThrow(
-                        () -> new GenieNotFoundException("Couldn't find command with unique id " + commandId)
-                    )
+                this.getCommandEntity(commandId).orElseThrow(
+                    () -> new GenieNotFoundException("Couldn't find command with unique id " + commandId)
+                )
             );
         }
     }
@@ -479,7 +482,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         @Nullable final Set<CommandStatus> statuses
     ) throws GenieException {
         final Optional<ClusterCommandsProjection> commandsProjection
-            = this.clusterRepository.findByUniqueId(id, ClusterCommandsProjection.class);
+            = this.getClusterRepository().findByUniqueId(id, ClusterCommandsProjection.class);
 
         final List<CommandEntity> commandEntities = commandsProjection
             .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
@@ -502,18 +505,16 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No cluster id entered. Unable to update commands.") final String id,
         @NotNull(message = "No command ids entered. Unable to update commands.") final List<String> commandIds
     ) throws GenieException {
-        if (commandIds.size() != commandIds.stream().filter(this.commandRepository::existsByUniqueId).count()) {
+        if (commandIds.size() != commandIds.stream().filter(this.getCommandRepository()::existsByUniqueId).count()) {
             throw new GeniePreconditionException("All commands need to exist to add to a cluster");
         }
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = new ArrayList<>();
         for (final String commandId : commandIds) {
             commandEntities.add(
-                this.commandRepository
-                    .findByUniqueId(commandId)
-                    .orElseThrow(
-                        () -> new GenieNotFoundException("Couldn't find command with unique id " + commandId)
-                    )
+                this.getCommandEntity(commandId).orElseThrow(
+                    () -> new GenieNotFoundException("Couldn't find command with unique id " + commandId)
+                )
             );
         }
 
@@ -540,11 +541,9 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
     ) throws GenieException {
         this.findCluster(id)
             .removeCommand(
-                this.commandRepository
-                    .findByUniqueId(cmdId)
-                    .orElseThrow(
-                        () -> new GenieNotFoundException("No command with id " + cmdId + " exists.")
-                    )
+                this.getCommandEntity(cmdId).orElseThrow(
+                    () -> new GenieNotFoundException("No command with id " + cmdId + " exists.")
+                )
             );
     }
 
@@ -553,8 +552,8 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
      */
     @Override
     public long deleteTerminatedClusters() {
-        return this.clusterRepository.deleteByIdIn(
-            this.clusterRepository
+        return this.getClusterRepository().deleteByIdIn(
+            this.getClusterRepository()
                 .findTerminatedUnusedClusters()
                 .stream()
                 .map(Number::longValue)
@@ -601,7 +600,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
     ) throws GenieServerException {
         final Map<Cluster, String> foundClusters = Maps.newHashMap();
         for (final Criterion clusterCriterion : clusterCriteria) {
-            final List<Object[]> clusterCommands = this.clusterRepository.resolveClustersAndCommands(
+            final List<Object[]> clusterCommands = this.getClusterRepository().resolveClustersAndCommands(
                 clusterCriterion,
                 commandCriterion
             );
@@ -624,7 +623,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
                         throw new GenieServerException("Expected String type but got " + ids[1].getClass().getName());
                     }
 
-                    final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
+                    final ClusterEntity clusterEntity = this.getClusterRepository().getOne(clusterId);
                     foundClusters.put(EntityDtoConverters.toV4ClusterDto(clusterEntity), commandUniqueId);
                 }
                 return foundClusters;
@@ -643,7 +642,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
      * @throws GenieNotFoundException If the cluster doesn't exist
      */
     private ClusterEntity findCluster(final String id) throws GenieNotFoundException {
-        return this.clusterRepository
+        return this.getClusterRepository()
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists."));
     }
