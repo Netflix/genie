@@ -32,6 +32,12 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.proto.AgentMetadata;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
@@ -57,7 +63,7 @@ import java.util.stream.Collectors;
  */
 public final class JobServiceProtoConverter {
 
-    private static final String NO_ERROR_MESSAGE_PROVIDED = "No error message provided";
+    static final String NO_ERROR_MESSAGE_PROVIDED = "No error message provided";
 
     /**
      * Utility class shouldn't be constructed.
@@ -167,23 +173,29 @@ public final class JobServiceProtoConverter {
     }
 
     /**
-     * Build a {@link JobSpecificationResponse} out of the given {@link Throwable}.
+     * Build a {@link JobSpecificationResponse} out of the given {@link Exception}.
      *
-     * @param error The server exception that should be serialized and sent back to the client
+     * @param e The server exception that should be serialized and sent back to the client
      * @return The response instance
      */
-    public static JobSpecificationResponse toProtoJobSpecificationResponse(final Throwable error) {
-        // TODO: Flesh this out with other errors but for now just throw a generic error
-        return JobSpecificationResponse
-            .newBuilder()
-            .setError(
-                JobSpecificationError
-                    .newBuilder()
-                    .setType(JobSpecificationError.Type.UNKNOWN)
-                    .setMessage(error.getMessage() == null ? NO_ERROR_MESSAGE_PROVIDED : error.getMessage())
-                    .build()
-            )
-            .build();
+    public static JobSpecificationResponse toProtoJobSpecificationResponse(final Exception e) {
+        final JobSpecificationError.Builder builder = JobSpecificationError.newBuilder();
+        builder.setMessage(e.getMessage() == null ? NO_ERROR_MESSAGE_PROVIDED : e.getMessage());
+
+        if (e instanceof GenieJobNotFoundException) {
+            builder.setType(JobSpecificationError.Type.NO_JOB_FOUND);
+        } else if (e instanceof GenieClusterNotFoundException) {
+            builder.setType(JobSpecificationError.Type.NO_CLUSTER_FOUND);
+        } else if (e instanceof GenieCommandNotFoundException) {
+            builder.setType(JobSpecificationError.Type.NO_COMMAND_FOUND);
+        } else if (e instanceof GenieApplicationNotFoundException) {
+            builder.setType(JobSpecificationError.Type.NO_APPLICATION_FOUND);
+        } else if (e instanceof GenieJobSpecificationNotFoundException) {
+            builder.setType(JobSpecificationError.Type.NO_SPECIFICATION_FOUND);
+        } else {
+            builder.setType(JobSpecificationError.Type.UNKNOWN);
+        }
+        return JobSpecificationResponse.newBuilder().setError(builder).build();
     }
 
     /**
@@ -191,10 +203,45 @@ public final class JobServiceProtoConverter {
      *
      * @param response The response to parse
      * @return A job specification
+     * @throws GenieJobNotFoundException              When the job wasn't found in the database
+     * @throws GenieClusterNotFoundException          When the cluster for the specification wasn't found in the
+     *                                                database
+     * @throws GenieCommandNotFoundException          When the command for the specification wasn't found in the
+     *                                                database
+     * @throws GenieApplicationNotFoundException      When an application for the specification wasn't found in the
+     *                                                database
+     * @throws GenieJobSpecificationNotFoundException When the system expected the job specification details to be
+     *                                                saved in the database but they weren't found
+     * @throws GenieRuntimeException                  On unknown error from the server
      */
-    public static JobSpecification toJobSpecificationDTO(final JobSpecificationResponse response) {
+    public static JobSpecification toJobSpecificationDTO(
+        final JobSpecificationResponse response
+    ) throws
+        GenieJobNotFoundException,
+        GenieClusterNotFoundException,
+        GenieCommandNotFoundException,
+        GenieApplicationNotFoundException,
+        GenieJobSpecificationNotFoundException,
+        GenieRuntimeException {
         if (response.hasError()) {
-            // TODO: Throw exception
+            final JobSpecificationError error = response.getError();
+            final String message = error.getMessage();
+            // TODO: Once agent is figured out we may need to revisit this. For now throwing some basic exceptions.
+            switch (error.getType()) {
+                case NO_JOB_FOUND:
+                    throw new GenieJobNotFoundException(message);
+                case NO_CLUSTER_FOUND:
+                    throw new GenieClusterNotFoundException(message);
+                case NO_COMMAND_FOUND:
+                    throw new GenieCommandNotFoundException(message);
+                case NO_APPLICATION_FOUND:
+                    throw new GenieApplicationNotFoundException(message);
+                case NO_SPECIFICATION_FOUND:
+                    throw new GenieJobSpecificationNotFoundException(message);
+                case UNKNOWN:
+                default:
+                    throw new GenieRuntimeException(message);
+            }
         }
 
         final com.netflix.genie.proto.JobSpecification protoSpec = response.getSpecification();

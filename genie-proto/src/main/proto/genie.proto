@@ -146,7 +146,10 @@ message JobSpecificationError {
     enum Type {
         UNKNOWN = 0;
         NO_CLUSTER_FOUND = 1;
-        NO_SPECIFICATION_FOUND = 2;
+        NO_COMMAND_FOUND = 2;
+        NO_APPLICATION_FOUND = 3;
+        NO_JOB_FOUND = 4;
+        NO_SPECIFICATION_FOUND = 5;
     }
     Type type = 1;
     string message = 2;

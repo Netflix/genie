@@ -20,7 +20,7 @@ package com.netflix.genie.common.internal.dto.v4.converters
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
-import com.netflix.genie.common.exceptions.GenieConflictException
+import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
@@ -29,16 +29,24 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
+import com.netflix.genie.proto.JobSpecificationError
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Specifications for the {@link JobServiceProtoConverter} utility class.
@@ -314,18 +322,67 @@ class JobServiceProtoConverterSpec extends Specification {
         jobSpecification3 == jobSpecification
     }
 
-    def "Can convert exception to JobSpecificationResponse"() {
-        def message = UUID.randomUUID().toString()
-
+    @Unroll
+    def "Job specification response error #error throws #exception"() {
         when:
-        def response = JobServiceProtoConverter.toProtoJobSpecificationResponse(
-                new GenieConflictException(message)
-        )
+        JobServiceProtoConverter.toJobSpecificationDTO(JobSpecificationResponse.newBuilder().setError(error).build())
+
+        then:
+        thrown(exception)
+
+        where:
+        error                                             | exception
+        JobSpecificationError
+                .newBuilder()
+                .setType(JobSpecificationError.Type.NO_JOB_FOUND)
+                .setMessage(UUID.randomUUID().toString()) | GenieJobNotFoundException
+        JobSpecificationError
+                .newBuilder()
+                .setType(JobSpecificationError.Type.NO_CLUSTER_FOUND)
+                .setMessage(UUID.randomUUID().toString()) | GenieClusterNotFoundException
+        JobSpecificationError
+                .newBuilder()
+                .setType(JobSpecificationError.Type.NO_COMMAND_FOUND)
+                .setMessage(UUID.randomUUID().toString()) | GenieCommandNotFoundException
+        JobSpecificationError
+                .newBuilder()
+                .setType(JobSpecificationError.Type.NO_APPLICATION_FOUND)
+                .setMessage(UUID.randomUUID().toString()) | GenieApplicationNotFoundException
+        JobSpecificationError
+                .newBuilder()
+                .setType(JobSpecificationError.Type.NO_SPECIFICATION_FOUND)
+                .setMessage(UUID.randomUUID().toString()) | GenieJobSpecificationNotFoundException
+        JobSpecificationError
+                .newBuilder()
+                .setType(JobSpecificationError.Type.UNKNOWN)
+                .setMessage(UUID.randomUUID().toString()) | GenieRuntimeException
+    }
+
+    @Unroll
+    def "Can convert exception #exception.class to JobSpecificationResponse with error type #type"() {
+        when:
+        def response = JobServiceProtoConverter.toProtoJobSpecificationResponse(exception)
 
         then:
         response.hasError()
         !response.hasSpecification()
-        response.getError().getMessage() == message
+        response.getError().getMessage() ==
+                (
+                        exception.getMessage() == null
+                                ? JobServiceProtoConverter.NO_ERROR_MESSAGE_PROVIDED
+                                : exception.getMessage()
+                )
+        response.getError().getType() == type
+
+        where:
+        exception                                                                | type
+        new GenieJobNotFoundException(UUID.randomUUID().toString())              | JobSpecificationError.Type.NO_JOB_FOUND
+        new GenieClusterNotFoundException(UUID.randomUUID().toString())          | JobSpecificationError.Type.NO_CLUSTER_FOUND
+        new GenieCommandNotFoundException(UUID.randomUUID().toString())          | JobSpecificationError.Type.NO_COMMAND_FOUND
+        new GenieApplicationNotFoundException(UUID.randomUUID().toString())      | JobSpecificationError.Type.NO_APPLICATION_FOUND
+        new GenieJobSpecificationNotFoundException(UUID.randomUUID().toString()) | JobSpecificationError.Type.NO_SPECIFICATION_FOUND
+        new RuntimeException(UUID.randomUUID().toString())                       | JobSpecificationError.Type.UNKNOWN
+        new GenieNotFoundException(UUID.randomUUID().toString())                 | JobSpecificationError.Type.UNKNOWN
     }
 
     AgentJobRequest createJobRequest() {
