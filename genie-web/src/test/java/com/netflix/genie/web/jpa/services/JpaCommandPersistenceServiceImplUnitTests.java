@@ -78,9 +78,9 @@ public class JpaCommandPersistenceServiceImplUnitTests {
         this.service = new JpaCommandPersistenceServiceImpl(
             Mockito.mock(JpaTagPersistenceService.class),
             Mockito.mock(JpaFilePersistenceService.class),
-            this.jpaCommandRepository,
             this.jpaApplicationRepository,
-            Mockito.mock(JpaClusterRepository.class)
+            Mockito.mock(JpaClusterRepository.class),
+            this.jpaCommandRepository
         );
     }
 

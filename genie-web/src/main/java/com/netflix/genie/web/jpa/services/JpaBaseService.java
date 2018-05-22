@@ -20,15 +20,22 @@ package com.netflix.genie.web.jpa.services;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.web.jpa.entities.ApplicationEntity;
+import com.netflix.genie.web.jpa.entities.ClusterEntity;
+import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.UniqueIdEntity;
+import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -45,19 +52,31 @@ class JpaBaseService {
 
     private final JpaTagPersistenceService tagPersistenceService;
     private final JpaFilePersistenceService filePersistenceService;
+    private final JpaApplicationRepository applicationRepository;
+    private final JpaClusterRepository clusterRepository;
+    private final JpaCommandRepository commandRepository;
 
     /**
      * Constructor.
      *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
+     * @param tagPersistenceService  The tag persistence service to use
+     * @param filePersistenceService The file persistence service to use
+     * @param applicationRepository  Application repository to use
+     * @param clusterRepository      Cluster repository to use
+     * @param commandRepository      Command repository to use
      */
     JpaBaseService(
         final JpaTagPersistenceService tagPersistenceService,
-        final JpaFilePersistenceService filePersistenceService
+        final JpaFilePersistenceService filePersistenceService,
+        final JpaApplicationRepository applicationRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
         this.tagPersistenceService = tagPersistenceService;
         this.filePersistenceService = filePersistenceService;
+        this.applicationRepository = applicationRepository;
+        this.clusterRepository = clusterRepository;
+        this.commandRepository = commandRepository;
     }
 
     /**
@@ -171,5 +190,38 @@ class JpaBaseService {
      */
     void setEntityTags(final Set<String> tags, final Consumer<Set<TagEntity>> tagsConsumer) {
         tagsConsumer.accept(this.createAndGetTagEntities(tags));
+    }
+
+    /**
+     * Retrieve an application entity. If this API is called within an active transaction the returned entity will
+     * remain attached to the persistence context, otherwise it will be detached and any modifications will be lost.
+     *
+     * @param id The id of the application to retrieve from the database
+     * @return The {@link ApplicationEntity} if a match for the {@code id} is found or {@link Optional#empty()}
+     */
+    Optional<ApplicationEntity> getApplicationEntity(@NotBlank(message = "No application id entered") final String id) {
+        return this.applicationRepository.findByUniqueId(id);
+    }
+
+    /**
+     * Retrieve a cluster entity. If this API is called within an active transaction the returned entity will
+     * remain attached to the persistence context, otherwise it will be detached and any modifications will be lost.
+     *
+     * @param id The id of the cluster to retrieve from the database
+     * @return The {@link ClusterEntity} if a match for the {@code id} is found or {@link Optional#empty()}
+     */
+    Optional<ClusterEntity> getClusterEntity(@NotBlank(message = "No cluster id entered") final String id) {
+        return this.clusterRepository.findByUniqueId(id);
+    }
+
+    /**
+     * Retrieve a command entity. If this API is called within an active transaction the returned entity will
+     * remain attached to the persistence context, otherwise it will be detached and any modifications will be lost.
+     *
+     * @param id The id of the command to retrieve from the database
+     * @return The {@link CommandEntity} if a match for the {@code id} is found or {@link Optional#empty()}
+     */
+    Optional<CommandEntity> getCommandEntity(@NotBlank(message = "No command id entered") final String id) {
+        return this.commandRepository.findByUniqueId(id);
     }
 }
