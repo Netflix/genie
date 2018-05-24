@@ -21,6 +21,8 @@ before_script:
 - mysql -u root -e 'create database genie;'
 - mysql -u root genie < genie-ddl/src/main/sql/mysql/3.0.1-schema.mysql.sql
 script: ./gradle/buildViaTravis.sh
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
