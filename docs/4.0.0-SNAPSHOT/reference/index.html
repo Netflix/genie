@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-05-23</span>
+<span id="revdate">2018-05-24</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4954,6 +4954,21 @@ to work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.min-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum time between checks for job completion in milliseconds. Must be greater than zero.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.max-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most cases is specified as part of the <code>Command</code> entity for a particular job.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.factor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.leader.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
 determined by Zookeeper or other mechanism via Spring</p></td>
@@ -6136,7 +6151,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-05-23 18:22:04 +00:00
+Last updated 2018-05-24 16:43:13 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
