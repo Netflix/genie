@@ -128,8 +128,8 @@ configure(javaProjects) {
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.3.RELEASE")
             dependency("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.1.RELEASE")
             dependencySet(group: "org.springframework.statemachine", version: "2.0.1.RELEASE") {
-              entry "spring-statemachine-core"
-              entry "spring-statemachine-test"
+                entry "spring-statemachine-core"
+                entry "spring-statemachine-test"
             }
         }
     }
@@ -306,54 +306,52 @@ configure(javaProjects) {
     }
 }
 
-task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
-    group = "Coverage Reports"
-    dependsOn javaProjects.test
-    additionalSourceDirs = files(javaProjects.sourceSets.main.allSource.srcDirs)
-    sourceDirectories = files(javaProjects.sourceSets.main.allSource.srcDirs)
-    classDirectories = files(javaProjects.sourceSets.main.output)
-    executionData = files(javaProjects.jacocoTestReport.executionData)
-    reports {
-        html.enabled = true
-        xml.enabled = true
-    }
-    onlyIf = {
-        true
-    }
-    doFirst {
-        executionData = files(
-                executionData.findAll {
-                    it.exists()
-                }
-        )
-    }
-    afterEvaluate {
-        // Exclude generated files from top-level coverage report
-        classDirectories = files(
-            classDirectories.files.collect {
-                fileTree(dir: it, exclude: [
-                  "**/com/netflix/genie/proto/**",
-                  "**/com/netflix/genie/web/jpa/entities/**",
-                ])
-            }
-        )
-    }
-}
-
 /**********************************
  * Coverage Tasks
  **********************************/
 
+task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    dependsOn javaProjects*.test
+
+    javaProjects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled = true
+        xml.destination new File("${buildDir}/reports/jacoco/report.xml")
+        html.enabled = true
+        html.destination new File("${buildDir}/reports/jacoco/html")
+        csv.enabled = false
+    }
+    afterEvaluate {
+        // Exclude generated files from top-level coverage report
+        classDirectories = files(
+                classDirectories.files.collect {
+                    fileTree(
+                            dir: it,
+                            exclude: [
+                                    "**/com/netflix/genie/proto/**",
+                                    "**/com/netflix/genie/web/jpa/entities/*_*",
+                            ]
+                    )
+                }
+        )
+    }
+}
+
 coveralls {
     sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "${project.buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    jacocoReportPath = "${project.buildDir}/reports/jacoco/report.xml"
 }
 
 tasks.coveralls {
     group = "Coverage reports"
     description = "Uploads the aggregated coverage report to Coveralls"
 
-    dependsOn jacocoRootReport
+    dependsOn codeCoverageReport
     onlyIf {
         System.env."CI"
     }
