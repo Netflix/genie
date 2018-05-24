@@ -103,4 +103,122 @@ class ClusterMetadataSpec extends Specification {
         clusterMetadata.getTags() == tags
         clusterMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
     }
+
+    def "Test equals"() {
+        def base = createClusterMetadata()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+        ).build()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ClusterStatus.UP
+        base = new ClusterMetadata.Builder(name, user, version, status).build()
+        comparable = new ClusterMetadata.Builder(name, user, version, status).build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        ClusterMetadata one
+        ClusterMetadata two
+
+        when:
+        one = createClusterMetadata()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createClusterMetadata()
+        two = createClusterMetadata()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ClusterStatus.OUT_OF_SERVICE
+        one = new ClusterMetadata.Builder(name, user, version, status).build()
+        two = new ClusterMetadata.Builder(name, user, version, status).build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "Test toString"() {
+        ClusterMetadata one
+        ClusterMetadata two
+
+        when:
+        one = createClusterMetadata()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createClusterMetadata()
+        two = createClusterMetadata()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ClusterStatus.TERMINATED
+        one = new ClusterMetadata.Builder(name, user, version, status).build()
+        two = new ClusterMetadata.Builder(name, user, version, status).build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    ClusterMetadata createClusterMetadata() {
+        return new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+        )
+                .withDescription(UUID.randomUUID().toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
+    }
 }

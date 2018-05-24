@@ -18,6 +18,7 @@
 package com.netflix.genie.common.internal.dto.v4
 
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.test.suppliers.RandomSuppliers
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -51,5 +52,110 @@ class AgentClientMetadataSpec extends Specification {
         clientMetadata.getHostname().orElse(UUID.randomUUID().toString()) == hostname
         clientMetadata.getVersion().orElse(UUID.randomUUID().toString()) == version
         clientMetadata.getPid().orElse(pid - 1) == pid
+    }
+
+    def "Test equals"() {
+        def base = createAgentClientMetadata()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new AgentClientMetadata(UUID.randomUUID().toString(), null, RandomSuppliers.INT.get())
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def host = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def port = RandomSuppliers.INT.get()
+        base = new AgentClientMetadata(host, version, port)
+        comparable = new AgentClientMetadata(host, version, port)
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        AgentClientMetadata one
+        AgentClientMetadata two
+
+        when:
+        one = createAgentClientMetadata()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createAgentClientMetadata()
+        two = createAgentClientMetadata()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def host = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def port = RandomSuppliers.INT.get()
+        one = new AgentClientMetadata(host, version, port)
+        two = new AgentClientMetadata(host, version, port)
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        AgentClientMetadata one
+        AgentClientMetadata two
+
+        when:
+        one = createAgentClientMetadata()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createAgentClientMetadata()
+        two = createAgentClientMetadata()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def host = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def port = RandomSuppliers.INT.get()
+        one = new AgentClientMetadata(host, version, port)
+        two = new AgentClientMetadata(host, version, port)
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    AgentClientMetadata createAgentClientMetadata() {
+        return new AgentClientMetadata(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                RandomSuppliers.INT.get()
+        )
     }
 }

@@ -78,4 +78,136 @@ class ExecutionResourceCriteriaSpec extends Specification {
         resourceCriteria.getCommandCriterion() == commandCriterion
         resourceCriteria.getApplicationIds() == Lists.newArrayList(validApplicationId)
     }
+
+    def "Test equals"() {
+        def base = createExecutionResourceCriteria()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = createExecutionResourceCriteria()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def clusterCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        def commandCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        def applicationId = UUID.randomUUID().toString()
+        base = new ExecutionResourceCriteria(
+                Lists.newArrayList(clusterCriterion),
+                commandCriterion,
+                Lists.newArrayList(applicationId)
+        )
+        comparable = new ExecutionResourceCriteria(
+                Lists.newArrayList(clusterCriterion),
+                commandCriterion,
+                Lists.newArrayList(applicationId)
+        )
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        ExecutionResourceCriteria one
+        ExecutionResourceCriteria two
+
+        when:
+        one = createExecutionResourceCriteria()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createExecutionResourceCriteria()
+        two = createExecutionResourceCriteria()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def clusterCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        def commandCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        def applicationId = UUID.randomUUID().toString()
+        one = new ExecutionResourceCriteria(
+                Lists.newArrayList(clusterCriterion),
+                commandCriterion,
+                Lists.newArrayList(applicationId)
+        )
+        two = new ExecutionResourceCriteria(
+                Lists.newArrayList(clusterCriterion),
+                commandCriterion,
+                Lists.newArrayList(applicationId)
+        )
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "Test toString"() {
+        ExecutionResourceCriteria one
+        ExecutionResourceCriteria two
+
+        when:
+        one = createExecutionResourceCriteria()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createExecutionResourceCriteria()
+        two = createExecutionResourceCriteria()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def clusterCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        def commandCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        def applicationId = UUID.randomUUID().toString()
+        one = new ExecutionResourceCriteria(
+                Lists.newArrayList(clusterCriterion),
+                commandCriterion,
+                Lists.newArrayList(applicationId)
+        )
+        two = new ExecutionResourceCriteria(
+                Lists.newArrayList(clusterCriterion),
+                commandCriterion,
+                Lists.newArrayList(applicationId)
+        )
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    ExecutionResourceCriteria createExecutionResourceCriteria() {
+        def clusterCriteria = Lists.newArrayList(
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        )
+
+        def commandCriterion = new Criterion.Builder().withStatus(CommandStatus.ACTIVE.toString()).build()
+        def applicationIds = Lists.newArrayList(UUID.randomUUID().toString())
+        return new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds)
+    }
 }

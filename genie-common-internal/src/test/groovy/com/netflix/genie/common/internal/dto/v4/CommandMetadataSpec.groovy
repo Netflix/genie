@@ -103,4 +103,122 @@ class CommandMetadataSpec extends Specification {
         commandMetadata.getTags() == tags
         commandMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
     }
+
+    def "Test equals"() {
+        def base = createCommandMetadata()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.DEPRECATED
+        ).build()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = CommandStatus.INACTIVE
+        base = new CommandMetadata.Builder(name, user, version, status).build()
+        comparable = new CommandMetadata.Builder(name, user, version, status).build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        CommandMetadata one
+        CommandMetadata two
+
+        when:
+        one = createCommandMetadata()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createCommandMetadata()
+        two = createCommandMetadata()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = CommandStatus.INACTIVE
+        one = new CommandMetadata.Builder(name, user, version, status).build()
+        two = new CommandMetadata.Builder(name, user, version, status).build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "Test toString"() {
+        CommandMetadata one
+        CommandMetadata two
+
+        when:
+        one = createCommandMetadata()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createCommandMetadata()
+        two = createCommandMetadata()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = CommandStatus.DEPRECATED
+        one = new CommandMetadata.Builder(name, user, version, status).build()
+        two = new CommandMetadata.Builder(name, user, version, status).build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    CommandMetadata createCommandMetadata() {
+        return new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.ACTIVE
+        )
+                .withDescription(UUID.randomUUID().toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
+    }
 }

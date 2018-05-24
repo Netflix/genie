@@ -170,4 +170,201 @@ class JobSpecificationSpec extends Specification {
         executionResource.getExecutionEnvironment().getConfigs() == configs
         executionResource.getExecutionEnvironment().getDependencies() == dependencies
     }
+
+    def "Test equals"() {
+        def base = createJobSpecification()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = createJobSpecification()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def commandArg = UUID.randomUUID().toString()
+        def job = Mock(JobSpecification.ExecutionResource)
+        def cluster = Mock(JobSpecification.ExecutionResource)
+        def command = Mock(JobSpecification.ExecutionResource)
+        def application = Mock(JobSpecification.ExecutionResource)
+        def environmentVariables = ImmutableMap.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def interactive = true
+        def jobDirectoryLocation = new File(UUID.randomUUID().toString())
+        base = new JobSpecification(
+                Lists.newArrayList(commandArg),
+                job,
+                cluster,
+                command,
+                Lists.newArrayList(application),
+                environmentVariables,
+                interactive,
+                jobDirectoryLocation
+        )
+        comparable = new JobSpecification(
+                Lists.newArrayList(commandArg),
+                job,
+                cluster,
+                command,
+                Lists.newArrayList(application),
+                environmentVariables,
+                interactive,
+                jobDirectoryLocation
+        )
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        JobSpecification one
+        JobSpecification two
+
+        when:
+        one = createJobSpecification()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createJobSpecification()
+        two = createJobSpecification()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def commandArg = UUID.randomUUID().toString()
+        def job = Mock(JobSpecification.ExecutionResource)
+        def cluster = Mock(JobSpecification.ExecutionResource)
+        def command = Mock(JobSpecification.ExecutionResource)
+        def application = Mock(JobSpecification.ExecutionResource)
+        def environmentVariables = ImmutableMap.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def interactive = true
+        def jobDirectoryLocation = new File(UUID.randomUUID().toString())
+        one = new JobSpecification(
+                Lists.newArrayList(commandArg),
+                job,
+                cluster,
+                command,
+                Lists.newArrayList(application),
+                environmentVariables,
+                interactive,
+                jobDirectoryLocation
+        )
+        two = new JobSpecification(
+                Lists.newArrayList(commandArg),
+                job,
+                cluster,
+                command,
+                Lists.newArrayList(application),
+                environmentVariables,
+                interactive,
+                jobDirectoryLocation
+        )
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        JobSpecification one
+        JobSpecification two
+
+        when:
+        one = createJobSpecification()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createJobSpecification()
+        two = createJobSpecification()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def commandArg = UUID.randomUUID().toString()
+        def job = Mock(JobSpecification.ExecutionResource)
+        def cluster = Mock(JobSpecification.ExecutionResource)
+        def command = Mock(JobSpecification.ExecutionResource)
+        def application = Mock(JobSpecification.ExecutionResource)
+        def environmentVariables = ImmutableMap.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def interactive = true
+        def jobDirectoryLocation = new File(UUID.randomUUID().toString())
+        one = new JobSpecification(
+                Lists.newArrayList(commandArg),
+                job,
+                cluster,
+                command,
+                Lists.newArrayList(application),
+                environmentVariables,
+                interactive,
+                jobDirectoryLocation
+        )
+        two = new JobSpecification(
+                Lists.newArrayList(commandArg),
+                job,
+                cluster,
+                command,
+                Lists.newArrayList(application),
+                environmentVariables,
+                interactive,
+                jobDirectoryLocation
+        )
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    JobSpecification createJobSpecification() {
+        def jobId = UUID.randomUUID().toString()
+        def clusterId = UUID.randomUUID().toString()
+        def commandId = UUID.randomUUID().toString()
+        def applicationId = UUID.randomUUID().toString()
+
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def job = new JobSpecification.ExecutionResource(jobId, new ExecutionEnvironment(null, null, null))
+        def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
+        def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
+        def applications = Lists.newArrayList(
+                new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
+        )
+        ImmutableMap<String, String> environmentVariables = ImmutableMap.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def jobDirectoryLocation = new File(".")
+
+        return new JobSpecification(
+                commandArgs,
+                job,
+                cluster,
+                command,
+                applications,
+                environmentVariables,
+                false,
+                jobDirectoryLocation
+        )
+    }
 }

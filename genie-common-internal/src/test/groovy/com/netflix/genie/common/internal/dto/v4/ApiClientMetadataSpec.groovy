@@ -49,4 +49,105 @@ class ApiClientMetadataSpec extends Specification {
         clientMetadata.getHostname().orElse(UUID.randomUUID().toString()) == hostname
         clientMetadata.getUserAgent().orElse(UUID.randomUUID().toString()) == userAgent
     }
+
+    def "Test equals"() {
+        def base = createApiClientMetadata()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new ApiClientMetadata(UUID.randomUUID().toString(), null)
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def host = UUID.randomUUID().toString()
+        def userAgent = UUID.randomUUID().toString()
+        base = new ApiClientMetadata(host, userAgent)
+        comparable = new ApiClientMetadata(host, userAgent)
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        ApiClientMetadata one
+        ApiClientMetadata two
+
+        when:
+        one = createApiClientMetadata()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createApiClientMetadata()
+        two = createApiClientMetadata()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def host = UUID.randomUUID().toString()
+        def userAgent = UUID.randomUUID().toString()
+        one = new ApiClientMetadata(host, userAgent)
+        two = new ApiClientMetadata(host, userAgent)
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        ApiClientMetadata one
+        ApiClientMetadata two
+
+        when:
+        one = createApiClientMetadata()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createApiClientMetadata()
+        two = createApiClientMetadata()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def host = UUID.randomUUID().toString()
+        def userAgent = UUID.randomUUID().toString()
+        one = new ApiClientMetadata(host, userAgent)
+        two = new ApiClientMetadata(host, userAgent)
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    ApiClientMetadata createApiClientMetadata() {
+        return new ApiClientMetadata(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+    }
 }
