@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.test.suppliers.RandomSuppliers
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -302,5 +303,150 @@ class JobRequestSpec extends Specification {
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
+    }
+
+    def "Test equals"() {
+        def base = createJobRequest()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = createJobRequest()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def jobMetadata = Mock(JobMetadata)
+        def criteria = Mock(ExecutionResourceCriteria)
+        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder().build()
+        def agentConfigRequest = new AgentConfigRequest.Builder().build()
+        base = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest)
+        comparable = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest)
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        JobRequest one
+        JobRequest two
+
+        when:
+        one = createJobRequest()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createJobRequest()
+        two = createJobRequest()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def jobMetadata = Mock(JobMetadata)
+        def criteria = Mock(ExecutionResourceCriteria)
+        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder().build()
+        def agentConfigRequest = new AgentConfigRequest.Builder().build()
+        one = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest)
+        two = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest)
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        JobRequest one
+        JobRequest two
+
+        when:
+        one = createJobRequest()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createJobRequest()
+        two = createJobRequest()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def jobMetadata = Mock(JobMetadata)
+        def criteria = Mock(ExecutionResourceCriteria)
+        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder().build()
+        def agentConfigRequest = new AgentConfigRequest.Builder().build()
+        one = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest)
+        two = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest)
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    JobRequest createJobRequest() {
+        def metadata = new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build()
+        def criteria = new ExecutionResourceCriteria(
+                Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+                null
+        )
+        def requestedId = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def timeout = RandomSuppliers.INT.get()
+        def interactive = true
+        def archivingDisabled = true
+        def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        def jobDirectoryLocation = "/tmp"
+        def requestedEnvironmentVariables = ImmutableMap.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def requestedAgentEnvironment = new AgentEnvironmentRequest.Builder()
+                .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+                .withRequestedJobCpu(RandomSuppliers.INT.get())
+                .withRequestedJobMemory(RandomSuppliers.INT.get())
+                .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
+        def requestedAgentConfig = new AgentConfigRequest.Builder()
+                .withArchivingDisabled(archivingDisabled)
+                .withTimeoutRequested(timeout)
+                .withInteractive(interactive)
+                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+                .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
+
+        return new JobRequest(
+                requestedId,
+                jobResources,
+                commandArgs,
+                metadata,
+                criteria,
+                requestedAgentEnvironment,
+                requestedAgentConfig
+        )
     }
 }

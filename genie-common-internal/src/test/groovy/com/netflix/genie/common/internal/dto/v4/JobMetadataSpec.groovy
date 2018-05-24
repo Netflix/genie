@@ -124,4 +124,197 @@ class JobMetadataSpec extends Specification {
         !jobUserMetadata.getGrouping().isPresent()
         !jobUserMetadata.getGroupingInstance().isPresent()
     }
+
+    def "Test equals"() {
+        def base = createJobMetadata()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = createJobMetadata()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def description = UUID.randomUUID().toString()
+        def tag = UUID.randomUUID().toString()
+        def metadataJson = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def metadata = GenieObjectMapper.mapper.readTree(metadataJson)
+        def group = UUID.randomUUID().toString()
+        def email = UUID.randomUUID().toString() + "@" + UUID.randomUUID().toString() + ".com"
+        def grouping = UUID.randomUUID().toString()
+        def groupingInstance = UUID.randomUUID().toString()
+        base = new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withTags(Sets.newHashSet(tag))
+                .withMetadata(metadata)
+                .withGroup(group)
+                .withEmail(email)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build()
+        comparable = new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withTags(Sets.newHashSet(tag))
+                .withMetadata(metadata)
+                .withGroup(group)
+                .withEmail(email)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        JobMetadata one
+        JobMetadata two
+
+        when:
+        one = createJobMetadata()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createJobMetadata()
+        two = createJobMetadata()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def description = UUID.randomUUID().toString()
+        def tag = UUID.randomUUID().toString()
+        def metadataJson = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def metadata = GenieObjectMapper.mapper.readTree(metadataJson)
+        def group = UUID.randomUUID().toString()
+        def email = UUID.randomUUID().toString() + "@" + UUID.randomUUID().toString() + ".com"
+        def grouping = UUID.randomUUID().toString()
+        def groupingInstance = UUID.randomUUID().toString()
+        one = new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withTags(Sets.newHashSet(tag))
+                .withMetadata(metadata)
+                .withGroup(group)
+                .withEmail(email)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build()
+        two = new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withTags(Sets.newHashSet(tag))
+                .withMetadata(metadata)
+                .withGroup(group)
+                .withEmail(email)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "test toString"() {
+        JobMetadata one
+        JobMetadata two
+
+        when:
+        one = createJobMetadata()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createJobMetadata()
+        two = createJobMetadata()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def description = UUID.randomUUID().toString()
+        def tag = UUID.randomUUID().toString()
+        def metadataJson = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def metadata = GenieObjectMapper.mapper.readTree(metadataJson)
+        def group = UUID.randomUUID().toString()
+        def email = UUID.randomUUID().toString() + "@" + UUID.randomUUID().toString() + ".com"
+        def grouping = UUID.randomUUID().toString()
+        def groupingInstance = UUID.randomUUID().toString()
+        one = new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withTags(Sets.newHashSet(tag))
+                .withMetadata(metadata)
+                .withGroup(group)
+                .withEmail(email)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build()
+        two = new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withTags(Sets.newHashSet(tag))
+                .withMetadata(metadata)
+                .withGroup(group)
+                .withEmail(email)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    JobMetadata createJobMetadata() {
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def description = UUID.randomUUID().toString()
+        def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def metadataJson = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def metadata = GenieObjectMapper.mapper.readTree(metadataJson)
+        def group = UUID.randomUUID().toString()
+        def email = UUID.randomUUID().toString() + "@" + UUID.randomUUID().toString() + ".com"
+        def grouping = UUID.randomUUID().toString()
+        def groupingInstance = UUID.randomUUID().toString()
+
+        return new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withTags(tags)
+                .withMetadata(metadata)
+                .withGroup(group)
+                .withEmail(email)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build()
+    }
 }

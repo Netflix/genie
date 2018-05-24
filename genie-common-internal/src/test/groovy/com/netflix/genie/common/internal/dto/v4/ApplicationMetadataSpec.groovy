@@ -112,4 +112,123 @@ class ApplicationMetadataSpec extends Specification {
         applicationMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
         !applicationMetadata.getType().isPresent()
     }
+
+    def "Test equals"() {
+        def base = createApplicationMetadata()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new ApplicationMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ApplicationStatus.ACTIVE
+        ).build()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.DEPRECATED
+        base = new ApplicationMetadata.Builder(name, user, version, status).build()
+        comparable = new ApplicationMetadata.Builder(name, user, version, status).build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        ApplicationMetadata one
+        ApplicationMetadata two
+
+        when:
+        one = createApplicationMetadata()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createApplicationMetadata()
+        two = createApplicationMetadata()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.DEPRECATED
+        one = new ApplicationMetadata.Builder(name, user, version, status).build()
+        two = new ApplicationMetadata.Builder(name, user, version, status).build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        ApplicationMetadata one
+        ApplicationMetadata two
+
+        when:
+        one = createApplicationMetadata()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createApplicationMetadata()
+        two = createApplicationMetadata()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.DEPRECATED
+        one = new ApplicationMetadata.Builder(name, user, version, status).build()
+        two = new ApplicationMetadata.Builder(name, user, version, status).build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    ApplicationMetadata createApplicationMetadata() {
+        return new ApplicationMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ApplicationStatus.ACTIVE
+        )
+                .withDescription(UUID.randomUUID().toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .withType(UUID.randomUUID().toString())
+                .build()
+    }
 }

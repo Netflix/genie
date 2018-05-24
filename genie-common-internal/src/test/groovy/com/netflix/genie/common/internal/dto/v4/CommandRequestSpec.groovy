@@ -20,6 +20,7 @@ package com.netflix.genie.common.internal.dto.v4
 import com.google.common.collect.Lists
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.test.suppliers.RandomSuppliers
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -92,5 +93,133 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         request.getMemory().orElse(-1) == memory
         request.getCheckDelay().orElse(null) == checkDelay
+    }
+
+    def "Test equals"() {
+        def base = createCommandRequest()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new CommandRequest.Builder(Mock(CommandMetadata), Lists.newArrayList(UUID.randomUUID().toString()))
+                .withRequestedId(UUID.randomUUID().toString())
+                .toString()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = CommandStatus.INACTIVE
+        def binary = UUID.randomUUID().toString()
+        def baseMetadata = new CommandMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new CommandMetadata.Builder(name, user, version, status).build()
+        base = new CommandRequest.Builder(baseMetadata, Lists.newArrayList(binary)).build()
+        comparable = new CommandRequest.Builder(comparableMetadata, Lists.newArrayList(binary)).build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        CommandRequest one
+        CommandRequest two
+
+        when:
+        one = createCommandRequest()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createCommandRequest()
+        two = createCommandRequest()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = CommandStatus.INACTIVE
+        def binary = UUID.randomUUID().toString()
+        def baseMetadata = new CommandMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new CommandMetadata.Builder(name, user, version, status).build()
+        one = new CommandRequest.Builder(baseMetadata, Lists.newArrayList(binary)).build()
+        two = new CommandRequest.Builder(comparableMetadata, Lists.newArrayList(binary)).build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        CommandRequest one
+        CommandRequest two
+
+        when:
+        one = createCommandRequest()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createCommandRequest()
+        two = createCommandRequest()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = CommandStatus.INACTIVE
+        def binary = UUID.randomUUID().toString()
+        def baseMetadata = new CommandMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new CommandMetadata.Builder(name, user, version, status).build()
+        one = new CommandRequest.Builder(baseMetadata, Lists.newArrayList(binary)).build()
+        two = new CommandRequest.Builder(comparableMetadata, Lists.newArrayList(binary)).build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    CommandRequest createCommandRequest() {
+        def metadata = new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.ACTIVE
+        ).build()
+        def requestedId = UUID.randomUUID().toString()
+        def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        return new CommandRequest.Builder(metadata, Lists.newArrayList(UUID.randomUUID().toString()))
+                .withRequestedId(requestedId)
+                .withResources(resources)
+                .withMemory(RandomSuppliers.INT.get())
+                .withCheckDelay(RandomSuppliers.LONG.get())
+                .build()
     }
 }

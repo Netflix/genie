@@ -18,6 +18,7 @@
 package com.netflix.genie.common.internal.dto.v4
 
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.test.suppliers.RandomSuppliers
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -59,5 +60,114 @@ class JobRequestMetadataSpec extends Specification {
         jobRequestMetadata.getAgentClientMetadata().orElse(null) == agentClientMetadata
         jobRequestMetadata.getNumAttachments() == numAttachments
         jobRequestMetadata.getTotalSizeOfAttachments() == totalSizeOfAttachments
+    }
+
+    def "Test equals"() {
+        def base = createJobRequestMetadata()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = createJobRequestMetadata()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def apiClientMetadata = Mock(ApiClientMetadata)
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def numAttachments = RandomSuppliers.INT.get()
+        def sizeAttachments = RandomSuppliers.LONG.get()
+        base = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+        comparable = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        JobRequestMetadata one
+        JobRequestMetadata two
+
+        when:
+        one = createJobRequestMetadata()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createJobRequestMetadata()
+        two = createJobRequestMetadata()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def apiClientMetadata = Mock(ApiClientMetadata)
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def numAttachments = RandomSuppliers.INT.get()
+        def sizeAttachments = RandomSuppliers.LONG.get()
+        one = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+        two = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "test toString"() {
+        JobRequestMetadata one
+        JobRequestMetadata two
+
+        when:
+        one = createJobRequestMetadata()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createJobRequestMetadata()
+        two = createJobRequestMetadata()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def apiClientMetadata = Mock(ApiClientMetadata)
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def numAttachments = RandomSuppliers.INT.get()
+        def sizeAttachments = RandomSuppliers.LONG.get()
+        one = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+        two = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    JobRequestMetadata createJobRequestMetadata() {
+        return new JobRequestMetadata(
+                Mock(ApiClientMetadata),
+                Mock(AgentClientMetadata),
+                RandomSuppliers.INT.get(),
+                RandomSuppliers.LONG.get()
+        )
     }
 }

@@ -72,8 +72,8 @@ public class JobSpecification {
         @JsonProperty(value = "command", required = true) final ExecutionResource command,
         @JsonProperty("applications") @Nullable final List<ExecutionResource> applications,
         @JsonProperty("environmentVariables") @Nullable final Map<String, String> environmentVariables,
-        @JsonProperty("interactive") final boolean interactive,
-        @JsonProperty("jobDirectoryLocation") final File jobDirectoryLocation
+        @JsonProperty(value = "interactive", required = true) final boolean interactive,
+        @JsonProperty(value = "jobDirectoryLocation", required = true) final File jobDirectoryLocation
     ) {
         this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(
             commandArgs

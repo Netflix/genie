@@ -69,4 +69,126 @@ class ApplicationRequestSpec extends Specification {
         !request.getRequestedId().isPresent()
         request.getResources() != null
     }
+
+    def "Test equals"() {
+        def base = createApplicationRequest()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new ApplicationRequest.Builder(Mock(ApplicationMetadata))
+                .withRequestedId(UUID.randomUUID().toString())
+                .toString()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.INACTIVE
+        def baseMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        base = new ApplicationRequest.Builder(baseMetadata).build()
+        comparable = new ApplicationRequest.Builder(comparableMetadata).build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        ApplicationRequest one
+        ApplicationRequest two
+
+        when:
+        one = createApplicationRequest()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createApplicationRequest()
+        two = createApplicationRequest()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.INACTIVE
+        def baseMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        one = new ApplicationRequest.Builder(baseMetadata).build()
+        two = new ApplicationRequest.Builder(comparableMetadata).build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        ApplicationRequest one
+        ApplicationRequest two
+
+        when:
+        one = createApplicationRequest()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createApplicationRequest()
+        two = createApplicationRequest()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.DEPRECATED
+        def baseMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        one = new ApplicationRequest.Builder(baseMetadata).build()
+        two = new ApplicationRequest.Builder(comparableMetadata).build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    ApplicationRequest createApplicationRequest() {
+        def metadata = new ApplicationMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ApplicationStatus.INACTIVE
+        )
+                .withType(UUID.randomUUID().toString())
+                .build()
+        def requestedId = UUID.randomUUID().toString()
+        def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        return new ApplicationRequest.Builder(metadata).withRequestedId(requestedId).withResources(resources).build()
+    }
 }

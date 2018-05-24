@@ -69,4 +69,124 @@ class ClusterRequestSpec extends Specification {
         !request.getRequestedId().isPresent()
         request.getResources() != null
     }
+
+    def "Test equals"() {
+        def base = createClusterRequest()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new ClusterRequest.Builder(Mock(ClusterMetadata))
+                .withRequestedId(UUID.randomUUID().toString())
+                .toString()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ClusterStatus.OUT_OF_SERVICE
+        def baseMetadata = new ClusterMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ClusterMetadata.Builder(name, user, version, status).build()
+        base = new ClusterRequest.Builder(baseMetadata).build()
+        comparable = new ClusterRequest.Builder(comparableMetadata).build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        ClusterRequest one
+        ClusterRequest two
+
+        when:
+        one = createClusterRequest()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createClusterRequest()
+        two = createClusterRequest()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ClusterStatus.OUT_OF_SERVICE
+        def baseMetadata = new ClusterMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ClusterMetadata.Builder(name, user, version, status).build()
+        one = new ClusterRequest.Builder(baseMetadata).build()
+        two = new ClusterRequest.Builder(comparableMetadata).build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        ClusterRequest one
+        ClusterRequest two
+
+        when:
+        one = createClusterRequest()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createClusterRequest()
+        two = createClusterRequest()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ClusterStatus.OUT_OF_SERVICE
+        def baseMetadata = new ClusterMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ClusterMetadata.Builder(name, user, version, status).build()
+        one = new ClusterRequest.Builder(baseMetadata).build()
+        two = new ClusterRequest.Builder(comparableMetadata).build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    ClusterRequest createClusterRequest() {
+        def metadata = new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+        ).build()
+        def requestedId = UUID.randomUUID().toString()
+        def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        return new ClusterRequest.Builder(metadata).withRequestedId(requestedId).withResources(resources).build()
+    }
 }

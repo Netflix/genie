@@ -84,4 +84,109 @@ class ExecutionEnvironmentSpec extends Specification {
         environment.getConfigs().isEmpty()
         environment.getDependencies().isEmpty()
     }
+
+    def "Test equals"() {
+        def base = createExecutionEnvironment()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = createExecutionEnvironment()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def config = UUID.randomUUID().toString()
+        def dependency = UUID.randomUUID().toString()
+        def setupFile = UUID.randomUUID().toString()
+        base = new ExecutionEnvironment(Sets.newHashSet(config), Sets.newHashSet(dependency), setupFile)
+        comparable = new ExecutionEnvironment(Sets.newHashSet(config), Sets.newHashSet(dependency), setupFile)
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        ExecutionEnvironment one
+        ExecutionEnvironment two
+
+        when:
+        one = createExecutionEnvironment()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createExecutionEnvironment()
+        two = createExecutionEnvironment()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def config = UUID.randomUUID().toString()
+        def dependency = UUID.randomUUID().toString()
+        def setupFile = UUID.randomUUID().toString()
+        one = new ExecutionEnvironment(Sets.newHashSet(config), Sets.newHashSet(dependency), setupFile)
+        two = new ExecutionEnvironment(Sets.newHashSet(config), Sets.newHashSet(dependency), setupFile)
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "Test toString"() {
+        ExecutionEnvironment one
+        ExecutionEnvironment two
+
+        when:
+        one = createExecutionEnvironment()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createExecutionEnvironment()
+        two = createExecutionEnvironment()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def config = UUID.randomUUID().toString()
+        def dependency = UUID.randomUUID().toString()
+        def setupFile = UUID.randomUUID().toString()
+        one = new ExecutionEnvironment(Sets.newHashSet(config), Sets.newHashSet(dependency), setupFile)
+        two = new ExecutionEnvironment(Sets.newHashSet(config), Sets.newHashSet(dependency), setupFile)
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    ExecutionEnvironment createExecutionEnvironment() {
+        return new ExecutionEnvironment(
+                Sets.newHashSet(UUID.randomUUID().toString()),
+                Sets.newHashSet(UUID.randomUUID().toString()),
+                UUID.randomUUID().toString()
+        )
+    }
 }

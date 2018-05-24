@@ -198,4 +198,159 @@ class CriterionSpec extends Specification {
         !criterion.getStatus().isPresent()
         criterion.getTags() == Sets.newHashSet("valid tag")
     }
+
+    def "Test equals"() {
+        def base = createCriterion()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new Criterion.Builder()
+                .withName(UUID.randomUUID().toString())
+                .withStatus(UUID.randomUUID().toString())
+                .withVersion(UUID.randomUUID().toString())
+                .withId(UUID.randomUUID().toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def status = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def id = UUID.randomUUID().toString()
+        def tag = UUID.randomUUID().toString()
+        base = new Criterion.Builder()
+                .withName(name)
+                .withStatus(status)
+                .withVersion(version)
+                .withId(id)
+                .withTags(Sets.newHashSet(tag))
+                .build()
+        comparable = new Criterion.Builder()
+                .withName(name)
+                .withStatus(status)
+                .withVersion(version)
+                .withId(id)
+                .withTags(Sets.newHashSet(tag))
+                .build()
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        Criterion one
+        Criterion two
+
+        when:
+        one = createCriterion()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createCriterion()
+        two = createCriterion()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def status = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def id = UUID.randomUUID().toString()
+        def tag = UUID.randomUUID().toString()
+        one = new Criterion.Builder()
+                .withName(name)
+                .withStatus(status)
+                .withVersion(version)
+                .withId(id)
+                .withTags(Sets.newHashSet(tag))
+                .build()
+        two = new Criterion.Builder()
+                .withName(name)
+                .withStatus(status)
+                .withVersion(version)
+                .withId(id)
+                .withTags(Sets.newHashSet(tag))
+                .build()
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "Test toString"() {
+        Criterion one
+        Criterion two
+
+        when:
+        one = createCriterion()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createCriterion()
+        two = createCriterion()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def status = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def id = UUID.randomUUID().toString()
+        def tag = UUID.randomUUID().toString()
+        one = new Criterion.Builder()
+                .withName(name)
+                .withStatus(status)
+                .withVersion(version)
+                .withId(id)
+                .withTags(Sets.newHashSet(tag))
+                .build()
+        two = new Criterion.Builder()
+                .withName(name)
+                .withStatus(status)
+                .withVersion(version)
+                .withId(id)
+                .withTags(Sets.newHashSet(tag))
+                .build()
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    Criterion createCriterion() {
+        return new Criterion.Builder()
+                .withName(UUID.randomUUID().toString())
+                .withStatus(UUID.randomUUID().toString())
+                .withVersion(UUID.randomUUID().toString())
+                .withId(UUID.randomUUID().toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+    }
 }

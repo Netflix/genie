@@ -80,4 +80,141 @@ class ApplicationSpec extends Specification {
         application.getResources() == new ExecutionEnvironment(null, null, null)
         application.getMetadata() == metadata
     }
+
+    def "Test equals"() {
+        def base = createApplication()
+        Object comparable
+
+        when:
+        comparable = base
+
+        then:
+        base == comparable
+
+        when:
+        comparable = null
+
+        then:
+        base != comparable
+
+        when:
+        comparable = new Application(
+                UUID.randomUUID().toString(),
+                Instant.now(),
+                Instant.now(),
+                Mock(ExecutionEnvironment),
+                Mock(ApplicationMetadata)
+        )
+
+        then:
+        base != comparable
+
+        when:
+        comparable = "I'm definitely not the right type of object"
+
+        then:
+        base != comparable
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.INACTIVE
+        def id = UUID.randomUUID().toString()
+        def created = Instant.now()
+        def updated = Instant.now()
+        def baseMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        base = new Application(id, created, updated, null, baseMetadata)
+        comparable = new Application(id, created, updated, null, comparableMetadata)
+
+        then:
+        base == comparable
+    }
+
+    def "Test hashCode"() {
+        Application one
+        Application two
+
+        when:
+        one = createApplication()
+        two = one
+
+        then:
+        one.hashCode() == two.hashCode()
+
+        when:
+        one = createApplication()
+        two = createApplication()
+
+        then:
+        one.hashCode() != two.hashCode()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.INACTIVE
+        def id = UUID.randomUUID().toString()
+        def created = Instant.now()
+        def updated = Instant.now()
+        def baseMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        one = new Application(id, created, updated, null, baseMetadata)
+        two = new Application(id, created, updated, null, comparableMetadata)
+
+        then:
+        one.hashCode() == two.hashCode()
+    }
+
+    def "toString is consistent"() {
+        Application one
+        Application two
+
+        when:
+        one = createApplication()
+        two = one
+
+        then:
+        one.toString() == two.toString()
+
+        when:
+        one = createApplication()
+        two = createApplication()
+
+        then:
+        one.toString() != two.toString()
+
+        when:
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.INACTIVE
+        def id = UUID.randomUUID().toString()
+        def created = Instant.now()
+        def updated = Instant.now()
+        def baseMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        def comparableMetadata = new ApplicationMetadata.Builder(name, user, version, status).build()
+        one = new Application(id, created, updated, null, baseMetadata)
+        two = new Application(id, created, updated, null, comparableMetadata)
+
+        then:
+        one.toString() == two.toString()
+    }
+
+    Application createApplication() {
+        def metadata = new ApplicationMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ApplicationStatus.INACTIVE
+        )
+                .withType(UUID.randomUUID().toString())
+                .build()
+        def id = UUID.randomUUID().toString()
+        def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        def created = Instant.now()
+        def updated = Instant.now()
+        return new Application(id, created, updated, resources, metadata)
+    }
 }
