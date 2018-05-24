@@ -19,7 +19,6 @@
 package com.netflix.genie.agent.rpc;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
-import com.netflix.genie.proto.AgentRegistrationServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.PingServiceGrpc;
 import io.grpc.ManagedChannel;
@@ -56,14 +55,6 @@ class GrpcConfig {
         final ManagedChannel channel
     ) {
         return PingServiceGrpc.newFutureStub(channel);
-    }
-
-    @Bean
-    @Scope("prototype")
-    AgentRegistrationServiceGrpc.AgentRegistrationServiceFutureStub agentRegistrationClient(
-        final ManagedChannel channel
-    ) {
-        return AgentRegistrationServiceGrpc.newFutureStub(channel);
     }
 
     @Bean

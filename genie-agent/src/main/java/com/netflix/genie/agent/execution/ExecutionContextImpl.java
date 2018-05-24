@@ -49,7 +49,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @ThreadSafe
 class ExecutionContextImpl implements ExecutionContext {
 
-    private final AtomicReference<String> agentIdRef = new AtomicReference<>();
     private final AtomicReference<Process> jobProcessRef = new AtomicReference<>();
     private final AtomicReference<File> jobDirectoryRef = new AtomicReference<>();
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
@@ -59,22 +58,6 @@ class ExecutionContextImpl implements ExecutionContext {
     private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors = Lists.newArrayList();
 
     ExecutionContextImpl() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setAgentId(@NotBlank final String agentId) {
-        setIfNullOrTrow(agentId, agentIdRef);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getAgentId() {
-        return agentIdRef.get();
     }
 
     /**

@@ -31,24 +31,6 @@ message PongResponse {
     map<string, string> server_metadata = 3;
 }
 
-//
-service AgentRegistrationService {
-    rpc registerAgent (AgentRegistrationRequest) returns (AgentRegistrationResponse);
-}
-
-message AgentRegistrationRequest {
-    string agent_version = 1;
-    string agent_hostname = 2;
-    string agent_pid = 3;
-}
-
-message AgentRegistrationResponse {
-    string server_hostname = 1;
-    string agent_id = 2;
-    bool agent_accepted = 3;
-    string server_message = 4;
-}
-
 // Job Service
 service JobService {
     rpc reserveJobId (ReserveJobIdRequest) returns (ReserveJobIdResponse);

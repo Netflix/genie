@@ -45,7 +45,6 @@ class ExecutionContextImplSpec extends Specification {
         StateAction action2 = Mock(StateAction.LaunchJob)
 
         expect:
-        null == executionContext.getAgentId()
         null == executionContext.getJobProcess()
         null == executionContext.getJobDirectory()
         null == executionContext.getJobSpecification()
@@ -56,7 +55,6 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.getCleanupActions().isEmpty()
 
         when:
-        executionContext.setAgentId(agentId)
         executionContext.setJobProcess(process)
         executionContext.setJobDirectory(directory)
         executionContext.setJobSpecification(spec)
@@ -66,7 +64,6 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.addCleanupActions(action1)
 
         then:
-        agentId == executionContext.getAgentId()
         process == executionContext.getJobProcess()
         directory == executionContext.getJobDirectory()
         spec == executionContext.getJobSpecification()
@@ -77,12 +74,6 @@ class ExecutionContextImplSpec extends Specification {
         Triple.of(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception) == executionContext.getStateActionErrors().get(0)
         1 == executionContext.getCleanupActions().size()
         action1 == executionContext.getCleanupActions().get(0)
-
-        when:
-        executionContext.setAgentId("bar")
-
-        then:
-        thrown(RuntimeException)
 
         when:
         executionContext.setJobProcess(Mock(Process))

@@ -42,21 +42,6 @@ import java.util.Map;
 public interface ExecutionContext {
 
     /**
-     * Set the unique agent identifier obtained by the server.
-     *
-     * @param agentId a non-blank string
-     * @throws RuntimeException if the agent id is already set
-     */
-    void setAgentId(@NotBlank final String agentId);
-
-    /**
-     * Get the agent identifier.
-     *
-     * @return a non-blank string if the agent identifier was set, or null.
-     */
-    @Nullable String getAgentId();
-
-    /**
      * Set the job process once it has been launched.
      *
      * @param jobProcess a process handle for the children job
