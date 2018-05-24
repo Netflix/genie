@@ -1,7 +1,6 @@
 package com.netflix.genie.agent.rpc;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
-import com.netflix.genie.proto.AgentRegistrationServiceGrpc;
 import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.test.categories.IntegrationTest;
 import io.grpc.ManagedChannel;
@@ -32,10 +31,6 @@ public class GrpcConfigTest {
     private PingServiceGrpc.PingServiceFutureStub pingServiceClient1;
     @Autowired
     private PingServiceGrpc.PingServiceFutureStub pingServiceClient2;
-    @Autowired
-    private AgentRegistrationServiceGrpc.AgentRegistrationServiceFutureStub agentRegistrationServiceClient1;
-    @Autowired
-    private AgentRegistrationServiceGrpc.AgentRegistrationServiceFutureStub agentRegistrationServiceClient2;
 
     /**
      * Check that channel is a singleton.
@@ -57,17 +52,6 @@ public class GrpcConfigTest {
         Assert.assertNotNull(pingServiceClient1);
         Assert.assertNotNull(pingServiceClient2);
         Assert.assertTrue(pingServiceClient1 != pingServiceClient2);
-    }
-
-    /**
-     * Check that clients are not singletons.
-     * @throws Exception exception
-     */
-    @Test
-    public void agentRegistrationServiceClient() throws Exception {
-        Assert.assertNotNull(agentRegistrationServiceClient1);
-        Assert.assertNotNull(agentRegistrationServiceClient2);
-        Assert.assertTrue(agentRegistrationServiceClient1 != agentRegistrationServiceClient2);
     }
 }
 
