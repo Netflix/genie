@@ -17,13 +17,20 @@
  */
 package com.netflix.genie.common.util;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.google.common.annotations.VisibleForTesting;
 
+import java.io.IOException;
 import java.text.FieldPosition;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Optional;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  * The date format used by Genie.
@@ -34,6 +41,11 @@ import java.util.TimeZone;
  */
 public class GenieDateFormat extends StdDateFormat {
 
+    /**
+     * Pattern to validate (e.g., in tests) the expected date format this class produces.
+     */
+    @VisibleForTesting
+    public static final Pattern VALID_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$");
     private static final TimeZone TIMEZONE = TimeZone.getTimeZone("UTC");
 
     /**
@@ -64,5 +76,28 @@ public class GenieDateFormat extends StdDateFormat {
                 calendar.get(Calendar.MILLISECOND)
             )
         );
+    }
+
+    /**
+     * JsonSerializer to output (Optional) Date using GenieDateFormat.
+     *
+     * @since 3.3.11
+     */
+    public static class OptionalDateJsonSerializer extends JsonSerializer<Optional<Date>> {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void serialize(
+            final Optional<Date> optionalDate,
+            final JsonGenerator gen,
+            final SerializerProvider serializers
+        ) throws IOException {
+            if (optionalDate.isPresent()) {
+                gen.writeString(new GenieDateFormat().format(optionalDate.get()));
+            } else {
+                gen.writeNull();
+            }
+        }
     }
 }
