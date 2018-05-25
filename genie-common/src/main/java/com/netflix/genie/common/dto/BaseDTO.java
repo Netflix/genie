@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.netflix.genie.common.util.GenieDateFormat;
 import lombok.EqualsAndHashCode;
@@ -50,7 +51,9 @@ public abstract class BaseDTO implements Serializable {
 
     @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String id;
+    @JsonSerialize(using = GenieDateFormat.OptionalDateJsonSerializer.class)
     private final Date created;
+    @JsonSerialize(using = GenieDateFormat.OptionalDateJsonSerializer.class)
     private final Date updated;
 
     /**
