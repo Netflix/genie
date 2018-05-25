@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +52,9 @@ public class Job extends CommonDTO {
     private final JobStatus status;
     @Size(max = 255, message = "Max length of the status message is 255 characters")
     private final String statusMsg;
+    @JsonSerialize(using = GenieDateFormat.OptionalDateJsonSerializer.class)
     private final Date started;
+    @JsonSerialize(using = GenieDateFormat.OptionalDateJsonSerializer.class)
     private final Date finished;
     @Size(max = 1024, message = "Max character length is 1024 characters for the archive location")
     private final String archiveLocation;
