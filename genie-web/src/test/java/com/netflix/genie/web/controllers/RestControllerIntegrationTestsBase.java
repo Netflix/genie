@@ -29,7 +29,9 @@ import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
 import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.experimental.categories.Category;
@@ -114,6 +116,21 @@ public abstract class RestControllerIntegrationTestsBase {
         .setTimeZone(TimeZone.getTimeZone("UTC"))
         .setDateFormat(new GenieDateFormat())
         .registerModule(new Jdk8Module());
+
+    protected final Matcher<String> dateFormatMatcher = new BaseMatcher<String>() {
+        @Override
+        public boolean matches(final Object item) {
+            return item != null
+                && item instanceof CharSequence
+                && GenieDateFormat.VALID_PATTERN.matcher((CharSequence) item).matches();
+        }
+
+        @Override
+        public void describeTo(final Description description) {
+            description.appendText("matches regex: " + GenieDateFormat.VALID_PATTERN.pattern());
+        }
+    };
+
 
     @Autowired
     protected MockMvc mvc;
