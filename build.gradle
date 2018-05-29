@@ -125,6 +125,9 @@ configure(javaProjects) {
                 entry "spock-core"
                 entry "spock-spring"
             }
+            // NOTE: Updating this to 1.0.4 introduces another dependency not in Maven central:
+            //       https://spring.io/blog/2018/03/16/spring-security-saml-1-0-4-released
+            //       For now staying on 1.0.3 as not really thrilled with adding yet another maven repo
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.3.RELEASE")
             dependency("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.1.RELEASE")
             dependencySet(group: "org.springframework.statemachine", version: "2.0.1.RELEASE") {
