@@ -78,7 +78,7 @@ configure(javaProjects) {
         }
         dependencies {
             dependency("com.beust:jcommander:1.72")
-            dependency("cglib:cglib-nodep:3.2.5")
+            dependency("cglib:cglib-nodep:3.2.6")
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.springtestdbunit:spring-test-dbunit:1.3.0")
             dependencySet(group: "com.squareup.retrofit2", version: "2.1.0") {
