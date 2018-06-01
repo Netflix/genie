@@ -109,6 +109,9 @@ genie:
     scheduler:
       pool:
         size: 5
+  grpc:
+    server:
+      enabled: true
 
 info:
   genie:
@@ -157,3 +160,8 @@ spring:
       max-request-size: 200MB
   session:
     store-type: none
+
+grpc:
+  server:
+    port: 9090
+    address: 0.0.0.0
