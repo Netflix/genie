@@ -775,7 +775,10 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             UUID.randomUUID().toString()
         );
         final String agentEnvironmentExt
-            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+            = "{"
+            + "\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\", "
+            + "\"" + UUID.randomUUID().toString() + "\": \"\""
+            + "}";
         final AgentEnvironmentRequest agentEnvironmentRequest = new AgentEnvironmentRequest
             .Builder()
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)

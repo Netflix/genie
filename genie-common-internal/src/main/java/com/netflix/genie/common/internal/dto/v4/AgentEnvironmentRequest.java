@@ -28,6 +28,7 @@ import lombok.ToString;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +52,7 @@ public class AgentEnvironmentRequest {
     private final ImmutableMap<
         @NotBlank(message = "Environment variable key can't be blank")
         @Size(max = 255, message = "Max environment variable name length is 255 characters") String,
-        @NotBlank(message = "Environment variable value can't be blank")
+        @NotNull(message = "Environment variable value can't be null")
         @Size(max = 1024, message = "Max environment variable value length is 1024 characters") String>
         requestedEnvironmentVariables;
     private final JsonNode ext;
