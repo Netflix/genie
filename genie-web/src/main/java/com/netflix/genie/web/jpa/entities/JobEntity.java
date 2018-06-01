@@ -359,7 +359,7 @@ public class JobEntity extends BaseEntity implements
     )
     @MapKeyColumn(name = "name", updatable = false)
     @Column(name = "value", length = 1024, nullable = false, updatable = false)
-    private Map<@NotBlank @Size(max = 255) String, @NotBlank @Size(max = 1024) String>
+    private Map<@NotBlank @Size(max = 255) String, @NotNull @Size(max = 1024) String>
         requestedEnvironmentVariables = Maps.newHashMap();
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -371,7 +371,7 @@ public class JobEntity extends BaseEntity implements
     )
     @MapKeyColumn(name = "name")
     @Column(name = "value", length = 1024, nullable = false)
-    private Map<@NotBlank @Size(max = 255) String, @NotBlank @Size(max = 1024) String>
+    private Map<@NotBlank @Size(max = 255) String, @NotNull @Size(max = 1024) String>
         environmentVariables = Maps.newHashMap();
 
     @ManyToMany(fetch = FetchType.LAZY)
