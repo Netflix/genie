@@ -46,7 +46,7 @@ class GrpcConfig {
         final ArgumentDelegates.ServerArguments serverArguments
     ) {
         return ManagedChannelBuilder.forAddress(serverArguments.getServerHost(), serverArguments.getServerPort())
-            .usePlaintext(true)
+            .usePlaintext()
             .build();
     }
 
