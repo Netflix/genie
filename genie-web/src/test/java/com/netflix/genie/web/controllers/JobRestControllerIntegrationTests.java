@@ -830,6 +830,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH + "[0].id", Matchers.is(id)))
+            .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH + "[0].started", dateFormatMatcher))
+            .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH + "[0].finished", dateFormatMatcher))
             .andDo(findResultHandler);
     }
 
