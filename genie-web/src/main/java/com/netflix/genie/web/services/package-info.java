@@ -21,5 +21,7 @@
  *
  * @author tgianos
  */
+@ParametersAreNonnullByDefault
 package com.netflix.genie.web.services;
 
+import javax.annotation.ParametersAreNonnullByDefault;

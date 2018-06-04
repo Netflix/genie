@@ -82,7 +82,7 @@ public class GenieFileTransferService {
         this.getFileTransfer(dstRemotePath).putFile(srcLocalPath, dstRemotePath);
     }
 
-    protected FileTransfer getFileTransfer(final String path) throws GenieNotFoundException {
+    FileTransfer getFileTransfer(final String path) throws GenieNotFoundException {
         final FileTransfer result;
         try {
             final URI uri = new URI(path);
