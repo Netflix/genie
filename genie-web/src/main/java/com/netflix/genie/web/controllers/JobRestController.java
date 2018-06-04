@@ -29,6 +29,7 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
@@ -45,7 +46,6 @@ import com.netflix.genie.web.hateoas.resources.JobMetadataResource;
 import com.netflix.genie.web.hateoas.resources.JobRequestResource;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
-import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.services.AttachmentService;
@@ -325,7 +325,11 @@ public class JobRestController {
                 totalSizeOfAttachments += attachment.getSize();
                 log.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
                 try {
-                    this.attachmentService.save(jobId, attachment.getOriginalFilename(), attachment.getInputStream());
+                    String originalFilename = attachment.getOriginalFilename();
+                    if (originalFilename == null) {
+                        originalFilename = UUID.randomUUID().toString();
+                    }
+                    this.attachmentService.save(jobId, originalFilename, attachment.getInputStream());
                 } catch (final IOException ioe) {
                     throw new GenieServerException("Failed to save job attachment", ioe);
                 }
