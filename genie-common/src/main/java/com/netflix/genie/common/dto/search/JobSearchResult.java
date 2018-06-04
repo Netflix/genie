@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -47,7 +48,9 @@ public class JobSearchResult extends BaseSearchResult {
     private static final long serialVersionUID = -3886685874572773514L;
 
     private final JobStatus status;
+    @JsonSerialize(using = GenieDateFormat.OptionalDateJsonSerializer.class)
     private final Date started;
+    @JsonSerialize(using = GenieDateFormat.OptionalDateJsonSerializer.class)
     private final Date finished;
     private final String clusterName;
     private final String commandName;
