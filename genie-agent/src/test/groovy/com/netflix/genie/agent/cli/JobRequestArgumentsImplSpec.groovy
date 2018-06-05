@@ -63,6 +63,7 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobTags().isEmpty()
         options.jobRequestArguments.getJobVersion() == null
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode()
+        !options.jobRequestArguments.isJobRequestedViaAPI()
     }
 
     def "Parse"() {
@@ -87,6 +88,7 @@ class JobRequestArgumentsImplSpec extends Specification {
                 "--jobTag", "t2",
                 "--jobVersion", "1.0",
                 "--jobMetadata", "{\"foo\": false}",
+                "--api-job",
                 "foo", "bar",
         )
 
@@ -115,6 +117,7 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobVersion() == "1.0"
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode().put("foo", false)
         options.jobRequestArguments.getCommandArguments() == ["foo", "bar"].asList()
+        options.jobRequestArguments.isJobRequestedViaAPI()
     }
 
     class TestOptions {

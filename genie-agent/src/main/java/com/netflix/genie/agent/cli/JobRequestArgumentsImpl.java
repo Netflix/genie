@@ -163,4 +163,11 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
         converter = ArgumentConverters.FileConverter.class
     )
     private File jobSpecificationFile;
+
+    @Parameter(
+        names = {"--api-job"},
+        description = "Whether the agent was launched by a Genie server in response to an API job submission",
+        hidden = true // Do not expose this option via CLI to users
+    )
+    private boolean jobRequestedViaAPI;
 }
