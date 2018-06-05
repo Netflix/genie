@@ -43,6 +43,8 @@ class ExecutionContextImplSpec extends Specification {
         Exception exception = new RuntimeException()
         StateAction action1 = Mock(StateAction.SetUpJob)
         StateAction action2 = Mock(StateAction.LaunchJob)
+        JobStatus jobStatus = JobStatus.INIT
+        String jobId = UUID.randomUUID().toString()
 
         expect:
         null == executionContext.getJobProcess()
@@ -50,6 +52,8 @@ class ExecutionContextImplSpec extends Specification {
         null == executionContext.getJobSpecification()
         null == executionContext.getJobEnvironment()
         null == executionContext.getFinalJobStatus()
+        null == executionContext.getCurrentJobStatus()
+        null == executionContext.getClaimedJobId()
         !executionContext.hasStateActionError()
         executionContext.getStateActionErrors().isEmpty()
         executionContext.getCleanupActions().isEmpty()
@@ -62,6 +66,8 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.setFinalJobStatus(finalJobStatus)
         executionContext.addStateActionError(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception)
         executionContext.addCleanupActions(action1)
+        executionContext.setCurrentJobStatus(jobStatus)
+        executionContext.setClaimedJobId(jobId)
 
         then:
         process == executionContext.getJobProcess()
@@ -74,6 +80,8 @@ class ExecutionContextImplSpec extends Specification {
         Triple.of(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception) == executionContext.getStateActionErrors().get(0)
         1 == executionContext.getCleanupActions().size()
         action1 == executionContext.getCleanupActions().get(0)
+        jobStatus == executionContext.getCurrentJobStatus()
+        jobId == executionContext.getClaimedJobId()
 
         when:
         executionContext.setJobProcess(Mock(Process))
@@ -121,6 +129,12 @@ class ExecutionContextImplSpec extends Specification {
         2 == executionContext.getCleanupActions().size()
         action1 == executionContext.getCleanupActions().get(0)
         action2 == executionContext.getCleanupActions().get(1)
+
+        when:
+        executionContext.setClaimedJobId("xxx")
+
+        then:
+        thrown(RuntimeException)
     }
 
     @Unroll

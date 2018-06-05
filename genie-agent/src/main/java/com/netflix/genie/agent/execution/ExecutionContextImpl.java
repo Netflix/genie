@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
@@ -54,6 +55,8 @@ class ExecutionContextImpl implements ExecutionContext {
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
     private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
     private final AtomicReference<JobStatus> finalJobStatusRef = new AtomicReference<>();
+    private final AtomicReference<JobStatus> currentJobStatusRef = new AtomicReference<>();
+    private final AtomicReference<String> claimedJobIdRef = new AtomicReference<>();
     private final List<StateAction> cleanupActions = Lists.newArrayList();
     private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors = Lists.newArrayList();
 
@@ -195,6 +198,40 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public JobStatus getFinalJobStatus() {
         return finalJobStatusRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCurrentJobStatus(final JobStatus jobStatus) {
+        currentJobStatusRef.set(jobStatus);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
+    @Override
+    public JobStatus getCurrentJobStatus() {
+        return currentJobStatusRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setClaimedJobId(@NotBlank final String jobId) {
+        setIfNullOrTrow(jobId, claimedJobIdRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
+    @Override
+    public String getClaimedJobId() {
+        return claimedJobIdRef.get();
     }
 
     private static <T> void setIfNullOrTrow(final T value, final AtomicReference<T> reference) {
