@@ -151,4 +151,31 @@ public interface ExecutionContext {
      * @return the final job status or null
      */
     @Nullable JobStatus getFinalJobStatus();
+
+    /**
+     * Set the current job status.
+     *
+     * @param jobStatus the job status
+     */
+    void setCurrentJobStatus(final JobStatus jobStatus);
+
+    /**
+     * Get the current job status.
+     *
+     * @return the latest job status set, or null if never set
+     */
+    @Nullable JobStatus getCurrentJobStatus();
+
+    /**
+     * Set the job id of a successfully claimed job.
+     * @param jobId the job id
+     */
+    void setClaimedJobId(@NotBlank String jobId);
+
+    /**
+     * Get the job id, if a job was claimed.
+     *
+     * @return a job id or null a job was not claimed
+     */
+    @Nullable String getClaimedJobId();
 }
