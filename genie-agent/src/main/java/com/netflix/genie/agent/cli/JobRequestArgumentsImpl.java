@@ -158,13 +158,6 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private JsonNode jobMetadata = GenieObjectMapper.getMapper().createObjectNode();
 
     @Parameter(
-        names = {"--jobSpecificationFile"},
-        description = "The local file where to load a job specification from, rather than resolving via server",
-        converter = ArgumentConverters.FileConverter.class
-    )
-    private File jobSpecificationFile;
-
-    @Parameter(
         names = {"--api-job"},
         description = "Whether the agent was launched by a Genie server in response to an API job submission",
         hidden = true // Do not expose this option via CLI to users

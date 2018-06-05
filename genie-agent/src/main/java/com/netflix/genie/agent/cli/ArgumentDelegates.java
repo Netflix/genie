@@ -95,8 +95,6 @@ public interface ArgumentDelegates {
 
         JsonNode getJobMetadata();
 
-        File getJobSpecificationFile();
-
         boolean isJobRequestedViaAPI();
     }
 
