@@ -20,17 +20,18 @@ package com.netflix.genie.agent.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * Configuration for {@link com.netflix.genie.agent.execution.services.FetchingCacheService} clean up task.
+ * Configuration for various agent beans.
  *
  * @author standon
  * @since 4.0.0
  */
 @Configuration
-public class FetchingCacheServiceCleanUpTaskExecutorConfig {
+class AgentConfig {
 
     /**
      * Get a task executor for cleaning up {@link com.netflix.genie.agent.execution.services.FetchingCacheService}.
@@ -38,6 +39,7 @@ public class FetchingCacheServiceCleanUpTaskExecutorConfig {
      * @return The task executor to use
      */
     @Bean
+    @Lazy
     public TaskExecutor fetchingCacheServiceCleanUpTaskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         //TODO Pool size should be parametrized once its decide how agent properties will be configured

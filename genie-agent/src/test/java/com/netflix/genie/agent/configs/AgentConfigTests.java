@@ -25,22 +25,22 @@ import org.junit.experimental.categories.Category;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * Tests for {@link FetchingCacheServiceCleanUpTaskExecutorConfig}.
+ * Tests for {@link AgentConfig}.
  *
  * @author standon
  * @since 4.0.0
  */
 @Category(UnitTest.class)
-public class FetchingCacheServiceCleanUpTaskExecutorConfigTests {
+public class AgentConfigTests {
 
-    private FetchingCacheServiceCleanUpTaskExecutorConfig config;
+    private AgentConfig config;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.config = new FetchingCacheServiceCleanUpTaskExecutorConfig();
+        this.config = new AgentConfig();
     }
 
     /**
