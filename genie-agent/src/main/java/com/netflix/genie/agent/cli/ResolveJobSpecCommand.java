@@ -75,13 +75,14 @@ class ResolveJobSpecCommand implements AgentCommand {
             .enable(SerializationFeature.INDENT_OUTPUT);
 
         final JobSpecification spec;
-        final String specId = resolveJobSpecCommandArguments.getSpecificationId();
-        if (!StringUtils.isBlank(specId)) {
+        final String jobId = resolveJobSpecCommandArguments.getSpecificationId();
+        if (!StringUtils.isBlank(jobId)) {
             // Do a specification lookup if an id is given
+            log.info("Looking up specification of job {}", jobId);
             try {
-                spec = agentJobService.getJobSpecification(specId);
+                spec = agentJobService.getJobSpecification(jobId);
             } catch (final JobSpecificationResolutionException e) {
-                throw new RuntimeException("Failed to get spec: " + specId, e);
+                throw new RuntimeException("Failed to get spec: " + jobId, e);
             }
 
         } else {
@@ -153,7 +154,7 @@ class ResolveJobSpecCommand implements AgentCommand {
 
         @Parameter(
             names = {"--spec-id"},
-            description = "Lookup an existing specification rather than resolving"
+            description = "Lookup an existing specification rather than resolving (ignores other job arguments)"
         )
         private String specificationId;
 
