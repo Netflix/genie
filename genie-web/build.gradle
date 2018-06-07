@@ -25,6 +25,7 @@ dependencies {
     compile("com.amazonaws:aws-java-sdk-sts")
     compile("com.github.fge:json-patch")
     compile("com.google.guava:guava")
+    compile("commons-codec:commons-codec")
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")
     compile("commons-validator:commons-validator")
@@ -124,8 +125,8 @@ def genieVersion = project.version.toString()
 asciidoctor {
     dependsOn test
     inputs.dir snippetsDir
-    attributes    \
-               "snippets": snippetsDir,
+    attributes     \
+                "snippets": snippetsDir,
             "revnumber": genieVersion,
             "docinfo1": ""
 
