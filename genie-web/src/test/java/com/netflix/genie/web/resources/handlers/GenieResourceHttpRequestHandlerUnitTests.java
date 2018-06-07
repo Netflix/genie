@@ -18,9 +18,10 @@
 package com.netflix.genie.web.resources.handlers;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
+import com.netflix.genie.web.services.JobFileService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -53,7 +53,7 @@ public class GenieResourceHttpRequestHandlerUnitTests {
 
     private DirectoryWriter directoryWriter;
     private GenieResourceHttpRequestHandler handler;
-    private Resource location;
+    private JobFileService jobFileService;
 
     /**
      * Setup for the tests.
@@ -61,11 +61,8 @@ public class GenieResourceHttpRequestHandlerUnitTests {
     @Before
     public void setup() {
         this.directoryWriter = Mockito.mock(DirectoryWriter.class);
-        this.handler = new GenieResourceHttpRequestHandler(this.directoryWriter);
-        this.location = Mockito.mock(Resource.class);
-
-        final List<Resource> locations = Lists.newArrayList(this.location);
-        this.handler.setLocations(locations);
+        this.jobFileService = Mockito.mock(JobFileService.class);
+        this.handler = new GenieResourceHttpRequestHandler(this.directoryWriter, this.jobFileService);
     }
 
     /**
@@ -116,10 +113,12 @@ public class GenieResourceHttpRequestHandlerUnitTests {
     public void cantHandleRequestIfResourceDoesntExist() throws ServletException, IOException {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final String jobId = UUID.randomUUID().toString();
         final String path = UUID.randomUUID().toString();
+        Mockito.when(request.getAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE)).thenReturn(jobId);
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(path);
         final Resource resource = Mockito.mock(Resource.class);
-        Mockito.when(this.location.createRelative(Mockito.eq(path))).thenReturn(resource);
+        Mockito.when(this.jobFileService.getJobFileAsResource(jobId, path)).thenReturn(resource);
         Mockito.when(resource.exists()).thenReturn(false);
 
         this.handler.handleRequest(request, response);
@@ -140,10 +139,13 @@ public class GenieResourceHttpRequestHandlerUnitTests {
     public void canHandleRequestForFile() throws ServletException, IOException {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final String jobId = UUID.randomUUID().toString();
         final String path = UUID.randomUUID().toString();
+        Mockito.when(request.getAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE)).thenReturn(jobId);
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(path);
         final Resource resource = Mockito.mock(Resource.class);
-        Mockito.when(this.location.createRelative(Mockito.eq(path))).thenReturn(resource);
+        // The second time will return the 404
+        Mockito.when(this.jobFileService.getJobFileAsResource(jobId, path)).thenReturn(resource).thenReturn(null);
         Mockito.when(resource.exists()).thenReturn(true);
         final File file = Mockito.mock(File.class);
         Mockito.when(resource.getFile()).thenReturn(file);
@@ -163,13 +165,15 @@ public class GenieResourceHttpRequestHandlerUnitTests {
     public void canHandleRequestForDirectoryHtml() throws Exception {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final String jobId = UUID.randomUUID().toString();
         final String path = UUID.randomUUID().toString();
+        Mockito.when(request.getAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE)).thenReturn(jobId);
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(path);
         Mockito.when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.TEXT_HTML_VALUE);
         final String forwardedUrl = UUID.randomUUID().toString();
         Mockito.when(request.getHeader(JobConstants.GENIE_FORWARDED_FROM_HEADER)).thenReturn(forwardedUrl);
         final Resource resource = Mockito.mock(Resource.class);
-        Mockito.when(this.location.createRelative(Mockito.eq(path))).thenReturn(resource);
+        Mockito.when(this.jobFileService.getJobFileAsResource(jobId, path)).thenReturn(resource);
         Mockito.when(resource.exists()).thenReturn(true);
         final File file = Mockito.mock(File.class);
         Mockito.when(resource.getFile()).thenReturn(file);
@@ -202,13 +206,15 @@ public class GenieResourceHttpRequestHandlerUnitTests {
     public void canHandleRequestForDirectoryJson() throws Exception {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final String jobId = UUID.randomUUID().toString();
         final String path = UUID.randomUUID().toString();
+        Mockito.when(request.getAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE)).thenReturn(jobId);
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(path);
         Mockito.when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(null);
         final String requestUrl = UUID.randomUUID().toString();
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(requestUrl));
         final Resource resource = Mockito.mock(Resource.class);
-        Mockito.when(this.location.createRelative(Mockito.eq(path))).thenReturn(resource);
+        Mockito.when(this.jobFileService.getJobFileAsResource(jobId, path)).thenReturn(resource);
         Mockito.when(resource.exists()).thenReturn(true);
         final File file = Mockito.mock(File.class);
         Mockito.when(resource.getFile()).thenReturn(file);
@@ -241,14 +247,17 @@ public class GenieResourceHttpRequestHandlerUnitTests {
     public void cantHandleRequestForDirectoryWhenException() throws Exception {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final String jobId = UUID.randomUUID().toString();
         final String path = UUID.randomUUID().toString();
+        Mockito.when(request.getAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE)).thenReturn(jobId);
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(path);
-        Mockito.when(request.getAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY))
+        Mockito
+            .when(request.getAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY))
             .thenReturn(false);
         final String requestUrl = UUID.randomUUID().toString();
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(requestUrl));
         final Resource resource = Mockito.mock(Resource.class);
-        Mockito.when(this.location.createRelative(Mockito.eq(path))).thenReturn(resource);
+        Mockito.when(this.jobFileService.getJobFileAsResource(jobId, path)).thenReturn(resource);
         Mockito.when(resource.exists()).thenReturn(true);
         final File file = Mockito.mock(File.class);
         Mockito.when(resource.getFile()).thenReturn(file);

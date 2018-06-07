@@ -748,7 +748,8 @@ public class JobRestController {
             request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
         }
         log.debug("PATH = {}", path);
-        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, id + "/" + path);
+        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, path);
+        request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE, id);
 
         this.resourceHttpRequestHandler.handleRequest(request, response);
     }
