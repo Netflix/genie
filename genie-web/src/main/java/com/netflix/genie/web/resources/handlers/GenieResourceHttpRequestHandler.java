@@ -19,11 +19,12 @@ package com.netflix.genie.web.resources.handlers;
 
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
+import com.netflix.genie.web.services.JobFileService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * Class extends ResourceHttpRequestHandler to override handling a request to return directory listing if it
+ * Class extends {@link ResourceHttpRequestHandler} to override handling a request to return directory listing if it
  * is a directory otherwise follow default behavior.
  *
  * @author tgianos
@@ -51,18 +52,26 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
     public static final String GENIE_JOB_IS_ROOT_DIRECTORY
         = GenieResourceHttpRequestHandler.class.getName() + ".isRootDirectory";
 
+    /**
+     * Used to identify the id of the job that is being requested.
+     */
+    public static final String GENIE_JOB_ID_ATTRIBUTE = GenieResourceHttpRequestHandler.class.getName() + ".jobId";
+
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    private DirectoryWriter directoryWriter;
+    private final DirectoryWriter directoryWriter;
+    private final JobFileService jobFileService;
 
     /**
      * Constructor.
      *
      * @param directoryWriter The class to use to convert directories to representations like HTML
+     * @param jobFileService  The log service to use
      */
-    public GenieResourceHttpRequestHandler(final DirectoryWriter directoryWriter) {
+    public GenieResourceHttpRequestHandler(final DirectoryWriter directoryWriter, final JobFileService jobFileService) {
         super();
         this.directoryWriter = directoryWriter;
+        this.jobFileService = jobFileService;
     }
 
     /**
@@ -73,15 +82,8 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
         @Nonnull final HttpServletRequest request,
         @Nonnull final HttpServletResponse response
     ) throws ServletException, IOException {
-        Assert.state(this.getLocations().size() == 1, "Too many resource locations");
-        Assert.state(
-            request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE) != null,
-            "Request doesn't have a " + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + " attribute."
-        );
-
-        final String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        final Resource resource = this.getLocations().get(0).createRelative(path);
-        if (!resource.exists()) {
+        final Resource resource = this.getResource(request);
+        if (resource == null || !resource.exists()) {
             response.sendError(HttpStatus.NOT_FOUND.value());
             return;
         }
@@ -133,6 +135,22 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
         } else {
             super.handleRequest(request, response);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Default to using the {@link JobFileService} implementation.
+     */
+    @Override
+    protected Resource getResource(final HttpServletRequest request) throws IOException {
+        final String jobId = (String) request.getAttribute(GENIE_JOB_ID_ATTRIBUTE);
+        if (StringUtils.isBlank(jobId)) {
+            throw new IllegalStateException("Required request attribute '" + GENIE_JOB_ID_ATTRIBUTE + "' is not set");
+        }
+        final String relativePath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+        return this.jobFileService.getJobFileAsResource(jobId, relativePath);
     }
 
     /**

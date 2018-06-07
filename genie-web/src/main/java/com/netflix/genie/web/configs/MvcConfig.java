@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.configs;
 
-import com.google.common.collect.Lists;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
+import com.netflix.genie.web.services.JobFileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -186,23 +186,23 @@ public class MvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Get a static resource handler for Genie Jobs.
+     * Get a static resource handler for Genie job logs.
      *
      * @param directoryWriter The directory writer to use for converting directory resources
      * @param context         The spring application context
-     * @param jobsDir         The location the user is requesting the jobs be stored
+     * @param jobFileService  The job file service to use
      * @return The genie resource http request handler.
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(GenieResourceHttpRequestHandler.class)
     public GenieResourceHttpRequestHandler genieResourceHttpRequestHandler(
         final DirectoryWriter directoryWriter,
         final ApplicationContext context,
-        final Resource jobsDir
+        final JobFileService jobFileService
     ) {
-        final GenieResourceHttpRequestHandler handler = new GenieResourceHttpRequestHandler(directoryWriter);
+        final GenieResourceHttpRequestHandler handler
+            = new GenieResourceHttpRequestHandler(directoryWriter, jobFileService);
         handler.setApplicationContext(context);
-        handler.setLocations(Lists.newArrayList(jobsDir));
 
         return handler;
     }

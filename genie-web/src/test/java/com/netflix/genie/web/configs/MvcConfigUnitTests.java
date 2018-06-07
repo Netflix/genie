@@ -22,6 +22,7 @@ import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
+import com.netflix.genie.web.services.JobFileService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -187,12 +188,10 @@ public class MvcConfigUnitTests {
     public void canGetGenieResourceHttpRequestHandler() {
         final DirectoryWriter directoryWriter = Mockito.mock(DirectoryWriter.class);
         final ApplicationContext context = Mockito.mock(ApplicationContext.class);
-        final Resource jobsDir = Mockito.mock(Resource.class);
+        final JobFileService jobFileService = Mockito.mock(JobFileService.class);
 
         final GenieResourceHttpRequestHandler handler
-            = this.mvcConfig.genieResourceHttpRequestHandler(directoryWriter, context, jobsDir);
+            = this.mvcConfig.genieResourceHttpRequestHandler(directoryWriter, context, jobFileService);
         Assert.assertThat(handler.getApplicationContext(), Matchers.is(context));
-        Assert.assertThat(handler.getLocations(), Matchers.hasSize(1));
-        Assert.assertThat(handler.getLocations(), Matchers.contains(jobsDir));
     }
 }
