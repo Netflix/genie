@@ -22,6 +22,19 @@ attempt to assume this role on the host Genie is running on
 |Where to store cached files on local disk
 |file:///tmp/genie/cache
 
+|genie.grpc.server.enabled
+|Whether to start the gRPC server and services during server startup
+|true
+
+|genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds
+|How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
+whether the `maxSyncMessages` threshold has been reached or not
+|30,000
+
+|genie.grpc.server.services.job-file-sync.maxSyncMessages
+|How many messages to receive from the agent before an acknowledgement message is sent back from the server
+|10
+
 |genie.health.maxCpuLoadConsecutiveOccurrences
 |Defines the threshold of consecutive occurrences of CPU load crossing the <maxCpuLoadPercent>.
 Health of the system is marked unhealthy if the CPU load of a system goes beyond the threshold 'maxCpuLoadPercent'
@@ -378,12 +391,8 @@ to the number of CPU cores x 2 + 1
 |/genie/leader/
 
 |genie.s3filetransfer.strictUrlCheckEnabled
-|Wether to strictly check an S3 URL for illegal characters before attempting to use it
+|Whether to strictly check an S3 URL for illegal characters before attempting to use it
 |false
-
-|genie.grpc.server.enabled
-|Wether to start the gRPC server and services during server startup
-|true
 
 |===
 
