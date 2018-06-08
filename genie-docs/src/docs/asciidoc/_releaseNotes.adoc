@@ -55,6 +55,19 @@ See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more informa
 management endpoints. Switched from default `/actuator`
 |/admin
 
+|genie.grpc.server.enabled
+|Whether to start the gRPC server and services during server startup
+|true
+
+|genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds
+|How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
+whether the `maxSyncMessages` threshold has been reached or not
+|30,000
+
+|genie.grpc.server.services.job-file-sync.maxSyncMessages
+|How many messages to receive from the agent before an acknowledgement message is sent back from the server
+|10
+
 |===
 
 ==== Renamed

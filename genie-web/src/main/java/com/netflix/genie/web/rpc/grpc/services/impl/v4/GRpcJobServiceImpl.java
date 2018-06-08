@@ -37,6 +37,7 @@ import com.netflix.genie.web.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Extension of {@link JobServiceGrpc.JobServiceImplBase} to provide
@@ -45,6 +46,8 @@ import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
  * @author tgianos
  * @since 4.0.0
  */
+// TODO: Centralize this conditional somehow
+@ConditionalOnProperty(value = "genie.grpc.server.enabled", havingValue = "true")
 @GrpcService(
     value = JobServiceGrpc.class,
     interceptors = {
