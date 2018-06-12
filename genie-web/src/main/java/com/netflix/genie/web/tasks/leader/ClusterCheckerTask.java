@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
@@ -59,7 +60,7 @@ import java.util.Set;
 public class ClusterCheckerTask extends LeadershipTask {
     private static final String PROPERTY_STATUS = "status";
 
-    private final String hostName;
+    private final String hostname;
     private final ClusterCheckerProperties properties;
     private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
@@ -77,7 +78,7 @@ public class ClusterCheckerTask extends LeadershipTask {
     /**
      * Constructor.
      *
-     * @param hostName              The host name of this node
+     * @param genieHostInfo         Information about the host this Genie process is running on
      * @param properties            The properties to use to configure the task
      * @param jobSearchService      The job search service to use
      * @param jobPersistenceService The job persistence service to use
@@ -87,7 +88,7 @@ public class ClusterCheckerTask extends LeadershipTask {
      */
     @Autowired
     public ClusterCheckerTask(
-        @NotNull final String hostName,
+        @NotNull final GenieHostInfo genieHostInfo,
         @NotNull final ClusterCheckerProperties properties,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobPersistenceService jobPersistenceService,
@@ -95,7 +96,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final WebEndpointProperties webEndpointProperties,
         @NotNull final MeterRegistry registry
     ) {
-        this.hostName = hostName;
+        this.hostname = genieHostInfo.getHostname();
         this.properties = properties;
         this.jobSearchService = jobSearchService;
         this.jobPersistenceService = jobPersistenceService;
@@ -118,7 +119,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         log.info("Checking for cluster node health...");
         this.jobSearchService.getAllHostsWithActiveJobs()
             .stream()
-            .filter(host -> !this.hostName.equals(host))
+            .filter(host -> !this.hostname.equals(host))
             .forEach(this::validateHostAndUpdateErrorCount);
 
         this.errorCounts.entrySet().removeIf(

@@ -31,6 +31,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
@@ -168,7 +169,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private String schedulerRunId;
 
     @Autowired
-    private String hostname;
+    private GenieHostInfo genieHostInfo;
 
     @Autowired
     private Resource jobDirResource;
@@ -663,7 +664,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(ID_PATH, Matchers.is(id))
             .body(CREATED_PATH, Matchers.notNullValue())
             .body(UPDATED_PATH, Matchers.notNullValue())
-            .body(HOST_NAME_PATH, Matchers.is(this.hostname))
+            .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()))
             .body(PROCESS_ID_PATH, Matchers.notNullValue())
             .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
             .body(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE));

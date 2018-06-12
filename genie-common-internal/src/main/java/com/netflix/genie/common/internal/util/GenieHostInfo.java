@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,14 +15,30 @@
  *     limitations under the License.
  *
  */
-
-/**
- * Internal utilities shared by client and server components.
- *
- * @author mprimi
- * @since 4.0.0
- */
-@ParametersAreNonnullByDefault
 package com.netflix.genie.common.internal.util;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+/**
+ * Container for information about the host a Genie process (web server or agent) is running on.
+ *
+ * @author tgianos
+ * @since 4.0.0
+ */
+@Getter
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString
+public class GenieHostInfo {
+    private final String hostname;
+
+    /**
+     * Constructor.
+     *
+     * @param hostname The hostname of the node this Genie process is running on.
+     */
+    public GenieHostInfo(final String hostname) {
+        this.hostname = hostname;
+    }
+}

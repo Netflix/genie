@@ -58,7 +58,7 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 public class LocalJobKillServiceImpl implements JobKillService {
 
-    private final String hostName;
+    private final String hostname;
     private final JobSearchService jobSearchService;
     private final Executor executor;
     private final boolean runAsUser;
@@ -69,7 +69,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
     /**
      * Constructor.
      *
-     * @param hostName         The name of the host this Genie node is running on
+     * @param hostname         The name of the host this Genie node is running on
      * @param jobSearchService The job search service to use to locate job information
      * @param executor         The executor to use to run system processes
      * @param runAsUser        True if jobs are run as the user who submitted the job
@@ -78,7 +78,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      */
     public LocalJobKillServiceImpl(
-        @NotBlank final String hostName,
+        @NotBlank final String hostname,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final Executor executor,
         final boolean runAsUser,
@@ -86,7 +86,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
         @NotNull final Resource genieWorkingDir,
         @NotNull final ObjectMapper objectMapper
     ) {
-        this.hostName = hostName;
+        this.hostname = hostname;
         this.jobSearchService = jobSearchService;
         this.executor = executor;
         this.runAsUser = runAsUser;
@@ -128,12 +128,12 @@ public class LocalJobKillServiceImpl implements JobKillService {
                 return;
             }
 
-            if (!this.hostName.equals(jobExecution.getHostName())) {
+            if (!this.hostname.equals(jobExecution.getHostName())) {
                 throw new GeniePreconditionException(
                     "Job with id "
                         + id
                         + " is not running on this host ("
-                        + this.hostName
+                        + this.hostname
                         + "). It's actually on "
                         + jobExecution.getHostName()
                 );

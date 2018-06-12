@@ -17,16 +17,15 @@
  */
 package com.netflix.genie.web.configs.aws;
 
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.mockito.Mockito;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.UUID;
+import java.net.UnknownHostException;
 
 /**
  * Unit tests for the AwsMvcConfig class.
@@ -48,57 +47,13 @@ public class AwsMvcConfigUnitTests {
     }
 
     /**
-     * Make sure we attempt public hostname first.
+     * Make sure we can get the {@link GenieHostInfo} instance even if EC2 metadata fails.
+     *
+     * @throws UnknownHostException When the fallback fails
      */
     @Test
-    public void canGetPublicHostname() {
-        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        final String hostname = UUID.randomUUID().toString();
-        Mockito.when(restTemplate.getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class)).thenReturn(hostname);
-
-        Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
-        Mockito
-            .verify(restTemplate, Mockito.times(1))
-            .getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class);
-        Mockito
-            .verify(restTemplate, Mockito.never())
-            .getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class);
-    }
-
-    /**
-     * Make sure we get IPv4 hostname if public hostname fails.
-     */
-    @Test
-    @SuppressWarnings("unchecked")
-    public void canGetIPv4Hostname() {
-        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        final String hostname = UUID.randomUUID().toString();
-        Mockito
-            .when(restTemplate.getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class))
-            .thenThrow(RuntimeException.class);
-
-        Mockito.when(restTemplate.getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class))
-            .thenReturn(hostname);
-
-        Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
-        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class);
-        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class);
-    }
-
-    /**
-     * Make sure if both fails we throw an exception.
-     */
-    @Test(expected = RuntimeException.class)
-    @SuppressWarnings("unchecked")
-    public void cantGetHostname() {
-        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        Mockito
-            .when(restTemplate.getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class))
-            .thenThrow(RuntimeException.class);
-        Mockito
-            .when(restTemplate.getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class))
-            .thenThrow(RuntimeException.class);
-
-        this.awsMvcConfig.hostName(restTemplate);
+    public void canGetGenieHostInfo() throws UnknownHostException {
+        final GenieHostInfo genieHostInfo = this.awsMvcConfig.genieHostInfo();
+        Assert.assertThat(genieHostInfo.getHostname(), Matchers.notNullValue());
     }
 }

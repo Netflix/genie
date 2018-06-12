@@ -19,6 +19,7 @@ package com.netflix.genie.web.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -100,7 +101,7 @@ public class ServicesConfig {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param hostName         The name of the host this Genie node is running on.
+     * @param genieHostInfo    Information about the host the Genie process is running on
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
      * @param jobsProperties   The jobs properties to use
@@ -111,7 +112,7 @@ public class ServicesConfig {
      */
     @Bean
     public JobKillService jobKillService(
-        final String hostName,
+        final GenieHostInfo genieHostInfo,
         final JobSearchService jobSearchService,
         final Executor executor,
         final JobsProperties jobsProperties,
@@ -120,7 +121,7 @@ public class ServicesConfig {
         final ObjectMapper objectMapper
     ) {
         return new LocalJobKillServiceImpl(
-            hostName,
+            genieHostInfo.getHostname(),
             jobSearchService,
             executor,
             jobsProperties.getUsers().isRunAsUserEnabled(),
@@ -214,7 +215,7 @@ public class ServicesConfig {
      * @param commandPersistenceService     Implementation of command service interface
      * @param specificationService          The job specification service to use
      * @param registry                      The metrics registry to use
-     * @param hostName                      The host this Genie instance is running on
+     * @param genieHostInfo                 Information about the host the Genie process is running on
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
@@ -229,7 +230,7 @@ public class ServicesConfig {
         final CommandPersistenceService commandPersistenceService,
         final JobSpecificationService specificationService,
         final MeterRegistry registry,
-        final String hostName
+        final GenieHostInfo genieHostInfo
     ) {
         return new JobCoordinatorServiceImpl(
             jobPersistenceService,
@@ -242,7 +243,7 @@ public class ServicesConfig {
             commandPersistenceService,
             specificationService,
             registry,
-            hostName
+            genieHostInfo.getHostname()
         );
     }
 

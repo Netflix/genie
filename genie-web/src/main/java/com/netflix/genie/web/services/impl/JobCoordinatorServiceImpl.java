@@ -86,7 +86,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final CommandPersistenceService commandPersistenceService;
     private final JobSpecificationService specificationService;
     private final JobsProperties jobsProperties;
-    private final String hostName;
+    private final String hostname;
 
     // Metrics
     private final MeterRegistry registry;
@@ -105,7 +105,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * @param commandPersistenceService     Implementation of command service interface
      * @param specificationService          The job specification service to use
      * @param registry                      The registry
-     * @param hostName                      The name of the host this Genie instance is running on
+     * @param hostname                      The name of the host this Genie instance is running on
      */
     public JobCoordinatorServiceImpl(
         @NotNull final JobPersistenceService jobPersistenceService,
@@ -118,7 +118,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         @NotNull final CommandPersistenceService commandPersistenceService,
         @NotNull final JobSpecificationService specificationService,
         @NotNull final MeterRegistry registry,
-        @NotBlank final String hostName
+        @NotBlank final String hostname
     ) {
         this.jobPersistenceService = jobPersistenceService;
         this.jobKillService = jobKillService;
@@ -129,7 +129,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         this.commandPersistenceService = commandPersistenceService;
         this.specificationService = specificationService;
         this.jobsProperties = jobsProperties;
-        this.hostName = hostName;
+        this.hostname = hostname;
 
         // Metrics
         this.registry = registry;
@@ -179,9 +179,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 );
             }
 
-            final JobExecution jobExecution = new JobExecution.Builder(
-                this.hostName
-            )
+            final JobExecution jobExecution = new JobExecution
+                .Builder(this.hostname)
                 .withId(jobId)
                 .build();
 
