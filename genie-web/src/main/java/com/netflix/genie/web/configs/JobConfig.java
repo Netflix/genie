@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.web.jobs.workflow.impl.ClusterTask;
@@ -168,7 +169,7 @@ public class JobConfig {
      *
      * @param jobsProperties The various jobs properties
      * @param executor       An instance of an executor
-     * @param hostName       Host on which the job will run
+     * @param genieHostInfo  Info about the host Genie is running on
      * @param registry       The metrics registry to use
      * @return An application task object
      */
@@ -178,14 +179,14 @@ public class JobConfig {
     public WorkflowTask jobKickoffTask(
         final JobsProperties jobsProperties,
         final Executor executor,
-        final String hostName,
+        final GenieHostInfo genieHostInfo,
         final MeterRegistry registry
     ) {
         return new JobKickoffTask(
             jobsProperties.getUsers().isRunAsUserEnabled(),
             jobsProperties.getUsers().isCreationEnabled(),
             executor,
-            hostName,
+            genieHostInfo.getHostname(),
             registry
         );
     }

@@ -23,11 +23,12 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.JobStartedEvent;
-import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSubmitterService;
@@ -62,7 +63,7 @@ import java.util.concurrent.ScheduledFuture;
 @Primary
 @Slf4j
 public class JobMonitoringCoordinator extends JobStateServiceImpl {
-    private final String hostName;
+    private final String hostname;
     private final JobSearchService jobSearchService;
     private final Executor executor;
     private final File jobsDir;
@@ -73,7 +74,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
     /**
      * Constructor.
      *
-     * @param hostName            The name of the host this Genie process is running on
+     * @param genieHostInfo       Information about the host the Genie process is currently running on
      * @param jobSearchService    The search service to use to find jobs
      * @param genieEventBus       The Genie event bus to use for publishing events
      * @param scheduler           The task scheduler to use to register scheduling of job checkers
@@ -86,7 +87,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
      */
     @Autowired
     public JobMonitoringCoordinator(
-        final String hostName,
+        final GenieHostInfo genieHostInfo,
         final JobSearchService jobSearchService,
         final GenieEventBus genieEventBus,
         @Qualifier("genieTaskScheduler") final TaskScheduler scheduler,
@@ -97,7 +98,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
         final JobSubmitterService jobSubmitterService
     ) throws IOException {
         super(jobSubmitterService, scheduler, genieEventBus, registry);
-        this.hostName = hostName;
+        this.hostname = genieHostInfo.getHostname();
         this.jobSearchService = jobSearchService;
         this.executor = executor;
         this.jobsDir = jobsDir.getFile();
@@ -146,7 +147,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
 
     private void reAttach(final ApplicationEvent event) throws GenieException {
         log.info("Application is ready according to event {}. Attempting to re-attach to any active jobs", event);
-        final Set<Job> jobsOnHost = this.jobSearchService.getAllActiveJobsOnHost(this.hostName);
+        final Set<Job> jobsOnHost = this.jobSearchService.getAllActiveJobsOnHost(this.hostname);
         if (jobsOnHost.isEmpty()) {
             log.info("No jobs currently active on this node.");
             return;

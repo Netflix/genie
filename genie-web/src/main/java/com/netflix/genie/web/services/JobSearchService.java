@@ -91,10 +91,10 @@ public interface JobSearchService {
     /**
      * Given a hostname return a set of all the jobs currently active on that host.
      *
-     * @param hostName The host name to search for. Not null or empty.
+     * @param hostname The host name to search for. Not null or empty.
      * @return All the jobs active on the host as a set of Job objects
      */
-    Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostName);
+    Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostname);
 
     /**
      * Get a set of host names which are currently have active jobs in the Genie cluster.

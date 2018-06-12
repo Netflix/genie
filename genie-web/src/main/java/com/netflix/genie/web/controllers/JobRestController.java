@@ -30,6 +30,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
@@ -135,7 +136,7 @@ public class JobRestController {
     private final JobExecutionResourceAssembler jobExecutionResourceAssembler;
     private final JobMetadataResourceAssembler jobMetadataResourceAssembler;
     private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
-    private final String hostName;
+    private final String hostname;
     private final RestTemplate restTemplate;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
     private final JobsProperties jobsProperties;
@@ -158,7 +159,7 @@ public class JobRestController {
      * @param jobExecutionResourceAssembler    Assemble job execution resources out of job executions
      * @param jobMetadataResourceAssembler     Assemble job metadata resources out of job metadata DTO
      * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
-     * @param hostName                         The hostname this Genie instance is running on
+     * @param genieHostInfo                    Information about the host that the Genie process is running on
      * @param restTemplate                     The rest template for http requests
      * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
      *                                         Genie File System.
@@ -179,7 +180,7 @@ public class JobRestController {
         final JobExecutionResourceAssembler jobExecutionResourceAssembler,
         final JobMetadataResourceAssembler jobMetadataResourceAssembler,
         final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
-        final String hostName,
+        final GenieHostInfo genieHostInfo,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
         final JobsProperties jobsProperties,
@@ -196,7 +197,7 @@ public class JobRestController {
         this.jobExecutionResourceAssembler = jobExecutionResourceAssembler;
         this.jobMetadataResourceAssembler = jobMetadataResourceAssembler;
         this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
-        this.hostName = hostName;
+        this.hostname = genieHostInfo.getHostname();
         this.restTemplate = restTemplate;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
         this.jobsProperties = jobsProperties;
@@ -543,7 +544,7 @@ public class JobRestController {
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
         if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
             final String jobHostname = this.jobSearchService.getJobHost(id);
-            if (!this.hostName.equals(jobHostname)) {
+            if (!this.hostname.equals(jobHostname)) {
                 log.info("Job {} is not on this node. Forwarding kill request to {}", id, jobHostname);
                 final String forwardHost = this.buildForwardHost(jobHostname);
                 try {
@@ -709,7 +710,7 @@ public class JobRestController {
             //       However that could get into problems where the job finished or died
             //       and it would return false on check if the job with given id is running on that node
             final String jobHostname = this.jobSearchService.getJobHost(id);
-            if (!this.hostName.equals(jobHostname)) {
+            if (!this.hostname.equals(jobHostname)) {
                 log.info("Job {} is not or was not run on this node. Forwarding to {}", id, jobHostname);
                 final String forwardHost = this.buildForwardHost(jobHostname);
                 try {

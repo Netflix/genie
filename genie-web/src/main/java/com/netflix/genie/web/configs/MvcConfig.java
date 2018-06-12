@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import com.netflix.genie.web.services.JobFileService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -79,17 +81,23 @@ public class MvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Get the hostname for this application. This is the default fallback implementation if no other bean with
-     * id hostname has been created by another profile.
+     * Get the {@link GenieHostInfo} for this application. This is the default fallback implementation if no other bean
+     * instance of this type has been created.
      *
-     * @return The hostname calculated from InetAddress
-     * @throws UnknownHostException When the host can't be calculated
+     * @return The hostname calculated from {@link InetAddress}
+     * @throws UnknownHostException  When the host can't be calculated
+     * @throws IllegalStateException When an instance can't be created
      * @see InetAddress#getCanonicalHostName()
      */
     @Bean
-    @ConditionalOnMissingBean
-    public String hostName() throws UnknownHostException {
-        return InetAddress.getLocalHost().getCanonicalHostName();
+    @ConditionalOnMissingBean(GenieHostInfo.class)
+    public GenieHostInfo genieHostInfo() throws UnknownHostException {
+        final String hostname = InetAddress.getLocalHost().getCanonicalHostName();
+        if (StringUtils.isNotBlank(hostname)) {
+            return new GenieHostInfo(hostname);
+        } else {
+            throw new IllegalStateException("Unable to create a Genie Host Info instance");
+        }
     }
 
     /**
@@ -140,7 +148,7 @@ public class MvcConfig implements WebMvcConfigurer {
      * @return A default directory writer
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(DirectoryWriter.class)
     public DirectoryWriter directoryWriter() {
         return new DefaultDirectoryWriter();
     }

@@ -84,9 +84,9 @@ public class MvcConfigUnitTests {
      * @throws UnknownHostException When the host can't be calculated
      */
     @Test
-    public void canGetHostname() throws UnknownHostException {
+    public void canGetGenieHostInfo() throws UnknownHostException {
         final String expectedHostname = InetAddress.getLocalHost().getCanonicalHostName();
-        Assert.assertThat(this.mvcConfig.hostName(), Matchers.is(expectedHostname));
+        Assert.assertThat(this.mvcConfig.genieHostInfo().getHostname(), Matchers.is(expectedHostname));
     }
 
     /**

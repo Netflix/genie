@@ -32,17 +32,17 @@ import javax.validation.constraints.NotNull;
 public class JobMetricsServiceImpl implements JobMetricsService {
 
     private final JobSearchService jobSearchService;
-    private final String hostName;
+    private final String hostname;
 
     /**
      * Constructor.
      *
      * @param jobSearchService The job search service to use.
-     * @param hostName         The name of this host
+     * @param hostname         The name of this host
      */
-    public JobMetricsServiceImpl(@NotNull final JobSearchService jobSearchService, @NotNull final String hostName) {
+    public JobMetricsServiceImpl(@NotNull final JobSearchService jobSearchService, @NotNull final String hostname) {
         this.jobSearchService = jobSearchService;
-        this.hostName = hostName;
+        this.hostname = hostname;
     }
 
     /**
@@ -50,7 +50,7 @@ public class JobMetricsServiceImpl implements JobMetricsService {
      */
     @Override
     public int getNumActiveJobs() {
-        return this.jobSearchService.getAllActiveJobsOnHost(this.hostName).size();
+        return this.jobSearchService.getAllActiveJobsOnHost(this.hostname).size();
     }
 
     /**

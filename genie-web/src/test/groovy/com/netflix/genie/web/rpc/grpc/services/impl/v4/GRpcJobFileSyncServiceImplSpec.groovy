@@ -40,6 +40,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.ScheduledFuture
 
 /**
@@ -51,7 +52,7 @@ import java.util.concurrent.ScheduledFuture
 class GRpcJobFileSyncServiceImplSpec extends Specification {
 
     @Shared
-    Charset UTF_8 = Charset.forName("utf-8")
+    Charset UTF_8 = StandardCharsets.UTF_8
 
     @Rule
     GrpcServerRule gRpcServerRule = new GrpcServerRule().directExecutor()

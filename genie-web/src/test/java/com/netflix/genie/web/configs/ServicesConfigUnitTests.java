@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
@@ -141,7 +142,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(CommandPersistenceService.class),
                 Mockito.mock(JobSpecificationService.class),
                 Mockito.mock(MeterRegistry.class),
-                UUID.randomUUID().toString()
+                new GenieHostInfo(UUID.randomUUID().toString())
             )
         );
     }
@@ -153,7 +154,7 @@ public class ServicesConfigUnitTests {
     public void canGetJobKillServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.jobKillService(
-                "localhost",
+                new GenieHostInfo("localhost"),
                 this.jobSearchService,
                 Mockito.mock(Executor.class),
                 new JobsProperties(),

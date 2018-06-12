@@ -19,6 +19,7 @@ package com.netflix.genie.web.controllers;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
@@ -112,7 +113,7 @@ public class JobRestControllerUnitTests {
             Mockito.mock(JobExecutionResourceAssembler.class),
             Mockito.mock(JobMetadataResourceAssembler.class),
             Mockito.mock(JobSearchResultResourceAssembler.class),
-            this.hostname,
+            new GenieHostInfo(this.hostname),
             this.restTemplate,
             this.genieResourceHttpRequestHandler,
             this.jobsProperties,
@@ -501,7 +502,7 @@ public class JobRestControllerUnitTests {
             Mockito.mock(JobExecutionResourceAssembler.class),
             Mockito.mock(JobMetadataResourceAssembler.class),
             Mockito.mock(JobSearchResultResourceAssembler.class),
-            this.hostname,
+            new GenieHostInfo(this.hostname),
             template,
             this.genieResourceHttpRequestHandler,
             this.jobsProperties,

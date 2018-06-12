@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,14 +15,25 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.common.internal.util
+
+import spock.lang.Specification
 
 /**
- * Internal utilities shared by client and server components.
+ * Specifications for {@link GenieHostInfo} class.
  *
- * @author mprimi
+ * @author tgianos
  * @since 4.0.0
  */
-@ParametersAreNonnullByDefault
-package com.netflix.genie.common.internal.util;
+class GenieHostInfoSpec extends Specification {
 
-import javax.annotation.ParametersAreNonnullByDefault;
+    def "Can construct"() {
+        def hostname = UUID.randomUUID().toString()
+
+        when:
+        def genieHostInfo = new GenieHostInfo(hostname)
+
+        then:
+        genieHostInfo.getHostname() == hostname
+    }
+}

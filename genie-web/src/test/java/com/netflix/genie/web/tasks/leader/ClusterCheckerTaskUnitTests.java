@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
@@ -55,7 +56,7 @@ import java.util.UUID;
 public class ClusterCheckerTaskUnitTests {
 
     private ClusterCheckerTask task;
-    private String hostName;
+    private String hostname;
     private JobSearchService jobSearchService;
     private JobPersistenceService jobPersistenceService;
     private RestTemplate restTemplate;
@@ -67,7 +68,8 @@ public class ClusterCheckerTaskUnitTests {
      */
     @Before
     public void setup() {
-        this.hostName = UUID.randomUUID().toString();
+        this.hostname = UUID.randomUUID().toString();
+        final GenieHostInfo genieHostInfo = new GenieHostInfo(this.hostname);
         final ClusterCheckerProperties properties = new ClusterCheckerProperties();
         properties.setHealthIndicatorsToIgnore("memory,genie ");
         this.jobSearchService = Mockito.mock(JobSearchService.class);
@@ -76,7 +78,7 @@ public class ClusterCheckerTaskUnitTests {
         final WebEndpointProperties serverProperties = Mockito.mock(WebEndpointProperties.class);
         Mockito.when(serverProperties.getBasePath()).thenReturn("/actuator");
         this.task = new ClusterCheckerTask(
-            this.hostName,
+            genieHostInfo,
             properties,
             this.jobSearchService,
             this.jobPersistenceService,
@@ -187,7 +189,7 @@ public class ClusterCheckerTaskUnitTests {
                 emptyString
             );
 
-        final Set<String> hostsRunningJobs = Sets.newHashSet(this.hostName, host1, host2, host3);
+        final Set<String> hostsRunningJobs = Sets.newHashSet(this.hostname, host1, host2, host3);
         Mockito.when(this.jobSearchService.getAllHostsWithActiveJobs()).thenReturn(hostsRunningJobs);
 
         final Job job1 = Mockito.mock(Job.class);

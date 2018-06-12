@@ -18,6 +18,7 @@
  package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
 import com.google.protobuf.util.Timestamps;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.proto.PingRequest;
 import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.proto.PongResponse;
@@ -45,8 +46,8 @@ public class GRpcPingServiceImpl extends PingServiceGrpc.PingServiceImplBase {
 
     private final String hostName;
 
-    GRpcPingServiceImpl(final String hostName) {
-        this.hostName = hostName;
+    GRpcPingServiceImpl(final GenieHostInfo genieHostInfo) {
+        this.hostName = genieHostInfo.getHostname();
     }
 
     /**

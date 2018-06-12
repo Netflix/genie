@@ -17,12 +17,16 @@
  */
 package com.netflix.genie.web.configs.aws;
 
+import com.amazonaws.util.EC2MetadataUtils;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.aws.context.annotation.ConditionalOnAwsCloudEnvironment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Beans and configuration specifically for MVC on AWS.
@@ -35,27 +39,31 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AwsMvcConfig {
 
-    // See: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
-    static final String PUBLIC_HOSTNAME_GET = "http://169.254.169.254/latest/meta-data/public-hostname";
-    static final String LOCAL_IPV4_HOSTNAME_GET = "http://169.254.169.254/latest/meta-data/local-ipv4";
-
     /**
-     * Get the host name for this application by calling the AWS metadata endpoints. Overrides default implementation
-     * which defaults to using InetAddress class. Only active when profile enabled.
+     * Create an instance of {@link GenieHostInfo} using the EC2 metadata service as we're deployed in an AWS cloud
+     * environment.
      *
-     * @param restTemplate The rest template to use to call the Amazon endpoints
-     * @return The hostname
+     * @return The {@link GenieHostInfo} instance
+     * @throws UnknownHostException If all EC2 host instance calculation AND local resolution can't determine a hostname
+     * @throws IllegalStateException If an instance can't be created
      */
     @Bean
-    public String hostName(@Qualifier("genieRestTemplate") final RestTemplate restTemplate) {
-        String result;
-        try {
-            result = restTemplate.getForObject(PUBLIC_HOSTNAME_GET, String.class);
-            log.debug("AWS Public Hostname: {}", result);
-        } catch (Exception e) {
-            result = restTemplate.getForObject(LOCAL_IPV4_HOSTNAME_GET, String.class);
-            log.debug("AWS IPV4 Hostname: {}", result);
+    public GenieHostInfo genieHostInfo() throws UnknownHostException {
+        final String ec2LocalHostName = EC2MetadataUtils.getLocalHostName();
+        if (StringUtils.isNotBlank(ec2LocalHostName)) {
+            return new GenieHostInfo(ec2LocalHostName);
         }
-        return result;
+
+        final String ec2Ipv4Address = EC2MetadataUtils.getPrivateIpAddress();
+        if (StringUtils.isNotBlank(ec2Ipv4Address)) {
+            return new GenieHostInfo(ec2Ipv4Address);
+        }
+
+        final String localHostname = InetAddress.getLocalHost().getCanonicalHostName();
+        if (StringUtils.isNotBlank(localHostname)) {
+            return new GenieHostInfo(localHostname);
+        }
+
+        throw new IllegalStateException("Unable to resolve Genie host info");
     }
 }
