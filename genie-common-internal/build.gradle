@@ -9,6 +9,7 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
+     implementation("org.springframework:spring-context")
      implementation(project(":genie-common"))
      implementation(project(":genie-common-external"))
      implementation(project(":genie-proto"))
