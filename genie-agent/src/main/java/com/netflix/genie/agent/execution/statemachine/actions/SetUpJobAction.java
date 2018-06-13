@@ -21,18 +21,20 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.RegexRuleSet;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -60,13 +62,16 @@ import java.util.regex.Pattern;
 class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
     private DownloadService downloadService;
+    private final AgentJobService agentJobService;
 
     SetUpJobAction(
         final ExecutionContext executionContext,
-        final DownloadService downloadService
+        final DownloadService downloadService,
+        final AgentJobService agentJobService
     ) {
         super(executionContext);
         this.downloadService = downloadService;
+        this.agentJobService = agentJobService;
     }
 
     /**
@@ -76,6 +81,19 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     protected Events executeStateAction(
         final ExecutionContext executionContext
     ) {
+
+        try {
+            this.agentJobService.changeJobStatus(
+                executionContext.getClaimedJobId(),
+                executionContext.getCurrentJobStatus(),
+                JobStatus.INIT,
+                "Setting up job"
+            );
+            executionContext.setCurrentJobStatus(JobStatus.INIT);
+        } catch (final ChangeJobStatusException e) {
+            throw new RuntimeException("Failed to update job status", e);
+        }
+
         try {
             performJobSetup(executionContext);
         } catch (final SetUpJobException e) {
@@ -137,7 +155,8 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         }
 
         // Create job directory
-        final File jobDirectory = createJobDirectory(jobSpec);
+        final File jobDirectory = new File(jobSpec.getJobDirectoryLocation(), executionContext.getClaimedJobId());
+        createJobDirectory(jobDirectory);
 
         executionContext.setJobDirectory(jobDirectory);
 
@@ -173,33 +192,26 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         executionContext.setJobEnvironment(jobEnvironment);
     }
 
-    private File createJobDirectory(
-        final JobSpecification jobSpec
+    private void createJobDirectory(
+        final File jobDirectory
     ) throws SetUpJobException {
-        final File parentDir = jobSpec.getJobDirectoryLocation();
-        final String jobId = jobSpec.getJob().getId();
+        final File parentDir = jobDirectory.getParentFile();
 
-        if (StringUtils.isBlank(jobId)) {
-            throw new SetUpJobException("Job directory parent is blank");
-        } else if (!parentDir.exists() || !parentDir.isDirectory()) {
+        if (!parentDir.exists() || !parentDir.isDirectory()) {
             throw new SetUpJobException("Invalid destination for job directory: " + parentDir);
         } else if (!parentDir.isAbsolute()) {
             throw new SetUpJobException("Job directory parent path is not absolute: " + parentDir);
         }
 
-        final File jobDir = new File(parentDir, jobId);
-
-        if (jobDir.exists()) {
-            throw new SetUpJobException("Job directory already exists: " + jobDir);
+        if (jobDirectory.exists()) {
+            throw new SetUpJobException("Job directory already exists: " + jobDirectory);
         }
 
         try {
-            Files.createDirectory(jobDir.toPath());
+            Files.createDirectory(jobDirectory.toPath());
         } catch (final IOException e) {
             throw new SetUpJobException("Failed to create job directory", e);
         }
-
-        return jobDir;
     }
 
     private void createJobDirectoryStructure(

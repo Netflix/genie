@@ -19,60 +19,87 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
+import spock.lang.Unroll
 
 @Category(UnitTest.class)
 class MonitorJobActionSpec extends Specification {
+    String id
     ExecutionContext executionContext
     MonitorJobAction action
     Process process
+    AgentJobService agentJobService
 
     void setup() {
+        this.id = UUID.randomUUID().toString()
         this.executionContext = Mock(ExecutionContext)
-        this.action = new MonitorJobAction()
+        this.agentJobService = Mock(AgentJobService)
         this.process = Mock(Process)
+        this.action = new MonitorJobAction(executionContext, agentJobService)
     }
 
-    void cleanup() {
-    }
+    @Unroll
+    def "Successful, expecting job status #expectedJobStatus"() {
+        JobStatus currentJobStatus = JobStatus.RUNNING
 
-    def "Successful job execution"() {
         when:
         def event = action.executeStateAction(executionContext)
 
         then:
         1 * executionContext.getJobProcess() >> process
-        1 * process.waitFor() >> 0
-        1 * executionContext.setFinalJobStatus(JobStatus.SUCCEEDED)
-        event == Events.MONITOR_JOB_COMPLETE
-    }
+        1 * process.waitFor() >> exitCode
+        1 * executionContext.setFinalJobStatus(expectedJobStatus)
+        1 * executionContext.getClaimedJobId() >> id
+        1 * executionContext.getCurrentJobStatus() >> currentJobStatus
+        1 * agentJobService.changeJobStatus(id, currentJobStatus, expectedJobStatus, _ as String)
+        1 * executionContext.setCurrentJobStatus(expectedJobStatus)
 
-    def "Unsuccessful job execution"() {
-        when:
-        def event = action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getJobProcess() >> process
-        1 * process.waitFor() >> 123
-        1 * executionContext.setFinalJobStatus(JobStatus.FAILED)
+        expect:
         event == Events.MONITOR_JOB_COMPLETE
+
+        where:
+        exitCode | expectedJobStatus
+        0        | JobStatus.SUCCEEDED
+        123L     | JobStatus.FAILED
     }
 
     def "Interrupt while monitoring"() {
         setup:
-        def interruptException = new InterruptedException("test")
+        def exception = new InterruptedException("...")
 
         when:
         action.executeStateAction(executionContext)
 
         then:
         1 * executionContext.getJobProcess() >> process
-        1 * process.waitFor() >> { throw interruptException }
+        1 * process.waitFor() >> { throw exception }
         Exception e = thrown(RuntimeException)
-        e.getCause() == interruptException
+        e.getCause() == exception
+    }
+
+    def "Change job status exception"() {
+        JobStatus currentJobStatus = JobStatus.RUNNING
+        JobStatus expectedJobStatus = JobStatus.SUCCEEDED
+        Exception exception = new ChangeJobStatusException("...")
+
+        when:
+        action.executeStateAction(executionContext)
+
+        then:
+        1 * executionContext.getJobProcess() >> process
+        1 * process.waitFor() >> 0
+        1 * executionContext.setFinalJobStatus(expectedJobStatus)
+        1 * executionContext.getClaimedJobId() >> id
+        1 * executionContext.getCurrentJobStatus() >> currentJobStatus
+        1 * agentJobService.changeJobStatus(id, currentJobStatus, expectedJobStatus, _ as String) >> { throw exception }
+        0 * executionContext.setCurrentJobStatus(_)
+        Exception e = thrown(RuntimeException)
+        e.getCause() == exception
     }
 }
