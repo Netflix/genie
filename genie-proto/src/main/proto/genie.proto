@@ -85,8 +85,14 @@ message ReserveJobIdRequest {
 }
 
 message ReserveJobIdError {
-    string message = 1;
-    string exception = 2;
+    enum Type {
+        UNKNOWN = 0;
+        ID_NOT_AVAILABLE = 1;
+        INVALID_REQUEST = 2;
+        SERVER_ERROR = 3;
+    }
+    Type type = 1;
+    string message = 2;
 }
 
 message ReserveJobIdResponse {
@@ -132,6 +138,7 @@ message JobSpecificationError {
         NO_APPLICATION_FOUND = 3;
         NO_JOB_FOUND = 4;
         NO_SPECIFICATION_FOUND = 5;
+        INVALID_REQUEST = 6;
     }
     Type type = 1;
     string message = 2;
@@ -160,7 +167,7 @@ message ClaimJobError {
         UNKNOWN = 0;
         ALREADY_CLAIMED = 1;
         NO_SUCH_JOB = 2;
-        NO_ID_SUPPLIED = 3;
+        INVALID_REQUEST = 3;
         INVALID_STATUS = 4;
     }
     Type type = 1;
@@ -181,11 +188,10 @@ message ChangeJobStatusRequest {
 
 message ChangeJobStatusError {
     enum Type {
-        NO_ID_SUPPLIED = 0;
-        INCORRECT_CURRENT_STATUS = 1;
-        UNKNOWN_STATUS_SUPPLIED = 2;
-        NO_SUCH_JOB = 4;
-        UNKNOWN = 3;
+        UNKNOWN = 0;
+        INVALID_REQUEST = 1;
+        INCORRECT_CURRENT_STATUS = 2;
+        NO_SUCH_JOB = 3;
     }
     Type type = 1;
     string message = 2;

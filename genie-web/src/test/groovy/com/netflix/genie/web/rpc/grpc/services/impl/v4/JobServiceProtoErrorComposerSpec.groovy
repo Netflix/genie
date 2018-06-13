@@ -18,7 +18,7 @@
 
 package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
-import com.netflix.genie.common.exceptions.GenieConversionException
+import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.common.exceptions.GeniePreconditionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException

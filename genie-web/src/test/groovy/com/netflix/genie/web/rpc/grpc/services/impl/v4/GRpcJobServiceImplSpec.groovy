@@ -17,39 +17,20 @@
  */
 package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
-import com.google.common.collect.ImmutableMap
-import com.google.common.collect.Lists
-import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.exceptions.GeniePreconditionException
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
-import com.netflix.genie.proto.AgentConfig
-import com.netflix.genie.proto.AgentMetadata
-import com.netflix.genie.proto.ChangeJobStatusError
-import com.netflix.genie.proto.ChangeJobStatusRequest
-import com.netflix.genie.proto.ChangeJobStatusResponse
-import com.netflix.genie.proto.ClaimJobError
-import com.netflix.genie.proto.ClaimJobRequest
-import com.netflix.genie.proto.ClaimJobResponse
-import com.netflix.genie.proto.Criterion
-import com.netflix.genie.proto.DryRunJobSpecificationRequest
-import com.netflix.genie.proto.ExecutionResourceCriteria
-import com.netflix.genie.proto.JobMetadata
-import com.netflix.genie.proto.JobSpecificationRequest
-import com.netflix.genie.proto.JobSpecificationResponse
-import com.netflix.genie.proto.ReserveJobIdRequest
-import com.netflix.genie.proto.ReserveJobIdResponse
+import com.netflix.genie.proto.*
 import com.netflix.genie.web.services.AgentJobService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
-import spock.lang.Unroll
 
 /**
  * Specifications for the {@link GRpcJobServiceImpl} class.
@@ -59,591 +40,287 @@ import spock.lang.Unroll
  */
 class GRpcJobServiceImplSpec extends Specification {
 
-    // TODO: explore using GrpcServerRule
+    String id
+    JobServiceProtoErrorComposer errorMessageComposer
+    AgentJobService agentJobService
+    GRpcJobServiceImpl gRpcJobService
+    StreamObserver<ReserveJobIdResponse> reserveJobIdResponseObserver
+    StreamObserver<JobSpecificationResponse> jobSpecificationResponseObserver
+    StreamObserver<ClaimJobResponse> claimJobResponseObserver
+    StreamObserver<ChangeJobStatusResponse> changeJobStatusResponseObserver
+    JobServiceProtoConverter jobServiceProtoConverter
 
-    def id = UUID.randomUUID().toString()
-    def name = UUID.randomUUID().toString()
-    def user = UUID.randomUUID().toString()
-    def description = UUID.randomUUID().toString()
-    def version = UUID.randomUUID().toString()
-    def metadataString = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
-    def tags = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def email = UUID.randomUUID().toString()
-    def grouping = UUID.randomUUID().toString()
-    def groupingInstance = UUID.randomUUID().toString()
-
-    def interactive = true
-    def commandArgs = Lists.newArrayList(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def jobDirectoryLocation = new File("/tmp").getAbsolutePath()
-
-    def configs = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def dependencies = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def setupFile = UUID.randomUUID().toString()
-
-    def commandCriterionId = UUID.randomUUID().toString()
-    def commandCriterionName = UUID.randomUUID().toString()
-    def commandCriterionStatus = UUID.randomUUID().toString()
-    def commandCriterionTags = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def clusterCriterion0Id = UUID.randomUUID().toString()
-    def clusterCriterion0Name = UUID.randomUUID().toString()
-    def clusterCriterion0Status = UUID.randomUUID().toString()
-    def clusterCriterion0Tags = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def clusterCriterion1Id = UUID.randomUUID().toString()
-    def clusterCriterion1Name = UUID.randomUUID().toString()
-    def clusterCriterion1Status = UUID.randomUUID().toString()
-    def clusterCriterion1Tags = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def clusterCriterion2Id = UUID.randomUUID().toString()
-    def clusterCriterion2Name = UUID.randomUUID().toString()
-    def clusterCriterion2Status = UUID.randomUUID().toString()
-    def clusterCriterion2Tags = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def applicationIds = Lists.newArrayList(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-
-    def clusterId = UUID.randomUUID().toString()
-    def clusterConfigs = Sets.newHashSet(
-            UUID.randomUUID().toString()
-    )
-    def clusterDependencies = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def clusterSetupFile = UUID.randomUUID().toString()
-
-    def commandId = UUID.randomUUID().toString()
-    def commandConfigs = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def commandDependencies = Sets.newHashSet(
-            UUID.randomUUID().toString()
-    )
-    def commandSetupFile = UUID.randomUUID().toString()
-
-    def application0Id = UUID.randomUUID().toString()
-    def application0Configs = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def application0Dependencies = Sets.newHashSet(
-            UUID.randomUUID().toString()
-    )
-    def application0SetupFile = UUID.randomUUID().toString()
-
-    def application1Id = UUID.randomUUID().toString()
-    def application1Configs = Sets.newHashSet(
-            UUID.randomUUID().toString()
-    )
-    def application1Dependencies = Sets.newHashSet(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-    )
-    def application1SetupFile = UUID.randomUUID().toString()
-
-    def environmentVariables = ImmutableMap.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-
-    def agentHostname = UUID.randomUUID().toString()
-    def agentVersion = UUID.randomUUID().toString()
-    def agentPid = 12_345
-
-    def "Can reserve job id"() {
-        def reserveJobIdRequest = createReserveJobIdRequest()
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ReserveJobIdResponse> responseObserver = Mock()
-
-        when:
-        service.reserveJobId(reserveJobIdRequest, responseObserver)
-
-        then:
-        1 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata) >> id
-        1 * responseObserver.onNext(_ as ReserveJobIdResponse)
-        1 * responseObserver.onCompleted()
-
-        when:
-        service.reserveJobId(reserveJobIdRequest, responseObserver)
-
-        then:
-        1 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata) >> {
-            throw new RuntimeException("uh oh")
-        }
-        1 * responseObserver.onNext(_ as ReserveJobIdResponse)
-        1 * responseObserver.onCompleted()
+    def setup() {
+        this.id = UUID.randomUUID().toString()
+        this.errorMessageComposer = Mock(JobServiceProtoErrorComposer)
+        this.jobServiceProtoConverter = Mock(JobServiceProtoConverter)
+        this.agentJobService = Mock(AgentJobService)
+        this.gRpcJobService = new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, errorMessageComposer)
+        this.reserveJobIdResponseObserver = Mock(StreamObserver)
+        this.jobSpecificationResponseObserver = Mock(StreamObserver)
+        this.claimJobResponseObserver = Mock(StreamObserver)
+        this.changeJobStatusResponseObserver = Mock(StreamObserver)
     }
 
-    def "Can resolve job specification"() {
-        def jobSpecification = createJobSpecification()
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+    def "Reserve job id -- successful"() {
+        ReserveJobIdRequest request = ReserveJobIdRequest.newBuilder().build()
+        JobRequest jobRequest = Mock(JobRequest)
+        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
+        ReserveJobIdResponse expectedResponse = ReserveJobIdResponse.newBuilder().setId(id).build()
 
         when:
-        service.resolveJobSpecification(createJobSpecificationRequest(), responseObserver)
+        gRpcJobService.reserveJobId(request, reserveJobIdResponseObserver)
+
+        then:
+        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
+        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> agentClientMetadata
+        1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> id
+        1 * reserveJobIdResponseObserver.onNext(expectedResponse)
+        1 * reserveJobIdResponseObserver.onCompleted()
+    }
+
+    def "Reserve job id -- service exception"() {
+        ReserveJobIdRequest request = ReserveJobIdRequest.newBuilder().build()
+        JobRequest jobRequest = Mock(JobRequest)
+        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
+        Exception e = new RuntimeException()
+        ReserveJobIdResponse errorResponse = ReserveJobIdResponse.newBuilder().build()
+
+        when:
+        gRpcJobService.reserveJobId(request, reserveJobIdResponseObserver)
+
+        then:
+        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
+        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> agentClientMetadata
+        1 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata) >> {
+            throw e
+        }
+        1 * errorMessageComposer.toProtoReserveJobIdResponse(e) >> errorResponse
+        1 * reserveJobIdResponseObserver.onNext(errorResponse)
+        1 * reserveJobIdResponseObserver.onCompleted()
+    }
+
+    def "Resolve specification -- successful"() {
+        JobSpecificationRequest request = JobSpecificationRequest.newBuilder().setId(id).build()
+        JobSpecification jobSpecification = Mock(JobSpecification)
+        JobSpecificationResponse specificationResponse = JobSpecificationResponse.newBuilder().build()
+
+        when:
+        gRpcJobService.resolveJobSpecification(request, jobSpecificationResponseObserver)
 
         then:
         1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
-        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-        1 * responseObserver.onCompleted()
+        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> specificationResponse
+        1 * jobSpecificationResponseObserver.onNext(specificationResponse)
+        1 * jobSpecificationResponseObserver.onCompleted()
     }
 
-    def "Can't resolve job specification"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+
+    def "Resolve job specification -- successful"() {
+        JobSpecificationRequest request = JobSpecificationRequest.newBuilder().setId(id).build()
+        JobSpecification jobSpecification = Mock(JobSpecification)
+        JobSpecificationResponse response = JobSpecificationResponse.newBuilder().build()
 
         when:
-        service.resolveJobSpecification(createJobSpecificationRequest(), responseObserver)
+        gRpcJobService.resolveJobSpecification(request, jobSpecificationResponseObserver)
 
         then:
-        1 * agentJobService.resolveJobSpecification(id) >> {
-            throw new RuntimeException(UUID.randomUUID().toString())
-        }
-        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-        1 * responseObserver.onCompleted()
+        1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
+        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> response
+        1 * jobSpecificationResponseObserver.onNext(response)
+        1 * jobSpecificationResponseObserver.onCompleted()
     }
 
-    def "Can get a job specification that has already been resolved"() {
-        def jobSpecification = createJobSpecification()
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+    def "Resolve job specification -- service exception"() {
+        JobSpecificationRequest request = JobSpecificationRequest.newBuilder().setId(id).build()
+        Exception exception = new GenieJobNotFoundException()
+        JobSpecificationResponse response = JobSpecificationResponse.newBuilder().build()
 
         when:
-        service.getJobSpecification(createJobSpecificationRequest(), responseObserver)
+        gRpcJobService.resolveJobSpecification(request, jobSpecificationResponseObserver)
+
+        then:
+        1 * agentJobService.resolveJobSpecification(id) >> { throw exception }
+        1 * errorMessageComposer.toProtoJobSpecificationResponse(exception) >> response
+        1 * jobSpecificationResponseObserver.onNext(response)
+        1 * jobSpecificationResponseObserver.onCompleted()
+    }
+
+    def "Get job specification -- successful"() {
+        JobSpecificationRequest request = JobSpecificationRequest.newBuilder().setId(id).build()
+        JobSpecification jobSpecification = Mock(JobSpecification)
+        JobSpecificationResponse response = JobSpecificationResponse.newBuilder().build()
+
+        when:
+        gRpcJobService.getJobSpecification(request, jobSpecificationResponseObserver)
 
         then:
         1 * agentJobService.getJobSpecification(id) >> jobSpecification
-        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-        1 * responseObserver.onCompleted()
+        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> response
+        1 * jobSpecificationResponseObserver.onNext(response)
+        1 * jobSpecificationResponseObserver.onCompleted()
     }
 
-    def "Can not get a job specification that hasn't already been resolved"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+    def "Get job specification -- service exception"() {
+        JobSpecificationRequest request = JobSpecificationRequest.newBuilder().setId(id).build()
+        Exception exception = new GenieJobSpecificationNotFoundException()
+        JobSpecificationResponse response = JobSpecificationResponse.newBuilder().build()
 
         when:
-        service.getJobSpecification(createJobSpecificationRequest(), responseObserver)
+        gRpcJobService.getJobSpecification(request, jobSpecificationResponseObserver)
 
         then:
-        1 * agentJobService.getJobSpecification(id) >> {
-            throw new GenieJobSpecificationNotFoundException()
-        }
-        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-        1 * responseObserver.onCompleted()
+        1 * agentJobService.getJobSpecification(id) >> { throw exception }
+        1 * errorMessageComposer.toProtoJobSpecificationResponse(exception) >> response
+        1 * jobSpecificationResponseObserver.onNext(response)
+        1 * jobSpecificationResponseObserver.onCompleted()
     }
 
-    def "Can dry run job specification resolution"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
-        def jobSpecification = createJobSpecification()
+    def "Dry run resolve job specification -- successful"() {
+        DryRunJobSpecificationRequest request = DryRunJobSpecificationRequest.newBuilder().build()
+        JobRequest jobRequest = Mock(JobRequest)
+        JobSpecification jobSpecification = Mock(JobSpecification)
+        JobSpecificationResponse response = JobSpecificationResponse.newBuilder().build()
 
         when:
-        service.resolveJobSpecificationDryRun(createDryRunSpecificationRequest(), responseObserver)
+        gRpcJobService.resolveJobSpecificationDryRun(request, jobSpecificationResponseObserver)
 
         then:
-        1 * agentJobService.dryRunJobSpecificationResolution(_ as JobRequest) >> jobSpecification
-        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-        1 * responseObserver.onCompleted()
+        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
+        1 * agentJobService.dryRunJobSpecificationResolution(jobRequest) >> jobSpecification
+        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> response
+        1 * jobSpecificationResponseObserver.onNext(response)
+        1 * jobSpecificationResponseObserver.onCompleted()
     }
 
-    def "Can not dry run job specification resolution if resolution throws an error"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+    def "Dry run resolve job specification -- service exception"() {
+        DryRunJobSpecificationRequest request = DryRunJobSpecificationRequest.newBuilder().build()
+        JobRequest jobRequest = Mock(JobRequest)
+        Exception exception = new GenieJobAlreadyClaimedException()
+        JobSpecificationResponse response = JobSpecificationResponse.newBuilder().build()
 
         when:
-        service.resolveJobSpecificationDryRun(createDryRunSpecificationRequest(), responseObserver)
+        gRpcJobService.resolveJobSpecificationDryRun(request, jobSpecificationResponseObserver)
 
         then:
-        1 * agentJobService.dryRunJobSpecificationResolution(_ as JobRequest) >> {
-            throw new GenieRuntimeException()
-        }
-        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-        1 * responseObserver.onCompleted()
+        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
+        1 * agentJobService.dryRunJobSpecificationResolution(jobRequest) >> { throw exception }
+        1 * errorMessageComposer.toProtoJobSpecificationResponse(exception) >> response
+        1 * jobSpecificationResponseObserver.onNext(response)
+        1 * jobSpecificationResponseObserver.onCompleted()
     }
 
-    def "Can't claim job for agent if id isn't present"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ClaimJobResponse> responseObserver = Mock()
-        ClaimJobResponse response
+    def "Claim job -- successful"() {
+        ClaimJobRequest request = ClaimJobRequest.newBuilder().setId(id).build()
+        AgentClientMetadata clientMetadata = Mock(AgentClientMetadata)
+        ClaimJobResponse responseCapture
 
         when:
-        service.claimJob(ClaimJobRequest.newBuilder().setId("").build(), responseObserver)
+        gRpcJobService.claimJob(request, claimJobResponseObserver)
 
         then:
-        1 * responseObserver.onNext(_ as ClaimJobResponse) >> {
-            arguments -> response = (ClaimJobResponse) arguments[0]
+        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> clientMetadata
+        1 * agentJobService.claimJob(id, clientMetadata)
+        1 * claimJobResponseObserver.onNext(_ as ClaimJobResponse) >> {
+            args ->
+                responseCapture = args[0] as ClaimJobResponse
         }
-        0 * agentJobService.claimJob(_ as String, _ as AgentClientMetadata)
-        response != null
-        !response.getSuccessful()
-        response.getError().getType() == ClaimJobError.Type.NO_ID_SUPPLIED
-        response.getError().getMessage() != null
-        1 * responseObserver.onCompleted()
+        1 * claimJobResponseObserver.onCompleted()
+
+        expect:
+        responseCapture != null
+        responseCapture.getSuccessful()
     }
 
-    @Unroll
-    def "Can't claim job for agent when #error.class is thrown"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ClaimJobResponse> responseObserver = Mock()
-        ClaimJobResponse response
+    def "Claim job -- service exception"() {
+        ClaimJobRequest request = ClaimJobRequest.newBuilder().setId(id).build()
+        AgentClientMetadata clientMetadata = Mock(AgentClientMetadata)
+        Exception exception = new GenieJobAlreadyClaimedException()
+        ClaimJobResponse response = ClaimJobResponse.newBuilder().build()
+
 
         when:
-        service.claimJob(createClaimJobRequest(), responseObserver)
+        gRpcJobService.claimJob(request, claimJobResponseObserver)
 
         then:
-        1 * responseObserver.onNext(_ as ClaimJobResponse) >> {
-            arguments -> response = (ClaimJobResponse) arguments[0]
-        }
-        1 * agentJobService.claimJob(_ as String, _ as AgentClientMetadata) >> {
-            throw error
-        }
-        response != null
-        !response.getSuccessful()
-        response.getError().getType() == type
-        response.getError().getMessage() == error.getMessage()
-        1 * responseObserver.onCompleted()
-
-        where:
-        error                                                             | type
-        new GenieJobAlreadyClaimedException(UUID.randomUUID().toString()) | ClaimJobError.Type.ALREADY_CLAIMED
-        new GenieJobNotFoundException(UUID.randomUUID().toString())       | ClaimJobError.Type.NO_SUCH_JOB
-        new GenieInvalidStatusException(UUID.randomUUID().toString())     | ClaimJobError.Type.INVALID_STATUS
-        new RuntimeException(UUID.randomUUID().toString())                | ClaimJobError.Type.UNKNOWN
+        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> clientMetadata
+        1 * agentJobService.claimJob(id, clientMetadata) >> { throw exception }
+        1 * errorMessageComposer.toProtoClaimJobResponse(exception) >> response
+        1 * claimJobResponseObserver.onNext(response)
+        1 * claimJobResponseObserver.onCompleted()
     }
 
-    def "Can claim job for agent"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ClaimJobResponse> responseObserver = Mock()
-        ClaimJobResponse response
-
-        when:
-        service.claimJob(createClaimJobRequest(), responseObserver)
-
-        then:
-        1 * responseObserver.onNext(_ as ClaimJobResponse) >> {
-            arguments -> response = (ClaimJobResponse) arguments[0]
-        }
-        1 * agentJobService.claimJob(_ as String, _ as AgentClientMetadata)
-        response != null
-        response.getSuccessful()
-        1 * responseObserver.onCompleted()
-    }
-
-    def "Can't update job for agent if id isn't present"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
-        ChangeJobStatusResponse response
-
-        when:
-        service.changeJobStatus(ChangeJobStatusRequest.newBuilder().setId("").build(), responseObserver)
-
-        then:
-        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
-            arguments -> response = (ChangeJobStatusResponse) arguments[0]
-        }
-        0 * agentJobService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
-        response != null
-        !response.getSuccessful()
-        response.getError().getType() == ChangeJobStatusError.Type.NO_ID_SUPPLIED
-        response.getError().getMessage() != null
-        1 * responseObserver.onCompleted()
-    }
-
-    @Unroll
-    def "Can't update job for agent if request has invalid status #request.getCurrentStatus() #request.getNewStatus()"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
-        ChangeJobStatusResponse response
-
-        when:
-        service.changeJobStatus(request, responseObserver)
-
-        then:
-        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
-            arguments -> response = (ChangeJobStatusResponse) arguments[0]
-        }
-        0 * agentJobService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
-        response != null
-        !response.getSuccessful()
-        response.getError().getType() == ChangeJobStatusError.Type.UNKNOWN_STATUS_SUPPLIED
-        response.getError().getMessage() != null
-        1 * responseObserver.onCompleted()
-
-        where:
-        request          | _
-        ChangeJobStatusRequest
-                .newBuilder()
-                .setId(UUID.randomUUID().toString())
-                .setCurrentStatus(UUID.randomUUID().toString())
-                .setNewStatusMessage(JobStatus.RUNNING.toString())
-                .build() | _
-        ChangeJobStatusRequest
-                .newBuilder()
-                .setId(UUID.randomUUID().toString())
-                .setCurrentStatus(JobStatus.INIT.toString())
-                .setNewStatusMessage(UUID.randomUUID().toString())
-                .build() | _
-    }
-
-    @Unroll
-    def "Can't update job for agent when #error.class is thrown"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
-        ChangeJobStatusResponse response
-
-        when:
-        service.changeJobStatus(createChangeJobStatusRequest(), responseObserver)
-
-        then:
-        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
-            arguments -> response = (ChangeJobStatusResponse) arguments[0]
-        }
-        1 * agentJobService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String) >> {
-            throw error
-        }
-        response != null
-        !response.getSuccessful()
-        response.getError().getType() == type
-        response.getError().getMessage() == error.getMessage()
-        1 * responseObserver.onCompleted()
-
-        where:
-        error                                                         | type
-        new GenieJobNotFoundException(UUID.randomUUID().toString())   | ChangeJobStatusError.Type.NO_SUCH_JOB
-        new GenieInvalidStatusException(UUID.randomUUID().toString()) | ChangeJobStatusError.Type.INCORRECT_CURRENT_STATUS
-        new RuntimeException(UUID.randomUUID().toString())            | ChangeJobStatusError.Type.UNKNOWN
-    }
-
-    def "Can update job status for agent"() {
-        def agentJobService = Mock(AgentJobService)
-        def service = new GRpcJobServiceImpl(agentJobService)
-        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
-        ChangeJobStatusResponse response
-        def request = createChangeJobStatusRequest()
-
-        when:
-        service.changeJobStatus(request, responseObserver)
-
-        then:
-        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
-            arguments -> response = (ChangeJobStatusResponse) arguments[0]
-        }
-        1 * agentJobService.updateJobStatus(
-                request.getId(),
-                JobStatus.parse(request.getCurrentStatus()),
-                JobStatus.parse(request.getNewStatus()),
-                request.getNewStatusMessage()
-        )
-        response != null
-        response.getSuccessful()
-        1 * responseObserver.onCompleted()
-    }
-
-    JobSpecificationRequest createJobSpecificationRequest() {
-        return JobSpecificationRequest.newBuilder().setId(id).build()
-    }
-
-    ReserveJobIdRequest createReserveJobIdRequest() {
-        def jobMetadataProto = createJobMetadataProto()
-        def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
-        def agentConfigProto = createAgentConfigProto()
-        def agentMetadata = createAgentMetadataProto()
-
-        return ReserveJobIdRequest
-                .newBuilder()
-                .setMetadata(jobMetadataProto)
-                .setCriteria(executionResourceCriteriaProto)
-                .setAgentConfig(agentConfigProto)
-                .setAgentMetadata(agentMetadata)
-                .build()
-    }
-
-    DryRunJobSpecificationRequest createDryRunSpecificationRequest() {
-        def jobMetadataProto = createJobMetadataProto()
-        def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
-        def agentConfigProto = createAgentConfigProto()
-
-        return DryRunJobSpecificationRequest
-                .newBuilder()
-                .setMetadata(jobMetadataProto)
-                .setCriteria(executionResourceCriteriaProto)
-                .setAgentConfig(agentConfigProto)
-                .build()
-    }
-
-    ClaimJobRequest createClaimJobRequest() {
-        def id = UUID.randomUUID().toString()
-        def agentMetadataProto = createAgentMetadataProto()
-
-        return ClaimJobRequest
-                .newBuilder()
+    def "Change job status -- successful"() {
+        JobStatus currentStatus = JobStatus.INIT
+        JobStatus newStatus = JobStatus.RUNNING
+        String message = "..."
+        ChangeJobStatusRequest request = ChangeJobStatusRequest.newBuilder()
+                .setCurrentStatus(currentStatus.name())
+                .setNewStatus(newStatus.name())
                 .setId(id)
-                .setAgentMetadata(agentMetadataProto)
+                .setNewStatusMessage(message)
                 .build()
+        ChangeJobStatusResponse responseCapture
+
+        when:
+        gRpcJobService.changeJobStatus(request, changeJobStatusResponseObserver)
+
+        then:
+        1 * agentJobService.updateJobStatus(id, currentStatus, newStatus, message)
+        1 * changeJobStatusResponseObserver.onNext(_ as ChangeJobStatusResponse) >> {
+            args -> responseCapture = args[0] as ChangeJobStatusResponse
+        }
+        1 * changeJobStatusResponseObserver.onCompleted()
+
+        expect:
+        responseCapture != null
+        responseCapture.getSuccessful()
     }
 
-    ChangeJobStatusRequest createChangeJobStatusRequest() {
-        return ChangeJobStatusRequest
-                .newBuilder()
-                .setId(UUID.randomUUID().toString())
-                .setCurrentStatus(JobStatus.INIT.toString())
-                .setNewStatus(JobStatus.RUNNING.toString())
-                .setNewStatusMessage(UUID.randomUUID().toString())
-                .build()
-    }
-
-    JobSpecification createJobSpecification() {
-        return new JobSpecification(
-                commandArgs,
-                new JobSpecification.ExecutionResource(
-                        id,
-                        new ExecutionEnvironment(configs, dependencies, setupFile)
-                ),
-                new JobSpecification.ExecutionResource(
-                        clusterId,
-                        new ExecutionEnvironment(clusterConfigs, clusterDependencies, clusterSetupFile)
-                ),
-                new JobSpecification.ExecutionResource(
-                        commandId,
-                        new ExecutionEnvironment(commandConfigs, commandDependencies, commandSetupFile)
-                ),
-                Lists.newArrayList(
-                        new JobSpecification.ExecutionResource(
-                                application0Id,
-                                new ExecutionEnvironment(
-                                        application0Configs,
-                                        application0Dependencies,
-                                        application0SetupFile
-                                )
-                        ),
-                        new JobSpecification.ExecutionResource(
-                                application1Id,
-                                new ExecutionEnvironment(
-                                        application1Configs,
-                                        application1Dependencies,
-                                        application1SetupFile
-                                )
-                        )
-                ),
-                environmentVariables,
-                interactive,
-                new File(jobDirectoryLocation)
-        )
-    }
-
-    JobMetadata createJobMetadataProto() {
-        return JobMetadata
-                .newBuilder()
+    def "Change job status -- service exception"() {
+        JobStatus currentStatus = JobStatus.INIT
+        JobStatus newStatus = JobStatus.RUNNING
+        String message = "..."
+        ChangeJobStatusRequest request = ChangeJobStatusRequest.newBuilder()
+                .setCurrentStatus(currentStatus.name())
+                .setNewStatus(newStatus.name())
                 .setId(id)
-                .setName(name)
-                .setUser(user)
-                .setVersion(version)
-                .setDescription(description)
-                .addAllTags(tags)
-                .setMetadata(metadataString)
-                .setEmail(email)
-                .setGrouping(grouping)
-                .setGroupingInstance(groupingInstance)
-                .setSetupFile(setupFile)
-                .addAllConfigs(configs)
-                .addAllDependencies(dependencies)
-                .addAllCommandArgs(commandArgs)
+                .setNewStatusMessage(message)
                 .build()
+        Exception exception = new GenieInvalidStatusException()
+        ChangeJobStatusResponse response = ChangeJobStatusResponse.newBuilder().build()
+
+        when:
+        gRpcJobService.changeJobStatus(request, changeJobStatusResponseObserver)
+
+        then:
+        1 * agentJobService.updateJobStatus(id, currentStatus, newStatus, message) >> {
+            throw exception
+        }
+        1 * errorMessageComposer.toProtoChangeJobStatusResponse(exception) >> response
+        1 * changeJobStatusResponseObserver.onNext(response)
+        1 * changeJobStatusResponseObserver.onCompleted()
     }
 
-    ExecutionResourceCriteria createExecutionResourceCriteriaProto() {
-        ExecutionResourceCriteria.newBuilder()
-                .addAllClusterCriteria(
-                Lists.newArrayList(
-                        Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion0Id)
-                                .setName(clusterCriterion0Name)
-                                .setStatus(clusterCriterion0Status)
-                                .addAllTags(clusterCriterion0Tags)
-                                .build(),
-                        Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion1Id)
-                                .setName(clusterCriterion1Name)
-                                .setStatus(clusterCriterion1Status)
-                                .addAllTags(clusterCriterion1Tags)
-                                .build(),
-                        Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion2Id)
-                                .setName(clusterCriterion2Name)
-                                .setStatus(clusterCriterion2Status)
-                                .addAllTags(clusterCriterion2Tags)
-                                .build()
-                )
-        ).setCommandCriterion(
-                Criterion
-                        .newBuilder()
-                        .setId(commandCriterionId)
-                        .setName(commandCriterionName)
-                        .setStatus(commandCriterionStatus)
-                        .addAllTags(commandCriterionTags)
-                        .build()
-        ).addAllRequestedApplicationIdOverrides(applicationIds)
+    def "Change job status -- unrecognized state"() {
+        String invalidStatusName = "Foo"
+        JobStatus newStatus = JobStatus.RUNNING
+        String message = "..."
+        ChangeJobStatusRequest request = ChangeJobStatusRequest.newBuilder()
+                .setCurrentStatus(invalidStatusName)
+                .setNewStatus(newStatus.name())
+                .setId(id)
+                .setNewStatusMessage(message)
                 .build()
-    }
+        ChangeJobStatusResponse response = ChangeJobStatusResponse.newBuilder().build()
 
-    AgentConfig createAgentConfigProto() {
-        return AgentConfig
-                .newBuilder()
-                .setIsInteractive(interactive)
-                .setJobDirectoryLocation(jobDirectoryLocation)
-                .build()
-    }
+        when:
+        gRpcJobService.changeJobStatus(request, changeJobStatusResponseObserver)
 
-    AgentMetadata createAgentMetadataProto() {
-        return AgentMetadata
-                .newBuilder()
-                .setAgentHostname(agentHostname)
-                .setAgentVersion(agentVersion)
-                .setAgentPid(agentPid)
-                .build()
+        then:
+        0 * agentJobService.updateJobStatus(_, _, _, _)
+        1 * errorMessageComposer.toProtoChangeJobStatusResponse(_ as GeniePreconditionException) >> response
+        1 * changeJobStatusResponseObserver.onNext(response)
+        1 * changeJobStatusResponseObserver.onCompleted()
     }
 }

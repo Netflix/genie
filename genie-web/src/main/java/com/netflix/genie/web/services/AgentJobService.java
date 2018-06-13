@@ -33,6 +33,8 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.ConstraintViolationException;
 
 /**
  * A Service to collect the logic for implementing calls from the Agent when a job is launched via the CLI.
@@ -50,6 +52,7 @@ public interface AgentJobService {
      * @param agentClientMetadata The metadata about the agent driving this job request
      * @return The unique id of the job which was saved in the database
      * @throws GenieIdAlreadyExistsException If the id requested along with the job request is already in use
+     * @throws ConstraintViolationException  If the arguments fail validation
      */
     String reserveJobId(@Valid final JobRequest jobRequest, @Valid final AgentClientMetadata agentClientMetadata);
 
@@ -66,8 +69,9 @@ public interface AgentJobService {
      *                                           exist
      * @throws GenieApplicationNotFoundException When an application specified in the job specification doesn't
      *                                           actually exist
+     * @throws ConstraintViolationException      If the arguments fail validation
      */
-    JobSpecification resolveJobSpecification(final String id);
+    JobSpecification resolveJobSpecification(@NotBlank final String id);
 
     /**
      * Get a job specification if has been resolved.
@@ -77,14 +81,16 @@ public interface AgentJobService {
      * @throws GenieJobNotFoundException              If the job has not yet had its ID reserved and/or can't be found
      * @throws GenieJobSpecificationNotFoundException If the job exists but the specification hasn't been
      *                                                resolved or saved yet
+     * @throws ConstraintViolationException           If the arguments fail validation
      */
-    JobSpecification getJobSpecification(final String id);
+    JobSpecification getJobSpecification(@NotBlank final String id);
 
     /**
      * Run the job specification resolution algorithm on the given input but save nothing in the system.
      *
      * @param jobRequest The job request containing all the metadata needed to resolve a job specification
      * @return The job specification that would have been resolved for the given input
+     * @throws ConstraintViolationException      If the arguments fail validation
      */
     JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest);
 
@@ -98,8 +104,9 @@ public interface AgentJobService {
      * @throws GenieJobAlreadyClaimedException if the job with the given {@code id} already has been claimed
      * @throws GenieInvalidStatusException     if the current job status is not
      *                                         {@link com.netflix.genie.common.dto.JobStatus#RESOLVED}
+     * @throws ConstraintViolationException    If the arguments fail validation
      */
-    void claimJob(final String id, @Valid final AgentClientMetadata agentClientMetadata);
+    void claimJob(@NotBlank final String id, @Valid final AgentClientMetadata agentClientMetadata);
 
     /**
      * Update the status of the job identified with {@code id} to be {@code newStatus} provided that the current status
@@ -116,9 +123,10 @@ public interface AgentJobService {
      * @throws GenieInvalidStatusException if the current status of the job identified by {@code id} in the system
      *                                     doesn't match the supplied {@code currentStatus}.
      *                                     Also if the {@code currentStatus} equals the {@code newStatus}.
+     * @throws ConstraintViolationException If the arguments fail validation
      */
     void updateJobStatus(
-        final String id,
+        @NotBlank final String id,
         final JobStatus currentStatus,
         final JobStatus newStatus,
         @Nullable final String newStatusMessage

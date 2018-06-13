@@ -20,6 +20,7 @@ package com.netflix.genie.common.internal.dto.v4.converters
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
@@ -34,7 +35,6 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFou
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
@@ -213,40 +213,42 @@ class JobServiceProtoConverterSpec extends Specification {
     def agentVersion = UUID.randomUUID().toString()
     def agentPid = 21_031
 
+    def converter = new JobServiceProtoConverter();
+
     def "Can convert JobRequest to ReserveJobIdRequest and vice versa"() {
-        def jobRequest = createJobRequest()
+        def jobRequest = createJobRequest(id)
         def agentClientMetadata = createAgentClientMetadata()
         def reserveJobIdRequest = createReserveJobIdRequest()
 
         when:
-        def reserveJobIdRequest1 = JobServiceProtoConverter.toProtoReserveJobIdRequest(jobRequest, agentClientMetadata)
-        def jobRequest1 = JobServiceProtoConverter.toJobRequestDTO(reserveJobIdRequest1)
+        def reserveJobIdRequest1 = converter.toProtoReserveJobIdRequest(jobRequest, agentClientMetadata)
+        def jobRequest1 = converter.toJobRequestDTO(reserveJobIdRequest1)
 
         then:
         jobRequest1 == jobRequest
 
 
         when:
-        def jobRequest2 = JobServiceProtoConverter.toJobRequestDTO(reserveJobIdRequest)
+        def jobRequest2 = converter.toJobRequestDTO(reserveJobIdRequest)
 
         then:
         jobRequest2 == jobRequest
     }
 
     def "Can convert JobRequest to DryRunJobSpecificationRequest and vice versa"() {
-        def jobRequest = createJobRequest()
+        def jobRequest = createJobRequest(id)
         def dryRunJobSpecificationRequest = createDryRunJobSpecificationRequest()
 
         when:
-        def dryRunJobSpecificationRequest1 = JobServiceProtoConverter.toProtoDryRunJobSpecificationRequest(jobRequest)
-        def jobRequest1 = JobServiceProtoConverter.toJobRequestDTO(dryRunJobSpecificationRequest1)
+        def dryRunJobSpecificationRequest1 = converter.toProtoDryRunJobSpecificationRequest(jobRequest)
+        def jobRequest1 = converter.toJobRequestDTO(dryRunJobSpecificationRequest1)
 
         then:
         jobRequest1 == jobRequest
 
 
         when:
-        def jobRequest2 = JobServiceProtoConverter.toJobRequestDTO(dryRunJobSpecificationRequest)
+        def jobRequest2 = converter.toJobRequestDTO(dryRunJobSpecificationRequest)
 
         then:
         jobRequest2 == jobRequest
@@ -254,7 +256,7 @@ class JobServiceProtoConverterSpec extends Specification {
 
     def "Can create a JobSpecificationRequest"() {
         when:
-        def request = JobServiceProtoConverter.toProtoJobSpecificationRequest(id)
+        def request = converter.toProtoJobSpecificationRequest(id)
 
         then:
         request.getId() == id
@@ -265,7 +267,7 @@ class JobServiceProtoConverterSpec extends Specification {
         def agentClientMetadata = createAgentClientMetadata()
 
         when:
-        def agentClientMetadata1 = JobServiceProtoConverter.toAgentClientMetadataDTO(agentMetadata)
+        def agentClientMetadata1 = converter.toAgentClientMetadataDTO(agentMetadata)
 
         then:
         agentClientMetadata1 == agentClientMetadata
@@ -294,8 +296,8 @@ class JobServiceProtoConverterSpec extends Specification {
         )
 
         when:
-        def specResponseProto = JobServiceProtoConverter.toProtoJobSpecificationResponse(originalSpecification)
-        def convertedSpecification = JobServiceProtoConverter.toJobSpecificationDTO(specResponseProto)
+        def specResponseProto = converter.toProtoJobSpecificationResponse(originalSpecification)
+        def convertedSpecification = converter.toJobSpecificationDTO(specResponseProto.getSpecification())
 
         then:
         originalSpecification == convertedSpecification
@@ -306,8 +308,8 @@ class JobServiceProtoConverterSpec extends Specification {
         def jobSpecificationResponse = createJobSpecificationResponse()
 
         when:
-        def jobSpecificationResponse2 = JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification)
-        def jobSpecification2 = JobServiceProtoConverter.toJobSpecificationDTO(jobSpecificationResponse2)
+        def jobSpecificationResponse2 = converter.toProtoJobSpecificationResponse(jobSpecification)
+        def jobSpecification2 = converter.toJobSpecificationDTO(jobSpecificationResponse2.getSpecification())
 
         then:
         jobSpecificationResponse2.hasSpecification()
@@ -316,76 +318,66 @@ class JobServiceProtoConverterSpec extends Specification {
 
 
         when:
-        def jobSpecification3 = JobServiceProtoConverter.toJobSpecificationDTO(jobSpecificationResponse)
+        def jobSpecification3 = converter.toJobSpecificationDTO(jobSpecificationResponse.getSpecification())
 
         then:
         jobSpecification3 == jobSpecification
     }
 
-    @Unroll
-    def "Job specification response error #error throws #exception"() {
+    def "Can convert id and AgentMetadata to ClaimJobRequest"() {
+        def agentClientMetadata = createAgentClientMetadata()
+
         when:
-        JobServiceProtoConverter.toJobSpecificationDTO(JobSpecificationResponse.newBuilder().setError(error).build())
+        def request = converter.toProtoClaimJobRequest(id, agentClientMetadata)
+        def agentClientMetadata2 = converter.toAgentClientMetadataDTO(request.getAgentMetadata());
 
         then:
-        thrown(exception)
-
-        where:
-        error                                             | exception
-        JobSpecificationError
-                .newBuilder()
-                .setType(JobSpecificationError.Type.NO_JOB_FOUND)
-                .setMessage(UUID.randomUUID().toString()) | GenieJobNotFoundException
-        JobSpecificationError
-                .newBuilder()
-                .setType(JobSpecificationError.Type.NO_CLUSTER_FOUND)
-                .setMessage(UUID.randomUUID().toString()) | GenieClusterNotFoundException
-        JobSpecificationError
-                .newBuilder()
-                .setType(JobSpecificationError.Type.NO_COMMAND_FOUND)
-                .setMessage(UUID.randomUUID().toString()) | GenieCommandNotFoundException
-        JobSpecificationError
-                .newBuilder()
-                .setType(JobSpecificationError.Type.NO_APPLICATION_FOUND)
-                .setMessage(UUID.randomUUID().toString()) | GenieApplicationNotFoundException
-        JobSpecificationError
-                .newBuilder()
-                .setType(JobSpecificationError.Type.NO_SPECIFICATION_FOUND)
-                .setMessage(UUID.randomUUID().toString()) | GenieJobSpecificationNotFoundException
-        JobSpecificationError
-                .newBuilder()
-                .setType(JobSpecificationError.Type.UNKNOWN)
-                .setMessage(UUID.randomUUID().toString()) | GenieRuntimeException
+        request.getId() == id
+        agentClientMetadata == agentClientMetadata2
     }
 
-    @Unroll
-    def "Can convert exception #exception.class to JobSpecificationResponse with error type #type"() {
+
+    def "Can convert JobRequest to ReserveJobIdRequest with null id"() {
+        def jobRequest = createJobRequest(null)
+        def agentClientMetadata = createAgentClientMetadata()
+
         when:
-        def response = JobServiceProtoConverter.toProtoJobSpecificationResponse(exception)
+        def reserveJobIdRequest = converter.toProtoReserveJobIdRequest(jobRequest, agentClientMetadata)
+        def jobRequest1 = converter.toJobRequestDTO(reserveJobIdRequest)
 
         then:
-        response.hasError()
-        !response.hasSpecification()
-        response.getError().getMessage() ==
-                (
-                        exception.getMessage() == null
-                                ? JobServiceProtoConverter.NO_ERROR_MESSAGE_PROVIDED
-                                : exception.getMessage()
-                )
-        response.getError().getType() == type
+        jobRequest1 == jobRequest
 
-        where:
-        exception                                                                | type
-        new GenieJobNotFoundException(UUID.randomUUID().toString())              | JobSpecificationError.Type.NO_JOB_FOUND
-        new GenieClusterNotFoundException(UUID.randomUUID().toString())          | JobSpecificationError.Type.NO_CLUSTER_FOUND
-        new GenieCommandNotFoundException(UUID.randomUUID().toString())          | JobSpecificationError.Type.NO_COMMAND_FOUND
-        new GenieApplicationNotFoundException(UUID.randomUUID().toString())      | JobSpecificationError.Type.NO_APPLICATION_FOUND
-        new GenieJobSpecificationNotFoundException(UUID.randomUUID().toString()) | JobSpecificationError.Type.NO_SPECIFICATION_FOUND
-        new RuntimeException(UUID.randomUUID().toString())                       | JobSpecificationError.Type.UNKNOWN
-        new GenieNotFoundException(UUID.randomUUID().toString())                 | JobSpecificationError.Type.UNKNOWN
+        when:
+        def resolveSpecDryRunRequest = converter.toProtoDryRunJobSpecificationRequest(jobRequest)
+        def jobRequest2 = converter.toJobRequestDTO(resolveSpecDryRunRequest)
+
+        then:
+        jobRequest2 == jobRequest
+
     }
 
-    AgentJobRequest createJobRequest() {
+    def "Can convert parameters to ChangeJobStatusRequest"() {
+        def currentStatus = JobStatus.INIT
+        def newStatus = JobStatus.RUNNING
+        def message = "..."
+
+        when:
+        def changeJobStatusRequest = converter.toProtoChangeJobStatusRequest(
+                id,
+                currentStatus,
+                newStatus,
+                message
+        )
+
+        then:
+        id == changeJobStatusRequest.getId()
+        currentStatus == JobStatus.parse(changeJobStatusRequest.getCurrentStatus())
+        newStatus == JobStatus.parse(changeJobStatusRequest.getNewStatus())
+        message == changeJobStatusRequest.getNewStatusMessage()
+    }
+
+    AgentJobRequest createJobRequest(String id) {
         def jobMetadata = new JobMetadata.Builder(name, user, version)
                 .withDescription(description)
                 .withMetadata(metadata)
