@@ -19,9 +19,12 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -43,13 +46,16 @@ import java.util.Map;
 class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
     private final LaunchJobService launchJobService;
+    private final AgentJobService agentJobService;
 
     LaunchJobAction(
         final ExecutionContext executionContext,
-        final LaunchJobService launchJobService
+        final LaunchJobService launchJobService,
+        final AgentJobService agentJobService
     ) {
         super(executionContext);
         this.launchJobService = launchJobService;
+        this.agentJobService = agentJobService;
     }
 
     /**
@@ -77,9 +83,24 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
             throw new RuntimeException("Failed to launch job", e);
         }
 
-        log.info("Job process started (pid: {})", getPid(jobProcess));
+        final long pid = getPid(jobProcess);
+
+        log.info("Job process started (pid: {})", pid);
 
         executionContext.setJobProcess(jobProcess);
+
+        try {
+            this.agentJobService.changeJobStatus(
+                executionContext.getClaimedJobId(),
+                executionContext.getCurrentJobStatus(),
+                JobStatus.RUNNING,
+                "Job running (pid: " + pid + ")"
+            );
+            executionContext.setCurrentJobStatus(JobStatus.RUNNING);
+
+        } catch (final ChangeJobStatusException e) {
+            throw new RuntimeException("Failed to update job status", e);
+        }
 
         return Events.LAUNCH_JOB_COMPLETE;
     }

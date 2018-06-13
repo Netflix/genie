@@ -19,6 +19,8 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +37,14 @@ import org.springframework.stereotype.Component;
 @Lazy
 class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob {
 
-    MonitorJobAction(final ExecutionContext executionContext) {
+    private final AgentJobService agentJobService;
+
+    MonitorJobAction(
+        final ExecutionContext executionContext,
+        final AgentJobService agentJobService
+    ) {
         super(executionContext);
+        this.agentJobService = agentJobService;
     }
 
     /**
@@ -56,9 +64,21 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
         log.info("Job process completed with exit code: {}", exitCode);
 
         // TODO: handle KILLED case
-        executionContext.setFinalJobStatus(
-            exitCode == 0 ? JobStatus.SUCCEEDED : JobStatus.FAILED
-        );
+        final JobStatus finalJobStatus = exitCode == 0 ? JobStatus.SUCCEEDED : JobStatus.FAILED;
+
+        executionContext.setFinalJobStatus(finalJobStatus);
+
+        try {
+            this.agentJobService.changeJobStatus(
+                executionContext.getClaimedJobId(),
+                executionContext.getCurrentJobStatus(),
+                finalJobStatus,
+                "Job process exited with status " + exitCode
+            );
+            executionContext.setCurrentJobStatus(finalJobStatus);
+        } catch (ChangeJobStatusException e) {
+            throw new RuntimeException("Failed to update job status", e);
+        }
 
         return Events.MONITOR_JOB_COMPLETE;
     }

@@ -18,24 +18,26 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
+import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.UUID;
-
 /**
  * Action performed when in state RESOLVE_JOB_SPECIFICATION.
+ * If this action executes successfully, the context contains a resolved job specification.
  *
  * @author mprimi
  * @since 4.0.0
@@ -47,17 +49,20 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
 
     private final ArgumentDelegates.JobRequestArguments jobRequestArguments;
     private final AgentJobService agentJobService;
+    private final AgentMetadata agentMetadata;
     private final JobRequestConverter jobRequestConverter;
 
     ResolveJobSpecificationAction(
         final ExecutionContext executionContext,
         final ArgumentDelegates.JobRequestArguments jobRequestArguments,
         final AgentJobService agentJobService,
+        final AgentMetadata agentMetadata,
         final JobRequestConverter jobRequestConverter
     ) {
         super(executionContext);
         this.jobRequestArguments = jobRequestArguments;
         this.agentJobService = agentJobService;
+        this.agentMetadata = agentMetadata;
         this.jobRequestConverter = jobRequestConverter;
     }
 
@@ -67,45 +72,75 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
 
+        log.info("Resolving job specification...");
+
         final JobSpecification jobSpecification;
+        final String jobId;
 
-        if (jobRequestArguments.getJobSpecificationFile() != null) {
-            log.info("Loading job specification from file: ");
+        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
+            agentMetadata.getAgentHostName(),
+            agentMetadata.getAgentVersion(),
+            Integer.parseInt(agentMetadata.getAgentPid())
+        );
 
+        // 2 cases:
+        // - Job requested via API and agent launched by the server (with specification pre-resolved)
+        // - Job launched directly via agent CLI (with job request to be resolved into a specification)
+        if (jobRequestArguments.isJobRequestedViaAPI()) {
+            // Set current status to expected server-side state.
+            executionContext.setCurrentJobStatus(JobStatus.ACCEPTED);
+
+            // Expect job id to be provided on the command-line
+            jobId = jobRequestArguments.getJobId();
+
+            // Obtain the specification pre-resolved on server
             try {
-                jobSpecification = GenieObjectMapper.getMapper().readValue(
-                    jobRequestArguments.getJobSpecificationFile(),
-                    JobSpecification.class
-                );
-            } catch (final IOException e) {
-                throw new RuntimeException("Failed to load job specification", e);
+                jobSpecification = agentJobService.getJobSpecification(jobId);
+            } catch (final JobSpecificationResolutionException e) {
+                throw new RuntimeException("Could not get specification for job " + jobId, e);
             }
-        } else {
-            log.info("Resolving job specification...");
 
-            // Compose a job request from argument
+        } else {
             final AgentJobRequest agentJobRequest;
             try {
                 agentJobRequest = jobRequestConverter.agentJobRequestArgsToDTO(jobRequestArguments);
             } catch (final JobRequestConverter.ConversionException e) {
-                throw new RuntimeException("Failed to construct job request from arguments", e);
+                throw new RuntimeException("Failed to compose job request", e);
             }
 
-            // Resolve via service
+            // Reserve a job ID
             try {
-                // TODO: Total placeholder here until we pass job id through ExecutionContext after reservation is
-                // complete
-                jobSpecification = agentJobService.resolveJobSpecification(
-                    agentJobRequest
-                        .getRequestedId()
-                        .orElse(UUID.randomUUID().toString())
-                );
-            } catch (final JobSpecificationResolutionException e) {
-                throw new RuntimeException("Failed to resolve job specification", e);
+                jobId = agentJobService.reserveJobId(agentJobRequest, agentClientMetadata);
+            } catch (final JobIdUnavailableException e) {
+                throw new RuntimeException("The requested job id is already in use", e);
+            } catch (final JobReservationException e) {
+                throw new RuntimeException("Failed to issue job reservation", e);
             }
+
+            executionContext.setCurrentJobStatus(JobStatus.RESERVED);
+
+            // Request server-side resolution
+            try {
+                jobSpecification = agentJobService.resolveJobSpecification(jobId);
+            } catch (final JobSpecificationResolutionException e) {
+                throw new RuntimeException("Failed to request job specification resolution for job id: " + jobId, e);
+            }
+
+            executionContext.setCurrentJobStatus(JobStatus.RESOLVED);
         }
 
+        // Claim this job, excluding other agents from doing the same
+        try {
+            agentJobService.claimJob(jobId, agentClientMetadata);
+        } catch (final JobReservationException e) {
+            throw new RuntimeException("Failed to claim job id: " + jobId, e);
+        }
+
+        // Update context
+        executionContext.setCurrentJobStatus(JobStatus.CLAIMED);
         executionContext.setJobSpecification(jobSpecification);
+        executionContext.setClaimedJobId(jobId);
+
         return Events.RESOLVE_JOB_SPECIFICATION_COMPLETE;
     }
 }

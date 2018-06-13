@@ -19,28 +19,76 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 @Category(UnitTest.class)
 class HandleErrorActionSpec extends Specification {
+    String id
     ExecutionContext executionContext
     HandleErrorAction action
+    AgentJobService agentJobService
 
     void setup() {
+        this.id = UUID.randomUUID().toString()
         this.executionContext = Mock(ExecutionContext)
-        this.action = new HandleErrorAction()
+        this.agentJobService = Mock(AgentJobService)
+        this.action = new HandleErrorAction(executionContext, agentJobService)
     }
 
-    void cleanup() {
-    }
-
-    def "ExecuteStateAction"() {
+    def "Successful"() {
         when:
         def event = action.executeStateAction(executionContext)
+
         then:
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.RUNNING
+        1 * executionContext.getClaimedJobId() >> id
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String)
+
         event == Events.HANDLE_ERROR_COMPLETE
     }
+
+    def "Skip job status update"() {
+        when:
+        def event = action.executeStateAction(executionContext)
+
+        then:
+        1 * executionContext.getCurrentJobStatus() >> null
+        1 * executionContext.getClaimedJobId() >> null
+        0 * agentJobService.changeJobStatus(_, _, _, _)
+
+        event == Events.HANDLE_ERROR_COMPLETE
+    }
+
+    def "Change job status exception"() {
+        when:
+        def event = action.executeStateAction(executionContext)
+
+        then:
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.RUNNING
+        1 * executionContext.getClaimedJobId() >> id
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw new ChangeJobStatusException("...")}
+
+        event == Events.HANDLE_ERROR_COMPLETE
+    }
+
+    def "Change job status runtime exception"() {
+        Exception exception = new RuntimeException("...")
+
+        when:
+        action.executeStateAction(executionContext)
+
+        then:
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.RUNNING
+        1 * executionContext.getClaimedJobId() >> id
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw exception}
+
+        thrown(exception.class)
+    }
+
 }

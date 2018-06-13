@@ -19,13 +19,15 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
-
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.utils.EnvUtils
 import com.netflix.genie.agent.utils.PathUtils
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.jobs.JobConstants
@@ -52,6 +54,7 @@ class SetUpJobActionSpec extends Specification {
     DownloadService.Manifest manifest
     DownloadService.Manifest.Builder manifestBuilder
     DownloadService downloadService
+    AgentJobService agentJobService
     SetUpJobAction action
 
     JobSpecification spec
@@ -97,107 +100,109 @@ class SetUpJobActionSpec extends Specification {
 
     void setup() {
 
-        temporaryFolder.create()
-        dummyFile = temporaryFolder.newFile()
+        this.temporaryFolder.create()
+        this.dummyFile = temporaryFolder.newFile()
 
-        executionContext = Mock(ExecutionContext)
+        this.executionContext = Mock(ExecutionContext)
 
-        manifestUris = Sets.newHashSet()
+        this.manifestUris = Sets.newHashSet()
 
-        manifest = Mock(DownloadService.Manifest) {
+        this.manifest = Mock(DownloadService.Manifest) {
         }
 
-        manifestBuilder = Mock(DownloadService.Manifest.Builder) {
+        this.manifestBuilder = Mock(DownloadService.Manifest.Builder) {
             _ * build() >> manifest
         }
-        downloadService = Mock(DownloadService) {
+        this.downloadService = Mock(DownloadService) {
             _ * newManifestBuilder() >> manifestBuilder
         }
 
-        jobId = UUID.randomUUID().toString()
-        jobDir = new File(temporaryFolder.getRoot(), jobId)
-        jobSetup = Optional.empty()
-        jobConfigs = []
-        jobDeps = []
-        jobEnv = Mock(ExecutionEnvironment) {
+        this.agentJobService = Mock(AgentJobService)
+
+        this.jobId = UUID.randomUUID().toString()
+        this.jobDir = new File(temporaryFolder.getRoot(), jobId)
+        this.jobSetup = Optional.empty()
+        this.jobConfigs = []
+        this.jobDeps = []
+        this.jobEnv = Mock(ExecutionEnvironment) {
             _ * getSetupFile() >> {return jobSetup}
             _ * getConfigs() >> {return jobConfigs}
             _ * getDependencies() >> {return jobDeps}
         }
-        job = Mock(JobSpecification.ExecutionResource) {
+        this.job = Mock(JobSpecification.ExecutionResource) {
             _ * getId() >> {return jobId}
             _ * getExecutionEnvironment() >> {return jobEnv}
         }
 
         def app1Id = UUID.randomUUID().toString()
-        app1Setup = Optional.empty()
-        app1Configs = []
-        app1Deps = []
-        app1Env = Mock(ExecutionEnvironment) {
+        this.app1Setup = Optional.empty()
+        this.app1Configs = []
+        this.app1Deps = []
+        this.app1Env = Mock(ExecutionEnvironment) {
             _ * getSetupFile() >> {return app1Setup}
             _ * getConfigs() >> {return app1Configs}
             _ * getDependencies() >> {return app1Deps}
         }
-        app1 = Mock(JobSpecification.ExecutionResource) {
+        this.app1 = Mock(JobSpecification.ExecutionResource) {
             _ * getId() >> {return app1Id}
             _ * getExecutionEnvironment() >> {return app1Env}
         }
-        app1Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app1.getId()).toFile()
+        this.app1Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app1.getId()).toFile()
 
         def app2Id = UUID.randomUUID().toString()
-        app2Setup = Optional.empty()
-        app2Configs = []
-        app2Deps = []
-        app2Env = Mock(ExecutionEnvironment) {
+        this.app2Setup = Optional.empty()
+        this.app2Configs = []
+        this.app2Deps = []
+        this.app2Env = Mock(ExecutionEnvironment) {
             _ * getSetupFile() >> {return app2Setup}
             _ * getConfigs() >> {return app2Configs}
             _ * getDependencies() >> {return app2Deps}
         }
-        app2 = Mock(JobSpecification.ExecutionResource) {
+        this.app2 = Mock(JobSpecification.ExecutionResource) {
             _ * getId() >> {return app2Id}
             _ * getExecutionEnvironment() >> {return app2Env}
         }
-        app2Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app2.getId()).toFile()
+        this.app2Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app2.getId()).toFile()
 
-        apps = [
+        this.apps = [
                 app1,
                 app2
         ]
 
         def clusterId = UUID.randomUUID().toString()
-        clusterSetup = Optional.empty()
-        clusterConfigs = []
-        clusterDeps = []
-        clusterEnv = Mock(ExecutionEnvironment) {
+        this.clusterSetup = Optional.empty()
+        this.clusterConfigs = []
+        this.clusterDeps = []
+        this.clusterEnv = Mock(ExecutionEnvironment) {
             _ * getSetupFile() >> {return clusterSetup}
             _ * getConfigs() >> {return clusterConfigs}
             _ * getDependencies() >> {return clusterDeps}
         }
-        cluster = Mock(JobSpecification.ExecutionResource) {
+        this.cluster = Mock(JobSpecification.ExecutionResource) {
             _ * getId() >> {return clusterId}
             _ * getExecutionEnvironment() >> {return clusterEnv}
         }
-        clusterDir = PathUtils.jobClusterDirectoryPath(jobDir, cluster.getId()).toFile()
+        this.clusterDir = PathUtils.jobClusterDirectoryPath(jobDir, cluster.getId()).toFile()
 
         def commandId = UUID.randomUUID().toString()
-        commandSetup = Optional.empty()
-        commandConfigs = []
-        commandDeps = []
-        commandEnv = Mock(ExecutionEnvironment) {
+        this.commandSetup = Optional.empty()
+        this.commandConfigs = []
+        this.commandDeps = []
+        this.commandEnv = Mock(ExecutionEnvironment) {
             _ * getSetupFile() >> {return commandSetup}
             _ * getConfigs() >> {return commandConfigs}
             _ * getDependencies() >> {return commandDeps}
         }
-        command = Mock(JobSpecification.ExecutionResource) {
+        this.command = Mock(JobSpecification.ExecutionResource) {
             _ * getId() >> {return commandId}
             _ * getExecutionEnvironment() >> {return commandEnv}
         }
 
-        commandDir = PathUtils.jobCommandDirectoryPath(jobDir, command.getId()).toFile()
+        this.commandDir = PathUtils.jobCommandDirectoryPath(jobDir, command.getId()).toFile()
 
-        jobServerEnvMap = [:]
+        this.jobServerEnvMap = [:]
 
-        spec = Mock(JobSpecification) {
+        this.spec = Mock(JobSpecification) {
             _ * getApplications() >> apps
             _ * getCluster() >> cluster
             _ * getCommand() >> command
@@ -206,7 +211,7 @@ class SetUpJobActionSpec extends Specification {
             _ * getEnvironmentVariables() >> jobServerEnvMap
         }
 
-        action = new SetUpJobAction(executionContext, downloadService)
+        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService)
     }
 
     void cleanup() {
@@ -220,6 +225,7 @@ class SetUpJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         executionContext.setJobDirectory(jobDir)
         downloadService.newManifestBuilder() >> manifestBuilder
@@ -280,6 +286,7 @@ class SetUpJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         executionContext.setJobDirectory(jobDir)
         downloadService.newManifestBuilder() >> manifestBuilder
@@ -329,26 +336,29 @@ class SetUpJobActionSpec extends Specification {
         ).toFile().getText(StandardCharsets.UTF_8.toString()).count("Hello World") == 5
     }
 
-    def "Null job spec"() {
+    def "Change job status exception"() {
+        Exception exception = new ChangeJobStatusException("...")
 
         when:
         action.executeStateAction(executionContext)
 
         then:
-        executionContext.getJobSpecification() >> null
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.CLAIMED
+        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> { throw exception }
         def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
+        e.getCause() == exception
     }
 
-    def "Invalid job id"() {
-        setup:
-
+    def "Null job spec"() {
         when:
         action.executeStateAction(executionContext)
 
         then:
-        executionContext.getJobSpecification() >> spec
-        job.getId() >> ""
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.CLAIMED
+        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
+        1 * executionContext.getJobSpecification() >> null
         def e = thrown(RuntimeException)
         e.getCause().getClass() == SetUpJobException
     }
@@ -360,6 +370,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         spec.getJobDirectoryLocation() >> new File(temporaryFolder.getRoot(), "nonexistent")
         def e = thrown(RuntimeException)
@@ -373,6 +384,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         spec.getJobDirectoryLocation() >> temporaryFolder.newFile()
         def e = thrown(RuntimeException)
@@ -386,6 +398,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         spec.getJobDirectoryLocation() >> new File(".")
         def e = thrown(RuntimeException)
@@ -400,6 +413,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         def e = thrown(RuntimeException)
         e.getCause().getClass() == SetUpJobException
@@ -414,6 +428,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         executionContext.setJobDirectory(jobDir)
         downloadService.newManifestBuilder() >> manifestBuilder
@@ -433,6 +448,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         executionContext.setJobDirectory(jobDir)
         downloadService.newManifestBuilder() >> manifestBuilder
@@ -448,6 +464,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         executionContext.setJobDirectory(jobDir)
         downloadService.newManifestBuilder() >> manifestBuilder
@@ -468,6 +485,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         executionContext.setJobDirectory(jobDir)
         downloadService.newManifestBuilder() >> manifestBuilder
@@ -495,6 +513,7 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        executionContext.getClaimedJobId() >> jobId
         executionContext.getJobSpecification() >> spec
         executionContext.setJobDirectory(jobDir)
         downloadService.newManifestBuilder() >> manifestBuilder
