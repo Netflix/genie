@@ -18,25 +18,18 @@
 package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
-import com.netflix.genie.proto.ChangeJobStatusError;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
-import com.netflix.genie.proto.ClaimJobError;
 import com.netflix.genie.proto.ClaimJobRequest;
 import com.netflix.genie.proto.ClaimJobResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
-import com.netflix.genie.proto.ReserveJobIdError;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import com.netflix.genie.proto.ReserveJobIdResponse;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
@@ -44,7 +37,6 @@ import com.netflix.genie.web.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Extension of {@link JobServiceGrpc.JobServiceImplBase} to provide
@@ -62,6 +54,8 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
     private final AgentJobService agentJobService;
+    private final JobServiceProtoConverter jobServiceProtoConverter;
+    private final JobServiceProtoErrorComposer protoErrorComposer;
 
     // TODO: Metrics which I believe can be captured by an interceptor
 
@@ -69,9 +63,17 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
      * Constructor.
      *
      * @param agentJobService The implementation of the {@link AgentJobService} to use
+     * @param jobServiceProtoConverter DTO/Proto converter
+     * @param protoErrorComposer proto error message composer
      */
-    public GRpcJobServiceImpl(final AgentJobService agentJobService) {
+    public GRpcJobServiceImpl(
+        final AgentJobService agentJobService,
+        final JobServiceProtoConverter jobServiceProtoConverter,
+        final JobServiceProtoErrorComposer protoErrorComposer
+    ) {
         this.agentJobService = agentJobService;
+        this.jobServiceProtoConverter = jobServiceProtoConverter;
+        this.protoErrorComposer = protoErrorComposer;
     }
 
     /**
@@ -86,28 +88,17 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final StreamObserver<ReserveJobIdResponse> responseObserver
     ) {
         try {
-            final JobRequest jobRequest = JobServiceProtoConverter.toJobRequestDTO(request);
+            final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDTO(request);
             final AgentClientMetadata agentClientMetadata
-                = JobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+                = jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+            final String jobId =  this.agentJobService.reserveJobId(jobRequest, agentClientMetadata);
             responseObserver.onNext(
-                ReserveJobIdResponse
-                    .newBuilder()
-                    .setId(this.agentJobService.reserveJobId(jobRequest, agentClientMetadata))
+                ReserveJobIdResponse.newBuilder()
+                    .setId(jobId)
                     .build()
-            );
+                );
         } catch (final Exception e) {
-            log.error("Error reserving job id for request " + request, e);
-            responseObserver.onNext(
-                ReserveJobIdResponse
-                    .newBuilder()
-                    .setError(
-                        ReserveJobIdError
-                            .newBuilder()
-                            .setException(e.getClass().getCanonicalName())
-                            .setMessage(e.getMessage())
-                    )
-                    .build()
-            );
+            responseObserver.onNext(protoErrorComposer.toProtoReserveJobIdResponse(e));
         }
         responseObserver.onCompleted();
     }
@@ -125,21 +116,13 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final JobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
-        final String id = request.getId();
-        if (StringUtils.isBlank(id)) {
-            responseObserver.onNext(
-                JobServiceProtoConverter.toProtoJobSpecificationResponse(
-                    new GeniePreconditionException("No job id entered")
-                )
-            );
-        } else {
-            try {
-                final JobSpecification jobSpec = this.agentJobService.resolveJobSpecification(id);
-                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpec));
-            } catch (final Exception e) {
-                log.error(e.getMessage(), e);
-                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
-            }
+        try {
+            final String id = request.getId();
+            final JobSpecification jobSpec = this.agentJobService.resolveJobSpecification(id);
+            responseObserver.onNext(jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpec));
+        } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+            responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
         }
         responseObserver.onCompleted();
     }
@@ -156,21 +139,13 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final JobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
-        final String id = request.getId();
-        if (StringUtils.isBlank(id)) {
-            responseObserver.onNext(
-                JobServiceProtoConverter.toProtoJobSpecificationResponse(
-                    new GeniePreconditionException("No job id entered")
-                )
-            );
-        } else {
-            try {
-                final JobSpecification jobSpecification = this.agentJobService.getJobSpecification(id);
-                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
-            } catch (final Exception e) {
-                log.error(e.getMessage(), e);
-                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
-            }
+        try {
+            final String id = request.getId();
+            final JobSpecification jobSpecification = this.agentJobService.getJobSpecification(id);
+            responseObserver.onNext(jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
+        } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+            responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
         }
         responseObserver.onCompleted();
     }
@@ -189,12 +164,12 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
         try {
-            final JobRequest jobRequest = JobServiceProtoConverter.toJobRequestDTO(request);
+            final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDTO(request);
             final JobSpecification jobSpecification = this.agentJobService.dryRunJobSpecificationResolution(jobRequest);
-            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
+            responseObserver.onNext(jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
         } catch (final Exception e) {
             log.error("Error resolving job specification for request " + request, e);
-            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
+            responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
         }
         responseObserver.onCompleted();
     }
@@ -206,54 +181,20 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
      * @param responseObserver The observer to send a response with
      */
     @Override
-    public void claimJob(final ClaimJobRequest request, final StreamObserver<ClaimJobResponse> responseObserver) {
-        final String id = request.getId();
-        if (StringUtils.isBlank(id)) {
-            responseObserver.onNext(
-                ClaimJobResponse
-                    .newBuilder()
-                    .setSuccessful(false)
-                    .setError(
-                        ClaimJobError
-                            .newBuilder()
-                            .setType(ClaimJobError.Type.NO_ID_SUPPLIED)
-                            .setMessage("No job id provided. Unable to claim.")
-                            .build()
-                    )
-                    .build()
-            );
-        } else {
-            try {
-                final AgentClientMetadata clientMetadata
-                    = JobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
-                this.agentJobService.claimJob(id, clientMetadata);
-                responseObserver.onNext(ClaimJobResponse.newBuilder().setSuccessful(true).build());
-            } catch (final Exception e) {
-                log.error(e.getMessage(), e);
-                final ClaimJobError.Builder builder = ClaimJobError.newBuilder();
-                if (e.getMessage() != null) {
-                    builder.setMessage(e.getMessage());
-                } else {
-                    builder.setMessage("No error message provided");
-                }
+    public void claimJob(
+        final ClaimJobRequest request,
+        final StreamObserver<ClaimJobResponse> responseObserver
+    ) {
+        try {
+            final String id = request.getId();
+            final AgentClientMetadata clientMetadata
+                = jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+            this.agentJobService.claimJob(id, clientMetadata);
+            responseObserver.onNext(ClaimJobResponse.newBuilder().setSuccessful(true).build());
+        } catch (final Exception e) {
+            log.error("Error claiming job for request " + request, e);
+            responseObserver.onNext(protoErrorComposer.toProtoClaimJobResponse(e));
 
-                if (e instanceof GenieJobAlreadyClaimedException) {
-                    builder.setType(ClaimJobError.Type.ALREADY_CLAIMED);
-                } else if (e instanceof GenieJobNotFoundException) {
-                    builder.setType(ClaimJobError.Type.NO_SUCH_JOB);
-                } else if (e instanceof GenieInvalidStatusException) {
-                    builder.setType(ClaimJobError.Type.INVALID_STATUS);
-                } else {
-                    builder.setType(ClaimJobError.Type.UNKNOWN);
-                }
-                responseObserver.onNext(
-                    ClaimJobResponse
-                        .newBuilder()
-                        .setSuccessful(false)
-                        .setError(builder)
-                        .build()
-                );
-            }
         }
         responseObserver.onCompleted();
     }
@@ -269,54 +210,16 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ChangeJobStatusRequest request,
         final StreamObserver<ChangeJobStatusResponse> responseObserver
     ) {
-        final String id = request.getId();
-        if (StringUtils.isBlank(id)) {
-            responseObserver.onNext(
-                ChangeJobStatusResponse
-                    .newBuilder()
-                    .setSuccessful(false)
-                    .setError(
-                        ChangeJobStatusError
-                            .newBuilder()
-                            .setType(ChangeJobStatusError.Type.NO_ID_SUPPLIED)
-                            .setMessage("No job id provided. Unable to update status.")
-                            .build()
-                    )
-                    .build()
-            );
-        } else {
-            try {
-                final JobStatus currentStatus = JobStatus.parse(request.getCurrentStatus());
-                final JobStatus newStatus = JobStatus.parse(request.getNewStatus());
-                final String newStatusMessage = request.getNewStatusMessage();
-                this.agentJobService.updateJobStatus(id, currentStatus, newStatus, newStatusMessage);
-                responseObserver.onNext(ChangeJobStatusResponse.newBuilder().setSuccessful(true).build());
-            } catch (final Exception e) {
-                log.error(e.getMessage(), e);
-                final ChangeJobStatusError.Builder builder = ChangeJobStatusError.newBuilder();
-                if (e.getMessage() != null) {
-                    builder.setMessage(e.getMessage());
-                } else {
-                    builder.setMessage("No error message provided");
-                }
-
-                if (e instanceof GenieJobNotFoundException) {
-                    builder.setType(ChangeJobStatusError.Type.NO_SUCH_JOB);
-                } else if (e instanceof GenieInvalidStatusException) {
-                    builder.setType(ChangeJobStatusError.Type.INCORRECT_CURRENT_STATUS);
-                } else if (e instanceof GeniePreconditionException) {
-                    builder.setType(ChangeJobStatusError.Type.UNKNOWN_STATUS_SUPPLIED);
-                } else {
-                    builder.setType(ChangeJobStatusError.Type.UNKNOWN);
-                }
-                responseObserver.onNext(
-                    ChangeJobStatusResponse
-                        .newBuilder()
-                        .setSuccessful(false)
-                        .setError(builder)
-                        .build()
-                );
-            }
+        try {
+            final String id = request.getId();
+            final JobStatus currentStatus = JobStatus.parse(request.getCurrentStatus());
+            final JobStatus newStatus = JobStatus.parse(request.getNewStatus());
+            final String newStatusMessage = request.getNewStatusMessage();
+            this.agentJobService.updateJobStatus(id, currentStatus, newStatus, newStatusMessage);
+            responseObserver.onNext(ChangeJobStatusResponse.newBuilder().setSuccessful(true).build());
+        } catch (Exception e) {
+            log.error("Error changing job status for request " + request, e);
+            responseObserver.onNext(protoErrorComposer.toProtoChangeJobStatusResponse(e));
         }
         responseObserver.onCompleted();
     }

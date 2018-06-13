@@ -40,20 +40,26 @@ import spock.lang.Specification
 @Category(UnitTest.class)
 class AgentJobServiceImplSpec extends Specification {
 
-    def "Can reserve job id"() {
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
-        def meterRegistry = Mock(MeterRegistry)
+    JobPersistenceService jobPersistenceService
+    JobSpecificationService jobSpecificationService
+    MeterRegistry meterRegistry
+    AgentJobServiceImpl service
 
+    def setup() {
+        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.jobSpecificationService = Mock(JobSpecificationService)
+        this.meterRegistry = Mock(MeterRegistry)
+        this.service = new AgentJobServiceImpl(
+                jobPersistenceService,
+                jobSpecificationService,
+                this.meterRegistry
+        )
+    }
+
+    def "Can reserve job id"() {
         def jobRequest = Mock(JobRequest)
         def agentClientMetadata = Mock(AgentClientMetadata)
         def reservedId = UUID.randomUUID().toString()
-
-        AgentJobServiceImpl service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                meterRegistry
-        )
 
         when:
         def id = service.reserveJobId(jobRequest, agentClientMetadata)
@@ -64,18 +70,9 @@ class AgentJobServiceImplSpec extends Specification {
     }
 
     def "Can Resolve Job Specification"() {
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
-        def meterRegistry = Mock(MeterRegistry)
         def jobId = UUID.randomUUID().toString()
         def jobRequest = Mock(JobRequest)
         def jobSpecificationMock = Mock(JobSpecification)
-
-        AgentJobServiceImpl service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                meterRegistry
-        )
 
         when:
         service.resolveJobSpecification(jobId)
@@ -89,22 +86,14 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(jobRequest)
-        1 * jobSpecificationService.resolveJobSpecification(jobId, jobRequest) >> jobSpecificationMock
+        1 * this.jobSpecificationService.resolveJobSpecification(jobId, jobRequest) >> jobSpecificationMock
         1 * jobPersistenceService.saveJobSpecification(jobId, jobSpecificationMock)
         jobSpecification == jobSpecificationMock
     }
 
     def "Can retrieve Job Specification"() {
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
-        def meterRegistry = Mock(MeterRegistry)
         def jobId = UUID.randomUUID().toString()
 
-        AgentJobServiceImpl service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                meterRegistry
-        )
         def jobSpecificationMock = Mock(JobSpecification)
         JobSpecification jobSpecification
 
@@ -124,16 +113,7 @@ class AgentJobServiceImplSpec extends Specification {
     }
 
     def "Can dry run job specification resolution"() {
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
-        def meterRegistry = Mock(MeterRegistry)
         def jobRequest = Mock(JobRequest)
-
-        AgentJobServiceImpl service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                meterRegistry
-        )
 
         def jobSpecificationMock = Mock(JobSpecification)
         def id = UUID.randomUUID().toString()
@@ -156,17 +136,8 @@ class AgentJobServiceImplSpec extends Specification {
     }
 
     def "Can claim job"() {
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
-        def meterRegistry = Mock(MeterRegistry)
         def agentClientMetadata = Mock(AgentClientMetadata)
         def id = UUID.randomUUID().toString()
-
-        AgentJobServiceImpl service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                meterRegistry
-        )
 
         when:
         service.claimJob(id, agentClientMetadata)
@@ -176,16 +147,7 @@ class AgentJobServiceImplSpec extends Specification {
     }
 
     def "Can update job status"() {
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
-        def meterRegistry = Mock(MeterRegistry)
         def id = UUID.randomUUID().toString()
-
-        AgentJobServiceImpl service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                meterRegistry
-        )
 
         when:
         service.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, UUID.randomUUID().toString())

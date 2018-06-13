@@ -34,6 +34,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 /**
@@ -84,7 +85,7 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification resolveJobSpecification(final String id) {
+    public JobSpecification resolveJobSpecification(@NotBlank final String id) {
         final JobRequest jobRequest = this.jobPersistenceService
             .getJobRequest(id)
             .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
@@ -98,7 +99,7 @@ public class AgentJobServiceImpl implements AgentJobService {
      */
     @Override
     @Transactional(readOnly = true)
-    public JobSpecification getJobSpecification(final String id) {
+    public JobSpecification getJobSpecification(@NotBlank final String id) {
         return this.jobPersistenceService
             .getJobSpecification(id)
             .orElseThrow(
@@ -122,7 +123,7 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
-    public void claimJob(final String id, @Valid final AgentClientMetadata agentClientMetadata) {
+    public void claimJob(@NotBlank final String id, @Valid final AgentClientMetadata agentClientMetadata) {
         this.jobPersistenceService.claimJob(id, agentClientMetadata);
     }
 
@@ -131,7 +132,7 @@ public class AgentJobServiceImpl implements AgentJobService {
      */
     @Override
     public void updateJobStatus(
-        final String id,
+        @NotBlank final String id,
         final JobStatus currentStatus,
         final JobStatus newStatus,
         @Nullable final String newStatusMessage
