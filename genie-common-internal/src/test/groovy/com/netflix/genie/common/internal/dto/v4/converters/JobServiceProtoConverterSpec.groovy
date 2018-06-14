@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
@@ -30,24 +29,16 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
-import com.netflix.genie.proto.JobSpecificationError
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
-import spock.lang.Unroll
-
 /**
  * Specifications for the {@link JobServiceProtoConverter} utility class.
  *
@@ -213,7 +204,7 @@ class JobServiceProtoConverterSpec extends Specification {
     def agentVersion = UUID.randomUUID().toString()
     def agentPid = 21_031
 
-    def converter = new JobServiceProtoConverter();
+    def converter = new JobServiceProtoConverter()
 
     def "Can convert JobRequest to ReserveJobIdRequest and vice versa"() {
         def jobRequest = createJobRequest(id)
@@ -329,7 +320,7 @@ class JobServiceProtoConverterSpec extends Specification {
 
         when:
         def request = converter.toProtoClaimJobRequest(id, agentClientMetadata)
-        def agentClientMetadata2 = converter.toAgentClientMetadataDTO(request.getAgentMetadata());
+        def agentClientMetadata2 = converter.toAgentClientMetadataDTO(request.getAgentMetadata())
 
         then:
         request.getId() == id
@@ -493,7 +484,7 @@ class JobServiceProtoConverterSpec extends Specification {
                 .newBuilder()
                 .setId(id)
                 .addAllConfigs(configs)
-                .addAllDependences(dependencies)
+                .addAllDependencies(dependencies)
                 .setSetupFile(setupFile)
                 .build()
 
@@ -501,7 +492,7 @@ class JobServiceProtoConverterSpec extends Specification {
                 .newBuilder()
                 .setId(clusterId)
                 .addAllConfigs(clusterConfigs)
-                .addAllDependences(clusterDependencies)
+                .addAllDependencies(clusterDependencies)
                 .setSetupFile(clusterSetupFile)
                 .build()
 
@@ -509,7 +500,7 @@ class JobServiceProtoConverterSpec extends Specification {
                 .newBuilder()
                 .setId(commandId)
                 .addAllConfigs(commandConfigs)
-                .addAllDependences(commandDependencies)
+                .addAllDependencies(commandDependencies)
                 .setSetupFile(commandSetupFile)
                 .build()
 
@@ -517,7 +508,7 @@ class JobServiceProtoConverterSpec extends Specification {
                 .newBuilder()
                 .setId(application0Id)
                 .addAllConfigs(application0Configs)
-                .addAllDependences(application0Dependencies)
+                .addAllDependencies(application0Dependencies)
                 .setSetupFile(application0SetupFile)
                 .build()
 
@@ -525,7 +516,7 @@ class JobServiceProtoConverterSpec extends Specification {
                 .newBuilder()
                 .setId(application1Id)
                 .addAllConfigs(application1Configs)
-                .addAllDependences(application1Dependencies)
+                .addAllDependencies(application1Dependencies)
                 .setSetupFile(application1SetupFile)
                 .build()
 
