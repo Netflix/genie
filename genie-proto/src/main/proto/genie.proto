@@ -116,7 +116,7 @@ message ExecutionResource {
     string id = 1;
     string setup_file = 2;
     repeated string configs = 3;
-    repeated string dependences = 4;
+    repeated string dependencies = 4;
 }
 
 message JobSpecification {

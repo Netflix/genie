@@ -255,7 +255,7 @@ public class JobServiceProtoConverter {
             protoResource.getId(),
             new ExecutionEnvironment(
                 ImmutableSet.copyOf(protoResource.getConfigsList()),
-                ImmutableSet.copyOf(protoResource.getDependencesList()),
+                ImmutableSet.copyOf(protoResource.getDependenciesList()),
                 protoResource.getSetupFile().isEmpty() ? null : protoResource.getSetupFile()
             )
         );
@@ -268,7 +268,7 @@ public class JobServiceProtoConverter {
             .newBuilder()
             .setId(executionResource.getId())
             .addAllConfigs(executionResource.getExecutionEnvironment().getConfigs())
-            .addAllDependences(executionResource.getExecutionEnvironment().getDependencies());
+            .addAllDependencies(executionResource.getExecutionEnvironment().getDependencies());
 
         executionResource.getExecutionEnvironment().getSetupFile().ifPresent(builder::setSetupFile);
 
