@@ -381,6 +381,10 @@ to the number of CPU cores x 2 + 1
 |Wether to strictly check an S3 URL for illegal characters before attempting to use it
 |false
 
+|genie.grpc.server.enabled
+|Wether to start the gRPC server and services during server startup
+|true
+
 |===
 
 ==== Spring Properties
@@ -558,6 +562,20 @@ See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more informa
 |Whether auto stack detection is enabled.
 See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
 |false
+
+|===
+
+==== gRPC Server properties
+
+|===
+|Property |Description| Default Value
+|grpc.server.port
+|The port on which to bind the gRPC server, if enabled.
+|9090
+
+|grpc.server.address
+|The address on which to bind the gRPC server, if enabled.
+|0.0.0.0
 
 |===
 
