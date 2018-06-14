@@ -1,26 +1,21 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url "https://repo.spring.io/libs-milestone"
-        }
-        maven {
-            url "https://repo.spring.io/libs-snapshot"
-        }
     }
 
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}")
-        classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
+        classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.8")
+        // As of July 7, 2018 upgrading this plugin to 1.5.x release conflicts with nebula for grgit
         classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17")
         classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
-        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.3")
+        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.5")
     }
 }
 
 plugins {
-    id "com.github.kt3k.coveralls" version "2.8.1"
-    id "nebula.netflixoss" version "5.0.0"
+    id "com.github.kt3k.coveralls" version "2.8.2"
+    id "nebula.netflixoss" version "5.1.1"
     id "org.ajoberstar.github-pages" version "1.7.2"
 }
 
@@ -39,12 +34,6 @@ allprojects {
 
     repositories {
         jcenter()
-        maven {
-            url "https://repo.spring.io/libs-milestone"
-        }
-        maven {
-            url "https://repo.spring.io/libs-snapshot"
-        }
     }
 }
 
@@ -250,7 +239,8 @@ configure(javaProjects) {
             generatedSourcesGRPCJavaDir.mkdirs()
         }
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        options.incremental = true
+        // TODO: Turn this back on once this lombok fix is released https://github.com/rzwitserloot/lombok/pull/1718
+        options.incremental = false
         options.compilerArgs += ['-s', generatedSourcesJavaDir]
     }
 
