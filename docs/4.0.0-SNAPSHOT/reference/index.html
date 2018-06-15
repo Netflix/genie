@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-06-14</span>
+<span id="revdate">2018-06-15</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1033,6 +1033,22 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default base path for the Spring Actuator[<a href="https://docs.spring.io/spring-boot/docs/current/actuator-api/html/" class="bare">https://docs.spring.io/spring-boot/docs/current/actuator-api/html/</a>]
 management endpoints. Switched from default <code>/actuator</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/admin</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to start the gRPC server and services during server startup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
+whether the <code>maxSyncMessages</code> threshold has been reached or not</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30,000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.services.job-file-sync.maxSyncMessages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many messages to receive from the agent before an acknowledgement message is sent back from the server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
 </tr>
 </tbody>
 </table>
@@ -4807,6 +4823,22 @@ attempt to assume this role on the host Genie is running on</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/cache" class="bare">file:///tmp/genie/cache</a></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to start the gRPC server and services during server startup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
+whether the <code>maxSyncMessages</code> threshold has been reached or not</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30,000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.services.job-file-sync.maxSyncMessages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How many messages to receive from the agent before an acknowledgement message is sent back from the server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.health.maxCpuLoadConsecutiveOccurrences</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Defines the threshold of consecutive occurrences of CPU load crossing the &lt;maxCpuLoadPercent&gt;.
 Health of the system is marked unhealthy if the CPU load of a system goes beyond the threshold 'maxCpuLoadPercent'
@@ -5246,13 +5278,8 @@ to the number of CPU cores x 2 + 1</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.s3filetransfer.strictUrlCheckEnabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to strictly check an S3 URL for illegal characters before attempting to use it</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to strictly check an S3 URL for illegal characters before attempting to use it</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to start the gRPC server and services during server startup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 </tbody>
 </table>
@@ -6184,7 +6211,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-06-14 19:48:22 +00:00
+Last updated 2018-06-15 17:30:50 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">

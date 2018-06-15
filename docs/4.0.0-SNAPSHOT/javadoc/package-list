@@ -22,6 +22,7 @@ com.netflix.genie.common.dto.search
 com.netflix.genie.common.exceptions
 com.netflix.genie.common.internal.dto.v4
 com.netflix.genie.common.internal.dto.v4.converters
+com.netflix.genie.common.internal.dto.v4.files
 com.netflix.genie.common.internal.exceptions
 com.netflix.genie.common.internal.exceptions.unchecked
 com.netflix.genie.common.internal.jobs
