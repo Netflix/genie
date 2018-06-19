@@ -29,6 +29,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -75,7 +76,7 @@ public class MvcConfig implements WebMvcConfigurer {
      * @return a DefaultResourceLoader
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(ResourceLoader.class)
     public ResourceLoader resourceLoader() {
         return new DefaultResourceLoader();
     }
@@ -107,6 +108,7 @@ public class MvcConfig implements WebMvcConfigurer {
      * @param httpReadTimeout    http read timeout in milliseconds
      * @return The rest template to use
      */
+    @Primary
     @Bean(name = "genieRestTemplate")
     public RestTemplate restTemplate(
         @Value("${genie.http.connect.timeout:2000}") final int httpConnectTimeout,
