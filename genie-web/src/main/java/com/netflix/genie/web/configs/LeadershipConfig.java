@@ -18,7 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.web.events.GenieEventBus;
-import com.netflix.genie.web.properties.ZookeeperProperties;
+import com.netflix.genie.web.properties.ZookeeperLeadershipProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
@@ -63,25 +63,25 @@ public class LeadershipConfig {
      * The leadership initialization factory bean which will create a LeaderInitiator to kick off the leader election
      * process within this node for the cluster if Zookeeper is configured.
      *
-     * @param client              The curator framework client to use
-     * @param zookeeperProperties The Zookeeper properties to use
+     * @param client                        The curator framework client to use
+     * @param zookeeperLeadershipProperties The Zookeeper properties to use
      * @return The factory bean
      */
     @Bean
-    @ConditionalOnProperty(value = "genie.zookeeper.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = "spring.cloud.zookeeper.enabled", havingValue = "true")
     public LeaderInitiatorFactoryBean leaderInitiatorFactory(
         final CuratorFramework client,
-        final ZookeeperProperties zookeeperProperties
+        final ZookeeperLeadershipProperties zookeeperLeadershipProperties
     ) {
         final LeaderInitiatorFactoryBean factoryBean = new LeaderInitiatorFactoryBean();
         factoryBean.setClient(client);
-        factoryBean.setPath(zookeeperProperties.getLeader().getPath());
+        factoryBean.setPath(zookeeperLeadershipProperties.getPath());
         factoryBean.setRole("cluster");
         return factoryBean;
     }
 
     /**
-     * If Spring Cloud Leadership is disabled and this node is forced to be the leader create the local leader
+     * If Spring Zookeeper Leadership is disabled and this node is forced to be the leader create the local leader
      * bean which will fire appropriate events.
      *
      * @param genieEventBus The genie event bus implementation to use
@@ -89,7 +89,7 @@ public class LeadershipConfig {
      * @return The local leader bean
      */
     @Bean
-    @ConditionalOnProperty(value = "genie.zookeeper.enabled", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(value = "spring.cloud.zookeeper.enabled", havingValue = "false", matchIfMissing = true)
     public LocalLeader localLeader(
         final GenieEventBus genieEventBus,
         @Value("${genie.leader.enabled}") final boolean isLeader

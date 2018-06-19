@@ -378,14 +378,6 @@ number of CPU cores x 2 + 1
 to the number of CPU cores x 2 + 1
 |1
 
-|genie.zookeeper.enabled
-|Whether to enable connectivity to Zookeeper
-|false
-
-|genie.zookeeper.connectionString
-|Comma separated list of Zookeeper nodes to connect to as `host:port` pairs
-|localhost:2181
-
 |genie.zookeeper.leader.path
 |The namespace to use for Genie leadership election of a given cluster
 |/genie/leader/
@@ -571,6 +563,14 @@ See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more informa
 |Whether auto stack detection is enabled.
 See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
 |false
+
+|spring.cloud.zookeeper.enabled
+|Whether to enable zookeeper functionality or not
+|false
+
+|spring.cloud.zookeeper.connectString
+|The connection string for the zookeeper cluster
+|localhost:2181
 
 |===
 

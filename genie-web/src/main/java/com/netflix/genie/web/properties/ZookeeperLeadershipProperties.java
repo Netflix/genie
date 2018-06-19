@@ -29,37 +29,14 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 3.1.0
  */
-@ConfigurationProperties(prefix = "genie.zookeeper")
+@ConfigurationProperties(prefix = "genie.zookeeper.leader")
 @Component
 @Getter
 @Setter
 @Validated
-public class ZookeeperProperties {
+public class ZookeeperLeadershipProperties {
     /**
-     * Whether Zookeeper connectivity should be enabled or not for this node.
+     * The base Zookeeper node path for Genie leadership.
      */
-    private boolean enabled;
-    /**
-     * The Zookeeper connection string as comma separated list of host:port pairs.
-     */
-    private String connectionString = "localhost:2181";
-    /**
-     * Leadership properties related to interacting with Zookeeper.
-     */
-    private Leader leader = new Leader();
-
-    /**
-     * Properties related to Zookeeper leadership activities.
-     *
-     * @author tgianos
-     * @since 3.1.0
-     */
-    @Getter
-    @Setter
-    public static class Leader {
-        /**
-         * The base Zookeeper node path for Genie leadership.
-         */
-        private String path = "/genie/leader/";
-    }
+    private String path = "/genie/leader/";
 }

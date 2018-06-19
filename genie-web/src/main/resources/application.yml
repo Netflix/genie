@@ -30,6 +30,9 @@ genie:
   file:
     cache:
       location: file:///tmp/genie/cache
+  grpc:
+    server:
+      enabled: true
   health:
     maxCpuLoadPercent: 80
   jobs:
@@ -109,9 +112,6 @@ genie:
     scheduler:
       pool:
         size: 5
-  grpc:
-    server:
-      enabled: true
 
 info:
   genie:
@@ -127,6 +127,9 @@ spring:
     name: genie
   banner:
     location: genie-banner.txt
+  cloud:
+    zookeeper:
+      enabled: false
   datasource:
     url: jdbc:h2:mem:genie
     username: root
