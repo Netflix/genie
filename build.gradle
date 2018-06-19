@@ -112,6 +112,10 @@ configure(javaProjects) {
             dependency("net.sf.jtidy:jtidy:r938")
             dependency("org.apache.commons:commons-configuration2:2.2")
             dependency("org.apache.commons:commons-exec:1.3")
+            // For some reason 3.5.3-beta was throwing error with 3.4.x server
+            // https://issues.apache.org/jira/browse/ZOOKEEPER-2775
+            // https://curator.apache.org/zk-compatibility.html
+            dependency("org.apache.zookeeper:zookeeper:3.4.12")
             dependency("org.bitbucket.b_c:jose4j:0.6.3")
             dependency("org.dbunit:dbunit:2.5.4")
             dependencySet(group: "org.jruby", version: "9.1.14.0") {
