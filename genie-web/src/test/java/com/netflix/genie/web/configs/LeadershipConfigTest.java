@@ -20,7 +20,7 @@ package com.netflix.genie.web.configs;
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
-import com.netflix.genie.web.properties.ZookeeperProperties;
+import com.netflix.genie.web.properties.ZookeeperLeadershipProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import org.apache.curator.framework.CuratorFramework;
 import org.junit.Assert;
@@ -56,8 +56,8 @@ public class LeadershipConfigTest {
     @Test
     public void canGetLeaderInitiatorFactoryBean() {
         final CuratorFramework client = Mockito.mock(CuratorFramework.class);
-        final ZookeeperProperties zookeeperProperties = new ZookeeperProperties();
-        Assert.assertNotNull(new LeadershipConfig().leaderInitiatorFactory(client, zookeeperProperties));
+        final ZookeeperLeadershipProperties zookeeperLeadershipProperties = new ZookeeperLeadershipProperties();
+        Assert.assertNotNull(new LeadershipConfig().leaderInitiatorFactory(client, zookeeperLeadershipProperties));
     }
 
     /**
