@@ -21,7 +21,6 @@ import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
@@ -34,7 +33,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 @SpringBootApplication(
     exclude = {
         RedisAutoConfiguration.class,
-        RedisRepositoriesAutoConfiguration.class,
         GrpcServerAutoConfiguration.class,
     }
 )

@@ -21,7 +21,6 @@ import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
@@ -33,7 +32,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication(
     exclude = {
         RedisAutoConfiguration.class,
-        RedisRepositoriesAutoConfiguration.class,
         GrpcServerAutoConfiguration.class,
     }
 )
