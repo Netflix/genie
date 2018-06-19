@@ -1050,6 +1050,11 @@ whether the <code>maxSyncMessages</code> threshold has been reached or not</p></
 <td class="tableblock halign-left valign-top"><p class="tableblock">How many messages to receive from the agent before an acknowledgement message is sent back from the server</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.data.redis.repositories.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether Spring data repositories are enabled on top of redis as the backend store</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1092,6 +1097,16 @@ whether the <code>maxSyncMessages</code> threshold has been reached or not</p></
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.*</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modifications to how Spring handled
 <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.zookeeper.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Leverage existing code rather than re-invent the wheel</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.connectionString</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.zookeeper.connectString</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Leverage existing code rather than re-invent the wheel</p></td>
 </tr>
 </tbody>
 </table>
@@ -1331,11 +1346,11 @@ drop them yourself if they&#8217;re no longer needed.
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Finchley.RC2 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Finchley.RELEASE for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Finchley.RC2/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Finchley.RELEASE/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -4790,7 +4805,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
 <a href="http://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Finchley.RC2/">Spring Cloud</a> documentation.
+and the <a href="http://cloud.spring.io/spring-cloud-static/Finchley.RELEASE/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -5262,16 +5277,6 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable connectivity to Zookeeper</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.connectionString</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Comma separated list of Zookeeper nodes to connect to as <code>host:port</code> pairs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">localhost:2181</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.leader.path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie leadership election of a given cluster</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/leader/</p></td>
@@ -5352,7 +5357,7 @@ management endpoints. Switched from default <code>/actuator</code></p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.data.redis.repositories.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether Spring data repositories should attempt to be created for Redis</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.url</p></td>
@@ -5522,6 +5527,16 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether auto stack detection is enabled.
 See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.zookeeper.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable zookeeper functionality or not</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.zookeeper.connectString</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The connection string for the zookeeper cluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">localhost:2181</p></td>
 </tr>
 </tbody>
 </table>
@@ -6211,7 +6226,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-06-19 17:18:33 +00:00
+Last updated 2018-06-19 22:53:22 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
