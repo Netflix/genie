@@ -68,6 +68,10 @@ whether the `maxSyncMessages` threshold has been reached or not
 |How many messages to receive from the agent before an acknowledgement message is sent back from the server
 |10
 
+|spring.data.redis.repositories.enabled
+|Whether Spring data repositories are enabled on top of redis as the backend store
+|false
+
 |===
 
 ==== Renamed

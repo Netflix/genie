@@ -434,7 +434,7 @@ management endpoints. Switched from default `/actuator`
 
 |spring.data.redis.repositories.enabled
 |Whether Spring data repositories should attempt to be created for Redis
-|true
+|false
 
 |spring.datasource.url
 |JDBC URL of the database

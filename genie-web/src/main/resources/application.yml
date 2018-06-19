@@ -130,6 +130,10 @@ spring:
   cloud:
     zookeeper:
       enabled: false
+  data:
+    redis:
+      repositories:
+        enabled: false
   datasource:
     url: jdbc:h2:mem:genie
     username: root

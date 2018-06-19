@@ -58,8 +58,7 @@ public class RedisConfig {
             "genie.redis.enabled",
             "spring.data.redis.repositories.enabled"
         },
-        havingValue = "true",
-        matchIfMissing = true
+        havingValue = "true"
     )
     @EnableRedisRepositories("com.netflix.genie")
     public static class EnableRedisRepositoryConfig {
