@@ -7,7 +7,7 @@ import Picker from "rc-calendar/lib/Picker";
 import enUS from "rc-calendar/lib/locale/en_US";
 import Panel from "rc-time-picker/lib/Panel";
 
-import { momentFormat, milliSeconds, nowUtc } from "./../utils";
+import { momentFormat, milliSeconds, nowUtc } from "../utils";
 
 import T from "prop-types";
 

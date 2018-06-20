@@ -3,11 +3,11 @@
 [![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/genie.svg)]()
 
 ## Development
-*Make sure the main genie java web app is running on port :8080*
 
 To run the webpack dev server do:
 
-2. `cd genie/genie-web && npm install`
+1. Make sure the main genie java web app is running on port 8080
+2. `cd genie/genie-ui && npm install`
 3. `npm start`
 4. `open http://localhost:3000`
 

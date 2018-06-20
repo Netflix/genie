@@ -1,7 +1,3 @@
-plugins {
-    id "com.moowork.node" version "1.2.0"
-}
-
 apply plugin: "org.asciidoctor.convert"
 
 project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
@@ -9,8 +5,6 @@ project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
 ext {
     metaModelIgnorePattern = "**/com/netflix/genie/web/jpa/entities/*_.java"
     snippetsDir = new File(project.buildDir, "generated-snippets")
-    static_build_dir = new File(project.projectDir, "/src/main/resources/static/build")
-    static_project_dir = new File(project.projectDir, "/src/main/resources/static")
 }
 
 dependencies {
@@ -49,7 +43,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-integration")
-    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-starter-aws")
@@ -98,8 +91,6 @@ dependencies {
 }
 
 license {
-    exclude "static/*"
-    exclude "templates/*"
     exclude "*.yml"
     exclude "genie-banner.txt"
     exclude "db/**/*.sql"
@@ -153,42 +144,9 @@ compileJava {
     dependsOn processResources
 }
 
-node {
-    version = "4.4.0"
-    npmVersion = "3.8.6"
-    download = true
-}
-
-clean {
-    delete static_build_dir
-}
-
-task bundle(type: NpmTask) {
-    inputs.files(fileTree("node_modules"))
-    inputs.file("npm-shrinkwrap.json")
-    inputs.file("package.json")
-    inputs.file("server.js")
-    inputs.file("webpack.config.js")
-    inputs.dir static_project_dir
-
-    outputs.dir static_build_dir
-
-    dependsOn npm_install
-    args = ["run", "build"]
-}
-
-npm_install.args = ["--loglevel", "error"]
-npmInstall.args = ["--loglevel", "error"]
-
 jar {
-    dependsOn bundle
-
     manifest {
         attributes("Implementation-Version": genieVersion)
-    }
-
-    from(static_build_dir) {
-        into "static"
     }
 }
 

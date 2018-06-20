@@ -34,9 +34,9 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-    - genie-web/node_modules/
-    - genie-web/.gradle/nodejs
-    - genie-web/.gradle/npm
+    - genie-ui/node_modules/
+    - genie-ui/.gradle/nodejs
+    - genie-ui/.gradle/npm
   timeout: 1000
 env:
   global:

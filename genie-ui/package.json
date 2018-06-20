@@ -1,6 +1,6 @@
 {
-  "name": "genie-web",
-  "version": "3.2.0",
+  "name": "genie-ui",
+  "version": "4.0.0",
   "description": "UI for Genie",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "url": "https://github.com/Netflix/genie.git"
   },
   "author": "Netflix",
-  "license": "Apache License, Version 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/Netflix/genie/issues"
   },

@@ -1,0 +1,74 @@
+plugins {
+    id "com.moowork.node" version "1.2.0"
+}
+
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile(project(":genie-web"))
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-starter-web")
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Optional Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    testCompile(project(":genie-test"))
+}
+
+license {
+    exclude "templates/*"
+}
+
+node {
+    version = "8.11.1"
+    npmVersion = "5.8.0"
+    download = true
+}
+
+task bundle(type: NpmTask) {
+    inputs.files(fileTree("node_modules"))
+    inputs.files(fileTree("src/main/web"))
+    inputs.file("npm-shrinkwrap.json")
+    inputs.file("package.json")
+    inputs.file("server.js")
+    inputs.file("webpack.config.js")
+
+    outputs.dir file("${project.buildDir}/web/bundle")
+
+    dependsOn npmInstall
+    args = ["run", "build"]
+}
+
+jar {
+    dependsOn bundle
+
+    from(file("${project.buildDir}/web/bundle")) {
+        into "META-INF/resources/webjars/${project.name}"
+    }
+
+    from(file("${project.projectDir}/src/main/web/images")) {
+        into "META-INF/resources/webjars/${project.name}/images"
+    }
+
+    manifest {
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+        )
+    }
+}

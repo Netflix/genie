@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.controllers;
+package com.netflix.genie.ui.controllers;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
