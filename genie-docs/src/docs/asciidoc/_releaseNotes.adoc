@@ -10,6 +10,8 @@ The following are the release notes for Genie {revnumber}.
 ** Standard for Boot 2.0
 * Switched to https://jcp.org/en/jsr/detail?id=310[JSR 310] classes for date and time manipulation
 * Upgrade to JPA 2.2
+* Integrate gRPC for Agent to server communication
+* Break 3.x security implementations into `genie-security` module
 
 === Library Upgrades
 

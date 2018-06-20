@@ -49,7 +49,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-integration")
-    compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
@@ -57,14 +56,6 @@ dependencies {
     compile("org.springframework.cloud:spring-cloud-starter-zookeeper")
     compile("org.springframework.integration:spring-integration-zookeeper")
     compile("org.springframework.retry:spring-retry")
-    compile("org.springframework.security:spring-security-jwt")
-    compile("org.springframework.security.extensions:spring-security-saml2-core") {
-        exclude group: "org.bouncycastle", module: "bcprov-jdk15"
-    }
-    compile("org.springframework.security.oauth:spring-security-oauth2")
-    // TODO: Remove this as they move features into core spring security
-    //       https://spring.io/blog/2018/01/30/next-generation-oauth-2-0-support-with-spring-security
-    compile("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure")
     compile("org.springframework.session:spring-session-core")
 
     /*******************************
@@ -103,7 +94,6 @@ dependencies {
     testCompile("org.springframework.restdocs:spring-restdocs-core")
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
     testCompile("org.springframework.restdocs:spring-restdocs-restassured")
-    testCompile("org.springframework.security:spring-security-test")
     testCompile("io.grpc:grpc-testing")
 }
 

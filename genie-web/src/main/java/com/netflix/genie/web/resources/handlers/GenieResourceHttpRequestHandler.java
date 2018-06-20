@@ -20,7 +20,7 @@ package com.netflix.genie.web.resources.handlers;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import com.netflix.genie.web.services.JobFileService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

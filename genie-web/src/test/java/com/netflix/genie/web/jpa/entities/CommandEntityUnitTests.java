@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;

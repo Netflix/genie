@@ -25,13 +25,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
+import java.security.Principal;
 import java.util.UUID;
 
 /**
@@ -58,17 +58,20 @@ public class UIControllerUnitTests {
      */
     @Test
     public void canGetIndex() {
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getUserPrincipal()).thenReturn(null);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         final ArgumentCaptor<Cookie> cookieArgumentCaptor = ArgumentCaptor.forClass(Cookie.class);
-        Assert.assertThat(this.controller.getIndex(response, null), Matchers.is("index"));
+        Assert.assertThat(this.controller.getIndex(request, response), Matchers.is("index"));
         Mockito.verify(response, Mockito.times(1)).addCookie(cookieArgumentCaptor.capture());
         Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
         Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is("user@genie"));
 
-        final Authentication authentication = Mockito.mock(Authentication.class);
+        final Principal principal = Mockito.mock(Principal.class);
         final String name = UUID.randomUUID().toString();
-        Mockito.when(authentication.getName()).thenReturn(name);
-        Assert.assertThat(this.controller.getIndex(response, authentication), Matchers.is("index"));
+        Mockito.when(principal.getName()).thenReturn(name);
+        Mockito.when(request.getUserPrincipal()).thenReturn(principal);
+        Assert.assertThat(this.controller.getIndex(request, response), Matchers.is("index"));
         Mockito.verify(response, Mockito.times(2)).addCookie(cookieArgumentCaptor.capture());
         Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
         Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is(name));
@@ -76,6 +79,7 @@ public class UIControllerUnitTests {
 
     /**
      * Make sure the getFile method returns the right forward command.
+     *
      * @throws Exception if an error occurs
      */
     @Test

@@ -74,17 +74,11 @@ public class UIControllerIntegrationTest {
     @Test
     public void testGetIndex() throws Exception {
         final String indexContent;
-        InputStream is = null;
 
-        try {
-            is = UIController.class.getResourceAsStream("/templates/index.html");
+        try (final InputStream is = UIController.class.getResourceAsStream("/templates/index.html")) {
             Assert.assertNotNull(is);
             Assert.assertTrue(is.available() > 0);
             indexContent = IOUtils.toString(is, StandardCharsets.UTF_8);
-        } finally {
-            if (is != null) {
-                is.close();
-            }
         }
 
         final List<String> validPaths = Arrays.asList(
