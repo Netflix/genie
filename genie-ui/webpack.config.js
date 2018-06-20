@@ -1,12 +1,12 @@
 var webpack = require("webpack");
 var path = require("path");
 
-var APP_DIR = path.resolve(__dirname, "src/main/resources/static");
-var BUILD_DIR = APP_DIR + "/build";
+var APP_DIR = path.resolve(__dirname, "src/main/web");
+var BUILD_DIR = path.resolve(__dirname, "build/web/bundle");
 
 var config = {
   entry: { app: [ APP_DIR + "/index.js" ] },
-  output: { path: BUILD_DIR, filename: "bundle.js", publicPath: "/build/" },
+  output: { path: BUILD_DIR, filename: "bundle.js", publicPath: "webjars/genie-ui/" },
   plugins: [
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({ compressor: { warnings: false } }),

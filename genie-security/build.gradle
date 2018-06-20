@@ -4,6 +4,7 @@ dependencies {
      *******************************/
 
     compile(project(":genie-web"))
+    compile(project(":genie-ui"))
     compile("org.bitbucket.b_c:jose4j")
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.security:spring-security-jwt")
@@ -23,6 +24,7 @@ dependencies {
     /*******************************
      * Optional Dependencies
      *******************************/
+
     compileOnly("org.springframework.boot:spring-boot-configuration-processor")
 
     /*******************************

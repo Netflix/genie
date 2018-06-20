@@ -99,7 +99,7 @@ genie-client/src/main/python/build
 genie-client/src/main/python/nflx_genie_client.egg-info
 genie-client/src/main/python/MANIFEST
 genie-common/src/generated
-genie-web/src/main/resources/static/build/
+/genie-ui/src/main/resources/static/build/
 node_modules
 node-v4.4.0-darwin-x64
 

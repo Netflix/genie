@@ -15,8 +15,9 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.controllers;
+package com.netflix.genie.ui.controllers;
 
+import com.netflix.genie.web.controllers.ControllerUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
