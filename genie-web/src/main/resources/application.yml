@@ -115,7 +115,7 @@ genie:
 
 info:
   genie:
-    version: GENIE_VERSION
+    version: ${project.version}
 
 management:
   endpoints:
