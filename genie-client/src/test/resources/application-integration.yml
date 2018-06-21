@@ -17,6 +17,9 @@
 ##
 
 genie:
+  grpc:
+    server:
+      enabled: false
   jobs:
     dir:
       location: "file:///tmp/"
