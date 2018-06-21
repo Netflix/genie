@@ -35,6 +35,7 @@ com.netflix.genie.security.saml
 com.netflix.genie.security.x509
 com.netflix.genie.test.categories
 com.netflix.genie.test.suppliers
+com.netflix.genie.ui.controllers
 com.netflix.genie.web.aspect
 com.netflix.genie.web.configs
 com.netflix.genie.web.configs.aws
