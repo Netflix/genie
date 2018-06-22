@@ -39,7 +39,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude group: "org.hibernate.javax.persistence"
     }
-    compile("org.springframework.boot:spring-boot-starter-data-redis")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-integration")
@@ -49,7 +48,6 @@ dependencies {
     compile("org.springframework.cloud:spring-cloud-starter-zookeeper")
     compile("org.springframework.integration:spring-integration-zookeeper")
     compile("org.springframework.retry:spring-retry")
-    compile("org.springframework.session:spring-session-core")
 
     /*******************************
      * Provided Dependencies
@@ -70,7 +68,6 @@ dependencies {
     runtime("mysql:mysql-connector-java")
     runtime("org.codehaus.groovy:groovy-all")
     runtime("org.postgresql:postgresql")
-    runtime("org.springframework.session:spring-session-data-redis")
 
     /*******************************
      * Test Dependencies

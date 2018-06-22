@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.configs;
+package com.netflix.genie.security.configs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 public class HttpSessionConfig {
 
-    @Autowired
+    @Autowired(required = false)
     private SessionProperties sessionProperties;
 
     /**
