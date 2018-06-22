@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.configs;
+package com.netflix.genie.security.configs;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;

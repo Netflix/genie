@@ -6,6 +6,7 @@ dependencies {
     compile(project(":genie-web"))
     compile(project(":genie-ui"))
     compile("org.bitbucket.b_c:jose4j")
+    compile("org.springframework.boot:spring-boot-starter-data-redis")
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.security:spring-security-jwt")
     compile("org.springframework.security.extensions:spring-security-saml2-core") {
@@ -30,6 +31,8 @@ dependencies {
     /*******************************
      * Runtime Dependencies
      *******************************/
+
+    runtime("org.springframework.session:spring-session-data-redis")
 
     /*******************************
      * Test Dependencies
