@@ -23,15 +23,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.web.servlet.HandlerMapping;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
-import java.security.Principal;
 import java.util.UUID;
 
 /**
@@ -58,23 +54,7 @@ public class UIControllerUnitTests {
      */
     @Test
     public void canGetIndex() {
-        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        Mockito.when(request.getUserPrincipal()).thenReturn(null);
-        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        final ArgumentCaptor<Cookie> cookieArgumentCaptor = ArgumentCaptor.forClass(Cookie.class);
-        Assert.assertThat(this.controller.getIndex(request, response), Matchers.is("index"));
-        Mockito.verify(response, Mockito.times(1)).addCookie(cookieArgumentCaptor.capture());
-        Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
-        Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is("user@genie"));
-
-        final Principal principal = Mockito.mock(Principal.class);
-        final String name = UUID.randomUUID().toString();
-        Mockito.when(principal.getName()).thenReturn(name);
-        Mockito.when(request.getUserPrincipal()).thenReturn(principal);
-        Assert.assertThat(this.controller.getIndex(request, response), Matchers.is("index"));
-        Mockito.verify(response, Mockito.times(2)).addCookie(cookieArgumentCaptor.capture());
-        Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
-        Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is(name));
+        Assert.assertThat(this.controller.getIndex(), Matchers.is("index"));
     }
 
     /**

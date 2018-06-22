@@ -1,8 +1,6 @@
 import T from "prop-types";
 import React from "react";
-import { fetch } from "./utils";
-
-import cookie from "react-cookie";
+import {fetch} from "./utils";
 
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
@@ -26,7 +24,7 @@ export default class App extends React.Component {
     this.state = {
       version: "",
       infos: [
-        { className: "supress", name: cookie.load("genie.user"), url: "#" }
+        { className: "supress", name: "", url: "#" }
       ]
     };
   }
@@ -35,6 +33,21 @@ export default class App extends React.Component {
     fetch("/admin/info", null, "GET", "application/json").done(data => {
       this.setState({ version: data.genie.version });
     });
+      fetch("/ui/user", null, "GET", "application/json").done(
+          data => {
+              this.setState(
+                  {
+                      infos: [
+                          {
+                              className: "supress",
+                              name: data.name,
+                              url: "#"
+                          }
+                      ]
+                  }
+              );
+          }
+      );
   }
 
   render() {
