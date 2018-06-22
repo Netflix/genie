@@ -22,13 +22,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.Principal;
 
 /**
  * Controller for forwarding UI requests.
@@ -42,8 +38,6 @@ public class UIController {
     /**
      * Return the getIndex.html template for requests to root.
      *
-     * @param request  The request to get the principal from if there is one
-     * @param response The servlet response to add cookies to
      * @return The index page
      */
     @GetMapping(
@@ -56,13 +50,7 @@ public class UIController {
             "/output/**"
         }
     )
-    public String getIndex(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response) {
-        final Principal principal = request.getUserPrincipal();
-        if (principal != null) {
-            response.addCookie(new Cookie("genie.user", principal.getName()));
-        } else {
-            response.addCookie(new Cookie("genie.user", "user@genie"));
-        }
+    public String getIndex() {
         return "index";
     }
 
