@@ -29,6 +29,7 @@ com.netflix.genie.common.internal.jobs
 com.netflix.genie.common.internal.util
 com.netflix.genie.common.util
 com.netflix.genie.security
+com.netflix.genie.security.configs
 com.netflix.genie.security.oauth2
 com.netflix.genie.security.oauth2.pingfederate
 com.netflix.genie.security.saml
