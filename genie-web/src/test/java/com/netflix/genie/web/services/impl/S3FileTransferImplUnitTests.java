@@ -24,6 +24,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.google.common.collect.ImmutableMap;
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
@@ -64,7 +65,7 @@ public class S3FileTransferImplUnitTests {
     private static final String LOCAL_PATH = "local";
     private static final Set<Tag> SUCCESS_TAGS = MetricsUtils.newSuccessTagsSet();
     private static final Set<Tag> FAILURE_TAGS
-        = MetricsUtils.newFailureTagsSetForException(new GenieServerException("test"));
+        = MetricsUtils.newFailureTagsSetForException(new GenieBadRequestException("test"));
 
     private MeterRegistry registry;
     private S3FileTransferImpl s3FileTransfer;
@@ -86,6 +87,7 @@ public class S3FileTransferImplUnitTests {
         this.downloadTimer = Mockito.mock(Timer.class);
         this.uploadTimer = Mockito.mock(Timer.class);
         this.urlFailingStrictValidationCounter = Mockito.mock(Counter.class);
+        this.s3Client = Mockito.mock(AmazonS3Client.class);
         Mockito.
             when(registry.timer(Mockito.eq(S3FileTransferImpl.DOWNLOAD_TIMER_NAME), Mockito.anySet()))
             .thenReturn(this.downloadTimer);
@@ -95,7 +97,6 @@ public class S3FileTransferImplUnitTests {
         Mockito
             .when(registry.counter(S3FileTransferImpl.STRICT_VALIDATION_COUNTER_NAME))
             .thenReturn(this.urlFailingStrictValidationCounter);
-        this.s3Client = Mockito.mock(AmazonS3Client.class);
         this.s3FileTransferProperties = Mockito.mock(S3FileTransferProperties.class);
         this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, this.registry, this.s3FileTransferProperties);
     }
@@ -219,7 +220,7 @@ public class S3FileTransferImplUnitTests {
             boolean genieException = false;
             try {
                 this.s3FileTransfer.getS3Uri(path);
-            } catch (GenieServerException e) {
+            } catch (GenieBadRequestException e) {
                 genieException = true;
             } finally {
                 Assert.assertTrue(
@@ -255,7 +256,7 @@ public class S3FileTransferImplUnitTests {
             boolean genieException = false;
             try {
                 this.s3FileTransfer.getS3Uri(path);
-            } catch (GenieServerException e) {
+            } catch (final GenieBadRequestException e) {
                 genieException = true;
             } finally {
                 Assert.assertTrue(
@@ -288,7 +289,7 @@ public class S3FileTransferImplUnitTests {
             boolean genieException = false;
             try {
                 this.s3FileTransfer.getS3Uri(path);
-            } catch (GenieServerException e) {
+            } catch (GenieBadRequestException e) {
                 genieException = true;
             } finally {
                 Assert.assertTrue(
@@ -304,7 +305,7 @@ public class S3FileTransferImplUnitTests {
      *
      * @throws GenieException If there is any problem
      */
-    @Test(expected = GenieServerException.class)
+    @Test(expected = GenieBadRequestException.class)
     public void testGetFileMethodInvalidS3Path() throws GenieException {
         final String invalidS3Path = "filepath";
         try {
@@ -369,7 +370,10 @@ public class S3FileTransferImplUnitTests {
             Mockito
                 .verify(this.registry, Mockito.times(1))
                 .timer(Mockito.eq(S3FileTransferImpl.DOWNLOAD_TIMER_NAME), this.tagsCaptor.capture());
-            Assert.assertEquals(FAILURE_TAGS, this.tagsCaptor.getValue());
+            Assert.assertEquals(
+                MetricsUtils.newFailureTagsSetForException(new GenieServerException("blah")),
+                this.tagsCaptor.getValue()
+            );
         }
     }
 
@@ -378,7 +382,7 @@ public class S3FileTransferImplUnitTests {
      *
      * @throws GenieException If there is any problem
      */
-    @Test(expected = GenieServerException.class)
+    @Test(expected = GenieBadRequestException.class)
     public void testPutFileMethodInvalidS3Path() throws GenieException {
         final String invalidS3Path = "filepath";
         try {
@@ -449,7 +453,10 @@ public class S3FileTransferImplUnitTests {
             Mockito
                 .verify(this.registry, Mockito.times(1))
                 .timer(Mockito.eq(S3FileTransferImpl.UPLOAD_TIMER_NAME), this.tagsCaptor.capture());
-            Assert.assertEquals(FAILURE_TAGS, this.tagsCaptor.getValue());
+            Assert.assertEquals(
+                MetricsUtils.newFailureTagsSetForException(new GenieServerException("blah")),
+                this.tagsCaptor.getValue()
+            );
         }
     }
 }
