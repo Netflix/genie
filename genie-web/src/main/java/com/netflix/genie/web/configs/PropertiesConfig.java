@@ -21,6 +21,7 @@ import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +42,7 @@ public class PropertiesConfig {
      */
     @Bean
     @ConfigurationProperties("genie.jobs")
+    @ConditionalOnMissingBean(JobsProperties.class)
     public JobsProperties jobsProperties() {
         return new JobsProperties();
     }
@@ -52,6 +54,7 @@ public class PropertiesConfig {
      */
     @Bean
     @ConfigurationProperties("genie.data.service.retry")
+    @ConditionalOnMissingBean(DataServiceRetryProperties.class)
     public DataServiceRetryProperties dataServiceRetryProperties() {
         return new DataServiceRetryProperties();
     }
@@ -63,6 +66,7 @@ public class PropertiesConfig {
      */
     @Bean
     @ConfigurationProperties("genie.health")
+    @ConditionalOnMissingBean(HealthProperties.class)
     public HealthProperties healthProperties() {
         return new HealthProperties();
     }
@@ -74,6 +78,7 @@ public class PropertiesConfig {
      */
     @Bean
     @ConfigurationProperties("genie.s3filetransfer")
+    @ConditionalOnMissingBean(S3FileTransferProperties.class)
     public S3FileTransferProperties s3FileTransferProperties() {
         return new S3FileTransferProperties();
     }

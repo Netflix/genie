@@ -31,6 +31,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,11 @@ import java.util.UUID;
  */
 @Configuration
 @ConditionalOnBean(AWSCredentialsProvider.class)
+@AutoConfigureAfter(
+    name = {
+        "org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration"
+    }
+)
 @Slf4j
 public class AwsS3Config {
 

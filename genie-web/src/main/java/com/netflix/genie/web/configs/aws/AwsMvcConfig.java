@@ -21,6 +21,8 @@ import com.amazonaws.util.EC2MetadataUtils;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
 import org.springframework.cloud.aws.context.annotation.ConditionalOnAwsCloudEnvironment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +37,7 @@ import java.net.UnknownHostException;
  * @since 3.0.0
  */
 @Configuration
+@AutoConfigureAfter(ContextCredentialsAutoConfiguration.class)
 @ConditionalOnAwsCloudEnvironment
 @Slf4j
 public class AwsMvcConfig {
