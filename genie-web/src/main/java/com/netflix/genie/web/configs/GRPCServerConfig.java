@@ -20,6 +20,7 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.web.properties.JobFileSyncRpcProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +55,7 @@ public class GRPCServerConfig {
      * @return The properties instance
      */
     @Bean
+    @ConditionalOnMissingBean(JobFileSyncRpcProperties.class)
     @ConfigurationProperties(prefix = "genie.grpc.server.services.job-file-sync")
     public JobFileSyncRpcProperties jobFileSyncRpcProperties() {
         return new JobFileSyncRpcProperties();

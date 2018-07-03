@@ -111,6 +111,7 @@ public class ServicesConfig {
      * @return A job kill service instance.
      */
     @Bean
+    @ConditionalOnMissingBean(JobKillService.class)
     public JobKillService jobKillService(
         final GenieHostInfo genieHostInfo,
         final JobSearchService jobSearchService,
@@ -137,6 +138,7 @@ public class ServicesConfig {
      * @return A randomized cluster load balancer instance.
      */
     @Bean
+    @ConditionalOnMissingBean(ClusterLoadBalancer.class)
     public ClusterLoadBalancer clusterLoadBalancer() {
         return new RandomizedClusterLoadBalancerImpl();
     }
@@ -186,6 +188,7 @@ public class ServicesConfig {
      * @return An instance of the JobSubmitterService.
      */
     @Bean
+    @ConditionalOnMissingBean(JobSubmitterService.class)
     public JobSubmitterService jobSubmitterService(
         final JobPersistenceService jobPersistenceService,
         final GenieEventBus genieEventBus,
@@ -219,6 +222,7 @@ public class ServicesConfig {
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
+    @ConditionalOnMissingBean(JobCoordinatorService.class)
     public JobCoordinatorService jobCoordinatorService(
         final JobPersistenceService jobPersistenceService,
         final JobKillService jobKillService,
@@ -254,6 +258,7 @@ public class ServicesConfig {
      * @return The attachment service to use
      */
     @Bean
+    @ConditionalOnMissingBean(AttachmentService.class)
     public AttachmentService attachmentService(final JobsProperties jobsProperties) {
         return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments());
     }

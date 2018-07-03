@@ -19,6 +19,7 @@ package com.netflix.genie.web.configs;
 
 import com.netflix.genie.web.events.GenieEventBusImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
@@ -42,6 +43,7 @@ public class EventConfig {
      * @return The application event multicaster to use
      */
     @Bean
+    @ConditionalOnMissingBean(GenieEventBusImpl.class)
     public GenieEventBusImpl applicationEventMulticaster(
         @Qualifier("genieSyncTaskExecutor") final SyncTaskExecutor syncTaskExecutor,
         @Qualifier("genieAsyncTaskExecutor") final AsyncTaskExecutor asyncTaskExecutor

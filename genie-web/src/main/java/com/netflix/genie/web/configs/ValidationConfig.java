@@ -40,7 +40,7 @@ public class ValidationConfig {
      * @return The bean validator
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(Validator.class)
     public Validator localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
     }
@@ -51,7 +51,7 @@ public class ValidationConfig {
      * @return The method validation processor
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(MethodValidationPostProcessor.class)
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }
