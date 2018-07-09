@@ -72,7 +72,7 @@ import java.util.UUID;
 @Category(IntegrationTest.class)
 @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaClusterPersistenceServiceImplIntegrationTests extends DBUnitTestBase {
+public class JpaClusterPersistenceServiceImplIntegrationTests extends DBIntegrationTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";

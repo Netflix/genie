@@ -45,7 +45,7 @@ import java.util.UUID;
  */
 @Category(IntegrationTest.class)
 @DatabaseTearDown("cleanup.xml")
-public class JpaTagPersistenceServiceImplIntegrationTest extends DBUnitTestBase {
+public class JpaTagPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired

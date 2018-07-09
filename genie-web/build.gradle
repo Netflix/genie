@@ -74,6 +74,7 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
+    testCompile(project(":genie-test-web"))
     testCompile("com.github.springtestdbunit:spring-test-dbunit")
     testCompile("com.jayway.jsonpath:json-path")
     testCompile("net.sf.jtidy:jtidy")
@@ -126,16 +127,6 @@ asciidoctor {
             }
         }
     }
-}
-
-processResources {
-    filesMatching("**/*.yml") {
-        expand(project.properties)
-    }
-}
-
-compileJava {
-    dependsOn processResources
 }
 
 jar {

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,31 +17,24 @@
  */
 package com.netflix.genie;
 
-import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
- * Main Genie Spring Configuration class.
+ * Reusable Spring Boot test application.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 4.0.0
  */
-@SpringBootApplication(
-    exclude = {
-        RedisAutoConfiguration.class,
-        GrpcServerAutoConfiguration.class,
-    }
-)
+@SpringBootApplication
 @EnableAspectJAutoProxy
-public class GenieWeb {
+public class GenieTestApp {
 
     /**
-     * Protected constructor.
+     * Constructor.
      */
-    protected GenieWeb() {
+    protected GenieTestApp() {
     }
 
     /**
@@ -51,6 +44,6 @@ public class GenieWeb {
      * @throws Exception For any failure during program execution
      */
     public static void main(final String[] args) throws Exception {
-        new SpringApplication(GenieWeb.class).run(args);
+        new SpringApplication(GenieTestApp.class).run(args);
     }
 }

@@ -30,10 +30,14 @@ genie:
     maxCpuLoadPercent: 100
   jobs:
     clusters:
-      loadBalancers:
+      load-balancers:
         script:
           enabled: true
-    dir:
-      location: "file:///tmp/"
-    archive:
-      location: /archive/location
+    locations:
+      archives: /archive/location
+      jobs: file:///tmp/genie/jobs/
+
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration, net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration
+

@@ -18,6 +18,7 @@
 package com.netflix.genie.web.jpa.services;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -42,7 +43,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
  */
 @RunWith(SpringRunner.class)
 //@DataJpaTest
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(classes = GenieTestApp.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestExecutionListeners(
     {
         DependencyInjectionTestExecutionListener.class,
@@ -59,7 +60,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
         "db-h2",
     }
 )
-public abstract class DBUnitTestBase {
+public abstract class DBIntegrationTestBase {
 
     @Autowired
     protected JpaApplicationRepository applicationRepository;

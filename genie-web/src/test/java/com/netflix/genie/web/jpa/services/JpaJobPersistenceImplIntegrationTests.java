@@ -86,7 +86,7 @@ import java.util.UUID;
 @Category(IntegrationTest.class)
 @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
+public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase {
 
     private static final String JOB_3_ID = "job3";
 

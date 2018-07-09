@@ -17,14 +17,13 @@
  */
 package com.netflix.genie.security.x509;
 
-import com.netflix.genie.GenieWeb;
-import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.security.AbstractAPISecurityIntegrationTests;
+import com.netflix.genie.test.categories.IntegrationTest;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -37,9 +36,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
  */
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    classes = GenieTestApp.class,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {"genie.security.x509.enabled = true"}
+)
 @ActiveProfiles({"integration"})
-@TestPropertySource(properties = {"genie.security.x509.enabled = true"})
 public class X509ConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
 
     /**

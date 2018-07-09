@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.security.saml;
 
-import com.netflix.genie.GenieWeb;
+import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -45,7 +45,10 @@ import org.springframework.web.context.WebApplicationContext;
 @Ignore
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    classes = GenieTestApp.class,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 @ActiveProfiles({"saml", "integration"})
 public class SAMLConfigIntegrationTests {
 

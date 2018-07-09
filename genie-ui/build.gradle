@@ -28,6 +28,7 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
+    testCompile(project(":genie-test-web"))
 }
 
 license {

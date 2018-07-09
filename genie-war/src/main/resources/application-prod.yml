@@ -16,4 +16,21 @@
 #
 ##
 
-loader.path=lib,${user.home}/.genie/lib
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1/genie?useUnicode=yes&characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password:
+    hikari:
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+#        useLocalSessionState: true
+#        useLocalTransactionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false

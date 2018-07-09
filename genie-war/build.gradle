@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: "war"
 
 dependencies {
@@ -28,11 +30,19 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
+    testCompile(project(":genie-test-web"))
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "genie.version": project.version.toString()
+    ]
 }
 
 jar {
     manifest {
-        attributes("Implementation-Version": version)
+        attributes("Implementation-Title": project.name)
+        attributes("Implementation-Version": project.version)
     }
 }
 

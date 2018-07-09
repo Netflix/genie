@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.HealthProperties;
@@ -40,7 +41,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:/PropertiesConfigIntegrationTest.properties")
-@SpringBootTest()
+@SpringBootTest(
+    classes = GenieTestApp.class,
+    properties = {"genie.grpc.server.enabled = false"}
+)
 public class PropertiesConfigIntegrationTest {
 
     @Autowired

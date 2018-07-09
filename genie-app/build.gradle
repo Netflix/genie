@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: "org.springframework.boot"
 
 dependencies {
@@ -24,24 +26,27 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
+
+    testCompile(project(":genie-test"))
+    testCompile(project(":genie-test-web"))
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "genie.version": project.version.toString()
+    ]
 }
 
 bootJar {
     manifest {
-        attributes("Implementation-Version": version)
+        attributes("Implementation-Title": project.name)
+        attributes("Implementation-Version": project.version)
     }
 }
 
 springBoot {
-    mainClassName = "com.netflix.genie.GenieWeb"
+    mainClassName = "com.netflix.genie.GenieApp"
     buildInfo()
-}
-
-def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
-
-bootRun {
-//    addResources = false
-    systemProperty "spring.profiles.active", env
 }
 
 def dockerDir = new File(project.buildDir, "/docker")

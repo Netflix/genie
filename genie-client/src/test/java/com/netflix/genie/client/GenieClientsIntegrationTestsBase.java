@@ -18,7 +18,7 @@
 package com.netflix.genie.client;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.GenieWeb;
+import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -45,7 +45,7 @@ import java.util.UUID;
  */
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = GenieTestApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 public abstract class GenieClientsIntegrationTestsBase {
 

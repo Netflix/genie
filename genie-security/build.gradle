@@ -39,6 +39,7 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
+    testCompile(project(":genie-test-web"))
     testCompile("com.jayway.jsonpath:json-path")
     testCompile("org.apache.tomcat:tomcat-jdbc")
     testCompile("org.springframework.boot:spring-boot-starter-jetty")

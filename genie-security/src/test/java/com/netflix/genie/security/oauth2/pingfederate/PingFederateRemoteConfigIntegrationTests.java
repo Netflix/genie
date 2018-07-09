@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.security.oauth2.pingfederate;
 
-import com.netflix.genie.GenieWeb;
-import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.security.AbstractAPISecurityIntegrationTests;
+import com.netflix.genie.test.categories.IntegrationTest;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +36,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
  */
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    classes = GenieTestApp.class,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 @ActiveProfiles({"oauth2-pingfederate-remote", "integration"})
 public class PingFederateRemoteConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
 
