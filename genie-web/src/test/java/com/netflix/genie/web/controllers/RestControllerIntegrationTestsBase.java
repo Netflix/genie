@@ -18,7 +18,7 @@
 package com.netflix.genie.web.controllers;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.GenieWeb;
+import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -72,7 +72,7 @@ import java.util.stream.Collectors;
  */
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = GenieTestApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
 public abstract class RestControllerIntegrationTestsBase {
 

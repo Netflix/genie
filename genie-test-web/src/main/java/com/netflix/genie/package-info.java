@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,27 +15,14 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie;
-
-import com.netflix.genie.test.categories.UnitTest;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
- * Unit tests for the GenieWeb class.
+ * Common test resources in the base package.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 4.0.0
  */
-@Category(UnitTest.class)
-public class GenieWebUnitTests {
+@ParametersAreNonnullByDefault
+package com.netflix.genie;
 
-    /**
-     * Make sure we can construct a new Genie Web instance.
-     */
-    @Test
-    public void canConstruct() {
-        Assert.assertNotNull(new GenieWeb());
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

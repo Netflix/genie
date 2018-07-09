@@ -1,0 +1,29 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile(project(":genie-test"))
+    compile("org.springframework.boot:spring-boot-starter-aop")
+    compile("org.springframework.boot:spring-boot-starter-test")
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "genie.version": project.version.toString()
+    ]
+}

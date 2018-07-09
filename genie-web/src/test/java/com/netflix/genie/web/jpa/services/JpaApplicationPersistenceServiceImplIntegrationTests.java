@@ -59,7 +59,7 @@ import java.util.UUID;
 @Category(IntegrationTest.class)
 @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaApplicationPersistenceServiceImplIntegrationTests extends DBUnitTestBase {
+public class JpaApplicationPersistenceServiceImplIntegrationTests extends DBIntegrationTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";

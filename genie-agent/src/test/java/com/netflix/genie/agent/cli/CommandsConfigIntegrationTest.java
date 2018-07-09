@@ -2,6 +2,7 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.collect.Sets;
+import com.netflix.genie.GenieAgentApplication;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = GenieAgentApplication.class)
 public class CommandsConfigIntegrationTest {
 
     @Autowired
@@ -31,6 +32,7 @@ public class CommandsConfigIntegrationTest {
 
     /**
      * Test creation of AgentArguments bean.
+     *
      * @throws Exception for error
      */
     @Test
@@ -40,6 +42,7 @@ public class CommandsConfigIntegrationTest {
 
     /**
      * Test creation of JCommander bean.
+     *
      * @throws Exception for error
      */
     @Test
@@ -49,6 +52,7 @@ public class CommandsConfigIntegrationTest {
 
     /**
      * Test creation of CommandFactory bean.
+     *
      * @throws Exception for error
      */
     @Test
@@ -81,6 +85,7 @@ public class CommandsConfigIntegrationTest {
 
     /**
      * Test creation of ArgumentParser bean.
+     *
      * @throws Exception for error
      */
     @Test

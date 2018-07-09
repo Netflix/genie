@@ -31,6 +31,7 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
+    testCompile(project(":genie-test-web"))
     testCompile(project(":genie-web"))
 
     testCompile("org.springframework.boot:spring-boot-starter-jetty")
