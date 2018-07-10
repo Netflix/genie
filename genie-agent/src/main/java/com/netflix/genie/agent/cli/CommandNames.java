@@ -48,6 +48,8 @@ final class CommandNames {
 
     static final String RESOLVE = "resolve";
 
+    static final String HEARTBEAT = "heartbeat";
+
     private static final Set<Field> COMMAND_NAMES_FIELDS;
 
     static {
