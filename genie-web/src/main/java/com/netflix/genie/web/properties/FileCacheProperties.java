@@ -15,27 +15,28 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.URL;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 /**
- * Properties to configure an ExponentialBackOffTrigger.
+ * Properties related to the Genie file cache.
  *
- * @author mprimi
- * @since 3.3.9
+ * @author tgianos
+ * @since 4.0.0
  */
+@ConfigurationProperties(prefix = "genie.file.cache")
+@Validated
 @Getter
 @Setter
-@Validated
-public class ExponentialBackOffTriggerProperties {
-    @Min(value = 1)
-    private long minInterval = 100;
-    private long maxInterval = 10_000;
-    private float factor = 1.2f;
+public class FileCacheProperties {
+    @NotBlank
+    @URL
+    private String location = "file:///tmp/genie/cache";
 }

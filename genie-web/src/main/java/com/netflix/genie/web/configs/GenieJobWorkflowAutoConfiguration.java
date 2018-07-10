@@ -33,7 +33,6 @@ import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +46,8 @@ import org.springframework.web.client.RestTemplate;
  * @since 3.0.0
  */
 @Configuration
-public class JobConfig {
+// TODO: This is going to go away once the V4 API is in place
+public class GenieJobWorkflowAutoConfiguration {
     /**
      * Bean to create a local file transfer object.
      *
@@ -155,7 +155,6 @@ public class JobConfig {
      */
     @Bean
     @Order(value = 5)
-    @Autowired
     public WorkflowTask jobProcessorTask(
         final AttachmentService attachmentService,
         final MeterRegistry registry,
@@ -175,7 +174,6 @@ public class JobConfig {
      */
     @Bean
     @Order(value = 6)
-    @Autowired
     public WorkflowTask jobKickoffTask(
         final JobsProperties jobsProperties,
         final Executor executor,

@@ -15,27 +15,30 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.properties
 
-package com.netflix.genie.web.properties;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.Min;
+import spock.lang.Specification
 
 /**
- * Properties to configure an ExponentialBackOffTrigger.
+ * Specifications for {@link MailProperties}.
  *
- * @author mprimi
- * @since 3.3.9
+ * @author tgianos
+ * @since 4.0.0
  */
-@Getter
-@Setter
-@Validated
-public class ExponentialBackOffTriggerProperties {
-    @Min(value = 1)
-    private long minInterval = 100;
-    private long maxInterval = 10_000;
-    private float factor = 1.2f;
+class MailPropertiesSpec extends Specification {
+
+    def "Can get and set values"() {
+        when:
+        def properties = new MailProperties()
+
+        then:
+        properties.getFromAddress() == "no-reply-genie@geniehost.com"
+
+        when:
+        def newFromAddress = "test@genie.net"
+        properties.setFromAddress(newFromAddress)
+
+        then:
+        properties.getFromAddress() == newFromAddress
+    }
 }

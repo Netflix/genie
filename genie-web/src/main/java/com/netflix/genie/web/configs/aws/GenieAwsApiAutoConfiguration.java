@@ -19,9 +19,12 @@ package com.netflix.genie.web.configs.aws;
 
 import com.amazonaws.util.EC2MetadataUtils;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.configs.GenieApiAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
 import org.springframework.cloud.aws.context.annotation.ConditionalOnAwsCloudEnvironment;
 import org.springframework.context.annotation.Bean;
@@ -38,9 +41,10 @@ import java.net.UnknownHostException;
  */
 @Configuration
 @AutoConfigureAfter(ContextCredentialsAutoConfiguration.class)
+@AutoConfigureBefore(GenieApiAutoConfiguration.class)
 @ConditionalOnAwsCloudEnvironment
 @Slf4j
-public class AwsMvcConfig {
+public class GenieAwsApiAutoConfiguration {
 
     /**
      * Create an instance of {@link GenieHostInfo} using the EC2 metadata service as we're deployed in an AWS cloud
@@ -51,6 +55,7 @@ public class AwsMvcConfig {
      * @throws IllegalStateException If an instance can't be created
      */
     @Bean
+    @ConditionalOnMissingBean(GenieHostInfo.class)
     public GenieHostInfo genieHostInfo() throws UnknownHostException {
         final String ec2LocalHostName = EC2MetadataUtils.getLocalHostName();
         if (StringUtils.isNotBlank(ec2LocalHostName)) {

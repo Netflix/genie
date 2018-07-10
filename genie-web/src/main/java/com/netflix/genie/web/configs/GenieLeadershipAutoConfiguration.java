@@ -18,14 +18,15 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.ZookeeperLeadershipProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
 import org.apache.curator.framework.CuratorFramework;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.zookeeper.config.LeaderInitiatorFactoryBean;
@@ -40,7 +41,13 @@ import java.util.Collection;
  * @since 3.1.0
  */
 @Configuration
-public class LeadershipConfig {
+@EnableConfigurationProperties(
+    {
+        LeadershipProperties.class,
+        ZookeeperLeadershipProperties.class
+    }
+)
+public class GenieLeadershipAutoConfiguration {
 
     /**
      * Create the LeadershipTasksCoordination bean used to start and stop all leadership related tasks based on
@@ -84,16 +91,16 @@ public class LeadershipConfig {
      * If Spring Zookeeper Leadership is disabled and this node is forced to be the leader create the local leader
      * bean which will fire appropriate events.
      *
-     * @param genieEventBus The genie event bus implementation to use
-     * @param isLeader      Whether this node is the leader of the cluster or not
+     * @param genieEventBus        The genie event bus implementation to use
+     * @param leadershipProperties Properties related to static leadership configuration for the Genie cluster
      * @return The local leader bean
      */
     @Bean
     @ConditionalOnProperty(value = "spring.cloud.zookeeper.enabled", havingValue = "false", matchIfMissing = true)
     public LocalLeader localLeader(
         final GenieEventBus genieEventBus,
-        @Value("${genie.leader.enabled}") final boolean isLeader
+        final LeadershipProperties leadershipProperties
     ) {
-        return new LocalLeader(genieEventBus, isLeader);
+        return new LocalLeader(genieEventBus, leadershipProperties.isEnabled());
     }
 }

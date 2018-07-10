@@ -19,6 +19,7 @@ package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
  * @author amajumdar
  * @since 3.0.0
  */
+@ConfigurationProperties("genie.data.service.retry")
 @Getter
 @Setter
 @Validated

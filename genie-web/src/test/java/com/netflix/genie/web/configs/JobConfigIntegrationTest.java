@@ -42,6 +42,7 @@ import java.io.IOException;
         "integration"
     }
 )
+// TODO: Move to common location
 public class JobConfigIntegrationTest {
 
     private File jobsDir;

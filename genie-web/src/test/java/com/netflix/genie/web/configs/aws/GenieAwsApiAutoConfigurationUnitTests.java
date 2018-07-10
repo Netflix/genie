@@ -28,22 +28,22 @@ import org.junit.experimental.categories.Category;
 import java.net.UnknownHostException;
 
 /**
- * Unit tests for the AwsMvcConfig class.
+ * Unit tests for the {@link GenieAwsApiAutoConfiguration} class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class AwsMvcConfigUnitTests {
+public class GenieAwsApiAutoConfigurationUnitTests {
 
-    private AwsMvcConfig awsMvcConfig;
+    private GenieAwsApiAutoConfiguration genieAwsApiAutoConfiguration;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.awsMvcConfig = new AwsMvcConfig();
+        this.genieAwsApiAutoConfiguration = new GenieAwsApiAutoConfiguration();
     }
 
     /**
@@ -53,7 +53,7 @@ public class AwsMvcConfigUnitTests {
      */
     @Test
     public void canGetGenieHostInfo() throws UnknownHostException {
-        final GenieHostInfo genieHostInfo = this.awsMvcConfig.genieHostInfo();
+        final GenieHostInfo genieHostInfo = this.genieAwsApiAutoConfiguration.genieHostInfo();
         Assert.assertThat(genieHostInfo.getHostname(), Matchers.notNullValue());
     }
 }

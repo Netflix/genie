@@ -18,18 +18,19 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.properties.HttpProperties;
+import com.netflix.genie.web.properties.RetryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import com.netflix.genie.web.services.JobFileService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -50,13 +51,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 /**
- * Configuration for Spring MVC.
+ * Configuration for Spring MVC REST API tier.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Configuration
-public class MvcConfig implements WebMvcConfigurer {
+@EnableConfigurationProperties(
+    {
+        HttpProperties.class,
+        RetryProperties.class
+    }
+)
+public class GenieApiAutoConfiguration implements WebMvcConfigurer {
 
     /**
      * {@inheritDoc}
@@ -104,42 +111,37 @@ public class MvcConfig implements WebMvcConfigurer {
     /**
      * Get RestTemplate for calling between Genie nodes.
      *
-     * @param httpConnectTimeout http connection timeout in milliseconds
-     * @param httpReadTimeout    http read timeout in milliseconds
+     * @param httpProperties The properties related to Genie's HTTP client configuration
      * @return The rest template to use
      */
-    @Primary
-    @Bean(name = "genieRestTemplate")
-    public RestTemplate restTemplate(
-        @Value("${genie.http.connect.timeout:2000}") final int httpConnectTimeout,
-        @Value("${genie.http.read.timeout:10000}") final int httpReadTimeout
-    ) {
+    @Bean
+    @ConditionalOnMissingBean(name = "genieRestTemplate")
+    public RestTemplate genieRestTemplate(final HttpProperties httpProperties) {
         final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(httpConnectTimeout);
-        factory.setReadTimeout(httpReadTimeout);
+        factory.setConnectTimeout(httpProperties.getConnect().getTimeout());
+        factory.setReadTimeout(httpProperties.getRead().getTimeout());
         return new RestTemplate(factory);
     }
 
     /**
      * Get RetryTemplate.
      *
-     * @param noOfRetries     number of retries
-     * @param initialInterval initial interval for the back-off policy
-     * @param maxInterval     maximum interval for the back-off policy
+     * @param retryProperties The http retry properties to use
      * @return The retry template to use
      */
-    @Bean(name = "genieRetryTemplate")
-    public RetryTemplate retryTemplate(
-        @Value("${genie.retry.noOfRetries:5}") final int noOfRetries,
-        @Value("${genie.retry.initialInterval:10000}") final int initialInterval,
-        @Value("${genie.retry.maxInterval:60000}") final int maxInterval
-    ) {
+    @Bean
+    @ConditionalOnMissingBean(name = "genieRetryTemplate")
+    public RetryTemplate genieRetryTemplate(final RetryProperties retryProperties) {
         final RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(noOfRetries,
-            Collections.singletonMap(Exception.class, true)));
+        retryTemplate.setRetryPolicy(
+            new SimpleRetryPolicy(
+                retryProperties.getNoOfRetries(),
+                Collections.singletonMap(Exception.class, true)
+            )
+        );
         final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-        backOffPolicy.setInitialInterval(initialInterval);
-        backOffPolicy.setMaxInterval(maxInterval);
+        backOffPolicy.setInitialInterval(retryProperties.getInitialInterval());
+        backOffPolicy.setMaxInterval(retryProperties.getMaxInterval());
         retryTemplate.setBackOffPolicy(backOffPolicy);
         return retryTemplate;
     }
@@ -164,7 +166,7 @@ public class MvcConfig implements WebMvcConfigurer {
      * @throws IOException on error reading or creating the directory
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(name = "jobsDir", value = Resource.class)
     public Resource jobsDir(
         final ResourceLoader resourceLoader,
         final JobsProperties jobsProperties
@@ -210,8 +212,10 @@ public class MvcConfig implements WebMvcConfigurer {
         final ApplicationContext context,
         final JobFileService jobFileService
     ) {
-        final GenieResourceHttpRequestHandler handler
-            = new GenieResourceHttpRequestHandler(directoryWriter, jobFileService);
+        final GenieResourceHttpRequestHandler handler = new GenieResourceHttpRequestHandler(
+            directoryWriter,
+            jobFileService
+        );
         handler.setApplicationContext(context);
 
         return handler;

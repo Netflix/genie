@@ -15,27 +15,36 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.properties
 
-package com.netflix.genie.web.properties;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.Min;
-
+import spock.lang.Specification
 /**
- * Properties to configure an ExponentialBackOffTrigger.
+ * Specifications for the {@link LeadershipProperties} class.
  *
- * @author mprimi
- * @since 3.3.9
+ * @author tgianos
+ * @since 4.0.0
  */
-@Getter
-@Setter
-@Validated
-public class ExponentialBackOffTriggerProperties {
-    @Min(value = 1)
-    private long minInterval = 100;
-    private long maxInterval = 10_000;
-    private float factor = 1.2f;
+class LeadershipPropertiesSpec extends Specification {
+
+    def "Default parameters are as expected"() {
+        when:
+        def properties = new LeadershipProperties()
+
+        then:
+        !properties.isEnabled()
+    }
+
+    def "Can set new values"() {
+        when:
+        def properties = new LeadershipProperties()
+
+        then:
+        !properties.isEnabled()
+
+        when:
+        properties.setEnabled(true)
+
+        then:
+        properties.isEnabled()
+    }
 }

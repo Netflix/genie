@@ -18,7 +18,7 @@
 package com.netflix.genie.web.health
 
 import com.netflix.genie.test.categories.UnitTest
-import com.netflix.genie.web.configs.PropertiesConfig
+import com.netflix.genie.web.properties.HealthProperties
 import com.sun.management.OperatingSystemMXBean
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
@@ -44,7 +44,7 @@ class GenieCpuHealthIndicatorSpec extends Specification {
     def setup() {
         operatingSystemMXBean = Mock(OperatingSystemMXBean)
         summary = Mock(DistributionSummary)
-        def props = new PropertiesConfig().healthProperties()
+        def props = new HealthProperties()
         cpuHealthIndicator = new GenieCpuHealthIndicator(
                 props.getMaxCpuLoadPercent(),
                 1,

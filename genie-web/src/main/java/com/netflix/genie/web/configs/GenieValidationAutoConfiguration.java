@@ -32,7 +32,7 @@ import javax.validation.Validator;
  * @since 3.0.0
  */
 @Configuration
-public class ValidationConfig {
+public class GenieValidationAutoConfiguration {
 
     /**
      * Setup bean validation.

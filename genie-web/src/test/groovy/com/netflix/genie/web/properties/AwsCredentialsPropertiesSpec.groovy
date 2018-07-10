@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2017 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,32 +15,30 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.configs
+package com.netflix.genie.web.properties
 
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
-import org.springframework.core.task.AsyncTaskExecutor
-import org.springframework.core.task.SyncTaskExecutor
 import spock.lang.Specification
 
 /**
- * Specification for the EventConfig class.
+ * Specifications for {@link AwsCredentialsProperties}.
  *
  * @author tgianos
- * @since 3.1.2
+ * @since 4.0.0
  */
-@Category(UnitTest.class)
-class EventConfigSpec extends Specification {
+class AwsCredentialsPropertiesSpec extends Specification {
 
-    def "Can create Genie Event Bus"() {
-        def config = new EventConfig()
-        def syncExecutor = Mock(SyncTaskExecutor)
-        def asyncExecutor = Mock(AsyncTaskExecutor)
-
+    def "Can get and set values"() {
         when:
-        def eventBus = config.applicationEventMulticaster(syncExecutor, asyncExecutor)
+        def properties = new AwsCredentialsProperties()
 
         then:
-        eventBus != null
+        properties.getRole() == null
+
+        when:
+        def newRole = UUID.randomUUID().toString()
+        properties.setRole(newRole)
+
+        then:
+        properties.getRole() == newRole
     }
 }

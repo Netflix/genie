@@ -17,10 +17,16 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.web.properties.ClusterCheckerProperties;
+import com.netflix.genie.web.properties.DatabaseCleanupProperties;
+import com.netflix.genie.web.properties.DiskCleanupProperties;
+import com.netflix.genie.web.properties.TasksExecutorPoolProperties;
+import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -37,7 +43,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  */
 @Configuration
 @EnableScheduling
-public class TaskConfig {
+@EnableConfigurationProperties(
+    {
+        ClusterCheckerProperties.class,
+        DatabaseCleanupProperties.class,
+        DiskCleanupProperties.class,
+        TasksExecutorPoolProperties.class,
+        TasksSchedulerPoolProperties.class
+    }
+)
+public class GenieTasksAutoConfiguration {
 
     /**
      * Get an {@link Executor} to use for executing processes from tasks.
@@ -45,6 +60,7 @@ public class TaskConfig {
      * @return The executor to use
      */
     @Bean
+    @ConditionalOnMissingBean(Executor.class)
     public Executor processExecutor() {
         final Executor executor = new DefaultExecutor();
         executor.setStreamHandler(new PumpStreamHandler(null, null));
@@ -54,28 +70,32 @@ public class TaskConfig {
     /**
      * Get a task scheduler.
      *
-     * @param poolSize The initial size of the thread pool that should be allocated
+     * @param tasksSchedulerPoolProperties The properties regarding the thread pool to use for task scheduling
      * @return The task scheduler
      */
     @Bean
+    @ConditionalOnMissingBean(name = "genieTaskScheduler")
     public ThreadPoolTaskScheduler genieTaskScheduler(
-        @Value("${genie.tasks.scheduler.pool.size:1}") final int poolSize
+        final TasksSchedulerPoolProperties tasksSchedulerPoolProperties
     ) {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(poolSize);
+        scheduler.setPoolSize(tasksSchedulerPoolProperties.getSize());
+        scheduler.setThreadNamePrefix(tasksSchedulerPoolProperties.getThreadNamePrefix());
         return scheduler;
     }
 
     /**
      * Get a task executor for executing tasks asynchronously that don't need to be scheduled at a recurring rate.
      *
-     * @param poolSize The number of threads desired for this system. Likely best to do one more than number of CPUs
+     * @param tasksExecutorPoolProperties The properties for the task executor thread pool
      * @return The task executor the system to use
      */
     @Bean
-    public AsyncTaskExecutor genieAsyncTaskExecutor(@Value("${genie.tasks.executor.pool.size:1}") final int poolSize) {
+    @ConditionalOnMissingBean(name = "genieAsyncTaskExecutor")
+    public AsyncTaskExecutor genieAsyncTaskExecutor(final TasksExecutorPoolProperties tasksExecutorPoolProperties) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(poolSize);
+        executor.setCorePoolSize(tasksExecutorPoolProperties.getSize());
+        executor.setThreadNamePrefix(tasksExecutorPoolProperties.getThreadNamePrefix());
         return executor;
     }
 
@@ -85,6 +105,7 @@ public class TaskConfig {
      * @return The synchronous task executor to use
      */
     @Bean
+    @ConditionalOnMissingBean(name = "genieSyncTaskExecutor")
     public SyncTaskExecutor genieSyncTaskExecutor() {
         return new SyncTaskExecutor();
     }

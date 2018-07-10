@@ -20,6 +20,7 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.GenieEventBusImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,8 @@ import org.springframework.core.task.SyncTaskExecutor;
  * @since 3.1.2
  */
 @Configuration
-public class EventConfig {
+@AutoConfigureAfter(GenieTasksAutoConfiguration.class)
+public class GenieEventBusAutoConfiguration {
 
     /**
      * A multicast event publisher to replace the default one used by Spring via the ApplicationContext.

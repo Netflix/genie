@@ -15,27 +15,37 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 /**
- * Properties to configure an ExponentialBackOffTrigger.
+ * Properties related to the thread pool for the task executor within Genie.
  *
- * @author mprimi
- * @since 3.3.9
+ * @author tgianos
+ * @since 4.0.0
  */
+@ConfigurationProperties(prefix = "genie.tasks.scheduler.pool")
+@Validated
 @Getter
 @Setter
-@Validated
-public class ExponentialBackOffTriggerProperties {
-    @Min(value = 1)
-    private long minInterval = 100;
-    private long maxInterval = 10_000;
-    private float factor = 1.2f;
+public class TasksSchedulerPoolProperties {
+
+    /**
+     * The number of threads desired for this system. Likely best to do one more than number of CPUs.
+     */
+    @Min(1)
+    private int size = 2;
+
+    /**
+     * The prefix for the name of the threads in this pool.
+     */
+    @NotBlank(message = "A thread prefix name is required")
+    private String threadNamePrefix = "genie-task-scheduler-";
 }
