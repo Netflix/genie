@@ -21,6 +21,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
+
 /**
  * Properties related to users running jobs.
  *
@@ -33,5 +35,6 @@ import org.springframework.validation.annotation.Validated;
 public class JobsUsersProperties {
     private boolean creationEnabled;
     private boolean runAsUserEnabled;
+    @Valid
     private JobsUsersActiveLimitProperties activeLimit = new JobsUsersActiveLimitProperties();
 }

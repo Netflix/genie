@@ -20,6 +20,7 @@ package com.netflix.genie.web.configs;
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.ZookeeperLeadershipProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import org.apache.curator.framework.CuratorFramework;
@@ -38,7 +39,7 @@ import java.util.Collection;
  * @since 3.1.0
  */
 @Category(UnitTest.class)
-public class LeadershipConfigTest {
+public class GenieLeadershipAutoConfigurationUnitTests {
 
     /**
      * Make sure can get a valid leadership tasks coordinator.
@@ -47,7 +48,7 @@ public class LeadershipConfigTest {
     public void canGetLeadershipTasksCoordinator() {
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Collection<LeadershipTask> tasks = Sets.newHashSet();
-        Assert.assertNotNull(new LeadershipConfig().leadershipTasksCoordinator(scheduler, tasks));
+        Assert.assertNotNull(new GenieLeadershipAutoConfiguration().leadershipTasksCoordinator(scheduler, tasks));
     }
 
     /**
@@ -57,7 +58,9 @@ public class LeadershipConfigTest {
     public void canGetLeaderInitiatorFactoryBean() {
         final CuratorFramework client = Mockito.mock(CuratorFramework.class);
         final ZookeeperLeadershipProperties zookeeperLeadershipProperties = new ZookeeperLeadershipProperties();
-        Assert.assertNotNull(new LeadershipConfig().leaderInitiatorFactory(client, zookeeperLeadershipProperties));
+        Assert.assertNotNull(
+            new GenieLeadershipAutoConfiguration().leaderInitiatorFactory(client, zookeeperLeadershipProperties)
+        );
     }
 
     /**
@@ -66,6 +69,8 @@ public class LeadershipConfigTest {
     @Test
     public void canGetLocalLeader() {
         final GenieEventBus genieEventBus = Mockito.mock(GenieEventBus.class);
-        Assert.assertNotNull(new LeadershipConfig().localLeader(genieEventBus, true));
+        Assert.assertNotNull(
+            new GenieLeadershipAutoConfiguration().localLeader(genieEventBus, new LeadershipProperties())
+        );
     }
 }

@@ -20,7 +20,6 @@ package com.netflix.genie.web.properties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -30,7 +29,6 @@ import org.springframework.validation.annotation.Validated;
  * @since 3.0.0
  */
 @ConfigurationProperties(prefix = "genie.tasks.database-cleanup")
-@Component
 @Getter
 @Setter
 @Validated

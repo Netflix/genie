@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.google.common.collect.Lists;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,26 +44,23 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ConditionalOnProperty(value = "genie.swagger.enabled", havingValue = "true")
 @EnableSwagger2
 @Import(BeanValidatorPluginsConfiguration.class)
-public class SwaggerConfig {
+public class GenieSwaggerAutoConfiguration {
     /**
      * Configure Spring Fox.
      *
      * @return The spring fox docket.
      */
     @Bean
+    @ConditionalOnMissingBean(name = "genieApi", value = Docket.class)
     public Docket genieApi() {
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(
                 new ApiInfo(
                     "Genie REST API",
-//                                "See our &lt;a href=&quot;http://netflix.github.io/genie&quot;&gt;GitHub Page"
-//                                        + "&lt;/a&gt; for more documentation.&lt;br/&gt;Post any issues found &lt;"
-//                                        + "a href=&quot;https://github.com/Netflix/genie/issues&quot;>here"
-//                                        + "&lt;/a&gt;.&lt;br/&gt;",
                     "See our <a href=\"http://netflix.github.io/genie\">GitHub Page</a> for more "
                         + "documentation.<br/>Post any issues found "
                         + "<a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
-                    "3.0.0",
+                    "4.0.0",
                     null,
                     new Contact("Netflix, Inc.", "https://jobs.netflix.com/", null),
                     "Apache 2.0",

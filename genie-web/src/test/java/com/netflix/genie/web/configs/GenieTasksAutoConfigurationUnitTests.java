@@ -18,44 +18,33 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 /**
- * Tests for the bean validation configuration.
+ * Unit tests for the TaskConfig class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class ValidationConfigUnitTests {
-
-    private ValidationConfig validationConfig;
+public class GenieTasksAutoConfigurationUnitTests {
 
     /**
-     * Setup for the tests.
+     * Make sure we get a valid process executor to use.
      */
-    @Before
-    public void setup() {
-        this.validationConfig = new ValidationConfig();
+    @Test
+    public void canGetExecutor() {
+        Assert.assertNotNull(new GenieTasksAutoConfiguration().processExecutor());
     }
 
     /**
-     * Make sure the validation bean is of the right type.
+     * Make sure we get a valid task scheduler to use.
      */
     @Test
-    public void canGetValidator() {
-        Assert.assertTrue(this.validationConfig.localValidatorFactoryBean() instanceof LocalValidatorFactoryBean);
-    }
-
-    /**
-     * Make sure we get a method validation post processor.
-     */
-    @Test
-    public void canGetMethodValidator() {
-        Assert.assertNotNull(this.validationConfig.methodValidationPostProcessor());
+    public void canGetTaskScheduler() {
+        Assert.assertNotNull(new GenieTasksAutoConfiguration().genieTaskScheduler(new TasksSchedulerPoolProperties()));
     }
 }

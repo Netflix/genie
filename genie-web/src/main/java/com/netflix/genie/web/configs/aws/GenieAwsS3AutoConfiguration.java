@@ -20,24 +20,28 @@ package com.netflix.genie.web.configs.aws;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
+import com.netflix.genie.web.properties.AwsCredentialsProperties;
+import com.netflix.genie.web.properties.RetryProperties;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.services.impl.S3FileTransferImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
@@ -49,45 +53,50 @@ import java.util.UUID;
  */
 @Configuration
 @ConditionalOnBean(AWSCredentialsProvider.class)
-@AutoConfigureAfter(
-    name = {
-        "org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration"
+@AutoConfigureAfter(ContextCredentialsAutoConfiguration.class)
+@EnableConfigurationProperties(
+    {
+        AwsCredentialsProperties.class,
+        AwsCredentialsProperties.SpringCloudAwsRegionProperties.class,
+        RetryProperties.class
     }
 )
 @Slf4j
-public class AwsS3Config {
+public class GenieAwsS3AutoConfiguration {
 
     /**
      * Default AWS client configuration that sets the number of retries provided by the user.
      *
-     * @param noOfS3Retries The number of retries or the default of 5
+     * @param retryProperties The properties related to retry configuration in Genie
      * @return The client configuration to use for all built AWS clients
      */
     @Bean
-    public ClientConfiguration genieAwsClientConfiguration(
-        @Value("${genie.retry.s3.noOfRetries:5}") final int noOfS3Retries
-    ) {
-        return new ClientConfiguration()
-            .withRetryPolicy(PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(noOfS3Retries));
+    @ConditionalOnMissingBean(name = "genieAwsClientConfiguration", value = ClientConfiguration.class)
+    public ClientConfiguration genieAwsClientConfiguration(final RetryProperties retryProperties) {
+        return new ClientConfiguration().withRetryPolicy(
+            PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(retryProperties.getS3().getNoOfRetries())
+        );
     }
 
     /**
      * Amazon S3 client configured using either the default credentials provider or an
      * {@link STSAssumeRoleSessionCredentialsProvider} if a role is desired to be assumed.
      *
-     * @param credentialsProvider The default credentials provider to use
-     * @param clientConfiguration The client configuration to use
-     * @param region              The region the application is running in
-     * @param roleArn             The ARN of the role to assume if there is one. Else null.
+     * @param credentialsProvider            The default credentials provider to use
+     * @param clientConfiguration            The client configuration to use
+     * @param springCloudAwsRegionProperties Properties for the region coming from Spring Cloud AWS
+     * @param awsCredentialsProperties       The properties under the Genie namespace related to AWS context
      * @return An amazon s3 client object
      */
     @Bean
     public AmazonS3 amazonS3(
         final AWSCredentialsProvider credentialsProvider,
         final ClientConfiguration clientConfiguration,
-        @Value("${cloud.aws.region.static:us-east-1}") final String region,
-        @Value("${genie.aws.credentials.role:#{null}}") @Nullable final String roleArn
+        final AwsCredentialsProperties.SpringCloudAwsRegionProperties springCloudAwsRegionProperties,
+        final AwsCredentialsProperties awsCredentialsProperties
     ) {
+        final String roleArn = awsCredentialsProperties.getRole();
+        final Regions region = springCloudAwsRegionProperties.getRegion();
         final boolean assumeRole = StringUtils.isNotBlank(roleArn);
         final AWSCredentialsProvider s3CredentialsProvider;
         if (assumeRole) {

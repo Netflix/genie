@@ -22,17 +22,55 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
+
 /**
- * Properties for configuring the job file sync processes.
+ * Properties related to HTTP client configuration.
  *
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.grpc.server.services.job-file-sync")
+@ConfigurationProperties(prefix = "genie.http")
 @Validated
 @Getter
 @Setter
-public class JobFileSyncRpcProperties {
-    private int maxSyncMessages = 10;
-    private long ackIntervalMilliseconds = 30_000L;
+public class HttpProperties {
+
+    @Valid
+    private Connect connect = new Connect();
+
+    @Valid
+    private Read read = new Read();
+
+    /**
+     * Connection related properties for HTTP requests.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    @Validated
+    @Getter
+    @Setter
+    public static class Connect {
+        /**
+         * The connection timeout time in milliseconds.
+         */
+        private int timeout = 2_000;
+    }
+
+    /**
+     * Read related properties for HTTP requests.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    @Validated
+    @Getter
+    @Setter
+    public static class Read {
+        /**
+         * The read timeout time in milliseconds.
+         */
+        private int timeout = 10_000;
+    }
 }

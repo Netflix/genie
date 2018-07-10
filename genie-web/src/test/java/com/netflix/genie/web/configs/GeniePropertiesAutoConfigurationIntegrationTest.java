@@ -45,7 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
     classes = GenieTestApp.class,
     properties = {"genie.grpc.server.enabled = false"}
 )
-public class PropertiesConfigIntegrationTest {
+public class GeniePropertiesAutoConfigurationIntegrationTest {
 
     @Autowired
     private JobsProperties jobsProperties;

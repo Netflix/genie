@@ -1,13 +1,14 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.netflix.genie.web.configs.EventConfig,\
-  com.netflix.genie.web.configs.GRPCServerConfig,\
-  com.netflix.genie.web.configs.JobConfig,\
-  com.netflix.genie.web.configs.LeadershipConfig,\
-  com.netflix.genie.web.configs.MvcConfig,\
-  com.netflix.genie.web.configs.PropertiesConfig,\
-  com.netflix.genie.web.configs.ServicesConfig,\
-  com.netflix.genie.web.configs.SwaggerConfig,\
-  com.netflix.genie.web.configs.TaskConfig,\
-  com.netflix.genie.web.configs.ValidationConfig,\
-  com.netflix.genie.web.configs.aws.AwsMvcConfig,\
-  com.netflix.genie.web.configs.aws.AwsS3Config
+  com.netflix.genie.web.configs.GenieApiAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieEventBusAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieGRpcServerAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieJobWorkflowAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieLeadershipAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieMailAutoConfiguration,\
+  com.netflix.genie.web.configs.GeniePropertiesAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieServicesAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieSwaggerAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieTasksAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieValidationAutoConfiguration,\
+  com.netflix.genie.web.configs.aws.GenieAwsApiAutoConfiguration,\
+  com.netflix.genie.web.configs.aws.GenieAwsS3AutoConfiguration

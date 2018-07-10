@@ -22,30 +22,56 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 /**
- * All properties related to health thresholds in Genie.
+ * All properties related to Http retry template in Genie.
  *
  * @author amajumdar
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.health")
+@ConfigurationProperties("genie.retry")
 @Getter
 @Setter
 @Validated
-public class HealthProperties {
+public class RetryProperties {
     /**
-     * Defines the threshold for the maximum CPU load percentage. Health of the system is marked OUT_OF_SERVICE if
-     * the CPU load of a system goes beyond this threshold for <code>maxCpuLoadConsecutiveOccurrences</code>
-     * consecutive times.
-     * Default to 80 percentage.
+     * Total number of retries to attempt.
+     * Default to 5 retries.
      */
-    private double maxCpuLoadPercent = 80;
+    @Min(1)
+    private int noOfRetries = 5;
 
     /**
-     * Defines the threshold of consecutive occurrences of CPU load crossing the <code>maxCpuLoadPercent</code>.
-     * Health of the system is marked OUT_OF_SERVICE if the CPU load of a system goes beyond the threshold
-     * <code>maxCpuLoadPercent</code> for <code>maxCpuLoadConsecutiveOccurrences</code> consecutive times.
-     * Default to 3.
+     * Default to 10000 ms.
      */
-    private int maxCpuLoadConsecutiveOccurrences = 3;
+    @Min(1L)
+    private long initialInterval = 10_000L;
+
+    /**
+     * Defaults to 60000 ms.
+     */
+    @Min(1L)
+    @Max(Long.MAX_VALUE)
+    private long maxInterval = 60_000L;
+
+    @Valid
+    private S3RetryProperties s3 = new S3RetryProperties();
+
+    /**
+     * Retry properties related to S3.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    @Validated
+    @Getter
+    @Setter
+    public static class S3RetryProperties {
+
+        @Min(1)
+        private int noOfRetries = 5;
+    }
 }

@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
@@ -48,16 +49,16 @@ import java.util.UUID;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class MvcConfigUnitTests {
+public class GenieApiAutoConfigurationUnitTests {
 
-    private MvcConfig mvcConfig;
+    private GenieApiAutoConfiguration genieApiAutoConfiguration;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.mvcConfig = new MvcConfig();
+        this.genieApiAutoConfiguration = new GenieApiAutoConfiguration();
     }
 
     /**
@@ -66,7 +67,7 @@ public class MvcConfigUnitTests {
     @Test
     public void doesTurnOffSuffixMatcher() {
         final PathMatchConfigurer configurer = Mockito.mock(PathMatchConfigurer.class);
-        this.mvcConfig.configurePathMatch(configurer);
+        this.genieApiAutoConfiguration.configurePathMatch(configurer);
         Mockito.verify(configurer, Mockito.times(1)).setUseRegisteredSuffixPatternMatch(true);
     }
 
@@ -75,7 +76,7 @@ public class MvcConfigUnitTests {
      */
     @Test
     public void canGetResourceLoader() {
-        Assert.assertTrue(this.mvcConfig.resourceLoader() instanceof DefaultResourceLoader);
+        Assert.assertTrue(this.genieApiAutoConfiguration.resourceLoader() instanceof DefaultResourceLoader);
     }
 
     /**
@@ -86,7 +87,7 @@ public class MvcConfigUnitTests {
     @Test
     public void canGetGenieHostInfo() throws UnknownHostException {
         final String expectedHostname = InetAddress.getLocalHost().getCanonicalHostName();
-        Assert.assertThat(this.mvcConfig.genieHostInfo().getHostname(), Matchers.is(expectedHostname));
+        Assert.assertThat(this.genieApiAutoConfiguration.genieHostInfo().getHostname(), Matchers.is(expectedHostname));
     }
 
     /**
@@ -94,7 +95,7 @@ public class MvcConfigUnitTests {
      */
     @Test
     public void canGetRestTemplate() {
-        Assert.assertNotNull(this.mvcConfig.restTemplate(1, 1));
+        Assert.assertNotNull(this.genieApiAutoConfiguration.genieRestTemplate(new HttpProperties()));
     }
 
     /**
@@ -102,7 +103,7 @@ public class MvcConfigUnitTests {
      */
     @Test
     public void canGetDirectoryWriter() {
-        Assert.assertTrue(this.mvcConfig.directoryWriter() instanceof DefaultDirectoryWriter);
+        Assert.assertTrue(this.genieApiAutoConfiguration.directoryWriter() instanceof DefaultDirectoryWriter);
     }
 
     /**
@@ -127,7 +128,7 @@ public class MvcConfigUnitTests {
         Mockito.when(file.isDirectory()).thenReturn(false);
 
         try {
-            this.mvcConfig.jobsDir(resourceLoader, jobsProperties);
+            this.genieApiAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
             Assert.fail();
         } catch (final IllegalStateException ise) {
             Assert.assertThat(
@@ -147,7 +148,7 @@ public class MvcConfigUnitTests {
         Mockito.when(file.mkdirs()).thenReturn(false);
 
         try {
-            this.mvcConfig.jobsDir(resourceLoader, jobsProperties);
+            this.genieApiAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
             Assert.fail();
         } catch (final IllegalStateException ise) {
             Assert.assertThat(
@@ -177,7 +178,7 @@ public class MvcConfigUnitTests {
         Mockito.when(jobsDirResource.getFile()).thenReturn(file);
         Mockito.when(file.isDirectory()).thenReturn(true);
 
-        final Resource jobsDir = this.mvcConfig.jobsDir(resourceLoader, jobsProperties);
+        final Resource jobsDir = this.genieApiAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
         Assert.assertNotNull(jobsDir);
     }
 
@@ -191,7 +192,7 @@ public class MvcConfigUnitTests {
         final JobFileService jobFileService = Mockito.mock(JobFileService.class);
 
         final GenieResourceHttpRequestHandler handler
-            = this.mvcConfig.genieResourceHttpRequestHandler(directoryWriter, context, jobFileService);
+            = this.genieApiAutoConfiguration.genieResourceHttpRequestHandler(directoryWriter, context, jobFileService);
         Assert.assertThat(handler.getApplicationContext(), Matchers.is(context));
     }
 }

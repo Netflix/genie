@@ -44,6 +44,7 @@ public class JobsUsersActiveLimitProperties {
     public static final int DEFAULT_COUNT = 100;
 
     private boolean enabled = DEFAULT_ENABLED;
+
     @Min(value = 1)
     private int count = DEFAULT_COUNT;
 }

@@ -20,10 +20,8 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.web.properties.JobFileSyncRpcProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -38,8 +36,13 @@ import javax.annotation.PostConstruct;
 @Configuration
 @ConditionalOnProperty(value = "genie.grpc.server.enabled", havingValue = "true")
 @Import(GrpcServerAutoConfiguration.class)
+@EnableConfigurationProperties(
+    {
+        JobFileSyncRpcProperties.class
+    }
+)
 @Slf4j
-public class GRPCServerConfig {
+public class GenieGRpcServerAutoConfiguration {
 
     /**
      * Log that gRPC server is enabled.
@@ -47,17 +50,5 @@ public class GRPCServerConfig {
     @PostConstruct
     public void postConstruct() {
         log.info("gRPC server configuration is ENABLED");
-    }
-
-    /**
-     * Properties controlling the behavior of the job file sync service.
-     *
-     * @return The properties instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobFileSyncRpcProperties.class)
-    @ConfigurationProperties(prefix = "genie.grpc.server.services.job-file-sync")
-    public JobFileSyncRpcProperties jobFileSyncRpcProperties() {
-        return new JobFileSyncRpcProperties();
     }
 }

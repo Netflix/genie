@@ -22,6 +22,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
+import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.AttachmentService;
@@ -36,29 +37,24 @@ import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
-import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
-import com.netflix.genie.web.services.impl.DefaultMailServiceImpl;
 import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
-import com.netflix.genie.web.services.impl.MailServiceImpl;
 import com.netflix.genie.web.services.impl.RandomizedClusterLoadBalancerImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.List;
 
@@ -69,34 +65,12 @@ import java.util.List;
  * @since 3.0.0
  */
 @Configuration
-public class ServicesConfig {
-
-    /**
-     * Returns a bean for mail service impl using the Spring Mail.
-     *
-     * @param javaMailSender An implementation of the JavaMailSender interface.
-     * @param fromAddress    The from email address for the email.
-     * @return An instance of MailService implementation.
-     */
-    @Bean
-    @ConditionalOnProperty("spring.mail.host")
-    public MailService getJavaMailSenderMailService(
-        final JavaMailSender javaMailSender,
-        @Value("${genie.mail.fromAddress}") final String fromAddress
-    ) {
-        return new MailServiceImpl(javaMailSender, fromAddress);
+@EnableConfigurationProperties(
+    {
+        FileCacheProperties.class
     }
-
-    /**
-     * Get an default implementation of the Mail Service interface if nothing is supplied.
-     *
-     * @return The mail service implementation that does nothing.
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public MailService getDefaultMailServiceImpl() {
-        return new DefaultMailServiceImpl();
-    }
+)
+public class GenieServicesAutoConfiguration {
 
     /**
      * Get an local implementation of the JobKillService.
@@ -161,7 +135,7 @@ public class ServicesConfig {
      * Get an instance of the Cache Genie File Transfer service.
      *
      * @param fileTransferFactory file transfer implementation factory
-     * @param baseCacheLocation   file cache location
+     * @param fileCacheProperties Properties related to the file cache that can be set by the admin
      * @param localFileTransfer   local file transfer service
      * @param registry            Registry
      * @return A singleton for GenieFileTransferService
@@ -170,11 +144,16 @@ public class ServicesConfig {
     @Bean
     public GenieFileTransferService cacheGenieFileTransferService(
         final FileTransferFactory fileTransferFactory,
-        @Value("${genie.file.cache.location}") final String baseCacheLocation,
+        final FileCacheProperties fileCacheProperties,
         final LocalFileTransferImpl localFileTransfer,
         final MeterRegistry registry
     ) throws GenieException {
-        return new CacheGenieFileTransferService(fileTransferFactory, baseCacheLocation, localFileTransfer, registry);
+        return new CacheGenieFileTransferService(
+            fileTransferFactory,
+            fileCacheProperties.getLocation(),
+            localFileTransfer,
+            registry
+        );
     }
 
     /**

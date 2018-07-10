@@ -41,7 +41,6 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +53,10 @@ import java.util.UUID;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class ServicesConfigUnitTests {
+public class ServicesAutoConfigurationUnitTests {
 
     private JobSearchService jobSearchService;
-    private ServicesConfig servicesConfig;
+    private GenieServicesAutoConfiguration genieServicesAutoConfiguration;
 
     /**
      * Setup to run before each test.
@@ -66,7 +65,7 @@ public class ServicesConfigUnitTests {
     public void setUp() {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
 
-        this.servicesConfig = new ServicesConfig();
+        this.genieServicesAutoConfiguration = new GenieServicesAutoConfiguration();
     }
 
     /**
@@ -74,7 +73,7 @@ public class ServicesConfigUnitTests {
      */
     @Test
     public void canGetClusterLoadBalancer() {
-        Assert.assertNotNull(this.servicesConfig.clusterLoadBalancer());
+        Assert.assertNotNull(this.genieServicesAutoConfiguration.clusterLoadBalancer());
     }
 
     /**
@@ -84,24 +83,7 @@ public class ServicesConfigUnitTests {
      */
     @Test
     public void canGetGenieFileTransfer() throws GenieException {
-        Assert.assertNotNull(this.servicesConfig.genieFileTransferService(scheme -> null));
-    }
-
-    /**
-     * Confirm we can get a default mail service implementation.
-     */
-    @Test
-    public void canGetDefaultMailServiceImpl() {
-        Assert.assertNotNull(this.servicesConfig.getDefaultMailServiceImpl());
-    }
-
-    /**
-     * Confirm we can get a mail service implementation using JavaMailSender.
-     */
-    @Test
-    public void canGetMailServiceImpl() {
-        final JavaMailSender javaMailSender = Mockito.mock(JavaMailSender.class);
-        Assert.assertNotNull(this.servicesConfig.getJavaMailSenderMailService(javaMailSender, "fromAddress"));
+        Assert.assertNotNull(this.genieServicesAutoConfiguration.genieFileTransferService(scheme -> null));
     }
 
     /**
@@ -115,7 +97,7 @@ public class ServicesConfigUnitTests {
         final List<WorkflowTask> workflowTasks = new ArrayList<>();
 
         Assert.assertNotNull(
-            this.servicesConfig.jobSubmitterService(
+            this.genieServicesAutoConfiguration.jobSubmitterService(
                 jobPersistenceService,
                 genieEventBus,
                 workflowTasks,
@@ -131,7 +113,7 @@ public class ServicesConfigUnitTests {
     @Test
     public void canGetJobCoordinatorServiceBean() {
         Assert.assertNotNull(
-            this.servicesConfig.jobCoordinatorService(
+            this.genieServicesAutoConfiguration.jobCoordinatorService(
                 Mockito.mock(JobPersistenceService.class),
                 Mockito.mock(JobKillService.class),
                 Mockito.mock(JobStateService.class),
@@ -153,7 +135,7 @@ public class ServicesConfigUnitTests {
     @Test
     public void canGetJobKillServiceBean() {
         Assert.assertNotNull(
-            this.servicesConfig.jobKillService(
+            this.genieServicesAutoConfiguration.jobKillService(
                 new GenieHostInfo("localhost"),
                 this.jobSearchService,
                 Mockito.mock(Executor.class),

@@ -32,14 +32,14 @@ import springfox.documentation.spring.web.plugins.Docket;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class SwaggerConfigUnitTests {
+public class GenieSwaggerAutoConfigurationUnitTests {
 
     /**
      * Test to make sure the Swagger SpringFox docket is created properly.
      */
     @Test
     public void canCreateDocket() {
-        final SwaggerConfig config = new SwaggerConfig();
+        final GenieSwaggerAutoConfiguration config = new GenieSwaggerAutoConfiguration();
         final Docket docket = config.genieApi();
         Assert.assertThat(docket.getDocumentationType(), Matchers.is(DocumentationType.SWAGGER_2));
     }
