@@ -73,6 +73,8 @@ import java.io.IOException;
 )
 public class GenieTasksAutoConfiguration {
 
+    private static final int SINGLE_THREAD = 1;
+
     /**
      * Get an {@link Executor} to use for executing processes from tasks.
      *
@@ -100,6 +102,19 @@ public class GenieTasksAutoConfiguration {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(tasksSchedulerPoolProperties.getSize());
         scheduler.setThreadNamePrefix(tasksSchedulerPoolProperties.getThreadNamePrefix());
+        return scheduler;
+    }
+
+    /**
+     * Get the task scheduler used by the HeartBeat Service.
+     *
+     * @return The task scheduler
+     */
+    @Bean
+    @ConditionalOnMissingBean(name = "heartBeatServiceTaskScheduler")
+    public TaskScheduler heartBeatServiceTaskScheduler() {
+        final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(SINGLE_THREAD);
         return scheduler;
     }
 
