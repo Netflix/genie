@@ -285,3 +285,22 @@ message SyncRequestResult {
 message SyncAcknowledgement {
     repeated SyncRequestResult results = 1;
 }
+
+//--------------------------------------------------------------------
+// HeartBeat Service
+//
+// This service is keeps track of persistent connections from agents
+// to a server, detects disconnections and provides routing
+// information for requests that flow from the cluster to agents.
+//--------------------------------------------------------------------
+
+service HeartBeatService {
+    rpc heartbeat (stream AgentHeartBeat) returns (stream ServerHeartBeat);
+}
+
+message AgentHeartBeat {
+    string claimed_job_id = 1;
+}
+
+message ServerHeartBeat {
+}

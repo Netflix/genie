@@ -22,7 +22,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * Configuration for various agent beans.
@@ -47,4 +49,14 @@ class AgentConfig {
         return executor;
     }
 
+
+    @Bean
+    @Lazy
+    @Qualifier("heartBeatServiceTaskExecutor")
+    public TaskScheduler heartBeatServiceTaskExecutor() {
+        final ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(1);
+        taskScheduler.initialize();
+        return taskScheduler;
+    }
 }
