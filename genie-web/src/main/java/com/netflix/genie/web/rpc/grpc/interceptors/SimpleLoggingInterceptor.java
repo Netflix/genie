@@ -31,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SimpleLoggingInterceptor implements ServerInterceptor {
 
+    private static final String NO_CAUSE = "Error cause is unknown";
+
     /**
      * {@inheritDoc}
      */
@@ -62,7 +64,7 @@ public class SimpleLoggingInterceptor implements ServerInterceptor {
                         "gRPC error: {} -> {}: {}",
                         call.getMethodDescriptor().getFullMethodName(),
                         String.valueOf(status.getCode().value()),
-                        status.getCause().getMessage(),
+                        (status.getCause() != null ? status.getCause().getMessage() : NO_CAUSE),
                         status.getCause()
                     );
                 }
