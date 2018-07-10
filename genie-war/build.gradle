@@ -34,9 +34,11 @@ dependencies {
 }
 
 processResources {
-    filter ReplaceTokens, tokens: [
-            "genie.version": project.version.toString()
-    ]
+    filesMatching("**/*.yml") {
+        filter ReplaceTokens, tokens: [
+                "genie.version": project.version.toString()
+        ]
+    }
 }
 
 jar {
