@@ -69,14 +69,6 @@ public class ServicesAutoConfigurationUnitTests {
     }
 
     /**
-     * Confirm we can get a cluster load balancer.
-     */
-    @Test
-    public void canGetClusterLoadBalancer() {
-        Assert.assertNotNull(this.genieServicesAutoConfiguration.clusterLoadBalancer());
-    }
-
-    /**
      * Confirm we can get a GenieFileTransfer instance.
      *
      * @throws GenieException If there is any problem.

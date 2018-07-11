@@ -30,11 +30,8 @@ import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
@@ -49,11 +46,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty(
-    value = "genie.tasks.databaseCleanup.enabled",
-    havingValue = "true"
-)
-@Component
 @Slf4j
 public class DatabaseCleanupTask extends LeadershipTask {
 
@@ -80,7 +72,6 @@ public class DatabaseCleanupTask extends LeadershipTask {
      * @param tagPersistenceService     The tag service to use to delete unused tag references
      * @param registry                  The metrics registry
      */
-    @Autowired
     public DatabaseCleanupTask(
         @NotNull final DatabaseCleanupProperties cleanupProperties,
         @NotNull final JobPersistenceService jobPersistenceService,

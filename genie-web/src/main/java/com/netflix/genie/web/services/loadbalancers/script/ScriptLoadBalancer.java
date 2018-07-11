@@ -20,8 +20,8 @@ package com.netflix.genie.web.services.loadbalancers.script;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
@@ -31,13 +31,9 @@ import io.micrometer.core.instrument.Tag;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.script.Bindings;
@@ -76,17 +72,9 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.1.0
  */
-@Component
-@ConditionalOnProperty(value = ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "enabled", havingValue = "true")
 @Slf4j
 public class ScriptLoadBalancer implements ClusterLoadBalancer {
 
-    static final String SCRIPT_LOAD_BALANCER_PROPERTY_GROUP = "genie.jobs.clusters.load-balancers.script.";
-    static final String SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "order";
-    static final String SCRIPT_REFRESH_RATE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "refreshRate";
-    static final String SCRIPT_FILE_DESTINATION_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "destination";
-    static final String SCRIPT_FILE_SOURCE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "source";
-    static final String SCRIPT_TIMEOUT_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "timeout";
     static final String SELECT_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.select.timer";
     static final String UPDATE_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.update.timer";
     static final String STATUS_TAG_OK = "ok";
@@ -94,7 +82,16 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     static final String STATUS_TAG_NOT_CONFIGURED = "not configured";
     static final String STATUS_TAG_FOUND = "found";
     static final String STATUS_TAG_FAILED = "failed";
-
+    private static final String SCRIPT_LOAD_BALANCER_PROPERTY_GROUP = "genie.jobs.clusters.load-balancers.script.";
+    /**
+     * Feature flag constant. Property with this key should be true if this feature should be enabled.
+     */
+    public static final String SCRIPT_LOAD_BALANCER_ENABLED_PROPERTY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "enabled";
+    static final String SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "order";
+    static final String SCRIPT_REFRESH_RATE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "refreshRate";
+    static final String SCRIPT_FILE_DESTINATION_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "destination";
+    static final String SCRIPT_FILE_SOURCE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "source";
+    static final String SCRIPT_TIMEOUT_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "timeout";
     private static final long DEFAULT_TIMEOUT_LENGTH = 5_000L;
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final String SLASH = "/";
@@ -126,11 +123,10 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
      * @param mapper              The object mapper to use to serialize objects to JSON for binding with scripts
      * @param registry            The metrics registry to use for collecting metrics
      */
-    @Autowired
     public ScriptLoadBalancer(
-        @Qualifier("genieAsyncTaskExecutor") final AsyncTaskExecutor asyncTaskExecutor,
-        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
-        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fileTransferService,
+        final AsyncTaskExecutor asyncTaskExecutor,
+        final TaskScheduler taskScheduler,
+        final GenieFileTransferService fileTransferService,
         final Environment environment,
         final ObjectMapper mapper,
         final MeterRegistry registry
