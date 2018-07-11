@@ -26,6 +26,7 @@ import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Map;
 
@@ -35,6 +36,8 @@ import java.util.Map;
  * @author mprimi
  * @since 4.0.0
  */
+// TODO: Centralize this conditional somehow
+@ConditionalOnProperty(value = "genie.grpc.server.enabled", havingValue = "true")
 @GrpcService(
     value = PingServiceGrpc.class,
     interceptors = {
