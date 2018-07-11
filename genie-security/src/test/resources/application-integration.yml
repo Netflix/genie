@@ -23,9 +23,6 @@ genie:
         noOfRetries: 2
         initialInterval: 10
         maxInterval: 10
-  grpc:
-    server:
-      enabled: false
   health:
     maxCpuLoadPercent: 100
   jobs:

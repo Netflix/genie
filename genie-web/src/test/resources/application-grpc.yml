@@ -1,0 +1,11 @@
+genie:
+  grpc:
+    server:
+      enabled: true
+
+# Start gRPC on a random available port to avoid port binding conflicts during
+# integration tests shutting down less than gracefully
+grpc:
+  server:
+    port: 0
+    address: 127.0.0.1

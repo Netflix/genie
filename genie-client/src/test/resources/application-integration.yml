@@ -17,9 +17,6 @@
 ##
 
 genie:
-  grpc:
-    server:
-      enabled: false
   jobs:
     locations:
       archives: /archive/location
