@@ -22,7 +22,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
+import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
+import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.AttachmentService;
@@ -67,7 +69,10 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(
     {
-        FileCacheProperties.class
+        DataServiceRetryProperties.class,
+        FileCacheProperties.class,
+        HealthProperties.class,
+        JobsProperties.class,
     }
 )
 public class GenieServicesAutoConfiguration {

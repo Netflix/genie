@@ -5,7 +5,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.configs.GenieJobWorkflowAutoConfiguration,\
   com.netflix.genie.web.configs.GenieLeadershipAutoConfiguration,\
   com.netflix.genie.web.configs.GenieMailAutoConfiguration,\
-  com.netflix.genie.web.configs.GeniePropertiesAutoConfiguration,\
   com.netflix.genie.web.configs.GenieServicesAutoConfiguration,\
   com.netflix.genie.web.configs.GenieSwaggerAutoConfiguration,\
   com.netflix.genie.web.configs.GenieTasksAutoConfiguration,\
