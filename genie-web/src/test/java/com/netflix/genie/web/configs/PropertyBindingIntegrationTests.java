@@ -24,6 +24,7 @@ import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -38,14 +39,15 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author mprimi
  * @since 3.1.0
  */
+@Ignore("This seems more like a test of Spring functionality than Genie functionality, do we need it?")
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@TestPropertySource(locations = "classpath:/PropertiesConfigIntegrationTest.properties")
+@TestPropertySource(locations = "classpath:/PropertyBindingIntegrationTests.properties")
 @SpringBootTest(
     classes = GenieTestApp.class,
     properties = {"genie.grpc.server.enabled = false"}
 )
-public class GeniePropertiesAutoConfigurationIntegrationTest {
+public class PropertyBindingIntegrationTests {
 
     @Autowired
     private JobsProperties jobsProperties;
