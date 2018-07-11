@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
  */
 
 /**
- * Package containing configurations needed by Spring to run Integration tests for clients.
+ * Any configurations used during web testing.
  *
- * @author amsharma
- * @since 3.0.0
+ * @author tgianos
+ * @since 4.0.0
  */
-package com.netflix.genie.client.configs;
+package com.netflix.genie.test.web.configs;
