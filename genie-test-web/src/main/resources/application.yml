@@ -32,7 +32,7 @@ genie:
       location: file:///tmp/genie/cache
   grpc:
     server:
-      enabled: true
+      enabled: false
   health:
     maxCpuLoadPercent: 80
   jobs:

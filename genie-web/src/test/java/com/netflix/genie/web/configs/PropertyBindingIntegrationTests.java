@@ -43,10 +43,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:/PropertyBindingIntegrationTests.properties")
-@SpringBootTest(
-    classes = GenieTestApp.class,
-    properties = {"genie.grpc.server.enabled = false"}
-)
+@SpringBootTest(classes = GenieTestApp.class)
 public class PropertyBindingIntegrationTests {
 
     @Autowired

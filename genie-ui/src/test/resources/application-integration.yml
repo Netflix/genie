@@ -1,8 +1,3 @@
-genie:
-  grpc:
-    server:
-      enabled: false
-
 spring:
   autoconfigure:
     exclude:
