@@ -58,7 +58,8 @@ import java.util.UUID;
     {
         AwsCredentialsProperties.class,
         AwsCredentialsProperties.SpringCloudAwsRegionProperties.class,
-        RetryProperties.class
+        RetryProperties.class,
+        S3FileTransferProperties.class
     }
 )
 @Slf4j
