@@ -25,7 +25,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -47,7 +46,6 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-@Service
 @Slf4j
 public class DiskJobFileServiceImpl implements JobFileService {
 

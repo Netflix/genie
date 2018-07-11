@@ -31,7 +31,7 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-interface JpaFilePersistenceService extends FilePersistenceService {
+public interface JpaFilePersistenceService extends FilePersistenceService {
 
     /**
      * Get a reference to the file entity for the given file path string.

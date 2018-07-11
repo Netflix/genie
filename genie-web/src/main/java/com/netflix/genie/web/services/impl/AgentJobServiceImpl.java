@@ -28,7 +28,6 @@ import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -44,7 +43,6 @@ import java.util.UUID;
  * @since 4.0.0
  */
 @Validated
-@Service
 @Transactional
 public class AgentJobServiceImpl implements AgentJobService {
 

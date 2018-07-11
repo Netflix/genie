@@ -26,6 +26,7 @@ import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -33,23 +34,25 @@ import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
+import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
+import com.netflix.genie.web.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
+import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
+import com.netflix.genie.web.services.impl.JobSpecificationServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
-import com.netflix.genie.web.services.impl.RandomizedClusterLoadBalancerImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -58,6 +61,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
+import javax.validation.constraints.NotEmpty;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -112,17 +117,6 @@ public class GenieServicesAutoConfiguration {
     }
 
     /**
-     * Get a Randomized Cluster load balancer.
-     *
-     * @return A randomized cluster load balancer instance.
-     */
-    @Bean
-    @ConditionalOnMissingBean(ClusterLoadBalancer.class)
-    public ClusterLoadBalancer clusterLoadBalancer() {
-        return new RandomizedClusterLoadBalancerImpl();
-    }
-
-    /**
      * Get an instance of the Genie File Transfer service.
      *
      * @param fileTransferFactory file transfer implementation factory
@@ -130,6 +124,7 @@ public class GenieServicesAutoConfiguration {
      * @throws GenieException If there is any problem
      */
     @Bean
+    @ConditionalOnMissingBean(name = "genieFileTransferService")
     public GenieFileTransferService genieFileTransferService(
         final FileTransferFactory fileTransferFactory
     ) throws GenieException {
@@ -147,6 +142,7 @@ public class GenieServicesAutoConfiguration {
      * @throws GenieException If there is any problem
      */
     @Bean
+    @ConditionalOnMissingBean(name = "cacheGenieFileTransferService")
     public GenieFileTransferService cacheGenieFileTransferService(
         final FileTransferFactory fileTransferFactory,
         final FileCacheProperties fileCacheProperties,
@@ -253,9 +249,76 @@ public class GenieServicesAutoConfiguration {
      * @return FileTransfer factory
      */
     @Bean
-    public FactoryBean fileTransferFactory() {
+    @ConditionalOnMissingBean(name = "fileTransferFactory", value = ServiceLocatorFactoryBean.class)
+    public ServiceLocatorFactoryBean fileTransferFactory() {
         final ServiceLocatorFactoryBean factoryBean = new ServiceLocatorFactoryBean();
         factoryBean.setServiceLocatorInterface(FileTransferFactory.class);
         return factoryBean;
+    }
+
+    /**
+     * Get a {@link AgentJobService} instance if there isn't already one.
+     *
+     * @param jobPersistenceService   The persistence service to use
+     * @param jobSpecificationService The specification service to use
+     * @param meterRegistry           The metrics registry to use
+     * @return An {@link AgentJobServiceImpl} instance.
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentJobService.class)
+    public AgentJobService agentJobService(
+        final JobPersistenceService jobPersistenceService,
+        final JobSpecificationService jobSpecificationService,
+        final MeterRegistry meterRegistry
+    ) {
+        return new AgentJobServiceImpl(
+            jobPersistenceService,
+            jobSpecificationService,
+            meterRegistry
+        );
+    }
+
+    /**
+     * Get a {@link JobFileService} implementation if one is required.
+     *
+     * @param jobsDir The job directory resource
+     * @return A {@link DiskJobFileServiceImpl} instance
+     * @throws IOException When the job directory can't be created or isn't a directory
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobFileService.class)
+    public JobFileService jobFileService(@Qualifier("jobsDir") final Resource jobsDir) throws IOException {
+        return new DiskJobFileServiceImpl(jobsDir);
+    }
+
+    /**
+     * Get an implementation of {@link JobSpecificationService} if one hasn't already been defined.
+     *
+     * @param applicationPersistenceService The service to use to manipulate applications
+     * @param clusterPersistenceService     The service to use to manipulate clusters
+     * @param commandPersistenceService     The service to use to manipulate commands
+     * @param clusterLoadBalancers          The load balancer implementations to use
+     * @param registry                      The metrics repository to use
+     * @param jobsProperties                The properties for running a job set by the user
+     * @return A {@link JobSpecificationServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobSpecificationService.class)
+    public JobSpecificationService jobSpecificationService(
+        final ApplicationPersistenceService applicationPersistenceService,
+        final ClusterPersistenceService clusterPersistenceService,
+        final CommandPersistenceService commandPersistenceService,
+        @NotEmpty final List<ClusterLoadBalancer> clusterLoadBalancers,
+        final MeterRegistry registry,
+        final JobsProperties jobsProperties
+    ) {
+        return new JobSpecificationServiceImpl(
+            applicationPersistenceService,
+            clusterPersistenceService,
+            commandPersistenceService,
+            clusterLoadBalancers,
+            registry,
+            jobsProperties
+        );
     }
 }

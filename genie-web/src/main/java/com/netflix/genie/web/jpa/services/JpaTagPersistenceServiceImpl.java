@@ -21,7 +21,6 @@ import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotBlank;
@@ -37,7 +36,6 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.3.0
  */
-@Service
 @Transactional
 @Slf4j
 public class JpaTagPersistenceServiceImpl implements JpaTagPersistenceService {

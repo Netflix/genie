@@ -31,7 +31,7 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-interface JpaTagPersistenceService extends TagPersistenceService {
+public interface JpaTagPersistenceService extends TagPersistenceService {
 
     /**
      * Get a tag entity reference for the given tag string.

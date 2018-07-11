@@ -32,11 +32,8 @@ import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -55,7 +52,6 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-@Component
 @Slf4j
 public class ClusterCheckerTask extends LeadershipTask {
     private static final String PROPERTY_STATUS = "status";
@@ -86,13 +82,12 @@ public class ClusterCheckerTask extends LeadershipTask {
      * @param webEndpointProperties The properties where Spring actuator is running
      * @param registry              The spectator registry for getting metrics
      */
-    @Autowired
     public ClusterCheckerTask(
         @NotNull final GenieHostInfo genieHostInfo,
         @NotNull final ClusterCheckerProperties properties,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobPersistenceService jobPersistenceService,
-        @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
+        @NotNull final RestTemplate restTemplate,
         @NotNull final WebEndpointProperties webEndpointProperties,
         @NotNull final MeterRegistry registry
     ) {
