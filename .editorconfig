@@ -10,6 +10,9 @@ indent_style = space
 [*.java]
 indent_size = 4
 
+[*.groovy]
+indent_size = 4
+
 [*.py]
 indent_size = 4
 
