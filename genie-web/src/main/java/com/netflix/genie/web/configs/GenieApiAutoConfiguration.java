@@ -19,8 +19,8 @@ package com.netflix.genie.web.configs;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.properties.HttpProperties;
-import com.netflix.genie.web.properties.RetryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.RetryProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
@@ -28,13 +28,13 @@ import com.netflix.genie.web.services.JobFileService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
@@ -111,16 +111,20 @@ public class GenieApiAutoConfiguration implements WebMvcConfigurer {
     /**
      * Get RestTemplate for calling between Genie nodes.
      *
-     * @param httpProperties The properties related to Genie's HTTP client configuration
+     * @param httpProperties      The properties related to Genie's HTTP client configuration
+     * @param restTemplateBuilder The Spring REST template builder to use
      * @return The rest template to use
      */
     @Bean
     @ConditionalOnMissingBean(name = "genieRestTemplate")
-    public RestTemplate genieRestTemplate(final HttpProperties httpProperties) {
-        final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(httpProperties.getConnect().getTimeout());
-        factory.setReadTimeout(httpProperties.getRead().getTimeout());
-        return new RestTemplate(factory);
+    public RestTemplate genieRestTemplate(
+        final HttpProperties httpProperties,
+        final RestTemplateBuilder restTemplateBuilder
+    ) {
+        return restTemplateBuilder
+            .setConnectTimeout(httpProperties.getConnect().getTimeout())
+            .setReadTimeout(httpProperties.getRead().getTimeout())
+            .build();
     }
 
     /**
