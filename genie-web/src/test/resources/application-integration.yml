@@ -44,4 +44,6 @@ grpc:
 
 spring:
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration, net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration
+    exclude:
+    - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+    - net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration

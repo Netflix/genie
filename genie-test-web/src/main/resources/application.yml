@@ -126,7 +126,8 @@ spring:
   application:
     name: genie
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+    exclude:
+    - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
   banner:
     location: genie-banner.txt
   cloud:
