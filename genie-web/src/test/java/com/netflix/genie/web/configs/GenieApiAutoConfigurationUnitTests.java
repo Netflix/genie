@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -95,7 +96,9 @@ public class GenieApiAutoConfigurationUnitTests {
      */
     @Test
     public void canGetRestTemplate() {
-        Assert.assertNotNull(this.genieApiAutoConfiguration.genieRestTemplate(new HttpProperties()));
+        Assert.assertNotNull(
+            this.genieApiAutoConfiguration.genieRestTemplate(new HttpProperties(), new RestTemplateBuilder())
+        );
     }
 
     /**
