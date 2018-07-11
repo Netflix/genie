@@ -6,6 +6,8 @@ dependencies {
      *******************************/
 
     compile(project(":genie-test"))
+    compile("com.google.guava:guava")
+    compile("commons-io:commons-io")
     compile("org.springframework.boot:spring-boot-starter-aop")
     compile("org.springframework.boot:spring-boot-starter-test")
 
@@ -23,7 +25,9 @@ dependencies {
 }
 
 processResources {
-    filter ReplaceTokens, tokens: [
-            "genie.version": project.version.toString()
-    ]
+    filesMatching("**/*.yml") {
+        filter ReplaceTokens, tokens: [
+                "genie.version": project.version.toString()
+        ]
+    }
 }

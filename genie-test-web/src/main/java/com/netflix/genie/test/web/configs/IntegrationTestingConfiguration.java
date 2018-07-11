@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.configs;
+package com.netflix.genie.test.web.configs;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
@@ -33,11 +33,17 @@ import java.io.IOException;
  * Configuration overrides for integration tests.
  *
  * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
 @Configuration
-@Profile("integration")
-public class JobConfigClientIntegrationTest {
+@Profile(
+    {
+        "ci",
+        "integration"
+    }
+)
+public class IntegrationTestingConfiguration {
 
     private File jobsDir;
 
@@ -45,10 +51,9 @@ public class JobConfigClientIntegrationTest {
      * Returns a temporary directory as the jobs resource.
      *
      * @return The job dir as a resource.
-     * @throws IOException If there is a problem.
      */
     @Bean
-    public Resource jobsDir() throws IOException {
+    public Resource jobsDir() {
         this.jobsDir = Files.createTempDir();
         if (!this.jobsDir.exists() && !this.jobsDir.mkdirs()) {
             throw new IllegalArgumentException("Unable to create directories: " + this.jobsDir);
