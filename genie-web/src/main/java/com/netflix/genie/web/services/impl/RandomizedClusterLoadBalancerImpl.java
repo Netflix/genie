@@ -18,12 +18,11 @@
 package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.Ordered;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotEmpty;
@@ -54,13 +53,5 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
         final Random rand = new Random();
 
         return new ArrayList<>(clusters).get(Math.abs(rand.nextInt(clusters.size())));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
     }
 }

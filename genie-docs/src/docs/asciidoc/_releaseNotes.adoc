@@ -130,6 +130,12 @@ Cloud AWS properties can be used to configure more specifically other than to as
 |Switched to `java.time.Instant` from `java.util.Date` for timestamps. Formatting in ISO8601 supported out of the box
 for `Instant` serialization/deserialization.
 
+|genie.jobs.clusters.load-balancers.script.order
+|This behavior was to control the order the script load balancer was evaluated relative to other cluster load
+balancer's. This logic is more a framework or execution configuration than anything specific to the class itself. It
+shouldn't know how it's used. The new mechanism is to provide an `@Order` annotation on beans that fit in the order
+the user wants at runtime via a Spring bean definition.
+
 |===
 
 === Metric Changes
