@@ -26,7 +26,9 @@ import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.AgentJobService;
+import com.netflix.genie.web.services.AgentRoutingService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -42,6 +44,7 @@ import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.impl.AgentJobServiceImpl;
+import com.netflix.genie.web.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
@@ -319,6 +322,25 @@ public class GenieServicesAutoConfiguration {
             clusterLoadBalancers,
             registry,
             jobsProperties
+        );
+    }
+
+    /**
+     * Get an implementation of {@link AgentRoutingService} if one hasn't already been defined.
+     *
+     * @param agentConnectionPersistenceService The persistence service to use for agent connections
+     * @param genieHostInfo                     The local genie host information
+     * @return A {@link AgentRoutingServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentRoutingService.class)
+    public AgentRoutingService agentRoutingService(
+        final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        final GenieHostInfo genieHostInfo
+    ) {
+        return new AgentRoutingServiceImpl(
+            agentConnectionPersistenceService,
+            genieHostInfo
         );
     }
 }
