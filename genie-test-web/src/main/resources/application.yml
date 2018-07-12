@@ -65,8 +65,9 @@ genie:
     users:
       creationEnabled: false
       runAsUserEnabled: false
-      activeJobsLimitEnabled: false
-      activeJobsLimit: 100 # Ignored unless enabled via activeJobsLimitEnabled
+      active-limit:
+        enabled: false
+        count: 100
   leader:
     enabled: false
   mail:
