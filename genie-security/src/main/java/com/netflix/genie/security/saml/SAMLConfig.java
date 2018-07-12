@@ -105,7 +105,7 @@ import java.util.Timer;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("genie.security.saml.enabled")
+@ConditionalOnProperty(value = "genie.security.saml.enabled", havingValue = "true")
 @Configuration
 @Order(5)
 //@EnableGlobalMethodSecurity(securedEnabled = true)
