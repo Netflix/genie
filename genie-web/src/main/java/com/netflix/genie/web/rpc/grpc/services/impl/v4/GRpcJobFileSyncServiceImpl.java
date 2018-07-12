@@ -32,6 +32,7 @@ import com.netflix.genie.proto.SyncComplete;
 import com.netflix.genie.proto.SyncRequest;
 import com.netflix.genie.proto.SyncRequestResult;
 import com.netflix.genie.proto.SyncResponse;
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.properties.JobFileSyncRpcProperties;
 import com.netflix.genie.web.services.JobFileService;
 import io.grpc.stub.StreamObserver;
@@ -62,8 +63,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 4.0.0
  */
-// TODO: Centralize this conditional somehow
-@ConditionalOnProperty(value = "genie.grpc.server.enabled", havingValue = "true")
+@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @GrpcService(value = JobFileSyncServiceGrpc.class)
 @Slf4j
 public class GRpcJobFileSyncServiceImpl extends JobFileSyncServiceGrpc.JobFileSyncServiceImplBase {

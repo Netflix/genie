@@ -32,6 +32,7 @@ import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import com.netflix.genie.proto.ReserveJobIdResponse;
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
@@ -46,8 +47,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
  * @author tgianos
  * @since 4.0.0
  */
-// TODO: Centralize this conditional somehow
-@ConditionalOnProperty(value = "genie.grpc.server.enabled", havingValue = "true")
+@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @GrpcService(
     value = JobServiceGrpc.class,
     interceptors = {
