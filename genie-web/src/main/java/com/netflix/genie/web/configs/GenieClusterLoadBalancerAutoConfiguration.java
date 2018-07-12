@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.web.properties.ScriptLoadBalancerProperties;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.RandomizedClusterLoadBalancerImpl;
@@ -26,6 +27,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -42,6 +44,11 @@ import org.springframework.scheduling.TaskScheduler;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        ScriptLoadBalancerProperties.class
+    }
+)
 @Slf4j
 public class GenieClusterLoadBalancerAutoConfiguration {
 
@@ -67,7 +74,7 @@ public class GenieClusterLoadBalancerAutoConfiguration {
      */
     @Bean
     @Order(SCRIPT_LOAD_BALANCER_PRECEDENCE)
-    @ConditionalOnProperty(value = ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_ENABLED_PROPERTY, havingValue = "true")
+    @ConditionalOnProperty(value = ScriptLoadBalancerProperties.ENABLED_PROPERTY, havingValue = "true")
     public ScriptLoadBalancer scriptLoadBalancer(
         @Qualifier("genieAsyncTaskExecutor") final AsyncTaskExecutor asyncTaskExecutor,
         @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
