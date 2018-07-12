@@ -175,7 +175,7 @@ public class GenieTasksAutoConfiguration {
      * @return The {@link DatabaseCleanupTask} instance to use if the conditions match
      */
     @Bean
-    @ConditionalOnProperty(value = "genie.tasks.database-cleanup.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = DatabaseCleanupProperties.ENABLED_PROPERTY, havingValue = "true")
     @ConditionalOnMissingBean(DatabaseCleanupTask.class)
     public DatabaseCleanupTask databaseCleanupTask(
         final DatabaseCleanupProperties cleanupProperties,
@@ -209,7 +209,7 @@ public class GenieTasksAutoConfiguration {
      * @throws IOException When it is unable to open a file reference to the job directory
      */
     @Bean
-    @ConditionalOnProperty(value = "genie.tasks.disk-cleanup.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = DiskCleanupProperties.ENABLED_PROPERTY, havingValue = "true")
     @ConditionalOnMissingBean(DiskCleanupTask.class)
     public DiskCleanupTask diskCleanupTask(
         final DiskCleanupProperties properties,

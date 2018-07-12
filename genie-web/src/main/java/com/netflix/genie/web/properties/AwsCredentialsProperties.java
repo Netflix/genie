@@ -31,11 +31,16 @@ import javax.annotation.Nullable;
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.aws.credentials")
+@ConfigurationProperties(prefix = AwsCredentialsProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
 public class AwsCredentialsProperties {
+
+    /**
+     * The property prefix for Genie AWS Credentials.
+     */
+    public static final String PROPERTY_PREFIX = "genie.aws.credentials";
 
     @Nullable
     private String role;
@@ -48,9 +53,14 @@ public class AwsCredentialsProperties {
      * @author tgianos
      * @since 4.0.0
      */
-    @ConfigurationProperties(prefix = "cloud.aws.region")
+    @ConfigurationProperties(prefix = SpringCloudAwsRegionProperties.PROPERTY_PREFIX)
     @Validated
     public static class SpringCloudAwsRegionProperties {
+
+        /**
+         * The property prefix for Spring Cloud AWS region properties.
+         */
+        static final String PROPERTY_PREFIX = "cloud.aws.region";
 
         @Getter
         @Setter

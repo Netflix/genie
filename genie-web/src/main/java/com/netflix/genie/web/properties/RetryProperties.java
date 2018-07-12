@@ -32,11 +32,17 @@ import javax.validation.constraints.Min;
  * @author amajumdar
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.retry")
+@ConfigurationProperties(prefix = RetryProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class RetryProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.retry";
+
     /**
      * Total number of retries to attempt.
      * Default to 5 retries.

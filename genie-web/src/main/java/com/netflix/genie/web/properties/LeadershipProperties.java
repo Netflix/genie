@@ -28,11 +28,21 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.leader")
+@ConfigurationProperties(prefix = LeadershipProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
 public class LeadershipProperties {
+
+    /**
+     * The property prefix for genie leadership.
+     */
+    public static final String PROPERTY_PREFIX = "genie.leader";
+
+    /**
+     * The property key for whether this feature is enabled or not.
+     */
+    public static final String ENABLED_PROPERTY = PROPERTY_PREFIX + ".enabled";
 
     /**
      * Whether this node is the leader within the cluster or not.

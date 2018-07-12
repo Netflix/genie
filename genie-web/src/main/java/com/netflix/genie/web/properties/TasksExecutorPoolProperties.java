@@ -31,11 +31,16 @@ import javax.validation.constraints.NotBlank;
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.tasks.executor.pool")
+@ConfigurationProperties(prefix = TasksExecutorPoolProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
 public class TasksExecutorPoolProperties {
+
+    /**
+     * The property prefix for this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.tasks.executor.pool";
 
     /**
      * The number of threads desired for this system. Likely best to do one more than number of CPUs.

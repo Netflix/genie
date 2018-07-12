@@ -30,11 +30,17 @@ import javax.validation.constraints.NotBlank;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.jobs.locations")
+@ConfigurationProperties(prefix = JobsLocationsProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class JobsLocationsProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs.locations";
+
     @NotBlank(message = "Archives location is required")
     private String archives = "file:///tmp/genie/archives/";
 

@@ -28,11 +28,17 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.grpc.server.services.job-file-sync")
+@ConfigurationProperties(prefix = JobFileSyncRpcProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
 public class JobFileSyncRpcProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.grpc.server.services.job-file-sync";
+
     private int maxSyncMessages = 10;
     private long ackIntervalMilliseconds = 30_000L;
 }

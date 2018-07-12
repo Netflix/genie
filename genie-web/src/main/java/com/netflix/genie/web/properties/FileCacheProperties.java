@@ -31,11 +31,17 @@ import javax.validation.constraints.NotBlank;
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.file.cache")
+@ConfigurationProperties(prefix = FileCacheProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
 public class FileCacheProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.file.cache";
+
     @NotBlank
     @URL
     private String location = "file:///tmp/genie/cache";

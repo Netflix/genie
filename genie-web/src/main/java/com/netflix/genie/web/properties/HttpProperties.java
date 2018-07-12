@@ -30,11 +30,16 @@ import javax.validation.Valid;
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.http")
+@ConfigurationProperties(prefix = HttpProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
 public class HttpProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.http";
 
     @Valid
     private Connect connect = new Connect();

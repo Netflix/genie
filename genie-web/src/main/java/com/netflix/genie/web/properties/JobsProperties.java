@@ -30,11 +30,17 @@ import javax.validation.Valid;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.jobs")
+@ConfigurationProperties(prefix = JobsProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class JobsProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs";
+
     @Valid
     private JobsCleanupProperties cleanup = new JobsCleanupProperties();
 
