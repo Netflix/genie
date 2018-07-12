@@ -176,3 +176,18 @@ ALTER TABLE `job_requested_applications`
     ON DELETE CASCADE,
   ADD KEY `JOB_REQUESTED_APPLICATIONS_APPLICATION_ID_INDEX` (`application_id`),
   ADD KEY `JOB_REQUESTED_APPLICATIONS_JOB_ID_INDEX` (`job_id`);
+
+CREATE TABLE `agent_connections` (
+  `id`              BIGINT(20)    AUTO_INCREMENT NOT NULL,
+  `created`         DATETIME(3)   DEFAULT CURRENT_TIMESTAMP(3) NOT NULL,
+  `updated`         DATETIME(3)   DEFAULT CURRENT_TIMESTAMP(3),
+  `entity_version`  INT(11)       DEFAULT '0' NOT NULL,
+  `job_id`          VARCHAR(255)  NOT NULL,
+  `server_hostname` VARCHAR(255)  NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `AGENT_CONNECTIONS_JOB_ID_INDEX` (`job_id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT = DYNAMIC;

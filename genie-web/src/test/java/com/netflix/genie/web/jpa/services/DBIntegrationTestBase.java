@@ -19,6 +19,7 @@ package com.netflix.genie.web.jpa.services;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.netflix.genie.GenieTestApp;
+import com.netflix.genie.web.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -80,6 +81,9 @@ public abstract class DBIntegrationTestBase {
     @Autowired
     protected JpaTagRepository tagRepository;
 
+    @Autowired
+    protected JpaAgentConnectionRepository agentConnectionRepository;
+
     /**
      * Clean out the db after every test.
      */
@@ -91,5 +95,6 @@ public abstract class DBIntegrationTestBase {
         this.applicationRepository.deleteAll();
         this.fileRepository.deleteAll();
         this.tagRepository.deleteAll();
+        this.agentConnectionRepository.deleteAll();
     }
 }
