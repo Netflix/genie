@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.web.controllers.DtoConverters;
+import com.netflix.genie.web.properties.ScriptLoadBalancerProperties;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -82,16 +83,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     static final String STATUS_TAG_NOT_CONFIGURED = "not configured";
     static final String STATUS_TAG_FOUND = "found";
     static final String STATUS_TAG_FAILED = "failed";
-    private static final String SCRIPT_LOAD_BALANCER_PROPERTY_GROUP = "genie.jobs.clusters.load-balancers.script.";
-    /**
-     * Feature flag constant. Property with this key should be true if this feature should be enabled.
-     */
-    public static final String SCRIPT_LOAD_BALANCER_ENABLED_PROPERTY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "enabled";
-    static final String SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "order";
-    static final String SCRIPT_REFRESH_RATE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "refreshRate";
-    static final String SCRIPT_FILE_DESTINATION_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "destination";
-    static final String SCRIPT_FILE_SOURCE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "source";
-    static final String SCRIPT_TIMEOUT_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "timeout";
     private static final long DEFAULT_TIMEOUT_LENGTH = 5_000L;
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final String SLASH = "/";
@@ -138,7 +129,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         this.registry = registry;
 
         this.order = this.environment.getProperty(
-            SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+            ScriptLoadBalancerProperties.ORDER_PROPERTY,
             Integer.class,
             ClusterLoadBalancer.DEFAULT_ORDER
         );
@@ -146,7 +137,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         // Schedule the task to run with the configured refresh rate
         // Task will be stopped when the system stops
         final long refreshRate = this.environment.getProperty(
-            SCRIPT_REFRESH_RATE_PROPERTY_KEY,
+            ScriptLoadBalancerProperties.REFRESH_RATE_PROPERTY,
             Long.class,
             300_000L
         );
@@ -238,26 +229,28 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
             // Update the script timeout
             this.timeoutLength.set(
                 this.environment.getProperty(
-                    SCRIPT_TIMEOUT_PROPERTY_KEY,
+                    ScriptLoadBalancerProperties.TIMEOUT_PROPERTY,
                     Long.class,
                     DEFAULT_TIMEOUT_LENGTH
                 )
             );
 
-            final String scriptFileSourceValue = this.environment.getProperty(SCRIPT_FILE_SOURCE_PROPERTY_KEY);
+            final String scriptFileSourceValue = this.environment
+                .getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY);
             if (StringUtils.isBlank(scriptFileSourceValue)) {
                 throw new IllegalStateException(
-                    "Invalid empty value for script source file property: " + SCRIPT_FILE_SOURCE_PROPERTY_KEY
+                    "Invalid empty value for script source file property: "
+                        + ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY
                 );
             }
             final String scriptFileSource = new URI(scriptFileSourceValue).toString();
 
             final String scriptFileDestinationValue =
-                this.environment.getProperty(SCRIPT_FILE_DESTINATION_PROPERTY_KEY);
+                this.environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY);
             if (StringUtils.isBlank(scriptFileDestinationValue)) {
                 throw new IllegalStateException(
                     "Invalid empty value for script destination directory property: "
-                        + SCRIPT_FILE_DESTINATION_PROPERTY_KEY
+                        + ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY
                 );
             }
             final Path scriptDestinationDirectory = Paths.get(new URI(scriptFileDestinationValue));

@@ -29,6 +29,7 @@ import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.web.properties.ScriptLoadBalancerProperties
 import com.netflix.genie.web.services.ClusterLoadBalancer
 import com.netflix.genie.web.services.impl.GenieFileTransferService
 import com.netflix.genie.web.util.MetricsConstants
@@ -173,24 +174,24 @@ class ScriptLoadBalancerSpec extends Specification {
         environment | order
         Mock(Environment) {
             1 * getProperty(
-                    ScriptLoadBalancer.SCRIPT_REFRESH_RATE_PROPERTY_KEY,
+                    ScriptLoadBalancerProperties.REFRESH_RATE_PROPERTY,
                     Long.class,
                     300_000L
             ) >> 300_000L
             1 * getProperty(
-                    ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+                    ScriptLoadBalancerProperties.ORDER_PROPERTY,
                     Integer.class,
                     ClusterLoadBalancer.DEFAULT_ORDER
             ) >> ClusterLoadBalancer.DEFAULT_ORDER
         }           | ClusterLoadBalancer.DEFAULT_ORDER
         Mock(Environment) {
             1 * getProperty(
-                    ScriptLoadBalancer.SCRIPT_REFRESH_RATE_PROPERTY_KEY,
+                    ScriptLoadBalancerProperties.REFRESH_RATE_PROPERTY,
                     Long.class,
                     300_000L
             ) >> 300_000L
             1 * getProperty(
-                    ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+                    ScriptLoadBalancerProperties.ORDER_PROPERTY,
                     Integer.class,
                     _ as Integer
             ) >> 3
@@ -219,12 +220,12 @@ class ScriptLoadBalancerSpec extends Specification {
 
         then:
         1 * environment.getProperty(
-                ScriptLoadBalancer.SCRIPT_REFRESH_RATE_PROPERTY_KEY,
+                ScriptLoadBalancerProperties.REFRESH_RATE_PROPERTY,
                 Long.class,
                 300_000L
         ) >> 300_000L
         1 * environment.getProperty(
-                ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+                ScriptLoadBalancerProperties.ORDER_PROPERTY,
                 Integer.class,
                 _ as Integer
         ) >> 3
@@ -245,8 +246,8 @@ class ScriptLoadBalancerSpec extends Specification {
         loadBalancer.refresh()
 
         then: "Metrics are recorded"
-        1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_TIMEOUT_PROPERTY_KEY, Long.class, _ as Long) >> 5_000L
-        1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_FILE_SOURCE_PROPERTY_KEY) >> null
+        1 * environment.getProperty(ScriptLoadBalancerProperties.TIMEOUT_PROPERTY, Long.class, _ as Long) >> 5_000L
+        1 * environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY) >> null
         1 * registry.timer(
                 ScriptLoadBalancer.UPDATE_TIMER_NAME,
                 ImmutableSet.of(
@@ -273,9 +274,9 @@ class ScriptLoadBalancerSpec extends Specification {
         loadBalancer.refresh()
 
         then: "Refresh successfully configures the script"
-        1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_TIMEOUT_PROPERTY_KEY, Long.class, _ as Long) >> 5_000L
-        1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_FILE_SOURCE_PROPERTY_KEY) >> file
-        1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_FILE_DESTINATION_PROPERTY_KEY) >> destDir
+        1 * environment.getProperty(ScriptLoadBalancerProperties.TIMEOUT_PROPERTY, Long.class, _ as Long) >> 5_000L
+        1 * environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY) >> file
+        1 * environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY) >> destDir
         1 * fileTransferService.getFile(file, file)
         1 * registry.timer(
                 ScriptLoadBalancer.UPDATE_TIMER_NAME,
