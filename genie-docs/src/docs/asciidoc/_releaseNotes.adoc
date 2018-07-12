@@ -101,6 +101,11 @@ https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Gu
 |Modifications to how Spring handled
 https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
 
+|genie.jobs.users.activeLimit.*
+|genie.jobs.users.active-limit.*
+|Modifications to how Spring handled
+https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
+
 |genie.zookeeper.enabled
 |spring.cloud.zookeeper.enabled
 |Leverage existing code rather than re-invent the wheel
