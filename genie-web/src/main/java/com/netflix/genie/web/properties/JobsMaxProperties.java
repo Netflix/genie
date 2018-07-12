@@ -19,6 +19,7 @@ package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
@@ -29,6 +30,7 @@ import javax.validation.constraints.Min;
  * @author tgianos
  * @since 3.0.0
  */
+@ConfigurationProperties("genie.jobs.max")
 @Getter
 @Setter
 @Validated
