@@ -40,11 +40,11 @@ public class PingFederateSecurityConditions {
             super(ConfigurationPhase.PARSE_CONFIGURATION);
         }
 
-        @ConditionalOnProperty("genie.security.oauth2.enabled")
+        @ConditionalOnProperty(value = "genie.security.oauth2.enabled", havingValue = "true")
         static class OnOAuth2 {
         }
 
-        @ConditionalOnProperty("genie.security.oauth2.pingfederate.enabled")
+        @ConditionalOnProperty(value = "genie.security.oauth2.pingfederate.enabled", havingValue = "true")
         static class OnPingFederate {
         }
 
@@ -72,15 +72,15 @@ public class PingFederateSecurityConditions {
             super(ConfigurationPhase.PARSE_CONFIGURATION);
         }
 
-        @ConditionalOnProperty("genie.security.oauth2.enabled")
+        @ConditionalOnProperty(value = "genie.security.oauth2.enabled", havingValue = "true")
         static class OnOAuth2 {
         }
 
-        @ConditionalOnProperty("genie.security.oauth2.pingfederate.enabled")
+        @ConditionalOnProperty(value = "genie.security.oauth2.pingfederate.enabled", havingValue = "true")
         static class OnPingFederate {
         }
 
-        @ConditionalOnProperty(value = "genie.security.oauth2.pingfederate.jwt.enabled")
+        @ConditionalOnProperty(value = "genie.security.oauth2.pingfederate.jwt.enabled", havingValue = "true")
         static class OnPingFederateJwtDisabled {
         }
     }
