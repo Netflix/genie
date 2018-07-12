@@ -19,8 +19,8 @@
 package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
 import com.google.common.collect.ImmutableMap;
-import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -37,6 +37,8 @@ import com.netflix.genie.proto.JobSpecificationError;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdError;
 import com.netflix.genie.proto.ReserveJobIdResponse;
+import com.netflix.genie.web.properties.GRpcServerProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +51,7 @@ import java.util.Map;
  * @author mprimi
  * @since 4.0.0
  */
+@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @Component
 @Lazy
 class JobServiceProtoErrorComposer {

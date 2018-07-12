@@ -22,6 +22,7 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.proto.PingRequest;
 import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.proto.PongResponse;
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +37,7 @@ import java.util.Map;
  * @author mprimi
  * @since 4.0.0
  */
-// TODO: Centralize this conditional somehow
-@ConditionalOnProperty(value = "genie.grpc.server.enabled", havingValue = "true")
+@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @GrpcService(
     value = PingServiceGrpc.class,
     interceptors = {

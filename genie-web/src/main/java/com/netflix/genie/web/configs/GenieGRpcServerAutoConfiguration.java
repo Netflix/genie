@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.properties.JobFileSyncRpcProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
@@ -34,10 +35,11 @@ import javax.annotation.PostConstruct;
  * @since 4.0.0
  */
 @Configuration
-@ConditionalOnProperty(value = "genie.grpc.server.enabled", havingValue = "true")
+@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @Import(GrpcServerAutoConfiguration.class)
 @EnableConfigurationProperties(
     {
+        GRpcServerProperties.class,
         JobFileSyncRpcProperties.class
     }
 )
