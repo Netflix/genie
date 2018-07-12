@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("genie.tasks.databaseCleanup.enabled")
+@ConditionalOnProperty(value = "genie.tasks.databaseCleanup.enabled", havingValue = "true")
 @Component
 @Slf4j
 public class DatabaseCleanupTask extends LeadershipTask {

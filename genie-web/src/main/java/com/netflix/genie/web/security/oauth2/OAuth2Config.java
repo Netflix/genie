@@ -38,7 +38,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("genie.security.oauth2.enabled")
+@ConditionalOnProperty(value = "genie.security.oauth2.enabled", havingValue = "true")
 @Configuration
 @EnableResourceServer
 public class OAuth2Config extends ResourceServerConfigurerAdapter {

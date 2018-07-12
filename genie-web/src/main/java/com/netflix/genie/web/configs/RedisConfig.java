@@ -33,7 +33,7 @@ import javax.annotation.PostConstruct;
  * @since 3.1.0
  */
 @Configuration
-@ConditionalOnProperty("genie.redis.enabled")
+@ConditionalOnProperty(value = "genie.redis.enabled", havingValue = "true")
 @Import(RedisAutoConfiguration.class)
 @Slf4j
 public class RedisConfig {

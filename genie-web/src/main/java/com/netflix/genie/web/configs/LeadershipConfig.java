@@ -68,7 +68,7 @@ public class LeadershipConfig {
      * @return The factory bean
      */
     @Bean
-    @ConditionalOnProperty("genie.zookeeper.enabled")
+    @ConditionalOnProperty(value = "genie.zookeeper.enabled", havingValue = "true")
     public LeaderInitiatorFactoryBean leaderInitiatorFactory(
         final CuratorFramework client,
         final ZookeeperProperties zookeeperProperties

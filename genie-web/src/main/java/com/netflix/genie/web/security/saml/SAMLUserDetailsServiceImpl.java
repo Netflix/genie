@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("genie.security.saml.enabled")
+@ConditionalOnProperty(value = "genie.security.saml.enabled", havingValue = "true")
 @Component
 @Slf4j
 public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
