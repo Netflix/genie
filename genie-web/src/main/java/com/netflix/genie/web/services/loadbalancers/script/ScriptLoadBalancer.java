@@ -99,7 +99,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     private final Environment environment;
     private final ObjectMapper mapper;
     private final MeterRegistry registry;
-    private final int order;
 
     private final AtomicReference<CompiledScript> script = new AtomicReference<>(null);
     private final AtomicLong timeoutLength = new AtomicLong(DEFAULT_TIMEOUT_LENGTH);
@@ -127,12 +126,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         this.environment = environment;
         this.mapper = mapper;
         this.registry = registry;
-
-        this.order = this.environment.getProperty(
-            ScriptLoadBalancerProperties.ORDER_PROPERTY,
-            Integer.class,
-            ClusterLoadBalancer.DEFAULT_ORDER
-        );
 
         // Schedule the task to run with the configured refresh rate
         // Task will be stopped when the system stops
@@ -206,14 +199,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 .timer(SELECT_TIMER_NAME, tags)
                 .record(System.nanoTime() - selectStart, TimeUnit.NANOSECONDS);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getOrder() {
-        return this.order;
     }
 
     /**

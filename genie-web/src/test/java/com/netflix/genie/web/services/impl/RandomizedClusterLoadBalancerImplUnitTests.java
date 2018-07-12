@@ -19,15 +19,14 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.core.Ordered;
 
 /**
  * Test for the cluster load balancer.
@@ -80,14 +79,5 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
                 Mockito.mock(JobRequest.class)
             )
         );
-    }
-
-    /**
-     * Make sure the order for the RandomizedLoadBalancer is the lowest precedence as the fallback for all other
-     * options.
-     */
-    @Test
-    public void testOrderIsLowestPrecedence() {
-        Assert.assertEquals(this.clb.getOrder(), Ordered.LOWEST_PRECEDENCE);
     }
 }

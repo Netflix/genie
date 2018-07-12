@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.properties;
 
-import com.netflix.genie.web.services.ClusterLoadBalancer;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -49,11 +48,6 @@ public class ScriptLoadBalancerProperties {
     public static final String ENABLED_PROPERTY = PROPERTY_PREFIX + ".enabled";
 
     /**
-     * The precedence order this load balancer should be evaluated relative to others.
-     */
-    public static final String ORDER_PROPERTY = PROPERTY_PREFIX + ".order";
-
-    /**
      * How often the script should be refreshed from the source.
      */
     public static final String REFRESH_RATE_PROPERTY = PROPERTY_PREFIX + ".refreshRate";
@@ -74,7 +68,6 @@ public class ScriptLoadBalancerProperties {
     public static final String TIMEOUT_PROPERTY = PROPERTY_PREFIX + ".timeout";
 
     private boolean enabled;
-    private int order = ClusterLoadBalancer.DEFAULT_ORDER;
     @Min(1L)
     private long refreshRate = 300_000L;
     @NotEmpty

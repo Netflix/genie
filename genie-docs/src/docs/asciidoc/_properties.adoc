@@ -74,12 +74,6 @@ See also: `genie.jobs.clusters.load-balancers.script.source`
 See also: `genie.jobs.clusters.load-balancers.script.destination`
 |false
 
-|genie.jobs.clusters.load-balancers.script.order
-|The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
-would be the first thing evaluated if nothing else is set to 0 as well. Must be < 2147483647 (Integer.MAX_VALUE). If
-no value set will be given Integer.MAX_VALUE - 1 (default).
-|2147483646
-
 |genie.jobs.clusters.load-balancers.script.refreshRate
 |How frequently to refresh the load balancer script (in milliseconds)
 |300000

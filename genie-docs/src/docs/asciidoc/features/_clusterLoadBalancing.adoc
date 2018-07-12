@@ -8,7 +8,7 @@ point Genie needs a mechanism to chose a final runtime target from the set of cl
 cluster load balancing feature of Genie comes into play.
 
 Genie has an interface `ClusterLoadBalancer` which can be implemented to provide plugin functionality of algorithms for
-cluster selection. The interface has two methods one from Genie:
+cluster selection. The interface has a single method:
 
 [source,java]
 ----
@@ -22,26 +22,6 @@ cluster selection. The interface has two methods one from Genie:
  */
 @Nullable
 Cluster selectCluster(final List<Cluster> clusters, final JobRequest jobRequest) throws GenieException;
-----
-
-And one inherited from Spring's
-http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/Ordered.html[Ordered]
-interface:
-
-[source,java]
-----
-/**
- * Get the order value of this object.
- * <p>Higher values are interpreted as lower priority. As a consequence,
- * the object with the lowest value has the highest priority (somewhat
- * analogous to Servlet {@code load-on-startup} values).
- * <p>Same order values will result in arbitrary sort positions for the
- * affected objects.
- * @return the order value
- * @see #HIGHEST_PRECEDENCE
- * @see #LOWEST_PRECEDENCE
- */
-int getOrder();
 ----
 
 At startup Genie will collect all beans that implement the `ClusterLoadBalancer` interface and based on their order
@@ -70,39 +50,33 @@ https://docs.oracle.com/javase/8/docs/api/javax/script/ScriptEngine.html[ScriptE
 ===== Configuration
 
 The script load balancer is disabled by default. To enable it an admin must set the property
-`genie.jobs.clusters.loadBalancers.script.enabled` to true.
+`genie.jobs.clusters.load-balancers.script.enabled` to true.
 
 Other properties:
 
 |===
 |Property |Description| Default Value
 
-|genie.jobs.clusters.loadBalancers.script.destination
+|genie.jobs.clusters.load-balancers.script.destination
 |The location on disk where the script source file should be stored after it is downloaded from
 `genie.jobs.clusters.loadBalancers.script.source`. The file will be given the same name.
 |file:///tmp/genie/loadbalancers/script/destination/
 
-|genie.jobs.clusters.loadBalancers.script.enabled
+|genie.jobs.clusters.load-balancers.script.enabled
 |Whether the script based load balancer should be enabled for the system or not.
 See also: `genie.jobs.clusters.loadBalancers.script.source`
 See also: `genie.jobs.clusters.loadBalancers.script.destination`
 |false
 
-|genie.jobs.clusters.loadBalancers.script.order
-|The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
-would be the first thing evaluated if nothing else is set to 0 as well. Must be < 2147483647 (Integer.MAX_VALUE). If
-no value set will be given Integer.MAX_VALUE - 1 (default).
-|2147483646
-
-|genie.jobs.clusters.loadBalancers.script.refreshRate
+|genie.jobs.clusters.load-balancers.script.refreshRate
 |How frequently to refresh the load balancer script (in milliseconds)
 |300000
 
-|genie.jobs.clusters.loadBalancers.script.source
+|genie.jobs.clusters.load-balancers.script.source
 |The location of the script the load balancer should load to evaluate which cluster to use for a job request
 |file:///tmp/genie/loadBalancers/script/source/loadBalance.js
 
-|genie.jobs.clusters.loadBalancers.script.timeout
+|genie.jobs.clusters.load-balancers.script.timeout
 |The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
 forces a timeout
 |5000
@@ -189,7 +163,7 @@ is recommended that once an algorithm is well tested it be converted to a true i
 
 Additionally if a script error is made the `ScriptLoadBalancer` will swallow the exceptions and simply return `null`
 from all calls to `selectCluster` until the script is fixed and `refresh` is invoked again. The metric
-`genie.jobs.clusters.loadBalancers.script.select.timer` with tag `status` and value `failed` can be used to monitor
+`genie.jobs.clusters.load-balancers.script.select.timer` with tag `status` and value `failed` can be used to monitor
 this situation.
 
 ==== Wrap Up
