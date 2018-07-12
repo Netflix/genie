@@ -28,11 +28,22 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties(prefix = "genie.tasks.database-cleanup")
+@ConfigurationProperties(prefix = DatabaseCleanupProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class DatabaseCleanupProperties {
+
+    /**
+     * The property prefix for Database Cleanup related tasks.
+     */
+    public static final String PROPERTY_PREFIX = "genie.tasks.database-cleanup";
+
+    /**
+     * The property key for whether this feature is enabled or not.
+     */
+    public static final String ENABLED_PROPERTY = PROPERTY_PREFIX + ".enabled";
+
     private boolean enabled;
     private String expression = "0 0 0 * * *";
     private int retention = 90;

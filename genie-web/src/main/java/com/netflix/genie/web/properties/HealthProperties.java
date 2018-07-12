@@ -28,11 +28,17 @@ import org.springframework.validation.annotation.Validated;
  * @author amajumdar
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.health")
+@ConfigurationProperties(prefix = HealthProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class HealthProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.health";
+
     /**
      * Defines the threshold for the maximum CPU load percentage. Health of the system is marked OUT_OF_SERVICE if
      * the CPU load of a system goes beyond this threshold for <code>maxCpuLoadConsecutiveOccurrences</code>

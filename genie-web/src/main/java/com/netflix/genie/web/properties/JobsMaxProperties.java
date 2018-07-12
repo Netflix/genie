@@ -30,11 +30,16 @@ import javax.validation.constraints.Min;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.jobs.max")
+@ConfigurationProperties(prefix = JobsMaxProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class JobsMaxProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs.max";
 
     @Min(value = 1L, message = "Max standard output file size has to be at least 1 byte and preferably much larger")
     private long stdOutSize = 8_589_934_592L;

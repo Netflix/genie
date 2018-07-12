@@ -30,11 +30,17 @@ import javax.validation.constraints.Email;
  * @author tgianos
  * @since 4.0.0
  */
-@ConfigurationProperties(prefix = "genie.mail")
+@ConfigurationProperties(prefix = MailProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
 public class MailProperties {
+
+    /**
+     * The property prefix for this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.mail";
+
     @Email
     private String fromAddress = "no-reply-genie@geniehost.com";
 }

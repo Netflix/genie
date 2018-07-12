@@ -30,11 +30,17 @@ import javax.validation.Valid;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.jobs.users")
+@ConfigurationProperties(prefix = JobsUsersProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class JobsUsersProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs.users";
+
     private boolean creationEnabled;
     private boolean runAsUserEnabled;
     @Valid

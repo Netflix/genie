@@ -30,11 +30,22 @@ import javax.validation.constraints.Min;
  * @author mprimi
  * @since 3.1.0
  */
-@ConfigurationProperties("genie.jobs.users.active-limit")
+@ConfigurationProperties(prefix = JobsUsersActiveLimitProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class JobsUsersActiveLimitProperties {
+
+    /**
+     * The property prefix for job user limiting.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs.users.active-limit";
+
+    /**
+     * The property key for whether this feature is enabled or not.
+     */
+    public static final String ENABLED_PROPERTY = PROPERTY_PREFIX + ".enabled";
+
     /**
      * Default value for active user job limit enabled.
      */

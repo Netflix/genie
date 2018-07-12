@@ -31,11 +31,17 @@ import javax.validation.constraints.Min;
  * @author mprimi
  * @since 3.3.9
  */
-@ConfigurationProperties("genie.jobs.completion-check-back-off")
+@ConfigurationProperties(prefix = ExponentialBackOffTriggerProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class ExponentialBackOffTriggerProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs.completion-check-back-off";
+
     @Min(value = 1)
     private long minInterval = 100L;
     private long maxInterval = 10_000L;

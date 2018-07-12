@@ -31,11 +31,22 @@ import javax.validation.constraints.NotEmpty;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.jobs.forwarding")
+@ConfigurationProperties(prefix = JobsForwardingProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class JobsForwardingProperties {
+
+    /**
+     * The property prefix for job forwarding.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs.forwarding";
+
+    /**
+     * The property key for whether this feature is enabled or not.
+     */
+    public static final String ENABLED_PROPERTY = PROPERTY_PREFIX + ".enabled";
+
     private boolean enabled;
 
     @NotEmpty(message = "A scheme is required for forwarding")

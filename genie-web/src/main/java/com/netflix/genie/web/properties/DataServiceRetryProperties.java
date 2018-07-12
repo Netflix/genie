@@ -28,11 +28,17 @@ import org.springframework.validation.annotation.Validated;
  * @author amajumdar
  * @since 3.0.0
  */
-@ConfigurationProperties("genie.data.service.retry")
+@ConfigurationProperties(prefix = DataServiceRetryProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
 public class DataServiceRetryProperties {
+
+    /**
+     * The property prefix for all properties in this group.
+     */
+    public static final String PROPERTY_PREFIX = "genie.data.service.retry";
+
     /**
      * Default to 5 retries.
      */
