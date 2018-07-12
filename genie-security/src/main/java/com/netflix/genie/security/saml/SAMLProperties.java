@@ -37,7 +37,7 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("genie.security.saml.enabled")
+@ConditionalOnProperty(value = "genie.security.saml.enabled", havingValue = "true")
 @ConfigurationProperties(prefix = "genie.security.saml")
 @Component
 @Getter
