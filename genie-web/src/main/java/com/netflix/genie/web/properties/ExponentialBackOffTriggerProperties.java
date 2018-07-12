@@ -20,6 +20,7 @@ package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
@@ -30,12 +31,13 @@ import javax.validation.constraints.Min;
  * @author mprimi
  * @since 3.3.9
  */
+@ConfigurationProperties("genie.jobs.completion-check-back-off")
 @Getter
 @Setter
 @Validated
 public class ExponentialBackOffTriggerProperties {
     @Min(value = 1)
-    private long minInterval = 100;
-    private long maxInterval = 10_000;
+    private long minInterval = 100L;
+    private long maxInterval = 10_000L;
     private float factor = 1.2f;
 }

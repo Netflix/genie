@@ -19,6 +19,7 @@ package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
@@ -29,6 +30,7 @@ import javax.validation.constraints.Min;
  * @author mprimi
  * @since 3.1.0
  */
+@ConfigurationProperties("genie.jobs.users.active-limit")
 @Getter
 @Setter
 @Validated

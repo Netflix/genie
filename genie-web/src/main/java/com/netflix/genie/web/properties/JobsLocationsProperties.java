@@ -19,6 +19,7 @@ package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
@@ -29,6 +30,7 @@ import javax.validation.constraints.NotBlank;
  * @author tgianos
  * @since 3.0.0
  */
+@ConfigurationProperties("genie.jobs.locations")
 @Getter
 @Setter
 @Validated
