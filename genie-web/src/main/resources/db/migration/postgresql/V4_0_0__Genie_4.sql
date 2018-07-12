@@ -163,3 +163,16 @@ CREATE INDEX job_requested_applications_application_id_index
 DROP INDEX job_applications_requested_job_id_index;
 CREATE INDEX job_requested_applications_job_id_index
   ON job_requested_applications (job_id);
+
+CREATE TABLE agent_connections (
+  id              BIGSERIAL                                    NOT NULL,
+  created         TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now() NOT NULL,
+  updated         TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now() NOT NULL,
+  entity_version  INTEGER      DEFAULT '0'                     NOT NULL,
+  job_id          VARCHAR(255)                                 NOT NULL,
+  server_hostname VARCHAR(255)                                 NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE UNIQUE INDEX agent_connections_job_id_index
+  ON agent_connections (job_id);

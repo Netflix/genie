@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.web.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
+import com.netflix.genie.web.jpa.services.JpaAgentConnectionPersistenceServiceImpl;
 import com.netflix.genie.web.jpa.services.JpaApplicationPersistenceServiceImpl;
 import com.netflix.genie.web.jpa.services.JpaClusterPersistenceServiceImpl;
 import com.netflix.genie.web.jpa.services.JpaCommandPersistenceServiceImpl;
@@ -32,6 +34,7 @@ import com.netflix.genie.web.jpa.services.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.web.jpa.services.JpaJobSearchServiceImpl;
 import com.netflix.genie.web.jpa.services.JpaTagPersistenceService;
 import com.netflix.genie.web.jpa.services.JpaTagPersistenceServiceImpl;
+import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -214,5 +217,20 @@ public class GenieJpaAutoConfiguration {
         final JpaCommandRepository commandRepository
     ) {
         return new JpaJobSearchServiceImpl(jobRepository, clusterRepository, commandRepository);
+    }
+
+
+    /**
+     * A JPA implementation of the {@link AgentConnectionPersistenceService} interface.
+     *
+     * @param jpaAgentConnectionRepository The repository to use for agent connection entities
+     * @return A {@link JpaAgentConnectionPersistenceServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentConnectionPersistenceService.class)
+    public JpaAgentConnectionPersistenceServiceImpl agentConnectionPersistenceService(
+        final JpaAgentConnectionRepository jpaAgentConnectionRepository
+    ) {
+        return new JpaAgentConnectionPersistenceServiceImpl(jpaAgentConnectionRepository);
     }
 }
