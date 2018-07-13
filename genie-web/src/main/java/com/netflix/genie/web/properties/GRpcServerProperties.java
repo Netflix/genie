@@ -19,7 +19,7 @@ package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -28,7 +28,7 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 4.0.0
  */
-@ConditionalOnProperty(prefix = GRpcServerProperties.PROPERTY_PREFIX)
+@ConfigurationProperties(prefix = GRpcServerProperties.PROPERTY_PREFIX)
 @Validated
 @Getter
 @Setter
