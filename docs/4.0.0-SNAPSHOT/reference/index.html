@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-07-12</span>
+<span id="revdate">2018-07-13</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1105,6 +1105,12 @@ whether the <code>maxSyncMessages</code> threshold has been reached or not</p></
 <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.activeLimit.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.active-limit.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modifications to how Spring handled
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.zookeeper.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Leverage existing code rather than re-invent the wheel</p></td>
@@ -1141,6 +1147,13 @@ Cloud AWS properties can be used to configure more specifically other than to as
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.date-format</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Switched to <code>java.time.Instant</code> from <code>java.util.Date</code> for timestamps. Formatting in ISO8601 supported out of the box
 for <code>Instant</code> serialization/deserialization.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.order</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This behavior was to control the order the script load balancer was evaluated relative to other cluster load
+balancer&#8217;s. This logic is more a framework or execution configuration than anything specific to the class itself. It
+shouldn&#8217;t know how it&#8217;s used. The new mechanism is to provide an <code>@Order</code> annotation on beans that fit in the order
+the user wants at runtime via a Spring bean definition.</p></td>
 </tr>
 </tbody>
 </table>
@@ -4207,7 +4220,7 @@ cluster load balancing feature of Genie comes into play.</p>
 </div>
 <div class="paragraph">
 <p>Genie has an interface <code>ClusterLoadBalancer</code> which can be implemented to provide plugin functionality of algorithms for
-cluster selection. The interface has two methods one from Genie:</p>
+cluster selection. The interface has a single method:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4221,27 +4234,6 @@ cluster selection. The interface has two methods one from Genie:</p>
  */
 @Nullable
 Cluster selectCluster(final List&lt;Cluster&gt; clusters, final JobRequest jobRequest) throws GenieException;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And one inherited from Spring&#8217;s
-<a href="http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/Ordered.html">Ordered</a>
-interface:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
- * Get the order value of this object.
- * &lt;p&gt;Higher values are interpreted as lower priority. As a consequence,
- * the object with the lowest value has the highest priority (somewhat
- * analogous to Servlet {@code load-on-startup} values).
- * &lt;p&gt;Same order values will result in arbitrary sort positions for the
- * affected objects.
- * @return the order value
- * @see #HIGHEST_PRECEDENCE
- * @see #LOWEST_PRECEDENCE
- */
-int getOrder();</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4277,7 +4269,7 @@ decide which cluster to select. Currently <code>JavaScript</code> and <code>Groo
 <h5 id="_configuration_2"><a class="anchor" href="#_configuration_2"></a><a class="link" href="#_configuration_2">7.1.2.1. Configuration</a></h5>
 <div class="paragraph">
 <p>The script load balancer is disabled by default. To enable it an admin must set the property
-<code>genie.jobs.clusters.loadBalancers.script.enabled</code> to true.</p>
+<code>genie.jobs.clusters.load-balancers.script.enabled</code> to true.</p>
 </div>
 <div class="paragraph">
 <p>Other properties:</p>
@@ -4297,37 +4289,30 @@ decide which cluster to select. Currently <code>JavaScript</code> and <code>Groo
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.destination</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.destination</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
 <code>genie.jobs.clusters.loadBalancers.script.source</code>. The file will be given the same name.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether the script based load balancer should be enabled for the system or not.
 See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
 See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.order</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
-would be the first thing evaluated if nothing else is set to 0 as well. Must be &lt; 2147483647 (Integer.MAX_VALUE). If
-no value set will be given Integer.MAX_VALUE - 1 (default).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2147483646</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.refreshRate</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
 forces a timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
@@ -4446,7 +4431,7 @@ is recommended that once an algorithm is well tested it be converted to a true i
 <div class="paragraph">
 <p>Additionally if a script error is made the <code>ScriptLoadBalancer</code> will swallow the exceptions and simply return <code>null</code>
 from all calls to <code>selectCluster</code> until the script is fixed and <code>refresh</code> is invoked again. The metric
-<code>genie.jobs.clusters.loadBalancers.script.select.timer</code> with tag <code>status</code> and value <code>failed</code> can be used to monitor
+<code>genie.jobs.clusters.load-balancers.script.select.timer</code> with tag <code>status</code> and value <code>failed</code> can be used to monitor
 this situation.</p>
 </div>
 </div>
@@ -4907,13 +4892,6 @@ See also: <code>genie.jobs.clusters.load-balancers.script.destination</code></p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.order</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
-would be the first thing evaluated if nothing else is set to 0 as well. Must be &lt; 2147483647 (Integer.MAX_VALUE). If
-no value set will be given Integer.MAX_VALUE - 1 (default).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2147483646</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.refreshRate</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
@@ -4998,13 +4976,13 @@ to work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.activeLimit.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Enables the per-user active job limit. The number of jobs is controlled by the <code>genie.jobs.users.activeLimit.count</code> property.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.active-limit.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables the per-user active job limit. The number of jobs is controlled by the <code>genie.jobs.users.active-limit.count</code> property.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.activeLimit.count</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.activeLimit.enabled</code> is set to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.active-limit.count</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
 </tr>
 <tr>
@@ -6232,7 +6210,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-07-12 00:20:52 UTC
+Last updated 2018-07-13 00:49:24 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
