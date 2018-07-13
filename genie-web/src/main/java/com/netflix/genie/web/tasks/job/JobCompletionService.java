@@ -49,11 +49,9 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -71,7 +69,6 @@ import java.util.concurrent.TimeUnit;
  * @since 3.0.0
  */
 @Slf4j
-@Service
 public class JobCompletionService {
 
     static final String JOB_COMPLETION_TIMER_NAME = "genie.jobs.completion.timer";
@@ -105,7 +102,6 @@ public class JobCompletionService {
      * @param retryTemplate            Retry template for retrying remote calls
      * @throws GenieException if there is a problem
      */
-    @Autowired
     public JobCompletionService(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,

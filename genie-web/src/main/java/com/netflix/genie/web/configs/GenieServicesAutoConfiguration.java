@@ -43,6 +43,7 @@ import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
+import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
@@ -54,6 +55,7 @@ import com.netflix.genie.web.services.impl.JobSpecificationServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
+import com.netflix.genie.web.tasks.job.JobCompletionService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -63,6 +65,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.retry.support.RetryTemplate;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
@@ -341,6 +344,44 @@ public class GenieServicesAutoConfiguration {
         return new AgentRoutingServiceImpl(
             agentConnectionPersistenceService,
             genieHostInfo
+        );
+    }
+
+    /**
+     * Get an implementation of {@link JobCompletionService} if one hasn't already been defined.
+     *
+     * @param jobPersistenceService    The job persistence service to use
+     * @param jobSearchService         The job search service to use
+     * @param genieFileTransferService The file transfer service to use
+     * @param genieWorkingDir          Working directory for genie where it creates jobs directories.
+     * @param mailService              The mail service
+     * @param registry                 Registry
+     * @param jobsProperties           The jobs properties to use
+     * @param retryTemplate            The retry template
+     * @return an instance of {@link JobCompletionService}
+     * @throws GenieException if the bean fails during construction
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobCompletionService.class)
+    public JobCompletionService jobCompletionService(
+        final JobPersistenceService jobPersistenceService,
+        final JobSearchService jobSearchService,
+        final GenieFileTransferService genieFileTransferService,
+        final Resource genieWorkingDir,
+        final MailService mailService,
+        final MeterRegistry registry,
+        final JobsProperties jobsProperties,
+        final RetryTemplate retryTemplate
+    ) throws GenieException {
+        return new JobCompletionService(
+            jobPersistenceService,
+            jobSearchService,
+            genieFileTransferService,
+            genieWorkingDir,
+            mailService,
+            registry,
+            jobsProperties,
+            retryTemplate
         );
     }
 }
