@@ -40,11 +40,11 @@ public class CommandStatusUnitTests {
     @Test
     public void testValidCommandStatus() throws GeniePreconditionException {
         Assert.assertEquals(CommandStatus.ACTIVE,
-                CommandStatus.parse(CommandStatus.ACTIVE.name().toLowerCase()));
+            CommandStatus.parse(CommandStatus.ACTIVE.name().toLowerCase()));
         Assert.assertEquals(CommandStatus.DEPRECATED,
-                CommandStatus.parse(CommandStatus.DEPRECATED.name().toLowerCase()));
+            CommandStatus.parse(CommandStatus.DEPRECATED.name().toLowerCase()));
         Assert.assertEquals(CommandStatus.INACTIVE,
-                CommandStatus.parse(CommandStatus.INACTIVE.name().toLowerCase()));
+            CommandStatus.parse(CommandStatus.INACTIVE.name().toLowerCase()));
     }
 
     /**

@@ -62,7 +62,7 @@ public interface ApplicationService {
      * Method to update a application in Genie.
      *
      * @param applicationId The id of the application to update.
-     * @param application The application object.
+     * @param application   The application object.
      * @return A callable object.
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}")
@@ -71,12 +71,11 @@ public interface ApplicationService {
     /**
      * Method to get all applications from Genie.
      *
-     * @param name The name of the commands.
-     * @param user The user who created the command.
+     * @param name       The name of the commands.
+     * @param user       The user who created the command.
      * @param statusList The list of Command statuses.
-     * @param tagList The list of tags.
-     * @param type The type of the application.
-     *
+     * @param tagList    The list of tags.
+     * @param type       The type of the application.
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX)
@@ -86,7 +85,7 @@ public interface ApplicationService {
         @Query("status") final List<String> statusList,
         @Query("tag") final List<String> tagList,
         @Query("type") final String type
-        );
+    );
 
     /**
      * Method to fetch a single job from Genie.
@@ -117,9 +116,8 @@ public interface ApplicationService {
     /**
      * Patch a application using JSON Patch.
      *
-     * @param applicationId    The id of the application to patch
-     * @param patch The JSON Patch instructions
-     *
+     * @param applicationId The id of the application to patch
+     * @param patch         The JSON Patch instructions
      * @return A callable object.
      */
     @PATCH(APPLICATION_URL_SUFFIX + "/{id}")
@@ -149,7 +147,7 @@ public interface ApplicationService {
      * Method to add dependencies to a application in Genie.
      *
      * @param applicationId The id of the application..
-     * @param dependencies The dependencies to be added.
+     * @param dependencies  The dependencies to be added.
      * @return A callable object.
      */
     @POST(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
@@ -162,7 +160,7 @@ public interface ApplicationService {
      * Method to update dependencies for a application in Genie.
      *
      * @param applicationId The id of the application..
-     * @param dependencies The dependencies to be added.
+     * @param dependencies  The dependencies to be added.
      * @return A callable object.
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
@@ -195,7 +193,7 @@ public interface ApplicationService {
      * Method to add configs to a application in Genie.
      *
      * @param applicationId The id of the application..
-     * @param configs The configs to be added.
+     * @param configs       The configs to be added.
      * @return A callable object.
      */
     @POST(APPLICATION_URL_SUFFIX + "/{id}/configs")
@@ -205,7 +203,7 @@ public interface ApplicationService {
      * Method to update configs for a application in Genie.
      *
      * @param applicationId The id of the application..
-     * @param configs The configs to be added.
+     * @param configs       The configs to be added.
      * @return A callable object.
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}/configs")
@@ -235,7 +233,7 @@ public interface ApplicationService {
      * Method to add tags to a application in Genie.
      *
      * @param applicationId The id of the application..
-     * @param tags The tags to be added.
+     * @param tags          The tags to be added.
      * @return A callable object.
      */
     @POST(APPLICATION_URL_SUFFIX + "/{id}/tags")
@@ -245,7 +243,7 @@ public interface ApplicationService {
      * Method to update tags for a application in Genie.
      *
      * @param applicationId The id of the application..
-     * @param tags The tags to be added.
+     * @param tags          The tags to be added.
      * @return A callable object.
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}/tags")
@@ -255,7 +253,7 @@ public interface ApplicationService {
      * Method to delete a tag for a application in Genie.
      *
      * @param applicationId The id of the application.
-     * @param tag The tag to delete.
+     * @param tag           The tag to delete.
      * @return A callable object.
      */
     @DELETE(APPLICATION_URL_SUFFIX + "/{id}/tags/{tag}")

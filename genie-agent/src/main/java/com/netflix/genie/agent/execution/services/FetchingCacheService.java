@@ -21,7 +21,6 @@ package com.netflix.genie.agent.execution.services;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import org.apache.commons.lang3.tuple.Pair;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -38,10 +37,10 @@ public interface FetchingCacheService {
     /**
      * Download a given resource (if not already cached) and copy it to the specified destination.
      *
-     * @param sourceFileUri the resource URI
+     * @param sourceFileUri   the resource URI
      * @param destinationFile the location on disk where to copy the resource for use
      * @throws DownloadException if the resource is not found or fails to download
-     * @throws IOException if downloading or copying the file to destination fails
+     * @throws IOException       if downloading or copying the file to destination fails
      */
     void get(final URI sourceFileUri, final File destinationFile) throws DownloadException, IOException;
 
@@ -50,7 +49,7 @@ public interface FetchingCacheService {
      *
      * @param sourceDestinationPairs a set of resource URIs and their requested local target locations
      * @throws DownloadException if the resource is not found or fails to download
-     * @throws IOException if downloading or copying the file to destination fails
+     * @throws IOException       if downloading or copying the file to destination fails
      */
     void get(final Set<Pair<URI, File>> sourceDestinationPairs) throws DownloadException, IOException;
 }

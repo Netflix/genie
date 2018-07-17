@@ -34,6 +34,7 @@ public class GrpcConfigTest {
 
     /**
      * Check that channel is a singleton.
+     *
      * @throws Exception exception
      */
     @Test
@@ -45,6 +46,7 @@ public class GrpcConfigTest {
 
     /**
      * Check that clients are not singletons.
+     *
      * @throws Exception exception
      */
     @Test

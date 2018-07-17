@@ -38,7 +38,7 @@ public interface JobCoordinatorService {
     /**
      * Takes in a Job Request object and does necessary preparation for execution.
      *
-     * @param jobRequest         of job to kill
+     * @param jobRequest  of job to kill
      * @param jobMetadata Metadata about the http request which generated started this job process
      * @return the id of the job run
      * @throws GenieException if there is an error
@@ -53,7 +53,7 @@ public interface JobCoordinatorService {
     /**
      * Kill the job identified by the given id.
      *
-     * @param jobId id of the job to kill
+     * @param jobId  id of the job to kill
      * @param reason brief reason for requesting the job be killed
      * @throws GenieException if there is an error
      */

@@ -37,6 +37,7 @@ import java.util.Map;
 
 /**
  * Action performed when in state LAUNCH_JOB.
+ *
  * @author mprimi
  * @since 4.0.0
  */

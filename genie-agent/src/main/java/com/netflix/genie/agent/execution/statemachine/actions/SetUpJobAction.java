@@ -53,6 +53,7 @@ import java.util.regex.Pattern;
 
 /**
  * Action performed when in state SETUP_JOB.
+ *
  * @author mprimi
  * @since 4.0.0
  */

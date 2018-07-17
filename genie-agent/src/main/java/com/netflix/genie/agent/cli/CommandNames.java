@@ -57,16 +57,17 @@ final class CommandNames {
         final List<Field> superFields = Arrays.asList(CommandNames.class.getSuperclass().getDeclaredFields());
         COMMAND_NAMES_FIELDS = Collections.unmodifiableSet(
             Arrays.stream(fields)
-            .filter(f -> Modifier.isStatic(f.getModifiers()))
-            .filter(f -> Modifier.isFinal(f.getModifiers()))
-            .filter(f -> f.getType() == String.class)
-            .filter(f -> !superFields.contains(f))
-            .peek(f -> f.setAccessible(true))
-            .collect(Collectors.toSet())
+                .filter(f -> Modifier.isStatic(f.getModifiers()))
+                .filter(f -> Modifier.isFinal(f.getModifiers()))
+                .filter(f -> f.getType() == String.class)
+                .filter(f -> !superFields.contains(f))
+                .peek(f -> f.setAccessible(true))
+                .collect(Collectors.toSet())
         );
     }
 
-    private CommandNames() { }
+    private CommandNames() {
+    }
 
     @VisibleForTesting
     static Set<Field> getCommandNamesFields() {

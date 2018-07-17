@@ -35,6 +35,7 @@ import java.util.Set;
 public interface DownloadService {
     /**
      * Get a new manifest builder.
+     *
      * @return a new builder
      */
     Manifest.Builder newManifestBuilder();
@@ -52,7 +53,7 @@ public interface DownloadService {
     /**
      * Manifest containing source (URIs) and their expected destination on disk after download.
      * This abstraction is used by different services to set up the job working directory.
-     *
+     * <p>
      * Currently, source URIs must be unique. I.e. it is not possible to have a manifest with the same source
      * URI and two or more target destinations.
      */
@@ -60,30 +61,35 @@ public interface DownloadService {
 
         /**
          * Get the set of files representing expected target location for files to be downloaded.
+         *
          * @return an immutable set of files objects
          */
         Set<File> getTargetFiles();
 
         /**
          * Get the set of directories that contain all the target files.
+         *
          * @return an immutable set of file objects
          */
         Set<File> getTargetDirectories();
 
         /**
          * Get the set of URI s (source files) that were added to the manifest.
+         *
          * @return an immutable set of URIs
          */
         Set<URI> getSourceFileUris();
 
         /**
          * Get the manifest entries.
+         *
          * @return an immutable set of entries in this manifest
          */
         Set<Pair<URI, File>> getEntries();
 
         /**
          * Return the target location for a given source URI.
+         *
          * @param sourceFileUri source file URI
          * @return a File target, or null if the source is not in the manifest
          */
@@ -98,7 +104,8 @@ public interface DownloadService {
             /**
              * Add a source file specifying a target directory.
              * The filename for the target is computed by using the last component of the resource path.
-             * @param sourceFileUri source URISi
+             *
+             * @param sourceFileUri   source URISi
              * @param targetDirectory target directory
              * @return a builder for chaining
              */
@@ -109,8 +116,9 @@ public interface DownloadService {
 
             /**
              * Add a source file specifying a target file destination.
+             *
              * @param sourceFileUri source URI
-             * @param targetFile target file
+             * @param targetFile    target file
              * @return a builder for chaining
              */
             Builder addFileWithTargetFile(
@@ -120,6 +128,7 @@ public interface DownloadService {
 
             /**
              * Build the manifest.
+             *
              * @return the manifest
              * @throws IllegalArgumentException if two or more source URIs point to the same target file
              */

@@ -69,11 +69,9 @@ public class ClusterClient extends BaseGenieClient {
      * Create a cluster ing genie.
      *
      * @param cluster A cluster object.
-     *
      * @return The id of the cluster created.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public String createCluster(
         final Cluster cluster
@@ -88,9 +86,8 @@ public class ClusterClient extends BaseGenieClient {
      * Method to get a list of all the clusters.
      *
      * @return A list of clusters.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Cluster> getClusters() throws IOException, GenieClientException {
         return this.getClusters(
@@ -105,16 +102,14 @@ public class ClusterClient extends BaseGenieClient {
     /**
      * Method to get a list of all the clusters from Genie for the query parameters specified.
      *
-     * @param name The name of the cluster.
-     * @param statusList The list of statuses.
-     * @param tagList The list of tags.
+     * @param name          The name of the cluster.
+     * @param statusList    The list of statuses.
+     * @param tagList       The list of tags.
      * @param minUpdateTime Minimum Time after which cluster was updated.
      * @param maxUpdateTime Maximum Time before which cluster was updated.
-     *
      * @return A list of clusters.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Cluster> getClusters(
         final String name,
@@ -125,7 +120,7 @@ public class ClusterClient extends BaseGenieClient {
     ) throws IOException, GenieClientException {
 
         final List<Cluster> clusterList = new ArrayList<>();
-        final JsonNode jnode =  clusterService.getClusters(
+        final JsonNode jnode = clusterService.getClusters(
             name,
             statusList,
             tagList,
@@ -147,9 +142,8 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @param clusterId The id of the cluster to get.
      * @return The cluster details.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Cluster getCluster(
         final String clusterId
@@ -164,9 +158,8 @@ public class ClusterClient extends BaseGenieClient {
      * Method to delete a cluster from Genie.
      *
      * @param clusterId The id of the cluster.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void deleteCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
@@ -178,9 +171,8 @@ public class ClusterClient extends BaseGenieClient {
     /**
      * Method to delete all clusters from Genie.
      *
-
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void deleteAllClusters() throws IOException, GenieClientException {
         clusterService.deleteAllClusters().execute();
@@ -190,10 +182,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to patch a cluster using json patch instructions.
      *
      * @param clusterId The id of the cluster.
-     * @param patch The patch object specifying all the instructions.
-     *
+     * @param patch     The patch object specifying all the instructions.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void patchCluster(final String clusterId, final JsonPatch patch) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
@@ -211,10 +202,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to updated a cluster.
      *
      * @param clusterId The id of the cluster.
-     * @param cluster The updated cluster object to use.
-     *
+     * @param cluster   The updated cluster object to use.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateCluster(final String clusterId, final Cluster cluster) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
@@ -234,11 +224,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to get all the configs for a cluster.
      *
      * @param clusterId The id of the cluster.
-     *
      * @return The set of configs for the cluster.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Set<String> getConfigsForCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
@@ -252,10 +240,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to add configs to a cluster.
      *
      * @param clusterId The id of the cluster.
-     * @param configs The set of configs to add.
-     *
+     * @param configs   The set of configs to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void addConfigsToCluster(
         final String clusterId, final Set<String> configs
@@ -275,10 +262,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to update configs for a cluster.
      *
      * @param clusterId The id of the cluster.
-     * @param configs The set of configs to add.
-     *
+     * @param configs   The set of configs to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateConfigsForCluster(
         final String clusterId, final Set<String> configs
@@ -298,9 +284,8 @@ public class ClusterClient extends BaseGenieClient {
      * Remove all configs for this cluster.
      *
      * @param clusterId The id of the cluster.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeAllConfigsForCluster(
         final String clusterId
@@ -334,8 +319,8 @@ public class ClusterClient extends BaseGenieClient {
     /**
      * Method to add dependencies to a cluster.
      *
-     * @param clusterId The id of the cluster.
-     * @param dependencies  The set of dependencies to add.
+     * @param clusterId    The id of the cluster.
+     * @param dependencies The set of dependencies to add.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues
      */
@@ -356,8 +341,8 @@ public class ClusterClient extends BaseGenieClient {
     /**
      * Method to update dependencies for a cluster.
      *
-     * @param clusterId The id of the cluster.
-     * @param dependencies  The set of dependencies to add.
+     * @param clusterId    The id of the cluster.
+     * @param dependencies The set of dependencies to add.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues
      */
@@ -398,11 +383,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to get all the commands for a cluster.
      *
      * @param clusterId The id of the cluster.
-     *
      * @return The set of commands for the cluster.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Command> getCommandsForCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
@@ -415,11 +398,10 @@ public class ClusterClient extends BaseGenieClient {
     /**
      * Method to add commands to a cluster.
      *
-     * @param clusterId The id of the cluster.
+     * @param clusterId  The id of the cluster.
      * @param commandIds The list of commands to add.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void addCommandsToCluster(
         final String clusterId, final List<String> commandIds
@@ -438,11 +420,10 @@ public class ClusterClient extends BaseGenieClient {
     /**
      * Method to update commands for a cluster.
      *
-     * @param clusterId The id of the cluster.
+     * @param clusterId  The id of the cluster.
      * @param commandIds The set of commands to add.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateCommandsForCluster(
         final String clusterId, final List<String> commandIds
@@ -463,9 +444,8 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @param clusterId The id of the cluster.
      * @param commandId The id of the command to remove.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeCommandFromCluster(
         final String clusterId,
@@ -486,9 +466,8 @@ public class ClusterClient extends BaseGenieClient {
      * Remove all commands for this cluster.
      *
      * @param clusterId The id of the cluster.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeAllCommandsForCluster(
         final String clusterId
@@ -506,11 +485,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to get all the tags for a cluster.
      *
      * @param clusterId The id of the cluster.
-     *
      * @return The set of tags for the cluster.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Set<String> getTagsForCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
@@ -524,10 +501,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to add tags to a cluster.
      *
      * @param clusterId The id of the cluster.
-     * @param tags The set of tags to add.
-     *
+     * @param tags      The set of tags to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void addTagsToCluster(
         final String clusterId, final Set<String> tags
@@ -547,10 +523,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to update tags for a cluster.
      *
      * @param clusterId The id of the cluster.
-     * @param tags The set of tags to add.
-     *
+     * @param tags      The set of tags to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateTagsForCluster(
         final String clusterId, final Set<String> tags
@@ -570,10 +545,9 @@ public class ClusterClient extends BaseGenieClient {
      * Remove a tag from a cluster.
      *
      * @param clusterId The id of the cluster.
-     * @param tag The tag to remove.
-     *
+     * @param tag       The tag to remove.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeTagFromCluster(
         final String clusterId,
@@ -594,9 +568,8 @@ public class ClusterClient extends BaseGenieClient {
      * Remove all tags for this cluster.
      *
      * @param clusterId The id of the cluster.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeAllTagsForCluster(
         final String clusterId

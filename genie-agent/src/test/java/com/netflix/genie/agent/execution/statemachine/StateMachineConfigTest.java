@@ -19,9 +19,9 @@ package com.netflix.genie.agent.execution.statemachine;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
-import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.test.categories.UnitTest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -72,6 +72,7 @@ public class StateMachineConfigTest {
 
     /**
      * Set up.
+     *
      * @throws Exception the exception
      */
     @Before
@@ -122,6 +123,7 @@ public class StateMachineConfigTest {
 
     /**
      * Execution with no errors or cancellation.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -170,6 +172,7 @@ public class StateMachineConfigTest {
 
     /**
      * Cancel event before job execution is started.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -206,6 +209,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is entering CONFIGURE_AGENT state.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -249,6 +253,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is preparing to exit CONFIGURE_AGENT state.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -293,6 +298,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is executing CONFIGURE_AGENT state action.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -336,6 +342,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is entering SETUP_JOB state.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -382,6 +389,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is preparing to exit SETUP_JOB state.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -432,6 +440,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is executing SETUP_JOB state action.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -478,6 +487,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is entering LAUNCH_JOB state.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -528,6 +538,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is preparing to exit LAUNCH_JOB state.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -578,6 +589,7 @@ public class StateMachineConfigTest {
 
     /**
      * Handle cancel signal as state machine is executing LAUNCH_JOB state action.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -629,6 +641,7 @@ public class StateMachineConfigTest {
 
     /**
      * Test failure during INITIALIZATION state action.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -667,6 +680,7 @@ public class StateMachineConfigTest {
 
     /**
      * Test failure during RESOLVE_JOB_SPECIFICATION state action.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -710,6 +724,7 @@ public class StateMachineConfigTest {
 
     /**
      * Test failure during SHUTDOWN state action.
+     *
      * @throws Exception the exception
      */
     @Test
@@ -831,7 +846,7 @@ public class StateMachineConfigTest {
     }
 
 
-    private void assertActionsExecuted(final StateAction ... expectedStateActions) {
+    private void assertActionsExecuted(final StateAction... expectedStateActions) {
         Assert.assertEquals(
             Lists.newArrayList(expectedStateActions),
             executedActions
@@ -851,7 +866,7 @@ public class StateMachineConfigTest {
         }
     }
 
-    private void assertStatesVisited(final States ... expectedStatesVisited) {
+    private void assertStatesVisited(final States... expectedStatesVisited) {
         Assert.assertEquals(
             Lists.newArrayList(expectedStatesVisited),
             this.visitedStates

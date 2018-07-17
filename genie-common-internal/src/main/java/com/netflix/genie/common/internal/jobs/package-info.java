@@ -18,6 +18,7 @@
 
 /**
  * Common job classes shared by agent and server.
+ *
  * @author mprimi
  * @since 4.0.0
  */

@@ -22,6 +22,7 @@ package com.netflix.genie.web.services;
 public interface FileTransferFactory {
     /**
      * Factory method to return the FileTransfer implementation.
+     *
      * @param scheme URI scheme
      * @return FileTransfer
      */

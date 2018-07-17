@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
@@ -33,6 +32,7 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.proto.AgentMetadata;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
@@ -189,7 +189,8 @@ public class JobServiceProtoConverter {
 
     /**
      * Convert agent metadata and job id into a ClaimJobRequest for the server.
-     * @param jobId job id
+     *
+     * @param jobId               job id
      * @param agentClientMetadata agent metadata
      * @return a ClaimJobRequest
      */
@@ -207,10 +208,11 @@ public class JobServiceProtoConverter {
 
     /**
      * Convert parameters into ChangeJobStatusRequest for the server.
-     * @param jobId job id
+     *
+     * @param jobId            job id
      * @param currentJobStatus the expected current status on the server
-     * @param newJobStatus the new current status for this job
-     * @param message an optional message to record with the state change
+     * @param newJobStatus     the new current status for this job
+     * @param message          an optional message to record with the state change
      * @return a ChangeJobStatusRequest
      */
     public ChangeJobStatusRequest toProtoChangeJobStatusRequest(

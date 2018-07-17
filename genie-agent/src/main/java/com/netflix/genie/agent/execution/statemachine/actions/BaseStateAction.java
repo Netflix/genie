@@ -26,6 +26,7 @@ import org.springframework.statemachine.StateContext;
 
 /**
  * Base class for StateAction.
+ *
  * @author mprimi
  * @since 4.0.0
  */

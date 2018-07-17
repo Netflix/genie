@@ -70,11 +70,9 @@ public class CommandClient extends BaseGenieClient {
      * Create a command ing genie.
      *
      * @param command A command object.
-     *
      * @return id Id of the command created.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public String createCommand(
         final Command command
@@ -89,9 +87,8 @@ public class CommandClient extends BaseGenieClient {
      * Method to get a list of all the commands.
      *
      * @return A list of commands.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Command> getCommands() throws IOException, GenieClientException {
         return this.getCommands(null, null, null, null);
@@ -100,15 +97,13 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Method to get a list of all the commands from Genie for the query parameters specified.
      *
-     * @param name The name of the commands.
-     * @param user The user who created the command.
+     * @param name       The name of the commands.
+     * @param user       The user who created the command.
      * @param statusList The list of Command statuses.
-     * @param tagList The list of tags.
-     *
+     * @param tagList    The list of tags.
      * @return A list of commands.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Command> getCommands(
         final String name,
@@ -117,7 +112,7 @@ public class CommandClient extends BaseGenieClient {
         final List<String> tagList
     ) throws IOException, GenieClientException {
         final List<Command> commandList = new ArrayList<>();
-        final JsonNode jNode =  commandService.getCommands(
+        final JsonNode jNode = commandService.getCommands(
             name,
             user,
             statusList,
@@ -126,7 +121,7 @@ public class CommandClient extends BaseGenieClient {
             .get("_embedded");
         if (jNode != null) {
             for (final JsonNode objNode : jNode.get("commandList")) {
-                final Command command  = this.treeToValue(objNode, Command.class);
+                final Command command = this.treeToValue(objNode, Command.class);
                 commandList.add(command);
             }
         }
@@ -138,9 +133,8 @@ public class CommandClient extends BaseGenieClient {
      *
      * @param commandId The id of the command to get.
      * @return The command details.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Command getCommand(
         final String commandId
@@ -155,9 +149,8 @@ public class CommandClient extends BaseGenieClient {
      * Method to delete a command from Genie.
      *
      * @param commandId The id of the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void deleteCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
@@ -170,7 +163,7 @@ public class CommandClient extends BaseGenieClient {
      * Method to delete all commands from Genie.
      *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void deleteAllCommands() throws IOException, GenieClientException {
         commandService.deleteAllCommands().execute();
@@ -180,10 +173,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to patch a command using json patch instructions.
      *
      * @param commandId The id of the command.
-     * @param patch The patch object specifying all the instructions.
-     *
+     * @param patch     The patch object specifying all the instructions.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void patchCommand(final String commandId, final JsonPatch patch) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
@@ -201,10 +193,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to updated a command.
      *
      * @param commandId The id of the command.
-     * @param command The updated command object to use.
-     *
+     * @param command   The updated command object to use.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateCommand(final String commandId, final Command command) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
@@ -224,11 +215,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to get all the configs for a command.
      *
      * @param commandId The id of the command.
-     *
      * @return The set of configs for the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Set<String> getConfigsForCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
@@ -242,10 +231,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to add configs to a command.
      *
      * @param commandId The id of the command.
-     * @param configs The set of configs to add.
-     *
+     * @param configs   The set of configs to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void addConfigsToCommand(
         final String commandId, final Set<String> configs
@@ -265,10 +253,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to update configs for a command.
      *
      * @param commandId The id of the command.
-     * @param configs The set of configs to add.
-     *
+     * @param configs   The set of configs to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateConfigsForCommand(
         final String commandId, final Set<String> configs
@@ -288,9 +275,8 @@ public class CommandClient extends BaseGenieClient {
      * Remove all configs for this command.
      *
      * @param commandId The id of the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeAllConfigsForCommand(
         final String commandId
@@ -324,8 +310,8 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Method to add dependencies to a command.
      *
-     * @param commandId The id of the command.
-     * @param dependencies  The set of dependencies to add.
+     * @param commandId    The id of the command.
+     * @param dependencies The set of dependencies to add.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues
      */
@@ -346,8 +332,8 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Method to update dependencies for a command.
      *
-     * @param commandId The id of the command.
-     * @param dependencies  The set of dependencies to add.
+     * @param commandId    The id of the command.
+     * @param dependencies The set of dependencies to add.
      * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues
      */
@@ -388,11 +374,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to get all the applications for a command.
      *
      * @param commandId The id of the command.
-     *
      * @return The set of applications for the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Application> getApplicationsForCommand(final String commandId)
         throws IOException, GenieClientException {
@@ -407,11 +391,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to get all the clusters for a command.
      *
      * @param commandId The id of the command.
-     *
      * @return The set of clusters for the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Cluster> getClustersForCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
@@ -424,11 +406,10 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Method to add applications to a command.
      *
-     * @param commandId The id of the command.
+     * @param commandId      The id of the command.
      * @param applicationIds The set of applications ids to add.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void addApplicationsToCommand(
         final String commandId, final List<String> applicationIds
@@ -447,11 +428,10 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Method to update applications for a command.
      *
-     * @param commandId The id of the command.
+     * @param commandId      The id of the command.
      * @param applicationIds The set of application ids to add.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateApplicationsForCommand(
         final String commandId, final List<String> applicationIds
@@ -470,11 +450,10 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Remove an application from a command.
      *
-     * @param commandId The id of the command.
+     * @param commandId     The id of the command.
      * @param applicationId The id of the application to remove.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeApplicationFromCommand(
         final String commandId,
@@ -495,9 +474,8 @@ public class CommandClient extends BaseGenieClient {
      * Remove all applications for this command.
      *
      * @param commandId The id of the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeAllApplicationsForCommand(
         final String commandId
@@ -515,11 +493,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to get all the tags for a command.
      *
      * @param commandId The id of the command.
-     *
      * @return The set of configs for the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Set<String> getTagsForCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
@@ -533,10 +509,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to add tags to a command.
      *
      * @param commandId The id of the command.
-     * @param tags The set of tags to add.
-     *
+     * @param tags      The set of tags to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void addTagsToCommand(
         final String commandId, final Set<String> tags
@@ -556,10 +531,9 @@ public class CommandClient extends BaseGenieClient {
      * Method to update tags for a command.
      *
      * @param commandId The id of the command.
-     * @param tags The set of tags to add.
-     *
+     * @param tags      The set of tags to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void updateTagsForCommand(
         final String commandId, final Set<String> tags
@@ -579,10 +553,9 @@ public class CommandClient extends BaseGenieClient {
      * Remove a tag from a command.
      *
      * @param commandId The id of the command.
-     * @param tag The tag to remove.
-     *
+     * @param tag       The tag to remove.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeTagFromCommand(
         final String commandId,
@@ -603,9 +576,8 @@ public class CommandClient extends BaseGenieClient {
      * Remove all tags for this command.
      *
      * @param commandId The id of the command.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void removeAllTagsForCommand(
         final String commandId

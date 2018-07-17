@@ -45,6 +45,7 @@ class ArgumentParser {
 
     /**
      * Parse command-line arguments.
+     *
      * @param args command-line arguments
      */
     void parse(final String[] args) {
@@ -53,6 +54,7 @@ class ArgumentParser {
 
     /**
      * Get a formatted string with all known options and sub-commands.
+     *
      * @return the usage message string
      */
     String getUsageMessage() {
@@ -69,6 +71,7 @@ class ArgumentParser {
 
     /**
      * Get the name of the command selected via arguments.
+     *
      * @return the name of a command selected or null
      */
     String getSelectedCommand() {

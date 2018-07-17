@@ -29,6 +29,7 @@ public class GenieConversionException extends Exception {
 
     /**
      * Constructor with message.
+     *
      * @param message message
      */
     public GenieConversionException(final String message) {
@@ -37,8 +38,9 @@ public class GenieConversionException extends Exception {
 
     /**
      * Constructor with message and cause.
+     *
      * @param message message
-     * @param cause cause
+     * @param cause   cause
      */
     public GenieConversionException(final String message, final Throwable cause) {
         super(message, cause);

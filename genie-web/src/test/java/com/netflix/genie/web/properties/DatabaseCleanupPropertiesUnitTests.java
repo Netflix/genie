@@ -127,6 +127,7 @@ public class DatabaseCleanupPropertiesUnitTests {
         this.properties.setSkipClustersCleanup(true);
         Assert.assertTrue(this.properties.isSkipClustersCleanup());
     }
+
     /**
      * Make sure can enable Tags entities cleanup.
      */
@@ -135,6 +136,7 @@ public class DatabaseCleanupPropertiesUnitTests {
         this.properties.setSkipTagsCleanup(true);
         Assert.assertTrue(this.properties.isSkipTagsCleanup());
     }
+
     /**
      * Make sure can enable Files entities cleanup.
      */

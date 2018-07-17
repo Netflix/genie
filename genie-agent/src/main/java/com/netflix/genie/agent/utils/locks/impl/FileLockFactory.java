@@ -22,6 +22,7 @@ import com.netflix.genie.agent.utils.locks.CloseableLock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
 import java.io.File;
 
 /**
@@ -38,6 +39,7 @@ public class FileLockFactory {
 
     /**
      * Get a lock locking the provided File object.
+     *
      * @param file file to be locked
      * @return a lock locking the file
      * @throws LockException in case of a problem getting a lock for the file

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state HANDLE_ERROR.
+ *
  * @author mprimi
  * @since 4.0.0
  */

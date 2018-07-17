@@ -28,6 +28,7 @@ public class ChangeJobStatusException extends Exception {
 
     /**
      * Constructor with message.
+     *
      * @param message message
      */
     public ChangeJobStatusException(final String message) {
@@ -36,8 +37,9 @@ public class ChangeJobStatusException extends Exception {
 
     /**
      * Constructor with message and cause.
+     *
      * @param message message
-     * @param cause cause
+     * @param cause   cause
      */
     public ChangeJobStatusException(final String message, final Throwable cause) {
         super(message, cause);

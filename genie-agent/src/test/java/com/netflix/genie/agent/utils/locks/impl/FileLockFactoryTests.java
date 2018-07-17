@@ -55,7 +55,7 @@ public class FileLockFactoryTests {
     /**
      * Make sure getLock returns a lock of the right type.
      *
-     * @throws IOException when the file is bad
+     * @throws IOException   when the file is bad
      * @throws LockException when there is a problem getting lock on the file
      */
     @Test

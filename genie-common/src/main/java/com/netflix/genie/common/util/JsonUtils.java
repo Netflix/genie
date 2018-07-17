@@ -64,8 +64,8 @@ public final class JsonUtils {
      * @throws GenieException For any exception during unmarshalling
      */
     public static <T extends Collection> T unmarshall(
-            final String source,
-            final TypeReference<T> typeReference
+        final String source,
+        final TypeReference<T> typeReference
     ) throws GenieException {
         try {
             if (StringUtils.isNotBlank(source)) {

@@ -110,8 +110,8 @@ public class PingFederateJWTTokenServices implements ResourceServerTokenServices
         @NotNull final JwtClaims claims
     ) throws MalformedClaimException, InvalidTokenException {
         final String clientId = claims.getClaimValue("client_id", String.class);
-        @SuppressWarnings("unchecked")
-        final Set<String> scopes = Sets.newHashSet(claims.getClaimValue("scope", Collection.class));
+        @SuppressWarnings("unchecked") final Set<String> scopes =
+            Sets.newHashSet(claims.getClaimValue("scope", Collection.class));
 
         final Set<SimpleGrantedAuthority> authorities = scopes
             .stream()

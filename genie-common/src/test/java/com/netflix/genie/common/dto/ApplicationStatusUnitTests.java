@@ -40,11 +40,11 @@ public class ApplicationStatusUnitTests {
     @Test
     public void testValidApplicationStatus() throws GeniePreconditionException {
         Assert.assertEquals(ApplicationStatus.ACTIVE,
-                ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()));
+            ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()));
         Assert.assertEquals(ApplicationStatus.DEPRECATED,
-                ApplicationStatus.parse(ApplicationStatus.DEPRECATED.name().toLowerCase()));
+            ApplicationStatus.parse(ApplicationStatus.DEPRECATED.name().toLowerCase()));
         Assert.assertEquals(ApplicationStatus.INACTIVE,
-                ApplicationStatus.parse(ApplicationStatus.INACTIVE.name().toLowerCase()));
+            ApplicationStatus.parse(ApplicationStatus.INACTIVE.name().toLowerCase()));
     }
 
     /**

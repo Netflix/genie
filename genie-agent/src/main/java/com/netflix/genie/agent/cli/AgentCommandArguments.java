@@ -28,6 +28,7 @@ interface AgentCommandArguments {
 
     /**
      * The command class that consumes this type of arguments.
+     *
      * @return a concrete AgentCommand class
      */
     Class<? extends AgentCommand> getConsumerClass();

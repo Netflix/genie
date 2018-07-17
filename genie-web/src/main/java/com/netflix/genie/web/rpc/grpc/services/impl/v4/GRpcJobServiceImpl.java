@@ -65,9 +65,9 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
     /**
      * Constructor.
      *
-     * @param agentJobService The implementation of the {@link AgentJobService} to use
+     * @param agentJobService          The implementation of the {@link AgentJobService} to use
      * @param jobServiceProtoConverter DTO/Proto converter
-     * @param protoErrorComposer proto error message composer
+     * @param protoErrorComposer       proto error message composer
      */
     public GRpcJobServiceImpl(
         final AgentJobService agentJobService,
@@ -94,12 +94,12 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
             final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDTO(request);
             final AgentClientMetadata agentClientMetadata
                 = jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
-            final String jobId =  this.agentJobService.reserveJobId(jobRequest, agentClientMetadata);
+            final String jobId = this.agentJobService.reserveJobId(jobRequest, agentClientMetadata);
             responseObserver.onNext(
                 ReserveJobIdResponse.newBuilder()
                     .setId(jobId)
                     .build()
-                );
+            );
         } catch (final Exception e) {
             responseObserver.onNext(protoErrorComposer.toProtoReserveJobIdResponse(e));
         }

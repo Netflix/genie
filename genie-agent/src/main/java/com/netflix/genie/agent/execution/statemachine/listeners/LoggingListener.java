@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 
 /**
  * Listener that logs state machine events and transitions.
+ *
  * @author mprimi
  * @since 4.0.0
  */

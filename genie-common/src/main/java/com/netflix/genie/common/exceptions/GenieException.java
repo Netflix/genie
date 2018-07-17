@@ -35,8 +35,8 @@ public class GenieException extends Exception {
      * Constructor.
      *
      * @param errorCode the HTTP status code for this exception
-     * @param msg human readable message
-     * @param cause reason for this exception
+     * @param msg       human readable message
+     * @param cause     reason for this exception
      */
     public GenieException(final int errorCode, final String msg, final Throwable cause) {
         super(msg, cause);
@@ -47,7 +47,7 @@ public class GenieException extends Exception {
      * Constructor.
      *
      * @param errorCode the HTTP status code for this exception
-     * @param msg human readable message
+     * @param msg       human readable message
      */
     public GenieException(final int errorCode, final String msg) {
         super(msg);

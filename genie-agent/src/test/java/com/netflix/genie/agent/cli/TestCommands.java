@@ -65,7 +65,7 @@ final class TestCommands {
         }
     }
 
-    @Parameters(commandNames = { ExampleCommand2.NAME, ExampleCommand2.SHORT_NAME})
+    @Parameters(commandNames = {ExampleCommand2.NAME, ExampleCommand2.SHORT_NAME})
     static class ExampleCommandArgs2 implements AgentCommandArguments {
 
         @Override

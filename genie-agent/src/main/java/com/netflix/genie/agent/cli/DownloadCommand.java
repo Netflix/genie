@@ -66,7 +66,7 @@ class DownloadCommand implements AgentCommand {
         if (!destinationDirectory.exists() || !destinationDirectory.isDirectory()) {
             throw new ParameterException(
                 "Not a valid destination directory: "
-                + destinationDirectory.getAbsolutePath()
+                    + destinationDirectory.getAbsolutePath()
             );
         }
 

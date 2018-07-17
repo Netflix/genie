@@ -17,7 +17,7 @@
  */
 
 /**
- *  Package for Genie core jobs workflow tests.
+ * Package for Genie core jobs workflow tests.
  *
  * @author amsharma
  * @since 3.0.0

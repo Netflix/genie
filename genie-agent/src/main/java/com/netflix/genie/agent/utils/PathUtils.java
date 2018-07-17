@@ -36,8 +36,9 @@ public final class PathUtils {
 
     /**
      * Append an arbitrary set of components to a base path.
+     *
      * @param baseDirectory the base directory
-     * @param children path components
+     * @param children      path components
      * @return a Path
      */
     public static Path composePath(
@@ -53,8 +54,9 @@ public final class PathUtils {
 
     /**
      * Append an arbitrary set of components to a base path.
+     *
      * @param baseDirectory the base directory
-     * @param children path components
+     * @param children      path components
      * @return a Path
      */
     public static Path composePath(
@@ -67,6 +69,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the applications directory inside a job directory.
+     *
      * @param jobDirectory the job directory
      * @return a Path
      */
@@ -82,8 +85,9 @@ public final class PathUtils {
 
     /**
      * Compose the path to an application directory inside a job directory.
+     *
      * @param jobDirectory the job directory
-     * @param appId the application id
+     * @param appId        the application id
      * @return a Path
      */
     public static Path jobApplicationDirectoryPath(
@@ -98,8 +102,9 @@ public final class PathUtils {
 
     /**
      * Compose the path to the cluster directory inside a job directory.
+     *
      * @param jobDirectory the job directory
-     * @param clusterId the cluster id
+     * @param clusterId    the cluster id
      * @return a Path
      */
     public static Path jobClusterDirectoryPath(final File jobDirectory, final String clusterId) {
@@ -113,8 +118,9 @@ public final class PathUtils {
 
     /**
      * Compose the path to the command directory inside a job directory.
+     *
      * @param jobDirectory the job directory
-     * @param commandId the command id
+     * @param commandId    the command id
      * @return a Path
      */
     public static Path jobCommandDirectoryPath(final File jobDirectory, final String commandId) {
@@ -128,6 +134,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the genie directory inside a job directory.
+     *
      * @param jobDirectory the job directory
      * @return a Path
      */
@@ -140,6 +147,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the genie logs directory inside a job directory.
+     *
      * @param jobDirectory the job directory
      * @return a Path
      */
@@ -153,6 +161,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the dependencies directory for a given entity.
+     *
      * @param entityDirectory the entity base directory
      * @return a Path
      */
@@ -165,6 +174,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the configurations directory for a given entity.
+     *
      * @param entityDirectory the entity base directory
      * @return a Path
      */
@@ -177,6 +187,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the standard output log file for a job.
+     *
      * @param jobDirectory the job directory
      * @return a Path
      */
@@ -189,6 +200,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the standard error log file for a job.
+     *
      * @param jobDirectory the job directory
      * @return a Path
      */

@@ -47,12 +47,12 @@ public enum ProcessStatus {
      * Job failed while copying user dependencies from S3.
      */
     HADOOP_LOCAL_CONF_COPY_FAILURE(203,
-            "Failed copying Hadoop files from local conf dir to current job conf dir."),
+        "Failed copying Hadoop files from local conf dir to current job conf dir."),
     /**
      * Job failed to copy Hadoop conf files from S3.
      */
     UPDATE_CORE_SITE_XML_FAILURE(204,
-            "Failed updating core-site.xml to add certain parameters."),
+        "Failed updating core-site.xml to add certain parameters."),
     /**
      * Job failed to copy Hive conf files from S3.
      */
@@ -138,6 +138,6 @@ public enum ProcessStatus {
         }
         // If we got to here no status exists for the error code. Throw exception.
         throw new GeniePreconditionException(
-                "No ProcessStatus found for code " + exitCode);
+            "No ProcessStatus found for code " + exitCode);
     }
 }

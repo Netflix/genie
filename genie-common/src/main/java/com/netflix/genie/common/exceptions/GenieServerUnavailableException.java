@@ -29,7 +29,7 @@ public class GenieServerUnavailableException extends GenieException {
     /**
      * Constructor.
      *
-     * @param msg human readable message
+     * @param msg   human readable message
      * @param cause reason for this exception
      */
     public GenieServerUnavailableException(final String msg, final Throwable cause) {

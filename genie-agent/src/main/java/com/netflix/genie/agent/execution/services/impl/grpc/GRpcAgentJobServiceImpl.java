@@ -24,11 +24,11 @@ import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.proto.ChangeJobStatusError;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
@@ -71,7 +71,8 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
     /**
      * Constructor.
      *
-     * @param client The gRPC client to use to call the server. Asynchronous version to allow timeouts.
+     * @param client                   The gRPC client to use to call the server.
+     *                                 Asynchronous version to allow timeouts.
      * @param jobServiceProtoConverter The proto/DTO converter utility
      */
     GRpcAgentJobServiceImpl(

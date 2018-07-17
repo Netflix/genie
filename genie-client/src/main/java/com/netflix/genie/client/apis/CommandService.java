@@ -63,7 +63,7 @@ public interface CommandService {
      * Method to update a command in Genie.
      *
      * @param commandId The id of the command to update.
-     * @param command The command object.
+     * @param command   The command object.
      * @return A callable object.
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}")
@@ -72,11 +72,10 @@ public interface CommandService {
     /**
      * Method to get all commands from Genie filtered based on query params.
      *
-     * @param name The name of the commands.
-     * @param user The user who created the command.
+     * @param name       The name of the commands.
+     * @param user       The user who created the command.
      * @param statusList The list of Command statuses.
-     * @param tagList The list of tags.
-     *
+     * @param tagList    The list of tags.
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX)
@@ -116,9 +115,8 @@ public interface CommandService {
     /**
      * Patch a command using JSON Patch.
      *
-     * @param commandId    The id of the command to patch
-     * @param patch The JSON Patch instructions
-     *
+     * @param commandId The id of the command to patch
+     * @param patch     The JSON Patch instructions
      * @return A callable object.
      */
     @PATCH(COMMAND_URL_SUFFIX + "/{id}")
@@ -131,7 +129,6 @@ public interface CommandService {
      *
      * @param commandId The id of the command.
      * @return A callable object.
-     *
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}/applications")
     Call<List<Application>> getApplicationsForCommand(@Path("id") final String commandId);
@@ -141,7 +138,6 @@ public interface CommandService {
      *
      * @param commandId The id of the command.
      * @return A callable object.
-     *
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}/clusters")
     Call<List<Cluster>> getClustersForCommand(@Path("id") final String commandId);
@@ -149,7 +145,7 @@ public interface CommandService {
     /**
      * Method to add applications to a command in Genie.
      *
-     * @param commandId The id of the command..
+     * @param commandId      The id of the command..
      * @param applicationIds The application Ids to be added.
      * @return A callable object.
      */
@@ -159,7 +155,7 @@ public interface CommandService {
     /**
      * Method to override and set applications for a command in Genie.
      *
-     * @param commandId The id of the command..
+     * @param commandId      The id of the command..
      * @param applicationIds The application Ids to be added.
      * @return A callable object.
      */
@@ -169,7 +165,7 @@ public interface CommandService {
     /**
      * Method to delete a application for a command in Genie.
      *
-     * @param commandId The id of the command.
+     * @param commandId     The id of the command.
      * @param applicationId The application to delete.
      * @return A callable object.
      */
@@ -203,7 +199,7 @@ public interface CommandService {
      * Method to add configs to a command in Genie.
      *
      * @param commandId The id of the command..
-     * @param configs The configs to be added.
+     * @param configs   The configs to be added.
      * @return A callable object.
      */
     @POST(COMMAND_URL_SUFFIX + "/{id}/configs")
@@ -213,7 +209,7 @@ public interface CommandService {
      * Method to update configs for a command in Genie.
      *
      * @param commandId The id of the command..
-     * @param configs The configs to be added.
+     * @param configs   The configs to be added.
      * @return A callable object.
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}/configs")
@@ -242,7 +238,7 @@ public interface CommandService {
     /**
      * Method to add dependencies to a command in Genie.
      *
-     * @param commandId The id of the command..
+     * @param commandId    The id of the command..
      * @param dependencies The dependencies to be added.
      * @return A callable object.
      */
@@ -255,7 +251,7 @@ public interface CommandService {
     /**
      * Method to update dependencies for a command in Genie.
      *
-     * @param commandId The id of the command..
+     * @param commandId    The id of the command..
      * @param dependencies The dependencies to be added.
      * @return A callable object.
      */
@@ -289,7 +285,7 @@ public interface CommandService {
      * Method to add tags to a command in Genie.
      *
      * @param commandId The id of the command..
-     * @param tags The tags to be added.
+     * @param tags      The tags to be added.
      * @return A callable object.
      */
     @POST(COMMAND_URL_SUFFIX + "/{id}/tags")
@@ -299,7 +295,7 @@ public interface CommandService {
      * Method to update tags for a command in Genie.
      *
      * @param commandId The id of the command..
-     * @param tags The tags to be added.
+     * @param tags      The tags to be added.
      * @return A callable object.
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}/tags")
@@ -309,7 +305,7 @@ public interface CommandService {
      * Method to delete a tag for a command in Genie.
      *
      * @param commandId The id of the command.
-     * @param tag The tag to delete.
+     * @param tag       The tag to delete.
      * @return A callable object.
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/tags/{tag}")

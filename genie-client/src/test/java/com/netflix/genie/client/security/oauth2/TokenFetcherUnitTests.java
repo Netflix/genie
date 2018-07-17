@@ -115,7 +115,7 @@ public class TokenFetcherUnitTests {
      */
     @Test
     public void testGetTokenFailure() throws GenieClientException {
-        final TokenFetcher tokenFetcher  = new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+        final TokenFetcher tokenFetcher = new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
         try {
             tokenFetcher.getToken();
         } catch (GenieClientException ge) {

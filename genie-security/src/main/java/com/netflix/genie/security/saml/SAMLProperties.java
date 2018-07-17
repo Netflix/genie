@@ -31,7 +31,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Class to bind properties to for SAML configurations.
- *
+ * <p>
  * See: http://docs.spring.io/spring-security-saml/docs/1.0.x/reference/html/
  *
  * @author tgianos

@@ -30,18 +30,21 @@ public interface AgentMetadata {
 
     /**
      * Get the agent version string, as it appears in the agent jar metadata.
+     *
      * @return a version string or a fallback
      */
     @NotBlank String getAgentVersion();
 
     /**
      * Get the name of the host the agent is running on.
+     *
      * @return a hostname or a fallback string
      */
     @NotBlank String getAgentHostName();
 
     /**
      * Get the agent process ID.
+     *
      * @return the agent process ID or a fallback string
      */
     @NotBlank String getAgentPid();
