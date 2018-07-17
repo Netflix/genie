@@ -42,6 +42,7 @@ public class FileLock implements CloseableLock {
 
     /**
      * Create a lock for the provided file.
+     *
      * @param file file to be locked
      * @throws LockException in case there is a problem creating a File CloseableLock
      */

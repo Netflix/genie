@@ -20,11 +20,12 @@ package com.netflix.genie.web.jobs;
 /**
  * @author amsharma
  */
+
 /**
  * The types of files that the entities hold.
  *
- *  @author amsharma
- *  @since 3.0.0
+ * @author amsharma
+ * @since 3.0.0
  */
 public enum FileType {
 

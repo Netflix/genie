@@ -40,11 +40,11 @@ public class ClusterStatusUnitTests {
     @Test
     public void testValidClusterStatus() throws GeniePreconditionException {
         Assert.assertEquals(ClusterStatus.UP,
-                ClusterStatus.parse(ClusterStatus.UP.name().toLowerCase()));
+            ClusterStatus.parse(ClusterStatus.UP.name().toLowerCase()));
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE,
-                ClusterStatus.parse(ClusterStatus.OUT_OF_SERVICE.name().toLowerCase()));
+            ClusterStatus.parse(ClusterStatus.OUT_OF_SERVICE.name().toLowerCase()));
         Assert.assertEquals(ClusterStatus.TERMINATED,
-                ClusterStatus.parse(ClusterStatus.TERMINATED.name().toLowerCase()));
+            ClusterStatus.parse(ClusterStatus.TERMINATED.name().toLowerCase()));
     }
 
     /**

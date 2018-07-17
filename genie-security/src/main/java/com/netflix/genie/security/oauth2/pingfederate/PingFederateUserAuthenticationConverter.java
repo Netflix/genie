@@ -71,8 +71,7 @@ public class PingFederateUserAuthenticationConverter extends DefaultUserAuthenti
             throw new InvalidTokenException("Scopes were not a collection");
         }
 
-        @SuppressWarnings("unchecked")
-        final Collection<String> scopes = (Collection<String>) scopeObject;
+        @SuppressWarnings("unchecked") final Collection<String> scopes = (Collection<String>) scopeObject;
         if (scopes.isEmpty()) {
             throw new InvalidTokenException("No scopes available. Unable to authenticate");
         }

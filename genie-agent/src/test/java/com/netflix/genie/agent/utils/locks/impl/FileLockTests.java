@@ -38,7 +38,7 @@ public class FileLockTests {
     /**
      * Make sure close method for a FileLock gets called .
      *
-     * @throws IOException when the file is bad
+     * @throws IOException   when the file is bad
      * @throws LockException when there is a problem getting lock on the file
      */
     @Test
@@ -56,7 +56,7 @@ public class FileLockTests {
     /**
      * Make sure close method for a FileLock gets called on exception.
      *
-     * @throws IOException when the file is bad
+     * @throws IOException   when the file is bad
      * @throws LockException when there is a problem getting lock on the file
      */
     @Test
@@ -65,7 +65,8 @@ public class FileLockTests {
         try (final CloseableLock lock = mockLock) {
             lock.lock();
             throw new LockException("dummy exception");
-        } catch (LockException e) { }
+        } catch (LockException e) {
+        }
 
         Mockito.verify(
             mockLock, Mockito.times(1)

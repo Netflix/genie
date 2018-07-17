@@ -18,10 +18,10 @@
 package com.netflix.genie.web.jobs;
 
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.exceptions.GenieException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -97,16 +97,11 @@ public final class JobExecutionEnvironment {
          * @param dir        The directory location for this job.
          */
         public Builder(
-            @NotNull(message = "Job Request cannot be null")
-            final JobRequest request,
-            @NotNull(message = "Cluster cannot be null")
-            final Cluster clusterObj,
-            @NotNull(message = "Command cannot be null")
-            final Command commandObj,
-            @Min(value = 1, message = "Amount of memory can't be less than 1 MB")
-            final int memory,
-            @NotBlank(message = "Job working directory cannot be empty")
-            final File dir
+            @NotNull(message = "Job Request cannot be null") final JobRequest request,
+            @NotNull(message = "Cluster cannot be null") final Cluster clusterObj,
+            @NotNull(message = "Command cannot be null") final Command commandObj,
+            @Min(value = 1, message = "Amount of memory can't be less than 1 MB") final int memory,
+            @NotBlank(message = "Job working directory cannot be empty") final File dir
         ) {
             this.bJobRequest = request;
             this.bCluster = clusterObj;

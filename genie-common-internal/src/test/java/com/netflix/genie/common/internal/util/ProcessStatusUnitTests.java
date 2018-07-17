@@ -60,35 +60,35 @@ public class ProcessStatusUnitTests {
     @Test
     public void testMessages() {
         Assert.assertEquals("Job execution interrupted.",
-                ProcessStatus.JOB_INTERRUPTED.getMessage());
+            ProcessStatus.JOB_INTERRUPTED.getMessage());
         Assert.assertEquals("Success.",
-                ProcessStatus.SUCCESS.getMessage());
+            ProcessStatus.SUCCESS.getMessage());
         Assert.assertEquals("Failed to create job jar dir.",
-                ProcessStatus.MKDIR_JAR_FAILURE.getMessage());
+            ProcessStatus.MKDIR_JAR_FAILURE.getMessage());
         Assert.assertEquals("Failed to create job conf dir.",
-                ProcessStatus.MKDIR_CONF_FAILURE.getMessage());
+            ProcessStatus.MKDIR_CONF_FAILURE.getMessage());
         Assert.assertEquals("Failed copying Hadoop files from local conf dir to current job conf dir.",
-                ProcessStatus.HADOOP_LOCAL_CONF_COPY_FAILURE.getMessage());
+            ProcessStatus.HADOOP_LOCAL_CONF_COPY_FAILURE.getMessage());
         Assert.assertEquals("Failed updating core-site.xml to add certain parameters.",
-                ProcessStatus.UPDATE_CORE_SITE_XML_FAILURE.getMessage());
+            ProcessStatus.UPDATE_CORE_SITE_XML_FAILURE.getMessage());
         Assert.assertEquals("Failed while sourcing resource envProperty files.",
-                ProcessStatus.ENV_VARIABLES_SOURCE_AND_SETUP_FAILURE.getMessage());
+            ProcessStatus.ENV_VARIABLES_SOURCE_AND_SETUP_FAILURE.getMessage());
         Assert.assertEquals("Failed copying cluster conf files from S3",
-                ProcessStatus.CLUSTER_CONF_FILES_COPY_FAILURE.getMessage());
+            ProcessStatus.CLUSTER_CONF_FILES_COPY_FAILURE.getMessage());
         Assert.assertEquals("Failed copying command conf files from S3",
-                ProcessStatus.COMMAND_CONF_FILES_COPY_FAILURE.getMessage());
+            ProcessStatus.COMMAND_CONF_FILES_COPY_FAILURE.getMessage());
         Assert.assertEquals("Failed copying application conf files from S3",
-                ProcessStatus.APPLICATION_CONF_FILES_COPY_FAILURE.getMessage());
+            ProcessStatus.APPLICATION_CONF_FILES_COPY_FAILURE.getMessage());
         Assert.assertEquals("Failed copying application jar files from S3",
-                ProcessStatus.APPLICATION_JAR_FILES_COPY_FAILURE.getMessage());
+            ProcessStatus.APPLICATION_JAR_FILES_COPY_FAILURE.getMessage());
         Assert.assertEquals("Job failed copying dependent files.",
-                ProcessStatus.JOB_DEPENDENCIES_COPY_FAILURE.getMessage());
+            ProcessStatus.JOB_DEPENDENCIES_COPY_FAILURE.getMessage());
         Assert.assertEquals("Job killed after it exceeded system limits",
-                ProcessStatus.JOB_KILLED.getMessage());
+            ProcessStatus.JOB_KILLED.getMessage());
         Assert.assertEquals("Job has been marked as a zombie",
-                ProcessStatus.ZOMBIE_JOB.getMessage());
+            ProcessStatus.ZOMBIE_JOB.getMessage());
         Assert.assertEquals("Command failed with non-zero exit code.",
-                ProcessStatus.COMMAND_RUN_FAILURE.getMessage());
+            ProcessStatus.COMMAND_RUN_FAILURE.getMessage());
     }
 
     /**
@@ -99,35 +99,35 @@ public class ProcessStatusUnitTests {
     @Test
     public void testParse() throws GeniePreconditionException {
         Assert.assertEquals(ProcessStatus.JOB_INTERRUPTED,
-                ProcessStatus.parse(-1));
+            ProcessStatus.parse(-1));
         Assert.assertEquals(ProcessStatus.SUCCESS,
-                ProcessStatus.parse(0));
+            ProcessStatus.parse(0));
         Assert.assertEquals(ProcessStatus.MKDIR_JAR_FAILURE,
-                ProcessStatus.parse(201));
+            ProcessStatus.parse(201));
         Assert.assertEquals(ProcessStatus.MKDIR_CONF_FAILURE,
-                ProcessStatus.parse(202));
+            ProcessStatus.parse(202));
         Assert.assertEquals(ProcessStatus.HADOOP_LOCAL_CONF_COPY_FAILURE,
-                ProcessStatus.parse(203));
+            ProcessStatus.parse(203));
         Assert.assertEquals(ProcessStatus.UPDATE_CORE_SITE_XML_FAILURE,
-                ProcessStatus.parse(204));
+            ProcessStatus.parse(204));
         Assert.assertEquals(ProcessStatus.ENV_VARIABLES_SOURCE_AND_SETUP_FAILURE,
-                ProcessStatus.parse(205));
+            ProcessStatus.parse(205));
         Assert.assertEquals(ProcessStatus.CLUSTER_CONF_FILES_COPY_FAILURE,
-                ProcessStatus.parse(206));
+            ProcessStatus.parse(206));
         Assert.assertEquals(ProcessStatus.COMMAND_CONF_FILES_COPY_FAILURE,
-                ProcessStatus.parse(207));
+            ProcessStatus.parse(207));
         Assert.assertEquals(ProcessStatus.APPLICATION_CONF_FILES_COPY_FAILURE,
-                ProcessStatus.parse(208));
+            ProcessStatus.parse(208));
         Assert.assertEquals(ProcessStatus.APPLICATION_JAR_FILES_COPY_FAILURE,
-                ProcessStatus.parse(209));
+            ProcessStatus.parse(209));
         Assert.assertEquals(ProcessStatus.JOB_DEPENDENCIES_COPY_FAILURE,
-                ProcessStatus.parse(210));
+            ProcessStatus.parse(210));
         Assert.assertEquals(ProcessStatus.JOB_KILLED,
-                ProcessStatus.parse(211));
+            ProcessStatus.parse(211));
         Assert.assertEquals(ProcessStatus.ZOMBIE_JOB,
-                ProcessStatus.parse(212));
+            ProcessStatus.parse(212));
         Assert.assertEquals(ProcessStatus.COMMAND_RUN_FAILURE,
-                ProcessStatus.parse(213));
+            ProcessStatus.parse(213));
     }
 
     /**
@@ -138,6 +138,6 @@ public class ProcessStatusUnitTests {
     @Test(expected = GeniePreconditionException.class)
     public void testParseBadErrorCode() throws GeniePreconditionException {
         Assert.assertEquals(ProcessStatus.COMMAND_RUN_FAILURE,
-                ProcessStatus.parse(-2490354));
+            ProcessStatus.parse(-2490354));
     }
 }

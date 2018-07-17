@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state SHUTDOWN.
+ *
  * @author mprimi
  * @since 4.0.0
  */

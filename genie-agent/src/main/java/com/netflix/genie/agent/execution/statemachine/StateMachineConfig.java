@@ -18,8 +18,8 @@
 
 package com.netflix.genie.agent.execution.statemachine;
 
-import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
+import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -38,6 +38,7 @@ import java.util.EnumSet;
 
 /**
  * Configuration of JobExecutionStateMachine state machine.
+ *
  * @author mprimi
  * @since 4.0.0
  */

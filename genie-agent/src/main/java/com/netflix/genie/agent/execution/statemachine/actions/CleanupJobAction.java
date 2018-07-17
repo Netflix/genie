@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * Action performed when in state CLEANUP_JOB.
+ *
  * @author mprimi
  * @since 4.0.0
  */

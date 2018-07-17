@@ -32,9 +32,9 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificat
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.ConstraintViolationException;
 
 /**
  * A Service to collect the logic for implementing calls from the Agent when a job is launched via the CLI.
@@ -90,7 +90,7 @@ public interface AgentJobService {
      *
      * @param jobRequest The job request containing all the metadata needed to resolve a job specification
      * @return The job specification that would have been resolved for the given input
-     * @throws ConstraintViolationException      If the arguments fail validation
+     * @throws ConstraintViolationException If the arguments fail validation
      */
     JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest);
 
@@ -119,10 +119,10 @@ public interface AgentJobService {
      * @param currentStatus    The status the caller to this API thinks the job currently has
      * @param newStatus        The new status the caller would like to update the status to
      * @param newStatusMessage An optional status message to associate with this change
-     * @throws GenieJobNotFoundException   if no job with the given {@code id} exists
-     * @throws GenieInvalidStatusException if the current status of the job identified by {@code id} in the system
-     *                                     doesn't match the supplied {@code currentStatus}.
-     *                                     Also if the {@code currentStatus} equals the {@code newStatus}.
+     * @throws GenieJobNotFoundException    if no job with the given {@code id} exists
+     * @throws GenieInvalidStatusException  if the current status of the job identified by {@code id} in the system
+     *                                      doesn't match the supplied {@code currentStatus}.
+     *                                      Also if the {@code currentStatus} equals the {@code newStatus}.
      * @throws ConstraintViolationException If the arguments fail validation
      */
     void updateJobStatus(

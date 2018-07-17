@@ -39,7 +39,7 @@ public class BaseJobEvent extends ApplicationEvent {
     /**
      * Constructor.
      *
-     * @param id The id of the job this event relates to
+     * @param id     The id of the job this event relates to
      * @param source The source object which generates this event
      */
     public BaseJobEvent(@NotEmpty final String id, @NotNull final Object source) {

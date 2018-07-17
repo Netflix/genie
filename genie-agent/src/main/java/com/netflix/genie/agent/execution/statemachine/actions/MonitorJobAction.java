@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state MONITOR_JOB.
+ *
  * @author mprimi
  * @since 4.0.0
  */
@@ -56,7 +57,7 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
 
         final int exitCode;
         try {
-             exitCode = executionContext.getJobProcess().waitFor();
+            exitCode = executionContext.getJobProcess().waitFor();
         } catch (final InterruptedException e) {
             throw new RuntimeException("Interrupted while waiting for job completion", e);
         }

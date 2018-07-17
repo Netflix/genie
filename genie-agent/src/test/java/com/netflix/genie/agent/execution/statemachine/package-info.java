@@ -18,6 +18,7 @@
 
 /**
  * Job execution state machine tests.
+ *
  * @author mprimi
  * @since 4.0.0
  */

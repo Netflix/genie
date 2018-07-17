@@ -27,6 +27,7 @@ package com.netflix.genie.agent.execution.exceptions;
 public class JobLaunchException extends Exception {
     /**
      * Construct with message.
+     *
      * @param message message
      */
     public JobLaunchException(final String message) {
@@ -35,8 +36,9 @@ public class JobLaunchException extends Exception {
 
     /**
      * Construct with message and cause.
+     *
      * @param message message
-     * @param cause cause
+     * @param cause   cause
      */
     public JobLaunchException(final String message, final Throwable cause) {
         super(message, cause);

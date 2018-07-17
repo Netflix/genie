@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * Implementation of JobExecutionStateMachine.
+ *
  * @author mprimi
  * @since 4.0.0
  */

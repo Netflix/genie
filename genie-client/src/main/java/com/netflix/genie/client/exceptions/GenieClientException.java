@@ -36,7 +36,7 @@ public class GenieClientException extends IOException {
      * Constructor.
      *
      * @param errorCode the HTTP status code for this exception
-     * @param msg human readable message
+     * @param msg       human readable message
      */
     public GenieClientException(final int errorCode, final String msg) {
         super(errorCode + ": " + msg);

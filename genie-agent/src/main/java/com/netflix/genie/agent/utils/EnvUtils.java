@@ -72,7 +72,7 @@ public final class EnvUtils {
      *
      * @param environmentFile file to parse
      * @return a map of the values parsed
-     * @throws IOException if the file cannot be read
+     * @throws IOException    if the file cannot be read
      * @throws ParseException if the file contents cannot be parsed
      */
     public static Map<String, String> parseEnvFile(
@@ -151,10 +151,10 @@ public final class EnvUtils {
 
                         throw new ParseException(
                             "Unexpected line while parsing multi-line variable: \'"
-                            + multiLineBeginMatcher.group(1)
-                            + "\': \""
-                            + midValueLine
-                            + "\""
+                                + multiLineBeginMatcher.group(1)
+                                + "\': \""
+                                + midValueLine
+                                + "\""
                         );
                     }
 
@@ -183,7 +183,7 @@ public final class EnvUtils {
     /**
      * Performs shell environment variables expansion on the given string.
      *
-     * @param inputString a string, possibly containing shell variables
+     * @param inputString             a string, possibly containing shell variables
      * @param environmentVariablesMap a map of string environment variables
      * @return a new string with variables expanded
      * @throws VariableSubstitutionException if the value for a variable appearing in input is not found in the map

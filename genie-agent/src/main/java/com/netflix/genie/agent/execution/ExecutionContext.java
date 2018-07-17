@@ -53,7 +53,8 @@ public interface ExecutionContext {
      *
      * @return a Process, if it was set, or null
      */
-    @Nullable Process getJobProcess();
+    @Nullable
+    Process getJobProcess();
 
     /**
      * Set the job directory.
@@ -67,7 +68,8 @@ public interface ExecutionContext {
      *
      * @return the job directory File if one was set up, or null
      */
-    @Nullable File getJobDirectory();
+    @Nullable
+    File getJobDirectory();
 
     /**
      * Set the job specification.
@@ -81,7 +83,8 @@ public interface ExecutionContext {
      *
      * @return the job specification if it was set, or null
      */
-    @Nullable JobSpecification getJobSpecification();
+    @Nullable
+    JobSpecification getJobSpecification();
 
     /**
      * Set the job environment variables map.
@@ -95,7 +98,8 @@ public interface ExecutionContext {
      *
      * @return a map of environment variables and values if one was set, or null
      */
-    @Nullable Map<String, String> getJobEnvironment();
+    @Nullable
+    Map<String, String> getJobEnvironment();
 
     /**
      * Enqueue cleanup for a state action.
@@ -114,9 +118,9 @@ public interface ExecutionContext {
     /**
      * Record a state action failure to execute and threw an exception.
      *
-     * @param state the state whose action failed with an exception
+     * @param state       the state whose action failed with an exception
      * @param actionClass the class of the state action that failed
-     * @param exception the exception thrown by the state action
+     * @param exception   the exception thrown by the state action
      */
     void addStateActionError(
         final States state,
@@ -150,7 +154,8 @@ public interface ExecutionContext {
      *
      * @return the final job status or null
      */
-    @Nullable JobStatus getFinalJobStatus();
+    @Nullable
+    JobStatus getFinalJobStatus();
 
     /**
      * Set the current job status.
@@ -164,10 +169,12 @@ public interface ExecutionContext {
      *
      * @return the latest job status set, or null if never set
      */
-    @Nullable JobStatus getCurrentJobStatus();
+    @Nullable
+    JobStatus getCurrentJobStatus();
 
     /**
      * Set the job id of a successfully claimed job.
+     *
      * @param jobId the job id
      */
     void setClaimedJobId(@NotBlank String jobId);
@@ -177,5 +184,6 @@ public interface ExecutionContext {
      *
      * @return a job id or null a job was not claimed
      */
-    @Nullable String getClaimedJobId();
+    @Nullable
+    String getClaimedJobId();
 }

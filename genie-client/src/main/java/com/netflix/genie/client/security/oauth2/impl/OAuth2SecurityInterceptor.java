@@ -46,7 +46,6 @@ public class OAuth2SecurityInterceptor implements SecurityInterceptor {
      * @param clientSecret The client secret to use to fetch credentials.
      * @param grantType    The grant type for the user.
      * @param scope        The scope of the user permissions.
-     *
      * @throws GenieClientException If there is a problem initializing the object.
      */
     public OAuth2SecurityInterceptor(
@@ -64,16 +63,16 @@ public class OAuth2SecurityInterceptor implements SecurityInterceptor {
     public Response intercept(
         final Chain chain
     ) throws IOException {
-            final AccessToken accessToken = this.tokenFetcher.getToken();
+        final AccessToken accessToken = this.tokenFetcher.getToken();
 
-            final Request newRequest = chain
-                .request()
-                .newBuilder()
-                .addHeader(HttpHeaders.AUTHORIZATION, accessToken.getTokenType() + " " + accessToken.getAccessToken())
-                .build();
+        final Request newRequest = chain
+            .request()
+            .newBuilder()
+            .addHeader(HttpHeaders.AUTHORIZATION, accessToken.getTokenType() + " " + accessToken.getAccessToken())
+            .build();
 
-            log.debug("Sending request {} on {} {}", newRequest.url(), chain.connection(), newRequest.headers());
+        log.debug("Sending request {} on {} {}", newRequest.url(), chain.connection(), newRequest.headers());
 
-            return chain.proceed(newRequest);
+        return chain.proceed(newRequest);
     }
 }

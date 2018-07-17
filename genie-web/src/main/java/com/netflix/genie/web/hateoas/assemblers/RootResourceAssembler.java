@@ -51,8 +51,8 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
             rootResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
-                    .methodOn(RootRestController.class)
-                    .getRoot()
+                        .methodOn(RootRestController.class)
+                        .getRoot()
                 ).withSelfRel()
             );
 

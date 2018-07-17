@@ -26,6 +26,7 @@ import java.util.Map;
 
 /**
  * Service that launches the job process.
+ *
  * @author mprimi
  * @since 4.0.0
  */
@@ -33,12 +34,13 @@ public interface LaunchJobService {
 
     /**
      * Launch the job process.
+     *
+     * @param runDirectory         Run directory
+     * @param environmentVariables additional environment variables (to merge on top of inherited environment)
+     * @param commandLine          command-line executable and arguments
+     * @param interactive          launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
      * @return a Process object
      * @throws JobLaunchException if the job process failed to launch
-     * @param runDirectory Run directory
-     * @param environmentVariables additional environment variables (to merge on top of inherited environment)
-     * @param commandLine command-line executable and arguments
-     * @param interactive launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
      */
     Process launchProcess(
         final File runDirectory,

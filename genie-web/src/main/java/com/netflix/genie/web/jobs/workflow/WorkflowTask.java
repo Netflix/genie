@@ -35,7 +35,7 @@ public interface WorkflowTask {
      *
      * @param context Information needed to execute the task.
      * @throws GenieException if there is an error.
-     * @throws IOException if there is a problem writing to the disk.
+     * @throws IOException    if there is a problem writing to the disk.
      */
     void executeTask(
         Map<String, Object> context

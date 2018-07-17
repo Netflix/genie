@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.utils.locks;
 
 import com.netflix.genie.agent.execution.exceptions.LockException;
+
 import java.io.Closeable;
 
 /**
@@ -30,6 +31,7 @@ public interface CloseableLock extends Closeable {
 
     /**
      * Acquire a lock.
+     *
      * @throws LockException in case of problem acquiring the lock
      */
     void lock() throws LockException;

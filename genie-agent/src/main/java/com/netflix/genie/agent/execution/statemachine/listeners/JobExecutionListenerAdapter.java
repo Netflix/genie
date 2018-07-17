@@ -44,77 +44,90 @@ class JobExecutionListenerAdapter implements JobExecutionListener {
         final StateMachine<States, Events> stateMachine,
         final Action<States, Events> action,
         final long duration
-    ) { }
+    ) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void stateChanged(final State<States, Events> from, final State<States, Events> to) { }
+    public void stateChanged(final State<States, Events> from, final State<States, Events> to) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void stateEntered(final State<States, Events> state) { }
+    public void stateEntered(final State<States, Events> state) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void stateExited(final State<States, Events> state) { }
+    public void stateExited(final State<States, Events> state) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void eventNotAccepted(final Message<Events> event) { }
+    public void eventNotAccepted(final Message<Events> event) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void transition(final Transition<States, Events> transition) { }
+    public void transition(final Transition<States, Events> transition) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void transitionStarted(final Transition<States, Events> transition) { }
+    public void transitionStarted(final Transition<States, Events> transition) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void transitionEnded(final Transition<States, Events> transition) { }
+    public void transitionEnded(final Transition<States, Events> transition) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void stateMachineStarted(final StateMachine<States, Events> stateMachine) { }
+    public void stateMachineStarted(final StateMachine<States, Events> stateMachine) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void stateMachineStopped(final StateMachine<States, Events> stateMachine) { }
+    public void stateMachineStopped(final StateMachine<States, Events> stateMachine) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void stateMachineError(final StateMachine<States, Events> stateMachine, final Exception exception) { }
+    public void stateMachineError(final StateMachine<States, Events> stateMachine, final Exception exception) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void extendedStateChanged(final Object key, final Object value) { }
+    public void extendedStateChanged(final Object key, final Object value) {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void stateContext(final StateContext<States, Events> stateContext) { }
+    public void stateContext(final StateContext<States, Events> stateContext) {
+    }
 }

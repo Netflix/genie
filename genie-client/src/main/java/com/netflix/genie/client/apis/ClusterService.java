@@ -62,7 +62,7 @@ public interface ClusterService {
      * Method to update a cluster in Genie.
      *
      * @param clusterId The id of the cluster to update.
-     * @param cluster The cluster object.
+     * @param cluster   The cluster object.
      * @return A callable object.
      */
     @PUT(CLUSTER_URL_SUFFIX + "/{id}")
@@ -71,12 +71,11 @@ public interface ClusterService {
     /**
      * Method to get clusters from Genie based on filters specified.
      *
-     * @param name The name of the cluster.
-     * @param statusList The list of statuses.
-     * @param tagList The list of tags.
+     * @param name          The name of the cluster.
+     * @param statusList    The list of statuses.
+     * @param tagList       The list of tags.
      * @param minUpdateTime Minimum Time after which cluster was updated.
      * @param maxUpdateTime Maximum Time before which cluster was updated.
-     *
      * @return A callable object.
      */
     @GET(CLUSTER_URL_SUFFIX)
@@ -130,9 +129,8 @@ public interface ClusterService {
     /**
      * Patch a cluster using JSON Patch.
      *
-     * @param clusterId    The id of the cluster to patch
-     * @param patch The JSON Patch instructions
-     *
+     * @param clusterId The id of the cluster to patch
+     * @param patch     The JSON Patch instructions
      * @return A callable object.
      */
     @PATCH(CLUSTER_URL_SUFFIX + "/{id}")
@@ -152,7 +150,7 @@ public interface ClusterService {
     /**
      * Method to add commands to a cluster in Genie.
      *
-     * @param clusterId The id of the cluster..
+     * @param clusterId  The id of the cluster..
      * @param commandIds The command Ids to be added.
      * @return A callable object.
      */
@@ -162,7 +160,7 @@ public interface ClusterService {
     /**
      * Method to override and set commands for a cluster in Genie.
      *
-     * @param clusterId The id of the cluster..
+     * @param clusterId  The id of the cluster..
      * @param commandIds The command Ids to be added.
      * @return A callable object.
      */
@@ -202,7 +200,7 @@ public interface ClusterService {
     /**
      * Method to add dependencies to a cluster in Genie.
      *
-     * @param clusterId The id of the cluster..
+     * @param clusterId    The id of the cluster..
      * @param dependencies The dependencies to be added.
      * @return A callable object.
      */
@@ -215,7 +213,7 @@ public interface ClusterService {
     /**
      * Method to update dependencies for a cluster in Genie.
      *
-     * @param clusterId The id of the cluster..
+     * @param clusterId    The id of the cluster..
      * @param dependencies The dependencies to be added.
      * @return A callable object.
      */
@@ -249,7 +247,7 @@ public interface ClusterService {
      * Method to add configs to a cluster in Genie.
      *
      * @param clusterId The id of the cluster..
-     * @param configs The configs to be added.
+     * @param configs   The configs to be added.
      * @return A callable object.
      */
     @POST(CLUSTER_URL_SUFFIX + "/{id}/configs")
@@ -259,7 +257,7 @@ public interface ClusterService {
      * Method to update configs for a cluster in Genie.
      *
      * @param clusterId The id of the cluster..
-     * @param configs The configs to be added.
+     * @param configs   The configs to be added.
      * @return A callable object.
      */
     @PUT(CLUSTER_URL_SUFFIX + "/{id}/configs")
@@ -289,7 +287,7 @@ public interface ClusterService {
      * Method to add tags to a cluster in Genie.
      *
      * @param clusterId The id of the cluster..
-     * @param tags The tags to be added.
+     * @param tags      The tags to be added.
      * @return A callable object.
      */
     @POST(CLUSTER_URL_SUFFIX + "/{id}/tags")
@@ -299,7 +297,7 @@ public interface ClusterService {
      * Method to update tags for a cluster in Genie.
      *
      * @param clusterId The id of the cluster..
-     * @param tags The tags to be added.
+     * @param tags      The tags to be added.
      * @return A callable object.
      */
     @PUT(CLUSTER_URL_SUFFIX + "/{id}/tags")
@@ -309,7 +307,7 @@ public interface ClusterService {
      * Method to delete a tag for a cluster in Genie.
      *
      * @param clusterId The id of the cluster.
-     * @param tag The tag to delete.
+     * @param tag       The tag to delete.
      * @return A callable object.
      */
     @DELETE(CLUSTER_URL_SUFFIX + "/{id}/tags/{tag}")

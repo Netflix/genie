@@ -18,6 +18,7 @@
 
 /**
  * Job execution state machine.
+ *
  * @author mprimi
  * @since 4.0.0
  */

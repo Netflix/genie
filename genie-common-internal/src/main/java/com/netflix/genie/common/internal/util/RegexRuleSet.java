@@ -44,6 +44,7 @@ public final class RegexRuleSet {
 
     /**
      * Evaluate an input string against the rule set.
+     *
      * @param input an input string
      * @return a response
      */
@@ -58,6 +59,7 @@ public final class RegexRuleSet {
 
     /**
      * Evaluate an input string against the ruleset for acceptance.
+     *
      * @param input an input string
      * @return true if the response for this input is ACCEPT, false otherwise
      */
@@ -67,6 +69,7 @@ public final class RegexRuleSet {
 
     /**
      * Evaluate an input string against the ruleset for rejection.
+     *
      * @param input an input string
      * @return true if the response for this input is REJECT, false otherwise
      */
@@ -113,6 +116,7 @@ public final class RegexRuleSet {
 
         /**
          * Constructor.
+         *
          * @param defaultResponse the response to return if no rule is matched
          */
         public Builder(final Response defaultResponse) {
@@ -121,8 +125,9 @@ public final class RegexRuleSet {
 
         /**
          * Add a rule by compiling the given string into a regular expression.
+         *
          * @param regexString a regex string
-         * @param response the response this rule returns if matched
+         * @param response    the response this rule returns if matched
          * @return the builder
          */
         public Builder addRule(final String regexString, final Response response) {
@@ -131,7 +136,8 @@ public final class RegexRuleSet {
 
         /**
          * Add a rule by with the given pre-compiled regular expression.
-         * @param pattern a pattern
+         *
+         * @param pattern  a pattern
          * @param response the response this rule returns if matched
          * @return the builder
          */
@@ -142,6 +148,7 @@ public final class RegexRuleSet {
 
         /**
          * Build the ruleset.
+         *
          * @return a RegexRuleSet
          */
         public RegexRuleSet build() {
@@ -152,6 +159,7 @@ public final class RegexRuleSet {
     /**
      * Factory method to build a whitelist ruleset.
      * (Whitelist rejects everything except for the given patterns).
+     *
      * @param patternStrings a set of pattern strings that constitute the whitelist
      * @return the ruleset
      */
@@ -162,6 +170,7 @@ public final class RegexRuleSet {
     /**
      * Factory method to build a whitelist ruleset.
      * (Whitelist rejects everything except for the given patterns).
+     *
      * @param patterns a set of patterns that constitute the whitelist
      * @return the ruleset
      */
@@ -176,6 +185,7 @@ public final class RegexRuleSet {
     /**
      * Factory method to build a whitelist ruleset.
      * (Blacklist accepts everything except for the given patterns).
+     *
      * @param patternStrings a set of pattern strings that constitute the blacklist
      * @return the ruleset
      */
@@ -186,6 +196,7 @@ public final class RegexRuleSet {
     /**
      * Factory method to build a whitelist ruleset.
      * (Blacklist accepts everything except for the given patterns).
+     *
      * @param patterns a set of patterns that constitute the blacklist
      * @return the ruleset
      */

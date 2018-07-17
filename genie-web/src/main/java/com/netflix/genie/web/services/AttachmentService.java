@@ -36,9 +36,9 @@ public interface AttachmentService {
     /**
      * Save a given attachment for a job for later retrieval.
      *
-     * @param jobId       The id of the job to save the attachment for
-     * @param filename    The name of the attachment
-     * @param content     A stream to access the contents of the attachment
+     * @param jobId    The id of the job to save the attachment for
+     * @param filename The name of the attachment
+     * @param content  A stream to access the contents of the attachment
      * @throws GenieException For any error during the save process
      */
     void save(final String jobId, final String filename, final InputStream content) throws GenieException;

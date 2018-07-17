@@ -24,6 +24,7 @@ import org.springframework.statemachine.action.Action;
 
 /**
  * Interface types for individual state actions.
+ *
  * @author mprimi
  * @since 4.0.0
  */

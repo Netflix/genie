@@ -50,7 +50,6 @@ public class JobKickoffTaskUnitTests {
 
     /**
      * Set up the tests.
-     *
      */
     @Before
     public void setUp() {
@@ -67,7 +66,7 @@ public class JobKickoffTaskUnitTests {
     /**
      * Test the change ownership method for success.
      *
-     * @throws IOException If there is any problem.
+     * @throws IOException    If there is any problem.
      * @throws GenieException If there is any problem.
      */
     @Test
@@ -88,7 +87,7 @@ public class JobKickoffTaskUnitTests {
     /**
      * Test the change ownership method for success.
      *
-     * @throws IOException If there is any problem.
+     * @throws IOException    If there is any problem.
      * @throws GenieException If there is any problem.
      */
     @Test(expected = GenieServerException.class)
@@ -103,7 +102,7 @@ public class JobKickoffTaskUnitTests {
     /**
      * Test the create user method for user already exists.
      *
-     * @throws IOException If there is any problem.
+     * @throws IOException    If there is any problem.
      * @throws GenieException If there is any problem.
      */
     @Test
@@ -121,7 +120,7 @@ public class JobKickoffTaskUnitTests {
     /**
      * Test the create user method for user already exists.
      *
-     * @throws IOException If there is any problem.
+     * @throws IOException    If there is any problem.
      * @throws GenieException If there is any problem.
      */
     @Test
@@ -151,7 +150,7 @@ public class JobKickoffTaskUnitTests {
     /**
      * Test the create user method for user already exists but swallow genie exception.
      *
-     * @throws IOException If there is any problem.
+     * @throws IOException    If there is any problem.
      * @throws GenieException If there is any problem.
      */
     @Test(expected = GenieServerException.class)

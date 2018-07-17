@@ -28,6 +28,7 @@ public class LockException extends Exception {
 
     /**
      * Constructor with message.
+     *
      * @param message a message
      */
     public LockException(final String message) {
@@ -36,8 +37,9 @@ public class LockException extends Exception {
 
     /**
      * Constructor with message and cause.
+     *
      * @param message a message
-     * @param cause a cause
+     * @param cause   a cause
      */
     public LockException(final String message, final Throwable cause) {
         super(message, cause);

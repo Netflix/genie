@@ -44,10 +44,10 @@ public interface AgentJobService {
      * Request a given job id to be reserved for this job, send along the job details, to be persisted by the server.
      * The request may or may not contain a job id.
      *
-     * @param jobRequest the job parameters and agent metadata
+     * @param jobRequest          the job parameters and agent metadata
      * @param agentClientMetadata metadata about the client making this request
      * @return the job id assigned by the server (matches the one in the request, if one was present)
-     * @throws JobReservationException if the server failed to fulfill this request
+     * @throws JobReservationException   if the server failed to fulfill this request
      * @throws JobIdUnavailableException if the id requested has already been used
      */
     String reserveJobId(
@@ -91,10 +91,10 @@ public interface AgentJobService {
     /**
      * Claim a given job, telling the server that this agent is about to begin execution.
      *
-     * @param jobId the id of the job
+     * @param jobId               the id of the job
      * @param agentClientMetadata metadata for the agent claiming this job
      * @throws JobReservationException When the the claim request fails is invalid (reasons include: job already
-     * claimed, invalid job ID, failure to reach the server
+     *                                 claimed, invalid job ID, failure to reach the server
      */
     void claimJob(
         @NotBlank final String jobId,
@@ -103,10 +103,11 @@ public interface AgentJobService {
 
     /**
      * Notify the server of a change of job status.
-     * @param jobId the id of the job
+     *
+     * @param jobId            the id of the job
      * @param currentJobStatus the expected current status of the job
-     * @param newJobStatus the new status of the job
-     * @param message an optional message tha accompanies this change of status
+     * @param newJobStatus     the new status of the job
+     * @param message          an optional message tha accompanies this change of status
      * @throws ChangeJobStatusException when the agent fails to update the job status
      */
     void changeJobStatus(

@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
- package com.netflix.genie.web.rpc.grpc.services.impl.v4;
+package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
 import com.google.protobuf.util.Timestamps;
 import com.netflix.genie.common.internal.util.GenieHostInfo;

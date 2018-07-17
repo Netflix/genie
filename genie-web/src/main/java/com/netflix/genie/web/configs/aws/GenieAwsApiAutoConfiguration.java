@@ -51,7 +51,8 @@ public class GenieAwsApiAutoConfiguration {
      * environment.
      *
      * @return The {@link GenieHostInfo} instance
-     * @throws UnknownHostException If all EC2 host instance calculation AND local resolution can't determine a hostname
+     * @throws UnknownHostException  If all EC2 host instance calculation AND local resolution can't determine a
+     *                               hostname
      * @throws IllegalStateException If an instance can't be created
      */
     @Bean

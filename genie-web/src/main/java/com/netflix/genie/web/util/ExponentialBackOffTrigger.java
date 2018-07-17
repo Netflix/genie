@@ -44,12 +44,13 @@ public class ExponentialBackOffTrigger implements Trigger {
 
     /**
      * Constructor.
+     *
      * @param delayType type of delay
-     * @param minDelay minimum delay in milliseconds
-     * @param maxDelay maximum delay in milliseconds
-     * @param factor multiplier factor to grow the delay
+     * @param minDelay  minimum delay in milliseconds
+     * @param maxDelay  maximum delay in milliseconds
+     * @param factor    multiplier factor to grow the delay
      * @throws IllegalArgumentException if the minimum delay is smaller than 1, the max delay is smaller than the
-     * minimum, or the factor is not positive.
+     *                                  minimum, or the factor is not positive.
      */
     public ExponentialBackOffTrigger(
         final DelayType delayType,

@@ -34,6 +34,7 @@ public class JobKillReasonFile {
 
     /**
      * Constructor, annotated for Jackson.
+     *
      * @param killReason stores a string with the reason a given job was killed
      */
     @JsonCreator

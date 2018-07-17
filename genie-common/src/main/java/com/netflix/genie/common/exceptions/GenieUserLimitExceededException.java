@@ -34,9 +34,10 @@ public final class GenieUserLimitExceededException extends GenieException {
 
     /**
      * Constructor.
-     * @param user user name
+     *
+     * @param user      user name
      * @param limitName limit name
-     * @param message message
+     * @param message   message
      */
     public GenieUserLimitExceededException(
         final String user,
@@ -51,7 +52,8 @@ public final class GenieUserLimitExceededException extends GenieException {
     /**
      * Static factory method to produce a GenieUserLimitExceededException suitable for when the user exceeded the
      * maximum number of active jobs and its trying to submit yet another.
-     * @param user the user name
+     *
+     * @param user            the user name
      * @param activeJobsCount the count of active jobs for this user
      * @param activeJobsLimit the current limit on active jobs
      * @return a new GenieUserLimitExceededException

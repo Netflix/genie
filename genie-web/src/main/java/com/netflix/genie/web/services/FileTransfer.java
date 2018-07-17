@@ -59,6 +59,7 @@ public interface FileTransfer {
 
     /**
      * Returns the last modified time of the file with the given path.
+     *
      * @param path location of the file
      * @return time in milliseconds
      * @throws GenieException exception in case of IO error

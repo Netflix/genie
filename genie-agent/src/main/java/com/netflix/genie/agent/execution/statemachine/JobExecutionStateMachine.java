@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine;
 
 /**
  * Interface JobExecutionStateMachine.
+ *
  * @author mprimi
  * @since 4.0.0
  */
@@ -32,6 +33,7 @@ public interface JobExecutionStateMachine {
 
     /**
      * Waits for the state machine to stop executing.
+     *
      * @return the final state in which the machine stopped
      * @throws InterruptedException if the waiting thread is interrupted
      */
