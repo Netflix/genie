@@ -18,6 +18,8 @@
 
 package com.netflix.genie.agent.configs;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -36,16 +38,17 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 class AgentConfig {
 
     /**
-     * Get a task executor for cleaning up {@link com.netflix.genie.agent.execution.services.FetchingCacheService}.
+     * Get a task executor which may be shared by different components.
      *
-     * @return The task executor to use
+     * @return A task executor
      */
     @Bean
     @Lazy
-    public TaskExecutor fetchingCacheServiceCleanUpTaskExecutor() {
+    @Qualifier("sharedAgentTaskExecutor")
+    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor")
+    public TaskExecutor sharedAgentTaskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        //TODO Pool size should be parametrized once its decide how agent properties will be configured
-        executor.setCorePoolSize(1);
+        executor.initialize();
         return executor;
     }
 
