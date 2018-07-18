@@ -49,7 +49,7 @@ public class AgentConfigTests {
     @Test
     public void canGetTaskExecutor() {
         Assert.assertTrue(
-            this.config.fetchingCacheServiceCleanUpTaskExecutor() instanceof ThreadPoolTaskExecutor
+            this.config.sharedAgentTaskExecutor() instanceof ThreadPoolTaskExecutor
         );
     }
 }
