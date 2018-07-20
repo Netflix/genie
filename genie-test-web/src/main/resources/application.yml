@@ -116,7 +116,7 @@ genie:
 
 info:
   genie:
-    version: @genie.version@
+    version: 0.0.0-TEST
 
 management:
   endpoints:
