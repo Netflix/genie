@@ -40,8 +40,6 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,19 +61,7 @@ import java.util.Collections;
         RetryProperties.class
     }
 )
-public class GenieApiAutoConfiguration implements WebMvcConfigurer {
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Turn off {@literal .} recognition in paths. Needed due to Job id's in paths potentially having '.' as character.
-     *
-     * @see <a href="http://stackoverflow.com/a/23938850">Stack Overflow Issue Answer From Dave Syer</a>
-     */
-    @Override
-    public void configurePathMatch(final PathMatchConfigurer configurer) {
-        configurer.setUseRegisteredSuffixPatternMatch(true);
-    }
+public class GenieApiAutoConfiguration {
 
     /**
      * Get a resource loader.

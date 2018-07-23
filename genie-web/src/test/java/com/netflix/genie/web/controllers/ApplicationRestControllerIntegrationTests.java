@@ -55,7 +55,9 @@ import java.util.UUID;
 //TODO: Add tests for error conditions
 public class ApplicationRestControllerIntegrationTests extends RestControllerIntegrationTestsBase {
 
-    private static final String ID = UUID.randomUUID().toString();
+    // Use a `.` to ensure that the Spring prefix matcher is turned off
+    // see: https://tinyurl.com/yblzglk8
+    private static final String ID = UUID.randomUUID().toString() + "." + UUID.randomUUID().toString();
     private static final String NAME = "spark";
     private static final String USER = "genie";
     private static final String VERSION = "1.5.1";

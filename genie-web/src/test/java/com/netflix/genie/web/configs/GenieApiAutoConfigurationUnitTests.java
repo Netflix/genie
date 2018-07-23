@@ -35,7 +35,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,16 +59,6 @@ public class GenieApiAutoConfigurationUnitTests {
     @Before
     public void setup() {
         this.genieApiAutoConfiguration = new GenieApiAutoConfiguration();
-    }
-
-    /**
-     * Make sure the suffix pattern matcher is turned off.
-     */
-    @Test
-    public void doesTurnOffSuffixMatcher() {
-        final PathMatchConfigurer configurer = Mockito.mock(PathMatchConfigurer.class);
-        this.genieApiAutoConfiguration.configurePathMatch(configurer);
-        Mockito.verify(configurer, Mockito.times(1)).setUseRegisteredSuffixPatternMatch(true);
     }
 
     /**
