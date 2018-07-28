@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  This file is a variation of the default configuration loaded by Boot.
+  Because this file is present, the default is not loaded.
+  This configuration is the same as base.xml found here:
+  See: https://github.com/spring-projects/spring-boot/blob/2.0.x/spring-boot-project/spring-boot/src/main/resources/org/springframework/boot/logging/logback/
+  but with customized appenders.
+-->
+<configuration debug="false">
+
+  <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+  <property name="LOG_FILE" value="/tmp/genie-agent-${PID}.log"/>
+  <property name="LOG_FILE_ROLLED" value="/tmp/genie-agent-${PID}.%i.log.zip"/>
+  <property name="LOG_FILE_SIZE_ROLL_TRESHOLD" value="1GB"/>
+  <include resource="genie-agent-file-appender.xml" />
+
+  <property name="CONSOLE_FILTER_LOGGER_NAME" value="genie-agent"/>
+  <include resource="genie-agent-console-appender.xml" />
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="FILE" />
+  </root>
+
+</configuration>
