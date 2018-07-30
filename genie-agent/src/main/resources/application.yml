@@ -12,3 +12,5 @@ cloud:
 spring:
   jmx:
     enabled: false
+  banner:
+    location: classpath:genie-agent-banner.txt
