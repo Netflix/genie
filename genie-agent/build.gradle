@@ -1,8 +1,11 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: "org.springframework.boot"
 
 license {
     exclude "*.yml"
     exclude "*.xml"
+    exclude "*.txt"
 }
 
 dependencies {
@@ -55,5 +58,13 @@ def genieVersion = project.version.toString()
 jar {
     manifest {
         attributes("Implementation-Version": genieVersion)
+    }
+}
+
+processResources {
+    filesMatching("**/*.txt") {
+        filter ReplaceTokens, tokens: [
+                "genie.version": project.version.toString()
+        ]
     }
 }
