@@ -117,9 +117,9 @@ class LoggingListenerSpec extends Specification {
 
         then:
         1 * transition.getKind() >> TransitionKind.EXTERNAL
-        1 * transition.getSource() >> state
-        1 * transition.getTarget() >> state
-        2 * state.getId() >> States.CONFIGURE_AGENT
+        2 * transition.getSource() >> state
+        2 * transition.getTarget() >> state
+        4 * state.getId() >> States.CONFIGURE_AGENT
         2 * transition.getActions() >> Lists.newArrayList()
     }
 
@@ -129,9 +129,9 @@ class LoggingListenerSpec extends Specification {
 
         then:
         1 * transition.getKind() >> TransitionKind.EXTERNAL
-        1 * transition.getSource() >> nullState
-        1 * transition.getTarget() >> state
-        1 * state.getId() >> States.CONFIGURE_AGENT
+        2 * transition.getSource() >> nullState
+        2 * transition.getTarget() >> state
+        2 * state.getId() >> States.CONFIGURE_AGENT
         1 * transition.getActions() >> null
     }
 
