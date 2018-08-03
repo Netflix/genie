@@ -304,3 +304,14 @@ message AgentHeartBeat {
 
 message ServerHeartBeat {
 }
+
+service JobKillService {
+    rpc registerForKillNotification (JobKillRegistrationRequest) returns (JobKillRegistrationResponse);
+}
+
+message JobKillRegistrationRequest {
+    string job_id = 1;
+}
+
+message JobKillRegistrationResponse {
+}
