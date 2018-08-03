@@ -57,6 +57,7 @@ class ExecutionContextImplSpec extends Specification {
         !executionContext.hasStateActionError()
         executionContext.getStateActionErrors().isEmpty()
         executionContext.getCleanupActions().isEmpty()
+        null == executionContext.getJobKillSource()
 
         when:
         executionContext.setJobProcess(process)
@@ -68,6 +69,7 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.addCleanupActions(action1)
         executionContext.setCurrentJobStatus(jobStatus)
         executionContext.setClaimedJobId(jobId)
+        executionContext.setJobKillSource(ExecutionContext.KillSource.API_KILL_REQUEST)
 
         then:
         process == executionContext.getJobProcess()
@@ -82,6 +84,7 @@ class ExecutionContextImplSpec extends Specification {
         action1 == executionContext.getCleanupActions().get(0)
         jobStatus == executionContext.getCurrentJobStatus()
         jobId == executionContext.getClaimedJobId()
+        ExecutionContext.KillSource.API_KILL_REQUEST == executionContext.getJobKillSource()
 
         when:
         executionContext.setJobProcess(Mock(Process))
@@ -132,6 +135,12 @@ class ExecutionContextImplSpec extends Specification {
 
         when:
         executionContext.setClaimedJobId("xxx")
+
+        then:
+        thrown(RuntimeException)
+
+        when:
+        executionContext.setJobKillSource(ExecutionContext.KillSource.SYSTEM_SIGNAL)
 
         then:
         thrown(RuntimeException)
