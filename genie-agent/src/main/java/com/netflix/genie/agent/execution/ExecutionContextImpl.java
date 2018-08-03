@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +58,7 @@ class ExecutionContextImpl implements ExecutionContext {
     private final AtomicReference<JobStatus> finalJobStatusRef = new AtomicReference<>();
     private final AtomicReference<JobStatus> currentJobStatusRef = new AtomicReference<>();
     private final AtomicReference<String> claimedJobIdRef = new AtomicReference<>();
+    private final AtomicReference<KillSource> killSourceRef = new AtomicReference<>();
     private final List<StateAction> cleanupActions = Lists.newArrayList();
     private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors = Lists.newArrayList();
 
@@ -223,6 +225,24 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public void setClaimedJobId(@NotBlank final String jobId) {
         setIfNullOrTrow(jobId, claimedJobIdRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
+    @Override
+    public KillSource getJobKillSource() {
+        return killSourceRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param killSource
+     */
+    @Override
+    public void setJobKillSource(@NotNull final ExecutionContext.KillSource killSource) {
+        setIfNullOrTrow(killSource, killSourceRef);
     }
 
     /**
