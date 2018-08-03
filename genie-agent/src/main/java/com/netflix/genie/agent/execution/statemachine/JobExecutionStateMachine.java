@@ -38,4 +38,14 @@ public interface JobExecutionStateMachine {
      * @throws InterruptedException if the waiting thread is interrupted
      */
     States waitForStop() throws InterruptedException;
+
+    /**
+     * Force an early termination of the state machine, in response to user submitting a kill via API or ctrl-c.
+     * Notice:
+     *  - State actions are not interrupted. Only after the one currently executing is completed the stop
+     *    signal is processed (TODO: make long-running actions, such as setup, interruptible).
+     *  - Some actions are still performed before the program exits. For example publish the updated job status
+     *    server-side. Refer to the {@link StateMachineConfig} for details.
+     */
+    void stop();
 }
