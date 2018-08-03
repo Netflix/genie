@@ -21,6 +21,7 @@ package com.netflix.genie.agent.rpc;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
+import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.PingServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -68,5 +69,13 @@ class GrpcConfig {
     @Scope("prototype")
     HeartBeatServiceGrpc.HeartBeatServiceStub heartBeatClient(final ManagedChannel channel) {
         return HeartBeatServiceGrpc.newStub(channel);
+    }
+
+    @Bean
+    @Scope("prototype")
+    JobKillServiceGrpc.JobKillServiceFutureStub jobKillClient(
+        final ManagedChannel channel
+    ) {
+        return JobKillServiceGrpc.newFutureStub(channel);
     }
 }
