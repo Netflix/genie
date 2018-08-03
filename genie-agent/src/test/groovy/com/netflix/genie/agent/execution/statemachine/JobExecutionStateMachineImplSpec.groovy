@@ -20,7 +20,10 @@ package com.netflix.genie.agent.execution.statemachine
 
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
+import org.springframework.statemachine.StateMachine
 import org.springframework.statemachine.config.StateMachineBuilder
+import org.springframework.statemachine.listener.StateMachineListener
+import org.springframework.statemachine.state.State
 import spock.lang.Specification
 
 @Category(UnitTest.class)
@@ -53,6 +56,28 @@ class JobExecutionStateMachineImplSpec extends Specification {
 
         then:
         finalState == States.END
+    }
 
+    def "Start and stop"() {
+        setup:
+        StateMachine<States, Events> mockStateMachine = Mock(StateMachine)
+        def monitorState = Mock(State)
+        def stateMachine = new JobExecutionStateMachineImpl(mockStateMachine)
+
+        when:
+        stateMachine.start()
+
+        then:
+        1 * mockStateMachine.addStateListener(_ as StateMachineListener)
+        1 * mockStateMachine.start()
+        1 * mockStateMachine.sendEvent(Events.START)
+
+        when:
+        stateMachine.stop()
+
+        then:
+        1 * mockStateMachine.getState() >> monitorState
+        1 * monitorState.getId() >> States.MONITOR_JOB
+        1 * mockStateMachine.sendEvent(Events.CANCEL_JOB_LAUNCH)
     }
 }

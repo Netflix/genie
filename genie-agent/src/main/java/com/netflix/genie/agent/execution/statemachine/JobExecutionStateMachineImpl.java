@@ -78,4 +78,13 @@ class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
             throw e;
         }
     }
+
+    @Override
+    public void stop() {
+        log.info("Stopping state machine (in state: {})", stateMachine.getState().getId());
+        // This event is processed iff the state machine has not reached the state where the job is launched.
+        stateMachine.sendEvent(Events.CANCEL_JOB_LAUNCH);
+        // If the job is already running, then the machine can do nothing but wait for it to complete
+        // (killing the child process is handled elsewhere).
+    }
 }
