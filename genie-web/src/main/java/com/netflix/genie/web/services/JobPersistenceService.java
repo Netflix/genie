@@ -251,4 +251,16 @@ public interface JobPersistenceService {
         @NotNull final JobStatus newStatus,
         @Nullable final String newStatusMessage
     );
+
+    /**
+     * Get whether the job is a v4 job.
+     *
+     * @param id The id of the job
+     * @return true if its a v4 job
+     * @throws GenieJobNotFoundException     If no job with {@code id} exists
+     */
+    boolean isV4(
+        @NotBlank(message = "Id is missing and is required") final String id
+    );
+
 }

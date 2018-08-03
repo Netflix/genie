@@ -28,10 +28,12 @@ import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
 import com.netflix.genie.web.services.JobKillService;
+import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
+import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.junit.Assert;
@@ -128,6 +130,20 @@ public class ServicesAutoConfigurationUnitTests {
     public void canGetJobKillServiceBean() {
         Assert.assertNotNull(
             this.genieServicesAutoConfiguration.jobKillService(
+                Mockito.mock(JobKillServiceV3.class),
+                Mockito.mock(JobKillServiceV4.class),
+                Mockito.mock(JobPersistenceService.class)
+            )
+        );
+    }
+
+    /**
+     * Can get a bean for killing V3 jobs.
+     */
+    @Test
+    public void canGetJobKillServiceV3Bean() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.jobKillServiceV3(
                 new GenieHostInfo("localhost"),
                 this.jobSearchService,
                 Mockito.mock(Executor.class),

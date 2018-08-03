@@ -23,21 +23,21 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.NotBlank;
 
 /**
- * Interface for services to kill jobs.
+ * Interface for services to kill V4 jobs.
  *
- * @author tgianos
- * @since 3.0.0
+ * @author standon
+ * @since 4.0.0
  */
 @Validated
-public interface JobKillService {
+public interface JobKillServiceV4 {
 
     /**
-     * Kill the job with the given id if possible. Should publish a JobFinishedEvent when done.
+     * Kill the job with the given id if possible.
      *
-     * @param id     id of job to kill
+     * @param jobId     id of job to kill
      * @param reason brief reason for requesting the job be killed
      * @throws GenieException if there is an error
      */
-    void killJob(@NotBlank(message = "No id entered. Unable to kill job.") final String id,
+    void killJob(@NotBlank(message = "No job id entered. Unable to kill job.") final String jobId,
                  @NotBlank(message = "No reason provided.") final String reason) throws GenieException;
 }

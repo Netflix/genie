@@ -30,7 +30,6 @@ import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.KillJobEvent;
 import com.netflix.genie.web.jobs.JobKillReasonFile;
-import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.util.ProcessChecker;
 import com.netflix.genie.web.util.UnixProcessChecker;
@@ -50,13 +49,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 /**
- * Implementation of the JobKillService interface which attempts to kill jobs running on the local node.
+ * A JobKillService that attempts to kill genie 3.0 jobs running on the local node.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Slf4j
-public class LocalJobKillServiceImpl implements JobKillService {
+public class JobKillServiceV3 {
 
     private final String hostname;
     private final JobSearchService jobSearchService;
@@ -77,7 +76,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param genieWorkingDir  The working directory where all job directories are created.
      * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      */
-    public LocalJobKillServiceImpl(
+    public JobKillServiceV3(
         @NotBlank final String hostname,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final Executor executor,
@@ -101,9 +100,12 @@ public class LocalJobKillServiceImpl implements JobKillService {
     }
 
     /**
-     * {@inheritDoc}
+     * Kill the job with the given id if possible. Should publish a JobFinishedEvent when done.
+     *
+     * @param id     id of job to kill
+     * @param reason brief reason for requesting the job be killed
+     * @throws GenieException if there is an error
      */
-    @Override
     public void killJob(
         @NotBlank(message = "No id entered. Unable to kill job.") final String id,
         @NotBlank(message = "No reason provided.") final String reason
