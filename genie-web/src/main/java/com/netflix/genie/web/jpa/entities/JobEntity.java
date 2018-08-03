@@ -28,6 +28,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobSearchProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.specifications.JpaSpecificationUtils;
 import lombok.AccessLevel;
@@ -130,7 +131,8 @@ public class JobEntity extends BaseEntity implements
     JobCommandProjection,
     JobSearchProjection,
     V4JobRequestProjection,
-    JobSpecificationProjection {
+    JobSpecificationProjection,
+    IsV4JobProjection {
 
     private static final long serialVersionUID = 2849367731657512224L;
 

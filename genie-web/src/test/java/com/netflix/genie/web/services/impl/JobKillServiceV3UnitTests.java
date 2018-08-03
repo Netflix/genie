@@ -49,13 +49,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Unit tests for the LocalJobKillServiceImpl class.
+ * Unit tests for the JobKillServiceV3 class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class LocalJobKillServiceImplUnitTests {
+public class JobKillServiceV3UnitTests {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String HOSTNAME = UUID.randomUUID().toString();
@@ -64,12 +64,13 @@ public class LocalJobKillServiceImplUnitTests {
     private CommandLine killCommand;
     private JobSearchService jobSearchService;
     private Executor executor;
-    private LocalJobKillServiceImpl service;
+    private JobKillServiceV3 service;
     private GenieEventBus genieEventBus;
     private FileSystemResource genieWorkingDir;
 
     /**
      * Setup for the tests.
+     *
      *
      * @throws IOException if the job directory cannot be created
      */
@@ -82,7 +83,7 @@ public class LocalJobKillServiceImplUnitTests {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.executor = Mockito.mock(Executor.class);
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
-        this.service = new LocalJobKillServiceImpl(
+        this.service = new JobKillServiceV3(
             HOSTNAME,
             this.jobSearchService,
             this.executor,
@@ -218,7 +219,7 @@ public class LocalJobKillServiceImplUnitTests {
      */
     @Test
     public void canKillJobRunningAsUser() throws GenieException, IOException {
-        this.service = new LocalJobKillServiceImpl(
+        this.service = new JobKillServiceV3(
             HOSTNAME,
             this.jobSearchService,
             this.executor,

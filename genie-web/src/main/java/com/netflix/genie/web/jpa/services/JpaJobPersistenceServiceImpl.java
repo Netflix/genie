@@ -54,6 +54,7 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
@@ -461,6 +462,26 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return projection.isResolved()
             ? Optional.of(EntityDtoConverters.toJobSpecificationDto(projection))
             : Optional.empty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isV4(
+        @NotBlank(message = "Id is missing and is required") final String id
+    ) {
+        log.debug("Read v4 flag from db for job {} ", id);
+        return this.jobRepository
+            .findByUniqueId(id, IsV4JobProjection.class)
+            .orElseThrow(
+                () -> {
+                    final String errorMessage = "No job with id " + id + "exists. Unable to get v4 flag.";
+                    log.error(errorMessage);
+                    return new GenieJobNotFoundException(errorMessage);
+                }
+            ).isV4();
     }
 
     /**

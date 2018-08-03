@@ -44,6 +44,7 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
@@ -738,6 +739,62 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Mockito.when(jobEntity.isResolved()).thenReturn(false);
 
         Assert.assertFalse(this.jobPersistenceService.getJobSpecification(UUID.randomUUID().toString()).isPresent());
+    }
+
+    /**
+     * If a job isn't found on querying for v4 flag.
+     */
+    @Test(expected = GenieJobNotFoundException.class)
+    public void noJobUnableToGetV4() {
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
+            .thenReturn(Optional.empty());
+
+        this.jobPersistenceService.isV4(UUID.randomUUID().toString());
+    }
+
+
+    /**
+     * If v4 is false in db then return false.
+     */
+    @Test
+    public void v4JobFalseReturnsFalse() {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito.when(jobEntity.isV4()).thenReturn(false);
+
+        Assert.assertFalse(this.jobPersistenceService.isV4(UUID.randomUUID().toString()));
+    }
+
+    /**
+     * If v4 is true in db then return true.
+     */
+    @Test
+    public void v4JobTrueReturnsTrue() {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito.when(jobEntity.isV4()).thenReturn(true);
+
+        Assert.assertTrue(this.jobPersistenceService.isV4(UUID.randomUUID().toString()));
+    }
+
+    /**
+     * If v4 job is not found in the db then throw a Exception.
+     */
+    @Test(expected = GenieJobNotFoundException.class)
+    public void v4JobNotFoundThrowsException() {
+        final JobEntity jobEntity = null;
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
+            .thenReturn(Optional.ofNullable(jobEntity));
+
+        this.jobPersistenceService.isV4(UUID.randomUUID().toString());
     }
 
     /**
