@@ -42,13 +42,6 @@ import java.util.Map;
 public interface ExecutionContext {
 
     /**
-     * Set the job process once it has been launched.
-     *
-     * @param jobProcess a process handle for the children job
-     */
-    void setJobProcess(final Process jobProcess);
-
-    /**
      * Get the job process.
      *
      * @return a Process, if it was set, or null
@@ -57,11 +50,11 @@ public interface ExecutionContext {
     Process getJobProcess();
 
     /**
-     * Set the job directory.
+     * Set the job process once it has been launched.
      *
-     * @param jobDirectory the job directory
+     * @param jobProcess a process handle for the children job
      */
-    void setJobDirectory(final File jobDirectory);
+    void setJobProcess(final Process jobProcess);
 
     /**
      * Get the job run directory.
@@ -72,11 +65,11 @@ public interface ExecutionContext {
     File getJobDirectory();
 
     /**
-     * Set the job specification.
+     * Set the job directory.
      *
-     * @param jobSpecification the job specification
+     * @param jobDirectory the job directory
      */
-    void setJobSpecification(final JobSpecification jobSpecification);
+    void setJobDirectory(final File jobDirectory);
 
     /**
      * Get the job specification.
@@ -87,11 +80,11 @@ public interface ExecutionContext {
     JobSpecification getJobSpecification();
 
     /**
-     * Set the job environment variables map.
+     * Set the job specification.
      *
-     * @param jobEnvironment a map of environment variables and their value to be passed to the job process at launch
+     * @param jobSpecification the job specification
      */
-    void setJobEnvironment(final Map<String, String> jobEnvironment);
+    void setJobSpecification(final JobSpecification jobSpecification);
 
     /**
      * Get the environment variables map for the job process.
@@ -100,6 +93,13 @@ public interface ExecutionContext {
      */
     @Nullable
     Map<String, String> getJobEnvironment();
+
+    /**
+     * Set the job environment variables map.
+     *
+     * @param jobEnvironment a map of environment variables and their value to be passed to the job process at launch
+     */
+    void setJobEnvironment(final Map<String, String> jobEnvironment);
 
     /**
      * Enqueue cleanup for a state action.
@@ -143,13 +143,6 @@ public interface ExecutionContext {
     List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors();
 
     /**
-     * Set the final job status.
-     *
-     * @param jobStatus the final job status
-     */
-    void setFinalJobStatus(final JobStatus jobStatus);
-
-    /**
      * Get the final job status, if one was set.
      *
      * @return the final job status or null
@@ -158,11 +151,11 @@ public interface ExecutionContext {
     JobStatus getFinalJobStatus();
 
     /**
-     * Set the current job status.
+     * Set the final job status.
      *
-     * @param jobStatus the job status
+     * @param jobStatus the final job status
      */
-    void setCurrentJobStatus(final JobStatus jobStatus);
+    void setFinalJobStatus(final JobStatus jobStatus);
 
     /**
      * Get the current job status.
@@ -173,11 +166,11 @@ public interface ExecutionContext {
     JobStatus getCurrentJobStatus();
 
     /**
-     * Set the job id of a successfully claimed job.
+     * Set the current job status.
      *
-     * @param jobId the job id
+     * @param jobStatus the job status
      */
-    void setClaimedJobId(@NotBlank String jobId);
+    void setCurrentJobStatus(final JobStatus jobStatus);
 
     /**
      * Get the job id, if a job was claimed.
@@ -186,4 +179,11 @@ public interface ExecutionContext {
      */
     @Nullable
     String getClaimedJobId();
+
+    /**
+     * Set the job id of a successfully claimed job.
+     *
+     * @param jobId the job id
+     */
+    void setClaimedJobId(@NotBlank String jobId);
 }

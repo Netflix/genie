@@ -101,8 +101,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             throw new RuntimeException("Failed to set up job", e);
         }
 
-        // TODO: turn off console logging if the job is interactive
-
         return Events.SETUP_JOB_COMPLETE;
     }
 
