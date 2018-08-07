@@ -102,4 +102,17 @@ class ExecCommandSpec extends Specification {
 
         thrown(RuntimeException.class)
     }
+
+    def "Handle ctrl-c"() {
+        setup:
+        def execCommand = new ExecCommand(args, stateMachine, execContext)
+
+        when:
+        execCommand.handleSigInt()
+
+        then:
+        1 * execContext.getCurrentJobStatus()
+        1 * execContext.setJobKillSource(ExecutionContext.KillSource.SYSTEM_SIGNAL)
+        1 * stateMachine.stop()
+    }
 }
