@@ -19,7 +19,10 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
+import com.netflix.genie.common.dto.JobStatus
 import org.assertj.core.util.Lists
 import spock.lang.Specification
 
@@ -27,12 +30,15 @@ class CleanupJobActionSpec extends Specification {
     ExecutionContext executionContext
     CleanupJobAction action
     List<StateAction> cleanupQueue
-
+    AgentJobService agentJobService
+    String jobId
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.action = new CleanupJobAction(executionContext)
+        this.agentJobService = Mock(AgentJobService)
+        this.action = new CleanupJobAction(executionContext, agentJobService)
         this.cleanupQueue = Lists.newArrayList()
+        this.jobId = UUID.randomUUID().toString()
 
         executionContext.getCleanupActions() >> cleanupQueue
     }
@@ -40,13 +46,16 @@ class CleanupJobActionSpec extends Specification {
     void cleanup() {
     }
 
-    def "Execute with empty queue"() {
+    def "Execute with empty queue and unclaimed job"() {
         when:
         def event = action.executeStateAction(executionContext)
+
         then:
         event == Events.CLEANUP_JOB_COMPLETE
+        1 * executionContext.getClaimedJobId() >> null
+        1 * executionContext.getFinalJobStatus() >> JobStatus.SUCCEEDED
+        1 * executionContext.getJobKillSource() >> null
     }
-
 
     def "Execute with actions and self"() {
         setup:
@@ -61,6 +70,9 @@ class CleanupJobActionSpec extends Specification {
 
         then:
         event == Events.CLEANUP_JOB_COMPLETE
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getFinalJobStatus() >> JobStatus.SUCCEEDED
+        1 * executionContext.getJobKillSource() >> null
         1 * action1.cleanup()
         1 * action2.cleanup()
         0 * action.cleanup()
@@ -79,8 +91,59 @@ class CleanupJobActionSpec extends Specification {
 
         then:
         event == Events.CLEANUP_JOB_COMPLETE
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getFinalJobStatus() >> JobStatus.SUCCEEDED
+        1 * executionContext.getJobKillSource() >> null
         1 * action1.cleanup()
         1 * action2.cleanup() >> {throw new RuntimeException()}
         0 * action.cleanup()
+    }
+
+    def "Aborted job launch"() {
+        when:
+        def event = action.executeStateAction(executionContext)
+
+        then:
+        event == Events.CLEANUP_JOB_COMPLETE
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getFinalJobStatus() >> null
+        1 * executionContext.getJobKillSource() >> ExecutionContext.KillSource.SYSTEM_SIGNAL
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.CLAIMED
+        1 * agentJobService.changeJobStatus(
+            jobId,
+            JobStatus.CLAIMED,
+            JobStatus.KILLED,
+            _ as String
+        )
+    }
+
+    def "Aborted job launch and exception"() {
+        when:
+        action.executeStateAction(executionContext)
+
+        then:
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getFinalJobStatus() >> null
+        1 * executionContext.getJobKillSource() >> ExecutionContext.KillSource.SYSTEM_SIGNAL
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.CLAIMED
+        1 * agentJobService.changeJobStatus(
+            jobId,
+            JobStatus.CLAIMED,
+            JobStatus.KILLED,
+            _ as String
+        ) >> { throw new ChangeJobStatusException("test")}
+        thrown(RuntimeException)
+    }
+
+    def "Handle illegal executionContext state"() {
+        when:
+        action.executeStateAction(executionContext)
+
+        then:
+        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getCurrentJobStatus() >> JobStatus.CLAIMED
+        1 * executionContext.getFinalJobStatus() >> null
+        1 * executionContext.getJobKillSource() >> null
+        thrown(IllegalStateException)
     }
 }

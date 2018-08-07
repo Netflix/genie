@@ -19,7 +19,10 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -37,8 +40,14 @@ import java.util.List;
 @Lazy
 class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob {
 
-    CleanupJobAction(final ExecutionContext executionContext) {
+    private final AgentJobService agentJobService;
+
+    CleanupJobAction(
+        final ExecutionContext executionContext,
+        final AgentJobService agentJobService
+    ) {
         super(executionContext);
+        this.agentJobService = agentJobService;
     }
 
     /**
@@ -47,6 +56,50 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Cleaning up job...");
+
+        // Set if this job got past the state where a job ID is successfully claimed.
+        final String claimedJobId = executionContext.getClaimedJobId();
+
+        // Set if the job was launched, null if that state was never reached,
+        // for example due to CANCEL_JOB_LAUNCH event.
+        final JobStatus finalJobStatus = executionContext.getFinalJobStatus();
+
+        // Reason for the job being killed.
+        final ExecutionContext.KillSource killSource = executionContext.getJobKillSource();
+
+        // Last job status the server was made aware of.
+        final JobStatus lastJobStatus = executionContext.getCurrentJobStatus();
+
+        if (lastJobStatus != null && claimedJobId != null) {
+            // A job was claimed, but final status is not set (due to error/kill/...).
+            // server should be made aware of final state.
+            if (finalJobStatus == null) {
+                // This job was killed
+                if (killSource != null) {
+                    try {
+                        // Job launch was aborted before the the job even started.
+                        agentJobService.changeJobStatus(
+                            claimedJobId,
+                            lastJobStatus,
+                            JobStatus.KILLED,
+                            "Terminated by user via " + killSource.name()
+                        );
+                    } catch (final ChangeJobStatusException e) {
+                        throw new RuntimeException("Failed to update server status", e);
+                    }
+                    executionContext.setFinalJobStatus(JobStatus.KILLED);
+                } else {
+                    // No job final status (which reflect server-side status), and no sign of abort/kill.
+                    throw new IllegalStateException(
+                        "Reached cleanup state and finalJobState is null. Last job state: " + lastJobStatus
+                    );
+                }
+            } else {
+                log.debug("Job final status already updated server-side: {}", finalJobStatus);
+            }
+        } else {
+            log.debug("Job never claimed an ID, skipping server-side status update");
+        }
 
         final List<StateAction> cleanupActions = executionContext.getCleanupActions();
         for (final StateAction cleanupAction : cleanupActions) {
