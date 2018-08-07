@@ -62,10 +62,30 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
             throw new RuntimeException("Interrupted while waiting for job completion", e);
         }
 
-        log.info("Job process completed with exit code: {}", exitCode);
+        try {
+            // Evil-but-necessary little hack.
+            // The agent and the child job process receive SIGINT at the same time.
+            // If the child terminates quickly, the code below will execute before the signal handler has a chance to
+            // set the job as killed, and the final status would be (incorrectly) reported as failed (due to non-zero
+            // exit code).
+            // So give the handler a chance to mark the context before attempting to read it.
+            Thread.sleep(100);
+        } catch (final InterruptedException e) {
+            // Do nothing.
+        }
 
-        // TODO: handle KILLED case
-        final JobStatus finalJobStatus = exitCode == 0 ? JobStatus.SUCCEEDED : JobStatus.FAILED;
+        final ExecutionContext.KillSource killSource = executionContext.getJobKillSource();
+
+        log.info("Job process completed with exit code: {} (kill source: )", exitCode, killSource);
+
+        final JobStatus finalJobStatus;
+        if (killSource != null) {
+            finalJobStatus = JobStatus.KILLED;
+        } else if (exitCode == 0) {
+            finalJobStatus = JobStatus.SUCCEEDED;
+        } else {
+            finalJobStatus = JobStatus.FAILED;
+        }
 
         executionContext.setFinalJobStatus(finalJobStatus);
 

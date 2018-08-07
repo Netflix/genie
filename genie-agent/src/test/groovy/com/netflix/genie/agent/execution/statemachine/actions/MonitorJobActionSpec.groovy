@@ -45,7 +45,7 @@ class MonitorJobActionSpec extends Specification {
     }
 
     @Unroll
-    def "Successful, expecting job status #expectedJobStatus"() {
+    def "Successful, expecting job status #expectedJobStatus and kill source #killSource"() {
         JobStatus currentJobStatus = JobStatus.RUNNING
 
         when:
@@ -54,6 +54,7 @@ class MonitorJobActionSpec extends Specification {
         then:
         1 * executionContext.getJobProcess() >> process
         1 * process.waitFor() >> exitCode
+        1 * executionContext.getJobKillSource() >> killSource
         1 * executionContext.setFinalJobStatus(expectedJobStatus)
         1 * executionContext.getClaimedJobId() >> id
         1 * executionContext.getCurrentJobStatus() >> currentJobStatus
@@ -64,9 +65,11 @@ class MonitorJobActionSpec extends Specification {
         event == Events.MONITOR_JOB_COMPLETE
 
         where:
-        exitCode | expectedJobStatus
-        0        | JobStatus.SUCCEEDED
-        123L     | JobStatus.FAILED
+        exitCode | killSource                                | expectedJobStatus
+        0        | null                                      | JobStatus.SUCCEEDED
+        123L     | null                                      | JobStatus.FAILED
+        0        | ExecutionContext.KillSource.SYSTEM_SIGNAL | JobStatus.KILLED
+        123L     | ExecutionContext.KillSource.SYSTEM_SIGNAL | JobStatus.KILLED
     }
 
     def "Interrupt while monitoring"() {
