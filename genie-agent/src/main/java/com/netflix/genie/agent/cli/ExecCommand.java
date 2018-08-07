@@ -20,6 +20,7 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.States;
@@ -59,6 +60,10 @@ class ExecCommand implements AgentCommand {
 
     @Override
     public void run() {
+        // Trap and handle SIGINT.
+        // The child process, if one is running, will also receive the signal since it belongs to the same process group
+        sun.misc.Signal.handle(new sun.misc.Signal("INT"), signal -> handleSigInt());
+
         log.info("Running job state machine");
         stateMachine.start();
 
@@ -93,6 +98,16 @@ class ExecCommand implements AgentCommand {
 
         log.info("Job execution completed successfully");
 
+    }
+
+    @VisibleForTesting
+    void handleSigInt() {
+        UserConsole.getLogger().info(
+            "Received SIGINT, terminating job (status: {})",
+            executionContext.getCurrentJobStatus()
+        );
+        executionContext.setJobKillSource(ExecutionContext.KillSource.SYSTEM_SIGNAL);
+        stateMachine.stop();
     }
 
     @Component
