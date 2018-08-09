@@ -27,6 +27,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
@@ -171,9 +172,9 @@ public interface JobSearchService {
      *
      * @param jobId The id of the job to get the hostname for
      * @return The hostname
-     * @throws GenieException If the job isn't found or any other error
+     * @throws GenieNotFoundException If the job host cannot be found
      */
-    String getJobHost(@NotBlank final String jobId) throws GenieException;
+    String getJobHost(@NotBlank final String jobId) throws GenieNotFoundException;
 
     /**
      * Get the count of 'active' jobs for a given user across all instances.

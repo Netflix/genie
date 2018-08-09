@@ -344,7 +344,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public String getJobHost(@NotBlank final String jobId) throws GenieException {
+    public String getJobHost(@NotBlank final String jobId) throws GenieNotFoundException {
         return this.jobRepository
             .findByUniqueId(jobId, AgentHostnameProjection.class)
             .orElseThrow(() -> new GenieNotFoundException("No job execution found for id " + jobId))

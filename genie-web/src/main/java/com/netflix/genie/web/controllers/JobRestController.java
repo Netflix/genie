@@ -27,8 +27,10 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
@@ -49,8 +51,10 @@ import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
+import com.netflix.genie.web.services.AgentRoutingService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
+import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -96,6 +100,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.EnumSet;
@@ -140,6 +145,8 @@ public class JobRestController {
     private final RestTemplate restTemplate;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
     private final JobsProperties jobsProperties;
+    private final AgentRoutingService agentRoutingService;
+    private final JobPersistenceService jobPersistenceService;
 
     // Metrics
     private final Counter submitJobWithoutAttachmentsRate;
@@ -165,6 +172,8 @@ public class JobRestController {
      *                                         Genie File System.
      * @param jobsProperties                   All the properties associated with jobs
      * @param registry                         The metrics registry to use
+     * @param jobPersistenceService            Job persistence service
+     * @param agentRoutingService              Agent routing service
      */
     @Autowired
     @SuppressWarnings("checkstyle:parameternumber")
@@ -184,8 +193,10 @@ public class JobRestController {
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
         final JobsProperties jobsProperties,
-        final MeterRegistry registry
-    ) {
+        final MeterRegistry registry,
+        final JobPersistenceService jobPersistenceService,
+        final AgentRoutingService agentRoutingService
+        ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;
         this.attachmentService = attachmentService;
@@ -201,6 +212,8 @@ public class JobRestController {
         this.restTemplate = restTemplate;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
         this.jobsProperties = jobsProperties;
+        this.agentRoutingService = agentRoutingService;
+        this.jobPersistenceService = jobPersistenceService;
 
         // Set up the metrics
         this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
@@ -543,7 +556,13 @@ public class JobRestController {
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
         if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
-            final String jobHostname = this.jobSearchService.getJobHost(id);
+            String jobHostname = null;
+            try {
+                jobHostname = this.getJobOwnerHostname(id);
+            } catch (GenieJobNotFoundException e) {
+                throw new GenieNotFoundException("Job " + id + " not found", e);
+            }
+
             if (!this.hostname.equals(jobHostname)) {
                 log.info("Job {} is not on this node. Forwarding kill request to {}", id, jobHostname);
                 final String forwardHost = this.buildForwardHost(jobHostname);
@@ -809,6 +828,28 @@ public class JobRestController {
             if (!TRANSFER_ENCODING_HEADER.equalsIgnoreCase(header.getKey())) {
                 response.setHeader(header.getKey(), header.getValue());
             }
+        }
+    }
+
+    /*
+     * Helper to find the owner for a job.
+     * Owner is defined as
+     * 1. For v3 jobs the server that spawned the process running the job
+     * 2. For v4 jobs the server owning the active connection to the agent
+     *
+     */
+    private String getJobOwnerHostname(
+        @NotBlank(message = "No job id entered. Unable to find the job owner.") final String jobId
+    ) throws GenieNotFoundException {
+        if (jobPersistenceService.isV4(jobId)) {
+            return this.agentRoutingService
+                .getHostnameForAgentConnection(jobId)
+                .orElseThrow(() -> new GenieNotFoundException(
+                        "No hostname found for v4 job - " + jobId
+                    )
+                );
+        } else {
+            return this.jobSearchService.getJobHost(jobId);
         }
     }
 }
