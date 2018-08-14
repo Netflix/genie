@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -51,34 +50,16 @@ import java.util.concurrent.atomic.AtomicReference;
 @ThreadSafe
 class ExecutionContextImpl implements ExecutionContext {
 
-    private final AtomicReference<Process> jobProcessRef = new AtomicReference<>();
     private final AtomicReference<File> jobDirectoryRef = new AtomicReference<>();
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
     private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
     private final AtomicReference<JobStatus> finalJobStatusRef = new AtomicReference<>();
     private final AtomicReference<JobStatus> currentJobStatusRef = new AtomicReference<>();
     private final AtomicReference<String> claimedJobIdRef = new AtomicReference<>();
-    private final AtomicReference<KillSource> killSourceRef = new AtomicReference<>();
     private final List<StateAction> cleanupActions = Lists.newArrayList();
     private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors = Lists.newArrayList();
 
     ExecutionContextImpl() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setJobProcess(final Process jobProcess) {
-        setIfNullOrTrow(jobProcess, jobProcessRef);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Process getJobProcess() {
-        return jobProcessRef.get();
     }
 
     /**
@@ -225,24 +206,6 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public void setClaimedJobId(@NotBlank final String jobId) {
         setIfNullOrTrow(jobId, claimedJobIdRef);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nullable
-    @Override
-    public KillSource getJobKillSource() {
-        return killSourceRef.get();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @param killSource
-     */
-    @Override
-    public void setJobKillSource(@NotNull final ExecutionContext.KillSource killSource) {
-        setIfNullOrTrow(killSource, killSourceRef);
     }
 
     /**

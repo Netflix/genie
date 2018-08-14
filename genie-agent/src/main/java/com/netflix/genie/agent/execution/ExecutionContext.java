@@ -28,7 +28,6 @@ import org.springframework.statemachine.action.Action;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -41,21 +40,6 @@ import java.util.Map;
  */
 @ThreadSafe
 public interface ExecutionContext {
-
-    /**
-     * Get the job process.
-     *
-     * @return a Process, if it was set, or null
-     */
-    @Nullable
-    Process getJobProcess();
-
-    /**
-     * Set the job process once it has been launched.
-     *
-     * @param jobProcess a process handle for the children job
-     */
-    void setJobProcess(final Process jobProcess);
 
     /**
      * Get the job run directory.
@@ -188,33 +172,4 @@ public interface ExecutionContext {
      * @param jobId the job id
      */
     void setClaimedJobId(@NotBlank String jobId);
-
-    /**
-     * If the job was killed, return the source of the kill request.
-     *
-     * @return null if the job was not killed, or else the source of the kill signal
-     */
-    @Nullable
-    KillSource getJobKillSource();
-
-    /**
-     * Flags the job as killed and save the source of the kill request.
-     *
-     * @param killSource the source of the kill
-     */
-    void setJobKillSource(@NotNull ExecutionContext.KillSource killSource);
-
-    /**
-     * Enumeration for the source of a request to kill the job.
-     */
-    enum KillSource {
-        /**
-         * A system signal (SIGINT), for example user ctrl-c or system shutdown.
-         */
-        SYSTEM_SIGNAL,
-        /**
-         * A request to the server, forwarded to the agent.
-         */
-        API_KILL_REQUEST,
-    }
 }
