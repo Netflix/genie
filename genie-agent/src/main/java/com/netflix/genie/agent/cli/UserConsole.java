@@ -34,6 +34,14 @@ public final class UserConsole {
      * consumed by Spring.
      */
     private static final String CONSOLE_LOGGER_NAME = "genie-agent";
+    /**
+     * This string path must match the one present in the log appender configuration consumed by Spring.
+     */
+    private static final String LOG_FILE_PATH = "/tmp/genie-agent-%s.log";
+    /**
+     * This system property is set by Spring.
+     */
+    private static final String PID_SYSTEM_PROPERTY_NAME = "PID";
     private static final Logger LOGGER = LoggerFactory.getLogger(CONSOLE_LOGGER_NAME);
 
     private UserConsole() {
@@ -47,5 +55,12 @@ public final class UserConsole {
      */
     public static Logger getLogger() {
         return LOGGER;
+    }
+
+    static String getLogFilePath() {
+        return String.format(
+            LOG_FILE_PATH,
+            System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???")
+        );
     }
 }
