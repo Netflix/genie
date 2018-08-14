@@ -25,8 +25,10 @@ class UserConsoleSpec extends Specification {
     def "GetLogger"() {
         when:
         Logger logger = UserConsole.getLogger()
+        String logPath = UserConsole.getLogFilePath()
 
         then:
         logger != null
+        logPath != null
     }
 }

@@ -60,6 +60,8 @@ public class GenieAgentRunnner implements CommandLineRunner, ExitCodeGenerator {
                 userConsoleException.getMessage(),
                 userConsoleException
             );
+
+            UserConsole.getLogger().info("Full execution log file: {}", UserConsole.getLogFilePath());
             log.info("Command execution failed", t);
         }
     }
