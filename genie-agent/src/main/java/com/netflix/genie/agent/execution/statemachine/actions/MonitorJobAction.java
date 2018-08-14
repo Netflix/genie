@@ -21,6 +21,7 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
+import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -39,13 +40,16 @@ import org.springframework.stereotype.Component;
 class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob {
 
     private final AgentJobService agentJobService;
+    private final LaunchJobService launchJobService;
 
     MonitorJobAction(
         final ExecutionContext executionContext,
-        final AgentJobService agentJobService
+        final AgentJobService agentJobService,
+        final LaunchJobService launchJobService
     ) {
         super(executionContext);
         this.agentJobService = agentJobService;
+        this.launchJobService = launchJobService;
     }
 
     /**
@@ -55,48 +59,24 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Monitoring job...");
 
-        final int exitCode;
-        try {
-            exitCode = executionContext.getJobProcess().waitFor();
-        } catch (final InterruptedException e) {
-            throw new RuntimeException("Interrupted while waiting for job completion", e);
-        }
-
-        try {
-            // Evil-but-necessary little hack.
-            // The agent and the child job process receive SIGINT at the same time.
-            // If the child terminates quickly, the code below will execute before the signal handler has a chance to
-            // set the job as killed, and the final status would be (incorrectly) reported as failed (due to non-zero
-            // exit code).
-            // So give the handler a chance to mark the context before attempting to read it.
-            Thread.sleep(100);
-        } catch (final InterruptedException e) {
-            // Do nothing.
-        }
-
-        final ExecutionContext.KillSource killSource = executionContext.getJobKillSource();
-
-        log.info("Job process completed with exit code: {} (kill source: )", exitCode, killSource);
-
         final JobStatus finalJobStatus;
-        if (killSource != null) {
-            finalJobStatus = JobStatus.KILLED;
-        } else if (exitCode == 0) {
-            finalJobStatus = JobStatus.SUCCEEDED;
-        } else {
-            finalJobStatus = JobStatus.FAILED;
+        try {
+            finalJobStatus = launchJobService.waitFor();
+        } catch (final InterruptedException e) {
+            throw new RuntimeException("Interrupted while waiting for job process completion", e);
         }
 
-        executionContext.setFinalJobStatus(finalJobStatus);
+        log.info("Job process completed with final status {}", finalJobStatus);
 
         try {
             this.agentJobService.changeJobStatus(
                 executionContext.getClaimedJobId(),
                 executionContext.getCurrentJobStatus(),
                 finalJobStatus,
-                "Job process exited with status " + exitCode
+                "Job process completed with final status " + finalJobStatus
             );
             executionContext.setCurrentJobStatus(finalJobStatus);
+            executionContext.setFinalJobStatus(finalJobStatus);
         } catch (ChangeJobStatusException e) {
             throw new RuntimeException("Failed to update job status", e);
         }

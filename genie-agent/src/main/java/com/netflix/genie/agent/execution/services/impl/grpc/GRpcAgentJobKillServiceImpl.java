@@ -127,7 +127,8 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
 
         @Override
         public void onSuccess(final JobKillRegistrationResponse result) {
-            killService.kill();
+            log.info("Received kill signal from server");
+            killService.kill(KillService.KillSource.API_KILL_REQUEST);
         }
 
         @Override

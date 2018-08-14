@@ -20,6 +20,7 @@ package com.netflix.genie.agent.cli
 
 import com.google.common.collect.Lists
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.agent.execution.statemachine.actions.BaseStateAction
@@ -34,11 +35,13 @@ class ExecCommandSpec extends Specification {
     ExecCommand.ExecCommandArguments args
     JobExecutionStateMachine stateMachine;
     ExecutionContext execContext
+    KillService killService
 
     void setup() {
         args = Mock()
         stateMachine = Mock()
         execContext = Mock()
+        killService = Mock()
     }
 
     void cleanup() {
@@ -46,7 +49,7 @@ class ExecCommandSpec extends Specification {
 
     def "Run"() {
         setup:
-        def execCommand = new ExecCommand(args, stateMachine, execContext)
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
         execCommand.run()
@@ -58,7 +61,7 @@ class ExecCommandSpec extends Specification {
 
     def "Run interrupted"() {
         setup:
-        def execCommand = new ExecCommand(args, stateMachine, execContext)
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
         execCommand.run()
@@ -72,7 +75,7 @@ class ExecCommandSpec extends Specification {
 
     def "Run fail"() {
         setup:
-        def execCommand = new ExecCommand(args, stateMachine, execContext)
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
         execCommand.run()
@@ -89,7 +92,7 @@ class ExecCommandSpec extends Specification {
         List<Triple<States, Class<? extends Action>, Exception>> actionErrors = Lists.newArrayList(
                 Triple.of(States.SETUP_JOB, BaseStateAction.class, new RuntimeException())
         )
-        def execCommand = new ExecCommand(args, stateMachine, execContext)
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
         execCommand.run()
@@ -105,14 +108,13 @@ class ExecCommandSpec extends Specification {
 
     def "Handle ctrl-c"() {
         setup:
-        def execCommand = new ExecCommand(args, stateMachine, execContext)
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
         execCommand.handleSigInt()
 
         then:
         1 * execContext.getCurrentJobStatus()
-        1 * execContext.setJobKillSource(ExecutionContext.KillSource.SYSTEM_SIGNAL)
-        1 * stateMachine.stop()
+        1 * killService.kill(KillService.KillSource.SYSTEM_SIGNAL)
     }
 }

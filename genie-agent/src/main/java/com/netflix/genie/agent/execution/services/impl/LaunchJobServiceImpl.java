@@ -22,6 +22,7 @@ import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
+import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -29,11 +30,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Configures and launches a job sub-process using metadata passed through ExecutionContext.
@@ -46,16 +50,24 @@ import java.util.Map;
 @Lazy
 class LaunchJobServiceImpl implements LaunchJobService {
 
+    private final AtomicBoolean launched = new AtomicBoolean(false);
+    private final AtomicReference<Process> processReference = new AtomicReference<>();
+    private final AtomicBoolean killed = new AtomicBoolean(false);
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public Process launchProcess(
+    public void launchProcess(
         final File runDirectory,
         final Map<String, String> environmentVariablesMap,
         final List<String> commandLine,
         final boolean interactive
     ) throws JobLaunchException {
+
+        if (!launched.compareAndSet(false, true)) {
+            throw new IllegalStateException("Job already launched");
+        }
 
         final ProcessBuilder processBuilder = new ProcessBuilder();
 
@@ -131,10 +143,69 @@ class LaunchJobServiceImpl implements LaunchJobService {
             processBuilder.redirectOutput(PathUtils.jobStdOutPath(runDirectory).toFile());
         }
 
+        if (killed.get()) {
+            log.info("Job aborted, skipping launch");
+        } else {
+            log.info("Launching job");
+            try {
+                processReference.set(processBuilder.start());
+            } catch (final IOException | SecurityException e) {
+                throw new JobLaunchException("Failed to launch job: ", e);
+            }
+            log.info("Process launched (pid: {})", getPid(processReference.get()));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void kill(final boolean sendSigIntToJobProcess) {
+        killed.set(true);
+
+        final Process process = processReference.get();
+
+        if (process != null && sendSigIntToJobProcess) {
+            process.destroy();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobStatus waitFor() throws InterruptedException {
+
+        if (!launched.get()) {
+            throw new IllegalStateException("Process not launched");
+        }
+
+        final Process process = processReference.get();
+
+        int exitCode = 0;
+        if (process != null) {
+            exitCode = process.waitFor();
+            log.info("Job process completed with exit code: {}", exitCode);
+        }
+
         try {
-            return processBuilder.start();
-        } catch (final IOException | SecurityException e) {
-            throw new JobLaunchException("Failed to launch job: ", e);
+            // Evil-but-necessary little hack.
+            // The agent and the child job process receive SIGINT at the same time (e.g. in case of ctrl-c).
+            // If the child terminates quickly, the code below will execute before the signal handler has a chance to
+            // set the job as killed, and the final status would be (incorrectly) reported as success/failure,
+            // depending on exit code, as opposed to killed.
+            // So give the handler a chance to raise the 'killed' flag before attempting to read it.
+            Thread.sleep(100);
+        } catch (final InterruptedException e) {
+            // Do nothing.
+        }
+
+        if (killed.get()) {
+            return JobStatus.KILLED;
+        } else if (exitCode == 0) {
+            return JobStatus.SUCCEEDED;
+        } else {
+            return JobStatus.FAILED;
         }
     }
 
@@ -152,4 +223,26 @@ class LaunchJobServiceImpl implements LaunchJobService {
 
         return Collections.unmodifiableList(expandedCommandLine);
     }
+
+    /* TODO: HACK, Process does not expose PID in Java 8 API */
+    private long getPid(final Process process) {
+        long pid = -1;
+        final String processClassName = process.getClass().getCanonicalName();
+        try {
+            if ("java.lang.UNIXProcess".equals(processClassName)) {
+                final Field pidMemberField = process.getClass().getDeclaredField("pid");
+                final boolean resetAccessible = pidMemberField.isAccessible();
+                pidMemberField.setAccessible(true);
+                pid = pidMemberField.getLong(process);
+                pidMemberField.setAccessible(resetAccessible);
+            } else {
+                log.debug("Don't know how to access PID for class {}", processClassName);
+            }
+        } catch (final Throwable t) {
+            log.warn("Failed to determine job process PID");
+        }
+        return pid;
+    }
 }
+
+

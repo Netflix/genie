@@ -21,6 +21,7 @@ package com.netflix.genie.agent.execution.services.impl
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.utils.PathUtils
+import com.netflix.genie.common.dto.JobStatus
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -57,7 +58,7 @@ class LaunchJobServiceImplSpec extends Specification {
         envMap.put("PATH", System.getenv("PATH") + ":/foo")
 
         when:
-        Process process = service.launchProcess(
+        service.launchProcess(
                 temporaryFolder.getRoot(),
                 envMap,
                 ["touch", expectedFile.getAbsolutePath()],
@@ -65,14 +66,13 @@ class LaunchJobServiceImplSpec extends Specification {
         )
 
         then:
-        process != null
+        noExceptionThrown()
 
         when:
-        boolean terminated = process.waitFor(3, TimeUnit.SECONDS)
+        JobStatus status = service.waitFor()
 
         then:
-        terminated
-        0 == process.exitValue()
+        status == JobStatus.SUCCEEDED
         expectedFile.exists()
         !stdErr.exists()
         !stdOut.exists()
@@ -85,7 +85,7 @@ class LaunchJobServiceImplSpec extends Specification {
         envMap.put("ECHO_COMMAND", "echo")
 
         when:
-        Process process = service.launchProcess(
+        service.launchProcess(
                 temporaryFolder.getRoot(),
                 envMap,
                 ["\${ECHO_COMMAND}", helloWorld],
@@ -93,14 +93,13 @@ class LaunchJobServiceImplSpec extends Specification {
         )
 
         then:
-        process != null
+        noExceptionThrown()
 
         when:
-        boolean terminated = process.waitFor(3, TimeUnit.SECONDS)
+        JobStatus status = service.waitFor()
 
         then:
-        terminated
-        0 == process.exitValue()
+        status == JobStatus.SUCCEEDED
         stdErr.exists()
         stdOut.exists()
         stdOut.getText(StandardCharsets.UTF_8.toString()).contains(helloWorld)
@@ -114,7 +113,7 @@ class LaunchJobServiceImplSpec extends Specification {
         LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        Process process = service.launchProcess(
+        service.launchProcess(
                 temporaryFolder.getRoot(),
                 envMap,
                 ["env"],
@@ -122,14 +121,13 @@ class LaunchJobServiceImplSpec extends Specification {
         )
 
         then:
-        process != null
+        noExceptionThrown()
 
         when:
-        boolean terminated = process.waitFor(3, TimeUnit.SECONDS)
+        JobStatus status = service.waitFor()
 
         then:
-        terminated
-        0 == process.exitValue()
+        status == JobStatus.SUCCEEDED
         stdErr.exists()
         stdOut.exists()
         stdOut.getText(StandardCharsets.UTF_8.toString()).contains(expectedString)
@@ -141,7 +139,7 @@ class LaunchJobServiceImplSpec extends Specification {
         LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        Process process = service.launchProcess(
+        service.launchProcess(
                 temporaryFolder.getRoot(),
                 envMap,
                 ["rm", nonExistentFile.absolutePath],
@@ -149,14 +147,13 @@ class LaunchJobServiceImplSpec extends Specification {
         )
 
         then:
-        process != null
+        noExceptionThrown()
 
         when:
-        boolean terminated = process.waitFor(3, TimeUnit.SECONDS)
+        JobStatus status = service.waitFor()
 
         then:
-        terminated
-        0 != process.exitValue()
+        status == JobStatus.FAILED
         stdErr.exists()
         stdOut.exists()
         stdErr.getText(StandardCharsets.UTF_8.toString()).contains("No such file or directory")
@@ -168,7 +165,7 @@ class LaunchJobServiceImplSpec extends Specification {
         LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        Process process = service.launchProcess(
+        service.launchProcess(
                 temporaryFolder.getRoot(),
                 envMap,
                 [uuid],
@@ -286,5 +283,133 @@ class LaunchJobServiceImplSpec extends Specification {
 
         then:
         thrown(JobLaunchException)
+    }
+
+    def "Kill running process"() {
+        setup:
+        LaunchJobService service = new LaunchJobServiceImpl()
+
+        when:
+        service.launchProcess(
+            temporaryFolder.getRoot(),
+            envMap,
+            ["sleep", "60"],
+            true
+        )
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.kill(true)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        JobStatus status = service.waitFor()
+
+        then:
+        status == JobStatus.KILLED
+        !stdErr.exists()
+        !stdOut.exists()
+    }
+
+    def "Kill completed process"() {
+        setup:
+        LaunchJobService service = new LaunchJobServiceImpl()
+
+        when:
+        service.launchProcess(
+            temporaryFolder.getRoot(),
+            envMap,
+            ["echo", "foo"],
+            true
+        )
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.kill(false)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        JobStatus status = service.waitFor()
+
+        then:
+        status == JobStatus.KILLED
+        !stdErr.exists()
+        !stdOut.exists()
+    }
+
+    def "Skip process launch"() {
+        setup:
+        LaunchJobService service = new LaunchJobServiceImpl()
+
+        when:
+        service.kill(true)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.launchProcess(
+            temporaryFolder.getRoot(),
+            envMap,
+            ["echo", "foo"],
+            true
+        )
+
+        then:
+        noExceptionThrown()
+
+        when:
+        JobStatus status = service.waitFor()
+
+        then:
+        status == JobStatus.KILLED
+        !stdErr.exists()
+        !stdOut.exists()
+    }
+
+    def "Double launch" () {
+        setup:
+        LaunchJobService service = new LaunchJobServiceImpl()
+
+        when:
+        service.launchProcess(
+            temporaryFolder.getRoot(),
+            envMap,
+            ["echo", "foo"],
+            true
+        )
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.launchProcess(
+            temporaryFolder.getRoot(),
+            envMap,
+            ["echo", "foo"],
+            true
+        )
+
+        then:
+        thrown(IllegalStateException)
+    }
+
+    def "No launch" () {
+        setup:
+        LaunchJobService service = new LaunchJobServiceImpl()
+
+        when:
+        service.waitFor()
+
+        then:
+        thrown(IllegalStateException)
     }
 }

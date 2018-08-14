@@ -73,8 +73,7 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobEnvironment() >> jobEnvironment
         1 * jobSpec.getCommandArgs() >> jobCommandLine
         1 * jobSpec.isInteractive() >> interactive
-        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive) >> process
-        1 * executionContext.setJobProcess(process)
+        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive)
         1 * executionContext.getClaimedJobId() >> id
         1 * executionContext.getCurrentJobStatus() >> currentJobStatus
         1 * agentJobService.changeJobStatus(id, currentJobStatus, JobStatus.RUNNING, _ as String)
@@ -98,8 +97,7 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobEnvironment() >> jobEnvironment
         1 * jobSpec.getCommandArgs() >> jobCommandLine
         1 * jobSpec.isInteractive() >> interactive
-        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive) >> process
-        1 * executionContext.setJobProcess(process)
+        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive)
         1 * executionContext.getClaimedJobId() >> id
         1 * executionContext.getCurrentJobStatus() >> currentJobStatus
         1 * agentJobService.changeJobStatus(id, currentJobStatus, JobStatus.RUNNING, _ as String)
@@ -122,7 +120,6 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.getCommandArgs() >> jobCommandLine
         1 * jobSpec.isInteractive() >> interactive
         1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive) >> {throw exception}
-        0 * executionContext.setJobProcess(process)
         def e = thrown(RuntimeException)
         e.getCause() == exception
     }
@@ -140,8 +137,7 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobEnvironment() >> jobEnvironment
         1 * jobSpec.getCommandArgs() >> jobCommandLine
         1 * jobSpec.isInteractive() >> interactive
-        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive) >> process
-        1 * executionContext.setJobProcess(process)
+        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive)
         1 * executionContext.getClaimedJobId() >> id
         1 * executionContext.getCurrentJobStatus() >> currentJobStatus
         1 * agentJobService.changeJobStatus(id, currentJobStatus, JobStatus.RUNNING, _ as String) >> { throw exception }

@@ -27,6 +27,22 @@ package com.netflix.genie.agent.execution.services;
 public interface KillService {
     /**
      * Perform all operations associated with killing the job.
+     *
+     * @param killSource the source of kill
      */
-    void kill();
+    void kill(final KillSource killSource);
+
+    /**
+     * Enumeration for the source of a request to kill the job.
+     */
+    enum KillSource {
+        /**
+         * A system signal (SIGINT), for example user ctrl-c or system shutdown.
+         */
+        SYSTEM_SIGNAL,
+        /**
+         * A request to the server, forwarded to the agent.
+         */
+        API_KILL_REQUEST,
+    }
 }

@@ -111,6 +111,7 @@ public interface ExecutionContext {
 
     /**
      * Get the queue of states visited for the purpose of tracking post-job cleanup execution.
+     * Actions are ordered in the order they were added (i.e., order in which the corresponding states were visited).
      *
      * @return a deque of state actions executed
      */

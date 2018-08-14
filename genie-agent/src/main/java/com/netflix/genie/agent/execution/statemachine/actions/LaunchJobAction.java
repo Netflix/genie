@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -71,10 +70,10 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         final Map<String, String> jobEnvironment = executionContext.getJobEnvironment();
         final List<String> jobCommandLine = jobSpec.getCommandArgs();
         final boolean interactive = jobSpec.isInteractive();
+        final JobStatus currentJobStatus = executionContext.getCurrentJobStatus();
 
-        final Process jobProcess;
         try {
-            jobProcess = launchJobService.launchProcess(
+            launchJobService.launchProcess(
                 jobRunDirectory,
                 jobEnvironment,
                 jobCommandLine,
@@ -84,45 +83,18 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
             throw new RuntimeException("Failed to launch job", e);
         }
 
-        final long pid = getPid(jobProcess);
-
-        log.info("Job process started (pid: {})", pid);
-
-        executionContext.setJobProcess(jobProcess);
-
         try {
             this.agentJobService.changeJobStatus(
                 executionContext.getClaimedJobId(),
-                executionContext.getCurrentJobStatus(),
+                currentJobStatus,
                 JobStatus.RUNNING,
-                "Job running (pid: " + pid + ")"
+                "Job process launched"
             );
             executionContext.setCurrentJobStatus(JobStatus.RUNNING);
-
         } catch (final ChangeJobStatusException e) {
             throw new RuntimeException("Failed to update job status", e);
         }
 
         return Events.LAUNCH_JOB_COMPLETE;
-    }
-
-    /* TODO: HACK, Process does not expose PID in Java 8 API */
-    private long getPid(final Process process) {
-        long pid = -1;
-        final String processClassName = process.getClass().getCanonicalName();
-        try {
-            if ("java.lang.UNIXProcess".equals(processClassName)) {
-                final Field pidMemberField = process.getClass().getDeclaredField("pid");
-                final boolean resetAccessible = pidMemberField.isAccessible();
-                pidMemberField.setAccessible(true);
-                pid = pidMemberField.getLong(process);
-                pidMemberField.setAccessible(resetAccessible);
-            } else {
-                log.debug("Don't know how to access PID for class {}", processClassName);
-            }
-        } catch (final Throwable t) {
-            log.warn("Failed to determine job process PID");
-        }
-        return pid;
     }
 }

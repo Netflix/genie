@@ -50,7 +50,7 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
         grpcServerRule.getServiceRegistry().addService(server)
         jobId = UUID.randomUUID().toString()
         client = JobKillServiceGrpc.newFutureStub(grpcServerRule.getChannel())
-        killService = Mock(KillServiceImpl)
+        killService = Mock(KillService)
         killExecutor = Mock(TaskExecutor)
         service = new GRpcAgentJobKillServiceImpl(client, killService, killExecutor)
     }
@@ -100,7 +100,7 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
         killCallback.run()
 
         then:
-        1 * killService.kill()
+        1 * killService.kill(KillService.KillSource.API_KILL_REQUEST)
     }
 
     def "Failure registering with the service followed by successful reregistration and kill notification"() {
@@ -124,7 +124,7 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
         killCallback.run()
 
         then:
-        0 * killService.kill()
+        0 * killService.kill(_)
 
         when:
         server.sendKill()
@@ -138,7 +138,7 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
         killCallback.run()
 
         then:
-        1 * killService.kill()
+        1 * killService.kill(KillService.KillSource.API_KILL_REQUEST)
     }
 
     /**

@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
+import com.netflix.genie.common.dto.JobStatus;
 
 import java.io.File;
 import java.util.List;
@@ -33,19 +34,36 @@ import java.util.Map;
 public interface LaunchJobService {
 
     /**
-     * Launch the job process.
+     * Launch the job process (unless launch was aborted by previous a {@code kill} call).
      *
      * @param runDirectory         Run directory
      * @param environmentVariables additional environment variables (to merge on top of inherited environment)
      * @param commandLine          command-line executable and arguments
      * @param interactive          launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
-     * @return a Process object
      * @throws JobLaunchException if the job process failed to launch
      */
-    Process launchProcess(
+    void launchProcess(
         final File runDirectory,
         final Map<String, String> environmentVariables,
         final List<String> commandLine,
         final boolean interactive
     ) throws JobLaunchException;
+
+    /**
+     * Terminate job process execution (if still running) or prevent it from launching (if not launched yet).
+     * Optionally sends SIGINT to the process (unnecessary under certain circumstances. For example,
+     * CTRL-C in a terminal session, is already received by the job process, issuing a second one is unneeded).
+     *
+     * @param sendSigIntToJobProcess whether to send SIGINT to the child process
+     */
+    void kill(boolean sendSigIntToJobProcess);
+
+    /**
+     * Wait indefinitely for the job process to terminate.
+     *
+     * @return KILLED, SUCCESSFUL, or FAILED
+     * @throws IllegalStateException if the process was not launched
+     * @throws InterruptedException  if the calling thread is interrupted while waiting
+     */
+    JobStatus waitFor() throws InterruptedException;
 }
