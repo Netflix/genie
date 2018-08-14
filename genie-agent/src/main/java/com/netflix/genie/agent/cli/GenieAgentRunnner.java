@@ -54,7 +54,13 @@ public class GenieAgentRunnner implements CommandLineRunner, ExitCodeGenerator {
         try {
             internalRun(args);
         } catch (final Throwable t) {
-            UserConsole.getLogger().error("Agent execution failed with exception", t);
+            final Throwable userConsoleException = t.getCause() != null ? t.getCause() : t;
+            UserConsole.getLogger().error(
+                "Command execution failed: {}",
+                userConsoleException.getMessage(),
+                userConsoleException
+            );
+            log.info("Command execution failed", t);
         }
     }
 
