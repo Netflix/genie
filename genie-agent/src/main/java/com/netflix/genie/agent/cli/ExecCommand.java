@@ -22,6 +22,7 @@ import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.Getter;
@@ -47,15 +48,18 @@ class ExecCommand implements AgentCommand {
     private final ExecCommandArguments execCommandArguments;
     private final JobExecutionStateMachine stateMachine;
     private final ExecutionContext executionContext;
+    private final KillService killService;
 
     ExecCommand(
         final ExecCommandArguments execCommandArguments,
         final JobExecutionStateMachine stateMachine,
-        final ExecutionContext executionContext
+        final ExecutionContext executionContext,
+        final KillService killService
     ) {
         this.execCommandArguments = execCommandArguments;
         this.stateMachine = stateMachine;
         this.executionContext = executionContext;
+        this.killService = killService;
     }
 
     @Override
@@ -106,8 +110,7 @@ class ExecCommand implements AgentCommand {
             "Received SIGINT, terminating job (status: {})",
             executionContext.getCurrentJobStatus()
         );
-        executionContext.setJobKillSource(ExecutionContext.KillSource.SYSTEM_SIGNAL);
-        stateMachine.stop();
+        killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
     }
 
     @Component

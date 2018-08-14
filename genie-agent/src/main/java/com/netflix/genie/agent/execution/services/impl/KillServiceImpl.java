@@ -19,6 +19,8 @@
 package com.netflix.genie.agent.execution.services.impl;
 
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.execution.services.LaunchJobService;
+import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -34,11 +36,34 @@ import org.springframework.stereotype.Component;
 @Slf4j
 class KillServiceImpl implements KillService {
 
+    private final JobExecutionStateMachine jobExecutionStateMachine;
+    private final LaunchJobService launchJobService;
+
+
+    KillServiceImpl(
+        final JobExecutionStateMachine jobExecutionStateMachine,
+        final LaunchJobService launchJobService
+    ) {
+        this.jobExecutionStateMachine = jobExecutionStateMachine;
+        this.launchJobService = launchJobService;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void kill() {
-        throw new UnsupportedOperationException();
+    public void kill(final KillSource killSource) {
+
+        // Cut job execution state machine short.
+        jobExecutionStateMachine.stop();
+
+        // If the kill was a system signal, the job process already received it too.
+        // (by virtue of being in the same process group as the agent)
+        // Avoid sending a second SIGINT
+        final boolean sendSigIntToJobProcess = killSource != KillSource.SYSTEM_SIGNAL;
+
+        // Make sure the process doesn't get started.
+        // If it was started already, kill it and mark it as such.
+        launchJobService.kill(sendSigIntToJobProcess);
     }
 }
