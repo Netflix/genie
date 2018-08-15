@@ -24,6 +24,7 @@ import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
+import com.netflix.genie.web.services.AgentConnectionObserver;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobSearchService;
 import io.grpc.stub.StreamObserver;
@@ -31,11 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
  * Service to kill agent jobs.
- * TODO Register with HeartBeatService to listen for agent stream to become inactive and clean it up.
  *
  * @author standon
  * @since 4.0.0
@@ -49,7 +50,7 @@ import java.util.Map;
 @Slf4j
 public class GRpcJobKillServiceImpl
     extends JobKillServiceGrpc.JobKillServiceImplBase
-    implements JobKillServiceV4 {
+    implements JobKillServiceV4, AgentConnectionObserver {
 
     private final Map<String, StreamObserver<JobKillRegistrationResponse>> parkedJobKillResponseObservers =
         Maps.newConcurrentMap();
@@ -58,7 +59,7 @@ public class GRpcJobKillServiceImpl
     /**
      * Constructor.
      *
-     * @param jobSearchService Job search service
+     * @param jobSearchService      Job search service
      */
     public GRpcJobKillServiceImpl(final JobSearchService jobSearchService) {
         this.jobSearchService = jobSearchService;
@@ -109,5 +110,21 @@ public class GRpcJobKillServiceImpl
 
             log.info("Agent notified for killing job {}", jobId);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onConnected(@NotNull final String jobId) {
+        //No op
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onDisconnected(@NotNull final String jobId) {
+        parkedJobKillResponseObservers.remove(jobId);
     }
 }

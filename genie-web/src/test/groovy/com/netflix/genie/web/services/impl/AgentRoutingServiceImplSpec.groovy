@@ -21,8 +21,10 @@ package com.netflix.genie.web.services.impl
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.AgentConnectionPersistenceService
+import com.netflix.genie.web.services.AgentConnectionObserver
 import com.netflix.genie.web.services.AgentRoutingService
 import org.junit.experimental.categories.Category
+import org.springframework.core.task.TaskExecutor
 import spock.lang.Specification
 
 @Category(UnitTest.class)
@@ -31,11 +33,20 @@ class AgentRoutingServiceImplSpec extends Specification {
 
     AgentConnectionPersistenceService persistenceService = Mock()
     GenieHostInfo genieHostInfo = Mock()
+    TaskExecutor taskExecutor = Mock()
+    AgentConnectionObserver agentConnectionObserver = Mock()
+    List<AgentConnectionObserver> agentConnectionObservers = new ArrayList<>();
     AgentRoutingService service
     String jobId
 
     void setup() {
-        service = new AgentRoutingServiceImpl(persistenceService, genieHostInfo);
+        agentConnectionObservers.add(agentConnectionObserver)
+        service = new AgentRoutingServiceImpl(
+            persistenceService,
+            genieHostInfo,
+            agentConnectionObservers,
+            taskExecutor
+        )
         jobId = UUID.randomUUID().toString()
     }
 
@@ -109,12 +120,23 @@ class AgentRoutingServiceImplSpec extends Specification {
 
     def "Reacting to connection and disconnection"() {
 
+        Runnable connectionStateChangeNotificationTask
+
         when:
         service.handleClientConnected(jobId)
 
         then:
         1 * genieHostInfo.getHostname() >> HOSTNAME
         1 * persistenceService.saveAgentConnection(jobId, HOSTNAME)
+        1 * taskExecutor.execute(_ as Runnable) >> {
+            args -> connectionStateChangeNotificationTask = args[0]
+        }
+
+        when:
+        connectionStateChangeNotificationTask.run()
+
+        then:
+        agentConnectionObserver.onConnected(jobId)
 
         when:
         service.handleClientDisconnected(jobId)
@@ -122,5 +144,14 @@ class AgentRoutingServiceImplSpec extends Specification {
         then:
         1 * genieHostInfo.getHostname() >> HOSTNAME
         1 * persistenceService.removeAgentConnection(jobId, HOSTNAME)
+        1 * taskExecutor.execute(_ as Runnable) >> {
+            args -> connectionStateChangeNotificationTask = args[0]
+        }
+
+        when:
+        connectionStateChangeNotificationTask.run()
+
+        then:
+        agentConnectionObserver.onDisconnected(jobId)
     }
 }

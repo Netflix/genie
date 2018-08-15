@@ -26,6 +26,7 @@ import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.AgentConnectionObserver;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.AgentRoutingService;
@@ -66,8 +67,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.retry.support.RetryTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
@@ -355,19 +359,25 @@ public class GenieServicesAutoConfiguration {
     /**
      * Get an implementation of {@link AgentRoutingService} if one hasn't already been defined.
      *
-     * @param agentConnectionPersistenceService The persistence service to use for agent connections
-     * @param genieHostInfo                     The local genie host information
+     * @param agentConnectionPersistenceService         The persistence service to use for agent connections
+     * @param genieHostInfo                             The local genie host information
+     * @param agentConnectionObservers                  Agent connection observers
+     * @param connectionObserversNotificationExecutor   A task executor to notify agent connection observers
      * @return A {@link AgentRoutingServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(AgentRoutingService.class)
     public AgentRoutingService agentRoutingService(
         final AgentConnectionPersistenceService agentConnectionPersistenceService,
-        final GenieHostInfo genieHostInfo
+        final GenieHostInfo genieHostInfo,
+        final List<AgentConnectionObserver> agentConnectionObservers,
+        @Qualifier("sharedTaskExecutor") final TaskExecutor connectionObserversNotificationExecutor
     ) {
         return new AgentRoutingServiceImpl(
             agentConnectionPersistenceService,
-            genieHostInfo
+            genieHostInfo,
+            agentConnectionObservers,
+            connectionObserversNotificationExecutor
         );
     }
 
@@ -407,5 +417,20 @@ public class GenieServicesAutoConfiguration {
             jobsProperties,
             retryTemplate
         );
+    }
+
+    /**
+     * Get a task executor which may be shared by different components.
+     *
+     * @return A task executor
+     */
+    @Bean
+    @Lazy
+    @Qualifier("sharedTaskExecutor")
+    @ConditionalOnMissingBean(name = "sharedTaskExecutor")
+    public TaskExecutor sharedTaskExecutor() {
+        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.initialize();
+        return executor;
     }
 }
