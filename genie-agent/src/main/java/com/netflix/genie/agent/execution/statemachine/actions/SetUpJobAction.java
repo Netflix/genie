@@ -24,6 +24,8 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
+import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
+import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.statemachine.Events;
@@ -64,15 +66,21 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
     private DownloadService downloadService;
     private final AgentJobService agentJobService;
+    private final AgentHeartBeatService heartbeatService;
+    private final AgentJobKillService killService;
 
     SetUpJobAction(
         final ExecutionContext executionContext,
         final DownloadService downloadService,
-        final AgentJobService agentJobService
+        final AgentJobService agentJobService,
+        final AgentHeartBeatService heartbeatService,
+        final AgentJobKillService killService
     ) {
         super(executionContext);
         this.downloadService = downloadService;
         this.agentJobService = agentJobService;
+        this.heartbeatService = heartbeatService;
+        this.killService = killService;
     }
 
     /**
@@ -83,9 +91,14 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         final ExecutionContext executionContext
     ) {
 
+        final String claimedJobId = executionContext.getClaimedJobId();
+
+        heartbeatService.start(claimedJobId);
+        killService.start(claimedJobId);
+
         try {
             this.agentJobService.changeJobStatus(
-                executionContext.getClaimedJobId(),
+                claimedJobId,
                 executionContext.getCurrentJobStatus(),
                 JobStatus.INIT,
                 "Setting up job"
@@ -141,6 +154,10 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         } catch (final IOException e) {
             log.warn("Failed to walk job directory: {}", jobDirectoryPath, e);
         }
+
+        // Stop services started during setup
+        killService.stop();
+        heartbeatService.stop();
     }
 
     private void performJobSetup(final ExecutionContext executionContext) throws SetUpJobException {
