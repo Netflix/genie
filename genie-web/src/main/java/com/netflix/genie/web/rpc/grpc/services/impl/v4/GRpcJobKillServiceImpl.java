@@ -94,9 +94,9 @@ public class GRpcJobKillServiceImpl
             parkedJobKillResponseObservers.remove(jobId);
 
         if (responseObserver == null) {
-            log.error("Job not killed. No response observer found for killing the job with id - {} ", jobId);
+            log.error("Job not killed. No response observer found for killing the job with id: {} ", jobId);
             throw new GenieServerException(
-                "Job not killed. No response observer found for killing the job with id - {} " + jobId);
+                "Job not killed. No response observer found for killing the job with id: " + jobId);
         }
 
         if (jobSearchService.getJobStatus(jobId).isFinished()) {
