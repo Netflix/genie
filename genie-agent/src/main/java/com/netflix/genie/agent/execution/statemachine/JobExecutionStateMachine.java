@@ -18,13 +18,16 @@
 
 package com.netflix.genie.agent.execution.statemachine;
 
+import com.netflix.genie.agent.execution.services.KillService;
+import org.springframework.context.ApplicationListener;
+
 /**
  * Interface JobExecutionStateMachine.
  *
  * @author mprimi
  * @since 4.0.0
  */
-public interface JobExecutionStateMachine {
+public interface JobExecutionStateMachine extends ApplicationListener<KillService.KillEvent> {
 
     /**
      * Starts the state machine and returns.

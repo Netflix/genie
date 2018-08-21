@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.common.dto.JobStatus;
+import org.springframework.context.ApplicationListener;
 
 import java.io.File;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.Map;
  * @author mprimi
  * @since 4.0.0
  */
-public interface LaunchJobService {
+public interface LaunchJobService extends ApplicationListener<KillService.KillEvent> {
 
     /**
      * Launch the job process (unless launch was aborted by previous a {@code kill} call).
@@ -54,9 +55,8 @@ public interface LaunchJobService {
      * Optionally sends SIGINT to the process (unnecessary under certain circumstances. For example,
      * CTRL-C in a terminal session, is already received by the job process, issuing a second one is unneeded).
      *
-     * @param sendSigIntToJobProcess whether to send SIGINT to the child process
      */
-    void kill(boolean sendSigIntToJobProcess);
+    void kill();
 
     /**
      * Wait indefinitely for the job process to terminate.

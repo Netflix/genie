@@ -19,35 +19,36 @@
 package com.netflix.genie.agent.execution.services
 
 import com.netflix.genie.agent.execution.services.impl.KillServiceImpl
-import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
+import org.springframework.context.ApplicationEventPublisher
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class KillServiceImplSpec extends Specification {
+    ApplicationEventPublisher applicationEventPublisher
     KillService service
-    JobExecutionStateMachine jobExecutionStateMachine
-    LaunchJobService launchJobService
 
     void setup() {
-        jobExecutionStateMachine = Mock()
-        launchJobService = Mock()
+        applicationEventPublisher = Mock(ApplicationEventPublisher)
+        service = new KillServiceImpl(applicationEventPublisher)
     }
 
     @Unroll
     def "Kill via #source"() {
         setup:
-        service = new KillServiceImpl(jobExecutionStateMachine, launchJobService)
 
         when:
         service.kill(source)
 
         then:
-        1 * jobExecutionStateMachine.stop()
-        1 * launchJobService.kill(sendSigInt)
+        1 * applicationEventPublisher.publishEvent(_ as KillService.KillEvent) >> {
+            args ->
+                assert args[0] != null
+                assert (args[0] as KillService.KillEvent).getKillSource() == source
+        }
 
         where:
-        source                                  | sendSigInt
-        KillService.KillSource.SYSTEM_SIGNAL    | false
-        KillService.KillSource.API_KILL_REQUEST | true
+        source                                  | _
+        KillService.KillSource.SYSTEM_SIGNAL    | _
+        KillService.KillSource.API_KILL_REQUEST | _
     }
 }

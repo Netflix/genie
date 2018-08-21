@@ -111,7 +111,7 @@ class ExecCommandSpec extends Specification {
         def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
-        execCommand.handleSigInt()
+        execCommand.handleTerminationSignal()
 
         then:
         1 * execContext.getCurrentJobStatus()

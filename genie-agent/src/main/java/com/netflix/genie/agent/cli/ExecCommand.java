@@ -32,6 +32,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -49,6 +51,10 @@ class ExecCommand implements AgentCommand {
     private final JobExecutionStateMachine stateMachine;
     private final ExecutionContext executionContext;
     private final KillService killService;
+    private final List<sun.misc.Signal> signalsToIntercept = Collections.unmodifiableList(Arrays.asList(
+        new sun.misc.Signal("INT"),
+        new sun.misc.Signal("TERM")
+    ));
 
     ExecCommand(
         final ExecCommandArguments execCommandArguments,
@@ -64,9 +70,9 @@ class ExecCommand implements AgentCommand {
 
     @Override
     public void run() {
-        // Trap and handle SIGINT.
-        // The child process, if one is running, will also receive the signal since it belongs to the same process group
-        sun.misc.Signal.handle(new sun.misc.Signal("INT"), signal -> handleSigInt());
+        for (final sun.misc.Signal s : signalsToIntercept) {
+            sun.misc.Signal.handle(s, signal -> handleTerminationSignal());
+        }
 
         log.info("Running job state machine");
         stateMachine.start();
@@ -105,9 +111,9 @@ class ExecCommand implements AgentCommand {
     }
 
     @VisibleForTesting
-    void handleSigInt() {
+    void handleTerminationSignal() {
         UserConsole.getLogger().info(
-            "Received SIGINT, terminating job (status: {})",
+            "Intercepted a signal, terminating job (status: {})",
             executionContext.getCurrentJobStatus()
         );
         killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
