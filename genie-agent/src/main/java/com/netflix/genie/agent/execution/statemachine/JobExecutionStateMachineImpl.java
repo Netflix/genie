@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine;
 
+import com.netflix.genie.agent.execution.services.KillService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.StateMachine;
@@ -86,5 +87,14 @@ class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
         stateMachine.sendEvent(Events.CANCEL_JOB_LAUNCH);
         // If the job is already running, then the machine can do nothing but wait for it to complete
         // (killing the child process is handled elsewhere).
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onApplicationEvent(final KillService.KillEvent event) {
+        log.info("Stopping state machine due to kill event (source: {})", event.getKillSource());
+        this.stop();
     }
 }

@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.services.impl;
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
+import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
@@ -160,12 +161,12 @@ class LaunchJobServiceImpl implements LaunchJobService {
      * {@inheritDoc}
      */
     @Override
-    public void kill(final boolean sendSigIntToJobProcess) {
+    public void kill() {
         killed.set(true);
 
         final Process process = processReference.get();
 
-        if (process != null && sendSigIntToJobProcess) {
+        if (process != null) {
             process.destroy();
         }
     }
@@ -207,6 +208,15 @@ class LaunchJobServiceImpl implements LaunchJobService {
         } else {
             return JobStatus.FAILED;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onApplicationEvent(final KillService.KillEvent event) {
+        log.info("Stopping state machine due to kill event (source: {})", event.getKillSource());
+        this.kill();
     }
 
     private List<String> expandCommandLineVariables(

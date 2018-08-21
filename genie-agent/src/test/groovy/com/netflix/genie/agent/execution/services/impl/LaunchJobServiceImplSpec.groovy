@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
+import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatus
@@ -28,7 +29,6 @@ import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-import java.util.concurrent.TimeUnit
 
 class LaunchJobServiceImplSpec extends Specification {
 
@@ -301,7 +301,37 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        service.kill(true)
+        service.kill()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        JobStatus status = service.waitFor()
+
+        then:
+        status == JobStatus.KILLED
+        !stdErr.exists()
+        !stdOut.exists()
+    }
+
+    def "Kill running process via event"() {
+        setup:
+        LaunchJobService service = new LaunchJobServiceImpl()
+
+        when:
+        service.launchProcess(
+            temporaryFolder.getRoot(),
+            envMap,
+            ["sleep", "60"],
+            true
+        )
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.onApplicationEvent(new KillService.KillEvent(KillService.KillSource.API_KILL_REQUEST))
 
         then:
         noExceptionThrown()
@@ -331,7 +361,7 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        service.kill(false)
+        service.kill()
 
         then:
         noExceptionThrown()
@@ -350,7 +380,7 @@ class LaunchJobServiceImplSpec extends Specification {
         LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        service.kill(true)
+        service.kill()
 
         then:
         noExceptionThrown()

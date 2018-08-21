@@ -18,10 +18,10 @@
 
 package com.netflix.genie.agent.execution.services.impl;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.services.KillService;
-import com.netflix.genie.agent.execution.services.LaunchJobService;
-import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -36,16 +36,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 class KillServiceImpl implements KillService {
 
-    private final JobExecutionStateMachine jobExecutionStateMachine;
-    private final LaunchJobService launchJobService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     KillServiceImpl(
-        final JobExecutionStateMachine jobExecutionStateMachine,
-        final LaunchJobService launchJobService
+        final ApplicationEventPublisher applicationEventPublisher
     ) {
-        this.jobExecutionStateMachine = jobExecutionStateMachine;
-        this.launchJobService = launchJobService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     /**
@@ -54,16 +51,14 @@ class KillServiceImpl implements KillService {
     @Override
     public void kill(final KillSource killSource) {
 
-        // Cut job execution state machine short.
-        jobExecutionStateMachine.stop();
+        UserConsole.getLogger().info("Job kill requested (source: {})", killSource.name());
 
-        // If the kill was a system signal, the job process already received it too.
-        // (by virtue of being in the same process group as the agent)
-        // Avoid sending a second SIGINT
-        final boolean sendSigIntToJobProcess = killSource != KillSource.SYSTEM_SIGNAL;
+        log.debug("Emitting kill event");
 
-        // Make sure the process doesn't get started.
-        // If it was started already, kill it and mark it as such.
-        launchJobService.kill(sendSigIntToJobProcess);
+        applicationEventPublisher.publishEvent(
+            new KillEvent(killSource)
+        );
+
+        log.debug("Kill event published");
     }
 }

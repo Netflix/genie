@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine
 
+import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import org.springframework.statemachine.StateMachine
@@ -74,6 +75,29 @@ class JobExecutionStateMachineImplSpec extends Specification {
 
         when:
         stateMachine.stop()
+
+        then:
+        1 * mockStateMachine.getState() >> monitorState
+        1 * monitorState.getId() >> States.MONITOR_JOB
+        1 * mockStateMachine.sendEvent(Events.CANCEL_JOB_LAUNCH)
+    }
+
+    def "Start and stop via event"() {
+        setup:
+        StateMachine<States, Events> mockStateMachine = Mock(StateMachine)
+        def monitorState = Mock(State)
+        def stateMachine = new JobExecutionStateMachineImpl(mockStateMachine)
+
+        when:
+        stateMachine.start()
+
+        then:
+        1 * mockStateMachine.addStateListener(_ as StateMachineListener)
+        1 * mockStateMachine.start()
+        1 * mockStateMachine.sendEvent(Events.START)
+
+        when:
+        stateMachine.onApplicationEvent(new KillService.KillEvent(KillService.KillSource.API_KILL_REQUEST))
 
         then:
         1 * mockStateMachine.getState() >> monitorState
