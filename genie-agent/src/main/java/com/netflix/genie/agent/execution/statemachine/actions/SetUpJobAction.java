@@ -20,6 +20,8 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.cli.JobFolderCleanupOption;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
@@ -40,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,19 +71,22 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     private final AgentJobService agentJobService;
     private final AgentHeartBeatService heartbeatService;
     private final AgentJobKillService killService;
+    private final ArgumentDelegates.AgentOptions agentOptions;
 
     SetUpJobAction(
         final ExecutionContext executionContext,
         final DownloadService downloadService,
         final AgentJobService agentJobService,
         final AgentHeartBeatService heartbeatService,
-        final AgentJobKillService killService
+        final AgentJobKillService killService,
+        final ArgumentDelegates.AgentOptions agentOptions
     ) {
         super(executionContext);
         this.downloadService = downloadService;
         this.agentJobService = agentJobService;
         this.heartbeatService = heartbeatService;
         this.killService = killService;
+        this.agentOptions = agentOptions;
     }
 
     /**
@@ -119,40 +125,57 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
     @Override
     protected void executeStateActionCleanup(final ExecutionContext executionContext) {
+
+        final JobFolderCleanupOption cleanupOption = this.agentOptions.getJobFolderCleanUpOption();
+
         final File jobDirectory = executionContext.getJobDirectory();
         final Path jobDirectoryPath = jobDirectory.toPath();
 
-        // TODO: this is a simple and safe cleanup strategy, 3 patterns are added that match any files in the
-        // dependencies directory of any entity by absolute path.
-        // A different implementation would allow override via server or CLI options, or collect the files list as
-        // they are downloaded and compile an exact list using Pattern.quote()
-        final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
-            (Pattern[]) Lists.newArrayList(
-                PathUtils.jobClusterDirectoryPath(jobDirectory, ".*"),
-                PathUtils.jobCommandDirectoryPath(jobDirectory, ".*"),
-                PathUtils.jobApplicationDirectoryPath(jobDirectory, ".*")
-            )
-                .stream()
-                .map(PathUtils::jobEntityDependenciesPath)
-                .map(Path::toString)
-                .map(pathString -> pathString + "/.*")
-                .map(Pattern::compile)
-                .toArray(Pattern[]::new)
-        );
+        //No clean up needed
+        if (cleanupOption == JobFolderCleanupOption.NO_CLEANUP) {
+            log.info("Job folder not deleted.");
+        } else if (cleanupOption == JobFolderCleanupOption.DELETE_JOB_FOLDER) { //Delete the job folder
+            try {
+                log.debug("Deleting {}", jobDirectory);
+                FileSystemUtils.deleteRecursively(jobDirectoryPath);
+                log.info("Deleted job folder.");
+            } catch (final IOException e) {
+                log.warn("Failed to delete job folder: {}", jobDirectoryPath.toAbsolutePath().toString(), e);
+            }
+        } else { //Remove only the dependencies
 
-        try {
-            Files.walk(jobDirectory.toPath())
-                .filter(path -> cleanupWhitelist.accept(path.toAbsolutePath().toString()))
-                .forEach(path -> {
-                    try {
-                        log.debug("Deleting {}", path);
-                        Files.deleteIfExists(path);
-                    } catch (final IOException e) {
-                        log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
-                    }
-                });
-        } catch (final IOException e) {
-            log.warn("Failed to walk job directory: {}", jobDirectoryPath, e);
+            // TODO: this is a simple and safe cleanup strategy, 3 patterns are added that match any files in the
+            // dependencies directory of any entity by absolute path.
+            // A different implementation would allow override via server or CLI options, or collect the files list as
+            // they are downloaded and compile an exact list using Pattern.quote()
+            final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
+                (Pattern[]) Lists.newArrayList(
+                    PathUtils.jobClusterDirectoryPath(jobDirectory, ".*"),
+                    PathUtils.jobCommandDirectoryPath(jobDirectory, ".*"),
+                    PathUtils.jobApplicationDirectoryPath(jobDirectory, ".*")
+                )
+                    .stream()
+                    .map(PathUtils::jobEntityDependenciesPath)
+                    .map(Path::toString)
+                    .map(pathString -> pathString + "/.*")
+                    .map(Pattern::compile)
+                    .toArray(Pattern[]::new)
+            );
+
+            try {
+                Files.walk(jobDirectory.toPath())
+                    .filter(path -> cleanupWhitelist.accept(path.toAbsolutePath().toString()))
+                    .forEach(path -> {
+                        try {
+                            log.debug("Deleting {}", path);
+                            Files.deleteIfExists(path);
+                        } catch (final IOException e) {
+                            log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
+                        }
+                    });
+            } catch (final IOException e) {
+                log.warn("Failed to walk job directory: {}", jobDirectoryPath, e);
+            }
         }
 
         // Stop services started during setup

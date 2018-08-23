@@ -132,14 +132,19 @@ class ExecCommand implements AgentCommand {
         @ParametersDelegate
         private final ArgumentDelegates.JobRequestArguments jobRequestArguments;
 
+        @ParametersDelegate
+        private final ArgumentDelegates.AgentOptions agentOptions;
+
         ExecCommandArguments(
             final ArgumentDelegates.ServerArguments serverArguments,
             final ArgumentDelegates.CacheArguments cacheArguments,
-            final ArgumentDelegates.JobRequestArguments jobRequestArguments
+            final ArgumentDelegates.JobRequestArguments jobRequestArguments,
+            final ArgumentDelegates.AgentOptions agentOptions
         ) {
             this.serverArguments = serverArguments;
             this.cacheArguments = cacheArguments;
             this.jobRequestArguments = jobRequestArguments;
+            this.agentOptions = agentOptions;
         }
 
         @Override
