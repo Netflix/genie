@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.agent.execution.statemachine.actions.BaseStateAction
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Triple
 import org.junit.experimental.categories.Category
@@ -57,10 +58,11 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
+        1 * execContext.getFinalJobStatus() >> JobStatus.SUCCEEDED
         exitCode == ExitCode.SUCCESS
     }
 
-    def "Run interrupted"() {
+    def "Run with no final job status"() {
         setup:
         def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
@@ -69,7 +71,8 @@ class ExecCommandSpec extends Specification {
 
         then:
         1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> { throw new InterruptedException() }
+        1 * stateMachine.waitForStop() >> States.END
+        1 * execContext.getFinalJobStatus() >> null
 
         thrown(RuntimeException.class)
     }
@@ -103,6 +106,78 @@ class ExecCommandSpec extends Specification {
         1 * stateMachine.waitForStop() >> States.END
         1 * execContext.hasStateActionError() >> true
         1 * execContext.getStateActionErrors() >> actionErrors
+
+        thrown(RuntimeException.class)
+    }
+
+    def "Exec fail"() {
+        setup:
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
+
+        when:
+        ExitCode exitCode = execCommand.run()
+
+        then:
+        1 * stateMachine.start()
+        1 * stateMachine.waitForStop() >> States.END
+        1 * execContext.getFinalJobStatus() >> JobStatus.FAILED
+        exitCode == ExitCode.EXEC_FAIL
+    }
+
+    def "Kill"() {
+        setup:
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
+
+        when:
+        ExitCode exitCode = execCommand.run()
+
+        then:
+        1 * stateMachine.start()
+        1 * stateMachine.waitForStop() >> States.END
+        1 * execContext.getFinalJobStatus() >> JobStatus.KILLED
+        exitCode == ExitCode.EXEC_ABORTED
+    }
+
+    def "Run with invalid final job status"() {
+        setup:
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
+
+        when:
+        execCommand.run()
+
+        then:
+        1 * stateMachine.start()
+        1 * stateMachine.waitForStop() >> States.END
+        1 * execContext.getFinalJobStatus() >> JobStatus.INVALID
+
+        thrown(RuntimeException)
+    }
+
+    def "Run with non-terminal final job status"() {
+        setup:
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
+
+        when:
+        execCommand.run()
+
+        then:
+        1 * stateMachine.start()
+        1 * stateMachine.waitForStop() >> States.END
+        1 * execContext.getFinalJobStatus() >> JobStatus.CLAIMED
+
+        thrown(RuntimeException.class)
+    }
+
+    def "Run interrupted"() {
+        setup:
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
+
+        when:
+        execCommand.run()
+
+        then:
+        1 * stateMachine.start()
+        1 * stateMachine.waitForStop() >> { throw new InterruptedException() }
 
         thrown(RuntimeException.class)
     }

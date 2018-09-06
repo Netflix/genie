@@ -25,6 +25,7 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.States;
+import com.netflix.genie.common.dto.JobStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
@@ -106,9 +107,34 @@ class ExecCommand implements AgentCommand {
             throw new RuntimeException("Job execution error", firstActionErrorException);
         }
 
-        log.info("Job execution completed successfully");
+        final JobStatus finalJobStatus = executionContext.getFinalJobStatus();
 
-        return ExitCode.SUCCESS;
+        if (finalJobStatus == null) {
+            throw new RuntimeException("Unknown final job status");
+        } else if (!finalJobStatus.isFinished()) {
+            throw new RuntimeException("Non-final job status post-execution: " + finalJobStatus.name());
+        }
+
+        final ExitCode exitCode;
+
+        switch (finalJobStatus) {
+            case SUCCEEDED:
+                log.info("Job execution completed successfully");
+                exitCode = ExitCode.SUCCESS;
+                break;
+            case KILLED:
+                log.info("Job execution killed by user");
+                exitCode = ExitCode.EXEC_ABORTED;
+                break;
+            case FAILED:
+                log.info("Job execution failed");
+                exitCode = ExitCode.EXEC_FAIL;
+                break;
+            default:
+                throw new RuntimeException("Unexpected final job status: " + finalJobStatus.name());
+        }
+
+        return exitCode;
     }
 
     @VisibleForTesting
