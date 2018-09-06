@@ -56,6 +56,26 @@ public enum ExitCode {
      */
     EXEC_ABORTED(105, "Command execution aborted");
 
+    static final String EXIT_CODE_HELP_MESSAGE;
+
+    static {
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+            .append("EXIT CODES:").append("\n");
+
+        for (final ExitCode exitCode : ExitCode.values()) {
+            stringBuilder
+                .append(exitCode.getCode())
+                .append(": ")
+                .append(exitCode.name())
+                .append(" - ")
+                .append(exitCode.getMessage())
+                .append("\n");
+        }
+
+        EXIT_CODE_HELP_MESSAGE = stringBuilder.toString();
+    }
+
     private final int code;
     private final String message;
 
