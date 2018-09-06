@@ -64,6 +64,8 @@ class ArgumentParser {
         stringBuilder
             .append("\n\n")
             .append(ArgumentConverters.CriterionConverter.CRITERION_SYNTAX_MESSAGE)
+            .append("\n")
+            .append(ExitCode.EXIT_CODE_HELP_MESSAGE)
             .append("\n");
 
         return stringBuilder.toString();
