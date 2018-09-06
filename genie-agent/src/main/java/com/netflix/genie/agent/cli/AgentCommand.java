@@ -28,6 +28,8 @@ public interface AgentCommand {
 
     /**
      * Entry point for command execution.
+     *
+     * @return an {@link ExitCode}
      */
-    void run();
+    ExitCode run();
 }

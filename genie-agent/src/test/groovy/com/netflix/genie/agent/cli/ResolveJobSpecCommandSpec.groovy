@@ -60,7 +60,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         setup:
 
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> " "
@@ -69,6 +69,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         1 * service.resolveJobSpecificationDryRun(jobRequest) >> spec
         1 * commandArgs.isPrintRequestDisabled() >> true
         1 * commandArgs.getOutputFile() >> null
+        exitCode == ExitCode.SUCCESS
     }
 
     def "Resolve spec service error"() {
@@ -91,12 +92,13 @@ class ResolveJobSpecCommandSpec extends Specification {
         String specId = "12345"
 
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> specId
         1 * service.getJobSpecification(specId) >> spec
         1 * commandArgs.getOutputFile() >> null
+        exitCode == ExitCode.SUCCESS
     }
 
     def "Get spec by id error"() {
@@ -104,7 +106,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         String specId = "12345"
 
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> specId
@@ -119,7 +121,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         File outputFile = new File(temporaryFolder.getRoot(), "spec.json")
 
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> specId
@@ -127,6 +129,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         1 * commandArgs.getOutputFile() >> outputFile
         outputFile.exists()
         GenieObjectMapper.getMapper().readValue(outputFile.getText(), JobSpecification.class)
+        exitCode == ExitCode.SUCCESS
     }
 
     def "Write spec to file that exists"() {
@@ -135,7 +138,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         File outputFile = temporaryFolder.newFile()
 
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> specId
@@ -149,7 +152,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         setup:
 
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> " "
@@ -165,7 +168,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         setup:
 
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * commandArgs.getSpecificationId() >> " "

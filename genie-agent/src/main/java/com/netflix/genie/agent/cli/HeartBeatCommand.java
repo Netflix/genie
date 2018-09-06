@@ -57,7 +57,7 @@ class HeartBeatCommand implements AgentCommand {
     }
 
     @Override
-    public void run() {
+    public ExitCode run() {
 
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(1);
@@ -79,6 +79,8 @@ class HeartBeatCommand implements AgentCommand {
         }
 
         agentHeartBeatService.stop();
+
+        return ExitCode.SUCCESS;
     }
 
     private void checkConnectionStatus() {

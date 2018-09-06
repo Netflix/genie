@@ -45,8 +45,10 @@ class HelpCommand implements AgentCommand {
     }
 
     @Override
-    public void run() {
+    public ExitCode run() {
         System.out.println(argumentParser.getUsageMessage());
+
+        return ExitCode.SUCCESS;
     }
 
     @Component

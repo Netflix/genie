@@ -51,7 +51,7 @@ class InfoCommandSpec extends Specification {
         def cmd = new InfoCommand(args, ctx, agentMetadata)
 
         when:
-        cmd.run()
+        ExitCode exitCode = cmd.run()
 
         then:
         1 * agentMetadata.getAgentVersion() >> "1.0.0"
@@ -68,6 +68,7 @@ class InfoCommandSpec extends Specification {
         1 * env.getSystemEnvironment() >> map
         1 * env.getSystemProperties() >> map
         1 * env.getPropertySources() >> new MutablePropertySources()
+        exitCode == ExitCode.SUCCESS
     }
 
     def "Run skip all"() {
@@ -75,7 +76,7 @@ class InfoCommandSpec extends Specification {
         def cmd = new InfoCommand(args, ctx, agentMetadata)
 
         when:
-        cmd.run()
+        ExitCode exitCode = cmd.run()
 
         then:
         1 * agentMetadata.getAgentVersion() >> "1.0.0"
@@ -89,5 +90,6 @@ class InfoCommandSpec extends Specification {
         2 * ctx.getEnvironment() >> env
         1 * env.getActiveProfiles() >> ["foo", "bar"]
         1 * env.getDefaultProfiles() >> ["default"]
+        exitCode == ExitCode.SUCCESS
     }
 }

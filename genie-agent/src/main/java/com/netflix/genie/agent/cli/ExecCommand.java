@@ -69,7 +69,7 @@ class ExecCommand implements AgentCommand {
     }
 
     @Override
-    public void run() {
+    public ExitCode run() {
         for (final sun.misc.Signal s : signalsToIntercept) {
             sun.misc.Signal.handle(s, signal -> handleTerminationSignal());
         }
@@ -108,6 +108,7 @@ class ExecCommand implements AgentCommand {
 
         log.info("Job execution completed successfully");
 
+        return ExitCode.SUCCESS;
     }
 
     @VisibleForTesting

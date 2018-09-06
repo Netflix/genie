@@ -58,7 +58,7 @@ class InfoCommand implements AgentCommand {
     }
 
     @Override
-    public void run() {
+    public ExitCode run() {
 
         final StringBuilder messageBuilder = new StringBuilder();
 
@@ -190,6 +190,8 @@ class InfoCommand implements AgentCommand {
         }
 
         System.out.println(messageBuilder.toString());
+
+        return ExitCode.SUCCESS;
     }
 
     @Component

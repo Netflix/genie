@@ -58,7 +58,7 @@ class DownloadCommand implements AgentCommand {
     }
 
     @Override
-    public void run() {
+    public ExitCode run() {
 
         final List<URI> uris = downloadCommandArguments.getFileUris();
         final File destinationDirectory = downloadCommandArguments.getDestinationDirectory();
@@ -91,6 +91,8 @@ class DownloadCommand implements AgentCommand {
         } catch (final DownloadException e) {
             throw new RuntimeException("Download failed", e);
         }
+
+        return ExitCode.SUCCESS;
     }
 
     @Component

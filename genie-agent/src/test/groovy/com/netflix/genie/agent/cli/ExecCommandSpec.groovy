@@ -52,11 +52,12 @@ class ExecCommandSpec extends Specification {
         def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
-        execCommand.run()
+        ExitCode exitCode = execCommand.run()
 
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
+        exitCode == ExitCode.SUCCESS
     }
 
     def "Run interrupted"() {

@@ -74,7 +74,7 @@ class PingCommandSpec extends Specification {
         def pingCommand = new PingCommand(pingCommandArgs, pingServiceClient, agentMetadata)
 
         when:
-        pingCommand.run()
+        ExitCode exitCode = pingCommand.run()
 
         then:
         2 * agentMetadata.getAgentHostName() >> agentHostName
@@ -87,6 +87,7 @@ class PingCommandSpec extends Specification {
         !StringUtils.isBlank(capturedRequest.getRequestId())
         capturedRequest.getTimestamp() != null
         agentHostName == capturedRequest.getClientMetadataOrThrow(PingCommand.CLIENT_HOST_NAME_METADATA_KEY)
+        exitCode == ExitCode.SUCCESS
     }
 
     def "RunWithError"() {

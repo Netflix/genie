@@ -95,8 +95,7 @@ public class GenieAgentRunnner implements CommandLineRunner, ExitCodeGenerator {
         final AgentCommand command = commandFactory.get(commandName);
 
         exitCode = ExitCode.EXEC_FAIL;
-        command.run();
-        exitCode = ExitCode.SUCCESS;
+        exitCode = command.run();
     }
 
     @Override

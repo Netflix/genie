@@ -64,7 +64,7 @@ class PingCommand implements AgentCommand {
     }
 
     @Override
-    public void run() {
+    public ExitCode run() {
 
         final String requestID =
             pingCommandArguments.getRequestId() == null
@@ -106,6 +106,8 @@ class PingCommand implements AgentCommand {
                 serverMetadataEntry.getKey(),
                 serverMetadataEntry.getValue());
         }
+
+        return ExitCode.SUCCESS;
     }
 
     @Component
