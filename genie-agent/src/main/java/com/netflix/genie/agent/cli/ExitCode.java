@@ -49,7 +49,12 @@ public enum ExitCode {
     /**
      * The selected agent command failed to execute.
      */
-    EXEC_FAIL(104, "Command execution error");
+    EXEC_FAIL(104, "Command execution error"),
+
+    /**
+     * The selected agent command was forcefully terminated before completion.
+     */
+    EXEC_ABORTED(105, "Command execution aborted");
 
     private final int code;
     private final String message;
