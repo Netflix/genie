@@ -67,7 +67,7 @@ class ResolveJobSpecCommand implements AgentCommand {
     }
 
     @Override
-    public void run() {
+    public ExitCode run() {
         log.info("Resolving job specification");
 
         final ObjectMapper prettyJsonMapper = GenieObjectMapper.getMapper()
@@ -137,6 +137,8 @@ class ResolveJobSpecCommand implements AgentCommand {
                 throw new RuntimeException("Failed to write request to: " + outputFile.getAbsolutePath(), e);
             }
         }
+
+        return ExitCode.SUCCESS;
     }
 
     @Component

@@ -41,7 +41,7 @@ class HeartBeatCommandSpec extends Specification {
 
     def "Run"() {
         when:
-        command.run()
+        ExitCode exitCode = command.run()
 
         then:
         1 * service.start(_ as String) >> {
@@ -53,5 +53,6 @@ class HeartBeatCommandSpec extends Specification {
         }
         1 * commandArguments.getRunDuration() >> 2
         1 * service.stop()
+        exitCode == ExitCode.SUCCESS
     }
 }

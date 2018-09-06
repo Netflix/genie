@@ -24,11 +24,31 @@ package com.netflix.genie.agent.cli;
  * @author mprimi
  * @since 4.0.0
  */
-enum ExitCode {
+public enum ExitCode {
+
+    /**
+     * Agent command execution completed successfully.
+     */
     SUCCESS(0, "Success"),
+
+    /**
+     * Agent failed to bootstrap and/or initialize.
+     */
     INIT_FAIL(101, "Agent initialization error"),
+
+    /**
+     * Command-line options provided are invalid.
+     */
     INVALID_ARGS(102, "Invalid arguments"),
+
+    /**
+     * The selected agent command failed to initialize.
+     */
     COMMAND_INIT_FAIL(103, "Command initialization error"),
+
+    /**
+     * The selected agent command failed to execute.
+     */
     EXEC_FAIL(104, "Command execution error");
 
     private final int code;

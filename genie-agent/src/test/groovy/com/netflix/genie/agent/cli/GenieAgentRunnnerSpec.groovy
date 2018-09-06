@@ -49,7 +49,7 @@ class GenieAgentRunnnerSpec extends Specification {
         1 * argsParser.getSelectedCommand() >> TestCommands.ExampleCommand1.NAME
         1 * argsParser.getCommandNames() >> TestCommands.allCommandNames()
         1 * cmdFactory.get(TestCommands.ExampleCommand1.NAME) >> agentCommand
-        1 * agentCommand.run()
+        1 * agentCommand.run() >> ExitCode.SUCCESS
 
         expect:
         ExitCode.SUCCESS.getCode() == runner.getExitCode()

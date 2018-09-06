@@ -42,7 +42,8 @@ final class TestCommands {
         static final String SHORT_NAME = "ex1";
 
         @Override
-        public void run() {
+        public ExitCode run() {
+            return ExitCode.SUCCESS;
         }
     }
 
@@ -61,7 +62,8 @@ final class TestCommands {
         static final String SHORT_NAME = "ex2";
 
         @Override
-        public void run() {
+        public ExitCode run() {
+            return ExitCode.SUCCESS;
         }
     }
 

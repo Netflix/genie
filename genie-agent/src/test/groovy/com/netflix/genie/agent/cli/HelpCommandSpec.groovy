@@ -38,9 +38,10 @@ class HelpCommandSpec extends Specification {
         def execCommand = new HelpCommand(argsParser)
 
         when:
-        execCommand.run()
+        ExitCode exitCode = execCommand.run()
 
         then:
         1 * argsParser.getUsageMessage() >> "Usage: ..."
+        exitCode == ExitCode.SUCCESS
     }
 }
