@@ -115,7 +115,7 @@ configure(javaProjects) {
             }
             dependency("org.opensaml:opensaml:2.6.4")
             dependency("org.python:jython-standalone:2.7.1")
-            dependencySet(group: "org.spockframework", version: "1.1-groovy-2.4") {
+            dependencySet(group: "org.spockframework", version: "1.2-groovy-2.4") {
                 entry "spock-core"
                 entry "spock-spring"
             }
