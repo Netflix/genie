@@ -9,6 +9,13 @@ ext {
 
 dependencies {
     /*******************************
+     * Annotation Processors
+     *******************************/
+
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    /*******************************
      * Compile Dependencies
      *******************************/
 
@@ -56,9 +63,6 @@ dependencies {
     /*******************************
      * Optional Dependencies
      *******************************/
-
-    compileOnly("org.hibernate:hibernate-jpamodelgen")
-    compileOnly("org.springframework.boot:spring-boot-configuration-processor")
 
     /*******************************
      * Runtime Dependencies
