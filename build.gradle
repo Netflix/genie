@@ -10,6 +10,7 @@ buildscript {
         classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17")
         classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
         classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.5")
+        classpath "io.franzbecker:gradle-lombok:1.14"
     }
 }
 
@@ -54,6 +55,7 @@ configure(javaProjects) {
     apply plugin: "io.spring.dependency-management"
     apply plugin: "com.gorylenko.gradle-git-properties"
     apply plugin: "groovy"
+    apply plugin: "io.franzbecker.gradle-lombok"
 
     group = "com.netflix.${githubProjectName}"
 
@@ -158,6 +160,12 @@ configure(javaProjects) {
 
     dependencies {
         /*******************************
+         * Annotation Processors
+         *******************************/
+
+        annotationProcessor("com.google.code.findbugs:annotations")
+
+        /*******************************
          * Compile Dependencies
          *******************************/
 
@@ -165,7 +173,6 @@ configure(javaProjects) {
          * Provided Dependencies
          *******************************/
 
-        compileOnly("org.projectlombok:lombok")
         compileOnly("com.google.code.findbugs:annotations")
 
         /*******************************
@@ -176,12 +183,13 @@ configure(javaProjects) {
          * Test Dependencies
          *******************************/
 
+        testAnnotationProcessor("com.google.code.findbugs:annotations")
+
         testCompile("cglib:cglib-nodep")
         testCompile("org.spockframework:spock-core")
         testCompile("org.spockframework:spock-spring")
         testCompile("org.springframework.boot:spring-boot-starter-test")
 
-        testCompileOnly("org.projectlombok:lombok")
         testCompileOnly("com.google.code.findbugs:annotations")
 
         testRuntime("javax.el:javax.el-api")
@@ -299,6 +307,10 @@ configure(javaProjects) {
             xml.enabled = true
             csv.enabled = false
         }
+    }
+
+    lombok {
+        version = "1.18.2"
     }
 }
 
