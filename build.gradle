@@ -240,8 +240,6 @@ configure(javaProjects) {
             generatedSourcesGRPCJavaDir.mkdirs()
         }
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        // TODO: Turn this back on once this lombok fix is released https://github.com/rzwitserloot/lombok/pull/1718
-        options.incremental = false
         options.compilerArgs += ['-s', generatedSourcesJavaDir]
     }
 
