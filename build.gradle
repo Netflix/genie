@@ -88,7 +88,7 @@ configure(javaProjects) {
                 entry "protoc-gen-grpc-java"
                 entry "grpc-testing"
             }
-            dependencySet(group: "io.springfox", version: "2.8.0") {
+            dependencySet(group: "io.springfox", version: "2.9.2") {
                 entry "springfox-swagger2"
                 entry "springfox-swagger-ui"
                 entry "springfox-bean-validators"
