@@ -29,6 +29,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.UUID;
 
 /**
@@ -155,7 +156,7 @@ public class LocalFileTransferImplUnitTests {
     @Test
     public void canGetLastModifiedTime() throws GenieException, IOException {
         final File file = this.temporaryFolder.newFile();
-        final long lastModifiedTime = file.lastModified();
+        final long lastModifiedTime = Files.getLastModifiedTime(file.toPath()).toMillis();
         Assert.assertThat(
             this.localFileTransfer.getLastModifiedTime(file.getAbsolutePath()),
             Matchers.is(lastModifiedTime)
