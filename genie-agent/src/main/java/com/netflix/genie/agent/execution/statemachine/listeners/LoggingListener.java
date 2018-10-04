@@ -21,7 +21,6 @@ import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
@@ -29,7 +28,6 @@ import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.transition.Transition;
 import org.springframework.statemachine.trigger.Trigger;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 
@@ -40,8 +38,6 @@ import javax.annotation.Nullable;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 public class LoggingListener implements JobExecutionListener {
 
     /**

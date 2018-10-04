@@ -27,8 +27,6 @@ import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
@@ -41,8 +39,6 @@ import java.util.Map;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
     private final LaunchJobService launchJobService;

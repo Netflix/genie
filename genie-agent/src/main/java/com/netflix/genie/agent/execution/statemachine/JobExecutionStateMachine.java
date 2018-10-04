@@ -48,7 +48,7 @@ public interface JobExecutionStateMachine extends ApplicationListener<KillServic
      *  - State actions are not interrupted. Only after the one currently executing is completed the stop
      *    signal is processed (TODO: make long-running actions, such as setup, interruptible).
      *  - Some actions are still performed before the program exits. For example publish the updated job status
-     *    server-side. Refer to the {@link StateMachineConfig} for details.
+     *    server-side. Refer to the {@link StateMachineAutoConfiguration} for details.
      */
     void stop();
 }

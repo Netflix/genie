@@ -21,12 +21,10 @@ package com.netflix.genie.agent.cli;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.validators.PositiveInteger;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
 
 /**
  * Implementation of ServerArguments delegate.
  */
-@Component
 @Getter
 class ServerArgumentsImpl implements ArgumentDelegates.ServerArguments {
 

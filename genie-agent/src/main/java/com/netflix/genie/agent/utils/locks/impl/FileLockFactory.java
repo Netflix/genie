@@ -20,8 +20,6 @@ package com.netflix.genie.agent.utils.locks.impl;
 import com.netflix.genie.agent.execution.exceptions.LockException;
 import com.netflix.genie.agent.utils.locks.CloseableLock;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 
@@ -33,8 +31,6 @@ import java.io.File;
  */
 
 @Slf4j
-@Component
-@Lazy
 public class FileLockFactory {
 
     /**

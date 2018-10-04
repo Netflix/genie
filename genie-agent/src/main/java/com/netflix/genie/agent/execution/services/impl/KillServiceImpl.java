@@ -22,8 +22,6 @@ import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.services.KillService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * Implementation of {@link KillService}.
@@ -31,17 +29,12 @@ import org.springframework.stereotype.Component;
  * @author standon
  * @since 4.0.0
  */
-@Component
-@Lazy
 @Slf4j
 class KillServiceImpl implements KillService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-
-    KillServiceImpl(
-        final ApplicationEventPublisher applicationEventPublisher
-    ) {
+    KillServiceImpl(final ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 

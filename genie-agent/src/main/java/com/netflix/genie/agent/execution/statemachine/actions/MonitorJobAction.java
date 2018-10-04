@@ -25,8 +25,6 @@ import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state MONITOR_JOB.
@@ -35,8 +33,6 @@ import org.springframework.stereotype.Component;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob {
 
     private final AgentJobService agentJobService;

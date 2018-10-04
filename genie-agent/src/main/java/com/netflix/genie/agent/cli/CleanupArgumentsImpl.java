@@ -20,15 +20,13 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
 import com.netflix.genie.agent.execution.CleanupStrategy;
-import org.springframework.stereotype.Component;
 
 /**
- * Implementation of CleanupArguments delegate.
+ * Implementation of {@link ArgumentDelegates.CleanupArguments} delegate.
  *
  * @author mprimi
  * @since 4.0.0
  */
-@Component
 class CleanupArgumentsImpl implements ArgumentDelegates.CleanupArguments {
 
     @Parameter(names = {"--no-cleanup"}, description = "Skip the post-execution cleanup and leave all files in place")

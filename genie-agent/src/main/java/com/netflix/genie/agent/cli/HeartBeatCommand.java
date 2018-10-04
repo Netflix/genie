@@ -24,9 +24,7 @@ import com.beust.jcommander.ParametersDelegate;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -39,8 +37,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class HeartBeatCommand implements AgentCommand {
 
     private final HeartBeatCommandArguments heartBeatCommandArguments;
@@ -93,7 +89,6 @@ class HeartBeatCommand implements AgentCommand {
         }
     }
 
-    @Component
     @Parameters(commandNames = CommandNames.HEARTBEAT, commandDescription = "Send heartbeats to a server")
     @Getter
     static class HeartBeatCommandArguments implements AgentCommandArguments {

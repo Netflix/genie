@@ -26,7 +26,6 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
@@ -39,7 +38,6 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Getter
-@Component
 class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
 
     @VisibleForTesting

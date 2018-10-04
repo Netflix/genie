@@ -25,22 +25,22 @@ import org.junit.experimental.categories.Category;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * Tests for {@link AgentConfig}.
+ * Tests for {@link AgentAutoConfiguration}.
  *
  * @author standon
  * @since 4.0.0
  */
 @Category(UnitTest.class)
-public class AgentConfigTests {
+public class AgentAutoConfigurationTests {
 
-    private AgentConfig config;
+    private AgentAutoConfiguration config;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.config = new AgentConfig();
+        this.config = new AgentAutoConfiguration();
     }
 
     /**

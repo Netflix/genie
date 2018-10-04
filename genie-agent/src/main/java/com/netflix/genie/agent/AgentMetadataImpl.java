@@ -22,8 +22,6 @@ import com.netflix.genie.GenieAgentApplication;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
@@ -38,17 +36,18 @@ import java.util.regex.Pattern;
  * @since 4.0.0
  */
 @Slf4j
-@Component
 @Getter
-@Lazy
-class AgentMetadataImpl implements AgentMetadata {
+public class AgentMetadataImpl implements AgentMetadata {
 
     private static final String FALLBACK_STRING = "unknown";
     private final String agentVersion;
     private final String agentHostName;
     private final String agentPid;
 
-    AgentMetadataImpl() {
+    /**
+     * Constructor.
+     */
+    public AgentMetadataImpl() {
         this.agentVersion = getAgentVersionOrFallback();
         this.agentHostName = getAgentHostNameOrFallback();
         this.agentPid = getAgentPidOrFallback();

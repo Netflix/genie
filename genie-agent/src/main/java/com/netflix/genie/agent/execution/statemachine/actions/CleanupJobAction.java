@@ -24,8 +24,6 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -36,8 +34,6 @@ import java.util.List;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob {
 
     private final AgentJobService agentJobService;

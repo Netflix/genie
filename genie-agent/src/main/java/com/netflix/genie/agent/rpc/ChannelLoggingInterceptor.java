@@ -24,8 +24,6 @@ import io.grpc.ClientCall;
 import io.grpc.ClientInterceptor;
 import io.grpc.MethodDescriptor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * Interceptor that logs outbound gRPC calls.
@@ -33,8 +31,6 @@ import org.springframework.stereotype.Component;
  * @author mprimi
  * @since 4.0.0
  */
-@Component
-@Lazy
 @Slf4j
 class ChannelLoggingInterceptor implements ClientInterceptor {
 

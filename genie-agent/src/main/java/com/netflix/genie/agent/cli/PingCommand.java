@@ -28,8 +28,6 @@ import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.proto.PongResponse;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.UUID;
@@ -44,8 +42,6 @@ import java.util.concurrent.TimeoutException;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class PingCommand implements AgentCommand {
 
     static final String CLIENT_HOST_NAME_METADATA_KEY = "clientHostName";
@@ -110,7 +106,6 @@ class PingCommand implements AgentCommand {
         return ExitCode.SUCCESS;
     }
 
-    @Component
     @Parameters(commandNames = CommandNames.PING, commandDescription = "Test connectivity with the server")
     static class PingCommandArguments implements AgentCommandArguments {
 

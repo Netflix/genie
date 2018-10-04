@@ -25,10 +25,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySources;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +38,6 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class InfoCommand implements AgentCommand {
 
     private final InfoCommandArguments infoCommandArguments;
@@ -51,7 +47,8 @@ class InfoCommand implements AgentCommand {
     InfoCommand(
         final InfoCommandArguments infoCommandArguments,
         final ConfigurableApplicationContext applicationContext,
-        final AgentMetadata agentMetadata) {
+        final AgentMetadata agentMetadata
+    ) {
         this.infoCommandArguments = infoCommandArguments;
         this.applicationContext = applicationContext;
         this.agentMetadata = agentMetadata;
@@ -194,7 +191,6 @@ class InfoCommand implements AgentCommand {
         return ExitCode.SUCCESS;
     }
 
-    @Component
     @Parameters(commandNames = CommandNames.INFO, commandDescription = "Print agent and environment information")
     @Getter
     static class InfoCommandArguments implements AgentCommandArguments {

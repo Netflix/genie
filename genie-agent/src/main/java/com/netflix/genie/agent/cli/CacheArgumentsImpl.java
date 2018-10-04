@@ -21,7 +21,6 @@ package com.netflix.genie.agent.cli;
 import com.beust.jcommander.Parameter;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 
@@ -32,7 +31,6 @@ import java.io.File;
  * @since 4.0.0
  */
 @Getter
-@Component
 class CacheArgumentsImpl implements ArgumentDelegates.CacheArguments {
 
     @VisibleForTesting

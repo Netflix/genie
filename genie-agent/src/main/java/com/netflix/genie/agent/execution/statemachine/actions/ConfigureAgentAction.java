@@ -21,8 +21,6 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state CONFIGURE_AGENT.
@@ -31,8 +29,6 @@ import org.springframework.stereotype.Component;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class ConfigureAgentAction extends BaseStateAction implements StateAction.ConfigureAgent {
 
     ConfigureAgentAction(final ExecutionContext executionContext) {

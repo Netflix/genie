@@ -28,13 +28,9 @@ import com.netflix.genie.agent.utils.locks.CloseableLock;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -78,10 +74,7 @@ import java.util.Set;
  * @author standon
  * @since 4.0.0
  */
-@Service
-@Lazy
 @Slf4j
-@Component
 class FetchingCacheServiceImpl implements FetchingCacheService {
 
     private static final String LOCK_FILE_NAME = "lock";
@@ -97,7 +90,7 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
         final ResourceLoader resourceLoader,
         final ArgumentDelegates.CacheArguments cacheArguments,
         final FileLockFactory fileLockFactory,
-        @Qualifier("sharedAgentTaskExecutor") final TaskExecutor cleanUpTaskExecutor
+        final TaskExecutor cleanUpTaskExecutor
     ) throws IOException {
         this.resourceLoader = resourceLoader;
         this.cacheDirectory = cacheArguments.getCacheDirectory();

@@ -27,8 +27,6 @@ import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URI;
@@ -42,8 +40,6 @@ import java.util.List;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class DownloadCommand implements AgentCommand {
 
     private final DownloadCommandArguments downloadCommandArguments;
@@ -95,7 +91,6 @@ class DownloadCommand implements AgentCommand {
         return ExitCode.SUCCESS;
     }
 
-    @Component
     @Parameters(commandNames = CommandNames.DOWNLOAD, commandDescription = "Download a set of files")
     static class DownloadCommandArguments implements AgentCommandArguments {
 

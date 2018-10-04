@@ -20,10 +20,8 @@ package com.netflix.genie.agent.execution.statemachine;
 
 import com.netflix.genie.agent.execution.services.KillService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -33,8 +31,6 @@ import java.util.concurrent.CountDownLatch;
  * @author mprimi
  * @since 4.0.0
  */
-@Component
-@Lazy
 @Slf4j
 class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
 
