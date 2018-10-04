@@ -16,15 +16,15 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   ./gradlew --no-daemon javadoc asciidoc dockerBuildAllImages
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then
   echo -e 'Build Branch with Snapshot => Branch ['$TRAVIS_BRANCH']'
-  ./gradlew --no-daemon -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" snapshot codeCoverageReport coveralls publishGhPages dockerPush
+  ./gradlew --no-daemon -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" snapshot codeCoverageReport coveralls gitPublishPush dockerPush
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" != "" ]; then
   echo -e 'Build Branch for Release => Branch ['$TRAVIS_BRANCH']  Tag ['$TRAVIS_TAG']'
   case "$TRAVIS_TAG" in
   *-rc\.*)
-    ./gradlew --no-daemon -Prelease.travisci=true -Prelease.useLastTag=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" candidate codeCoverageReport coveralls publishGhPages dockerPush
+    ./gradlew --no-daemon -Prelease.travisci=true -Prelease.useLastTag=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" candidate codeCoverageReport coveralls gitPublishPush dockerPush
     ;;
   *)
-    ./gradlew --no-daemon -Prelease.travisci=true -Prelease.useLastTag=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" final codeCoverageReport coveralls publishGhPages dockerPush
+    ./gradlew --no-daemon -Prelease.travisci=true -Prelease.useLastTag=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" final codeCoverageReport coveralls gitPublishPush dockerPush
     ;;
   esac
 else
