@@ -2,11 +2,13 @@ buildscript {
     repositories {
         gradlePluginPortal()
     }
+    
     dependencies {
-        classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
+        classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
     }
 }
-apply plugin: 'com.moowork.node'
+
+apply plugin: "com.moowork.node"
 
 dependencies {
     /*******************************
