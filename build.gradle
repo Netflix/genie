@@ -429,7 +429,8 @@ gitPublish {
     }
 
     preserve {
-        "**/*"
+        include "**/*"
+        exclude "docs/${project.version}/"
     }
 
     commitMessage = "Documentation generated for ${project.version} by Travis Build ${System.env.TRAVIS_BUILD_NUMBER}".toString()
