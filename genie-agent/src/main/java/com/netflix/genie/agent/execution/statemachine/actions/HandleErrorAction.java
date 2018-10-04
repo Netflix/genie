@@ -24,8 +24,6 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state HANDLE_ERROR.
@@ -33,8 +31,6 @@ import org.springframework.stereotype.Component;
  * @author mprimi
  * @since 4.0.0
  */
-@Component
-@Lazy
 @Slf4j
 class HandleErrorAction extends BaseStateAction implements StateAction.HandleError {
 

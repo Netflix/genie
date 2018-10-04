@@ -10,7 +10,9 @@ cloud:
       auto: false
 
 spring:
-  jmx:
-    enabled: false
   banner:
     location: classpath:genie-agent-banner.txt
+  jmx:
+    enabled: false
+  main:
+    web-application-type: none

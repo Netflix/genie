@@ -27,7 +27,7 @@ import org.springframework.statemachine.StateMachine
 import spock.lang.Specification
 
 @Category(UnitTest.class)
-class StateMachineConfigSpec extends Specification {
+class StateMachineAutoConfigurationSpec extends Specification {
     void setup() {
     }
 
@@ -36,7 +36,7 @@ class StateMachineConfigSpec extends Specification {
 
     def "StateMachine"() {
         setup:
-        def config = new StateMachineConfig()
+        def config = new StateMachineAutoConfiguration()
 
         when:
         StateMachine<States, Events> sm = config.stateMachine(

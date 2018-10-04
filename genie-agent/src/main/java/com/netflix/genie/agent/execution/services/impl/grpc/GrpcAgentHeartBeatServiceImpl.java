@@ -26,9 +26,7 @@ import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
@@ -43,8 +41,6 @@ import java.util.concurrent.ScheduledFuture;
  * @author mprimi
  * @since 4.0.0
  */
-@Component
-@Lazy
 @Slf4j
 @Validated
 class GrpcAgentHeartBeatServiceImpl implements AgentHeartBeatService {

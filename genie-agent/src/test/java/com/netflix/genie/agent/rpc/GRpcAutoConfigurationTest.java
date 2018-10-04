@@ -20,8 +20,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @Category(IntegrationTest.class)
-@ContextConfiguration(classes = {GrpcConfig.class, MockConfig.class})
-public class GrpcConfigTest {
+@ContextConfiguration(classes = {GRpcAutoConfiguration.class, MockConfig.class})
+public class GRpcAutoConfigurationTest {
 
     @Autowired
     private ManagedChannel managedChannel1;

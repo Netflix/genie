@@ -26,8 +26,6 @@ import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,8 +45,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class LaunchJobServiceImpl implements LaunchJobService {
 
     private final AtomicBoolean launched = new AtomicBoolean(false);

@@ -45,8 +45,6 @@ import com.netflix.genie.proto.ReserveJobIdError;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import com.netflix.genie.proto.ReserveJobIdResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -59,8 +57,6 @@ import java.util.concurrent.ExecutionException;
  * @author tgianos
  * @since 4.0.0
  */
-@Lazy
-@Service
 @Slf4j
 class GRpcAgentJobServiceImpl implements AgentJobService {
 

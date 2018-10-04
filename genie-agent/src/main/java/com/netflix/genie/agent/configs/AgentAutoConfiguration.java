@@ -18,7 +18,9 @@
 
 package com.netflix.genie.agent.configs;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.netflix.genie.agent.AgentMetadata;
+import com.netflix.genie.agent.AgentMetadataImpl;
+import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,27 +37,55 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  * @since 4.0.0
  */
 @Configuration
-class AgentConfig {
+public class AgentAutoConfiguration {
 
     /**
-     * Get a task executor which may be shared by different components.
+     * Provide a lazy bean definition for {@link AgentMetadata} if none already exists.
+     *
+     * @return A {@link AgentMetadataImpl} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(AgentMetadata.class)
+    public AgentMetadata agentMetadata() {
+        return new AgentMetadataImpl();
+    }
+
+    /**
+     * Provide a lazy {@link FileLockFactory} bean if none already exists.
+     *
+     * @return A {@link FileLockFactory} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(FileLockFactory.class)
+    public FileLockFactory fileLockFactory() {
+        return new FileLockFactory();
+    }
+
+    /**
+     * Get a lazy task executor bean which may be shared by different components if one isn't already defined.
      *
      * @return A task executor
      */
     @Bean
     @Lazy
-    @Qualifier("sharedAgentTaskExecutor")
-    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor")
+    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = TaskExecutor.class)
     public TaskExecutor sharedAgentTaskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.initialize();
         return executor;
     }
 
-
+    /**
+     * Provide a lazy {@link TaskScheduler} bean for use by the heart beat service is none has already been
+     * defined in the context.
+     *
+     * @return A {@link TaskScheduler} that the heart beat service should use
+     */
     @Bean
     @Lazy
-    @Qualifier("heartBeatServiceTaskExecutor")
+    @ConditionalOnMissingBean(name = "heartBeatServiceTaskExecutor", value = TaskScheduler.class)
     public TaskScheduler heartBeatServiceTaskExecutor() {
         final ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.setPoolSize(1);

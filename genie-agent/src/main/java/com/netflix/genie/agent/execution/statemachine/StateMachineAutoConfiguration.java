@@ -20,9 +20,11 @@ package com.netflix.genie.agent.execution.statemachine;
 
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
+import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -37,26 +39,64 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 /**
- * Configuration of JobExecutionStateMachine state machine.
+ * Spring auto configuration of {@link JobExecutionStateMachine} state machine for the agent process.
  *
  * @author mprimi
  * @since 4.0.0
  */
 @Configuration
 @Slf4j
-class StateMachineConfig {
+public class StateMachineAutoConfiguration {
 
     private static final String STATE_MACHINE_ID = "job-execution";
 
+    /**
+     * Provide a lazy {@link LoggingListener} bean if one hasn't already been defined.
+     *
+     * @return A {@link LoggingListener} instance
+     */
     @Bean
     @Lazy
-    StateMachine<States, Events> stateMachine(
+    @ConditionalOnMissingBean(LoggingListener.class)
+    public LoggingListener loggingListener() {
+        return new LoggingListener();
+    }
+
+    /**
+     * Provide a lazy {@link JobExecutionStateMachine} bean if one hasn't already been defined.
+     *
+     * @param stateMachine The state machine to use for job execution
+     * @return A {@link JobExecutionStateMachineImpl} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(JobExecutionStateMachine.class)
+    public JobExecutionStateMachine jobExecutionStateMachine(final StateMachine<States, Events> stateMachine) {
+        return new JobExecutionStateMachineImpl(stateMachine);
+    }
+
+    /**
+     * Provide a lazy {@link StateMachine} instance configured with the current model expected for job execution. It is
+     * not recommended to override this bean but it is possible.
+     *
+     * @param statesWithActions         The states to use that have actions associated with them available in the
+     *                                  Spring context
+     * @param eventDrivenTransitions    The event driven transitions available in the Spring context
+     * @param statesWithErrorTransition The states that have error transitions associated with them available in the
+     *                                  Spring context
+     * @param listeners                 Any {@link JobExecutionListener} implementations available in the Spring context
+     * @return A {@link StateMachine} instance configured with the available options from the application context
+     * @throws Exception On any error configuring the state machine
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(StateMachine.class)
+    public StateMachine<States, Events> stateMachine(
         final Collection<Pair<States, StateAction>> statesWithActions,
         final Collection<Triple<States, Events, States>> eventDrivenTransitions,
         final Collection<States> statesWithErrorTransition,
         final Collection<JobExecutionListener> listeners
     ) throws Exception {
-
         final StateMachineBuilder.Builder<States, Events> builder = new StateMachineBuilder.Builder<>();
 
         configureConfiguration(builder);
@@ -73,9 +113,24 @@ class StateMachineConfig {
         return stateMachine;
     }
 
+    /**
+     * Provide a lazy bean which is a collection of all the states the state machine should contain which have an
+     * associated action. All should implement {@link StateAction}.
+     *
+     * @param initializeAction              The initialization action
+     * @param configureAgentAction          The configure agent action
+     * @param resolveJobSpecificationAction The resolve job specification action
+     * @param setUpJobAction                The setup job action
+     * @param launchJobAction               The launch job action
+     * @param monitorJobAction              The monitor job action
+     * @param cleanupJobAction              The cleanup job action
+     * @param shutdownAction                The shut down action
+     * @param handleErrorAction             The handle error action
+     * @return A collection of all the actions
+     */
     @Bean
     @Lazy
-    Collection<Pair<States, StateAction>> statesWithActions(
+    public Collection<Pair<States, StateAction>> statesWithActions(
         final StateAction.Initialize initializeAction,
         final StateAction.ConfigureAgent configureAgentAction,
         final StateAction.ResolveJobSpecification resolveJobSpecificationAction,
@@ -99,9 +154,14 @@ class StateMachineConfig {
         );
     }
 
+    /**
+     * Provide a lazy bean definition for the event driven transitions within the state machine.
+     *
+     * @return A collection of transitions based on source state, event, destination state
+     */
     @Bean
     @Lazy
-    Collection<Triple<States, Events, States>> eventDrivenTransitions() {
+    public Collection<Triple<States, Events, States>> eventDrivenTransitions() {
         return Arrays.asList(
             // Regular execution
             Triple.of(States.READY, Events.START, States.INITIALIZE),
@@ -122,9 +182,14 @@ class StateMachineConfig {
         );
     }
 
+    /**
+     * Provide a bean with a collection of states which should have transitions to an error action when an error occurs.
+     *
+     * @return The collection of {@link States}
+     */
     @Bean
     @Lazy
-    Collection<States> statesWithErrorTransition() {
+    public Collection<States> statesWithErrorTransition() {
         return EnumSet.of(
             States.INITIALIZE,
             States.CONFIGURE_AGENT,

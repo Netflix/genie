@@ -28,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -47,8 +45,6 @@ import java.util.stream.Collectors;
  * @author mprimi
  * @since 4.0.0
  */
-@Component
-@Lazy
 @Slf4j
 class DownloadServiceImpl implements DownloadService {
     private final FetchingCacheService fetchingCacheService;

@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Category(UnitTest.class)
-public class StateMachineConfigTest {
+public class StateMachineAutoConfigurationTest {
 
     private static final int MIN_ACTION_DURATION_MS = 10;
     private static final int MAX_ACTION_DURATION_MS = 300;
@@ -99,7 +99,7 @@ public class StateMachineConfigTest {
         this.handleErrorActionMock =
             new TestStateAction(States.HANDLE_ERROR, Events.HANDLE_ERROR_COMPLETE);
 
-        final StateMachineConfig config = new StateMachineConfig();
+        final StateMachineAutoConfiguration config = new StateMachineAutoConfiguration();
 
         this.statesWithActions = config.statesWithActions(
             initializeActionMock,

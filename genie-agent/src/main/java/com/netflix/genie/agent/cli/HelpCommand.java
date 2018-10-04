@@ -21,8 +21,6 @@ package com.netflix.genie.agent.cli;
 import com.beust.jcommander.Parameters;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * Command to print agent usage/help message.
@@ -31,16 +29,11 @@ import org.springframework.stereotype.Component;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class HelpCommand implements AgentCommand {
-
 
     private final ArgumentParser argumentParser;
 
-    HelpCommand(
-        final ArgumentParser argumentParser
-    ) {
+    HelpCommand(final ArgumentParser argumentParser) {
         this.argumentParser = argumentParser;
     }
 
@@ -51,7 +44,6 @@ class HelpCommand implements AgentCommand {
         return ExitCode.SUCCESS;
     }
 
-    @Component
     @Parameters(commandNames = CommandNames.HELP, commandDescription = "Print agent usage and help message")
     @Getter
     static class HelpCommandArguments implements AgentCommandArguments {

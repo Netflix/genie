@@ -32,8 +32,6 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,8 +46,6 @@ import java.nio.file.StandardOpenOption;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class ResolveJobSpecCommand implements AgentCommand {
 
     private final ResolveJobSpecCommandArguments resolveJobSpecCommandArguments;
@@ -141,7 +137,6 @@ class ResolveJobSpecCommand implements AgentCommand {
         return ExitCode.SUCCESS;
     }
 
-    @Component
     @Parameters(
         commandNames = CommandNames.RESOLVE,
         commandDescription = "Resolve job parameters into a job specification via server")

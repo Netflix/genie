@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = GenieAgentApplication.class)
-public class CommandsConfigIntegrationTest {
+public class JCommanderAutoConfigurationIntegrationTest {
 
     @Autowired
     private ApplicationContext applicationContext;

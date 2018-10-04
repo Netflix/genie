@@ -15,44 +15,31 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs;
+package com.netflix.genie.agent.execution;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
-
-import javax.validation.Validator;
+import org.springframework.context.annotation.Lazy;
 
 /**
- * Configuration for bean validation within Genie Agent.
+ * Spring auto configuration for beans required for job execution.
  *
- * @author mprimi
+ * @author tgianos
  * @since 4.0.0
  */
 @Configuration
-class ValidationConfig {
+public class ExecutionAutoConfiguration {
 
     /**
-     * Setup bean validation.
+     * Provide a lazy execution context bean if one hasn't already been defined.
      *
-     * @return The bean validator
+     * @return An {@link ExecutionContextImpl} instance
      */
     @Bean
-    @ConditionalOnMissingBean(Validator.class)
-    public Validator localValidatorFactoryBean() {
-        return new LocalValidatorFactoryBean();
-    }
-
-    /**
-     * Setup method parameter bean validation.
-     *
-     * @return The method validation processor
-     */
-    @Bean
-    @ConditionalOnMissingBean(MethodValidationPostProcessor.class)
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
-        return new MethodValidationPostProcessor();
+    @Lazy
+    @ConditionalOnMissingBean(ExecutionContext.class)
+    public ExecutionContext executionContext() {
+        return new ExecutionContextImpl();
     }
 }

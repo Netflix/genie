@@ -22,7 +22,6 @@ import com.beust.jcommander.ParameterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -34,14 +33,13 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-public class GenieAgentRunnner implements CommandLineRunner, ExitCodeGenerator {
+public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
 
     private final ArgumentParser argumentParser;
     private final CommandFactory commandFactory;
     private ExitCode exitCode = ExitCode.INIT_FAIL;
 
-    GenieAgentRunnner(
+    GenieAgentRunner(
         final ArgumentParser argumentParser,
         final CommandFactory commandFactory
     ) {
@@ -53,6 +51,7 @@ public class GenieAgentRunnner implements CommandLineRunner, ExitCodeGenerator {
     public void run(final String... args) throws Exception {
         UserConsole.getLogger().info("Agent logging to: {}", UserConsole.getLogFilePath());
         try {
+            UserConsole.getLogger().info("Genie agent startup complete.");
             internalRun(args);
         } catch (final Throwable t) {
             final Throwable userConsoleException = t.getCause() != null ? t.getCause() : t;
@@ -64,6 +63,9 @@ public class GenieAgentRunnner implements CommandLineRunner, ExitCodeGenerator {
 
             log.info("Command execution failed", t);
         }
+
+
+        UserConsole.getLogger().info("Full execution log file: {}", UserConsole.getLogFilePath());
     }
 
     private void internalRun(final String[] args) {

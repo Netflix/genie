@@ -25,19 +25,19 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import spock.lang.Specification
 
 @Category(UnitTest.class)
-class GenieAgentRunnnerSpec extends Specification {
+class GenieAgentRunnerSpec extends Specification {
     ArgumentParser argsParser
     AgentCommand agentCommand
     CommandFactory cmdFactory
     String[] args
-    GenieAgentRunnner runner
+    GenieAgentRunner runner
 
     void setup() {
         this.argsParser = Mock(ArgumentParser.class)
         this.agentCommand = Mock(AgentCommand.class)
         this.cmdFactory = Mock(CommandFactory.class)
         this.args = new String[0]
-        this.runner = new GenieAgentRunnner(argsParser, cmdFactory)
+        this.runner = new GenieAgentRunner(argsParser, cmdFactory)
     }
 
     def "Successful run"() {

@@ -25,11 +25,11 @@ import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 
 @Category(UnitTest.class)
-class CommandsConfigSpec extends Specification {
-    CommandsConfig config
+class JCommanderAutoConfigurationSpec extends Specification {
+    JCommanderAutoConfiguration config
 
     void setup() {
-        this.config = new CommandsConfig()
+        this.config = new JCommanderAutoConfiguration()
     }
 
     void cleanup() {

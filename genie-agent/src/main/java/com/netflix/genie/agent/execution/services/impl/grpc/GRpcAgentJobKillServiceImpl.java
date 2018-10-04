@@ -26,10 +26,7 @@ import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotBlank;
 
@@ -39,16 +36,14 @@ import javax.validation.constraints.NotBlank;
  * @author standon
  * @since 4.0.0
  */
-@Lazy
-@Service
 @Slf4j
 public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
 
     private final JobKillServiceGrpc.JobKillServiceFutureStub client;
     private final KillService killService;
+    private final TaskExecutor killTaskExecutor;
     private ListenableFuture<JobKillRegistrationResponse> jobKillFuture;
     private boolean started;
-    private final TaskExecutor killTaskExecutor;
 
 
     /**
@@ -61,7 +56,7 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
     public GRpcAgentJobKillServiceImpl(
         final JobKillServiceGrpc.JobKillServiceFutureStub client,
         final KillService killService,
-        @Qualifier("sharedAgentTaskExecutor") final TaskExecutor killTaskExecutor
+        final TaskExecutor killTaskExecutor
     ) {
         this.client = client;
         this.killService = killService;
@@ -72,7 +67,7 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
     public synchronized void start(@NotBlank(message = "Job id cannot be blank") final String jobId) {
         //Service can be started only once
         if (started) {
-           throw new IllegalStateException("Service can be started only once");
+            throw new IllegalStateException("Service can be started only once");
         }
 
         registerForRemoteKillNotification(jobId);

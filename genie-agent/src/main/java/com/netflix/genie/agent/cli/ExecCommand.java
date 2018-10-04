@@ -29,9 +29,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.action.Action;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,8 +42,6 @@ import java.util.List;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class ExecCommand implements AgentCommand {
 
     private final ExecCommandArguments execCommandArguments;
@@ -146,7 +142,6 @@ class ExecCommand implements AgentCommand {
         killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
     }
 
-    @Component
     @Parameters(commandNames = CommandNames.EXEC, commandDescription = "Execute a Genie job")
     @Getter
     static class ExecCommandArguments implements AgentCommandArguments {

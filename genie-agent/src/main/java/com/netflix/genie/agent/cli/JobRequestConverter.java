@@ -24,8 +24,6 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -38,8 +36,6 @@ import java.util.Set;
  * @author mprimi
  * @since 4.0.0
  */
-@Component
-@Lazy
 public class JobRequestConverter {
 
     private final Validator validator;

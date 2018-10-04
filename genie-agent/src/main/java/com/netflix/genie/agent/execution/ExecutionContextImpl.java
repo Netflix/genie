@@ -25,9 +25,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.statemachine.action.Action;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -44,8 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author mprimi
  * @since 4.0.0
  */
-@Component
-@Lazy
 @Slf4j
 @ThreadSafe
 class ExecutionContextImpl implements ExecutionContext {

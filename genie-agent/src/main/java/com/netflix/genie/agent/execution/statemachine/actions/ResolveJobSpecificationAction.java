@@ -32,8 +32,6 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state RESOLVE_JOB_SPECIFICATION.
@@ -43,8 +41,6 @@ import org.springframework.stereotype.Component;
  * @since 4.0.0
  */
 @Slf4j
-@Component
-@Lazy
 class ResolveJobSpecificationAction extends BaseStateAction implements StateAction.ResolveJobSpecification {
 
     private final ArgumentDelegates.JobRequestArguments jobRequestArguments;
