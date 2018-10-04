@@ -1,26 +1,26 @@
 buildscript {
     repositories {
+        gradlePluginPortal()
         jcenter()
     }
 
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}")
-        classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.8")
-        // As of July 7, 2018 upgrading this plugin to 1.5.x release conflicts with nebula for grgit
-        classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17")
-        classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
-        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.5")
-        classpath "io.franzbecker:gradle-lombok:1.14"
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
+        classpath 'com.netflix.nebula:gradle-netflixoss-project-plugin:6.0.4'
+        classpath 'org.ajoberstar.grgit:grgit-gradle:3.0.0-beta.1'
+        classpath 'org.ajoberstar:gradle-git-publish:1.0.1'
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.8'
+        classpath 'gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2'
+        classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.5'
+        classpath 'io.franzbecker:gradle-lombok:1.14'
     }
 }
-
-plugins {
-    id "com.github.kt3k.coveralls" version "2.8.2"
-    id "nebula.netflixoss" version "6.0.3"
-    id "org.ajoberstar.grgit" version "3.0.0-beta.1"
-    id "org.ajoberstar.git-publish" version "1.0.1"
-}
-
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'nebula.netflixoss'
+apply plugin: 'org.ajoberstar.grgit'
+apply plugin: 'org.ajoberstar.git-publish'
 apply plugin: "nebula-aggregate-javadocs"
 
 ext.githubProjectName = rootProject.name

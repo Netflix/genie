@@ -1,6 +1,12 @@
-plugins {
-    id "com.moowork.node" version "1.2.0"
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
+    }
 }
+apply plugin: 'com.moowork.node'
 
 dependencies {
     /*******************************
