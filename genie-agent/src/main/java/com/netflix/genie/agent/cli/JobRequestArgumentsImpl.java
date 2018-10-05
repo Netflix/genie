@@ -62,10 +62,11 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private boolean interactive;
 
     @Parameter(
-        names = {"--archivalDisabled"},
-        description = "Disable server-side archival of logs (does not disable logs upload and short-term retrieval)"
+        names = {"--archiveLocationPrefix"},
+        description = "Prefix for job folder archival location (Currently only s3 URIs are supported)",
+        validateWith = ArgumentValidators.S3URIValidator.class
     )
-    private boolean archivalDisabled;
+    private String archiveLocationPrefix;
 
     @Parameter(
         names = {"--timeout"},

@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.cli
 
 import com.beust.jcommander.JCommander
+import com.beust.jcommander.ParameterException
 import com.beust.jcommander.ParametersDelegate
 import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.util.GenieObjectMapper
@@ -48,7 +49,7 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getCommandArguments().isEmpty()
         options.jobRequestArguments.getJobDirectoryLocation() == new File(JobRequestArgumentsImpl.DEFAULT_JOBS_DIRECTORY)
         !options.jobRequestArguments.isInteractive()
-        !options.jobRequestArguments.isArchivalDisabled()
+        options.jobRequestArguments.getArchiveLocationPrefix() == null
         options.jobRequestArguments.getTimeout() == null
         options.jobRequestArguments.getJobId() == null
         options.jobRequestArguments.getClusterCriteria().isEmpty()
@@ -67,11 +68,13 @@ class JobRequestArgumentsImplSpec extends Specification {
     }
 
     def "Parse"() {
+        def archiveLocationPrefix = "s3://bucket/" + UUID.randomUUID().toString()
+
         when:
         jCommander.parse(
                 "--jobDirectoryLocation", "/foo/bar",
                 "--interactive",
-                "--archivalDisabled",
+                "--archiveLocationPrefix", archiveLocationPrefix,
                 "--timeout", "10",
                 "--jobId", "FooBar",
                 "--clusterCriterion", "NAME=test",
@@ -95,7 +98,7 @@ class JobRequestArgumentsImplSpec extends Specification {
         then:
         options.jobRequestArguments.getJobDirectoryLocation() == new File("/foo/bar")
         options.jobRequestArguments.isInteractive()
-        options.jobRequestArguments.isArchivalDisabled()
+        options.jobRequestArguments.getArchiveLocationPrefix() == archiveLocationPrefix
         options.jobRequestArguments.getTimeout() == 10
         options.jobRequestArguments.getJobId() == "FooBar"
         options.jobRequestArguments.getClusterCriteria().size() == 2
@@ -118,6 +121,28 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode().put("foo", false)
         options.jobRequestArguments.getCommandArguments() == ["foo", "bar"].asList()
         options.jobRequestArguments.isJobRequestedViaAPI()
+    }
+
+    def "Non S3 url throws ParameterException"() {
+
+        when:
+        jCommander.parse("--archiveLocationPrefix", "file://" + UUID.randomUUID().toString())
+
+        then:
+        thrown(ParameterException)
+
+        when:
+        jCommander.parse("--archiveLocationPrefix", UUID.randomUUID().toString())
+
+        then:
+        thrown(ParameterException)
+
+        when:
+        jCommander.parse("--archiveLocationPrefix", "")
+
+        then:
+        thrown(ParameterException)
+
     }
 
     class TestOptions {
