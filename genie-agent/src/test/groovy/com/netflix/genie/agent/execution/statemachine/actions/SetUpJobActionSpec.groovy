@@ -18,6 +18,9 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.netflix.genie.agent.cli.AgentOptionsArgumentsImpl
+import com.netflix.genie.agent.cli.ArgumentDelegates
+import com.netflix.genie.agent.cli.JobFolderCleanupOption
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.DownloadException
@@ -103,12 +106,16 @@ class SetUpJobActionSpec extends Specification {
 
     Map<String, String> jobServerEnvMap
 
+    ArgumentDelegates.AgentOptions agentOptions
+
     void setup() {
 
         this.temporaryFolder.create()
         this.dummyFile = temporaryFolder.newFile()
 
         this.executionContext = Mock(ExecutionContext)
+
+        this.agentOptions = Mock(AgentOptionsArgumentsImpl)
 
         this.manifestUris = Sets.newHashSet()
 
@@ -219,7 +226,7 @@ class SetUpJobActionSpec extends Specification {
             _ * getEnvironmentVariables() >> jobServerEnvMap
         }
 
-        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService, heartbeatService, killService)
+        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService, heartbeatService, killService, agentOptions)
     }
 
     void cleanup() {
@@ -623,6 +630,23 @@ class SetUpJobActionSpec extends Specification {
 
         then:
         1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
+        1 * agentOptions.getJobFolderCleanUpOption() >> JobFolderCleanupOption.NO_CLEANUP
+        jobDir.exists()
+        allFiles.each {
+                // Check all directories not deleted, even the empty dependencies one
+            file -> assert file.getParentFile().exists()
+        }
+        1 * killService.stop()
+        1 * heartbeatService.stop()
+
+        when:
+        action.cleanup()
+
+        then:
+        1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
+        1 * agentOptions.getJobFolderCleanUpOption() >> JobFolderCleanupOption.DELETE_DEPENDENCIES_ONLY
+
+        jobDir.exists()
 
         dependencies.each {
             // Check all dependencies deleted
@@ -639,6 +663,16 @@ class SetUpJobActionSpec extends Specification {
             file -> assert file.getParentFile().exists()
         }
 
+        1 * killService.stop()
+        1 * heartbeatService.stop()
+
+        when:
+        action.cleanup()
+
+        then:
+        1 * agentOptions.getJobFolderCleanUpOption() >> JobFolderCleanupOption.DELETE_JOB_FOLDER
+        1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
+        !jobDir.exists()
         1 * killService.stop()
         1 * heartbeatService.stop()
     }

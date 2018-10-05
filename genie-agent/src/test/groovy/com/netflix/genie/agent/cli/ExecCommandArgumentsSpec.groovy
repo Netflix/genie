@@ -32,12 +32,14 @@ class ExecCommandArgumentsSpec extends Specification {
     ArgumentDelegates.ServerArguments serverArguments
     ArgumentDelegates.CacheArguments cacheArguments
     ArgumentDelegates.JobRequestArguments jobRequestArguments
+    ArgumentDelegates.AgentOptions agentOptions
 
     void setup() {
         serverArguments = new ServerArgumentsImpl()
         cacheArguments = new CacheArgumentsImpl()
         jobRequestArguments = new JobRequestArgumentsImpl()
-        options = new ExecCommand.ExecCommandArguments(serverArguments, cacheArguments, jobRequestArguments)
+        agentOptions = new AgentOptionsArgumentsImpl()
+        options = new ExecCommand.ExecCommandArguments(serverArguments, cacheArguments, jobRequestArguments, agentOptions)
         jCommander = new JCommander(options)
     }
 

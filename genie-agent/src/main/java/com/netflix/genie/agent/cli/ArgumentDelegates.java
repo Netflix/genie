@@ -98,4 +98,12 @@ public interface ArgumentDelegates {
         boolean isJobRequestedViaAPI();
     }
 
+    /**
+     * Options for specifying agent's behavior.
+     */
+    interface AgentOptions {
+
+        JobFolderCleanupOption getJobFolderCleanUpOption();
+
+    }
 }
