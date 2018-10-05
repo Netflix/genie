@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.cli;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.netflix.genie.agent.execution.CleanupStrategy;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 
 import java.io.File;
@@ -96,6 +97,14 @@ public interface ArgumentDelegates {
         JsonNode getJobMetadata();
 
         boolean isJobRequestedViaAPI();
+    }
+
+    /**
+     * Delegate for job folder cleanup options.
+     */
+    interface CleanupArguments {
+
+        CleanupStrategy getCleanupStrategy();
     }
 
 }
