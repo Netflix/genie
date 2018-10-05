@@ -18,6 +18,8 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.netflix.genie.agent.cli.ArgumentDelegates
+import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.DownloadException
@@ -59,6 +61,7 @@ class SetUpJobActionSpec extends Specification {
     AgentJobService agentJobService
     AgentHeartBeatService heartbeatService
     AgentJobKillService killService
+    ArgumentDelegates.CleanupArguments cleanupArguments
     SetUpJobAction action
 
     JobSpecification spec
@@ -125,6 +128,7 @@ class SetUpJobActionSpec extends Specification {
         this.agentJobService = Mock(AgentJobService)
         this.heartbeatService = Mock(AgentHeartBeatService)
         this.killService = Mock(AgentJobKillService)
+        this.cleanupArguments = Mock(ArgumentDelegates.CleanupArguments)
 
         this.jobId = UUID.randomUUID().toString()
         this.jobStatus = JobStatus.CLAIMED
@@ -219,7 +223,7 @@ class SetUpJobActionSpec extends Specification {
             _ * getEnvironmentVariables() >> jobServerEnvMap
         }
 
-        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService, heartbeatService, killService)
+        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService, heartbeatService, killService, cleanupArguments)
     }
 
     void cleanup() {
@@ -584,7 +588,7 @@ class SetUpJobActionSpec extends Specification {
         e.getCause().getCause().getClass() == EnvUtils.ParseException
     }
 
-    def "Dependencies cleanup"() {
+    def "Skip cleanup"() {
         setup:
         File[] dependencies = [
                 jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
@@ -596,16 +600,9 @@ class SetUpJobActionSpec extends Specification {
                 jobId + "/run",
                 jobId + "/genie/logs/genie.log",
                 jobId + "/genie/logs/env.log",
-                jobId + "/genie/applications/presto0180/config/presto.cfg",
-                jobId + "/genie/applications/presto0180/setup.sh",
-                jobId + "/genie/command/presto0180/config/presto-wrapper-config.py",
-                jobId + "/genie/command/presto0180/setup.sh",
-                jobId + "/genie/cluster/presto-v005/config/presto-v005.cfg",
                 jobId + "/genie/genie.done",
                 jobId + "/stdout",
-                jobId + "/stderr",
-                jobId + "/script.presto",
-                "dependencies/foo.txt"
+                jobId + "/stderr"
         ].collect { new File(temporaryFolder.getRoot(), it) }
 
         def allFiles = dependencies + otherFiles as File[]
@@ -622,6 +619,99 @@ class SetUpJobActionSpec extends Specification {
         action.cleanup()
 
         then:
+        1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.NO_CLEANUP
+        1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
+
+        allFiles.each {
+            // Check all directories not deleted, even the empty dependencies one
+            file -> assert file.exists()
+        }
+
+        1 * killService.stop()
+        1 * heartbeatService.stop()
+    }
+
+    def "Full cleanup"() {
+        setup:
+        File[] dependencies = [
+            jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
+            jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
+            jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
+        ].collect { new File(temporaryFolder.getRoot(), it) }
+
+        File[] otherFiles = [
+            jobId + "/run",
+            jobId + "/genie/logs/genie.log",
+            jobId + "/genie/logs/env.log",
+            jobId + "/genie/genie.done",
+            jobId + "/stdout",
+            jobId + "/stderr"
+        ].collect { new File(temporaryFolder.getRoot(), it) }
+
+        def allFiles = dependencies + otherFiles as File[]
+
+        allFiles.each {
+            file ->
+                println "Creating dir " + file.getParentFile().getAbsolutePath()
+                Files.createDirectories(file.getParentFile().toPath())
+                println "Creating file " + file.getAbsolutePath()
+                Files.createFile(file.toPath())
+        }
+
+        File jobDirectory = new File(temporaryFolder.getRoot(), jobId)
+
+        when:
+        action.cleanup()
+
+        then:
+        1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.FULL_CLEANUP
+        1 * executionContext.getJobDirectory() >> jobDirectory
+
+        !jobDirectory.exists()
+
+        1 * killService.stop()
+        1 * heartbeatService.stop()
+    }
+
+    def "Dependencies cleanup"() {
+        setup:
+        File[] dependencies = [
+            jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
+            jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
+            jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
+        ].collect { new File(temporaryFolder.getRoot(), it) }
+
+        File[] otherFiles = [
+            jobId + "/run",
+            jobId + "/genie/logs/genie.log",
+            jobId + "/genie/logs/env.log",
+            jobId + "/genie/applications/presto0180/config/presto.cfg",
+            jobId + "/genie/applications/presto0180/setup.sh",
+            jobId + "/genie/command/presto0180/config/presto-wrapper-config.py",
+            jobId + "/genie/command/presto0180/setup.sh",
+            jobId + "/genie/cluster/presto-v005/config/presto-v005.cfg",
+            jobId + "/genie/genie.done",
+            jobId + "/stdout",
+            jobId + "/stderr",
+            jobId + "/script.presto",
+            "dependencies/foo.txt"
+        ].collect { new File(temporaryFolder.getRoot(), it) }
+
+        def allFiles = dependencies + otherFiles as File[]
+
+        allFiles.each {
+            file ->
+                println "Creating dir " + file.getParentFile().getAbsolutePath()
+                Files.createDirectories(file.getParentFile().toPath())
+                println "Creating file " + file.getAbsolutePath()
+                Files.createFile(file.toPath())
+        }
+
+        when:
+        action.cleanup()
+
+        then:
+        1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.DEPENDENCIES_CLEANUP
         1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
 
         dependencies.each {
