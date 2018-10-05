@@ -66,7 +66,7 @@ public interface ArgumentDelegates {
 
         boolean isInteractive();
 
-        boolean isArchivalDisabled();
+        String getArchiveLocationPrefix();
 
         Integer getTimeout();
 
