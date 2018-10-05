@@ -63,6 +63,13 @@ public interface JobSpecificationProjection {
     Optional<FileEntity> getSetupFile();
 
     /**
+     * Get the job folder archive location agent should use.
+     *
+     * @return The job folder archive location wrapped in an {@link Optional}
+     */
+    Optional<String> getArchiveLocation();
+
+    /**
      * Get the job directory location the agent should use.
      *
      * @return The job directory location if its been set wrapped in an {@link Optional}

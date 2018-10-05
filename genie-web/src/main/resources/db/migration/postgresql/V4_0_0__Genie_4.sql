@@ -134,23 +134,25 @@ ALTER TABLE jobs RENAME COLUMN client_host          TO request_api_client_hostna
 ALTER TABLE jobs RENAME COLUMN user_agent           TO request_api_client_user_agent;
 
 ALTER TABLE jobs
-  ADD COLUMN interactive                      BOOLEAN       DEFAULT FALSE NOT NULL,
-  ADD COLUMN requested_job_directory_location VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN requested_agent_config_ext       TEXT          DEFAULT NULL,
-  ADD COLUMN requested_agent_environment_ext  TEXT          DEFAULT NULL,
+  ADD COLUMN interactive                       BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN requested_job_directory_location  VARCHAR(1024) DEFAULT NULL,
+  ADD COLUMN requested_agent_config_ext        TEXT          DEFAULT NULL,
+  ADD COLUMN requested_agent_environment_ext   TEXT          DEFAULT NULL,
   ALTER COLUMN agent_hostname DROP NOT NULL,
   ALTER COLUMN agent_hostname SET DEFAULT NULL,
-  ADD COLUMN request_agent_client_hostname    VARCHAR(255)  DEFAULT NULL,
-  ADD COLUMN request_agent_client_version     VARCHAR(255)  DEFAULT NULL,
-  ADD COLUMN request_agent_client_pid         INT           DEFAULT NULL,
+  ADD COLUMN request_agent_client_hostname     VARCHAR(255)  DEFAULT NULL,
+  ADD COLUMN request_agent_client_version      VARCHAR(255)  DEFAULT NULL,
+  ADD COLUMN request_agent_client_pid          INT           DEFAULT NULL,
   ALTER COLUMN status SET DEFAULT 'RESERVED',
-  ADD COLUMN requested_id                     BOOLEAN       DEFAULT FALSE NOT NULL,
-  ADD COLUMN job_directory_location           VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN resolved                         BOOLEAN       DEFAULT FALSE NOT NULL,
-  ADD COLUMN agent_version                    VARCHAR(255)  DEFAULT NULL,
-  ADD COLUMN agent_pid                        INT           DEFAULT NULL,
-  ADD COLUMN claimed                          BOOLEAN       DEFAULT FALSE NOT NULL,
-  ADD COLUMN v4                               BOOLEAN       DEFAULT FALSE NOT NULL;
+  ADD COLUMN requested_id                      BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN job_directory_location            VARCHAR(1024) DEFAULT NULL,
+  ADD COLUMN resolved                          BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN agent_version                     VARCHAR(255)  DEFAULT NULL,
+  ADD COLUMN agent_pid                         INT           DEFAULT NULL,
+  ADD COLUMN claimed                           BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN v4                                BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN requested_archive_location_prefix VARCHAR(1024) DEFAULT NULL;
+
 
 ALTER TABLE job_applications_requested RENAME TO job_requested_applications;
 ALTER TABLE job_requested_applications

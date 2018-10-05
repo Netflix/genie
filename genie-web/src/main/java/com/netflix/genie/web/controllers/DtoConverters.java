@@ -36,6 +36,7 @@ import com.netflix.genie.common.internal.dto.v4.CommandRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -389,6 +390,10 @@ public final class DtoConverters {
             .withInteractive(false);
         v3JobRequest.getTimeout().ifPresent(agentConfigBuilder::withTimeoutRequested);
 
+        final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder =
+            new JobArchivalDataRequest
+            .Builder();
+
         return new JobRequest(
             v3JobRequest.getId().orElse(null),
             resources,
@@ -398,7 +403,8 @@ public final class DtoConverters {
             metadataBuilder.build(),
             criteria,
             agentEnvironmentBuilder.build(),
-            agentConfigBuilder.build()
+            agentConfigBuilder.build(),
+            jobArchivalDataRequestBuilder.build()
         );
     }
 

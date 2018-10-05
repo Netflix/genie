@@ -77,11 +77,16 @@ message AgentConfig {
     string job_directory_location = 2;
 }
 
+message JobArchivalData {
+    string requested_archive_location_prefix = 1;
+}
+
 message ReserveJobIdRequest {
     JobMetadata metadata = 1;
     ExecutionResourceCriteria criteria = 2;
     AgentConfig agent_config = 3;
     AgentMetadata agent_metadata = 4;
+    JobArchivalData job_archival_data = 5;
 }
 
 message ReserveJobIdError {
@@ -110,6 +115,7 @@ message DryRunJobSpecificationRequest {
     JobMetadata metadata = 1;
     ExecutionResourceCriteria criteria = 2;
     AgentConfig agent_config = 3;
+    JobArchivalData job_archival_data = 4;
 }
 
 message ExecutionResource {
@@ -128,6 +134,7 @@ message JobSpecification {
     map<string, string> environment_variables = 6;
     bool is_interactive = 7;
     string job_directory_location = 8;
+    string archive_location = 9;
 }
 
 message JobSpecificationError {

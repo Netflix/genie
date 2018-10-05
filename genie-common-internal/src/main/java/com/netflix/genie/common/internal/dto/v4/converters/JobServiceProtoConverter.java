@@ -29,6 +29,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -80,6 +81,7 @@ public class JobServiceProtoConverter {
         builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
         builder.setAgentConfig(toProtoAgentConfig(jobRequest));
         builder.setAgentMetadata(toProtoAgentMetadata(agentClientMetadata));
+        builder.setJobArchivalData(toProtoJobArchivalData(jobRequest));
         return builder.build();
     }
 
@@ -101,7 +103,12 @@ public class JobServiceProtoConverter {
      * @throws GenieConversionException if conversion fails
      */
     public JobRequest toJobRequestDTO(final ReserveJobIdRequest request) throws GenieConversionException {
-        return toJobRequest(request.getMetadata(), request.getCriteria(), request.getAgentConfig());
+        return toJobRequest(
+            request.getMetadata(),
+            request.getCriteria(),
+            request.getAgentConfig(),
+            request.getJobArchivalData()
+        );
     }
 
     /**
@@ -118,6 +125,7 @@ public class JobServiceProtoConverter {
         builder.setMetadata(toProtoJobMetadata(jobRequest));
         builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
         builder.setAgentConfig(toProtoAgentConfig(jobRequest));
+        builder.setJobArchivalData(toProtoJobArchivalData(jobRequest));
         return builder.build();
     }
 
@@ -132,7 +140,12 @@ public class JobServiceProtoConverter {
     public JobRequest toJobRequestDTO(
         final DryRunJobSpecificationRequest request
     ) throws GenieConversionException {
-        return toJobRequest(request.getMetadata(), request.getCriteria(), request.getAgentConfig());
+        return toJobRequest(
+            request.getMetadata(),
+            request.getCriteria(),
+            request.getAgentConfig(),
+            request.getJobArchivalData()
+        );
     }
 
     /**
@@ -183,7 +196,8 @@ public class JobServiceProtoConverter {
                 .collect(Collectors.toList()),
             protoSpec.getEnvironmentVariablesMap(),
             protoSpec.getIsInteractive(),
-            new File(protoSpec.getJobDirectoryLocation())
+            new File(protoSpec.getJobDirectoryLocation()),
+            StringUtils.isBlank(protoSpec.getArchiveLocation()) ? null : protoSpec.getArchiveLocation()
         );
     }
 
@@ -249,6 +263,9 @@ public class JobServiceProtoConverter {
         builder.putAllEnvironmentVariables(jobSpecification.getEnvironmentVariables());
         builder.setIsInteractive(jobSpecification.isInteractive());
         builder.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
+        jobSpecification.getArchiveLocation().ifPresent(
+            archiveLocation -> builder.setArchiveLocation(archiveLocation)
+        );
         return builder.build();
     }
 
@@ -367,6 +384,16 @@ public class JobServiceProtoConverter {
         return builder.build();
     }
 
+    private static com.netflix.genie.proto.JobArchivalData toProtoJobArchivalData(final AgentJobRequest jobRequest) {
+        final com.netflix.genie.proto.JobArchivalData.Builder builder =
+            com.netflix.genie.proto.JobArchivalData.newBuilder();
+        final JobArchivalDataRequest jobArchivalDataRequest = jobRequest.getRequestedJobArchivalData();
+        jobArchivalDataRequest.getRequestedArchiveLocationPrefix().ifPresent(
+            builder::setRequestedArchiveLocationPrefix
+        );
+        return builder.build();
+    }
+
     private static AgentMetadata toProtoAgentMetadata(final AgentClientMetadata agentClientMetadata) {
         final AgentMetadata.Builder builder = AgentMetadata.newBuilder();
         agentClientMetadata.getHostname().ifPresent(builder::setAgentHostname);
@@ -378,7 +405,8 @@ public class JobServiceProtoConverter {
     private static JobRequest toJobRequest(
         final com.netflix.genie.proto.JobMetadata protoJobMetadata,
         final com.netflix.genie.proto.ExecutionResourceCriteria protoExecutionResourceCriteria,
-        final com.netflix.genie.proto.AgentConfig protoAgentConfig
+        final com.netflix.genie.proto.AgentConfig protoAgentConfig,
+        final com.netflix.genie.proto.JobArchivalData protoJobArchivalData
     ) throws GenieConversionException {
         try {
             final JobMetadata jobMetadata = new JobMetadata.Builder(
@@ -427,6 +455,15 @@ public class JobServiceProtoConverter {
                 .withInteractive(protoAgentConfig.getIsInteractive())
                 .build();
 
+            final JobArchivalDataRequest jobArchivalDataRequest = new JobArchivalDataRequest
+                .Builder()
+                .withRequestedArchiveLocationPrefix(
+                    StringUtils.isBlank(protoJobArchivalData.getRequestedArchiveLocationPrefix())
+                    ? null
+                    : protoJobArchivalData.getRequestedArchiveLocationPrefix()
+                )
+                .build();
+
             final String jobId = protoJobMetadata.getId();
 
             return new JobRequest(
@@ -436,7 +473,8 @@ public class JobServiceProtoConverter {
                 jobMetadata,
                 executionResourceCriteria,
                 null,
-                agentConfigRequest
+                agentConfigRequest,
+                jobArchivalDataRequest
             );
         } catch (GeniePreconditionException e) {
             throw new GenieConversionException("Failed to compose JobRequest", e);

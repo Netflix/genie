@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -228,6 +229,15 @@ public final class EntityDtoConverters {
         agentConfigRequestBuilder.withArchivingDisabled(jobRequestProjection.isArchivingDisabled());
         jobRequestProjection.getRequestedTimeout().ifPresent(agentConfigRequestBuilder::withTimeoutRequested);
 
+        //Rebuild Job Archival Data Request
+        final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder = new JobArchivalDataRequest.Builder();
+        jobRequestProjection
+            .getRequestedArchiveLocationPrefix()
+            .ifPresent(
+                requestedArchiveLocationPrefix -> jobArchivalDataRequestBuilder
+                    .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
+            );
+
         // Rebuild the Agent Environment Request
         final AgentEnvironmentRequest.Builder agentEnvironmentRequestBuilder = new AgentEnvironmentRequest.Builder();
         jobRequestProjection
@@ -245,7 +255,8 @@ public final class EntityDtoConverters {
             jobMetadataBuilder.build(),
             executionResourceCriteria,
             agentEnvironmentRequestBuilder.build(),
-            agentConfigRequestBuilder.build()
+            agentConfigRequestBuilder.build(),
+            jobArchivalDataRequestBuilder.build()
         );
     }
 
@@ -344,6 +355,8 @@ public final class EntityDtoConverters {
                 )
             );
 
+        final String archiveLocation = jobSpecificationProjection.getArchiveLocation().orElse(null);
+
         final JobSpecification.ExecutionResource job = toExecutionResource(
             id,
             jobSpecificationProjection.getConfigs(),
@@ -386,7 +399,8 @@ public final class EntityDtoConverters {
             applications,
             jobSpecificationProjection.getEnvironmentVariables(),
             jobSpecificationProjection.isInteractive(),
-            jobDirectoryLocation
+            jobDirectoryLocation,
+            archiveLocation
         );
     }
 

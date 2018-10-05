@@ -52,7 +52,7 @@ class JobRequestConverterSpec extends Specification {
         then:
         jobRequest.getRequestedAgentConfig().getTimeoutRequested() == Optional.ofNullable(jobRequestArgs.getTimeout())
         jobRequest.getCommandArgs() == jobRequestArgs.getCommandArguments()
-        jobRequest.getRequestedAgentConfig().isArchivingDisabled() == jobRequestArgs.isArchivalDisabled()
+        jobRequest.getRequestedJobArchivalData().getRequestedArchiveLocationPrefix() == Optional.ofNullable(jobRequestArgs.getArchiveLocationPrefix())
         jobRequest.getRequestedAgentConfig().isInteractive() == jobRequestArgs.isInteractive()
         jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation() == Optional.ofNullable(jobRequestArgs.getJobDirectoryLocation())
         jobRequest.getCriteria() != null
@@ -74,6 +74,7 @@ class JobRequestConverterSpec extends Specification {
 
     def "Convert with non defaults"() {
 
+        def archiveLocationPrefix = UUID.randomUUID().toString()
         setup:
         ArgumentDelegates.JobRequestArguments jobRequestArgs = Mock()
         AgentJobRequest jobRequest
@@ -90,8 +91,8 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getRequestedAgentConfig().getTimeoutRequested().get() == 10
         1 * jobRequestArgs.getCommandArguments() >> ["foo", "bar"].asList()
         jobRequest.getCommandArgs() == ["foo", "bar"].asList()
-        1 * jobRequestArgs.isArchivalDisabled() >> true
-        jobRequest.getRequestedAgentConfig().isArchivingDisabled()
+        1 * jobRequestArgs.getArchiveLocationPrefix() >> archiveLocationPrefix
+        jobRequest.getRequestedJobArchivalData().getRequestedArchiveLocationPrefix() == Optional.of(archiveLocationPrefix)
         1 * jobRequestArgs.isInteractive() >> true
         jobRequest.getRequestedAgentConfig().isInteractive()
         1 * jobRequestArgs.getJobDirectoryLocation() >> new File("/tmp")

@@ -198,7 +198,13 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 applicationResources,
                 this.generateEnvironmentVariables(id, jobRequest, cluster, command),
                 jobRequest.getRequestedAgentConfig().isInteractive(),
-                jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY)
+                jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY),
+                toArchiveLocation(
+                    jobRequest
+                        .getRequestedJobArchivalData()
+                        .getRequestedArchiveLocationPrefix()
+                        .orElse(null),
+                    id)
             );
 
             MetricsUtils.addSuccessTags(tags);
@@ -519,5 +525,25 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
         final String joinedString = StringUtils.join(sortedTags, ',');
         // Escape quotes
         return StringUtils.replaceAll(StringUtils.replaceAll(joinedString, "\'", "\\\'"), "\"", "\\\"");
+    }
+
+    /**
+     * Helper to convert archive location prefix to an archive location.
+     *
+     * @param requestedArchiveLocationPrefix archive location prefix uri
+     * @param jobId                          job id
+     * @return archive location for the job
+     */
+    private String toArchiveLocation(
+        final String requestedArchiveLocationPrefix,
+        final String jobId
+    ) {
+        if (StringUtils.isBlank(requestedArchiveLocationPrefix)) {
+            return null;
+        } else if (requestedArchiveLocationPrefix.endsWith(File.separator)) {
+            return requestedArchiveLocationPrefix + jobId;
+        } else {
+            return requestedArchiveLocationPrefix + File.separator + jobId;
+        }
     }
 }

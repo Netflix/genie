@@ -146,6 +146,8 @@ ALTER TABLE `jobs`
   ADD COLUMN `claimed` BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE `jobs`
   ADD COLUMN `v4` BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE `jobs`
+  ADD COLUMN `requested_archive_location_prefix` VARCHAR(1024) DEFAULT NULL;
 
 ALTER TABLE `job_applications_requested`
   RENAME TO `job_requested_applications`;
