@@ -43,14 +43,15 @@ class AgentExecutionExceptionsSpec extends Specification {
         exWithMessageAndCause.getCause() == CAUSE
 
         where:
-        aClass                                      | _
-        DownloadException.class                     | _
-        SetUpJobException.class                     | _
-        JobLaunchException.class                    | _
-        JobSpecificationResolutionException.class   | _
-        LockException.class                         | _
-        JobIdUnavailableException.class             | _
-        JobReservationException.class               | _
-        ChangeJobStatusException.class              | _
+        aClass                                    | _
+        DownloadException.class                   | _
+        SetUpJobException.class                   | _
+        JobLaunchException.class                  | _
+        JobSpecificationResolutionException.class | _
+        LockException.class                       | _
+        JobIdUnavailableException.class           | _
+        JobReservationException.class             | _
+        ChangeJobStatusException.class            | _
+        ArchivalException.class                   | _
     }
 }
