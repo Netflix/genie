@@ -17,13 +17,16 @@
  */
 package com.netflix.genie.agent.execution.services.impl;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.execution.services.ArchivalService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -106,5 +109,28 @@ public class ServicesAutoConfiguration {
     @ConditionalOnMissingBean(LaunchJobService.class)
     public LaunchJobService launchJobService() {
         return new LaunchJobServiceImpl();
+    }
+
+    /**
+     * Provide a lazy {@link ArchivalService} bean if AmazonS3 client exists.
+     * @param amazonS3 Amazon S3 client instance
+     * @return A {@link ArchivalService} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnBean(AmazonS3.class)
+    public ArchivalService archivalService(final AmazonS3 amazonS3) {
+        return new S3ArchivalServiceImpl(amazonS3);
+    }
+
+    /**
+     * Provide a lazy {@link ArchivalService} bean if one does not already exist.
+     * @return A {@link ArchivalService} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(ArchivalService.class)
+    public ArchivalService archivalService() {
+        return new NoOpArchivalServiceImpl();
     }
 }
