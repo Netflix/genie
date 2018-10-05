@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.JCommander;
+import com.netflix.genie.agent.execution.CleanupStrategy;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
@@ -63,6 +64,8 @@ class ArgumentParser {
 
         stringBuilder
             .append("\n\n")
+            .append(CleanupStrategy.CLEANUP_HELP_MESSAGE)
+            .append("\n")
             .append(ArgumentConverters.CriterionConverter.CRITERION_SYNTAX_MESSAGE)
             .append("\n")
             .append(ExitCode.EXIT_CODE_HELP_MESSAGE)
