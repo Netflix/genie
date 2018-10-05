@@ -19,28 +19,68 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.ArchivalService
 import com.netflix.genie.agent.execution.statemachine.Events
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.test.categories.UnitTest
+import org.junit.Rule
 import org.junit.experimental.categories.Category
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 @Category(UnitTest.class)
 class ShutdownActionSpec extends Specification {
+    @Rule
+    TemporaryFolder temporaryFolder
     ExecutionContext executionContext
+    ArchivalService archivalService
     ShutdownAction action
+    JobSpecification jobSpecification
+    File jobDir
+    URI sampleS3URI = new URI("s3://test-bucket/genie/job/test123")
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.action = new ShutdownAction()
+        this.archivalService = Mock(ArchivalService)
+        this.jobSpecification = Mock(JobSpecification)
+        this.jobDir = temporaryFolder.newFolder("job")
+        this.action = new ShutdownAction(executionContext, archivalService)
     }
 
     void cleanup() {
     }
 
-    def "ExecuteStateAction"() {
+    def "Archival works on shutdown"() {
+        def event
+
         when:
-        def event = action.executeStateAction(executionContext)
-        then:
+        event = action.executeStateAction(executionContext)
+
+        then: "Archive for a valid s3 archive location"
+        1 * executionContext.getJobSpecification() >> jobSpecification
+        1 * jobSpecification.getArchiveLocation() >> Optional.of(sampleS3URI.toString())
+        1 * executionContext.getJobDirectory() >> jobDir
+        1 * archivalService.archive(jobDir.toPath(), sampleS3URI)
+        event == Events.SHUTDOWN_COMPLETE
+
+        when:
+        event = action.executeStateAction(executionContext)
+
+        then: "Skip archival for a null archive location"
+        1 * executionContext.getJobSpecification() >> jobSpecification
+        1 * jobSpecification.getArchiveLocation() >> Optional.empty()
+        0 * executionContext.getJobDirectory() >> jobDir
+        0 * archivalService.archive(jobDir, _ as URI)
+        event == Events.SHUTDOWN_COMPLETE
+
+        when:
+        event = action.executeStateAction(executionContext)
+
+        then: "Skip archival for a empty archive location"
+        1 * executionContext.getJobSpecification() >> jobSpecification
+        1 * jobSpecification.getArchiveLocation() >> Optional.of("")
+        0 * executionContext.getJobDirectory() >> jobDir
+        0 * archivalService.archive(jobDir, _ as URI)
         event == Events.SHUTDOWN_COMPLETE
     }
 }
