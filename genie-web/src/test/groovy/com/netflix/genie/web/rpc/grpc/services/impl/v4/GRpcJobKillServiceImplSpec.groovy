@@ -92,4 +92,31 @@ class GRpcJobKillServiceImplSpec extends Specification {
         then:
         thrown(GenieServerException)
     }
+
+    def "On Agent Connected, no op. On agent disconnected, response observer cleaned up"() {
+
+        when:
+        service.registerForKillNotification(request, responseObserver)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.onConnected(jobId)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.onDisconnected(jobId)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        service.killJob(jobId, "Testing")
+
+        then:
+        thrown(GenieServerException)
+    }
 }

@@ -24,6 +24,8 @@ import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.AgentConnectionObserver;
+import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -43,6 +45,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,6 +154,24 @@ public class ServicesAutoConfigurationUnitTests {
                 Mockito.mock(GenieEventBus.class),
                 Mockito.mock(FileSystemResource.class),
                 GenieObjectMapper.getMapper()
+            )
+        );
+    }
+
+    /**
+     * Can get a bean for AgentRoutingService.
+     */
+    @Test
+    public void canGetAgentRoutingServiceBean() {
+        final List<AgentConnectionObserver> agentConnectionObservers = new ArrayList<AgentConnectionObserver>();
+        agentConnectionObservers.add(Mockito.mock(AgentConnectionObserver.class));
+
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.agentRoutingService(
+                Mockito.mock(AgentConnectionPersistenceService.class),
+                new GenieHostInfo("localhost"),
+                agentConnectionObservers,
+                Mockito.mock(TaskExecutor.class)
             )
         );
     }
