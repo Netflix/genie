@@ -262,5 +262,4 @@ public interface JobPersistenceService {
     boolean isV4(
         @NotBlank(message = "Id is missing and is required") final String id
     );
-
 }

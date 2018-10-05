@@ -65,6 +65,14 @@ public interface AgentJobRequest extends CommonRequest {
      */
     AgentConfigRequest getRequestedAgentConfig();
 
+
+    /**
+     * Get the requested job archival agent configuration parameters.
+     *
+     * @return The requested job archival agent configuration parameters
+     */
+    JobArchivalDataRequest getRequestedJobArchivalData();
+
     /**
      * Builder for a V4 Job Request.
      *
@@ -77,6 +85,7 @@ public interface AgentJobRequest extends CommonRequest {
         private final JobMetadata bMetadata;
         private final ExecutionResourceCriteria bCriteria;
         private final AgentConfigRequest bRequestedAgentConfig;
+        private final JobArchivalDataRequest bRequestedJobArchivalData;
         private final List<String> bCommandArgs = Lists.newArrayList();
 
         /**
@@ -85,17 +94,22 @@ public interface AgentJobRequest extends CommonRequest {
          * @param metadata             All user supplied metadata
          * @param criteria             All user supplied execution criteria
          * @param requestedAgentConfig The requested configuration of the Genie agent
+         * @param requestedJobArchivalData The requested job archival data
          */
         @JsonCreator
         public Builder(
             @JsonProperty(value = "metadata", required = true) final JobMetadata metadata,
             @JsonProperty(value = "criteria", required = true) final ExecutionResourceCriteria criteria,
-            @JsonProperty(value = "requestedAgentConfig", required = true) final AgentConfigRequest requestedAgentConfig
+            @JsonProperty(value = "requestedAgentConfig", required = true)
+            final AgentConfigRequest requestedAgentConfig,
+            @JsonProperty(value = "requestedJobArchivalData", required = true)
+            final JobArchivalDataRequest requestedJobArchivalData
         ) {
             super();
             this.bMetadata = metadata;
             this.bCriteria = criteria;
             this.bRequestedAgentConfig = requestedAgentConfig;
+            this.bRequestedJobArchivalData = requestedJobArchivalData;
         }
 
         /**

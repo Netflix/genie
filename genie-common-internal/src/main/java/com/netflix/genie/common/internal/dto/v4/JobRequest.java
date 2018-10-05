@@ -56,6 +56,8 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
     private final AgentEnvironmentRequest requestedAgentEnvironment;
     @Valid
     private final AgentConfigRequest requestedAgentConfig;
+    @Valid
+    private final JobArchivalDataRequest requestedJobArchivalData;
 
     JobRequest(final AgentJobRequest.Builder builder) {
         this(
@@ -65,7 +67,8 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
             builder.getBMetadata(),
             builder.getBCriteria(),
             null,
-            builder.getBRequestedAgentConfig()
+            builder.getBRequestedAgentConfig(),
+            builder.getBRequestedJobArchivalData()
         );
     }
 
@@ -77,7 +80,8 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
             builder.getBMetadata(),
             builder.getBCriteria(),
             builder.getBRequestedAgentEnvironment(),
-            builder.getBRequestedAgentConfig()
+            builder.getBRequestedAgentConfig(),
+            builder.getBRequestedJobArchivalData()
         );
     }
 
@@ -92,6 +96,7 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
      *                                  (cluster, command, etc)
      * @param requestedAgentEnvironment The optional agent environment request parameters
      * @param requestedAgentConfig      The optional configuration options for the Genie Agent
+     * @param requestedJobArchivalData  The optional configuration options for archiving the job folder by the agent
      */
     public JobRequest(
         @Nullable final String requestedId,
@@ -100,7 +105,8 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
         final JobMetadata metadata,
         final ExecutionResourceCriteria criteria,
         @Nullable final AgentEnvironmentRequest requestedAgentEnvironment,
-        @Nullable final AgentConfigRequest requestedAgentConfig
+        @Nullable final AgentConfigRequest requestedAgentConfig,
+        @Nullable final JobArchivalDataRequest requestedJobArchivalData
     ) {
         super(requestedId, resources);
         this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(
@@ -117,6 +123,9 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
         this.requestedAgentConfig = requestedAgentConfig == null
             ? new AgentConfigRequest.Builder().build()
             : requestedAgentConfig;
+        this.requestedJobArchivalData = requestedJobArchivalData == null
+            ? new JobArchivalDataRequest.Builder().build()
+            : requestedJobArchivalData;
     }
 
     /**

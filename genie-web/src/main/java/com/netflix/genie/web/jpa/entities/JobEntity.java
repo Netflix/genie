@@ -115,7 +115,8 @@ import java.util.Set;
         "jobDirectoryLocation",
         "resolved",
         "claimed",
-        "v4"
+        "v4",
+        "requestedArchiveLocationPrefix"
     },
     doNotUseGetters = true
 )
@@ -298,6 +299,11 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "archive_location", length = 1024)
     @Size(max = 1024, message = "Max length in database is 1024 characters")
     private String archiveLocation;
+
+    @Basic
+    @Column(name = "requested_archive_location_prefix", length = 1024)
+    @Size(max = 1024, message = "Max length in database is 1024 characters")
+    private String requestedArchiveLocationPrefix;
 
     @Basic(optional = false)
     @Column(name = "interactive", nullable = false, updatable = false)
@@ -510,6 +516,11 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<Integer> getRequestedTimeout() {
         return Optional.ofNullable(this.requestedTimeout);
+    }
+
+    @Override
+    public Optional<String> getRequestedArchiveLocationPrefix() {
+        return Optional.ofNullable(this.requestedArchiveLocationPrefix);
     }
 
     /**

@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
@@ -335,6 +336,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         this.setExecutionResourceCriteriaFields(jobEntity, jobRequest.getCriteria());
         this.setRequestedAgentEnvironmentFields(jobEntity, jobRequest.getRequestedAgentEnvironment());
         this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
+        this.setRequestedJobArchivalData(jobEntity, jobRequest.getRequestedJobArchivalData());
         this.setRequestMetadataFields(jobEntity, jobRequestMetadata);
 
         // Flag to signal to rest of system that this job is V4. Temporary until everything moved to v4
@@ -421,6 +423,9 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
             entity.setEnvironmentVariables(specification.getEnvironmentVariables());
             entity.setJobDirectoryLocation(specification.getJobDirectoryLocation().getAbsolutePath());
+            specification.getArchiveLocation().ifPresent(
+                archiveLocation -> entity.setArchiveLocation(archiveLocation)
+            );
             entity.setResolved(true);
             entity.setStatus(JobStatus.RESOLVED);
             log.debug("Saved job specification {} for job with id {}", specification, id);
@@ -796,7 +801,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     private void setRequestedAgentConfigFields(
         final JobEntity jobEntity,
         final AgentConfigRequest requestedAgentConfig
-    ) {
+        ) {
         jobEntity.setInteractive(requestedAgentConfig.isInteractive());
         jobEntity.setArchivingDisabled(requestedAgentConfig.isArchivingDisabled());
         requestedAgentConfig
@@ -806,6 +811,15 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         requestedAgentConfig.getExt().ifPresent(
             jsonNode -> EntityDtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentConfigExt)
         );
+    }
+
+    private void setRequestedJobArchivalData(
+        final JobEntity jobEntity,
+        final JobArchivalDataRequest requestedjobArchivalData
+    ) {
+        requestedjobArchivalData
+            .getRequestedArchiveLocationPrefix()
+            .ifPresent(jobEntity::setRequestedArchiveLocationPrefix);
     }
 
     private void setRequestMetadataFields(

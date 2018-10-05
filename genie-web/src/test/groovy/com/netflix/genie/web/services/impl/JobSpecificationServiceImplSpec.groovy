@@ -30,6 +30,7 @@ import com.netflix.genie.common.internal.dto.v4.CommandMetadata
 import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.jobs.JobConstants
@@ -84,6 +85,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .build()
         )
         def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
         def jobRequest = new JobRequest(
                 null,
                 null,
@@ -91,7 +93,11 @@ class JobSpecificationServiceImplSpec extends Specification {
                 new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
                 null,
-                null
+                new AgentConfigRequest.Builder()
+                    .build(),
+                new JobArchivalDataRequest.Builder()
+                    .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
+                    .build()
         )
         def cluster1 = new Cluster(
                 cluster1Id,
@@ -146,17 +152,10 @@ class JobSpecificationServiceImplSpec extends Specification {
         Map<Cluster, String> clusterCommandMap = Maps.newHashMap()
         clusterCommandMap.put(cluster1, commandId)
         clusterCommandMap.put(cluster2, commandId)
-        def clusterService = Mock(ClusterPersistenceService) {
-            1 * findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
-        }
-        def loadBalancer = Mock(ClusterLoadBalancer) {
-            1 * selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
-        }
+        def clusterService = Mock(ClusterPersistenceService)
+        def loadBalancer = Mock(ClusterLoadBalancer)
         def applicationService = Mock(ApplicationPersistenceService)
-        def commandService = Mock(CommandPersistenceService) {
-            1 * getCommand(commandId) >> command
-            1 * getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        }
+        def commandService = Mock(CommandPersistenceService)
         def service = new JobSpecificationServiceImpl(
                 applicationService,
                 clusterService,
@@ -170,6 +169,10 @@ class JobSpecificationServiceImplSpec extends Specification {
         def jobSpec = service.resolveJobSpecification(jobId, jobRequest)
 
         then:
+        1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
+        1 * loadBalancer.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
+        1 * commandService.getCommand(commandId) >> command
+        1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
         jobSpec.getCommandArgs() == jobCommandArgs
         jobSpec.getJob().getId() == jobId
         jobSpec.getCluster().getId() == cluster1Id
@@ -177,6 +180,35 @@ class JobSpecificationServiceImplSpec extends Specification {
         jobSpec.getApplications().isEmpty()
         !jobSpec.isInteractive()
         jobSpec.getEnvironmentVariables().size() == 15
+        jobSpec.getArchiveLocation() == Optional.of(requestedArchiveLocationPrefix + File.separator + jobId)
+
+        when:
+        def jobRequestNoArchivalData = new JobRequest(
+            null,
+            null,
+            commandArgs,
+            new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
+            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+            null,
+            new AgentConfigRequest.Builder()
+                .build(),
+            null
+        )
+        def jobSpecNoArchivalData = service.resolveJobSpecification(jobId, jobRequestNoArchivalData)
+
+        then:
+        1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
+        1 * loadBalancer.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
+        1 * commandService.getCommand(commandId) >> command
+        1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
+        jobSpecNoArchivalData.getCommandArgs() == jobCommandArgs
+        jobSpecNoArchivalData.getJob().getId() == jobId
+        jobSpecNoArchivalData.getCluster().getId() == cluster1Id
+        jobSpecNoArchivalData.getCommand().getId() == commandId
+        jobSpecNoArchivalData.getApplications().isEmpty()
+        !jobSpecNoArchivalData.isInteractive()
+        jobSpecNoArchivalData.getEnvironmentVariables().size() == 15
+        jobSpecNoArchivalData.getArchiveLocation() == Optional.empty()
     }
 
     def "Can convert tags to string"() {
@@ -243,6 +275,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                         .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+                null,
                 null,
                 null
         )
@@ -406,6 +439,9 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .withArchivingDisabled(true)
                         .withInteractive(true)
                         .withTimeoutRequested(timeout)
+                        .build(),
+                new JobArchivalDataRequest
+                        .Builder()
                         .build()
         )
 

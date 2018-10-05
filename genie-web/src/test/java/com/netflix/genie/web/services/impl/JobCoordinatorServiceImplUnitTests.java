@@ -230,6 +230,8 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(application1.getId()).thenReturn(application1Id);
         Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
+        final String archiveLocation = UUID.randomUUID().toString();
+
         final JobSpecification jobSpecification = new JobSpecification(
             null,
             new JobSpecification.ExecutionResource(
@@ -256,14 +258,16 @@ public class JobCoordinatorServiceImplUnitTests {
             ),
             null,
             false,
-            new File("/tmp/genie/jobs/" + JOB_1_ID)
+            new File("/tmp/genie/jobs/" + JOB_1_ID),
+            archiveLocation
         );
 
         Mockito
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
+                )
             )
             .thenReturn(jobSpecification);
 
@@ -354,6 +358,8 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(application1.getId()).thenReturn(application1Id);
         Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
+        final String archiveLocation = UUID.randomUUID().toString();
+
         final JobSpecification jobSpecification = new JobSpecification(
             null,
             new JobSpecification.ExecutionResource(
@@ -380,14 +386,16 @@ public class JobCoordinatorServiceImplUnitTests {
             ),
             null,
             false,
-            new File("/tmp/genie/jobs/" + JOB_1_ID)
+            new File("/tmp/genie/jobs/" + JOB_1_ID),
+            archiveLocation
         );
 
         Mockito
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
+                )
             )
             .thenReturn(jobSpecification);
 
@@ -451,6 +459,8 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(application1.getId()).thenReturn(application1Id);
         Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
+        final String archiveLocation = UUID.randomUUID().toString();
+
         final JobSpecification jobSpecification = new JobSpecification(
             null,
             new JobSpecification.ExecutionResource(
@@ -477,14 +487,16 @@ public class JobCoordinatorServiceImplUnitTests {
             ),
             null,
             false,
-            new File("/tmp/genie/jobs/" + JOB_1_ID)
+            new File("/tmp/genie/jobs/" + JOB_1_ID),
+            archiveLocation
         );
 
         Mockito
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
+                )
             )
             .thenReturn(jobSpecification);
 
@@ -567,6 +579,8 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(application1.getId()).thenReturn(application1Id);
         Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
+        final String archiveLocation = UUID.randomUUID().toString();
+
         final JobSpecification jobSpecification = new JobSpecification(
             null,
             new JobSpecification.ExecutionResource(
@@ -593,14 +607,16 @@ public class JobCoordinatorServiceImplUnitTests {
             ),
             null,
             false,
-            new File("/tmp/genie/jobs/" + JOB_1_ID)
+            new File("/tmp/genie/jobs/" + JOB_1_ID),
+            archiveLocation
         );
 
         Mockito
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
+                )
             )
             .thenReturn(jobSpecification);
 
@@ -665,6 +681,8 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(application1.getId()).thenReturn(application1Id);
         Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
+        final String archiveLocation = UUID.randomUUID().toString();
+
         final JobSpecification jobSpecification = new JobSpecification(
             null,
             new JobSpecification.ExecutionResource(
@@ -691,14 +709,16 @@ public class JobCoordinatorServiceImplUnitTests {
             ),
             null,
             false,
-            new File("/tmp/genie/jobs/" + JOB_1_ID)
+            new File("/tmp/genie/jobs/" + JOB_1_ID),
+            archiveLocation
         );
 
         Mockito
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
+                )
             )
             .thenReturn(jobSpecification);
 
@@ -766,6 +786,8 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(application1.getId()).thenReturn(application1Id);
         Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
+        final String archiveLocation = UUID.randomUUID().toString();
+
         final JobSpecification jobSpecification = new JobSpecification(
             null,
             new JobSpecification.ExecutionResource(
@@ -792,14 +814,16 @@ public class JobCoordinatorServiceImplUnitTests {
             ),
             null,
             false,
-            new File("/tmp/genie/jobs/" + JOB_1_ID)
+            new File("/tmp/genie/jobs/" + JOB_1_ID),
+            archiveLocation
         );
 
         Mockito
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
+                )
             )
             .thenReturn(jobSpecification);
 

@@ -40,6 +40,7 @@ import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
@@ -328,9 +329,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
     @Test
     public void canSaveAndRetrieveJobRequest() throws GenieException, IOException {
         final String job0Id = UUID.randomUUID().toString();
-        final JobRequest jobRequest0 = this.createJobRequest(job0Id);
-        final JobRequest jobRequest1 = this.createJobRequest(null);
-        final JobRequest jobRequest2 = this.createJobRequest(JOB_3_ID);
+        final String job3Id = UUID.randomUUID().toString();
+        final JobRequest jobRequest0 = this.createJobRequest(job0Id, UUID.randomUUID().toString());
+        final JobRequest jobRequest1 = this.createJobRequest(null, UUID.randomUUID().toString());
+        final JobRequest jobRequest2 = this.createJobRequest(JOB_3_ID, UUID.randomUUID().toString());
+        final JobRequest jobRequest3 = this.createJobRequest(job3Id, null);
         final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata();
 
         String id = this.jobPersistenceService.saveJobRequest(jobRequest0, jobRequestMetadata);
@@ -347,6 +350,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
         } catch (final GenieIdAlreadyExistsException e) {
             // Expected
         }
+
+        id = this.jobPersistenceService.saveJobRequest(jobRequest3, jobRequestMetadata);
+        Assert.assertThat(id, Matchers.is(job3Id));
+        this.validateSavedJobRequest(id, jobRequest3, jobRequestMetadata);
+
     }
 
     /**
@@ -358,7 +366,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
     @Test
     public void canSaveAndRetrieveJobSpecification() throws GenieException, IOException {
         final String jobId = this.jobPersistenceService.saveJobRequest(
-            this.createJobRequest(null),
+            this.createJobRequest(null, UUID.randomUUID().toString()),
             this.createJobRequestMetadata()
         );
 
@@ -366,12 +374,32 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
             .getJobRequest(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        final JobSpecification jobSpecification = this.createJobSpecification(jobId, jobRequest);
+        final JobSpecification jobSpecification = this.createJobSpecification(
+            jobId,
+            jobRequest, UUID.randomUUID().toString()
+        );
 
         this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
         Assert.assertThat(
             this.jobPersistenceService.getJobSpecification(jobId).orElse(null),
             Matchers.is(jobSpecification)
+        );
+
+        final String jobId2 = this.jobPersistenceService.saveJobRequest(
+            this.createJobRequest(null, null),
+            this.createJobRequestMetadata()
+        );
+
+        final JobRequest jobRequest2 = this.jobPersistenceService
+            .getJobRequest(jobId2)
+            .orElseThrow(IllegalArgumentException::new);
+
+        final JobSpecification jobSpecification2 = this.createJobSpecification(jobId2, jobRequest2, null);
+
+        this.jobPersistenceService.saveJobSpecification(jobId2, jobSpecification2);
+        Assert.assertThat(
+            this.jobPersistenceService.getJobSpecification(jobId2).orElse(null),
+            Matchers.is(jobSpecification2)
         );
     }
 
@@ -384,7 +412,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
     @Test
     public void canClaimJobAndUpdateStatus() throws GenieException, IOException {
         final String jobId = this.jobPersistenceService.saveJobRequest(
-            this.createJobRequest(null),
+            this.createJobRequest(null, UUID.randomUUID().toString()),
             this.createJobRequestMetadata()
         );
 
@@ -392,7 +420,10 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
             .getJobRequest(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        final JobSpecification jobSpecification = this.createJobSpecification(jobId, jobRequest);
+        final JobSpecification jobSpecification = this.createJobSpecification(
+            jobId,
+            jobRequest,
+            UUID.randomUUID().toString());
 
         this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
 
@@ -435,7 +466,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
     @Test
     public void canUpdateJobStatus() throws GenieException, IOException {
         final String jobId = this.jobPersistenceService.saveJobRequest(
-            this.createJobRequest(null),
+            this.createJobRequest(null, UUID.randomUUID().toString()),
             this.createJobRequestMetadata()
         );
 
@@ -443,7 +474,10 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
             .getJobRequest(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        final JobSpecification jobSpecification = this.createJobSpecification(jobId, jobRequest);
+        final JobSpecification jobSpecification = this.createJobSpecification(
+            jobId,
+            jobRequest,
+            UUID.randomUUID().toString());
 
         this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
 
@@ -714,7 +748,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
     }
 
     private JobRequest createJobRequest(
-        @Nullable final String requestedId
+        @Nullable final String requestedId,
+        @Nullable final String requestedArchivalLocationPrefix
     ) throws GeniePreconditionException, IOException {
         final String metadata = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
         final JobMetadata jobMetadata = new JobMetadata
@@ -798,6 +833,10 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
             .withArchivingDisabled(true)
             .withRequestedJobDirectoryLocation(requestedJobDirectoryLocation)
             .build();
+        final JobArchivalDataRequest jobArchivalDataRequest = new JobArchivalDataRequest
+            .Builder()
+            .withRequestedArchiveLocationPrefix(requestedArchivalLocationPrefix)
+            .build();
 
         return new JobRequest(
             requestedId,
@@ -810,7 +849,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
             jobMetadata,
             criteria,
             agentEnvironmentRequest,
-            agentConfigRequest
+            agentConfigRequest,
+            jobArchivalDataRequest
         );
     }
 
@@ -837,7 +877,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
 
     private JobSpecification createJobSpecification(
         final String jobId,
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String archiveLocation
     ) throws GenieException {
         final String clusterId = "cluster1";
         final String commandId = "command1";
@@ -887,7 +928,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
             ),
             environmentVariables,
             jobRequest.getRequestedAgentConfig().isInteractive(),
-            jobDirectoryLocation
+            jobDirectoryLocation,
+            ARCHIVE_LOCATION
         );
     }
 }

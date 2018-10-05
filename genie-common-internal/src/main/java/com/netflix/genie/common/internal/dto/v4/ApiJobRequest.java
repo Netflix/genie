@@ -73,6 +73,13 @@ public interface ApiJobRequest extends CommonRequest {
     AgentConfigRequest getRequestedAgentConfig();
 
     /**
+     * Get the requested job archival agent configuration parameters.
+     *
+     * @return The requested job archival agent configuration parameters
+     */
+    JobArchivalDataRequest getRequestedJobArchivalData();
+
+    /**
      * Builder for a V4 Job Request.
      *
      * @author tgianos
@@ -86,6 +93,7 @@ public interface ApiJobRequest extends CommonRequest {
         private final List<String> bCommandArgs = Lists.newArrayList();
         private AgentEnvironmentRequest bRequestedAgentEnvironment;
         private AgentConfigRequest bRequestedAgentConfig;
+        private JobArchivalDataRequest bRequestedJobArchivalData;
 
         /**
          * Constructor with required parameters.
@@ -139,6 +147,17 @@ public interface ApiJobRequest extends CommonRequest {
          */
         public Builder withRequestedAgentConfig(@Nullable final AgentConfigRequest requestedAgentConfig) {
             this.bRequestedAgentConfig = requestedAgentConfig;
+            return this;
+        }
+
+        /**
+         * Set the job archival related data provided by the user.
+         *
+         * @param requestedJobArchivalData The requested job archival data
+         * @return The builder
+         */
+        public Builder withRequestedJobArchivalData(@Nullable final JobArchivalDataRequest requestedJobArchivalData) {
+            this.bRequestedJobArchivalData = requestedJobArchivalData;
             return this;
         }
 

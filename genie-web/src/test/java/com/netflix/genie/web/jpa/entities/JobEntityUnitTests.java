@@ -918,6 +918,20 @@ public class JobEntityUnitTests extends EntityTestsBase {
     }
 
     /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetRequestedArchiveLocationPrefix() {
+        Assert.assertFalse(this.jobEntity.getRequestedArchiveLocationPrefix().isPresent());
+        final String requestedArchiveLocationPrefix = UUID.randomUUID().toString();
+        this.jobEntity.setRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix);
+        Assert.assertThat(
+            this.jobEntity.getRequestedArchiveLocationPrefix().get(),
+            Matchers.is(requestedArchiveLocationPrefix)
+        );
+    }
+
+    /**
      * Test the toString method.
      */
     @Test

@@ -21,6 +21,7 @@ package com.netflix.genie.agent.cli;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -88,14 +89,19 @@ public class JobRequestConverter {
             .Builder()
             .withRequestedJobDirectoryLocation(jobRequestArguments.getJobDirectoryLocation())
             .withTimeoutRequested(jobRequestArguments.getTimeout())
-            .withArchivingDisabled(jobRequestArguments.isArchivalDisabled())
             .withInteractive(jobRequestArguments.isInteractive())
+            .build();
+
+        final JobArchivalDataRequest jobArchivalDataRequest = new JobArchivalDataRequest
+            .Builder()
+            .withRequestedArchiveLocationPrefix(jobRequestArguments.getArchiveLocationPrefix())
             .build();
 
         final AgentJobRequest agentJobRequest = new AgentJobRequest.Builder(
             jobMetadataBuilder.build(),
             criteria,
-            requestedAgentConfig
+            requestedAgentConfig,
+            jobArchivalDataRequest
         )
             .withCommandArgs(jobRequestArguments.getCommandArguments())
             .withRequestedId(jobRequestArguments.getJobId())

@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +52,7 @@ public class JobSpecification {
     private final ImmutableMap<String, String> environmentVariables;
     private final boolean interactive;
     private final File jobDirectoryLocation;
+    private final String archiveLocation;
 
     /**
      * Constructor.
@@ -63,6 +65,7 @@ public class JobSpecification {
      * @param environmentVariables The environment variables the agent should set when running the job. Optional
      * @param interactive          Whether the job is interactive or not
      * @param jobDirectoryLocation Location on disk where the job directory will be created
+     * @param archiveLocation      Location where job folder is archived by the agent when job finishes. Optional
      */
     @JsonCreator
     public JobSpecification(
@@ -73,7 +76,8 @@ public class JobSpecification {
         @JsonProperty("applications") @Nullable final List<ExecutionResource> applications,
         @JsonProperty("environmentVariables") @Nullable final Map<String, String> environmentVariables,
         @JsonProperty(value = "interactive", required = true) final boolean interactive,
-        @JsonProperty(value = "jobDirectoryLocation", required = true) final File jobDirectoryLocation
+        @JsonProperty(value = "jobDirectoryLocation", required = true) final File jobDirectoryLocation,
+        @JsonProperty(value = "archiveLocation") @Nullable final String archiveLocation
     ) {
         this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(
             commandArgs
@@ -90,6 +94,7 @@ public class JobSpecification {
             : ImmutableMap.copyOf(environmentVariables);
         this.interactive = interactive;
         this.jobDirectoryLocation = jobDirectoryLocation;
+        this.archiveLocation = archiveLocation;
     }
 
     /**
@@ -118,6 +123,14 @@ public class JobSpecification {
      */
     public Map<String, String> getEnvironmentVariables() {
         return this.environmentVariables;
+    }
+
+    /**
+     * Get the archive location for the job folder.
+     * @return archive location for the job folder wrapped in an {@link Optional}
+     */
+    public Optional<String> getArchiveLocation() {
+        return Optional.ofNullable(this.archiveLocation);
     }
 
     /**

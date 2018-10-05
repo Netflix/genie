@@ -27,6 +27,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
 import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.util.GenieObjectMapper
@@ -34,6 +35,7 @@ import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
+import com.netflix.genie.proto.JobArchivalData
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.test.categories.UnitTest
@@ -68,6 +70,8 @@ class JobServiceProtoConverterSpec extends Specification {
     def groupingInstance = UUID.randomUUID().toString()
 
     def interactive = true
+    def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
+    def archiveLocation = UUID.randomUUID().toString()
     def commandArgs = Lists.newArrayList(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -207,7 +211,7 @@ class JobServiceProtoConverterSpec extends Specification {
     def converter = new JobServiceProtoConverter()
 
     def "Can convert JobRequest to ReserveJobIdRequest and vice versa"() {
-        def jobRequest = createJobRequest(id)
+        def jobRequest = createJobRequest(id, requestedArchiveLocationPrefix)
         def agentClientMetadata = createAgentClientMetadata()
         def reserveJobIdRequest = createReserveJobIdRequest()
 
@@ -224,10 +228,18 @@ class JobServiceProtoConverterSpec extends Specification {
 
         then:
         jobRequest2 == jobRequest
+
+        when:
+        def jobRequest3 = createJobRequest(id, null)
+        def reserveJobIdRequest3 = converter.toProtoReserveJobIdRequest(jobRequest3, agentClientMetadata)
+        def jobRequest4 = converter.toJobRequestDTO(reserveJobIdRequest3)
+
+        then:
+        jobRequest4 == jobRequest3
     }
 
     def "Can convert JobRequest to DryRunJobSpecificationRequest and vice versa"() {
-        def jobRequest = createJobRequest(id)
+        def jobRequest = createJobRequest(id, requestedArchiveLocationPrefix)
         def dryRunJobSpecificationRequest = createDryRunJobSpecificationRequest()
 
         when:
@@ -243,6 +255,15 @@ class JobServiceProtoConverterSpec extends Specification {
 
         then:
         jobRequest2 == jobRequest
+
+        when:
+        def jobRequest3 = createJobRequest(id, null)
+        def dryRunJobSpecificationRequest3 = converter.toProtoDryRunJobSpecificationRequest(jobRequest3)
+        def jobRequest4 = converter.toJobRequestDTO(dryRunJobSpecificationRequest3)
+
+        then:
+        jobRequest3 == jobRequest4
+
     }
 
     def "Can create a JobSpecificationRequest"() {
@@ -283,7 +304,8 @@ class JobServiceProtoConverterSpec extends Specification {
                 null,
                 null,
                 false,
-                new File("/tmp/jobs")
+                new File("/tmp/jobs"),
+                null
         )
 
         when:
@@ -329,7 +351,7 @@ class JobServiceProtoConverterSpec extends Specification {
 
 
     def "Can convert JobRequest to ReserveJobIdRequest with null id"() {
-        def jobRequest = createJobRequest(null)
+        def jobRequest = createJobRequest(null, requestedArchiveLocationPrefix)
         def agentClientMetadata = createAgentClientMetadata()
 
         when:
@@ -346,6 +368,13 @@ class JobServiceProtoConverterSpec extends Specification {
         then:
         jobRequest2 == jobRequest
 
+        when:
+        def jobRequest3 = createJobRequest(id, null)
+        def reserveJobIdRequest3 = converter.toProtoReserveJobIdRequest(jobRequest3, agentClientMetadata)
+        def jobRequest4 = converter.toJobRequestDTO(reserveJobIdRequest3)
+
+        then:
+        jobRequest4 == jobRequest3
     }
 
     def "Can convert parameters to ChangeJobStatusRequest"() {
@@ -368,7 +397,7 @@ class JobServiceProtoConverterSpec extends Specification {
         message == changeJobStatusRequest.getNewStatusMessage()
     }
 
-    AgentJobRequest createJobRequest(String id) {
+    AgentJobRequest createJobRequest(String id, String archiveLocationPrefix) {
         def jobMetadata = new JobMetadata.Builder(name, user, version)
                 .withDescription(description)
                 .withMetadata(metadata)
@@ -393,7 +422,11 @@ class JobServiceProtoConverterSpec extends Specification {
                 .withRequestedJobDirectoryLocation(jobDirectoryLocation)
                 .build()
 
-        return new AgentJobRequest.Builder(jobMetadata, executionResourceCriteria, agentConfigRequest)
+        def jobArchivalDataRequest = new JobArchivalDataRequest.Builder()
+                .withRequestedArchiveLocationPrefix(archiveLocationPrefix)
+                .build()
+
+        return new AgentJobRequest.Builder(jobMetadata, executionResourceCriteria, agentConfigRequest, jobArchivalDataRequest)
                 .withRequestedId(id)
                 .withCommandArgs(commandArgs)
                 .withResources(new ExecutionEnvironment(configs, dependencies, setupFile))
@@ -411,6 +444,8 @@ class JobServiceProtoConverterSpec extends Specification {
 
         def agentConfigProto = createAgentConfig()
 
+        def jobArchivalDataProto = createJobArchivalData()
+
         def agentMetadataProto = AgentMetadata
                 .newBuilder()
                 .setAgentHostname(agentHostname)
@@ -424,6 +459,7 @@ class JobServiceProtoConverterSpec extends Specification {
                 .setCriteria(executionResourceCriteriaProto)
                 .setAgentConfig(agentConfigProto)
                 .setAgentMetadata(agentMetadataProto)
+                .setJobArchivalData(jobArchivalDataProto)
                 .build()
     }
 
@@ -431,12 +467,14 @@ class JobServiceProtoConverterSpec extends Specification {
         def jobMetadataProto = createJobMetadataProto()
         def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
         def agentConfigProto = createAgentConfig()
+        def jobArchivalDataProto = createJobArchivalData()
 
         return DryRunJobSpecificationRequest
                 .newBuilder()
                 .setMetadata(jobMetadataProto)
                 .setCriteria(executionResourceCriteriaProto)
                 .setAgentConfig(agentConfigProto)
+                .setJobArchivalData(jobArchivalDataProto)
                 .build()
     }
 
@@ -475,7 +513,8 @@ class JobServiceProtoConverterSpec extends Specification {
                 ),
                 environmentVariables,
                 interactive,
-                new File(jobDirectoryLocation)
+                new File(jobDirectoryLocation),
+                archiveLocation
         )
     }
 
@@ -530,6 +569,7 @@ class JobServiceProtoConverterSpec extends Specification {
                 .setCluster(cluster)
                 .setCommand(command)
                 .addAllApplications(Lists.newArrayList(application0, application1))
+                .setArchiveLocation(archiveLocation)
                 .build()
 
         return JobSpecificationResponse.newBuilder().setSpecification(jobSpecification).build()
@@ -602,6 +642,13 @@ class JobServiceProtoConverterSpec extends Specification {
                 .newBuilder()
                 .setIsInteractive(interactive)
                 .setJobDirectoryLocation(jobDirectoryLocation)
+                .build()
+    }
+
+    JobArchivalData createJobArchivalData() {
+        return JobArchivalData
+                .newBuilder()
+                .setRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
                 .build()
     }
 }
