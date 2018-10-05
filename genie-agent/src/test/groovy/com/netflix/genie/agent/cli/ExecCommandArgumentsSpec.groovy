@@ -20,6 +20,7 @@ package com.netflix.genie.agent.cli
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParameterException
+import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
@@ -32,12 +33,14 @@ class ExecCommandArgumentsSpec extends Specification {
     ArgumentDelegates.ServerArguments serverArguments
     ArgumentDelegates.CacheArguments cacheArguments
     ArgumentDelegates.JobRequestArguments jobRequestArguments
+    ArgumentDelegates.CleanupArguments cleanupArguments
 
     void setup() {
         serverArguments = new ServerArgumentsImpl()
         cacheArguments = new CacheArgumentsImpl()
         jobRequestArguments = new JobRequestArgumentsImpl()
-        options = new ExecCommand.ExecCommandArguments(serverArguments, cacheArguments, jobRequestArguments)
+        cleanupArguments = new CleanupArgumentsImpl()
+        options = new ExecCommand.ExecCommandArguments(serverArguments, cacheArguments, jobRequestArguments, cleanupArguments)
         jCommander = new JCommander(options)
     }
 
@@ -53,6 +56,7 @@ class ExecCommandArgumentsSpec extends Specification {
         null == options.getJobRequestArguments().getJobId()
         !options.getJobRequestArguments().isInteractive()
         options.getJobRequestArguments().getJobTags().isEmpty()
+        options.getCleanupArguments().getCleanupStrategy() == CleanupStrategy.DEPENDENCIES_CLEANUP
     }
 
     def "Parse"() {
@@ -63,6 +67,7 @@ class ExecCommandArgumentsSpec extends Specification {
                 "--cacheDirectory", "/tmp/foo",
                 "--clusterCriterion", "NAME=prod",
                 "--clusterCriterion", "NAME=test",
+                "--no-cleanup"
         )
 
         then:
@@ -70,6 +75,7 @@ class ExecCommandArgumentsSpec extends Specification {
         1234 == options.getServerArguments().getServerPort()
         "/tmp/foo" == options.getCacheArguments().getCacheDirectory().getAbsolutePath()
         2 == options.getJobRequestArguments().getClusterCriteria().size()
+        options.getCleanupArguments().getCleanupStrategy() == CleanupStrategy.NO_CLEANUP
     }
 
     def "InvalidRequestId"() {

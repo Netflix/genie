@@ -20,6 +20,8 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.execution.CleanupStrategy;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
@@ -40,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,19 +71,22 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     private final AgentJobService agentJobService;
     private final AgentHeartBeatService heartbeatService;
     private final AgentJobKillService killService;
+    private final ArgumentDelegates.CleanupArguments cleanupArguments;
 
     SetUpJobAction(
         final ExecutionContext executionContext,
         final DownloadService downloadService,
         final AgentJobService agentJobService,
         final AgentHeartBeatService heartbeatService,
-        final AgentJobKillService killService
+        final AgentJobKillService killService,
+        final ArgumentDelegates.CleanupArguments cleanupArguments
     ) {
         super(executionContext);
         this.downloadService = downloadService;
         this.agentJobService = agentJobService;
         this.heartbeatService = heartbeatService;
         this.killService = killService;
+        this.cleanupArguments = cleanupArguments;
     }
 
     /**
@@ -120,39 +126,11 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     @Override
     protected void executeStateActionCleanup(final ExecutionContext executionContext) {
         final File jobDirectory = executionContext.getJobDirectory();
-        final Path jobDirectoryPath = jobDirectory.toPath();
-
-        // TODO: this is a simple and safe cleanup strategy, 3 patterns are added that match any files in the
-        // dependencies directory of any entity by absolute path.
-        // A different implementation would allow override via server or CLI options, or collect the files list as
-        // they are downloaded and compile an exact list using Pattern.quote()
-        final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
-            (Pattern[]) Lists.newArrayList(
-                PathUtils.jobClusterDirectoryPath(jobDirectory, ".*"),
-                PathUtils.jobCommandDirectoryPath(jobDirectory, ".*"),
-                PathUtils.jobApplicationDirectoryPath(jobDirectory, ".*")
-            )
-                .stream()
-                .map(PathUtils::jobEntityDependenciesPath)
-                .map(Path::toString)
-                .map(pathString -> pathString + "/.*")
-                .map(Pattern::compile)
-                .toArray(Pattern[]::new)
-        );
 
         try {
-            Files.walk(jobDirectory.toPath())
-                .filter(path -> cleanupWhitelist.accept(path.toAbsolutePath().toString()))
-                .forEach(path -> {
-                    try {
-                        log.debug("Deleting {}", path);
-                        Files.deleteIfExists(path);
-                    } catch (final IOException e) {
-                        log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
-                    }
-                });
+            cleanupJobDirectory(jobDirectory.toPath(), cleanupArguments.getCleanupStrategy());
         } catch (final IOException e) {
-            log.warn("Failed to walk job directory: {}", jobDirectoryPath, e);
+            log.warn("Exception while performing job directory cleanup", e);
         }
 
         // Stop services started during setup
@@ -504,4 +482,49 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         return Collections.unmodifiableMap(env);
     }
 
+    private void cleanupJobDirectory(
+        final Path jobDirectoryPath,
+        final CleanupStrategy cleanupStrategy
+    ) throws IOException {
+
+        switch (cleanupStrategy) {
+            case NO_CLEANUP:
+                log.info("Skipping cleanup of job directory: {}", jobDirectoryPath);
+                break;
+
+            case FULL_CLEANUP:
+                log.info("Wiping job directory: {}", jobDirectoryPath);
+                FileSystemUtils.deleteRecursively(jobDirectoryPath);
+                break;
+
+            case DEPENDENCIES_CLEANUP:
+                final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
+                    (Pattern[]) Lists.newArrayList(
+                        PathUtils.jobClusterDirectoryPath(jobDirectoryPath.toFile(), ".*"),
+                        PathUtils.jobCommandDirectoryPath(jobDirectoryPath.toFile(), ".*"),
+                        PathUtils.jobApplicationDirectoryPath(jobDirectoryPath.toFile(), ".*")
+                    )
+                        .stream()
+                        .map(PathUtils::jobEntityDependenciesPath)
+                        .map(Path::toString)
+                        .map(pathString -> pathString + "/.*")
+                        .map(Pattern::compile)
+                        .toArray(Pattern[]::new)
+                );
+                Files.walk(jobDirectoryPath)
+                    .filter(path -> cleanupWhitelist.accept(path.toAbsolutePath().toString()))
+                    .forEach(path -> {
+                        try {
+                            log.debug("Deleting {}", path);
+                            Files.deleteIfExists(path);
+                        } catch (final IOException e) {
+                            log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
+                        }
+                    });
+                break;
+
+            default:
+                throw new RuntimeException("Unknown cleanup strategy: " + cleanupStrategy.name());
+        }
+    }
 }
