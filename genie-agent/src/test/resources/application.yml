@@ -1,0 +1,18 @@
+# TODO: Refine these properties to be more flexible via profiles to allow people to provide their own credentials
+cloud:
+  aws:
+    credentials:
+      instanceProfile: true
+    region:
+      auto: false
+      static: us-east-1
+    stack:
+      auto: false
+
+spring:
+  banner:
+    location: classpath:genie-agent-banner.txt
+  jmx:
+    enabled: false
+  main:
+    web-application-type: none

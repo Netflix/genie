@@ -13,6 +13,7 @@ include "genie-test",
         "genie-war",
         "genie-client",
         "genie-agent",
+        "genie-agent-app",
         "genie-demo",
         "genie-docs"
 

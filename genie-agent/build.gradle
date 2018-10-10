@@ -1,7 +1,5 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-apply plugin: "org.springframework.boot"
-
 license {
     exclude "*.yml"
     exclude "*.xml"
@@ -50,10 +48,6 @@ dependencies {
     testCompile("org.springframework.statemachine:spring-statemachine-test")
 }
 
-springBoot {
-    mainClassName = "com.netflix.genie.GenieAgentApplication"
-}
-
 def genieVersion = project.version.toString()
 
 jar {
@@ -65,7 +59,7 @@ jar {
 processResources {
     filesMatching("**/*.txt") {
         filter ReplaceTokens, tokens: [
-                "genie.version": project.version.toString()
+                "genie.version": genieVersion
         ]
     }
 }

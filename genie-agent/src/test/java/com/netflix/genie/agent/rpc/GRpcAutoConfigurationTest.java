@@ -20,7 +20,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @Category(IntegrationTest.class)
-@ContextConfiguration(classes = {GRpcAutoConfiguration.class, MockConfig.class})
+@ContextConfiguration(
+    classes = {
+        GRpcAutoConfiguration.class,
+        MockConfig.class
+    }
+)
 public class GRpcAutoConfigurationTest {
 
     @Autowired
@@ -41,7 +46,7 @@ public class GRpcAutoConfigurationTest {
     public void channel() throws Exception {
         Assert.assertNotNull(managedChannel1);
         Assert.assertNotNull(managedChannel2);
-        Assert.assertTrue(managedChannel1 == managedChannel2);
+        Assert.assertSame(managedChannel1, managedChannel2);
     }
 
     /**
@@ -53,7 +58,7 @@ public class GRpcAutoConfigurationTest {
     public void pingServiceClient() throws Exception {
         Assert.assertNotNull(pingServiceClient1);
         Assert.assertNotNull(pingServiceClient2);
-        Assert.assertTrue(pingServiceClient1 != pingServiceClient2);
+        Assert.assertNotSame(pingServiceClient1, pingServiceClient2);
     }
 }
 

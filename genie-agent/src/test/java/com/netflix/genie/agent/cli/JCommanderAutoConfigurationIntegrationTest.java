@@ -2,13 +2,20 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.collect.Sets;
-import com.netflix.genie.GenieAgentApplication;
+import com.netflix.genie.agent.configs.AgentAutoConfiguration;
+import com.netflix.genie.agent.execution.ExecutionAutoConfiguration;
+import com.netflix.genie.agent.execution.services.impl.ServicesAutoConfiguration;
+import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration;
+import com.netflix.genie.agent.execution.statemachine.StateMachineAutoConfiguration;
+import com.netflix.genie.agent.execution.statemachine.actions.StateMachineActionsAutoConfiguration;
+import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,7 +31,20 @@ import java.util.stream.Collectors;
  */
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = GenieAgentApplication.class)
+@SpringBootTest(
+    classes = {
+        JCommanderAutoConfiguration.class,
+        CliAutoConfiguration.class,
+        StateMachineAutoConfiguration.class,
+        StateMachineActionsAutoConfiguration.class,
+        ExecutionAutoConfiguration.class,
+        GRpcServicesAutoConfiguration.class,
+        GRpcAutoConfiguration.class,
+        AgentAutoConfiguration.class,
+        ServicesAutoConfiguration.class,
+        ValidationAutoConfiguration.class
+    }
+)
 public class JCommanderAutoConfigurationIntegrationTest {
 
     @Autowired
