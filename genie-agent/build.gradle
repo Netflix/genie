@@ -31,7 +31,7 @@ dependencies {
     compile("javax.el:javax.el-api")
     compile("org.apache.commons:commons-lang3")
     compile("org.glassfish:javax.el")
-    compile("org.codehaus.janino:janino:")
+    compile("org.codehaus.janino:janino")
 
     /*******************************
      * Provided Dependencies
