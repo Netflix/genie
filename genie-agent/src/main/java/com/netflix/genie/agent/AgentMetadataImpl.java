@@ -18,7 +18,6 @@
 
 package com.netflix.genie.agent;
 
-import com.netflix.genie.GenieAgentApplication;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +53,7 @@ public class AgentMetadataImpl implements AgentMetadata {
     }
 
     private static String getAgentVersionOrFallback() {
-        final String agentVersion = GenieAgentApplication.class.getPackage().getImplementationVersion();
+        final String agentVersion = AgentMetadataImpl.class.getPackage().getImplementationVersion();
         if (!StringUtils.isBlank(agentVersion)) {
             return agentVersion;
         }
