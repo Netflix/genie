@@ -227,6 +227,10 @@ class SetUpJobActionSpec extends Specification {
     }
 
     void cleanup() {
+        File file = new File( "created-by-setup-file.txt")
+        if (file.exists()) {
+            file.delete()
+        }
     }
 
     def "Execute w/o dependencies and environment"() {
@@ -350,7 +354,7 @@ class SetUpJobActionSpec extends Specification {
         envMap.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
         envMap.get("SERVER_VARIABLE_KEY") == "SERVER VARIABLE VALUE"
         envMap.get("SETUP_VARIABLE_KEY") == "SETUP VARIABLE VALUE"
-        new File(jobDir, "created-by-setup-file.txt").exists()
+        new File( "created-by-setup-file.txt").exists()
         PathUtils.composePath(
                 PathUtils.jobGenieDirectoryPath(jobDir),
                 JobConstants.LOGS_PATH_VAR,

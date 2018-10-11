@@ -56,7 +56,7 @@ class LaunchJobServiceImpl implements LaunchJobService {
      */
     @Override
     public void launchProcess(
-        final File runDirectory,
+        final File jobDirectory,
         final Map<String, String> environmentVariablesMap,
         final List<String> commandLine,
         final boolean interactive
@@ -69,18 +69,15 @@ class LaunchJobServiceImpl implements LaunchJobService {
         final ProcessBuilder processBuilder = new ProcessBuilder();
 
         // Validate job running directory
-        if (runDirectory == null) {
+        if (jobDirectory == null) {
             throw new JobLaunchException("Job directory is null");
-        } else if (!runDirectory.exists()) {
-            throw new JobLaunchException("Job directory does not exist: " + runDirectory);
-        } else if (!runDirectory.isDirectory()) {
-            throw new JobLaunchException("Job directory is not a directory: " + runDirectory);
-        } else if (!runDirectory.canWrite()) {
-            throw new JobLaunchException("Job directory is not writable: " + runDirectory);
+        } else if (!jobDirectory.exists()) {
+            throw new JobLaunchException("Job directory does not exist: " + jobDirectory);
+        } else if (!jobDirectory.isDirectory()) {
+            throw new JobLaunchException("Job directory is not a directory: " + jobDirectory);
+        } else if (!jobDirectory.canWrite()) {
+            throw new JobLaunchException("Job directory is not writable: " + jobDirectory);
         }
-
-        // Configure job running directory
-        processBuilder.directory(runDirectory);
 
         final Map<String, String> currentEnvironmentVariables = processBuilder.environment();
 
@@ -136,8 +133,8 @@ class LaunchJobServiceImpl implements LaunchJobService {
         if (interactive) {
             processBuilder.inheritIO();
         } else {
-            processBuilder.redirectError(PathUtils.jobStdErrPath(runDirectory).toFile());
-            processBuilder.redirectOutput(PathUtils.jobStdOutPath(runDirectory).toFile());
+            processBuilder.redirectError(PathUtils.jobStdErrPath(jobDirectory).toFile());
+            processBuilder.redirectOutput(PathUtils.jobStdOutPath(jobDirectory).toFile());
         }
 
         if (killed.get()) {
