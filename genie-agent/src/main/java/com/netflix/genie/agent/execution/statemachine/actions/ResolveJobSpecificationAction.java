@@ -21,6 +21,7 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
@@ -131,6 +132,8 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
         } catch (final JobReservationException e) {
             throw new RuntimeException("Failed to claim job id: " + jobId, e);
         }
+
+        UserConsole.getLogger().info("Successfully claimed job '{}'", jobId);
 
         // Update context
         executionContext.setCurrentJobStatus(JobStatus.CLAIMED);
