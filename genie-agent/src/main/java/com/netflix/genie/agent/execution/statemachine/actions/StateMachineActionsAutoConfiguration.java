@@ -26,7 +26,6 @@ import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -41,7 +40,7 @@ import org.springframework.context.annotation.Lazy;
 public class StateMachineActionsAutoConfiguration {
 
     /**
-     * Provide a lazy {@link CleanupJobAction} bean if none was already defined.
+     * Provide a lazy {@link CleanupJobAction} bean.
      *
      * @param executionContext The job execution context to use
      * @param agentJobService  The agent job service to use
@@ -49,7 +48,6 @@ public class StateMachineActionsAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(CleanupJobAction.class)
     public CleanupJobAction cleanupJobAction(
         final ExecutionContext executionContext,
         final AgentJobService agentJobService
@@ -58,20 +56,19 @@ public class StateMachineActionsAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link ConfigureAgentAction} bean if none was already defined.
+     * Provide a lazy {@link ConfigureAgentAction} bean.
      *
      * @param executionContext The job execution context to use
      * @return A {@link ConfigureAgentAction} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(ConfigureAgentAction.class)
     public ConfigureAgentAction configureAgentAction(final ExecutionContext executionContext) {
         return new ConfigureAgentAction(executionContext);
     }
 
     /**
-     * Provide a lazy {@link HandleErrorAction} bean if none was already defined.
+     * Provide a lazy {@link HandleErrorAction} bean.
      *
      * @param executionContext The job execution context to use
      * @param agentJobService  The agent job service to use
@@ -79,7 +76,6 @@ public class StateMachineActionsAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(HandleErrorAction.class)
     public HandleErrorAction handleErrorAction(
         final ExecutionContext executionContext,
         final AgentJobService agentJobService
@@ -88,20 +84,19 @@ public class StateMachineActionsAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link InitializeAction} bean if none was already defined.
+     * Provide a lazy {@link InitializeAction} bean.
      *
      * @param executionContext The job execution context to use
      * @return An {@link InitializeAction} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(InitializeAction.class)
     public InitializeAction initializeAction(final ExecutionContext executionContext) {
         return new InitializeAction(executionContext);
     }
 
     /**
-     * Provide a lazy {@link LaunchJobAction} bean if none was already defined.
+     * Provide a lazy {@link LaunchJobAction} bean.
      *
      * @param executionContext The job execution context to use
      * @param launchJobService The launch job service to use
@@ -110,7 +105,6 @@ public class StateMachineActionsAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(LaunchJobAction.class)
     public LaunchJobAction launchJobAction(
         final ExecutionContext executionContext,
         final LaunchJobService launchJobService,
@@ -120,7 +114,7 @@ public class StateMachineActionsAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link MonitorJobAction} bean if none was already defined.
+     * Provide a lazy {@link MonitorJobAction} bean.
      *
      * @param executionContext The job execution context to use
      * @param launchJobService The launch job service to use
@@ -129,7 +123,6 @@ public class StateMachineActionsAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(MonitorJobAction.class)
     public MonitorJobAction monitorJobAction(
         final ExecutionContext executionContext,
         final LaunchJobService launchJobService,
@@ -139,7 +132,7 @@ public class StateMachineActionsAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link ResolveJobSpecificationAction} bean if none was already defined.
+     * Provide a lazy {@link ResolveJobSpecificationAction} bean.
      *
      * @param executionContext    The job execution context to use
      * @param jobRequestArguments The job request arguments to use
@@ -150,7 +143,6 @@ public class StateMachineActionsAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(ResolveJobSpecificationAction.class)
     public ResolveJobSpecificationAction resolveJobSpecificationAction(
         final ExecutionContext executionContext,
         final ArgumentDelegates.JobRequestArguments jobRequestArguments,
@@ -168,7 +160,7 @@ public class StateMachineActionsAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link SetUpJobAction} bean if none was already defined.
+     * Provide a lazy {@link SetUpJobAction} bean.
      *
      * @param executionContext      The job execution context to use
      * @param downloadService       The download service to use
@@ -180,7 +172,6 @@ public class StateMachineActionsAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(SetUpJobAction.class)
     public SetUpJobAction setUpJobAction(
         final ExecutionContext executionContext,
         final DownloadService downloadService,
@@ -200,14 +191,13 @@ public class StateMachineActionsAutoConfiguration {
     }
 
     /**
-     * Provide a {@link ShutdownAction} bean if none was already defined.
+     * Provide a {@link ShutdownAction} bean.
      *
      * @param executionContext The job execution context to use
      * @return A {@link ShutdownAction} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(ShutdownAction.class)
     public ShutdownAction shutdownAction(final ExecutionContext executionContext) {
         return new ShutdownAction(executionContext);
     }

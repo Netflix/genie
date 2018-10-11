@@ -44,13 +44,12 @@ import org.springframework.context.annotation.Scope;
 public class GRpcAutoConfiguration {
 
     /**
-     * Provide a lazy {@link ChannelLoggingInterceptor} bean if none was already defined.
+     * Provide a lazy {@link ChannelLoggingInterceptor} bean.
      *
      * @return A {@link ChannelLoggingInterceptor} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(ChannelLoggingInterceptor.class)
     public ChannelLoggingInterceptor channelLoggingInterceptor() {
         return new ChannelLoggingInterceptor();
     }
@@ -75,57 +74,52 @@ public class GRpcAutoConfiguration {
     }
 
     /**
-     * Provide a prototype bean definition for a {@link com.netflix.genie.proto.PingServiceGrpc.PingServiceFutureStub}
-     * if none has already been defined.
+     * Provide a prototype bean definition for a {@link com.netflix.genie.proto.PingServiceGrpc.PingServiceFutureStub}.
      *
      * @param channel The managed channel to use to connect to the Genie server
      * @return A {@link com.netflix.genie.proto.PingServiceGrpc.PingServiceFutureStub} instance per use
      */
     @Bean
     @Scope("prototype")
-    @ConditionalOnMissingBean(PingServiceGrpc.PingServiceFutureStub.class)
     public PingServiceGrpc.PingServiceFutureStub pingServiceClient(final ManagedChannel channel) {
         return PingServiceGrpc.newFutureStub(channel);
     }
 
     /**
      * Provide a prototype bean definition for a
-     * {@link com.netflix.genie.proto.JobServiceGrpc.JobServiceFutureStub} if none has already been defined.
+     * {@link com.netflix.genie.proto.JobServiceGrpc.JobServiceFutureStub}.
      *
      * @param channel The managed channel to use to connect to the Genie server
      * @return A {@link com.netflix.genie.proto.JobServiceGrpc.JobServiceFutureStub} instance per use
      */
     @Bean
     @Scope("prototype")
-    @ConditionalOnMissingBean(JobServiceGrpc.JobServiceFutureStub.class)
     public JobServiceGrpc.JobServiceFutureStub jobClient(final ManagedChannel channel) {
         return JobServiceGrpc.newFutureStub(channel);
     }
 
     /**
      * Provide a prototype bean definition for a
-     * {@link com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub} if none has already been defined.
+     * {@link com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub}.
      *
      * @param channel The managed channel to use to connect to the Genie server
      * @return A {@link com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceStub} instance per use
      */
     @Bean
     @Scope("prototype")
-    @ConditionalOnMissingBean(HeartBeatServiceGrpc.HeartBeatServiceStub.class)
     public HeartBeatServiceGrpc.HeartBeatServiceStub heartBeatClient(final ManagedChannel channel) {
         return HeartBeatServiceGrpc.newStub(channel);
     }
 
     /**
      * Provide a prototype bean definition for a
-     * {@link com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub} if none has already been defined.
+     * {@link com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub}.
      *
      * @param channel The managed channel to use to connect to the Genie server
      * @return A {@link com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub} instance per use
      */
     @Bean
     @Scope("prototype")
-    @ConditionalOnMissingBean(JobKillServiceGrpc.JobKillServiceFutureStub.class)
     public JobKillServiceGrpc.JobKillServiceFutureStub jobKillClient(final ManagedChannel channel) {
         return JobKillServiceGrpc.newFutureStub(channel);
     }

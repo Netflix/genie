@@ -55,12 +55,11 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a bean for cache command line arguments if none was created already.
+     * Provide a bean for cache command line arguments.
      *
      * @return a {@link CacheArgumentsImpl} instance
      */
     @Bean
-    @ConditionalOnMissingBean(ArgumentDelegates.CacheArguments.class)
     public ArgumentDelegates.CacheArguments cacheArgumentsDelegate() {
         return new CacheArgumentsImpl();
     }
@@ -72,7 +71,6 @@ public class CliAutoConfiguration {
      * @return An instance of {@link com.netflix.genie.agent.cli.DownloadCommand.DownloadCommandArguments}
      */
     @Bean
-    @ConditionalOnMissingBean(DownloadCommand.DownloadCommandArguments.class)
     public DownloadCommand.DownloadCommandArguments downloadCommandArguments(
         final ArgumentDelegates.CacheArguments cacheArguments
     ) {
@@ -80,7 +78,7 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a lazy bean definition for a {@link DownloadCommand} if one wasn't provided.
+     * Provide a lazy bean definition for a {@link DownloadCommand}.
      *
      * @param downloadCommandArguments The download command arguments to use
      * @param downloadService          The download service to use
@@ -88,7 +86,6 @@ public class CliAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(DownloadCommand.class)
     public DownloadCommand downloadCommand(
         final DownloadCommand.DownloadCommandArguments downloadCommandArguments,
         final DownloadService downloadService
@@ -97,7 +94,7 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a bean for execution command arguments if one hasn't already been provided.
+     * Provide a bean for execution command arguments.
      *
      * @param serverArguments     The server arguments to use
      * @param cacheArguments      The cache arguments to use
@@ -106,7 +103,6 @@ public class CliAutoConfiguration {
      * @return An instance of {@link com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments}
      */
     @Bean
-    @ConditionalOnMissingBean(ExecCommand.ExecCommandArguments.class)
     public ExecCommand.ExecCommandArguments execCommandArguments(
         final ArgumentDelegates.ServerArguments serverArguments,
         final ArgumentDelegates.CacheArguments cacheArguments,
@@ -132,7 +128,6 @@ public class CliAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(ExecCommand.class)
     public ExecCommand execCommand(
         final ExecCommand.ExecCommandArguments execCommandArguments,
         final JobExecutionStateMachine jobExecutionStateMachine,
@@ -151,20 +146,17 @@ public class CliAutoConfiguration {
      * @return An instance of {@link GenieAgentRunner} if one hasn't already been provided
      */
     @Bean
-    @ConditionalOnMissingBean(GenieAgentRunner.class)
     public GenieAgentRunner genieAgentRunner(final ArgumentParser argumentParser, final CommandFactory commandFactory) {
         return new GenieAgentRunner(argumentParser, commandFactory);
     }
 
     /**
-     * Provide a bean for {@link com.netflix.genie.agent.cli.HeartBeatCommand.HeartBeatCommandArguments} if none has
-     * been provided.
+     * Provide a bean for {@link com.netflix.genie.agent.cli.HeartBeatCommand.HeartBeatCommandArguments}.
      *
      * @param serverArguments The server arguments to use
      * @return An instance of {@link com.netflix.genie.agent.cli.HeartBeatCommand.HeartBeatCommandArguments}
      */
     @Bean
-    @ConditionalOnMissingBean(HeartBeatCommand.HeartBeatCommandArguments.class)
     public HeartBeatCommand.HeartBeatCommandArguments heartBeatCommandArguments(
         final ArgumentDelegates.ServerArguments serverArguments
     ) {
@@ -172,7 +164,7 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a lazy bean definition for a {@link HeartBeatCommand} if none has been provided already.
+     * Provide a lazy bean definition for a {@link HeartBeatCommand}.
      *
      * @param heartBeatCommandArguments The heart beat command arguments to use
      * @param agentHeartBeatService     The heart beat service to use
@@ -180,7 +172,6 @@ public class CliAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(HeartBeatCommand.class)
     public HeartBeatCommand heartBeatCommand(
         final HeartBeatCommand.HeartBeatCommandArguments heartBeatCommandArguments,
         final AgentHeartBeatService agentHeartBeatService
@@ -189,44 +180,39 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide an bean of {@link com.netflix.genie.agent.cli.HelpCommand.HelpCommandArguments} if none already
-     * exists.
+     * Provide an bean of {@link com.netflix.genie.agent.cli.HelpCommand.HelpCommandArguments}.
      *
      * @return An instance of {@link com.netflix.genie.agent.cli.HelpCommand.HelpCommandArguments}
      */
     @Bean
-    @ConditionalOnMissingBean(HelpCommand.HelpCommandArguments.class)
     public HelpCommand.HelpCommandArguments helpCommandArguments() {
         return new HelpCommand.HelpCommandArguments();
     }
 
     /**
-     * Provide a lazy bean instance of {@link HelpCommand} if none has been provided already.
+     * Provide a lazy bean instance of {@link HelpCommand}.
      *
      * @param argumentParser The argument parser to use
      * @return The {@link HelpCommand} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(HelpCommand.class)
     public HelpCommand helpCommand(final ArgumentParser argumentParser) {
         return new HelpCommand(argumentParser);
     }
 
     /**
-     * Provide an instance of {@link com.netflix.genie.agent.cli.InfoCommand.InfoCommandArguments} if none already
-     * exists.
+     * Provide an instance of {@link com.netflix.genie.agent.cli.InfoCommand.InfoCommandArguments}.
      *
      * @return An {@link com.netflix.genie.agent.cli.InfoCommand.InfoCommandArguments} instance
      */
     @Bean
-    @ConditionalOnMissingBean(InfoCommand.InfoCommandArguments.class)
     public InfoCommand.InfoCommandArguments infoCommandArguments() {
         return new InfoCommand.InfoCommandArguments();
     }
 
     /**
-     * Provide a lazy bean definition for an {@link InfoCommand} if none already exists.
+     * Provide a lazy bean definition for an {@link InfoCommand}.
      *
      * @param infoCommandArguments           The info command arguments to use
      * @param configurableApplicationContext The Spring context to use
@@ -235,7 +221,6 @@ public class CliAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(InfoCommand.class)
     public InfoCommand infoCommand(
         final InfoCommand.InfoCommandArguments infoCommandArguments,
         final ConfigurableApplicationContext configurableApplicationContext,
@@ -245,39 +230,34 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments} instance if none has already
-     * been provided.
+     * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments}.
      *
      * @return An instance of {@link com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments}
      */
     @Bean
-    @ConditionalOnMissingBean(ArgumentDelegates.JobRequestArguments.class)
     public ArgumentDelegates.JobRequestArguments jobRequestArguments() {
         return new JobRequestArgumentsImpl();
     }
 
     /**
-     * Provide an instance of {@link JobRequestConverter} if none has already been provided.
+     * Provide an instance of {@link JobRequestConverter}.
      *
      * @param validator The validator to use
      * @return A {@link JobRequestConverter} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(JobRequestConverter.class)
     public JobRequestConverter jobRequestConverter(final Validator validator) {
         return new JobRequestConverter(validator);
     }
 
     /**
-     * Provides a {@link com.netflix.genie.agent.cli.PingCommand.PingCommandArguments} instance if none has already been
-     * provided.
+     * Provides a {@link com.netflix.genie.agent.cli.PingCommand.PingCommandArguments} bean.
      *
      * @param serverArguments The server arguments to use
      * @return A {@link com.netflix.genie.agent.cli.PingCommand.PingCommandArguments} instance
      */
     @Bean
-    @ConditionalOnMissingBean(PingCommand.PingCommandArguments.class)
     public PingCommand.PingCommandArguments pingCommandArguments(
         final ArgumentDelegates.ServerArguments serverArguments
     ) {
@@ -285,7 +265,7 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a lazy bean for a {@link PingCommand} if none has already been provided.
+     * Provide a lazy bean for a {@link PingCommand}.
      *
      * @param pingCommandArguments  The ping command arguments to use
      * @param pingServiceFutureStub The gRPC future stub to use
@@ -294,7 +274,6 @@ public class CliAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(PingCommand.class)
     public PingCommand pingCommand(
         final PingCommand.PingCommandArguments pingCommandArguments,
         final PingServiceGrpc.PingServiceFutureStub pingServiceFutureStub,
@@ -304,15 +283,13 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a bean of type {@link com.netflix.genie.agent.cli.ResolveJobSpecCommand.ResolveJobSpecCommandArguments}
-     * if none has already been provided.
+     * Provide a bean of type {@link com.netflix.genie.agent.cli.ResolveJobSpecCommand.ResolveJobSpecCommandArguments}.
      *
      * @param serverArguments     The server arguments to use
      * @param jobRequestArguments The job request arguments to use
      * @return An instance of {@link com.netflix.genie.agent.cli.ResolveJobSpecCommand.ResolveJobSpecCommandArguments}
      */
     @Bean
-    @ConditionalOnMissingBean(ResolveJobSpecCommand.ResolveJobSpecCommandArguments.class)
     public ResolveJobSpecCommand.ResolveJobSpecCommandArguments resolveJobSpecCommandArguments(
         final ArgumentDelegates.ServerArguments serverArguments,
         final ArgumentDelegates.JobRequestArguments jobRequestArguments
@@ -321,7 +298,7 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a lazy bean definition for a {@link ResolveJobSpecCommand} if none has already been provided.
+     * Provide a lazy bean definition for a {@link ResolveJobSpecCommand}.
      *
      * @param resolveJobSpecCommandArguments The resolve job spec arguments to use
      * @param agentJobService                The agent job service to use
@@ -330,7 +307,6 @@ public class CliAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(ResolveJobSpecCommand.class)
     public ResolveJobSpecCommand resolveJobSpecCommand(
         final ResolveJobSpecCommand.ResolveJobSpecCommandArguments resolveJobSpecCommandArguments,
         final AgentJobService agentJobService,
@@ -340,25 +316,21 @@ public class CliAutoConfiguration {
     }
 
     /**
-     * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments} bean if none has already been
-     * defined.
+     * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments}.
      *
      * @return A {@link ServerArgumentsImpl} instance
      */
     @Bean
-    @ConditionalOnMissingBean(ArgumentDelegates.ServerArguments.class)
     public ArgumentDelegates.ServerArguments serverArguments() {
         return new ServerArgumentsImpl();
     }
 
     /**
-     * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.CleanupArguments} bean if none has already been
-     * defined.
+     * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.CleanupArguments}.
      *
      * @return A {@link CleanupArgumentsImpl} instance
      */
     @Bean
-    @ConditionalOnMissingBean(ArgumentDelegates.CleanupArguments.class)
     public ArgumentDelegates.CleanupArguments cleanupArguments() {
         return new CleanupArgumentsImpl();
     }
