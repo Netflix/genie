@@ -52,13 +52,12 @@ public class AgentAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link FileLockFactory} bean if none already exists.
+     * Provide a lazy {@link FileLockFactory}.
      *
      * @return A {@link FileLockFactory} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(FileLockFactory.class)
     public FileLockFactory fileLockFactory() {
         return new FileLockFactory();
     }

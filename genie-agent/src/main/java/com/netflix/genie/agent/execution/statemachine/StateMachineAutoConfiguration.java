@@ -51,13 +51,12 @@ public class StateMachineAutoConfiguration {
     private static final String STATE_MACHINE_ID = "job-execution";
 
     /**
-     * Provide a lazy {@link LoggingListener} bean if one hasn't already been defined.
+     * Provide a lazy {@link LoggingListener} bean.
      *
      * @return A {@link LoggingListener} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(LoggingListener.class)
     public LoggingListener loggingListener() {
         return new LoggingListener();
     }
@@ -76,8 +75,7 @@ public class StateMachineAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link StateMachine} instance configured with the current model expected for job execution. It is
-     * not recommended to override this bean but it is possible.
+     * Provide a lazy {@link StateMachine} instance configured with the current model expected for job execution.
      *
      * @param statesWithActions         The states to use that have actions associated with them available in the
      *                                  Spring context
@@ -90,7 +88,6 @@ public class StateMachineAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(StateMachine.class)
     public StateMachine<States, Events> stateMachine(
         final Collection<Pair<States, StateAction>> statesWithActions,
         final Collection<Triple<States, Events, States>> eventDrivenTransitions,

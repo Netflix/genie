@@ -19,7 +19,6 @@
 package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.JCommander;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,18 +36,17 @@ import java.util.List;
 public class JCommanderAutoConfiguration {
 
     /**
-     * Provide a {@link GlobalAgentArguments} bean if one hasn't already been provided.
+     * Provide a {@link GlobalAgentArguments} bean.
      *
      * @return A {@link GlobalAgentArguments} instance
      */
     @Bean
-    @ConditionalOnMissingBean(GlobalAgentArguments.class)
     public GlobalAgentArguments globalAgentArguments() {
         return new GlobalAgentArguments();
     }
 
     /**
-     * Provide a {@link JCommander} instance if one hasn't already been provided.
+     * Provide a {@link JCommander} bean.
      *
      * @param globalAgentArguments  The global command arguments to use
      * @param agentCommandArguments An command argument beans in the environment that should also be used in addition
@@ -56,7 +54,6 @@ public class JCommanderAutoConfiguration {
      * @return A {@link JCommander} instance
      */
     @Bean
-    @ConditionalOnMissingBean(JCommander.class)
     public JCommander jCommander(
         final GlobalAgentArguments globalAgentArguments,
         final List<AgentCommandArguments> agentCommandArguments
@@ -71,14 +68,13 @@ public class JCommanderAutoConfiguration {
     }
 
     /**
-     * Provide a command factory if one hasn't already been provided.
+     * Provide a command factory bean.
      *
      * @param agentCommandArguments Any agent command argument implementations that are in the application context
      * @param applicationContext    The Spring application context
      * @return A {@link CommandFactory} instance
      */
     @Bean
-    @ConditionalOnMissingBean(CommandFactory.class)
     public CommandFactory commandFactory(
         final List<AgentCommandArguments> agentCommandArguments,
         final ApplicationContext applicationContext
@@ -87,22 +83,14 @@ public class JCommanderAutoConfiguration {
     }
 
     /**
-     * Provide an argument parser instance if one hasn't already been defined.
+     * Provide an argument parser bean.
      *
      * @param jCommander     The JCommander instance to use
      * @param commandFactory The command factory instance to use
      * @return An {@link ArgumentParser} instance
      */
     @Bean
-    @ConditionalOnMissingBean(ArgumentParser.class)
-    public ArgumentParser argumentParser(
-        final JCommander jCommander,
-        final CommandFactory commandFactory
-    ) {
-        return new ArgumentParser(
-            jCommander,
-            commandFactory
-        );
+    public ArgumentParser argumentParser(final JCommander jCommander, final CommandFactory commandFactory) {
+        return new ArgumentParser(jCommander, commandFactory);
     }
-
 }
