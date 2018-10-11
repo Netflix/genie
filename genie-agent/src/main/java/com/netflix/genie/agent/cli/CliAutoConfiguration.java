@@ -31,6 +31,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 
 import javax.validation.Validator;
 
@@ -143,11 +144,16 @@ public class CliAutoConfiguration {
      *
      * @param argumentParser The argument parser to use
      * @param commandFactory The command factory to use
+     * @param environment    The spring environment
      * @return An instance of {@link GenieAgentRunner} if one hasn't already been provided
      */
     @Bean
-    public GenieAgentRunner genieAgentRunner(final ArgumentParser argumentParser, final CommandFactory commandFactory) {
-        return new GenieAgentRunner(argumentParser, commandFactory);
+    public GenieAgentRunner genieAgentRunner(
+        final ArgumentParser argumentParser,
+        final CommandFactory commandFactory,
+        final Environment environment
+    ) {
+        return new GenieAgentRunner(argumentParser, commandFactory, environment);
     }
 
     /**

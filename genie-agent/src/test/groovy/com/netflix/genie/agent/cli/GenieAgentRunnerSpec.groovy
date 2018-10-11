@@ -22,6 +22,7 @@ import com.beust.jcommander.ParameterException
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
+import org.springframework.core.env.Environment
 import spock.lang.Specification
 
 @Category(UnitTest.class)
@@ -29,6 +30,7 @@ class GenieAgentRunnerSpec extends Specification {
     ArgumentParser argsParser
     AgentCommand agentCommand
     CommandFactory cmdFactory
+    Environment environment
     String[] args
     GenieAgentRunner runner
 
@@ -36,8 +38,9 @@ class GenieAgentRunnerSpec extends Specification {
         this.argsParser = Mock(ArgumentParser.class)
         this.agentCommand = Mock(AgentCommand.class)
         this.cmdFactory = Mock(CommandFactory.class)
+        this.environment = Mock(Environment)
         this.args = new String[0]
-        this.runner = new GenieAgentRunner(argsParser, cmdFactory)
+        this.runner = new GenieAgentRunner(argsParser, cmdFactory, environment)
     }
 
     def "Successful run"() {

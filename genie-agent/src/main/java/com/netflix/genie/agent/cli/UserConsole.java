@@ -18,8 +18,18 @@
 
 package com.netflix.genie.agent.cli;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StreamUtils;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Utilities for interacting with the user terminal/console.
@@ -44,6 +54,13 @@ public final class UserConsole {
     private static final String PID_SYSTEM_PROPERTY_NAME = "PID";
     private static final Logger LOGGER = LoggerFactory.getLogger(CONSOLE_LOGGER_NAME);
 
+    /**
+     * Because the banner is printed in the log file and not visible to the user, manually re-print it
+     * in {@code UserConsole}. Use the existing Spring configuration to control this behavior.
+     */
+    private static final String BANNER_LOCATION_SPRING_PROPERTY_KEY = SpringApplication.BANNER_LOCATION_PROPERTY;
+    private static final String BANNER_CHARSET_SPRING_PROPERTY_KEY = "spring.banner.charset";
+
     private UserConsole() {
     }
 
@@ -62,5 +79,33 @@ public final class UserConsole {
             LOG_FILE_PATH,
             System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???")
         );
+    }
+
+    /**
+     * Load and print the Spring banner (if one is configured) to UserConsole.
+     * @param environment the Spring environment
+     */
+    static void printBanner(final Environment environment) {
+        try {
+            final String bannerLocation = environment.getProperty(BANNER_LOCATION_SPRING_PROPERTY_KEY);
+            if (StringUtils.isNotBlank(bannerLocation)) {
+                final ResourceLoader resourceLoader = new DefaultResourceLoader();
+                final Resource resource = resourceLoader.getResource(bannerLocation);
+                if (resource.exists()) {
+                    final String banner = StreamUtils.copyToString(
+                        resource.getInputStream(),
+                        environment.getProperty(
+                            BANNER_CHARSET_SPRING_PROPERTY_KEY,
+                            Charset.class,
+                            StandardCharsets.UTF_8
+                        )
+                    );
+                    UserConsole.getLogger().info(banner);
+                }
+            }
+        } catch (final Throwable t) {
+            System.err.println("Failed to print banner: " + t.getMessage());
+            t.printStackTrace(System.err);
+        }
     }
 }
