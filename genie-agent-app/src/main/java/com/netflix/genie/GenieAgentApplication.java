@@ -19,15 +19,32 @@ package com.netflix.genie;
 
 import com.netflix.genie.agent.cli.UserConsole;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
+import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Genie Agent application.
  *
  * @author mprimi
+ * @author tgianos
  * @since 4.0.0
  */
-@SpringBootApplication
+@Configuration
+@EnableAutoConfiguration(
+    exclude = {
+        /*
+         * Picked up by default but not believed to be needed currently
+         */
+        GsonAutoConfiguration.class,
+        JacksonAutoConfiguration.class,
+        PersistenceExceptionTranslationAutoConfiguration.class,
+        TransactionAutoConfiguration.class,
+    }
+)
 public class GenieAgentApplication {
     /**
      * Main method, actual execution is delegated to GenieAgentRunner.

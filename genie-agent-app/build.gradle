@@ -1,4 +1,5 @@
 apply plugin: "org.springframework.boot"
+//apply plugin: "application"
 
 license {
     exclude "*.yml"
@@ -31,6 +32,9 @@ dependencies {
 springBoot {
     mainClassName = "com.netflix.genie.GenieAgentApplication"
 }
+
+//mainClassName = "com.netflix.genie.GenieAgentApplication"
+//applicationDefaultJvmArgs = ["-noverify", "-XX:TieredStopAtLevel=1"]
 
 def genieVersion = project.version.toString()
 
