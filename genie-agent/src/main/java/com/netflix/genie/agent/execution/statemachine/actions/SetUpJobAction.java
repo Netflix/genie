@@ -422,7 +422,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
         // Set up process that executes the script
         final ProcessBuilder processBuilder = new ProcessBuilder()
-            .directory(jobDirectory)
             .inheritIO();
 
         processBuilder.environment().putAll(serverProvidedEnvironment);

@@ -37,14 +37,14 @@ public interface LaunchJobService extends ApplicationListener<KillService.KillEv
     /**
      * Launch the job process (unless launch was aborted by previous a {@code kill} call).
      *
-     * @param runDirectory         Run directory
+     * @param jobDirectory         Job directory
      * @param environmentVariables additional environment variables (to merge on top of inherited environment)
      * @param commandLine          command-line executable and arguments
      * @param interactive          launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
      * @throws JobLaunchException if the job process failed to launch
      */
     void launchProcess(
-        final File runDirectory,
+        final File jobDirectory,
         final Map<String, String> environmentVariables,
         final List<String> commandLine,
         final boolean interactive

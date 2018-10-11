@@ -62,7 +62,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         log.info("Launching job...");
 
         final JobSpecification jobSpec = executionContext.getJobSpecification();
-        final File jobRunDirectory = executionContext.getJobDirectory();
+        final File jobDirectory = executionContext.getJobDirectory();
         final Map<String, String> jobEnvironment = executionContext.getJobEnvironment();
         final List<String> jobCommandLine = jobSpec.getCommandArgs();
         final boolean interactive = jobSpec.isInteractive();
@@ -70,7 +70,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
         try {
             launchJobService.launchProcess(
-                jobRunDirectory,
+                jobDirectory,
                 jobEnvironment,
                 jobCommandLine,
                 interactive
