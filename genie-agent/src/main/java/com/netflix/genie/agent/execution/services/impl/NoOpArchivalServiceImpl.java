@@ -22,8 +22,8 @@ import com.netflix.genie.agent.execution.exceptions.ArchivalException;
 import com.netflix.genie.agent.execution.services.ArchivalService;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.file.Path;
 import java.net.URI;
+import java.nio.file.Path;
 
 /**
  * Implementation of ArchivalService which does no archival.
@@ -36,9 +36,10 @@ class NoOpArchivalServiceImpl implements ArchivalService {
 
     /**
      * No archival is done.
+     *
      * @param path      path to the file/dir to archive
      * @param targetURI target uri for the archival location
-     * @throws ArchivalException
+     * @throws ArchivalException On error
      */
     @Override
     public void archive(final Path path, final URI targetURI) throws ArchivalException {

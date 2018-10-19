@@ -18,6 +18,8 @@
 
 package com.netflix.genie.agent.cli;
 
+import lombok.Getter;
+
 /**
  * Exit codes for Genie agent.
  *
@@ -76,19 +78,13 @@ public enum ExitCode {
         EXIT_CODE_HELP_MESSAGE = stringBuilder.toString();
     }
 
+    @Getter
     private final int code;
+    @Getter
     private final String message;
 
     ExitCode(final int code, final String message) {
         this.code = code;
         this.message = message;
-    }
-
-    int getCode() {
-        return code;
-    }
-
-    String getMessage() {
-        return message;
     }
 }

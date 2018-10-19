@@ -17,12 +17,15 @@
  */
 package com.netflix.genie;
 
+import com.netflix.genie.agent.cli.ExitCode;
 import com.netflix.genie.agent.cli.GenieAgentRunner;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,18 +43,78 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = GenieAgentApplication.class)
 public class GenieAgentApplicationIntegrationTests {
 
+    /**
+     * Used for creating folders and files that are guaranteed to be removed upon test completion.
+     */
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Autowired
     private ApplicationContext context;
 
     /**
-     * Test to ensure the agent app can start up using the default configuration and print help.
+     * Test to ensure the agent app can start up using the default configuration and run smoke tests against each of
+     * the available top level commands.
      *
      * @throws Exception on any error
      */
     @Test
-    public void canStartup() throws Exception {
+    public void smokeTestCommands() throws Exception {
         final GenieAgentRunner runner = this.context.getBean(GenieAgentRunner.class);
+
+        // Test Help
         runner.run("help");
-        Assert.assertThat(runner.getExitCode(), Matchers.is(0));
+        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
+
+        // Test Download
+        runner.run("download", "--destinationDirectory", this.temporaryFolder.newFolder().getAbsolutePath());
+        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
+
+        // Test exec
+        runner.run(
+            "exec",
+            "--clusterCriterion",
+            "TAGS=type:presto",
+            "--commandCriterion",
+            "TAGS=type:presto",
+            "--jobName",
+            "Dummy Job",
+            "--serverHost",
+            "www.genie.com",
+            "--serverPort",
+            "9090",
+            "--interactive"
+        );
+        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.EXEC_FAIL.getCode()));
+
+        // Test heartbeat
+        runner.run(
+            "heartbeat",
+            "--duration",
+            "1",
+            "--serverHost",
+            "www.genie.com",
+            "--serverPort",
+            "9090"
+        );
+        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
+
+        // Test info
+        runner.run("info");
+        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
+
+        // Test ping
+        runner.run(
+            "ping",
+            "--serverHost",
+            "www.genie.com",
+            "--serverPort",
+            "9090"
+        );
+        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.EXEC_FAIL.getCode()));
+
+        // Test resolve
+        runner.run("resolve");
+        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.EXEC_FAIL.getCode()));
     }
 }
