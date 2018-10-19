@@ -113,24 +113,26 @@ public class ServicesAutoConfiguration {
 
     /**
      * Provide a lazy {@link ArchivalService} bean if AmazonS3 client exists.
+     *
      * @param amazonS3 Amazon S3 client instance
-     * @return A {@link ArchivalService} instance
+     * @return A {@link S3ArchivalServiceImpl} instance
      */
     @Bean
     @Lazy
     @ConditionalOnBean(AmazonS3.class)
-    public ArchivalService archivalService(final AmazonS3 amazonS3) {
+    public S3ArchivalServiceImpl s3ArchivalService(final AmazonS3 amazonS3) {
         return new S3ArchivalServiceImpl(amazonS3);
     }
 
     /**
      * Provide a lazy {@link ArchivalService} bean if one does not already exist.
+     *
      * @return A {@link ArchivalService} instance
      */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(ArchivalService.class)
-    public ArchivalService archivalService() {
+    public NoOpArchivalServiceImpl noOpArchivalService() {
         return new NoOpArchivalServiceImpl();
     }
 }
