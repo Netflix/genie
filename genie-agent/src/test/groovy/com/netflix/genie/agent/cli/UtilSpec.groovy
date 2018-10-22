@@ -38,4 +38,23 @@ class UtilSpec extends Specification {
         _ | ["---", "-"] as String[]
         _ | ["--foo", "f", "--", "--bar=b"] as String[]
     }
+
+    @Unroll
+    def "Split options and operands: #args"() {
+        setup:
+
+        expect:
+        expectedOptions == Util.getOptionArguments(args)
+        expectedOperands == Util.getOperandArguments(args)
+
+        where:
+        args                                               | expectedOptions                | expectedOperands
+        [] as String[]                                     | [] as String[]                 | [] as String[]
+        ["--"] as String[]                                 | [] as String[]                 | [] as String[]
+        ["--foo", "f"] as String[]                         | ["--foo", "f"] as String[]     | [] as String[]
+        ["--foo", "f", "--"] as String[]                   | ["--foo", "f"] as String[]     | [] as String[]
+        ["--", "--foo", "f"] as String[]                   | [] as String[]                 | ["--foo", "f"] as String[]
+        ["--", "--foo", "f"] as String[]                   | [] as String[]                 | ["--foo", "f"] as String[]
+        ["--bar", "--baz", "--", "--foo", "f"] as String[] | ["--bar", "--baz"] as String[] | ["--foo", "f"] as String[]
+    }
 }
