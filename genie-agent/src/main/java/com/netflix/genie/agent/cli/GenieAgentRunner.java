@@ -72,12 +72,15 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
 
     private void internalRun(final String[] args) {
         log.info("Parsing arguments...");
-        log.debug("Arguments: {}", Arrays.toString(args));
 
         exitCode = ExitCode.INVALID_ARGS;
 
+        //TODO: workaround for https://jira.spring.io/browse/SPR-17416
+        final String[] originalArgs = Util.unmangleBareDoubleDash(args);
+        log.debug("Arguments: {}", Arrays.toString(originalArgs));
+
         try {
-            argumentParser.parse(args);
+            argumentParser.parse(originalArgs);
         } catch (ParameterException e) {
             throw new IllegalArgumentException("Failed to parse arguments: " + e.getMessage(), e);
         }

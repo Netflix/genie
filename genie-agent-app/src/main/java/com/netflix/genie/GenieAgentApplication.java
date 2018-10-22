@@ -18,6 +18,7 @@
 package com.netflix.genie;
 
 import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.Util;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
@@ -60,6 +61,12 @@ public class GenieAgentApplication {
         final SpringApplication app = new SpringApplication(GenieAgentApplication.class);
         // Disable parsing of command-line arguments into properties.
         app.setAddCommandLineProperties(false);
-        return SpringApplication.exit(app.run(args));
+
+        //TODO: workaround for https://jira.spring.io/browse/SPR-17416
+        // Spring chokes on argument '--' (a.k.a. bare double dash) conventionally used to separate options from
+        // operands. Perform a token replacement to avoid triggering an error in Spring argument parsing.
+        // Later the original token is restored before the actual Genie argument parsing.
+        final String[] editedArgs = Util.mangleBareDoubleDash(args);
+        return SpringApplication.exit(app.run(editedArgs));
     }
 }
