@@ -2,7 +2,7 @@
 cloud:
   aws:
     credentials:
-      instanceProfile: true
+      useDefaultAwsCredentialsChain: true
     region:
       auto: false
       static: us-east-1
