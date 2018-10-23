@@ -393,60 +393,6 @@ class SetUpJobActionSpec extends Specification {
         e.getCause().getClass() == SetUpJobException
     }
 
-    def "Non-existent job directory parent"() {
-        setup:
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        2 * executionContext.getClaimedJobId() >> jobId
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
-        1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
-        1 * spec.getJobDirectoryLocation() >> new File(temporaryFolder.getRoot(), "nonexistent")
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-    }
-
-    def "Invalid job directory parent"() {
-        setup:
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        2 * executionContext.getClaimedJobId() >> jobId
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
-        1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
-        1 * spec.getJobDirectoryLocation() >> temporaryFolder.newFile()
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-    }
-
-    def "Relative job directory parent"() {
-        setup:
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        2 * executionContext.getClaimedJobId() >> jobId
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
-        1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
-        1 * spec.getJobDirectoryLocation() >> new File(".")
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-    }
-
     def "Existing job directory"() {
         setup:
         temporaryFolder.newFolder(jobId)
