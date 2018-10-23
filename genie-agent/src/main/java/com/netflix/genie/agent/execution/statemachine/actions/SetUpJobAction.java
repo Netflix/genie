@@ -187,14 +187,10 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     ) throws SetUpJobException {
         final File parentDir = jobDirectory.getParentFile();
 
-        if (!parentDir.exists() || !parentDir.isDirectory()) {
-            throw new SetUpJobException("Invalid destination for job directory: " + parentDir);
-        } else if (!parentDir.isAbsolute()) {
-            throw new SetUpJobException("Job directory parent path is not absolute: " + parentDir);
-        }
-
-        if (jobDirectory.exists()) {
-            throw new SetUpJobException("Job directory already exists: " + jobDirectory);
+        try {
+            Files.createDirectories(parentDir.toPath());
+        } catch (final IOException e) {
+            throw new SetUpJobException("Failed to create jobs directory", e);
         }
 
         try {
