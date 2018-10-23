@@ -30,11 +30,13 @@ import spock.lang.Specification
 @Category(UnitTest.class)
 class JobRequestArgumentsImplSpec extends Specification {
 
+    MainCommandArguments commandArguments
     TestOptions options
     JCommander jCommander
 
     void setup() {
-        options = new TestOptions()
+        commandArguments = Mock(MainCommandArguments.class)
+        options = new TestOptions(commandArguments)
         jCommander = new JCommander(options)
     }
 
@@ -46,7 +48,6 @@ class JobRequestArgumentsImplSpec extends Specification {
         jCommander.parse()
 
         then:
-        options.jobRequestArguments.getCommandArguments().isEmpty()
         options.jobRequestArguments.getJobDirectoryLocation() == new File(JobRequestArgumentsImpl.DEFAULT_JOBS_DIRECTORY)
         !options.jobRequestArguments.isInteractive()
         options.jobRequestArguments.getArchiveLocationPrefix() == null
@@ -65,6 +66,12 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobVersion() == null
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode()
         !options.jobRequestArguments.isJobRequestedViaAPI()
+
+        when:
+        options.jobRequestArguments.getCommandArguments()
+
+        then:
+        1 * commandArguments.get()
     }
 
     def "Parse"() {
@@ -91,8 +98,7 @@ class JobRequestArgumentsImplSpec extends Specification {
                 "--jobTag", "t2",
                 "--jobVersion", "1.0",
                 "--jobMetadata", "{\"foo\": false}",
-                "--api-job",
-                "foo", "bar",
+                "--api-job"
         )
 
         then:
@@ -119,9 +125,26 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobTags().containsAll(["t1", "t2"])
         options.jobRequestArguments.getJobVersion() == "1.0"
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode().put("foo", false)
-        options.jobRequestArguments.getCommandArguments() == ["foo", "bar"].asList()
         options.jobRequestArguments.isJobRequestedViaAPI()
     }
+
+    def "Unknown parameters throw"() {
+
+        when:
+        jCommander.parse(
+            "--interactive",
+            "--jobId", "FooBar",
+            "--clusterCriterion", "NAME=test",
+            "--clusterCriterion", "NAME=prod",
+            "--commandCriterion", "STATUS=active",
+            "--",
+            "foo"
+        )
+
+        then:
+        thrown(ParameterException)
+    }
+
 
     def "Non S3 url throws ParameterException"() {
 
@@ -146,7 +169,12 @@ class JobRequestArgumentsImplSpec extends Specification {
     }
 
     class TestOptions {
+
         @ParametersDelegate
-        private ArgumentDelegates.JobRequestArguments jobRequestArguments = new JobRequestArgumentsImpl()
+        private final ArgumentDelegates.JobRequestArguments jobRequestArguments
+
+        TestOptions(MainCommandArguments mainCommandArguments) {
+            jobRequestArguments = new JobRequestArgumentsImpl(mainCommandArguments)
+        }
     }
 }

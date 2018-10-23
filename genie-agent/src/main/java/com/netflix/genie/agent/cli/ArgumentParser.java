@@ -35,13 +35,16 @@ class ArgumentParser {
 
     private final JCommander jCommander;
     private final CommandFactory commandFactory;
+    private final MainCommandArguments mainCommandArguments;
 
     ArgumentParser(
         final JCommander jCommander,
-        final CommandFactory commandFactory
+        final CommandFactory commandFactory,
+        final MainCommandArguments mainCommandArguments
     ) {
         this.jCommander = jCommander;
         this.commandFactory = commandFactory;
+        this.mainCommandArguments = mainCommandArguments;
     }
 
     /**
@@ -50,7 +53,11 @@ class ArgumentParser {
      * @param args command-line arguments
      */
     void parse(final String[] args) {
-        jCommander.parse(args);
+        final String[] optionArguments = Util.getOptionArguments(args);
+        final String[] operandArguments = Util.getOperandArguments(args);
+
+        jCommander.parse(optionArguments);
+        mainCommandArguments.set(operandArguments);
     }
 
     /**

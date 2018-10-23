@@ -85,12 +85,17 @@ public class JCommanderAutoConfiguration {
     /**
      * Provide an argument parser bean.
      *
-     * @param jCommander     The JCommander instance to use
-     * @param commandFactory The command factory instance to use
+     * @param jCommander           The JCommander instance to use
+     * @param commandFactory       The command factory instance to use
+     * @param mainCommandArguments The container of main arguments for the command
      * @return An {@link ArgumentParser} instance
      */
     @Bean
-    public ArgumentParser argumentParser(final JCommander jCommander, final CommandFactory commandFactory) {
-        return new ArgumentParser(jCommander, commandFactory);
+    public ArgumentParser argumentParser(
+        final JCommander jCommander,
+        final CommandFactory commandFactory,
+        final MainCommandArguments mainCommandArguments
+    ) {
+        return new ArgumentParser(jCommander, commandFactory, mainCommandArguments);
     }
 }

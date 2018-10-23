@@ -72,7 +72,8 @@ class JCommanderAutoConfigurationSpec extends Specification {
         when:
         def argumentParser = config.argumentParser(
             Mock(JCommander.class),
-            Mock(CommandFactory.class)
+            Mock(CommandFactory.class),
+            Mock(MainCommandArguments.class)
         )
         then:
         argumentParser != null

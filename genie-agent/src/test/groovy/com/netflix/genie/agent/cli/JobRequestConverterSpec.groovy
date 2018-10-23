@@ -34,16 +34,18 @@ class JobRequestConverterSpec extends Specification {
 
     JobRequestConverter converter
     Validator validator
+    MainCommandArguments mainCommandArguments
 
     void setup() {
         validator = Mock(Validator)
         converter = new JobRequestConverter(validator)
+        mainCommandArguments = new MainCommandArguments()
     }
 
     def "Convert with defaults"() {
 
         setup:
-        ArgumentDelegates.JobRequestArguments jobRequestArgs = new JobRequestArgumentsImpl()
+        ArgumentDelegates.JobRequestArguments jobRequestArgs = new JobRequestArgumentsImpl(mainCommandArguments)
         AgentJobRequest jobRequest
 
         when:
@@ -127,7 +129,7 @@ class JobRequestConverterSpec extends Specification {
     def "Convert fail validation"() {
 
         setup:
-        ArgumentDelegates.JobRequestArguments jobRequestArgs = new JobRequestArgumentsImpl()
+        ArgumentDelegates.JobRequestArguments jobRequestArgs = new JobRequestArgumentsImpl(mainCommandArguments)
         ConstraintViolation<AgentJobRequest> violation = Mock()
 
         when:

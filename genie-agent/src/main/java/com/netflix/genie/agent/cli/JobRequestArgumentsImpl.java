@@ -43,10 +43,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     @VisibleForTesting
     static final String DEFAULT_JOBS_DIRECTORY = "/tmp/genie/jobs/";
 
-    // Notice this is a 'main' argument: it has no name and binds to all unnamed arguments that
-    // appear on the command-line after the named options.
-    @Parameter(description = "[commandArg1, [commandArg2 [...]]")
-    private List<String> commandArguments = Lists.newArrayList();
+    private final MainCommandArguments mainCommandArguments;
 
     @Parameter(
         names = {"--jobDirectoryLocation"},
@@ -162,4 +159,16 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
         hidden = true // Do not expose this option via CLI to users
     )
     private boolean jobRequestedViaAPI;
+
+    JobRequestArgumentsImpl(final MainCommandArguments mainCommandArguments) {
+        this.mainCommandArguments = mainCommandArguments;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getCommandArguments() {
+        return mainCommandArguments.get();
+    }
 }

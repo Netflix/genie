@@ -28,32 +28,35 @@ class ArgumentParserSpec extends Specification {
 
     JCommander mockJCommander
     CommandFactory mockCommandFactory
+    MainCommandArguments mockMainCommandArguments
 
     void setup() {
         mockJCommander = Mock(JCommander.class)
         mockCommandFactory = Mock(CommandFactory.class)
+        mockMainCommandArguments = Mock(MainCommandArguments.class)
     }
 
     def "Construct"() {
         setup:
-        new ArgumentParser(mockJCommander, mockCommandFactory)
+        new ArgumentParser(mockJCommander, mockCommandFactory, mockMainCommandArguments)
     }
 
     def "Parse"() {
         setup:
-        def parser = new ArgumentParser(mockJCommander, mockCommandFactory)
-        String[] args = ["foo", "bar", "baz"]
+        def parser = new ArgumentParser(mockJCommander, mockCommandFactory, mockMainCommandArguments)
+        String[] args = ["foo", "bar", "--", "baz"]
 
         when:
         parser.parse(args)
 
         then:
-        1 * mockJCommander.parse(args)
+        1 * mockJCommander.parse(["foo", "bar"] as String[])
+        1 * mockMainCommandArguments.set(["baz"] as String[])
     }
 
     def "GetUsageMessage"() {
         setup:
-        def parser = new ArgumentParser(mockJCommander, mockCommandFactory)
+        def parser = new ArgumentParser(mockJCommander, mockCommandFactory, mockMainCommandArguments)
 
         when:
         parser.getUsageMessage()
@@ -64,7 +67,7 @@ class ArgumentParserSpec extends Specification {
 
     def "GetSelectedCommand"() {
         setup:
-        def parser = new ArgumentParser(mockJCommander, mockCommandFactory)
+        def parser = new ArgumentParser(mockJCommander, mockCommandFactory, mockMainCommandArguments)
 
         when:
         parser.getSelectedCommand()
@@ -74,7 +77,7 @@ class ArgumentParserSpec extends Specification {
 
     def "GetCommandNames"() {
         setup:
-        def parser = new ArgumentParser(mockJCommander, mockCommandFactory)
+        def parser = new ArgumentParser(mockJCommander, mockCommandFactory, mockMainCommandArguments)
 
         when:
         parser.getCommandNames()
