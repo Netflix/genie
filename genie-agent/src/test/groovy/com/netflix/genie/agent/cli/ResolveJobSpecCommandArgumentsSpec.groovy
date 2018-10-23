@@ -31,10 +31,13 @@ class ResolveJobSpecCommandArgumentsSpec extends Specification {
     JCommander jCommander
     ArgumentDelegates.ServerArguments serverArguments
     ArgumentDelegates.JobRequestArguments jobArguments
+    MainCommandArguments mainCommandArguments
+
 
     void setup() {
         serverArguments = new ServerArgumentsImpl()
-        jobArguments = new JobRequestArgumentsImpl()
+        mainCommandArguments = Mock(MainCommandArguments)
+        jobArguments = new JobRequestArgumentsImpl(mainCommandArguments)
         options = new ResolveJobSpecCommand.ResolveJobSpecCommandArguments(serverArguments, jobArguments)
         jCommander = new JCommander(options)
     }
@@ -61,8 +64,7 @@ class ResolveJobSpecCommandArgumentsSpec extends Specification {
                 "--serverPort", "1234",
                 "--spec-id", "666666",
                 "--no-request",
-                "--output-file", "/foo/spec.json",
-                "foo", "bar"
+                "--output-file", "/foo/spec.json"
         )
 
         then:
@@ -72,7 +74,6 @@ class ResolveJobSpecCommandArgumentsSpec extends Specification {
         "666666" == options.getSpecificationId()
         options.isPrintRequestDisabled()
         new File("/foo/spec.json") == options.getOutputFile()
-        ["foo", "bar"].asList() == options.getJobRequestArguments().getCommandArguments()
     }
 
     def "InvalidRequestId"() {

@@ -34,11 +34,14 @@ class ExecCommandArgumentsSpec extends Specification {
     ArgumentDelegates.CacheArguments cacheArguments
     ArgumentDelegates.JobRequestArguments jobRequestArguments
     ArgumentDelegates.CleanupArguments cleanupArguments
+    MainCommandArguments mainCommandArguments
+
 
     void setup() {
         serverArguments = new ServerArgumentsImpl()
         cacheArguments = new CacheArgumentsImpl()
-        jobRequestArguments = new JobRequestArgumentsImpl()
+        mainCommandArguments = Mock(MainCommandArguments)
+        jobRequestArguments = new JobRequestArgumentsImpl(mainCommandArguments)
         cleanupArguments = new CleanupArgumentsImpl()
         options = new ExecCommand.ExecCommandArguments(serverArguments, cacheArguments, jobRequestArguments, cleanupArguments)
         jCommander = new JCommander(options)

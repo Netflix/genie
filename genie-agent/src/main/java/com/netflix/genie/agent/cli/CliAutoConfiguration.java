@@ -236,13 +236,24 @@ public class CliAutoConfiguration {
     }
 
     /**
+     * Provide a {@link com.netflix.genie.agent.cli.MainCommandArguments}.
+     *
+     * @return An instance of {@link com.netflix.genie.agent.cli.MainCommandArguments}.
+     */
+    @Bean
+    public MainCommandArguments mainCommandArguments() {
+        return new MainCommandArguments();
+    }
+
+    /**
      * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments}.
      *
+     * @param mainCommandArguments container for the main arguments
      * @return An instance of {@link com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments}
      */
     @Bean
-    public ArgumentDelegates.JobRequestArguments jobRequestArguments() {
-        return new JobRequestArgumentsImpl();
+    public ArgumentDelegates.JobRequestArguments jobRequestArguments(final MainCommandArguments mainCommandArguments) {
+        return new JobRequestArgumentsImpl(mainCommandArguments);
     }
 
     /**
