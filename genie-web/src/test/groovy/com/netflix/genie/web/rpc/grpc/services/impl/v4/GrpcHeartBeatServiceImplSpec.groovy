@@ -22,6 +22,7 @@ import com.netflix.genie.proto.AgentHeartBeat
 import com.netflix.genie.proto.ServerHeartBeat
 import com.netflix.genie.web.services.AgentRoutingService
 import io.grpc.stub.StreamObserver
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 
@@ -34,6 +35,7 @@ class GrpcHeartBeatServiceImplSpec extends Specification {
     TaskScheduler taskScheduler
     ScheduledFuture taskFuture
     Runnable task
+    MeterRegistry registry
 
     void setup() {
         this.taskFuture = Mock(ScheduledFuture)
@@ -46,7 +48,8 @@ class GrpcHeartBeatServiceImplSpec extends Specification {
         }
         this.agentRoutingService = Mock(AgentRoutingService)
         this.responseObserver = Mock(StreamObserver)
-        this.service = new GrpcHeartBeatServiceImpl(agentRoutingService, taskScheduler)
+        this.registry = Mock(MeterRegistry)
+        this.service = new GrpcHeartBeatServiceImpl(agentRoutingService, taskScheduler, registry)
         assert task != null
     }
 

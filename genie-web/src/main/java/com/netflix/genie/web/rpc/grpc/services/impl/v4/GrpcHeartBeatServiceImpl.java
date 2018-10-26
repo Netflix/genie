@@ -25,6 +25,7 @@ import com.netflix.genie.proto.ServerHeartBeat;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentRoutingService;
 import io.grpc.stub.StreamObserver;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,7 @@ import javax.annotation.PreDestroy;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An edge gRPC service that uses bi-directional streaming.
@@ -55,20 +57,25 @@ class GrpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImpl
 
     private static final long HEART_BEAT_PERIOD_MILLIS = 5_000L; // TODO make configurable
     private final TaskScheduler taskScheduler;
+    private final MeterRegistry registry;
     private final Map<String, AgentStreamRecord> activeStreamsMap = Maps.newHashMap();
     private final ScheduledFuture<?> sendHeartbeatsFuture;
     private final AgentRoutingService agentRoutingService;
+    private final AtomicInteger connectionsCounter = new AtomicInteger();
 
     GrpcHeartBeatServiceImpl(
         final AgentRoutingService agentRoutingService,
-        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler
+        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler,
+        final MeterRegistry registry
     ) {
         this.agentRoutingService = agentRoutingService;
         this.taskScheduler = taskScheduler;
+        this.registry = registry;
         this.sendHeartbeatsFuture = this.taskScheduler.scheduleWithFixedDelay(
             this::sendHeartbeats,
             HEART_BEAT_PERIOD_MILLIS
         );
+        this.registry.gauge("genie.grpc.connections.gauge", this.connectionsCounter);
     }
 
     @PreDestroy
@@ -114,6 +121,9 @@ class GrpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImpl
 
             // Create a record for this connection
             activeStreamsMap.put(streamId, new AgentStreamRecord(responseObserver));
+
+            //Update count of active connections
+            connectionsCounter.set(activeStreamsMap.size());
         }
         return requestObserver;
     }
@@ -148,6 +158,8 @@ class GrpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImpl
         final AgentStreamRecord agentStreamRecord;
         synchronized (activeStreamsMap) {
             agentStreamRecord = activeStreamsMap.remove(streamId);
+            //Update count of active connections
+            connectionsCounter.set(activeStreamsMap.size());
         }
 
         if (agentStreamRecord == null) {
@@ -165,6 +177,8 @@ class GrpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImpl
         final AgentStreamRecord agentStreamRecord;
         synchronized (activeStreamsMap) {
             agentStreamRecord = activeStreamsMap.remove(streamId);
+            //Update count of active connections
+            connectionsCounter.set(activeStreamsMap.size());
         }
 
         if (agentStreamRecord == null) {
