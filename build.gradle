@@ -67,7 +67,7 @@ configure(javaProjects) {
 
     dependencyManagement {
         imports {
-            mavenBom "io.spring.platform:platform-bom:${spring_platform_version}"
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
         }
         dependencies {
@@ -80,10 +80,14 @@ configure(javaProjects) {
                 entry "converter-jackson"
             }
             dependency("com.google.code.findbugs:annotations:3.0.1")
+            dependency("com.google.guava:guava:20.0")
             dependencySet(group: "com.google.protobuf", version: "3.5.1") {
                 entry "protobuf-java"
                 entry "protoc"
             }
+            dependency("commons-beanutils:commons-beanutils:1.9.3")
+            dependency("commons-httpclient:commons-httpclient:3.1")
+            dependency("commons-io:commons-io:2.6")
             dependency("commons-validator:commons-validator:1.6")
             dependencySet(group: "io.grpc", version: "1.12.0") {
                 entry "grpc-core"
@@ -98,6 +102,7 @@ configure(javaProjects) {
                 entry "springfox-swagger-ui"
                 entry "springfox-bean-validators"
             }
+            dependency("javax.el:javax.el-api:3.0.1-b06")
             dependency("javax.persistence:javax.persistence-api:2.2")
             dependencySet(group: "net.devh", version: "2.0.1.RELEASE") {
                 entry "grpc-server-spring-boot-autoconfigure"

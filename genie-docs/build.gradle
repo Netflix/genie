@@ -13,6 +13,5 @@ asciidoctor {
             "docinfo1": "",
             "isSnapshot": isSnapshot,
             "springBootVersion": "${spring_boot_version}",
-            "springCloudVersion": "${spring_cloud_version}",
-            "springPlatformVersion": "${spring_platform_version}"
+            "springCloudVersion": "${spring_cloud_version}"
 }
