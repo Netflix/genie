@@ -227,8 +227,6 @@ drop them yourself if they're no longer needed.
 === Library Upgrades
 
 * Upgrade Spring Boot to {springBootVersion}
-* Upgrade to Spring Platform IO {springPlatformVersion} for library dependency management
-** http://docs.spring.io/platform/docs/{springPlatformVersion}/reference/htmlsingle/[Reference Docs]
 * Upgrade to Spring Cloud {springCloudVersion} for cloud dependency management
 ** http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Reference Docs]
 
