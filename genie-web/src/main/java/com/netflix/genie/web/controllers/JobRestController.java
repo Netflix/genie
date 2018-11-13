@@ -196,7 +196,7 @@ public class JobRestController {
         final MeterRegistry registry,
         final JobPersistenceService jobPersistenceService,
         final AgentRoutingService agentRoutingService
-        ) {
+    ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;
         this.attachmentService = attachmentService;
@@ -720,11 +720,14 @@ public class JobRestController {
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
-        log.info("[getJobOutput] Called for job with id: {}", id);
+        // TODO: V4 currently doesn't fully support logs so we need to handle these jobs specially in mixed environment
+        final boolean isV4 = this.jobPersistenceService.isV4(id);
         final String path = ControllerUtils.getRemainingPath(request);
 
+        log.info("[getJobOutput] Called to get output path \"{}\" for job with id {}", path, id);
+
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
-        if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
+        if (!isV4 && this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
             // TODO: It's possible that could use the JobMonitorCoordinator to check this in memory
             //       However that could get into problems where the job finished or died
             //       and it would return false on check if the job with given id is running on that node
@@ -761,16 +764,29 @@ public class JobRestController {
             }
         }
 
-        log.info("Job {} is running or was run on this node. Fetching requested resource...", id);
+        log.info("Job {} is running or was run on this node. Fetching requested resource \"{}\"", id, path);
         if (StringUtils.isNotBlank(path)) {
             request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);
         } else {
             request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
         }
-        log.debug("PATH = {}", path);
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, path);
-        request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE, id);
 
+        // TODO: Remove this once V4 logging is fixed
+        if (isV4) {
+            // Replace with dummy V4 job id.
+            log.info(
+                "Requested output for V4 job {}. Currently unsupported. Replacing with dummy job {}",
+                id,
+                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID
+            );
+            request.setAttribute(
+                GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE,
+                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID
+            );
+        } else {
+            request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE, id);
+        }
         this.resourceHttpRequestHandler.handleRequest(request, response);
     }
 

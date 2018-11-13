@@ -66,6 +66,58 @@ public class GenieResourceHttpRequestHandlerUnitTests {
     }
 
     /**
+     * Make sure the job directory used as a mock for all V4 output requests is created after construction.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void v4DummyJobDirectoryIsCreated() throws IOException {
+        Mockito
+            .verify(this.jobFileService, Mockito.times(1))
+            .createJobDirectory(GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID);
+        Mockito
+            .verify(this.jobFileService, Mockito.times(1))
+            .updateFile(
+                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID,
+                JobConstants.GENIE_JOB_LAUNCHER_SCRIPT,
+                0L,
+                new byte[0]
+            );
+        Mockito
+            .verify(this.jobFileService, Mockito.times(1))
+            .updateFile(
+                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID,
+                JobConstants.STDOUT_LOG_FILE_NAME,
+                0L,
+                new byte[0]
+            );
+        Mockito
+            .verify(this.jobFileService, Mockito.times(1))
+            .updateFile(
+                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID,
+                JobConstants.STDERR_LOG_FILE_NAME,
+                0L,
+                new byte[0]
+            );
+    }
+
+    /**
+     * Make sure if the job directory used as a mock for all V4 output requests can't be created the system will still
+     * run.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void v4DummyJobDirectoryIsNotCreated() throws IOException {
+        Mockito
+            .doThrow(new IOException("Expected"))
+            .when(this.jobFileService)
+            .createJobDirectory(GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID);
+
+        new GenieResourceHttpRequestHandler(this.directoryWriter, this.jobFileService);
+    }
+
+    /**
      * Make sure we can't handle any requests for resources without a resource location to look in.
      *
      * @throws ServletException on error

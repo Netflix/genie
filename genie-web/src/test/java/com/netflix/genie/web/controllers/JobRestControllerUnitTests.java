@@ -59,6 +59,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -129,7 +130,7 @@ public class JobRestControllerUnitTests {
             registry,
             this.jobPersistenceService,
             this.agentRoutingService
-            );
+        );
     }
 
     /**
@@ -160,8 +161,8 @@ public class JobRestControllerUnitTests {
     /**
      * Make sure won't forward job kill request if it's already been forwarded.
      *
-     * @throws IOException      on error
-     * @throws GenieException   on error
+     * @throws IOException    on error
+     * @throws GenieException on error
      */
     @Test
     public void wontForwardJobKillRequestIfAlreadyForwarded() throws IOException, GenieException {
@@ -440,10 +441,10 @@ public class JobRestControllerUnitTests {
     /**
      * Make sure GenieNotFoundException exception thrown on no job found for a job kill request.
      *
-     * @throws IOException      on error
-     * @throws GenieException   on error
+     * @throws IOException    on error
+     * @throws GenieException on error
      */
-    @Test (expected = GenieNotFoundException.class)
+    @Test(expected = GenieNotFoundException.class)
     public void missingJobOnJobKillRequestThrowsException() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
@@ -467,8 +468,8 @@ public class JobRestControllerUnitTests {
      * Make sure GenieNotFoundException thrown on a missing host name for a v3
      * job kill request gets percolated up.
      *
-     * @throws IOException      on error
-     * @throws GenieException   on error
+     * @throws IOException    on error
+     * @throws GenieException on error
      */
     @Test(expected = GenieNotFoundException.class)
     public void exceptionThrownMissingHostNameForV3JobKill() throws IOException, GenieException {
@@ -495,8 +496,8 @@ public class JobRestControllerUnitTests {
      * Make sure GenieNotFoundException exception thrown on a missing host name for v4 job kill
      * request gets percolated up.
      *
-     * @throws IOException      on error
-     * @throws GenieException   on error
+     * @throws IOException    on error
+     * @throws GenieException on error
      */
     @Test(expected = GenieNotFoundException.class)
     public void exceptionThrownMissingHostNameForV4JobKill() throws IOException, GenieException {
@@ -756,5 +757,42 @@ public class JobRestControllerUnitTests {
         Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt());
         Mockito.verify(this.genieResourceHttpRequestHandler, Mockito.never()).handleRequest(request, response);
+    }
+
+    /**
+     * Test to make sure that when job output is requested for a V4 job the id requested is actually the dummy job
+     * id while development is still ongoing for V4 log handling.
+     *
+     * @throws GenieException   on error
+     * @throws IOException      on error
+     * @throws ServletException on error
+     */
+    @Test
+    public void canSwitchJobIdForGetJobOutputForV4Job() throws GenieException, IOException, ServletException {
+        final String jobId = UUID.randomUUID().toString();
+        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(true);
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.doNothing().when(this.genieResourceHttpRequestHandler).handleRequest(request, response);
+        Mockito
+            .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
+            .thenReturn("/api/v3/jobs/" + jobId + "/output/");
+
+        this.controller.getJobOutput(jobId, null, request, response);
+
+        Mockito
+            .verify(request, Mockito.times(1))
+            .setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
+        Mockito
+            .verify(request, Mockito.times(1))
+            .setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, "");
+        Mockito
+            .verify(request, Mockito.times(1))
+            .setAttribute(
+                GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE,
+                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID
+            );
+        Mockito.verify(this.genieResourceHttpRequestHandler, Mockito.times(1)).handleRequest(request, response);
+        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
     }
 }

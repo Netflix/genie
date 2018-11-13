@@ -20,6 +20,7 @@ package com.netflix.genie.web.resources.handlers;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import com.netflix.genie.web.services.JobFileService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +45,7 @@ import java.nio.charset.Charset;
  * @see ResourceHttpRequestHandler
  * @since 3.0.0
  */
+@Slf4j
 public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler {
 
     /**
@@ -56,6 +58,12 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
      * Used to identify the id of the job that is being requested.
      */
     public static final String GENIE_JOB_ID_ATTRIBUTE = GenieResourceHttpRequestHandler.class.getName() + ".jobId";
+
+    /**
+     * The id of a job to use as a placeholder for all requests for V4 job output temporarily while we develop V4 job
+     * support.
+     */
+    public static final String V4_MOCK_JOB_ID = "V4-Mock-Job-Directory";
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -72,6 +80,20 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
         super();
         this.directoryWriter = directoryWriter;
         this.jobFileService = jobFileService;
+
+        try {
+            this.jobFileService.createJobDirectory(V4_MOCK_JOB_ID);
+
+            // Create the three "expected" files
+            this.jobFileService.updateFile(V4_MOCK_JOB_ID, JobConstants.STDOUT_LOG_FILE_NAME, 0L, new byte[0]);
+            this.jobFileService.updateFile(V4_MOCK_JOB_ID, JobConstants.STDERR_LOG_FILE_NAME, 0L, new byte[0]);
+            this.jobFileService.updateFile(V4_MOCK_JOB_ID, JobConstants.GENIE_JOB_LAUNCHER_SCRIPT, 0L, new byte[0]);
+        } catch (final IOException ioe) {
+            log.error(
+                "Unable to create V4 placeholder job directory. All requests for V4 output will return 404.",
+                ioe
+            );
+        }
     }
 
     /**
