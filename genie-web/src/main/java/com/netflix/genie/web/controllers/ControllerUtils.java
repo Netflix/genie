@@ -40,8 +40,8 @@ public final class ControllerUtils {
 
     /**
      * Get the remaining path from a given request. e.g. if the request went to a method with the matching pattern of
-     * /api/v3/jobs/output/** and the request was /api/v3/jobs/output/blah.txt the return value of this method would be
-     * blah.txt.
+     * /api/v3/jobs/{id}/output/** and the request was /api/v3/jobs/{id}/output/blah.txt the return value of this
+     * method would be blah.txt.
      *
      * @param request The http servlet request.
      * @return The remaining path
