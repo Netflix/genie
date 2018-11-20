@@ -39,6 +39,7 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.RegexRuleSet;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileSystemUtils;
 
@@ -470,6 +471,13 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
                 e
             );
         }
+
+        // Variables in environment file are base64 encoded to avoid escaping, quoting.
+        // Decode all values.
+        env.keySet().forEach( key ->
+            env.compute(key, (k,v) -> new String(Base64.decodeBase64(v)))
+        );
+
         return Collections.unmodifiableMap(env);
     }
 

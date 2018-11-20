@@ -62,5 +62,6 @@ echo " *** Dumping environment in ${env_output_file} *** " >> ${log_file}
 
 unset IFS
 for var in $(compgen -e); do
-    printf "%s=\'%s\'\n" "$var" "${!var}" >> ${env_output_file}
+    encoded_value=$(printf "%s" "${!var}" | base64 )
+    printf "%s=\'%s\'\n" "$var" "${encoded_value}" >> ${env_output_file}
 done
