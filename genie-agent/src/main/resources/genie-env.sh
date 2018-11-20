@@ -25,13 +25,13 @@ input_setup_scripts=${@:3}
 
 # Check inputs
 if [[ -z "${env_output_file}" ]]; then
-  echo "Invalid arguments: missing output file: ${env_output_file}"
+  echo "Invalid arguments: missing output file"
   exit 1;
 elif [[ -e ${env_output_file} ]]; then
   echo "Invalid arguments: output file exists: ${env_output_file}"
   exit 1;
 elif [[ -z "${log_file}" ]]; then
-  echo "Invalid arguments: missing log file: ${log_file}"
+  echo "Invalid arguments: missing log file"
   exit 1;
 elif [[ -e ${log_file} ]]; then
   echo "Invalid arguments: log file exists: ${log_file}"
