@@ -27,7 +27,7 @@ class AgentExecutionExceptionsSpec extends Specification {
     final Throwable CAUSE = new IOException()
 
     @Unroll
-    def "Constructors for exception class #aClass"(Class<? extends Throwable> aClass) {
+    def "Constructors for exception class #aClass"(Class<? extends Throwable> aClass, boolean checked) {
         setup:
         Throwable exWithMessage = aClass.getConstructor(String.class).newInstance(MESSAGE)
         Throwable exWithMessageAndCause = aClass.getConstructor(String.class, Throwable.class).newInstance(MESSAGE, CAUSE)
@@ -35,23 +35,24 @@ class AgentExecutionExceptionsSpec extends Specification {
         expect:
         Exception.isInstance(exWithMessage)
         Exception.isInstance(exWithMessageAndCause)
-        !RuntimeException.isInstance(exWithMessage)
-        !RuntimeException.isInstance(exWithMessageAndCause)
         exWithMessage.getMessage() == MESSAGE
         exWithMessageAndCause.getMessage() == MESSAGE
         exWithMessage.getCause() == null
         exWithMessageAndCause.getCause() == CAUSE
+        RuntimeException.isInstance(exWithMessage) != checked
+        RuntimeException.isInstance(exWithMessageAndCause) != checked
 
         where:
-        aClass                                    | _
-        DownloadException.class                   | _
-        SetUpJobException.class                   | _
-        JobLaunchException.class                  | _
-        JobSpecificationResolutionException.class | _
-        LockException.class                       | _
-        JobIdUnavailableException.class           | _
-        JobReservationException.class             | _
-        ChangeJobStatusException.class            | _
-        ArchivalException.class                   | _
+        aClass                                    | checked
+        DownloadException.class                   | true
+        SetUpJobException.class                   | true
+        JobLaunchException.class                  | true
+        JobSpecificationResolutionException.class | true
+        LockException.class                       | true
+        JobIdUnavailableException.class           | true
+        JobReservationException.class             | true
+        ChangeJobStatusException.class            | true
+        ArchivalException.class                   | true
+        InvalidStateException.class               | false
     }
 }
