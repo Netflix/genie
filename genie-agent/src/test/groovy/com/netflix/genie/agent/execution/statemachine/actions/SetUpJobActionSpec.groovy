@@ -300,7 +300,8 @@ class SetUpJobActionSpec extends Specification {
         dummyFile.write(
                 "echo Hello World\n"
                         + "export SETUP_VARIABLE_KEY='SETUP VARIABLE VALUE'\n"
-                        + "touch created-by-setup-file.txt"
+                        + "touch created-by-setup-file.txt\n"
+                        + "export TRICKY_VARIABLE=\"'foo\nbar\ny'all'\"\n"
         )
 
         when:
@@ -354,6 +355,7 @@ class SetUpJobActionSpec extends Specification {
         envMap.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
         envMap.get("SERVER_VARIABLE_KEY") == "SERVER VARIABLE VALUE"
         envMap.get("SETUP_VARIABLE_KEY") == "SETUP VARIABLE VALUE"
+        envMap.get("TRICKY_VARIABLE") == "'foo\nbar\ny'all'"
         new File( "created-by-setup-file.txt").exists()
         PathUtils.composePath(
                 PathUtils.jobGenieDirectoryPath(jobDir),
