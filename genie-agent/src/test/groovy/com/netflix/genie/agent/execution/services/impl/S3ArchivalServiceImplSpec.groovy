@@ -22,28 +22,28 @@ import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.PutObjectRequest
+import com.netflix.genie.agent.aws.s3.S3ClientFactory
 import com.netflix.genie.agent.execution.exceptions.ArchivalException
-
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.Rule
 import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
-import org.springframework.core.io.WritableResource
 import spock.lang.Specification
 
-import java.nio.file.Paths
 import java.nio.file.Path
+import java.nio.file.Paths
 
 @Category(UnitTest)
 class S3ArchivalServiceImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
-    AmazonS3 amazonS3 = Mock()
-    WritableResource resource = Mock()
+    S3ClientFactory s3ClientFactory
+    AmazonS3 amazonS3
     S3ArchivalServiceImpl s3ArchivalService
+
     File jobDir
-    String bucketName = "netflix-dataoven-test-users";
-    String baseLocation = "genie/main/logs";
+    String bucketName = UUID.randomUUID().toString()
+    String baseLocation = "genie/main/logs"
     File stdout
     File stderr
     File run
@@ -63,8 +63,9 @@ class S3ArchivalServiceImplSpec extends Specification {
     AmazonS3URI archivalLocationS3URI
 
     void setup() {
-        temporaryFolder.create()
-        s3ArchivalService = new S3ArchivalServiceImpl(amazonS3)
+        s3ClientFactory = Mock()
+        amazonS3 = Mock()
+        s3ArchivalService = new S3ArchivalServiceImpl(s3ClientFactory)
         jobDir = temporaryFolder.newFolder("job")
         stdout = new File(jobDir, "stdout")
         stdout.createNewFile()
@@ -126,49 +127,48 @@ class S3ArchivalServiceImplSpec extends Specification {
         s3ArchivalService.archive(jobDir.toPath(), archivalLocationS3URI.getURI())
 
         then:
+        1 * s3ClientFactory.getClient(archivalLocationS3URI) >> amazonS3
         7 * amazonS3.putObject(_ as PutObjectRequest) >> {
             PutObjectRequest putObjectRequest ->
-                assert putObjectRequest.getBucketName().equals(bucketName)
+                assert putObjectRequest.getBucketName() == bucketName
 
                 //Name of the file for which the s3 putObject call is invoked
                 String fileName =
                     putObjectRequest.getFile() == null ?
-                    sparkDir.getName() :
-                    putObjectRequest.getFile().getName()
+                        sparkDir.getName() :
+                        putObjectRequest.getFile().getName()
 
                 switch (fileName) {
 
                     case stdout.getName():
-                        assert putObjectRequest.getKey()
-                            .equals(baseLocation + File.separator + pathRelativeToJobFolderParent(stdout))
+                        assert putObjectRequest.getKey() ==
+                            baseLocation + File.separator + pathRelativeToJobFolderParent(stdout)
                         break
                     case stderr.getName():
-                        assert putObjectRequest.getKey()
-                            .equals(baseLocation + File.separator + pathRelativeToJobFolderParent(stderr))
+                        assert putObjectRequest.getKey() ==
+                            baseLocation + File.separator + pathRelativeToJobFolderParent(stderr)
                         break
                     case run.getName():
-                        assert putObjectRequest.getKey()
-                            .equals(baseLocation + File.separator + pathRelativeToJobFolderParent(run))
+                        assert putObjectRequest.getKey() ==
+                            baseLocation + File.separator + pathRelativeToJobFolderParent(run)
                         break
                     case sparkDir.getName():
-                        assert putObjectRequest.getKey()
-                            .equals(
-                                baseLocation +
-                                File.separator +
-                                pathRelativeToJobFolderParent(sparkDir) + File.separator
-                        )
+                        assert putObjectRequest.getKey() ==
+                            baseLocation +
+                            File.separator +
+                            pathRelativeToJobFolderParent(sparkDir) + File.separator
                         break
                     case hadoopCoreSite.getName():
-                        assert putObjectRequest.getKey()
-                            .equals(baseLocation + File.separator + pathRelativeToJobFolderParent(hadoopCoreSite))
+                        assert putObjectRequest.getKey() ==
+                            baseLocation + File.separator + pathRelativeToJobFolderParent(hadoopCoreSite)
                         break
                     case sparkShellSetUp.getName():
-                        assert putObjectRequest.getKey()
-                            .equals(baseLocation + File.separator + pathRelativeToJobFolderParent(sparkShellSetUp))
+                        assert putObjectRequest.getKey() ==
+                            baseLocation + File.separator + pathRelativeToJobFolderParent(sparkShellSetUp)
                         break
                     case logFile.getName():
-                        assert putObjectRequest.getKey()
-                            .equals(baseLocation + File.separator + pathRelativeToJobFolderParent(logFile))
+                        assert putObjectRequest.getKey() ==
+                            baseLocation + File.separator + pathRelativeToJobFolderParent(logFile)
                         break
                 }
         }
@@ -189,6 +189,7 @@ class S3ArchivalServiceImplSpec extends Specification {
         s3ArchivalService.archive(jobDir.toPath(), archivalLocationS3URI.getURI())
 
         then:
+        1 * s3ClientFactory.getClient(archivalLocationS3URI) >> amazonS3
         1 * amazonS3.putObject(_ as PutObjectRequest) >> {
             throw new AmazonServiceException("test")
         }
