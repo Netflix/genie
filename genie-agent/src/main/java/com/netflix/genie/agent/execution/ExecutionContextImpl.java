@@ -27,13 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.statemachine.action.Action;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -70,8 +70,8 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public File getJobDirectory() {
-        return jobDirectoryRef.get();
+    public Optional<File> getJobDirectory() {
+        return Optional.ofNullable(jobDirectoryRef.get());
     }
 
     /**
@@ -86,8 +86,8 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification getJobSpecification() {
-        return jobSpecRef.get();
+    public Optional<JobSpecification> getJobSpecification() {
+        return Optional.ofNullable(jobSpecRef.get());
     }
 
     /**
@@ -102,8 +102,8 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> getJobEnvironment() {
-        return jobEnvironmentRef.get();
+    public Optional<Map<String, String>> getJobEnvironment() {
+        return Optional.ofNullable(jobEnvironmentRef.get());
     }
 
     /**
@@ -175,8 +175,8 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public JobStatus getFinalJobStatus() {
-        return finalJobStatusRef.get();
+    public Optional<JobStatus> getFinalJobStatus() {
+        return Optional.ofNullable(finalJobStatusRef.get());
     }
 
     /**
@@ -190,10 +190,9 @@ class ExecutionContextImpl implements ExecutionContext {
     /**
      * {@inheritDoc}
      */
-    @Nullable
     @Override
-    public JobStatus getCurrentJobStatus() {
-        return currentJobStatusRef.get();
+    public Optional<JobStatus> getCurrentJobStatus() {
+        return Optional.ofNullable(currentJobStatusRef.get());
     }
 
     /**
@@ -207,10 +206,9 @@ class ExecutionContextImpl implements ExecutionContext {
     /**
      * {@inheritDoc}
      */
-    @Nullable
     @Override
-    public String getClaimedJobId() {
-        return claimedJobIdRef.get();
+    public Optional<String> getClaimedJobId() {
+        return Optional.ofNullable(claimedJobIdRef.get());
     }
 
     private static <T> void setIfNullOrThrow(final T value, final AtomicReference<T> reference) {

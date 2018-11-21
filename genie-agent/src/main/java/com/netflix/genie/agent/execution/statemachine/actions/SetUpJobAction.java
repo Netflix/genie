@@ -94,7 +94,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         final ExecutionContext executionContext
     ) {
 
-        final String claimedJobId = executionContext.getClaimedJobId();
+        final String claimedJobId = executionContext.getClaimedJobId().get();
 
         heartbeatService.start(claimedJobId);
         killService.start(claimedJobId);
@@ -102,7 +102,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         try {
             this.agentJobService.changeJobStatus(
                 claimedJobId,
-                executionContext.getCurrentJobStatus(),
+                executionContext.getCurrentJobStatus().get(),
                 JobStatus.INIT,
                 "Setting up job"
             );
@@ -122,7 +122,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
     @Override
     protected void executeStateActionCleanup(final ExecutionContext executionContext) {
-        final File jobDirectory = executionContext.getJobDirectory();
+        final File jobDirectory = executionContext.getJobDirectory().get();
 
         try {
             cleanupJobDirectory(jobDirectory.toPath(), cleanupArguments.getCleanupStrategy());
@@ -139,14 +139,17 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
         log.info("Setting up job...");
 
-        final JobSpecification jobSpec = executionContext.getJobSpecification();
-
-        if (jobSpec == null) {
+        if (!executionContext.getJobSpecification().isPresent()) {
             throw new SetUpJobException("Job specification not set");
         }
 
+        final JobSpecification jobSpec = executionContext.getJobSpecification().get();
+
         // Create job directory
-        final File jobDirectory = new File(jobSpec.getJobDirectoryLocation(), executionContext.getClaimedJobId());
+        final File jobDirectory = new File(
+            jobSpec.getJobDirectoryLocation(),
+            executionContext.getClaimedJobId().get()
+        );
         createJobDirectory(jobDirectory);
 
         executionContext.setJobDirectory(jobDirectory);

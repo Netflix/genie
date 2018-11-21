@@ -51,8 +51,8 @@ class CleanupJobActionSpec extends Specification {
 
         then:
         event == Events.CLEANUP_JOB_COMPLETE
-        1 * executionContext.getClaimedJobId() >> null
-        1 * executionContext.getFinalJobStatus() >> JobStatus.INIT
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+        1 * executionContext.getFinalJobStatus() >> Optional.of(JobStatus.INIT)
         0 * executionContext.getCurrentJobStatus()
         0 * agentJobService.changeJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
         0 * executionContext.setFinalJobStatus(_ as JobStatus)
@@ -73,8 +73,8 @@ class CleanupJobActionSpec extends Specification {
 
         then:
         event == Events.CLEANUP_JOB_COMPLETE
-        1 * executionContext.getClaimedJobId() >> null
-        1 * executionContext.getFinalJobStatus() >> JobStatus.INIT
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+        1 * executionContext.getFinalJobStatus() >> Optional.of(JobStatus.INIT)
         0 * executionContext.getCurrentJobStatus()
         0 * agentJobService.changeJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
         0 * executionContext.setFinalJobStatus(_ as JobStatus)
@@ -98,8 +98,8 @@ class CleanupJobActionSpec extends Specification {
 
         then:
         event == Events.CLEANUP_JOB_COMPLETE
-        1 * executionContext.getClaimedJobId() >> null
-        1 * executionContext.getFinalJobStatus() >> JobStatus.INIT
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+        1 * executionContext.getFinalJobStatus() >> Optional.of(JobStatus.INIT)
         0 * executionContext.getCurrentJobStatus()
         0 * agentJobService.changeJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
         0 * executionContext.setFinalJobStatus(_ as JobStatus)
@@ -116,9 +116,9 @@ class CleanupJobActionSpec extends Specification {
 
         then:
         event == Events.CLEANUP_JOB_COMPLETE
-        1 * executionContext.getClaimedJobId() >> jobId
-        1 * executionContext.getFinalJobStatus() >> null
-        1 * executionContext.getCurrentJobStatus() >> JobStatus.CLAIMED
+        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.CLAIMED)
         1 * agentJobService.changeJobStatus(
             jobId,
             JobStatus.CLAIMED,
@@ -135,9 +135,9 @@ class CleanupJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getClaimedJobId() >> jobId
-        1 * executionContext.getFinalJobStatus() >> null
-        1 * executionContext.getCurrentJobStatus() >> JobStatus.CLAIMED
+        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.CLAIMED)
         1 * agentJobService.changeJobStatus(
             jobId,
             JobStatus.CLAIMED,

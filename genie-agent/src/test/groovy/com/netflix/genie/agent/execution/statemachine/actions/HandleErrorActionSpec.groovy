@@ -46,8 +46,8 @@ class HandleErrorActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getCurrentJobStatus() >> JobStatus.RUNNING
-        1 * executionContext.getClaimedJobId() >> id
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String)
 
         event == Events.HANDLE_ERROR_COMPLETE
@@ -58,8 +58,8 @@ class HandleErrorActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getCurrentJobStatus() >> null
-        1 * executionContext.getClaimedJobId() >> null
+        1 * executionContext.getCurrentJobStatus() >> Optional.empty()
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
         0 * agentJobService.changeJobStatus(_, _, _, _)
 
         event == Events.HANDLE_ERROR_COMPLETE
@@ -70,8 +70,8 @@ class HandleErrorActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getCurrentJobStatus() >> JobStatus.RUNNING
-        1 * executionContext.getClaimedJobId() >> id
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw new ChangeJobStatusException("...")}
 
         event == Events.HANDLE_ERROR_COMPLETE
@@ -84,8 +84,8 @@ class HandleErrorActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getCurrentJobStatus() >> JobStatus.RUNNING
-        1 * executionContext.getClaimedJobId() >> id
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw exception}
 
         thrown(exception.class)

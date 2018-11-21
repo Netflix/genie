@@ -61,12 +61,12 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Launching job...");
 
-        final JobSpecification jobSpec = executionContext.getJobSpecification();
-        final File jobDirectory = executionContext.getJobDirectory();
-        final Map<String, String> jobEnvironment = executionContext.getJobEnvironment();
+        final JobSpecification jobSpec = executionContext.getJobSpecification().get();
+        final File jobDirectory = executionContext.getJobDirectory().get();
+        final Map<String, String> jobEnvironment = executionContext.getJobEnvironment().get();
         final List<String> jobCommandLine = jobSpec.getCommandArgs();
         final boolean interactive = jobSpec.isInteractive();
-        final JobStatus currentJobStatus = executionContext.getCurrentJobStatus();
+        final JobStatus currentJobStatus = executionContext.getCurrentJobStatus().get();
 
         try {
             launchJobService.launchProcess(
@@ -81,7 +81,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
         try {
             this.agentJobService.changeJobStatus(
-                executionContext.getClaimedJobId(),
+                executionContext.getClaimedJobId().get(),
                 currentJobStatus,
                 JobStatus.RUNNING,
                 "Job process launched"

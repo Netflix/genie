@@ -25,12 +25,12 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.statemachine.action.Action;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Stateful context used by execution components to track state.
@@ -44,10 +44,9 @@ public interface ExecutionContext {
     /**
      * Get the job run directory.
      *
-     * @return the job directory File if one was set up, or null
+     * @return the job directory File if one was set up, or empty
      */
-    @Nullable
-    File getJobDirectory();
+    Optional<File> getJobDirectory();
 
     /**
      * Set the job directory.
@@ -59,10 +58,9 @@ public interface ExecutionContext {
     /**
      * Get the job specification.
      *
-     * @return the job specification if it was set, or null
+     * @return the job specification if it was set, or empty
      */
-    @Nullable
-    JobSpecification getJobSpecification();
+    Optional<JobSpecification> getJobSpecification();
 
     /**
      * Set the job specification.
@@ -74,10 +72,9 @@ public interface ExecutionContext {
     /**
      * Get the environment variables map for the job process.
      *
-     * @return a map of environment variables and values if one was set, or null
+     * @return a map of environment variables and values if one was set, or empty
      */
-    @Nullable
-    Map<String, String> getJobEnvironment();
+    Optional<Map<String, String>> getJobEnvironment();
 
     /**
      * Set the job environment variables map.
@@ -131,10 +128,9 @@ public interface ExecutionContext {
     /**
      * Get the final job status, if one was set.
      *
-     * @return the final job status or null
+     * @return the final job status if set, or empty
      */
-    @Nullable
-    JobStatus getFinalJobStatus();
+    Optional<JobStatus> getFinalJobStatus();
 
     /**
      * Set the final job status.
@@ -146,10 +142,9 @@ public interface ExecutionContext {
     /**
      * Get the current job status.
      *
-     * @return the latest job status set, or null if never set
+     * @return the latest job status status if set, or empty
      */
-    @Nullable
-    JobStatus getCurrentJobStatus();
+    Optional<JobStatus> getCurrentJobStatus();
 
     /**
      * Set the current job status.
@@ -161,10 +156,9 @@ public interface ExecutionContext {
     /**
      * Get the job id, if a job was claimed.
      *
-     * @return a job id or null a job was not claimed
+     * @return a job id or empty a job was not claimed
      */
-    @Nullable
-    String getClaimedJobId();
+    Optional<String> getClaimedJobId();
 
     /**
      * Set the job id of a successfully claimed job.

@@ -26,6 +26,7 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -55,21 +56,25 @@ class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Shutting down...");
 
-        try {
-            final JobSpecification jobSpecification = executionContext.getJobSpecification();
-            final String archiveLocation = jobSpecification.getArchiveLocation().orElse(null);
-            if (StringUtils.isNotBlank(archiveLocation)) {
-                log.info("Attempting to archive job folder to: " + archiveLocation);
-                archivalService.archive(
-                    executionContext.getJobDirectory().toPath(),
-                    new URI(archiveLocation)
-                );
-            } else {
-                log.info("Job folder archival location is empty. Skipping archiving the job folder.");
+        if (executionContext.getJobSpecification().isPresent()) {
+            final JobSpecification jobSpecification = executionContext.getJobSpecification().get();
+            if (jobSpecification.getArchiveLocation().isPresent()) {
+                final String archiveLocation = jobSpecification.getArchiveLocation().get();
+                if (StringUtils.isNotBlank(archiveLocation)
+                    && executionContext.getJobDirectory().isPresent()) {
+                    final File jobDirectory = executionContext.getJobDirectory().get();
+                    try {
+                        log.info("Attempting to archive job folder to: " + archiveLocation);
+                        archivalService.archive(
+                            jobDirectory.toPath(),
+                            new URI(archiveLocation)
+                        );
+                        log.info("Job folder archived to: " + archiveLocation);
+                    } catch (ArchivalException | URISyntaxException e) {
+                        log.error("Error archiving job folder", e);
+                    }
+                }
             }
-            log.info("Job folder archived to: " + archiveLocation);
-        } catch (ArchivalException | URISyntaxException e) {
-            log.error("Error archiving job folder", e);
         }
 
         return Events.SHUTDOWN_COMPLETE;

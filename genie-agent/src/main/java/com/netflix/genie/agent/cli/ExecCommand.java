@@ -103,7 +103,7 @@ class ExecCommand implements AgentCommand {
             throw new RuntimeException("Job execution error", firstActionErrorException);
         }
 
-        final JobStatus finalJobStatus = executionContext.getFinalJobStatus();
+        final JobStatus finalJobStatus = executionContext.getFinalJobStatus().get();
 
         if (finalJobStatus == null) {
             throw new RuntimeException("Unknown final job status");
@@ -137,7 +137,7 @@ class ExecCommand implements AgentCommand {
     void handleTerminationSignal() {
         UserConsole.getLogger().info(
             "Intercepted a signal, terminating job (status: {})",
-            executionContext.getCurrentJobStatus()
+            executionContext.getCurrentJobStatus().orElse(null)
         );
         killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
     }

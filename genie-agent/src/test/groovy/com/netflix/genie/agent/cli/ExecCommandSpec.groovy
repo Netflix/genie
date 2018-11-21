@@ -58,7 +58,7 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> JobStatus.SUCCEEDED
+        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.SUCCEEDED)
         exitCode == ExitCode.SUCCESS
     }
 
@@ -72,7 +72,7 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> null
+        1 * execContext.getFinalJobStatus() >> Optional.empty()
 
         thrown(RuntimeException.class)
     }
@@ -120,7 +120,7 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> JobStatus.FAILED
+        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.FAILED)
         exitCode == ExitCode.EXEC_FAIL
     }
 
@@ -134,7 +134,7 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> JobStatus.KILLED
+        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.KILLED)
         exitCode == ExitCode.EXEC_ABORTED
     }
 
@@ -148,7 +148,7 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> JobStatus.INVALID
+        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.INVALID)
 
         thrown(RuntimeException)
     }
@@ -163,7 +163,7 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> JobStatus.CLAIMED
+        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.CLAIMED)
 
         thrown(RuntimeException.class)
     }
@@ -190,7 +190,7 @@ class ExecCommandSpec extends Specification {
         execCommand.handleTerminationSignal()
 
         then:
-        1 * execContext.getCurrentJobStatus()
+        1 * execContext.getCurrentJobStatus() >> Optional.empty()
         1 * killService.kill(KillService.KillSource.SYSTEM_SIGNAL)
     }
 }

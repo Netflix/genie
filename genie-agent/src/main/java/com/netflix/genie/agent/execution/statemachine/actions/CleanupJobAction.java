@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Action performed when in state CLEANUP_JOB.
@@ -54,15 +55,15 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
         log.info("Cleaning up job...");
 
         // If execution was aborted sometimes before the job was launched, the server is due for a job status update.
-        final String claimedJobId = executionContext.getClaimedJobId();
-        final JobStatus finalJobStatus = executionContext.getFinalJobStatus();
-        if (claimedJobId != null && finalJobStatus == null) {
+        final Optional<String> claimedJobId = executionContext.getClaimedJobId();
+        final Optional<JobStatus> finalJobStatus = executionContext.getFinalJobStatus();
+        if (claimedJobId.isPresent() && !finalJobStatus.isPresent()) {
             // This job is tracked server-side (an ID was claimed), but the server was not updated with a final
             // status. The only path that leads to this state is a CANCEL_JOB_LAUNCH transition.
             try {
                 agentJobService.changeJobStatus(
-                    claimedJobId,
-                    executionContext.getCurrentJobStatus(),
+                    claimedJobId.get(),
+                    executionContext.getCurrentJobStatus().get(),
                     JobStatus.KILLED,
                     "Job aborted before process launch"
                 );
