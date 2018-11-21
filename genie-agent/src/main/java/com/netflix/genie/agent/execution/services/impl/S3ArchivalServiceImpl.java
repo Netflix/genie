@@ -22,6 +22,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.netflix.genie.agent.aws.s3.S3ClientFactory;
 import com.netflix.genie.agent.execution.exceptions.ArchivalException;
 import com.netflix.genie.agent.execution.services.ArchivalService;
 import com.netflix.genie.common.internal.jobs.JobConstants;
@@ -31,26 +32,38 @@ import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.net.URI;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
- * Implementation of ArchivalService for S3.
+ * Implementation of {@link ArchivalService} for S3 destinations.
  *
  * @author standon
+ * @author tgianos
  * @since 4.0.0
  */
 @Slf4j
-class S3ArchivalServiceImpl implements ArchivalService {
+/*
+ *  TODO: This implementation should be replaced with a single default implementation that uses the Spring
+ *        resource loader to get a Resource object which is an instance of WritableResource. Then use that to
+ *        write out the archive data. This would let us have one implementation that is automatically plugable
+ *        at a framework/classpath level and save us from hand rolling all our own implementations.
+ */
+public class S3ArchivalServiceImpl implements ArchivalService {
 
-    private final AmazonS3 amazonS3;
+    private final S3ClientFactory s3ClientFactory;
 
-    S3ArchivalServiceImpl(final AmazonS3 amazonS3) {
-        this.amazonS3 = amazonS3;
+    /**
+     * Constructor.
+     *
+     * @param s3ClientFactory The factory to use to get S3 client instances for a given S3 bucket.
+     */
+    public S3ArchivalServiceImpl(final S3ClientFactory s3ClientFactory) {
+        this.s3ClientFactory = s3ClientFactory;
     }
 
     /**
@@ -92,10 +105,25 @@ class S3ArchivalServiceImpl implements ArchivalService {
         @NotNull final URI targetURI
     ) throws ArchivalException {
         log.info("Archiving to location: {}", targetURI);
+
+        final AmazonS3URI s3URI;
         try {
-            Files.walkFileTree(path, new FileArchivalVisitor(path, amazonS3, new AmazonS3URI(targetURI)));
-        } catch (Exception e) {
-            log.info("Error archiving to location: {} ", targetURI);
+            s3URI = new AmazonS3URI(targetURI);
+        } catch (final IllegalArgumentException iae) {
+            log.error("{} is not a valid S3 URI", targetURI);
+            throw new ArchivalException(
+                "Error archiving " + path.toString() + " due to " + targetURI + " not being a valid S3 URI",
+                iae
+            );
+        }
+
+        try {
+            Files.walkFileTree(
+                path,
+                new FileArchivalVisitor(path, this.s3ClientFactory.getClient(s3URI), s3URI)
+            );
+        } catch (final Exception e) {
+            log.error("Error archiving to location: {} ", targetURI, e);
             throw new ArchivalException("Error archiving file: " + path.getFileName(), e);
         }
     }
@@ -111,6 +139,7 @@ class S3ArchivalServiceImpl implements ArchivalService {
 
         /**
          * Constructor.
+         *
          * @param root          Root of the directory being archived. For a regular file, path to the file
          * @param amazonS3      S3 client
          * @param rootTargetURI S3 uri where root should get archived

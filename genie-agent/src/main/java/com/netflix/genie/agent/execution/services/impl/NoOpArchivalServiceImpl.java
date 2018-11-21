@@ -32,7 +32,7 @@ import java.nio.file.Path;
  * @since 4.0.0
  */
 @Slf4j
-class NoOpArchivalServiceImpl implements ArchivalService {
+public class NoOpArchivalServiceImpl implements ArchivalService {
 
     /**
      * No archival is done.
