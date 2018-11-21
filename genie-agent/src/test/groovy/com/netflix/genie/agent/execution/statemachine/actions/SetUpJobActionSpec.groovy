@@ -241,13 +241,13 @@ class SetUpJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
@@ -308,13 +308,13 @@ class SetUpJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
@@ -371,10 +371,10 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String) >> { throw exception }
         def e = thrown(RuntimeException)
         e.getCause() == exception
@@ -385,12 +385,12 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getClaimedJobId() >> jobId
+        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> null
+        1 * executionContext.getJobSpecification() >> Optional.empty()
         def e = thrown(RuntimeException)
         e.getCause().getClass() == SetUpJobException
     }
@@ -403,12 +403,12 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         def e = thrown(RuntimeException)
         e.getCause().getClass() == SetUpJobException
     }
@@ -422,13 +422,13 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
@@ -446,12 +446,12 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         def e = thrown(RuntimeException)
@@ -466,12 +466,12 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
@@ -491,12 +491,12 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
@@ -523,12 +523,12 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getClaimedJobId() >> jobId
+        2 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * executionContext.getCurrentJobStatus() >> jobStatus
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(jobStatus)
         1 * agentJobService.changeJobStatus(jobId, jobStatus, JobStatus.INIT, _ as String)
-        1 * executionContext.getJobSpecification() >> spec
+        2 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
@@ -572,7 +572,7 @@ class SetUpJobActionSpec extends Specification {
 
         then:
         1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.NO_CLEANUP
-        1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
+        1 * executionContext.getJobDirectory() >> Optional.of(new File(temporaryFolder.getRoot(), jobId))
 
         allFiles.each {
             // Check all directories not deleted, even the empty dependencies one
@@ -617,7 +617,7 @@ class SetUpJobActionSpec extends Specification {
 
         then:
         1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.FULL_CLEANUP
-        1 * executionContext.getJobDirectory() >> jobDirectory
+        1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
 
         !jobDirectory.exists()
 
@@ -664,7 +664,7 @@ class SetUpJobActionSpec extends Specification {
 
         then:
         1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.DEPENDENCIES_CLEANUP
-        1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
+        1 * executionContext.getJobDirectory() >> Optional.of(new File(temporaryFolder.getRoot(), jobId))
 
         dependencies.each {
             // Check all dependencies deleted

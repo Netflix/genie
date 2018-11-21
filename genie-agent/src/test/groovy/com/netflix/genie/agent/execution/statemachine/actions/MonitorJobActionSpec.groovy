@@ -57,8 +57,8 @@ class MonitorJobActionSpec extends Specification {
 
         then:
         1 * launchJobService.waitFor() >> expectedJobStatus
-        1 * executionContext.getClaimedJobId() >> id
-        1 * executionContext.getCurrentJobStatus() >> currentJobStatus
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(currentJobStatus)
         1 * agentJobService.changeJobStatus(id, currentJobStatus, expectedJobStatus, _ as String)
         1 * executionContext.setCurrentJobStatus(expectedJobStatus)
         1 * executionContext.setFinalJobStatus(expectedJobStatus)
@@ -96,8 +96,8 @@ class MonitorJobActionSpec extends Specification {
 
         then:
         1 * launchJobService.waitFor() >> expectedJobStatus
-        1 * executionContext.getClaimedJobId() >> id
-        1 * executionContext.getCurrentJobStatus() >> currentJobStatus
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(currentJobStatus)
         1 * agentJobService.changeJobStatus(id, currentJobStatus, expectedJobStatus, _ as String) >> { throw exception }
         Exception e = thrown(RuntimeException)
         e.getCause() == exception

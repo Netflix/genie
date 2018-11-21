@@ -45,12 +45,12 @@ class ExecutionContextImplSpec extends Specification {
         String jobId = UUID.randomUUID().toString()
 
         expect:
-        null == executionContext.getJobDirectory()
-        null == executionContext.getJobSpecification()
-        null == executionContext.getJobEnvironment()
-        null == executionContext.getFinalJobStatus()
-        null == executionContext.getCurrentJobStatus()
-        null == executionContext.getClaimedJobId()
+        !executionContext.getJobDirectory().isPresent()
+        !executionContext.getJobSpecification().isPresent()
+        !executionContext.getJobEnvironment().isPresent()
+        !executionContext.getFinalJobStatus().isPresent()
+        !executionContext.getCurrentJobStatus().isPresent()
+        !executionContext.getClaimedJobId().isPresent()
         !executionContext.hasStateActionError()
         executionContext.getStateActionErrors().isEmpty()
         executionContext.getCleanupActions().isEmpty()
@@ -66,17 +66,17 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.setClaimedJobId(jobId)
 
         then:
-        directory == executionContext.getJobDirectory()
-        spec == executionContext.getJobSpecification()
-        env == executionContext.getJobEnvironment()
-        finalJobStatus == executionContext.getFinalJobStatus()
+        directory == executionContext.getJobDirectory().get()
+        spec == executionContext.getJobSpecification().get()
+        env == executionContext.getJobEnvironment().get()
+        finalJobStatus == executionContext.getFinalJobStatus().get()
         executionContext.hasStateActionError()
         1 == executionContext.getStateActionErrors().size()
         Triple.of(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception) == executionContext.getStateActionErrors().get(0)
         1 == executionContext.getCleanupActions().size()
         action1 == executionContext.getCleanupActions().get(0)
-        jobStatus == executionContext.getCurrentJobStatus()
-        jobId == executionContext.getClaimedJobId()
+        jobStatus == executionContext.getCurrentJobStatus().get()
+        jobId == executionContext.getClaimedJobId().get()
 
         when:
         executionContext.setJobDirectory(Mock(File))
@@ -135,7 +135,7 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.setFinalJobStatus(jobStatus)
 
         then:
-        jobStatus == executionContext.getFinalJobStatus()
+        jobStatus == executionContext.getFinalJobStatus().get()
 
         where:
         jobStatus           | _
