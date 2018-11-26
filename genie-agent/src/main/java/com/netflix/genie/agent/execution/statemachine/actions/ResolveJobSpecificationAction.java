@@ -126,6 +126,15 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
             executionContext.setCurrentJobStatus(JobStatus.RESOLVED);
         }
 
+        UserConsole.getLogger().info(
+            "Job request criteria resolved to command '{}' on cluster '{}'",
+            jobSpecification.getCommand().getId(),
+            jobSpecification.getCluster().getId()
+        );
+
+        // Update context
+        executionContext.setJobSpecification(jobSpecification);
+
         // Claim this job, excluding other agents from doing the same
         try {
             agentJobService.claimJob(jobId, agentClientMetadata);
@@ -137,7 +146,6 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
 
         // Update context
         executionContext.setCurrentJobStatus(JobStatus.CLAIMED);
-        executionContext.setJobSpecification(jobSpecification);
         executionContext.setClaimedJobId(jobId);
 
         return Events.RESOLVE_JOB_SPECIFICATION_COMPLETE;
