@@ -49,6 +49,8 @@ class ResolveJobSpecificationActionSpec extends Specification {
     AgentMetadata agentMetadata
     ResolveJobSpecificationAction action
     AgentJobRequest request
+    JobSpecification.ExecutionResource command
+    JobSpecification.ExecutionResource cluster
     JobSpecification spec
     String id
     String hostname = "host.foo.com"
@@ -72,8 +74,16 @@ class ResolveJobSpecificationActionSpec extends Specification {
                 converter
         )
         this.request = Mock(AgentJobRequest)
-        this.spec = Mock(JobSpecification)
-
+        this.command = Mock(JobSpecification.ExecutionResource) {
+            getId() >> "command-" + UUID.randomUUID().toString()
+        }
+        this.cluster = Mock(JobSpecification.ExecutionResource) {
+            getId() >> "cluster-" + UUID.randomUUID().toString()
+        }
+        this.spec = Mock(JobSpecification) {
+            getCommand() >> this.command
+            getCluster() >> this.cluster
+        }
         this.temporaryFolder.create()
         this.id = UUID.randomUUID().toString()
     }

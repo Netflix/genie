@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.services.impl;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
@@ -179,7 +180,7 @@ class LaunchJobServiceImpl implements LaunchJobService {
         int exitCode = 0;
         if (process != null) {
             exitCode = process.waitFor();
-            log.info("Job process completed with exit code: {}", exitCode);
+            UserConsole.getLogger().info("Job process terminated with exit code: {}", exitCode);
         }
 
         try {
