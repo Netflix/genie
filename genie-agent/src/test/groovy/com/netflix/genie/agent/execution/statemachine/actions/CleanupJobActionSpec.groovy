@@ -21,7 +21,6 @@ package com.netflix.genie.agent.execution.statemachine.actions
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
 import org.assertj.core.util.Lists
@@ -145,5 +144,37 @@ class CleanupJobActionSpec extends Specification {
             _ as String
         ) >> { throw new ChangeJobStatusException("test")}
         thrown(RuntimeException)
+    }
+
+
+    def "Pre and post action validation"() {
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+        1 * executionContext.getCurrentJobStatus() >> Optional.empty()
+
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.KILLED)
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
+        3 * executionContext.getFinalJobStatus() >> Optional.of(JobStatus.KILLED)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.KILLED)
     }
 }

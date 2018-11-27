@@ -37,6 +37,10 @@ class InitializeAction extends BaseStateAction implements StateAction.Initialize
         super(executionContext);
     }
 
+    @Override
+    protected void executePreActionValidation() {
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -45,5 +49,9 @@ class InitializeAction extends BaseStateAction implements StateAction.Initialize
         log.info("Initializing...");
 
         return Events.INITIALIZE_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
     }
 }

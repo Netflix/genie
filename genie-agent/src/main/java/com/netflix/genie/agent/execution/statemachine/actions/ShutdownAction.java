@@ -49,6 +49,10 @@ class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
         this.archivalService = archivalService;
     }
 
+    @Override
+    protected void executePreActionValidation() {
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -78,5 +82,9 @@ class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
         }
 
         return Events.SHUTDOWN_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
     }
 }

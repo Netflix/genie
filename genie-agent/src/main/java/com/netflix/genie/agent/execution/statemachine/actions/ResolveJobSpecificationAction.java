@@ -63,12 +63,18 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
         this.jobRequestConverter = jobRequestConverter;
     }
 
+    @Override
+    protected void executePreActionValidation() {
+        assertJobSpecificationNotPresent();
+        assertCurrentJobStatusNotPresent();
+        assertClaimedJobIdNotPresent();
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-
         log.info("Resolving job specification...");
 
         final JobSpecification jobSpecification;
@@ -149,5 +155,12 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
         executionContext.setClaimedJobId(jobId);
 
         return Events.RESOLVE_JOB_SPECIFICATION_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
+        assertJobSpecificationPresent();
+        assertClaimedJobIdPresent();
+        assertCurrentJobStatusEqual(JobStatus.CLAIMED);
     }
 }

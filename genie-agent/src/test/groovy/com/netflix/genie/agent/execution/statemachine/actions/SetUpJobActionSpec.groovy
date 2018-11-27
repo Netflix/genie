@@ -684,4 +684,24 @@ class SetUpJobActionSpec extends Specification {
         1 * killService.stop()
         1 * heartbeatService.stop()
     }
+
+    def "Pre and post action validation"() {
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.CLAIMED)
+        1 * executionContext.getJobSpecification() >> Optional.of(spec)
+        1 * executionContext.getJobDirectory() >> Optional.empty()
+        1 * executionContext.getJobEnvironment() >> Optional.empty()
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.INIT)
+        1 * executionContext.getJobDirectory() >> Optional.of(jobDir)
+        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnv)
+    }
 }
