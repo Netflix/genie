@@ -1,6 +1,12 @@
+apply plugin: "java-library"
+
 dependencies {
     /*******************************
-     * Compile Dependencies
+     * API Dependencies
+     *******************************/
+
+    /*******************************
+     * Implementation Dependencies
      *******************************/
 
     /*******************************

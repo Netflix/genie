@@ -5,15 +5,17 @@ dependencies {
      * API Dependencies
      *******************************/
 
+    api(project(":genie-proto"))
+    api(project(":genie-common"))
+    api(project(":genie-common-external"))
+
     /*******************************
      * Implementation Dependencies
      *******************************/
 
-     implementation("org.springframework:spring-context")
-     implementation(project(":genie-common"))
-     implementation(project(":genie-common-external"))
-     implementation(project(":genie-proto"))
-     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework:spring-context")
+    implementation("com.google.guava:guava")
+    implementation("org.apache.commons:commons-lang3")
 
     /*******************************
      * Provided Dependencies

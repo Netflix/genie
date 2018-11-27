@@ -1,3 +1,4 @@
+apply plugin: "java-library"
 apply plugin: "com.google.protobuf"
 
 ext {
@@ -7,13 +8,16 @@ ext {
 dependencies {
 
     /*******************************
-     * Compile Dependencies
+     * API Dependencies
      *******************************/
 
-    compile(project(":genie-common"))
-    compile("com.google.protobuf:protobuf-java")
-    compile("io.grpc:grpc-stub")
-    compile("io.grpc:grpc-protobuf")
+    api("com.google.protobuf:protobuf-java")
+    api("io.grpc:grpc-stub")
+    api("io.grpc:grpc-protobuf")
+
+    /*******************************
+     * Implementation Dependencies
+     *******************************/
 
     /*******************************
      * Provided Dependencies
