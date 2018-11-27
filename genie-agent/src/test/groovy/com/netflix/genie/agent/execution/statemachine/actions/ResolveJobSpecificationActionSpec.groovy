@@ -325,4 +325,22 @@ class ResolveJobSpecificationActionSpec extends Specification {
         expect:
         e.getCause() == exception
     }
+
+    def "Pre and post action validation"() {
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getJobSpecification() >> Optional.empty()
+        1 * executionContext.getCurrentJobStatus() >> Optional.empty()
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        1 * executionContext.getJobSpecification() >> Optional.of(Mock(JobSpecification))
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.CLAIMED)
+        1 * executionContext.getClaimedJobId() >> Optional.of(UUID.randomUUID().toString())
+    }
 }

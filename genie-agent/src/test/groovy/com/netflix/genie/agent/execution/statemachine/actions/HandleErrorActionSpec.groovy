@@ -91,4 +91,25 @@ class HandleErrorActionSpec extends Specification {
         thrown(exception.class)
     }
 
+    def "Pre and post action validation"() {
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+        1 * executionContext.getCurrentJobStatus() >> Optional.empty()
+
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.KILLED)
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        noExceptionThrown()
+    }
 }

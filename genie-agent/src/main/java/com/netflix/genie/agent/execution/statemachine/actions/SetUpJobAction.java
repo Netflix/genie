@@ -86,6 +86,15 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         this.cleanupArguments = cleanupArguments;
     }
 
+    @Override
+    protected void executePreActionValidation() {
+        assertClaimedJobIdPresent();
+        assertCurrentJobStatusEqual(JobStatus.CLAIMED);
+        assertJobSpecificationPresent();
+        assertJobDirectoryNotPresent();
+        assertJobEnvironmentNotPresent();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -93,7 +102,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     protected Events executeStateAction(
         final ExecutionContext executionContext
     ) {
-
         final String claimedJobId = executionContext.getClaimedJobId().get();
 
         heartbeatService.start(claimedJobId);
@@ -118,6 +126,13 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         }
 
         return Events.SETUP_JOB_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
+        assertCurrentJobStatusEqual(JobStatus.INIT);
+        assertJobDirectoryPresent();
+        assertJobEnvironmentPresent();
     }
 
     @Override

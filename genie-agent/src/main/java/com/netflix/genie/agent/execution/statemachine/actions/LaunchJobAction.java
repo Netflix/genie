@@ -54,12 +54,22 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         this.agentJobService = agentJobService;
     }
 
+    @Override
+    protected void executePreActionValidation() {
+        assertClaimedJobIdPresent();
+        assertCurrentJobStatusEqual(JobStatus.INIT);
+        assertJobSpecificationPresent();
+        assertJobDirectoryPresent();
+        assertJobEnvironmentPresent();
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Launching job...");
+
 
         final JobSpecification jobSpec = executionContext.getJobSpecification().get();
         final File jobDirectory = executionContext.getJobDirectory().get();
@@ -92,5 +102,10 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         }
 
         return Events.LAUNCH_JOB_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
+        assertCurrentJobStatusEqual(JobStatus.RUNNING);
     }
 }

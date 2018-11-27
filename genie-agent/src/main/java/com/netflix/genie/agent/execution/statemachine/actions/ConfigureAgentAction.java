@@ -35,6 +35,10 @@ class ConfigureAgentAction extends BaseStateAction implements StateAction.Config
         super(executionContext);
     }
 
+    @Override
+    protected void executePreActionValidation() {
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -43,5 +47,9 @@ class ConfigureAgentAction extends BaseStateAction implements StateAction.Config
         log.info("Configuring agent...");
         //TODO implement this action
         return Events.CONFIGURE_AGENT_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
     }
 }

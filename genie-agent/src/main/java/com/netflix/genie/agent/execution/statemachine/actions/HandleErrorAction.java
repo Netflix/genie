@@ -46,6 +46,11 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
         this.agentJobService = agentJobService;
     }
 
+    @Override
+    protected void executePreActionValidation() {
+        assertCurrentJobStatusPresentIfJobIdPresent();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -64,6 +69,8 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
                     JobStatus.FAILED,
                     "Setting failed status due to execution error"
                 );
+                executionContext.setCurrentJobStatus(JobStatus.FAILED);
+                executionContext.setFinalJobStatus(JobStatus.FAILED);
             } catch (ChangeJobStatusException e) {
                 log.error("Failed to update job status as part of execution error handling");
             }
@@ -76,5 +83,9 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
         }
 
         return Events.HANDLE_ERROR_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
     }
 }

@@ -146,4 +146,22 @@ class LaunchJobActionSpec extends Specification {
         def e = thrown(RuntimeException)
         e.getCause() == exception
     }
+
+    def "Pre and post action validation"() {
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.INIT)
+        1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
+        1 * executionContext.getJobDirectory() >> Optional.of(jobRunDirectory)
+        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
+    }
 }

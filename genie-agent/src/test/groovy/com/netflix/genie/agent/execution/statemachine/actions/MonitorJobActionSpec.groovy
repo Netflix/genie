@@ -102,4 +102,21 @@ class MonitorJobActionSpec extends Specification {
         Exception e = thrown(RuntimeException)
         e.getCause() == exception
     }
+
+    def "Pre and post action validation"() {
+        when:
+        action.executePreActionValidation()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.of(id)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.KILLED)
+        2 * executionContext.getFinalJobStatus() >> Optional.of(JobStatus.KILLED)
+    }
 }

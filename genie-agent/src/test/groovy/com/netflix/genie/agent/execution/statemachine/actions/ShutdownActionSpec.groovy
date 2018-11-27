@@ -124,4 +124,18 @@ class ShutdownActionSpec extends Specification {
         event == Events.SHUTDOWN_COMPLETE
     }
 
+
+    def "Pre and post action validation"() {
+        when:
+        action.executePreActionValidation()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        action.executePostActionValidation()
+
+        then:
+        noExceptionThrown()
+    }
 }

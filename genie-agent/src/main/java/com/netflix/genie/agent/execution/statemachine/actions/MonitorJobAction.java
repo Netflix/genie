@@ -48,6 +48,13 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
         this.launchJobService = launchJobService;
     }
 
+    @Override
+    protected void executePreActionValidation() {
+        assertClaimedJobIdPresent();
+        assertCurrentJobStatusEqual(JobStatus.RUNNING);
+        assertFinalJobStatusNotPresent();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -78,5 +85,10 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
         }
 
         return Events.MONITOR_JOB_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
+        assertFinalJobStatusPresentAndValid();
     }
 }

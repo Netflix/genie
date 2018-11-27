@@ -47,12 +47,18 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
         this.agentJobService = agentJobService;
     }
 
+    @Override
+    protected void executePreActionValidation() {
+        assertCurrentJobStatusPresentIfJobIdPresent();
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Cleaning up job...");
+
 
         // If execution was aborted sometimes before the job was launched, the server is due for a job status update.
         final Optional<String> claimedJobId = executionContext.getClaimedJobId();
@@ -95,5 +101,10 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
         }
 
         return Events.CLEANUP_JOB_COMPLETE;
+    }
+
+    @Override
+    protected void executePostActionValidation() {
+        assertFinalJobStatusPresentAndValidIfJobIdPresent();
     }
 }
