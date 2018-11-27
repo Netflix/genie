@@ -8,6 +8,13 @@ license {
 }
 
 dependencies {
+
+    /*******************************
+     * Annotation Processors
+     *******************************/
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
     /*******************************
      * Compile Dependencies
      *******************************/
