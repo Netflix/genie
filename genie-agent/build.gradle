@@ -25,7 +25,6 @@ dependencies {
 
     // Spring
     compile("org.springframework.boot:spring-boot-starter")
-    compile("org.springframework.cloud:spring-cloud-aws-context")
     compile("org.springframework.cloud:spring-cloud-starter-aws")
     compile("org.springframework.statemachine:spring-statemachine-core")
 
