@@ -102,7 +102,10 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     protected Events executeStateAction(
         final ExecutionContext executionContext
     ) {
+        log.info("Setting up job...");
+
         final String claimedJobId = executionContext.getClaimedJobId().get();
+        final JobSpecification jobSpecification = executionContext.getJobSpecification().get();
 
         heartbeatService.start(claimedJobId);
         killService.start(claimedJobId);
@@ -120,7 +123,16 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         }
 
         try {
-            performJobSetup(executionContext);
+            // Create folder structure
+            final File jobDirectory = setupJobDirectory(claimedJobId, jobSpecification);
+            executionContext.setJobDirectory(jobDirectory);
+
+            // Download dependencies, configurations, etc.
+            final List<File> setupFiles = downloadResources(jobSpecification, jobDirectory);
+
+            final Map<String, String> jobEnvironment = setupJobEnvironment(jobDirectory, jobSpecification, setupFiles);
+            executionContext.setJobEnvironment(jobEnvironment);
+
         } catch (final SetUpJobException e) {
             throw new RuntimeException("Failed to set up job", e);
         }
@@ -150,32 +162,32 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         heartbeatService.stop();
     }
 
-    private void performJobSetup(final ExecutionContext executionContext) throws SetUpJobException {
-
-        log.info("Setting up job...");
-
-        if (!executionContext.getJobSpecification().isPresent()) {
-            throw new SetUpJobException("Job specification not set");
-        }
-
-        final JobSpecification jobSpec = executionContext.getJobSpecification().get();
+    private File setupJobDirectory(
+        final String claimedJobId, final JobSpecification jobSpecification) throws SetUpJobException {
 
         // Create job directory
         final File jobDirectory = new File(
-            jobSpec.getJobDirectoryLocation(),
-            executionContext.getClaimedJobId().get()
+            jobSpecification.getJobDirectoryLocation(),
+            claimedJobId
         );
+
         createJobDirectory(jobDirectory);
-
-        executionContext.setJobDirectory(jobDirectory);
-
         // Create job directory structure
-        createJobDirectoryStructure(jobSpec, jobDirectory);
+        createJobDirectoryStructure(jobSpecification, jobDirectory);
 
-        final List<File> setupFiles = Lists.newArrayList();
+        return jobDirectory;
+    }
+
+    private List<File> downloadResources(
+        final JobSpecification jobSpecification,
+        final File jobDirectory
+    ) throws SetUpJobException {
+
+        final List<java.io.File> setupFiles = Lists.newArrayList();
 
         // Create download manifest for dependencies, configs, setup files for cluster, applications, command, job
-        final DownloadService.Manifest jobDownloadsManifest = createDownloadManifest(jobDirectory, jobSpec, setupFiles);
+        final DownloadService.Manifest jobDownloadsManifest =
+            createDownloadManifest(jobDirectory, jobSpecification, setupFiles);
 
         // Download all files into place
         try {
@@ -184,21 +196,29 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             throw new SetUpJobException("Failed to download job dependencies", e);
         }
 
+        return setupFiles;
+    }
+
+    private Map<String, String> setupJobEnvironment(
+        final File jobDirectory,
+        final JobSpecification jobSpecification,
+        final List<File> setupFiles
+    ) throws SetUpJobException {
+
         // Create additional environment variables
-        final Map<String, String> extraEnvironmentVariables = createAdditionalEnvironmentMap(jobDirectory, jobSpec);
+        final Map<String, String> extraEnvironmentVariables =
+            createAdditionalEnvironmentMap(jobDirectory, jobSpecification);
 
         // Source set up files and collect resulting environment variables into a file
         final File jobEnvironmentFile = createJobEnvironmentFile(
             jobDirectory,
             setupFiles,
-            jobSpec.getEnvironmentVariables(),
+            jobSpecification.getEnvironmentVariables(),
             extraEnvironmentVariables
         );
 
         // Collect environment variables into a map
-        final Map<String, String> jobEnvironment = createJobEnvironmentMap(jobEnvironmentFile);
-
-        executionContext.setJobEnvironment(jobEnvironment);
+        return createJobEnvironmentMap(jobEnvironmentFile);
     }
 
     private void createJobDirectory(
