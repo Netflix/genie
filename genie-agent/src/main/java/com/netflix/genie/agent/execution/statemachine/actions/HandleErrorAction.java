@@ -58,14 +58,14 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Handling execution error");
 
-        final Optional<JobStatus> currentJobStatus = executionContext.getCurrentJobStatus();
+        final Optional<JobStatus> finalJobStatus = executionContext.getFinalJobStatus();
         final Optional<String> claimedJobId = executionContext.getClaimedJobId();
 
-        if (currentJobStatus.isPresent() && claimedJobId.isPresent() && currentJobStatus.get().isActive()) {
+        if (claimedJobId.isPresent() && !finalJobStatus.isPresent()) {
             try {
                 agentJobService.changeJobStatus(
                     claimedJobId.get(),
-                    currentJobStatus.get(),
+                    executionContext.getCurrentJobStatus().get(),
                     JobStatus.FAILED,
                     "Setting failed status due to execution error"
                 );
@@ -74,12 +74,6 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
             } catch (ChangeJobStatusException e) {
                 log.error("Failed to update job status as part of execution error handling");
             }
-        } else {
-            log.warn(
-                "Skipping job status update while handling error (currentStatus: {}, claimedJobId: {})",
-                currentJobStatus,
-                claimedJobId
-            );
         }
 
         return Events.HANDLE_ERROR_COMPLETE;
