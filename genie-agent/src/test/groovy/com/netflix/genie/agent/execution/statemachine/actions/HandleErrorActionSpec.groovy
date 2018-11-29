@@ -46,9 +46,10 @@ class HandleErrorActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String)
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RESERVED)
+        1 * agentJobService.changeJobStatus(id, JobStatus.RESERVED, JobStatus.FAILED, _ as String)
 
         event == Events.HANDLE_ERROR_COMPLETE
     }
@@ -58,7 +59,7 @@ class HandleErrorActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getCurrentJobStatus() >> Optional.empty()
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
         1 * executionContext.getClaimedJobId() >> Optional.empty()
         0 * agentJobService.changeJobStatus(_, _, _, _)
 
@@ -70,6 +71,7 @@ class HandleErrorActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw new ChangeJobStatusException("...")}
@@ -84,6 +86,7 @@ class HandleErrorActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
+        1 * executionContext.getFinalJobStatus() >> Optional.empty()
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw exception}

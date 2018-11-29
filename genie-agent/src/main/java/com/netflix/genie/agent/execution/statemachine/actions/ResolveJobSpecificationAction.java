@@ -103,6 +103,8 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
                 throw new RuntimeException("Could not get specification for job " + jobId, e);
             }
 
+            executionContext.setClaimedJobId(jobId);
+
         } else {
             final AgentJobRequest agentJobRequest;
             try {
@@ -120,6 +122,7 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
                 throw new RuntimeException("Failed to issue job reservation", e);
             }
 
+            executionContext.setClaimedJobId(jobId);
             executionContext.setCurrentJobStatus(JobStatus.RESERVED);
 
             // Request server-side resolution
@@ -152,7 +155,6 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
 
         // Update context
         executionContext.setCurrentJobStatus(JobStatus.CLAIMED);
-        executionContext.setClaimedJobId(jobId);
 
         return Events.RESOLVE_JOB_SPECIFICATION_COMPLETE;
     }
