@@ -110,7 +110,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         try {
             this.agentJobService.changeJobStatus(
                 claimedJobId,
-                executionContext.getCurrentJobStatus().get(),
+                JobStatus.CLAIMED,
                 JobStatus.INIT,
                 "Setting up job"
             );

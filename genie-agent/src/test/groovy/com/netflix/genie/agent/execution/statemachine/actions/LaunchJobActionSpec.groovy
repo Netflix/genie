@@ -62,8 +62,6 @@ class LaunchJobActionSpec extends Specification {
     }
 
     def "Successful"() {
-        JobStatus currentJobStatus = JobStatus.INIT
-
         when:
         def event = action.executeStateAction(executionContext)
 
@@ -75,8 +73,7 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.isInteractive() >> interactive
         1 * launchJobService.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * executionContext.getCurrentJobStatus() >> Optional.of(currentJobStatus)
-        1 * agentJobService.changeJobStatus(id, currentJobStatus, JobStatus.RUNNING, _ as String)
+        1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.RUNNING)
 
         expect:
@@ -86,7 +83,6 @@ class LaunchJobActionSpec extends Specification {
     def "Successful with actual process"() {
         setup:
         process = new ProcessBuilder().command("echo").start()
-        JobStatus currentJobStatus = JobStatus.INIT
 
         when:
         def event = action.executeStateAction(executionContext)
@@ -99,8 +95,7 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.isInteractive() >> interactive
         1 * launchJobService.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * executionContext.getCurrentJobStatus() >> Optional.of(currentJobStatus)
-        1 * agentJobService.changeJobStatus(id, currentJobStatus, JobStatus.RUNNING, _ as String)
+        1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.RUNNING)
 
         expect:
@@ -119,7 +114,6 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
         1 * jobSpec.getCommandArgs() >> jobCommandLine
         1 * jobSpec.isInteractive() >> interactive
-        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.INIT)
         1 * launchJobService.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive) >> {throw exception}
         def e = thrown(RuntimeException)
         e.getCause() == exception
@@ -127,7 +121,6 @@ class LaunchJobActionSpec extends Specification {
 
     def "Change job status exception"() {
         Exception exception = new ChangeJobStatusException("")
-        JobStatus currentJobStatus = JobStatus.INIT
 
         when:
         action.executeStateAction(executionContext)
@@ -140,8 +133,7 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.isInteractive() >> interactive
         1 * launchJobService.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * executionContext.getCurrentJobStatus() >> Optional.of(currentJobStatus)
-        1 * agentJobService.changeJobStatus(id, currentJobStatus, JobStatus.RUNNING, _ as String) >> { throw exception }
+        1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String) >> { throw exception }
         0 * executionContext.setCurrentJobStatus(_)
         def e = thrown(RuntimeException)
         e.getCause() == exception
