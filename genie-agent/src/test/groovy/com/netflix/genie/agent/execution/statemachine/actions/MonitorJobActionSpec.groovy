@@ -50,16 +50,13 @@ class MonitorJobActionSpec extends Specification {
 
     @Unroll
     def "Successful #expectedJobStatus"() {
-        JobStatus currentJobStatus = JobStatus.RUNNING
-
         when:
         def event = action.executeStateAction(executionContext)
 
         then:
         1 * launchJobService.waitFor() >> expectedJobStatus
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * executionContext.getCurrentJobStatus() >> Optional.of(currentJobStatus)
-        1 * agentJobService.changeJobStatus(id, currentJobStatus, expectedJobStatus, _ as String)
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, expectedJobStatus, _ as String)
         1 * executionContext.setCurrentJobStatus(expectedJobStatus)
         1 * executionContext.setFinalJobStatus(expectedJobStatus)
 
@@ -87,7 +84,6 @@ class MonitorJobActionSpec extends Specification {
     }
 
     def "Change job status exception"() {
-        JobStatus currentJobStatus = JobStatus.RUNNING
         JobStatus expectedJobStatus = JobStatus.SUCCEEDED
         Exception exception = new ChangeJobStatusException("...")
 
@@ -97,8 +93,7 @@ class MonitorJobActionSpec extends Specification {
         then:
         1 * launchJobService.waitFor() >> expectedJobStatus
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * executionContext.getCurrentJobStatus() >> Optional.of(currentJobStatus)
-        1 * agentJobService.changeJobStatus(id, currentJobStatus, expectedJobStatus, _ as String) >> { throw exception }
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, expectedJobStatus, _ as String) >> { throw exception }
         Exception e = thrown(RuntimeException)
         e.getCause() == exception
     }

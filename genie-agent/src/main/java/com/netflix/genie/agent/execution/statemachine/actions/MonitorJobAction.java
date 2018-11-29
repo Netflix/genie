@@ -74,7 +74,7 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
         try {
             this.agentJobService.changeJobStatus(
                 executionContext.getClaimedJobId().get(),
-                executionContext.getCurrentJobStatus().get(),
+                JobStatus.RUNNING,
                 finalJobStatus,
                 "Job process completed with final status " + finalJobStatus
             );
