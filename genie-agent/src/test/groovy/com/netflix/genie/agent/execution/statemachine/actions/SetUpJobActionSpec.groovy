@@ -108,7 +108,6 @@ class SetUpJobActionSpec extends Specification {
 
     void setup() {
 
-        this.temporaryFolder.create()
         this.dummyFile = temporaryFolder.newFile()
 
         this.executionContext = Mock(ExecutionContext)

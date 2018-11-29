@@ -40,7 +40,6 @@ class LaunchJobServiceImplSpec extends Specification {
     File stdErr
 
     void setup() {
-        temporaryFolder.create()
         envMap = [:]
         stdOut = PathUtils.jobStdOutPath(temporaryFolder.getRoot()).toFile()
         stdErr = PathUtils.jobStdErrPath(temporaryFolder.getRoot()).toFile()
