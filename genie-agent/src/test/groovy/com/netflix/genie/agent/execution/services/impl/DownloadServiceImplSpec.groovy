@@ -45,7 +45,6 @@ class DownloadServiceImplSpec extends Specification {
     String fileContents = "Example content of a file in cache\n"
 
     void setup() {
-        temporaryFolder.create()
         cacheService = Mock()
         downloadService = new DownloadServiceImpl(cacheService)
         manifest = Mock()

@@ -66,7 +66,6 @@ class FetchingCacheServiceImplSpec extends Specification {
     }
 
     void setup() {
-        temporaryFolder.create()
         resourceLoader = Mock()
         cacheArguments = Mock()
         cacheArguments.getCacheDirectory() >> temporaryFolder.getRoot()

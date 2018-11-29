@@ -43,9 +43,6 @@ class ResolveJobSpecCommandSpec extends Specification {
     JobRequestConverter jobRequestConverter
 
     void setup() {
-        temporaryFolder = new TemporaryFolder()
-        temporaryFolder.create()
-
         commandArgs = Mock()
         service = Mock()
         jobRequestConverter = Mock()

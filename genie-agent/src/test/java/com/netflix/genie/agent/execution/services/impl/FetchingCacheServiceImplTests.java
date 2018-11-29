@@ -71,7 +71,6 @@ public class FetchingCacheServiceImplTests {
      */
     @Before
     public void setUp() throws Exception {
-        temporaryFolder.create();
         uri = new URI("https://my-server.com/path/to/config/config.xml");
         cacheArguments = Mockito.mock(ArgumentDelegates.CacheArguments.class);
         Mockito.when(

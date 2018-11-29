@@ -84,7 +84,6 @@ class ResolveJobSpecificationActionSpec extends Specification {
             getCommand() >> this.command
             getCluster() >> this.cluster
         }
-        this.temporaryFolder.create()
         this.id = UUID.randomUUID().toString()
     }
 
