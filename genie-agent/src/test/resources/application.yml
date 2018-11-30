@@ -1,4 +1,3 @@
-# TODO: Refine these properties to be more flexible via profiles to allow people to provide their own credentials
 cloud:
   aws:
     credentials:
