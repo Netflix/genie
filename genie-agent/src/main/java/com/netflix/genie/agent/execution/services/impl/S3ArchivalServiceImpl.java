@@ -83,9 +83,9 @@ public class S3ArchivalServiceImpl implements ArchivalService {
      * target uri - s3://bucketName/foo
      * <p>
      * following structure is created in S3
-     * s3://bucketName/foo/emptyDir/ -> empty content
-     * s3://bucketName/foo/file1 -> contents of file1
-     * s3://bucketName/foo/bar/file2 -> contents of file2
+     * s3://bucketName/foo/emptyDir/ contains empty content
+     * s3://bucketName/foo/file1 contains contents of file1
+     * s3://bucketName/foo/bar/file2 contains contents of file2
      * <p>
      * Example 2
      * <p>
@@ -93,7 +93,7 @@ public class S3ArchivalServiceImpl implements ArchivalService {
      * target uri - s3://bucketName/file1
      * <p>
      * following structure is created in S3
-     * s3://bucketName/file1 -> contents of file1
+     * s3://bucketName/file1 contains contents of file1
      *
      * @param path      path to file/directory to archive.
      * @param targetURI s3 archival location uri for the file/dir

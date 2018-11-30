@@ -25,6 +25,7 @@ import com.amazonaws.regions.Regions
 import com.netflix.genie.agent.aws.s3.S3ClientFactory
 import com.netflix.genie.agent.execution.services.impl.NoOpArchivalServiceImpl
 import com.netflix.genie.agent.execution.services.impl.S3ArchivalServiceImpl
+import org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -32,16 +33,18 @@ import spock.lang.Unroll
  * Specifications for {@link AwsAutoConfiguration}.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class AwsAutoConfigurationSpec extends Specification {
 
     @Unroll
     def "Can create the expected AwsRegionProvider instance when auto is #auto and static is #staticRegion"() {
         def config = new AwsAutoConfiguration()
+        def properties = new AwsRegionProperties()
 
         when:
-        def regionProvider = config.awsRegionProvider(auto, staticRegion)
+        properties.setAuto(auto)
+        properties.setStatic(staticRegion)
+        def regionProvider = config.awsRegionProvider(properties)
 
         then:
         if (!(regionProvider instanceof DefaultAwsRegionProviderChain)) {
