@@ -38,6 +38,9 @@ allprojects {
 
     repositories {
         jcenter()
+        maven {
+            url "https://repo.spring.io/snapshot"
+        }
     }
 }
 
@@ -416,7 +419,7 @@ task collectDocumentation(group: "documentation", description: "Copy the documen
 }
 
 gitPublish {
-    
+
     branch = "gh-pages"
 
     contents {
