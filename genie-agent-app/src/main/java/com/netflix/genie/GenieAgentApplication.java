@@ -17,7 +17,6 @@
  */
 package com.netflix.genie;
 
-import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.cli.Util;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -53,7 +52,7 @@ public class GenieAgentApplication {
      * @param args command-line arguments
      */
     public static void main(final String[] args) {
-        UserConsole.getLogger().info("Starting Genie Agent");
+        System.err.println("Starting Genie Agent");
         System.exit(new GenieAgentApplication().run(args));
     }
 
