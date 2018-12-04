@@ -49,6 +49,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -535,7 +536,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
      * @return archive location for the job
      */
     private String toArchiveLocation(
-        final String requestedArchiveLocationPrefix,
+        @Nullable final String requestedArchiveLocationPrefix,
         final String jobId
     ) {
         if (StringUtils.isBlank(requestedArchiveLocationPrefix)) {
