@@ -30,9 +30,6 @@ import org.springframework.cloud.aws.context.annotation.ConditionalOnAwsCloudEnv
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 /**
  * Beans and configuration specifically for MVC on AWS.
  *
@@ -51,26 +48,14 @@ public class GenieAwsApiAutoConfiguration {
      * environment.
      *
      * @return The {@link GenieHostInfo} instance
-     * @throws UnknownHostException  If all EC2 host instance calculation AND local resolution can't determine a
-     *                               hostname
      * @throws IllegalStateException If an instance can't be created
      */
     @Bean
     @ConditionalOnMissingBean(GenieHostInfo.class)
-    public GenieHostInfo genieHostInfo() throws UnknownHostException {
-        final String ec2LocalHostName = EC2MetadataUtils.getLocalHostName();
-        if (StringUtils.isNotBlank(ec2LocalHostName)) {
-            return new GenieHostInfo(ec2LocalHostName);
-        }
-
+    public GenieHostInfo genieHostInfo() {
         final String ec2Ipv4Address = EC2MetadataUtils.getPrivateIpAddress();
         if (StringUtils.isNotBlank(ec2Ipv4Address)) {
             return new GenieHostInfo(ec2Ipv4Address);
-        }
-
-        final String localHostname = InetAddress.getLocalHost().getCanonicalHostName();
-        if (StringUtils.isNotBlank(localHostname)) {
-            return new GenieHostInfo(localHostname);
         }
 
         throw new IllegalStateException("Unable to resolve Genie host info");
