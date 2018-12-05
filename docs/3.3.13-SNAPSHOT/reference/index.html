@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.3.13-SNAPSHOT,</span>
-<span id="revdate">2018-07-12</span>
+<span id="revdate">2018-12-05</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4687,8 +4687,13 @@ to work.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.activeLimit.count</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.activeLimit.enabled</code> is set to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This property is ignored unless <code>genie.jobs.users.activeLimit.enabled</code> is set to true. This limit applies to users that don&#8217;t have an override set via <code>genie.jobs.users.activeLimit.overrides.&lt;user-name&gt;</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.activeLimit.overrides.&lt;user-name&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs that user 'user-name' is allowed to have. This property is ignored unless <code>genie.jobs.users.activeLimit.enabled</code> is set to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completionCheckBackOff.minInterval</p></td>
@@ -5863,7 +5868,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.3.13-SNAPSHOT<br>
-Last updated 2018-07-12 22:13:04 UTC
+Last updated 2018-12-05 22:46:31 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
