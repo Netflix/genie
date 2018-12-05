@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.core.properties;
 
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
+import java.util.Map;
 
 /**
  * Properties related to user limits in number of active jobs.
@@ -46,4 +48,9 @@ public class JobsUsersActiveLimitProperties {
     private boolean enabled = DEFAULT_ENABLED;
     @Min(value = 1)
     private int count = DEFAULT_COUNT;
+    private Map<String, Integer> specialUser = Maps.newHashMap();
+
+    public int getUserLimit(final String user) {
+        return specialUser.getOrDefault(user, count);
+    }
 }

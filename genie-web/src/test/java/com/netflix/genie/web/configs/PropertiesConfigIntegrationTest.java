@@ -68,6 +68,9 @@ public class PropertiesConfigIntegrationTest {
         Assert.assertThat(jobsProperties.getUsers().isCreationEnabled(), Matchers.is(true));
         Assert.assertThat(jobsProperties.getUsers().getActiveLimit().isEnabled(), Matchers.is(true));
         Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getCount(), Matchers.is(15));
+        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("Jane"), Matchers.is(100));
+        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("John"), Matchers.is(200));
+        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("not-special"), Matchers.is(15));
 
         Assert.assertNotNull(dataServiceRetryProperties);
         Assert.assertThat(dataServiceRetryProperties.getInitialInterval(), Matchers.is(200L));
