@@ -24,9 +24,11 @@ import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
 import org.apache.curator.framework.CuratorFramework;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.zookeeper.ZookeeperAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.zookeeper.config.LeaderInitiatorFactoryBean;
@@ -45,6 +47,11 @@ import java.util.Collection;
     {
         LeadershipProperties.class,
         ZookeeperLeadershipProperties.class
+    }
+)
+@AutoConfigureAfter(
+    {
+        ZookeeperAutoConfiguration.class
     }
 )
 public class GenieLeadershipAutoConfiguration {
@@ -75,7 +82,7 @@ public class GenieLeadershipAutoConfiguration {
      * @return The factory bean
      */
     @Bean
-    @ConditionalOnProperty(value = "spring.cloud.zookeeper.enabled", havingValue = "true")
+    @ConditionalOnBean(CuratorFramework.class)
     public LeaderInitiatorFactoryBean leaderInitiatorFactory(
         final CuratorFramework client,
         final ZookeeperLeadershipProperties zookeeperLeadershipProperties
@@ -88,7 +95,7 @@ public class GenieLeadershipAutoConfiguration {
     }
 
     /**
-     * If Spring Zookeeper Leadership is disabled and this node is forced to be the leader create the local leader
+     * If Zookeeper isn't available and this node is forced to be the leader create the local leader
      * bean which will fire appropriate events.
      *
      * @param genieEventBus        The genie event bus implementation to use
@@ -96,7 +103,7 @@ public class GenieLeadershipAutoConfiguration {
      * @return The local leader bean
      */
     @Bean
-    @ConditionalOnProperty(value = "spring.cloud.zookeeper.enabled", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnMissingBean(CuratorFramework.class)
     public LocalLeader localLeader(
         final GenieEventBus genieEventBus,
         final LeadershipProperties leadershipProperties
