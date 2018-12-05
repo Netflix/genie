@@ -147,8 +147,12 @@ to work.
 |false
 
 |genie.jobs.users.active-limit.count
-|The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true.
+|The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true. This limit applies to users that don't have an override set via `genie.jobs.users.active-limit.overrides.<user-name>`.
 |100
+
+|genie.jobs.users.active-limit.overrides.<user-name>
+|The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true.
+|-
 
 |genie.jobs.completion-check-back-off.min-interval
 |The minimum time between checks for job completion in milliseconds. Must be greater than zero.
