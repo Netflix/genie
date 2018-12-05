@@ -24,8 +24,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
-import java.net.UnknownHostException;
+import org.springframework.cloud.aws.context.support.env.AwsCloudEnvironmentCheckUtils;
 
 /**
  * Unit tests for the {@link GenieAwsApiAutoConfiguration} class.
@@ -47,13 +46,21 @@ public class GenieAwsApiAutoConfigurationUnitTests {
     }
 
     /**
-     * Make sure we can get the {@link GenieHostInfo} instance even if EC2 metadata fails.
-     *
-     * @throws UnknownHostException When the fallback fails
+     * Make sure we can get the {@link GenieHostInfo}.
      */
     @Test
-    public void canGetGenieHostInfo() throws UnknownHostException {
-        final GenieHostInfo genieHostInfo = this.genieAwsApiAutoConfiguration.genieHostInfo();
-        Assert.assertThat(genieHostInfo.getHostname(), Matchers.notNullValue());
+    public void canGetGenieHostInfo() {
+        // Check to see if EC2 is available
+        if (AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment()) {
+            final GenieHostInfo genieHostInfo = this.genieAwsApiAutoConfiguration.genieHostInfo();
+            Assert.assertThat(genieHostInfo.getHostname(), Matchers.notNullValue());
+        } else {
+            try {
+                this.genieAwsApiAutoConfiguration.genieHostInfo();
+                Assert.fail("This test wasn't run on a box with AWS credentials and yet got an unexpected success");
+            } catch (final IllegalStateException ise) {
+                // Expected
+            }
+        }
     }
 }
