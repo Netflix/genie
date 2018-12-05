@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.web.properties;
 
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
+import java.util.Map;
 
 /**
  * Properties related to user limits in number of active jobs.
@@ -60,4 +62,16 @@ public class JobsUsersActiveLimitProperties {
 
     @Min(value = 1)
     private int count = DEFAULT_COUNT;
+    private Map<String, Integer> overrides = Maps.newHashMap();
+
+    /**
+     * Get the maximum number of jobs a user is allowed to run concurrently.
+     * Checks whether the user has a special limit associated, and if not it returns the global default.
+     *
+     * @param user the user name
+     * @return the maximum number of jobs
+     */
+    public int getUserLimit(final String user) {
+        return overrides.getOrDefault(user, count);
+    }
 }

@@ -229,7 +229,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             log.info("Checking if can run job {} from user {}", jobRequest.getId(), jobRequest.getUser());
             final JobsUsersActiveLimitProperties activeLimit = this.jobsProperties.getUsers().getActiveLimit();
             if (activeLimit.isEnabled()) {
-                final long activeJobsLimit = activeLimit.getCount();
+                final long activeJobsLimit = activeLimit.getUserLimit(jobRequest.getUser());
                 final long activeJobsCount = this.jobSearchService.getActiveJobCountForUser(jobRequest.getUser());
                 if (activeJobsCount >= activeJobsLimit) {
                     throw GenieUserLimitExceededException.createForActiveJobsLimit(
