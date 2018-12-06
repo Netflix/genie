@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-12-05</span>
+<span id="revdate">2018-12-06</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4972,8 +4972,13 @@ to work.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.active-limit.count</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true. This limit applies to users that don&#8217;t have an override set via <code>genie.jobs.users.active-limit.overrides.&lt;user-name&gt;</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.active-limit.overrides.&lt;user-name&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.min-interval</p></td>
@@ -6200,7 +6205,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-12-05 21:47:25 UTC
+Last updated 2018-12-06 23:33:34 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
