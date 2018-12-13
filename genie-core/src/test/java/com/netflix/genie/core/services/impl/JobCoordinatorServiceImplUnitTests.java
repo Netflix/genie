@@ -36,6 +36,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -59,6 +60,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.ObjectFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -100,6 +102,8 @@ public class JobCoordinatorServiceImplUnitTests {
     private ClusterLoadBalancer clusterLoadBalancer3;
     private ClusterLoadBalancer clusterLoadBalancer4;
     private JobsProperties jobsProperties;
+    private ObjectFactory<JobsUsersActiveLimitProperties> jobsUsersActiveLimitPropertiesProvider;
+    private JobsUsersActiveLimitProperties jobsUsersActiveLimitProperties;
     @Captor
     private ArgumentCaptor<Map<String, String>> tagsCaptor;
     private Id coordinationTimerId;
@@ -131,7 +135,9 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobsProperties = new JobsProperties();
         this.jobsProperties.getLocations().setArchives(BASE_ARCHIVE_LOCATION);
         this.jobsProperties.getMemory().setDefaultJobMemory(MEMORY);
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
+        this.jobsUsersActiveLimitProperties = new JobsUsersActiveLimitProperties();
+        this.jobsUsersActiveLimitProperties.setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
+        this.jobsUsersActiveLimitPropertiesProvider = Mockito.mock(ObjectFactory.class);
         this.applicationService = Mockito.mock(ApplicationService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
         this.commandService = Mockito.mock(CommandService.class);
@@ -228,11 +234,16 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.timer(clusterCommandQueryTimerId))
             .thenReturn(this.clusterCommandQueryTimer);
 
+        Mockito
+            .when(jobsUsersActiveLimitPropertiesProvider.getObject())
+            .thenReturn(jobsUsersActiveLimitProperties);
+
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
             this.jobKillService,
             this.jobStateService,
             this.jobsProperties,
+            this.jobsUsersActiveLimitPropertiesProvider,
             this.applicationService,
             this.jobSearchService,
             this.clusterService,
@@ -884,8 +895,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test
     public void canCoordinateJobUserJobLimitIsDisabled() throws GenieException {
         final int userActiveJobsLimit = 5;
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(false);
-        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+        this.jobsUsersActiveLimitProperties.setEnabled(false);
+        this.jobsUsersActiveLimitProperties.setCount(userActiveJobsLimit);
 
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -976,8 +987,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test(expected = GenieUserLimitExceededException.class)
     public void cantCoordinateJobUserJobLimitIsExceeded() throws GenieException {
         final int userActiveJobsLimit = 5;
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(true);
-        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+        this.jobsUsersActiveLimitProperties.setEnabled(true);
+        this.jobsUsersActiveLimitProperties.setCount(userActiveJobsLimit);
 
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),

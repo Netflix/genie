@@ -55,6 +55,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.aop.TargetClassAware;
+import org.springframework.beans.factory.ObjectFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -92,6 +93,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final CommandService commandService;
     private final List<ClusterLoadBalancer> clusterLoadBalancers;
     private final JobsProperties jobsProperties;
+    private final ObjectFactory<JobsUsersActiveLimitProperties> jobsUsersActiveLimitPropertiesProvider;
     private final String hostName;
 
     // Metrics
@@ -109,24 +111,28 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     /**
      * Constructor.
      *
-     * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobKillService        The job kill service to use
-     * @param jobStateService       The service where we report the job state and keep track of various metrics about
-     *                              jobs currently running
-     * @param jobsProperties        The jobs properties to use
-     * @param applicationService    Implementation of application service interface
-     * @param jobSearchService      Implementation of job search service
-     * @param clusterService        Implementation of cluster service interface
-     * @param commandService        Implementation of command service interface
-     * @param clusterLoadBalancers  Implementations of the cluster load balancer interface in invocation order
-     * @param registry              The registry
-     * @param hostName              The name of the host this Genie instance is running on
+     * @param jobPersistenceService                  implementation of job persistence service interface
+     * @param jobKillService                         The job kill service to use
+     * @param jobStateService                        The service where we report the job state and keep track of various
+     *                                               metrics about
+     *                                               jobs currently running
+     * @param jobsProperties                         The jobs properties to use
+     * @param jobsUsersActiveLimitPropertiesProvider The jobs user limits dynamic properties provider
+     * @param applicationService                     Implementation of application service interface
+     * @param jobSearchService                       Implementation of job search service
+     * @param clusterService                         Implementation of cluster service interface
+     * @param commandService                         Implementation of command service interface
+     * @param clusterLoadBalancers                   Implementations of the cluster load balancer interface in
+     *                                               invocation order
+     * @param registry                               The registry
+     * @param hostName                               The name of the host this Genie instance is running on
      */
     public JobCoordinatorServiceImpl(
         @NotNull final JobPersistenceService jobPersistenceService,
         @NotNull final JobKillService jobKillService,
         @NotNull final JobStateService jobStateService,
         @NotNull final JobsProperties jobsProperties,
+        @NotNull final ObjectFactory<JobsUsersActiveLimitProperties> jobsUsersActiveLimitPropertiesProvider,
         @NotNull final ApplicationService applicationService,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final ClusterService clusterService,
@@ -138,6 +144,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         this.jobPersistenceService = jobPersistenceService;
         this.jobKillService = jobKillService;
         this.jobStateService = jobStateService;
+        this.jobsUsersActiveLimitPropertiesProvider = jobsUsersActiveLimitPropertiesProvider;
         this.applicationService = applicationService;
         this.jobSearchService = jobSearchService;
         this.clusterService = clusterService;
@@ -243,7 +250,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             }
 
             log.info("Checking if can run job {} from user {}", jobRequest.getId(), jobRequest.getUser());
-            final JobsUsersActiveLimitProperties activeLimit = this.jobsProperties.getUsers().getActiveLimit();
+            final JobsUsersActiveLimitProperties activeLimit = this.jobsUsersActiveLimitPropertiesProvider.getObject();
             if (activeLimit.isEnabled()) {
                 final long activeJobsLimit = activeLimit.getUserLimit(jobRequest.getUser());
                 final long activeJobsCount = this.jobSearchService.getActiveJobCountForUser(jobRequest.getUser());

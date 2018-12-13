@@ -35,6 +35,7 @@ import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobSearchServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaTagServiceImpl;
 import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
@@ -63,6 +64,7 @@ import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
@@ -368,17 +370,19 @@ public class ServicesConfig {
     /**
      * Get an instance of the JobCoordinatorService.
      *
-     * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobKillService        The job kill service to use
-     * @param jobStateService       The running job metrics service to use
-     * @param jobSearchService      Implementation of job search service interface
-     * @param jobsProperties        The jobs properties to use
-     * @param applicationService    Implementation of application service interface
-     * @param clusterService        Implementation of cluster service interface
-     * @param commandService        Implementation of command service interface
-     * @param clusterLoadBalancers  Implementations of the cluster load balancer interface in invocation order
-     * @param registry              The metrics registry to use
-     * @param hostName              The host this Genie instance is running on
+     * @param jobPersistenceService                  implementation of job persistence service interface
+     * @param jobKillService                         The job kill service to use
+     * @param jobStateService                        The running job metrics service to use
+     * @param jobSearchService                       Implementation of job search service interface
+     * @param jobsProperties                         The jobs properties to use
+     * @param jobsUsersActiveLimitPropertiesProvider The user limits dynamic properties provider
+     * @param applicationService                     Implementation of application service interface
+     * @param clusterService                         Implementation of cluster service interface
+     * @param commandService                         Implementation of command service interface
+     * @param clusterLoadBalancers                   Implementations of the cluster load balancer interface in
+     *                                               invocation order
+     * @param registry                               The metrics registry to use
+     * @param hostName                               The host this Genie instance is running on
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
@@ -388,6 +392,7 @@ public class ServicesConfig {
         @Qualifier("jobMonitoringCoordinator") final JobStateService jobStateService,
         final JobSearchService jobSearchService,
         final JobsProperties jobsProperties,
+        final ObjectFactory<JobsUsersActiveLimitProperties> jobsUsersActiveLimitPropertiesProvider,
         final ApplicationService applicationService,
         final ClusterService clusterService,
         final CommandService commandService,
@@ -403,6 +408,7 @@ public class ServicesConfig {
             jobKillService,
             jobStateService,
             jobsProperties,
+            jobsUsersActiveLimitPropertiesProvider,
             applicationService,
             jobSearchService,
             clusterService,
