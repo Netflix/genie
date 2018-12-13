@@ -53,7 +53,7 @@ public interface ExecutionContext {
      *
      * @param jobDirectory the job directory
      */
-    void setJobDirectory(final File jobDirectory);
+    void setJobDirectory(File jobDirectory);
 
     /**
      * Get the job specification.
@@ -67,7 +67,7 @@ public interface ExecutionContext {
      *
      * @param jobSpecification the job specification
      */
-    void setJobSpecification(final JobSpecification jobSpecification);
+    void setJobSpecification(JobSpecification jobSpecification);
 
     /**
      * Get the environment variables map for the job process.
@@ -81,7 +81,7 @@ public interface ExecutionContext {
      *
      * @param jobEnvironment a map of environment variables and their value to be passed to the job process at launch
      */
-    void setJobEnvironment(final Map<String, String> jobEnvironment);
+    void setJobEnvironment(Map<String, String> jobEnvironment);
 
     /**
      * Enqueue cleanup for a state action.
@@ -106,9 +106,9 @@ public interface ExecutionContext {
      * @param exception   the exception thrown by the state action
      */
     void addStateActionError(
-        final States state,
-        final Class<? extends Action> actionClass,
-        final Exception exception
+        States state,
+        Class<? extends Action> actionClass,
+        Exception exception
     );
 
     /**
@@ -126,18 +126,18 @@ public interface ExecutionContext {
     List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors();
 
     /**
-     * Get the final job status, if one was set.
+     * Get the job status, if one was set.
      *
-     * @return the final job status if set, or empty
+     * @return the job status if set, or empty
      */
     Optional<JobStatus> getFinalJobStatus();
 
     /**
-     * Set the final job status.
+     * Set the job status.
      *
-     * @param jobStatus the final job status
+     * @param jobStatus the job status
      */
-    void setFinalJobStatus(final JobStatus jobStatus);
+    void setFinalJobStatus(JobStatus jobStatus);
 
     /**
      * Get the current job status.
@@ -151,7 +151,7 @@ public interface ExecutionContext {
      *
      * @param jobStatus the job status
      */
-    void setCurrentJobStatus(final JobStatus jobStatus);
+    void setCurrentJobStatus(JobStatus jobStatus);
 
     /**
      * Get the job id, if a job was claimed.

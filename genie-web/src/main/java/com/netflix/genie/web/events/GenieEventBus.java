@@ -33,12 +33,12 @@ public interface GenieEventBus {
      *
      * @param event The event to publish
      */
-    void publishSynchronousEvent(@NonNull final ApplicationEvent event);
+    void publishSynchronousEvent(@NonNull ApplicationEvent event);
 
     /**
      * Publish an event in a different thread than the calling thread.
      *
      * @param event The event to publish
      */
-    void publishAsynchronousEvent(@NonNull final ApplicationEvent event);
+    void publishAsynchronousEvent(@NonNull ApplicationEvent event);
 }

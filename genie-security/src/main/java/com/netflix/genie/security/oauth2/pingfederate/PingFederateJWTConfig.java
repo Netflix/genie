@@ -82,7 +82,7 @@ public class PingFederateJWTConfig {
 
         if (keyValue.startsWith(certBegin)) {
             // X.509 cert
-            try (final ByteArrayInputStream bis = new ByteArrayInputStream(keyValue.getBytes("UTF-8"))) {
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(keyValue.getBytes("UTF-8"))) {
                 final CertificateFactory fact = CertificateFactory.getInstance("X.509");
                 final X509Certificate cer = (X509Certificate) fact.generateCertificate(bis);
                 return cer.getPublicKey();

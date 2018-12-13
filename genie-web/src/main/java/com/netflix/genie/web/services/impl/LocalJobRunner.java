@@ -220,7 +220,7 @@ public class LocalJobRunner implements JobSubmitterService {
                     log.warn("Init failure details file exists");
                 }
                 try (
-                    final PrintWriter p = new PrintWriter(new OutputStreamWriter(
+                    PrintWriter p = new PrintWriter(new OutputStreamWriter(
                         new FileOutputStream(detailsFile), StandardCharsets.UTF_8)
                     )
                 ) {
@@ -312,7 +312,7 @@ public class LocalJobRunner implements JobSubmitterService {
 
     private JobExecution executeJob(final Map<String, Object> context, final File runScript) throws GenieException {
         final long start = System.nanoTime();
-        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), StandardCharsets.UTF_8)) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), StandardCharsets.UTF_8)) {
             final String jobId = ((JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY))
                 .getJobRequest()
                 .getId()

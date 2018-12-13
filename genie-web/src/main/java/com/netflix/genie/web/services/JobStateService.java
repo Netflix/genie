@@ -37,7 +37,7 @@ public interface JobStateService extends JobMetricsService {
      *
      * @param jobId job id
      */
-    void init(final String jobId);
+    void init(String jobId);
 
     /**
      * Schedules the job.
@@ -50,12 +50,12 @@ public interface JobStateService extends JobMetricsService {
      * @param memory       job memory
      */
     void schedule(
-        final String jobId,
-        final JobRequest jobRequest,
-        final Cluster cluster,
-        final Command command,
-        final List<Application> applications,
-        final int memory
+        String jobId,
+        JobRequest jobRequest,
+        Cluster cluster,
+        Command command,
+        List<Application> applications,
+        int memory
     );
 
     /**
@@ -64,7 +64,7 @@ public interface JobStateService extends JobMetricsService {
      * @param jobId job id
      * @throws GenieException on unrecoverable error
      */
-    void done(final String jobId) throws GenieException;
+    void done(String jobId) throws GenieException;
 
     /**
      * Returns true if the job exists locally.
@@ -72,5 +72,5 @@ public interface JobStateService extends JobMetricsService {
      * @param jobId job id
      * @return true if job exists
      */
-    boolean jobExists(final String jobId);
+    boolean jobExists(String jobId);
 }

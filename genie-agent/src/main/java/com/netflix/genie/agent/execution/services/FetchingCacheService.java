@@ -42,7 +42,7 @@ public interface FetchingCacheService {
      * @throws DownloadException if the resource is not found or fails to download
      * @throws IOException       if downloading or copying the file to destination fails
      */
-    void get(final URI sourceFileUri, final File destinationFile) throws DownloadException, IOException;
+    void get(URI sourceFileUri, File destinationFile) throws DownloadException, IOException;
 
     /**
      * Download a given set of resources (if not already cached) and copy them to the specified destinations.
@@ -51,5 +51,5 @@ public interface FetchingCacheService {
      * @throws DownloadException if the resource is not found or fails to download
      * @throws IOException       if downloading or copying the file to destination fails
      */
-    void get(final Set<Pair<URI, File>> sourceDestinationPairs) throws DownloadException, IOException;
+    void get(Set<Pair<URI, File>> sourceDestinationPairs) throws DownloadException, IOException;
 }

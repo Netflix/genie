@@ -53,7 +53,7 @@ public interface ApplicationPersistenceService {
      */
     String createApplication(
         @NotNull(message = "No application entered to create.")
-        @Valid final ApplicationRequest applicationRequest
+        @Valid ApplicationRequest applicationRequest
     ) throws GenieException;
 
     /**
@@ -64,7 +64,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     Application getApplication(
-        @NotBlank(message = "No id entered. Unable to get") final String id
+        @NotBlank(message = "No id entered. Unable to get") String id
     ) throws GenieException;
 
     /**
@@ -79,12 +79,12 @@ public interface ApplicationPersistenceService {
      * @return The page of found applications
      */
     Page<Application> getApplications(
-        @Nullable final String name,
-        @Nullable final String user,
-        @Nullable final Set<ApplicationStatus> statuses,
-        @Nullable final Set<String> tags,
-        @Nullable final String type,
-        final Pageable pageable
+        @Nullable String name,
+        @Nullable String user,
+        @Nullable Set<ApplicationStatus> statuses,
+        @Nullable Set<String> tags,
+        @Nullable String type,
+        Pageable pageable
     );
 
     /**
@@ -96,9 +96,9 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void updateApplication(
-        @NotBlank(message = "No application id entered. Unable to update.") final String id,
+        @NotBlank(message = "No application id entered. Unable to update.") String id,
         @NotNull(message = "No application information entered. Unable to update.")
-        @Valid final Application updateApp
+        @Valid Application updateApp
     ) throws GenieException;
 
     /**
@@ -108,7 +108,7 @@ public interface ApplicationPersistenceService {
      * @param patch The json patch to use to update the given application
      * @throws GenieException if there is an error
      */
-    void patchApplication(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException;
+    void patchApplication(@NotBlank String id, @NotNull JsonPatch patch) throws GenieException;
 
     /**
      * Delete all applications from database.
@@ -124,7 +124,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void deleteApplication(
-        @NotBlank(message = "No application id entered. Unable to delete.") final String id
+        @NotBlank(message = "No application id entered. Unable to delete.") String id
     ) throws GenieException;
 
     // TODO: Look into removing all these extraneous APIs
@@ -138,8 +138,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void addConfigsToApplication(
-        @NotBlank(message = "No application id entered. Unable to add configurations.") final String id,
-        @NotEmpty(message = "No configuration files entered.") final Set<String> configs
+        @NotBlank(message = "No application id entered. Unable to add configurations.") String id,
+        @NotEmpty(message = "No configuration files entered.") Set<String> configs
     ) throws GenieException;
 
     /**
@@ -152,7 +152,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     Set<String> getConfigsForApplication(
-        @NotBlank(message = "No application id entered. Unable to get configs.") final String id
+        @NotBlank(message = "No application id entered. Unable to get configs.") String id
     ) throws GenieException;
 
     /**
@@ -166,10 +166,10 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void updateConfigsForApplication(
-        @NotBlank(message = "No application id entered. Unable to update configurations.") final String id,
+        @NotBlank(message = "No application id entered. Unable to update configurations.") String id,
         @NotNull(
             message = "No configs entered. Unable to update. If you want, use delete API."
-        ) final Set<String> configs
+        ) Set<String> configs
     ) throws GenieException;
 
     /**
@@ -180,7 +180,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void removeAllConfigsForApplication(
-        @NotBlank(message = "No application id entered. Unable to remove configs.") final String id
+        @NotBlank(message = "No application id entered. Unable to remove configs.") String id
     ) throws GenieException;
 
     /**
@@ -192,8 +192,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void removeConfigForApplication(
-        @NotBlank(message = "No application id entered. Unable to remove configuration.") final String id,
-        @NotBlank(message = "No config entered. Unable to remove.") final String config
+        @NotBlank(message = "No application id entered. Unable to remove configuration.") String id,
+        @NotBlank(message = "No config entered. Unable to remove.") String config
     ) throws GenieException;
 
     /**
@@ -205,8 +205,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void addDependenciesForApplication(
-        @NotBlank(message = "No application id entered. Unable to add dependencies.") final String id,
-        @NotEmpty(message = "No dependencies entered. Unable to add dependencies.") final Set<String> dependencies
+        @NotBlank(message = "No application id entered. Unable to add dependencies.") String id,
+        @NotEmpty(message = "No dependencies entered. Unable to add dependencies.") Set<String> dependencies
     ) throws GenieException;
 
     /**
@@ -218,7 +218,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     Set<String> getDependenciesForApplication(
-        @NotBlank(message = "No application id entered. Unable to get dependencies.") final String id
+        @NotBlank(message = "No application id entered. Unable to get dependencies.") String id
     ) throws GenieException;
 
     /**
@@ -231,8 +231,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void updateDependenciesForApplication(
-        @NotBlank(message = "No application id entered. Unable to update dependencies.") final String id,
-        @NotNull(message = "No dependencies entered. Unable to update.") final Set<String> dependencies
+        @NotBlank(message = "No application id entered. Unable to update dependencies.") String id,
+        @NotNull(message = "No dependencies entered. Unable to update.") Set<String> dependencies
     ) throws GenieException;
 
     /**
@@ -243,7 +243,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void removeAllDependenciesForApplication(
-        @NotBlank(message = "No application id entered. Unable to remove dependencies.") final String id
+        @NotBlank(message = "No application id entered. Unable to remove dependencies.") String id
     ) throws GenieException;
 
     /**
@@ -255,8 +255,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void removeDependencyForApplication(
-        @NotBlank(message = "No application id entered. Unable to remove dependency.") final String id,
-        @NotBlank(message = "No dependency entered. Unable to remove dependency.") final String dependency
+        @NotBlank(message = "No application id entered. Unable to remove dependency.") String id,
+        @NotBlank(message = "No dependency entered. Unable to remove dependency.") String dependency
     ) throws GenieException;
 
     /**
@@ -268,8 +268,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void addTagsForApplication(
-        @NotBlank(message = "No application id entered. Unable to add tags.") final String id,
-        @NotEmpty(message = "No tags entered. Unable to add.") final Set<String> tags
+        @NotBlank(message = "No application id entered. Unable to add tags.") String id,
+        @NotEmpty(message = "No tags entered. Unable to add.") Set<String> tags
     ) throws GenieException;
 
     /**
@@ -282,7 +282,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     Set<String> getTagsForApplication(
-        @NotBlank(message = "No application id entered. Cannot retrieve tags.") final String id
+        @NotBlank(message = "No application id entered. Cannot retrieve tags.") String id
     ) throws GenieException;
 
     /**
@@ -296,8 +296,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void updateTagsForApplication(
-        @NotBlank(message = "No application id entered. Unable to update tags.") final String id,
-        @NotNull(message = "No tags entered unable to update tags.") final Set<String> tags
+        @NotBlank(message = "No application id entered. Unable to update tags.") String id,
+        @NotNull(message = "No tags entered unable to update tags.") Set<String> tags
     ) throws GenieException;
 
     /**
@@ -308,7 +308,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void removeAllTagsForApplication(
-        @NotBlank(message = "No application id entered. Unable to remove tags.") final String id
+        @NotBlank(message = "No application id entered. Unable to remove tags.") String id
     ) throws GenieException;
 
     /**
@@ -320,8 +320,8 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     void removeTagForApplication(
-        @NotBlank(message = "No application id entered. Unable to remove tag.") final String id,
-        @NotBlank(message = "No tag entered. Unable to remove.") final String tag
+        @NotBlank(message = "No application id entered. Unable to remove tag.") String id,
+        @NotBlank(message = "No tag entered. Unable to remove.") String tag
     ) throws GenieException;
 
     /**
@@ -333,7 +333,7 @@ public interface ApplicationPersistenceService {
      * @throws GenieException if there is an error
      */
     Set<Command> getCommandsForApplication(
-        @NotBlank(message = "No application id entered. Unable to get commands.") final String id,
-        @Nullable final Set<CommandStatus> statuses
+        @NotBlank(message = "No application id entered. Unable to get commands.") String id,
+        @Nullable Set<CommandStatus> statuses
     ) throws GenieException;
 }

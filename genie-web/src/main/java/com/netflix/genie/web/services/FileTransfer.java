@@ -37,7 +37,7 @@ public interface FileTransfer {
      * @throws GenieException if there are errors
      */
     // TODO can we use a map of file system type to impl
-    boolean isValid(final String fileName) throws GenieException;
+    boolean isValid(String fileName) throws GenieException;
 
     /**
      * Gets a file from any remote location to Genie's local working directory.

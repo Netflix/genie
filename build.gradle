@@ -57,7 +57,7 @@ configure(javaProjects) {
     apply plugin: "java"
     apply plugin: "checkstyle"
     apply plugin: "findbugs"
-    apply plugin: "pmd"
+//    apply plugin: "pmd"
     apply plugin: "io.spring.dependency-management"
     apply plugin: "com.gorylenko.gradle-git-properties"
     apply plugin: "groovy"
@@ -65,8 +65,8 @@ configure(javaProjects) {
 
     group = "com.netflix.${githubProjectName}"
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     dependencyManagement {
         imports {
@@ -308,9 +308,9 @@ configure(javaProjects) {
         excludeFilter = new File(project.parent.projectDir, "codequality/findbugs/excludeFilter.xml")
     }
 
-    tasks.withType(Pmd) {
-        reports.html.enabled true
-    }
+//    tasks.withType(Pmd) {
+//        reports.html.enabled true
+//    }
 
     jacocoTestReport {
         reports {

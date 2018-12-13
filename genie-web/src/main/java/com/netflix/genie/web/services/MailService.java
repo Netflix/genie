@@ -43,9 +43,9 @@ public interface MailService {
      */
     void sendEmail(
         @NotBlank(message = "Cannot send email to blank address.")
-        @Nonnull final String toEmail,
+        @Nonnull String toEmail,
         @NotBlank(message = "Subject cannot be empty")
-        @Nonnull final String subject,
-        @Nullable final String body
+        @Nonnull String subject,
+        @Nullable String body
     ) throws GenieException;
 }

@@ -40,9 +40,9 @@ public interface DirectoryWriter {
      * @throws Exception for any conversion problem
      */
     String toHtml(
-        @NotNull final File directory,
-        @URL final String requestURL,
-        final boolean includeParent
+        @NotNull File directory,
+        @URL String requestURL,
+        boolean includeParent
     ) throws Exception;
 
     /**
@@ -55,8 +55,8 @@ public interface DirectoryWriter {
      * @throws Exception for any conversion problem
      */
     String toJson(
-        @NotNull final File directory,
-        @URL final String requestURL,
-        final boolean includeParent
+        @NotNull File directory,
+        @URL String requestURL,
+        boolean includeParent
     ) throws Exception;
 }

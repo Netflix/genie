@@ -63,10 +63,10 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void createJob(
-        @NotNull final com.netflix.genie.common.dto.JobRequest jobRequest,
-        @NotNull final com.netflix.genie.common.dto.JobMetadata jobMetadata,
-        @NotNull final Job job,
-        @NotNull final JobExecution jobExecution
+        @NotNull com.netflix.genie.common.dto.JobRequest jobRequest,
+        @NotNull com.netflix.genie.common.dto.JobMetadata jobMetadata,
+        @NotNull Job job,
+        @NotNull JobExecution jobExecution
     ) throws GenieException;
 
     /**
@@ -80,11 +80,11 @@ public interface JobPersistenceService {
      * @throws GenieException For any problems while updating
      */
     void updateJobWithRuntimeEnvironment(
-        @NotBlank final String jobId,
-        @NotBlank final String clusterId,
-        @NotBlank final String commandId,
-        @NotNull final List<String> applicationIds,
-        @Min(1) final int memory
+        @NotBlank String jobId,
+        @NotBlank String clusterId,
+        @NotBlank String commandId,
+        @NotNull List<String> applicationIds,
+        @Min(1) int memory
     ) throws GenieException;
 
     /**
@@ -96,9 +96,9 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void updateJobStatus(
-        @NotBlank(message = "No job id entered. Unable to update.") final String id,
-        @NotNull(message = "Status cannot be null.") final JobStatus jobStatus,
-        @NotBlank(message = "Status message cannot be empty.") final String statusMsg
+        @NotBlank(message = "No job id entered. Unable to update.") String id,
+        @NotNull(message = "Status cannot be null.") JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.") String statusMsg
     ) throws GenieException;
 
     /**
@@ -111,10 +111,10 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void setJobRunningInformation(
-        @NotBlank final String id,
-        @Min(value = 0, message = "Must be no lower than zero") final int processId,
-        @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") final long checkDelay,
-        @NotNull final Instant timeout
+        @NotBlank String id,
+        @Min(value = 0, message = "Must be no lower than zero") int processId,
+        @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") long checkDelay,
+        @NotNull Instant timeout
     ) throws GenieException;
 
     /**
@@ -122,19 +122,19 @@ public interface JobPersistenceService {
      *
      * @param id            the id of the job to update the exit code
      * @param exitCode      The exit code of the process
-     * @param status        The final job status for the job
-     * @param statusMessage The final job status message
+     * @param status        The job status for the job
+     * @param statusMessage The job status message
      * @param stdOutSize    The size (in bytes) of the standard out file or null if there isn't one
      * @param stdErrSize    The size (in bytes) of the standard error file or null if there isn't one
      * @throws GenieException if there is an error
      */
     void setJobCompletionInformation(
-        @NotBlank(message = "No job id entered. Unable to update.") final String id,
-        final int exitCode,
-        @NotNull(message = "No job status entered. Unable to update") final JobStatus status,
-        @NotBlank(message = "Status message can't be blank. Unable to update") final String statusMessage,
-        @Nullable final Long stdOutSize,
-        @Nullable final Long stdErrSize
+        @NotBlank(message = "No job id entered. Unable to update.") String id,
+        int exitCode,
+        @NotNull(message = "No job status entered. Unable to update") JobStatus status,
+        @NotBlank(message = "Status message can't be blank. Unable to update") String statusMessage,
+        @Nullable Long stdOutSize,
+        @Nullable Long stdErrSize
     ) throws GenieException;
 
     /**
@@ -147,9 +147,9 @@ public interface JobPersistenceService {
      * @return the number of deleted jobs
      */
     long deleteBatchOfJobsCreatedBeforeDate(
-        @NotNull final Instant date,
-        @Min(1) final int maxDeleted,
-        @Min(1) final int pageSize
+        @NotNull Instant date,
+        @Min(1) int maxDeleted,
+        @Min(1) int pageSize
     );
 
     // V4 APIs
@@ -164,8 +164,8 @@ public interface JobPersistenceService {
      * @throws GenieRuntimeException         On other type of error
      */
     String saveJobRequest(
-        @Valid final JobRequest jobRequest,
-        @Valid final JobRequestMetadata jobRequestMetadata
+        @Valid JobRequest jobRequest,
+        @Valid JobRequestMetadata jobRequestMetadata
     );
 
     /**
@@ -175,7 +175,7 @@ public interface JobPersistenceService {
      * @return The job request if one was found. Wrapped in {@link Optional} so empty optional returned if no job found
      * @throws GenieRuntimeException On error converting entity values to DTO values
      */
-    Optional<JobRequest> getJobRequest(@NotBlank(message = "Id is missing and is required") final String id);
+    Optional<JobRequest> getJobRequest(@NotBlank(message = "Id is missing and is required") String id);
 
     /**
      * Save the given job specification details for a job. Sets the job status to {@link JobStatus#RESOLVED}.
@@ -192,8 +192,8 @@ public interface JobPersistenceService {
      *                                           actually exist
      */
     void saveJobSpecification(
-        @NotBlank(message = "Id is missing and is required") final String id,
-        @Valid final JobSpecification specification
+        @NotBlank(message = "Id is missing and is required") String id,
+        @Valid JobSpecification specification
     );
 
     /**
@@ -210,7 +210,7 @@ public interface JobPersistenceService {
      * @throws GenieRuntimeException         on unexpected error
      */
     Optional<JobSpecification> getJobSpecification(
-        @NotBlank(message = "Id is missing and is required") final String id
+        @NotBlank(message = "Id is missing and is required") String id
     );
 
     /**
@@ -225,8 +225,8 @@ public interface JobPersistenceService {
      *                                         {@link com.netflix.genie.common.dto.JobStatus#RESOLVED}
      */
     void claimJob(
-        @NotBlank(message = "Job id is missing and is required") final String id,
-        @Valid final AgentClientMetadata agentClientMetadata
+        @NotBlank(message = "Job id is missing and is required") String id,
+        @Valid AgentClientMetadata agentClientMetadata
     );
 
     /**
@@ -246,10 +246,10 @@ public interface JobPersistenceService {
      *                                     Also if the {@code currentStatus} equals the {@code newStatus}.
      */
     void updateJobStatus(
-        @NotBlank(message = "Id is missing and is required") final String id,
-        @NotNull final JobStatus currentStatus,
-        @NotNull final JobStatus newStatus,
-        @Nullable final String newStatusMessage
+        @NotBlank(message = "Id is missing and is required") String id,
+        @NotNull JobStatus currentStatus,
+        @NotNull JobStatus newStatus,
+        @Nullable String newStatusMessage
     );
 
     /**
@@ -257,9 +257,9 @@ public interface JobPersistenceService {
      *
      * @param id The id of the job
      * @return true if its a v4 job
-     * @throws GenieJobNotFoundException     If no job with {@code id} exists
+     * @throws GenieJobNotFoundException If no job with {@code id} exists
      */
     boolean isV4(
-        @NotBlank(message = "Id is missing and is required") final String id
+        @NotBlank(message = "Id is missing and is required") String id
     );
 }

@@ -39,7 +39,7 @@ public interface AgentRoutingService {
      * @param jobId the job id
      * @return a boxed hostname string, empty if the connection for the given job id is not found
      */
-    Optional<String> getHostnameForAgentConnection(@NotBlank final String jobId);
+    Optional<String> getHostnameForAgentConnection(@NotBlank String jobId);
 
     /**
      * Tells wether the agent running a given job is connected to the local node.
@@ -47,7 +47,7 @@ public interface AgentRoutingService {
      * @param jobId the job id
      * @return true if the agent has an active connection to this node
      */
-    boolean isAgentConnectionLocal(@NotBlank final String jobId);
+    boolean isAgentConnectionLocal(@NotBlank String jobId);
 
     /**
      * Handle a new agent connection.

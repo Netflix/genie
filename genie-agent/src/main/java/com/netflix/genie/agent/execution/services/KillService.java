@@ -35,7 +35,7 @@ public interface KillService {
      *
      * @param killSource the source of kill
      */
-    void kill(final KillSource killSource);
+    void kill(KillSource killSource);
 
     /**
      * Enumeration for the source of a request to kill the job.

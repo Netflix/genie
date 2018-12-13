@@ -39,7 +39,7 @@ public interface JpaTagPersistenceService extends TagPersistenceService {
      * @param tag The tag to get
      * @return The tag entity wrapped in an {@link Optional} or {@link Optional#empty()}
      */
-    Optional<TagEntity> getTag(@NotBlank(message = "Tag string to find can't be blank") final String tag);
+    Optional<TagEntity> getTag(@NotBlank(message = "Tag string to find can't be blank") String tag);
 
     /**
      * Get all the tag entity references that match the input set of tag strings.
@@ -49,5 +49,5 @@ public interface JpaTagPersistenceService extends TagPersistenceService {
      * will consist of all other discovered tags. E.G. {@code tags} is ("a", "b", "c") and only "b" and "c" are
      * in the database the returned set will contain "b" and "c". The method won't fail.
      */
-    Set<TagEntity> getTags(@NotNull final Set<String> tags);
+    Set<TagEntity> getTags(@NotNull Set<String> tags);
 }

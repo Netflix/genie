@@ -51,8 +51,8 @@ public interface AgentJobService {
      * @throws JobIdUnavailableException if the id requested has already been used
      */
     String reserveJobId(
-        @Valid final AgentJobRequest jobRequest,
-        @Valid final AgentClientMetadata agentClientMetadata
+        @Valid AgentJobRequest jobRequest,
+        @Valid AgentClientMetadata agentClientMetadata
     ) throws JobReservationException, JobIdUnavailableException;
 
     /**
@@ -63,7 +63,7 @@ public interface AgentJobService {
      * @throws JobSpecificationResolutionException if the specification cannot be resolved
      */
     JobSpecification resolveJobSpecification(
-        @NotBlank final String id
+        @NotBlank String id
     ) throws JobSpecificationResolutionException;
 
     /**
@@ -74,7 +74,7 @@ public interface AgentJobService {
      * @throws JobSpecificationResolutionException if the specification cannot be retrieved
      */
     JobSpecification getJobSpecification(
-        @NotBlank final String id
+        @NotBlank String id
     ) throws JobSpecificationResolutionException;
 
     /**
@@ -85,7 +85,7 @@ public interface AgentJobService {
      * @throws JobSpecificationResolutionException When an error occurred during attempted resolution
      */
     JobSpecification resolveJobSpecificationDryRun(
-        @Valid final AgentJobRequest jobRequest
+        @Valid AgentJobRequest jobRequest
     ) throws JobSpecificationResolutionException;
 
     /**
@@ -97,8 +97,8 @@ public interface AgentJobService {
      *                                 claimed, invalid job ID, failure to reach the server
      */
     void claimJob(
-        @NotBlank final String jobId,
-        @Valid final AgentClientMetadata agentClientMetadata
+        @NotBlank String jobId,
+        @Valid AgentClientMetadata agentClientMetadata
     ) throws JobReservationException;
 
     /**
@@ -111,9 +111,9 @@ public interface AgentJobService {
      * @throws ChangeJobStatusException when the agent fails to update the job status
      */
     void changeJobStatus(
-        @NotBlank final String jobId,
-        final JobStatus currentJobStatus,
-        final JobStatus newJobStatus,
-        final String message
+        @NotBlank String jobId,
+        JobStatus currentJobStatus,
+        JobStatus newJobStatus,
+        String message
     ) throws ChangeJobStatusException;
 }

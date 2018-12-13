@@ -20,8 +20,8 @@ package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.ArchivalException;
 
-import java.nio.file.Path;
 import java.net.URI;
+import java.nio.file.Path;
 
 /**
  * Service to archive a file to a remote location.
@@ -39,5 +39,5 @@ public interface ArchivalService {
      * @param targetURI target uri for the archival location
      * @throws ArchivalException if archival fails
      */
-    void archive(final Path path, final URI targetURI) throws ArchivalException;
+    void archive(Path path, URI targetURI) throws ArchivalException;
 }

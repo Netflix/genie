@@ -61,7 +61,7 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
      * @param file The file value to search for
      * @return An Optional of a FileEntity
      */
-    Optional<FileEntity> findByFile(final String file);
+    Optional<FileEntity> findByFile(String file);
 
     /**
      * Find out whether a file entity with the given file value exists.
@@ -69,7 +69,7 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
      * @param file The file value to check for
      * @return True if the file exists
      */
-    boolean existsByFile(final String file);
+    boolean existsByFile(String file);
 
     /**
      * Find file entities where the file value is in the given set of files.
@@ -77,7 +77,7 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
      * @param files The files to find entities for
      * @return The file entities
      */
-    Set<FileEntity> findByFileIn(final Set<String> files);
+    Set<FileEntity> findByFileIn(Set<String> files);
 
     /**
      * Find the ids of all files from the database that aren't referenced which were created before the supplied created
@@ -88,7 +88,7 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
      * @return The ids of the files which should be deleted
      */
     @Query(value = SELECT_FOR_UPDATE_UNUSED_FILES_SQL, nativeQuery = true)
-    Set<Number> findUnusedFiles(@Param("createdThreshold") final Instant createdThreshold);
+    Set<Number> findUnusedFiles(@Param("createdThreshold") Instant createdThreshold);
 
     /**
      * Delete all files from the database that are in the current set of ids.
@@ -97,5 +97,5 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
      * @return The number of files deleted
      */
     @Modifying
-    Long deleteByIdIn(final Set<Long> ids);
+    Long deleteByIdIn(Set<Long> ids);
 }

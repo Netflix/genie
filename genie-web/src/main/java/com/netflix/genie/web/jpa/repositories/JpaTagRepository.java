@@ -54,7 +54,7 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      * @param tag The tag value to search for
      * @return An Optional of a TagEntity
      */
-    Optional<TagEntity> findByTag(final String tag);
+    Optional<TagEntity> findByTag(String tag);
 
     /**
      * Find out whether a tag entity with the given tag value exists.
@@ -62,7 +62,7 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      * @param tag The tag value to check for
      * @return True if the tag exists
      */
-    boolean existsByTag(final String tag);
+    boolean existsByTag(String tag);
 
     /**
      * Find tag entities where the tag value is in the given set of tags.
@@ -70,7 +70,7 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      * @param tags The tags to find entities for
      * @return The tag entities
      */
-    Set<TagEntity> findByTagIn(final Set<String> tags);
+    Set<TagEntity> findByTagIn(Set<String> tags);
 
     /**
      * Find all tags from the database that aren't referenced which were created before the supplied created
@@ -81,7 +81,7 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      * @return The number of tags deleted
      */
     @Query(value = SELECT_FOR_UPDATE_UNUSED_TAGS_SQL, nativeQuery = true)
-    Set<Number> findUnusedTags(@Param("createdThreshold") final Instant createdThreshold);
+    Set<Number> findUnusedTags(@Param("createdThreshold") Instant createdThreshold);
 
     /**
      * Delete all tags from the database whose ids are in the supplied set.
@@ -90,5 +90,5 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      * @return The number of tags deleted
      */
     @Modifying
-    Long deleteByIdIn(final Set<Long> ids);
+    Long deleteByIdIn(Set<Long> ids);
 }

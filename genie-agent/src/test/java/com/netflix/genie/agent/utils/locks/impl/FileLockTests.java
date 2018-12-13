@@ -44,7 +44,7 @@ public class FileLockTests {
     @Test
     public void fileLockClosed() throws IOException, LockException {
         final FileLock mockLock = Mockito.mock(FileLock.class);
-        try (final CloseableLock lock = mockLock) {
+        try (CloseableLock lock = mockLock) {
             lock.lock();
         }
 
@@ -62,7 +62,7 @@ public class FileLockTests {
     @Test
     public void fileLockClosedOnException() throws IOException {
         final FileLock mockLock = Mockito.mock(FileLock.class);
-        try (final CloseableLock lock = mockLock) {
+        try (CloseableLock lock = mockLock) {
             lock.lock();
             throw new LockException("dummy exception");
         } catch (LockException e) {

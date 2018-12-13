@@ -37,7 +37,7 @@ public interface FilePersistenceService {
      *
      * @param file the file to create. Not blank.
      */
-    void createFileIfNotExists(@NotBlank(message = "File path cannot be blank") final String file);
+    void createFileIfNotExists(@NotBlank(message = "File path cannot be blank") String file);
 
     /**
      * Delete all files from the database that aren't referenced which were created before the supplied created
@@ -47,5 +47,5 @@ public interface FilePersistenceService {
      *                         will be deleted. Inclusive
      * @return The number of files deleted
      */
-    long deleteUnusedFiles(@NotNull final Instant createdThreshold);
+    long deleteUnusedFiles(@NotNull Instant createdThreshold);
 }

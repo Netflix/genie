@@ -78,7 +78,7 @@ public class UIControllerIntegrationTest {
     public void testGetIndex() throws Exception {
         final String indexContent;
 
-        try (final InputStream is = UIController.class.getResourceAsStream("/templates/index.html")) {
+        try (InputStream is = UIController.class.getResourceAsStream("/templates/index.html")) {
             Assert.assertNotNull(is);
             Assert.assertTrue(is.available() > 0);
             indexContent = IOUtils.toString(is, StandardCharsets.UTF_8);

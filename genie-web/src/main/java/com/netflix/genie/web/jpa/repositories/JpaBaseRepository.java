@@ -37,7 +37,7 @@ public interface JpaBaseRepository<E extends BaseEntity> extends JpaIdRepository
      * @param uniqueId The unique id to find an entity for
      * @return The entity found or empty Optional
      */
-    Optional<E> findByUniqueId(final String uniqueId);
+    Optional<E> findByUniqueId(String uniqueId);
 
     // TODO: Make interfaces generic but be aware of https://jira.spring.io/browse/DATAJPA-1185
 
@@ -49,7 +49,7 @@ public interface JpaBaseRepository<E extends BaseEntity> extends JpaIdRepository
      * @param type     The entity or projection type to return
      * @return The entity found or empty Optional
      */
-    <T> Optional<T> findByUniqueId(final String uniqueId, final Class<T> type);
+    <T> Optional<T> findByUniqueId(String uniqueId, Class<T> type);
 
     /**
      * Find out whether an entity with the given unique id exists.
@@ -57,5 +57,5 @@ public interface JpaBaseRepository<E extends BaseEntity> extends JpaIdRepository
      * @param uniqueId The unique id to check for existence
      * @return True if an entity with the unique id exists
      */
-    boolean existsByUniqueId(final String uniqueId);
+    boolean existsByUniqueId(String uniqueId);
 }

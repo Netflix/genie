@@ -38,6 +38,8 @@ public interface JobKillService {
      * @param reason brief reason for requesting the job be killed
      * @throws GenieException if there is an error
      */
-    void killJob(@NotBlank(message = "No id entered. Unable to kill job.") final String id,
-                 @NotBlank(message = "No reason provided.") final String reason) throws GenieException;
+    void killJob(
+        @NotBlank(message = "No id entered. Unable to kill job.") String id,
+        @NotBlank(message = "No reason provided.") String reason
+    ) throws GenieException;
 }
