@@ -30,6 +30,7 @@ dependencies {
 }
 
 license {
+    exclude "*.yml"
     exclude "templates/*"
 }
 

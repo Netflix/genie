@@ -6,7 +6,7 @@ buildscript {
 
     dependencies {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
-        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:6.0.4"
+        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:7.0.0"
         classpath "org.ajoberstar.grgit:grgit-gradle:3.0.0-beta.1"
         classpath "org.ajoberstar:gradle-git-publish:1.0.1"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
