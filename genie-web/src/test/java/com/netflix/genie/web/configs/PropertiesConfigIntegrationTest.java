@@ -20,6 +20,7 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.core.properties.DataServiceRetryProperties;
 import com.netflix.genie.core.properties.HealthProperties;
 import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -52,6 +53,9 @@ public class PropertiesConfigIntegrationTest {
     @Autowired
     private HealthProperties healthProperties;
 
+    @Autowired
+    private JobsUsersActiveLimitProperties jobsUsersActiveLimitProperties;
+
     /**
      * Verify than beans get autowired, and that (non-default) values correspond to the expected set via properties
      * file.
@@ -66,11 +70,6 @@ public class PropertiesConfigIntegrationTest {
         Assert.assertThat(jobsProperties.getMax().getStdOutSize(), Matchers.is(512L));
         Assert.assertThat(jobsProperties.getMemory().getMaxSystemMemory(), Matchers.is(1024));
         Assert.assertThat(jobsProperties.getUsers().isCreationEnabled(), Matchers.is(true));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().isEnabled(), Matchers.is(true));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getCount(), Matchers.is(15));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("Jane"), Matchers.is(100));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("John"), Matchers.is(200));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("not-special"), Matchers.is(15));
 
         Assert.assertNotNull(dataServiceRetryProperties);
         Assert.assertThat(dataServiceRetryProperties.getInitialInterval(), Matchers.is(200L));
@@ -78,5 +77,11 @@ public class PropertiesConfigIntegrationTest {
         Assert.assertNotNull(healthProperties);
         Assert.assertThat(healthProperties.getMaxCpuLoadPercent(), Matchers.is(33.3));
         Assert.assertThat(healthProperties.getMaxCpuLoadConsecutiveOccurrences(), Matchers.is(5));
+
+        Assert.assertThat(jobsUsersActiveLimitProperties.isEnabled(), Matchers.is(true));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getCount(), Matchers.is(15));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("Jane"), Matchers.is(100));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("John"), Matchers.is(200));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("not-special"), Matchers.is(15));
     }
 }

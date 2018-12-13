@@ -47,6 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -238,6 +239,7 @@ public class ServicesConfigUnitTests {
     /**
      * Can get a bean for Job Coordinator Service.
      */
+    @SuppressWarnings("unchecked") // For ObjectFactory
     @Test
     public void canGetJobCoordinatorServiceBean() {
         Assert.assertNotNull(
@@ -247,6 +249,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(JobStateService.class),
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
+                Mockito.mock(ObjectFactory.class),
                 Mockito.mock(ApplicationService.class),
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
@@ -260,6 +263,7 @@ public class ServicesConfigUnitTests {
     /**
      * Can't get a bean for Job Coordinator Service.
      */
+    @SuppressWarnings("unchecked") // For ObjectFactory
     @Test(expected = IllegalStateException.class)
     public void cantGetJobCoordinatorServiceBeanWhenNoClusterLoadBalancers() {
         Assert.assertNotNull(
@@ -269,6 +273,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(JobStateService.class),
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
+                Mockito.mock(ObjectFactory.class),
                 Mockito.mock(ApplicationService.class),
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
