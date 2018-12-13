@@ -57,7 +57,7 @@ configure(javaProjects) {
     apply plugin: "java"
     apply plugin: "checkstyle"
     apply plugin: "findbugs"
-//    apply plugin: "pmd"
+    apply plugin: "pmd"
     apply plugin: "io.spring.dependency-management"
     apply plugin: "com.gorylenko.gradle-git-properties"
     apply plugin: "groovy"
@@ -308,9 +308,15 @@ configure(javaProjects) {
         excludeFilter = new File(project.parent.projectDir, "codequality/findbugs/excludeFilter.xml")
     }
 
-//    tasks.withType(Pmd) {
-//        reports.html.enabled true
-//    }
+    pmd {
+        // Gradle 5 upgraded PMD to 6.7 (https://github.com/gradle/gradle/issues/6625)
+        // This caused all kinds of errors in our build. Pin back for now and upgrade at our own pace or look further
+        toolVersion = "5.6.1"
+    }
+
+    tasks.withType(Pmd) {
+        reports.html.enabled true
+    }
 
     jacocoTestReport {
         reports {
