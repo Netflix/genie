@@ -18,6 +18,7 @@
 package com.netflix.genie.test.suppliers;
 
 import java.time.Instant;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -33,16 +34,15 @@ public final class RandomSuppliers {
      * Get a random String.
      */
     public static final Supplier<String> STRING = UUID.randomUUID()::toString;
+    private static final Random RANDOM = new Random();
     /**
      * Get a random integer.
      */
-    public static final Supplier<Integer> INT
-        = () -> (int) (Math.random() * (Integer.MAX_VALUE - 1)) + 1;
+    public static final Supplier<Integer> INT = () -> RANDOM.nextInt(Integer.MAX_VALUE - 1);
     /**
      * Get a random long.
      */
-    public static final Supplier<Long> LONG
-        = () -> (long) (Math.random() * (Long.MAX_VALUE - 1)) + 1;
+    public static final Supplier<Long> LONG = RANDOM::nextLong;
     /**
      * Get a random instant.
      */

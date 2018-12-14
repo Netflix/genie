@@ -22,6 +22,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -486,8 +487,12 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
             .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
             .getCommands();
         if (statuses != null) {
-            return commandEntities.stream()
-                .filter(command -> statuses.contains(command.getStatus()))
+            // Spotbugs complains with JDK 1.8.0_141 about null dereference in the below lambda
+            // Create copy which ensures non-null
+            final Set<CommandStatus> notNullStatuses = Sets.newHashSet(statuses);
+            return commandEntities
+                .stream()
+                .filter(command -> notNullStatuses.contains(command.getStatus()))
                 .map(EntityDtoConverters::toV4CommandDto)
                 .collect(Collectors.toList());
         } else {

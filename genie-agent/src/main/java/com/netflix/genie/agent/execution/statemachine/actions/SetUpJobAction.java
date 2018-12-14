@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -513,7 +514,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         // Variables in environment file are base64 encoded to avoid escaping, quoting.
         // Decode all values.
         env.keySet().forEach(key ->
-            env.compute(key, (k, v) -> new String(Base64.decodeBase64(v)))
+            env.compute(key, (k, v) -> new String(Base64.decodeBase64(v), StandardCharsets.UTF_8))
         );
 
         return Collections.unmodifiableMap(env);
