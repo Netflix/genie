@@ -41,7 +41,7 @@ public interface AttachmentService {
      * @param content  A stream to access the contents of the attachment
      * @throws GenieException For any error during the save process
      */
-    void save(final String jobId, final String filename, final InputStream content) throws GenieException;
+    void save(String jobId, String filename, InputStream content) throws GenieException;
 
     /**
      * Copy all the attachments for a job into the specified directory.
@@ -50,7 +50,7 @@ public interface AttachmentService {
      * @param destination The directory to copy the attachments into
      * @throws GenieException For any error during the copy process
      */
-    void copy(final String jobId, final File destination) throws GenieException;
+    void copy(String jobId, File destination) throws GenieException;
 
     /**
      * Delete the attachments for the given job.
@@ -58,5 +58,5 @@ public interface AttachmentService {
      * @param jobId The id of the job to delete the attachments for
      * @throws GenieException For any error during the delete process
      */
-    void delete(final String jobId) throws GenieException;
+    void delete(String jobId) throws GenieException;
 }

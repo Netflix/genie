@@ -97,7 +97,7 @@ public abstract class BaseStateAction implements StateAction {
 
     protected abstract void executePreActionValidation();
 
-    protected abstract Events executeStateAction(final ExecutionContext ctx);
+    protected abstract Events executeStateAction(ExecutionContext ctx);
 
     protected abstract void executePostActionValidation();
 

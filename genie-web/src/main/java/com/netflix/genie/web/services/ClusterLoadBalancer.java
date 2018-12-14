@@ -48,7 +48,7 @@ public interface ClusterLoadBalancer {
      */
     @Nullable
     Cluster selectCluster(
-        @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
-        @Nonnull @NonNull final JobRequest jobRequest
+        @Nonnull @NonNull @NotEmpty Set<Cluster> clusters,
+        @Nonnull @NonNull JobRequest jobRequest
     ) throws GenieException;
 }

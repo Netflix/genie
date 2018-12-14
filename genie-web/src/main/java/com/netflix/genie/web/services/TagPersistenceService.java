@@ -37,7 +37,7 @@ public interface TagPersistenceService {
      *
      * @param tag the tag to create. Not blank.
      */
-    void createTagIfNotExists(@NotBlank(message = "Tag cannot be blank") final String tag);
+    void createTagIfNotExists(@NotBlank(message = "Tag cannot be blank") String tag);
 
     /**
      * Delete all tags from the database that aren't referenced which were created before the supplied created
@@ -47,5 +47,5 @@ public interface TagPersistenceService {
      *                         will be deleted. Inclusive
      * @return The number of tags deleted
      */
-    long deleteUnusedTags(@NotNull final Instant createdThreshold);
+    long deleteUnusedTags(@NotNull Instant createdThreshold);
 }

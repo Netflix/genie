@@ -53,5 +53,5 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity>, 
      * @return The number of deleted clusters
      */
     @Modifying
-    Long deleteByIdIn(final Set<Long> ids);
+    Long deleteByIdIn(Set<Long> ids);
 }

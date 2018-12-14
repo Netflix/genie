@@ -71,22 +71,22 @@ public interface JobSearchService {
      */
     @SuppressWarnings("checkstyle:parameternumber")
     Page<JobSearchResult> findJobs(
-        @Nullable final String id,
-        @Nullable final String name,
-        @Nullable final String user,
-        @Nullable final Set<JobStatus> statuses,
-        @Nullable final Set<String> tags,
-        @Nullable final String clusterName,
-        @Nullable final String clusterId,
-        @Nullable final String commandName,
-        @Nullable final String commandId,
-        @Nullable final Instant minStarted,
-        @Nullable final Instant maxStarted,
-        @Nullable final Instant minFinished,
-        @Nullable final Instant maxFinished,
-        @Nullable final String grouping,
-        @Nullable final String groupingInstance,
-        @NotNull final Pageable page
+        @Nullable String id,
+        @Nullable String name,
+        @Nullable String user,
+        @Nullable Set<JobStatus> statuses,
+        @Nullable Set<String> tags,
+        @Nullable String clusterName,
+        @Nullable String clusterId,
+        @Nullable String commandName,
+        @Nullable String commandId,
+        @Nullable Instant minStarted,
+        @Nullable Instant maxStarted,
+        @Nullable Instant minFinished,
+        @Nullable Instant maxFinished,
+        @Nullable String grouping,
+        @Nullable String groupingInstance,
+        @NotNull Pageable page
     );
 
     /**
@@ -95,7 +95,7 @@ public interface JobSearchService {
      * @param hostname The host name to search for. Not null or empty.
      * @return All the jobs active on the host as a set of Job objects
      */
-    Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostname);
+    Set<Job> getAllActiveJobsOnHost(@NotBlank String hostname);
 
     /**
      * Get a set of host names which are currently have active jobs in the Genie cluster.
@@ -111,7 +111,7 @@ public interface JobSearchService {
      * @return the job
      * @throws GenieException if there is an error
      */
-    Job getJob(@NotBlank(message = "No id entered. Unable to get job.") final String id) throws GenieException;
+    Job getJob(@NotBlank(message = "No id entered. Unable to get job.") String id) throws GenieException;
 
     /**
      * Get the status of the job with the given id.
@@ -120,7 +120,7 @@ public interface JobSearchService {
      * @return The job status
      * @throws GenieException When any error, including not found, is encountered
      */
-    JobStatus getJobStatus(@NotBlank final String id) throws GenieException;
+    JobStatus getJobStatus(@NotBlank String id) throws GenieException;
 
     /**
      * Get job request for given job id.
@@ -129,7 +129,7 @@ public interface JobSearchService {
      * @return the job
      * @throws GenieException if there is an error
      */
-    JobRequest getJobRequest(@NotBlank final String id) throws GenieException;
+    JobRequest getJobRequest(@NotBlank String id) throws GenieException;
 
     /**
      * Get job execution for given job id.
@@ -138,7 +138,7 @@ public interface JobSearchService {
      * @return the job
      * @throws GenieException if there is an error
      */
-    JobExecution getJobExecution(@NotBlank final String id) throws GenieException;
+    JobExecution getJobExecution(@NotBlank String id) throws GenieException;
 
     /**
      * Get the cluster the job was run on or exception if not found.
@@ -147,7 +147,7 @@ public interface JobSearchService {
      * @return The cluster
      * @throws GenieException If either the job or the cluster is not found
      */
-    Cluster getJobCluster(@NotBlank final String id) throws GenieException;
+    Cluster getJobCluster(@NotBlank String id) throws GenieException;
 
     /**
      * Get the command the job was run with or exception if not found.
@@ -156,7 +156,7 @@ public interface JobSearchService {
      * @return The command
      * @throws GenieException If either the job or the command is not found
      */
-    Command getJobCommand(@NotBlank final String id) throws GenieException;
+    Command getJobCommand(@NotBlank String id) throws GenieException;
 
     /**
      * Get the applications the job was run with or exception if not found.
@@ -165,7 +165,7 @@ public interface JobSearchService {
      * @return The applications
      * @throws GenieException If either the job or the applications were not found
      */
-    List<Application> getJobApplications(@NotBlank final String id) throws GenieException;
+    List<Application> getJobApplications(@NotBlank String id) throws GenieException;
 
     /**
      * Get the hostname a job is running on.
@@ -174,7 +174,7 @@ public interface JobSearchService {
      * @return The hostname
      * @throws GenieNotFoundException If the job host cannot be found
      */
-    String getJobHost(@NotBlank final String jobId) throws GenieNotFoundException;
+    String getJobHost(@NotBlank String jobId) throws GenieNotFoundException;
 
     /**
      * Get the count of 'active' jobs for a given user across all instances.
@@ -183,7 +183,7 @@ public interface JobSearchService {
      * @return the number of active jobs for a given user
      * @throws GenieException If any error occurs
      */
-    long getActiveJobCountForUser(@NotBlank final String user) throws GenieException;
+    long getActiveJobCountForUser(@NotBlank String user) throws GenieException;
 
     /**
      * Get the metadata about a job.
@@ -192,5 +192,5 @@ public interface JobSearchService {
      * @return The metadata for a job
      * @throws GenieException If any error occurs
      */
-    JobMetadata getJobMetadata(@NotBlank final String id) throws GenieException;
+    JobMetadata getJobMetadata(@NotBlank String id) throws GenieException;
 }

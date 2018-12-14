@@ -41,5 +41,5 @@ public interface CriteriaResolutionRepository {
      */
     //TODO: add algorithm explanation
     @Nonnull
-    List<Object[]> resolveClustersAndCommands(final Criterion clusterCriterion, final Criterion commandCriterion);
+    List<Object[]> resolveClustersAndCommands(Criterion clusterCriterion, Criterion commandCriterion);
 }

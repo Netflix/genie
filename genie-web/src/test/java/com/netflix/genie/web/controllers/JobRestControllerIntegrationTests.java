@@ -65,6 +65,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -572,7 +573,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getResource(BASE_DIR + runShFileName)
             .getFile()
             .getAbsolutePath();
-        final String runFileContents = new String(Files.readAllBytes(Paths.get(runShFile)), "UTF-8");
+        final String runFileContents = new String(Files.readAllBytes(Paths.get(runShFile)), StandardCharsets.UTF_8);
 
         final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + id;
         final String expectedRunScriptContent = this.getExpectedRunContents(runFileContents, jobWorkingDir, id);
@@ -867,7 +868,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getFile();
 
         final MockMultipartFile attachment1;
-        try (final InputStream is = new FileInputStream(attachment1File)) {
+        try (InputStream is = new FileInputStream(attachment1File)) {
             attachment1 = new MockMultipartFile(
                 "attachment",
                 attachment1File.getName(),
@@ -881,7 +882,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getFile();
 
         final MockMultipartFile attachment2;
-        try (final InputStream is = new FileInputStream(attachment2File)) {
+        try (InputStream is = new FileInputStream(attachment2File)) {
             attachment2 = new MockMultipartFile(
                 "attachment",
                 attachment2File.getName(),

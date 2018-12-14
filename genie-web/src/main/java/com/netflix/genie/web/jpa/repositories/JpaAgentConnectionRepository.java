@@ -38,5 +38,5 @@ public interface JpaAgentConnectionRepository
      * @param jobId job id
      * @return an optional, containing the entity if it exists
      */
-    Optional<AgentConnectionEntity> findByJobId(final @NotBlank String jobId);
+    Optional<AgentConnectionEntity> findByJobId(@NotBlank String jobId);
 }

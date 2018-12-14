@@ -44,17 +44,16 @@ public interface LaunchJobService extends ApplicationListener<KillService.KillEv
      * @throws JobLaunchException if the job process failed to launch
      */
     void launchProcess(
-        final File jobDirectory,
-        final Map<String, String> environmentVariables,
-        final List<String> commandLine,
-        final boolean interactive
+        File jobDirectory,
+        Map<String, String> environmentVariables,
+        List<String> commandLine,
+        boolean interactive
     ) throws JobLaunchException;
 
     /**
      * Terminate job process execution (if still running) or prevent it from launching (if not launched yet).
      * Optionally sends SIGINT to the process (unnecessary under certain circumstances. For example,
      * CTRL-C in a terminal session, is already received by the job process, issuing a second one is unneeded).
-     *
      */
     void kill();
 

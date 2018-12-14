@@ -48,7 +48,7 @@ public interface DownloadService {
      * @param downloadsManifest a download manifest
      * @throws DownloadException if at least one of the downloads fails
      */
-    void download(final Manifest downloadsManifest) throws DownloadException;
+    void download(Manifest downloadsManifest) throws DownloadException;
 
     /**
      * Manifest containing source (URIs) and their expected destination on disk after download.
@@ -94,7 +94,7 @@ public interface DownloadService {
          * @return a File target, or null if the source is not in the manifest
          */
         @Nullable
-        File getTargetLocation(final URI sourceFileUri);
+        File getTargetLocation(URI sourceFileUri);
 
         /**
          * Builder for Manifest.
@@ -110,8 +110,8 @@ public interface DownloadService {
              * @return a builder for chaining
              */
             DownloadService.Manifest.Builder addFileWithTargetDirectory(
-                final URI sourceFileUri,
-                final File targetDirectory
+                URI sourceFileUri,
+                File targetDirectory
             );
 
             /**
@@ -122,8 +122,8 @@ public interface DownloadService {
              * @return a builder for chaining
              */
             Builder addFileWithTargetFile(
-                final URI sourceFileUri,
-                final File targetFile
+                URI sourceFileUri,
+                File targetFile
             );
 
             /**

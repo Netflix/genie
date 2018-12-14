@@ -47,7 +47,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses      The job statuses to filter by
      * @return The jobs
      */
-    Set<JobProjection> findByAgentHostnameAndStatusIn(final String agentHostname, final Set<JobStatus> statuses);
+    Set<JobProjection> findByAgentHostnameAndStatusIn(String agentHostname, Set<JobStatus> statuses);
 
     /**
      * Find the jobs with one of the statuses entered.
@@ -55,7 +55,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses The statuses to search
      * @return The job information requested
      */
-    Set<AgentHostnameProjection> findDistinctByStatusInAndV4IsFalse(final Set<JobStatus> statuses);
+    Set<AgentHostnameProjection> findDistinctByStatusInAndV4IsFalse(Set<JobStatus> statuses);
 
     /**
      * Deletes all jobs for the given ids.
@@ -64,7 +64,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return no. of jobs deleted
      */
     @Modifying
-    Long deleteByIdIn(@NotNull final List<Long> ids);
+    Long deleteByIdIn(@NotNull List<Long> ids);
 
     /**
      * Count all jobs that belong to a given user and are in any of the given states.
@@ -73,7 +73,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses the set of statuses
      * @return the count of jobs matching the search criteria
      */
-    Long countJobsByUserAndStatusIn(@NotBlank final String user, @NotEmpty final Set<JobStatus> statuses);
+    Long countJobsByUserAndStatusIn(@NotBlank String user, @NotEmpty Set<JobStatus> statuses);
 
     /**
      * Returns the slice of ids for job requests created before the given date.
@@ -83,5 +83,5 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return List of job request ids
      */
     // TODO: Explore deleteFirst{N}ByCreatedBefore
-    Slice<IdProjection> findByCreatedBefore(@NotNull final Instant date, @NotNull Pageable pageable);
+    Slice<IdProjection> findByCreatedBefore(@NotNull Instant date, @NotNull Pageable pageable);
 }

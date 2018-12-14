@@ -46,6 +46,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -246,9 +247,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
     public void testJobSubmissionWithAttachmentsFiles() throws Exception {
 
         try (
-            final InputStream att1 = new FileInputStream(this.resourceLoader.getResource("/setupfile")
+            InputStream att1 = new FileInputStream(this.resourceLoader.getResource("/setupfile")
                 .getFile().getAbsolutePath());
-            final InputStream att2 = new FileInputStream(this.resourceLoader.getResource("/data.txt")
+            InputStream att2 = new FileInputStream(this.resourceLoader.getResource("/data.txt")
                 .getFile().getAbsolutePath())
         ) {
 
@@ -317,7 +318,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .withDisableLogArchival(true)
             .build();
 
-        try (final ByteArrayInputStream bis = new ByteArrayInputStream("ATTACHMENT DATA".getBytes("UTF-8"))) {
+        try (ByteArrayInputStream bis = new ByteArrayInputStream("ATTACHMENT DATA".getBytes(StandardCharsets.UTF_8))) {
             final Map<String, InputStream> attachments = new HashMap<>();
 
             attachments.put("attachmentfile.txt", bis);
@@ -332,7 +333,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final InputStream inputStream1
             = jobClient.getJobStdout(jobRequest.getId().orElseThrow(IllegalArgumentException::new));
-        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
+        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, StandardCharsets.UTF_8));
         final StringBuilder sb = new StringBuilder();
         String line;
         while ((line = reader1.readLine()) != null) {
@@ -695,19 +696,19 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         this.jobClient.submitJob(jobRequest1);
         this.jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
 
-        final InputStream inputStream1
-            = this.jobClient.getJobStdout(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
-        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
-        final StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader1.readLine()) != null) {
-            sb.append(line);
+        try (
+            InputStream inputStream1
+                = this.jobClient.getJobStdout(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
+            BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, StandardCharsets.UTF_8))
+        ) {
+            final StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader1.readLine()) != null) {
+                sb.append(line);
+            }
+
+            Assert.assertEquals("HELLO WORLD!!!", sb.toString());
         }
-
-        reader1.close();
-        inputStream1.close();
-
-        Assert.assertEquals("HELLO WORLD!!!", sb.toString());
     }
 
     /**
@@ -745,19 +746,19 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         this.jobClient.submitJob(jobRequest1);
         this.jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
 
-        final InputStream inputStream1
-            = this.jobClient.getJobStderr(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
-        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
-        final StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader1.readLine()) != null) {
-            sb.append(line);
+        try (
+            InputStream inputStream1
+                = this.jobClient.getJobStderr(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
+            BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, StandardCharsets.UTF_8))
+        ) {
+            final StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader1.readLine()) != null) {
+                sb.append(line);
+            }
+
+            Assert.assertEquals("ls: foo: No such file or directory", sb.toString());
         }
-
-        reader1.close();
-        inputStream1.close();
-
-        Assert.assertEquals("ls: foo: No such file or directory", sb.toString());
     }
 
     /**

@@ -39,7 +39,7 @@ public interface JpaFilePersistenceService extends FilePersistenceService {
      * @param file The path to search for
      * @return The entity wrapped in an {@link Optional} or {@link Optional#empty()}
      */
-    Optional<FileEntity> getFile(@NotBlank(message = "File path cannot be blank") final String file);
+    Optional<FileEntity> getFile(@NotBlank(message = "File path cannot be blank") String file);
 
     /**
      * Get all the file entity references that match the input set of file strings.
@@ -49,5 +49,5 @@ public interface JpaFilePersistenceService extends FilePersistenceService {
      * returned will consist of all other discovered files. E.G. {@code files} is ("a", "b", "c") and only "b"
      * and "c" are in the database the returned set will contain "b" and "c". The method won't fail.
      */
-    Set<FileEntity> getFiles(@NotNull final Set<String> files);
+    Set<FileEntity> getFiles(@NotNull Set<String> files);
 }

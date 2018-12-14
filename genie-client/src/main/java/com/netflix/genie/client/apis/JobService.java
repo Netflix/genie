@@ -61,7 +61,7 @@ public interface JobService {
      * @return A callable object.
      */
     @POST(JOBS_URL_SUFFIX)
-    Call<Void> submitJob(@Body final JobRequest request);
+    Call<Void> submitJob(@Body JobRequest request);
 
     /**
      * Submit a job with attachments.
@@ -98,21 +98,21 @@ public interface JobService {
      */
     @GET(JOBS_URL_SUFFIX)
     Call<JsonNode> getJobs(
-        @Query("id") final String id,
-        @Query("name") final String name,
-        @Query("user") final String user,
-        @Query("status") final Set<String> statuses,
-        @Query("tag") final Set<String> tags,
-        @Query("clusterName") final String clusterName,
-        @Query("clusterId") final String clusterId,
-        @Query("commandName") final String commandName,
-        @Query("commandId") final String commandId,
-        @Query("minStarted") final Long minStarted,
-        @Query("maxStarted") final Long maxStarted,
-        @Query("minFinished") final Long minFinished,
-        @Query("maxFinished") final Long maxFinished,
-        @Query("grouping") final String grouping,
-        @Query("groupingInstance") final String groupingInstance
+        @Query("id") String id,
+        @Query("name") String name,
+        @Query("user") String user,
+        @Query("status") Set<String> statuses,
+        @Query("tag") Set<String> tags,
+        @Query("clusterName") String clusterName,
+        @Query("clusterId") String clusterId,
+        @Query("commandName") String commandName,
+        @Query("commandId") String commandId,
+        @Query("minStarted") Long minStarted,
+        @Query("maxStarted") Long maxStarted,
+        @Query("minFinished") Long minFinished,
+        @Query("maxFinished") Long maxFinished,
+        @Query("grouping") String grouping,
+        @Query("groupingInstance") String groupingInstance
     );
 
     /**
@@ -122,7 +122,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}")
-    Call<Job> getJob(@Path("id") final String jobId);
+    Call<Job> getJob(@Path("id") String jobId);
 
     /**
      * Method to fetch the stdout of a job from Genie.
@@ -132,7 +132,7 @@ public interface JobService {
      */
     @Streaming
     @GET(JOBS_URL_SUFFIX + "/{id}/output/stdout")
-    Call<ResponseBody> getJobStdout(@Path("id") final String jobId);
+    Call<ResponseBody> getJobStdout(@Path("id") String jobId);
 
     /**
      * Method to fetch the stderr of a job from Genie.
@@ -142,7 +142,7 @@ public interface JobService {
      */
     @Streaming
     @GET(JOBS_URL_SUFFIX + "/{id}/output/stderr")
-    Call<ResponseBody> getJobStderr(@Path("id") final String jobId);
+    Call<ResponseBody> getJobStderr(@Path("id") String jobId);
 
     /**
      * Method to get Job status.
@@ -151,7 +151,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/status")
-    Call<JsonNode> getJobStatus(@Path("id") final String jobId);
+    Call<JsonNode> getJobStatus(@Path("id") String jobId);
 
     /**
      * Method to get the cluster information on which a job is run.
@@ -160,7 +160,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/cluster")
-    Call<Cluster> getJobCluster(@Path("id") final String jobId);
+    Call<Cluster> getJobCluster(@Path("id") String jobId);
 
     /**
      * Method to get the command information on which a job is run.
@@ -169,7 +169,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/command")
-    Call<Command> getJobCommand(@Path("id") final String jobId);
+    Call<Command> getJobCommand(@Path("id") String jobId);
 
     /**
      * Method to get the JobRequest for a job.
@@ -178,7 +178,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/request")
-    Call<JobRequest> getJobRequest(@Path("id") final String jobId);
+    Call<JobRequest> getJobRequest(@Path("id") String jobId);
 
     /**
      * Method to get the execution information for a job.
@@ -187,7 +187,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/execution")
-    Call<JobExecution> getJobExecution(@Path("id") final String jobId);
+    Call<JobExecution> getJobExecution(@Path("id") String jobId);
 
     /**
      * Method to get the metadata information for a job.
@@ -196,7 +196,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/metadata")
-    Call<JobMetadata> getJobMetadata(@Path("id") final String jobId);
+    Call<JobMetadata> getJobMetadata(@Path("id") String jobId);
 
     /**
      * Method to get the Applications for a job.
@@ -205,7 +205,7 @@ public interface JobService {
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/applications")
-    Call<List<Application>> getJobApplications(@Path("id") final String jobId);
+    Call<List<Application>> getJobApplications(@Path("id") String jobId);
 
     /**
      * Method to send a job kill request to Genie.
@@ -214,5 +214,5 @@ public interface JobService {
      * @return A callable object.
      */
     @DELETE(JOBS_URL_SUFFIX + "/{id}")
-    Call<Void> killJob(@Path("id") final String jobId);
+    Call<Void> killJob(@Path("id") String jobId);
 }

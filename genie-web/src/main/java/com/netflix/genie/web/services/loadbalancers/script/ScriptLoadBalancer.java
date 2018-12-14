@@ -273,8 +273,8 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
             }
             final Compilable compilable = (Compilable) engine;
             try (
-                final InputStream fis = Files.newInputStream(scriptDestinationPath);
-                final InputStreamReader reader = new InputStreamReader(fis, UTF_8)
+                InputStream fis = Files.newInputStream(scriptDestinationPath);
+                InputStreamReader reader = new InputStreamReader(fis, UTF_8)
             ) {
                 log.debug("Compiling {}", scriptFileSource);
                 this.script.set(compilable.compile(reader));

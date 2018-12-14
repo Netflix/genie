@@ -145,7 +145,7 @@ public class DiskJobFileServiceImpl implements JobFileService {
         }
 
         try (
-            final FileChannel fileChannel = FileChannel.open(
+            FileChannel fileChannel = FileChannel.open(
                 jobFile,
                 EnumSet.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.SPARSE)
             )
@@ -245,7 +245,7 @@ public class DiskJobFileServiceImpl implements JobFileService {
             final long size = Files.size(file);
             final String md5;
             if (this.calculateMd5) {
-                try (final InputStream fileInputStream = Files.newInputStream(file, StandardOpenOption.READ)) {
+                try (InputStream fileInputStream = Files.newInputStream(file, StandardOpenOption.READ)) {
                     md5 = DigestUtils.md5Hex(fileInputStream);
                 }
             } else {

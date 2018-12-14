@@ -56,7 +56,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @POST(APPLICATION_URL_SUFFIX)
-    Call<Void> createApplication(@Body final Application application);
+    Call<Void> createApplication(@Body Application application);
 
     /**
      * Method to update a application in Genie.
@@ -66,7 +66,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}")
-    Call<Void> updateApplication(@Path("id") final String applicationId, @Body final Application application);
+    Call<Void> updateApplication(@Path("id") String applicationId, @Body Application application);
 
     /**
      * Method to get all applications from Genie.
@@ -80,11 +80,11 @@ public interface ApplicationService {
      */
     @GET(APPLICATION_URL_SUFFIX)
     Call<JsonNode> getApplications(
-        @Query("name") final String name,
-        @Query("user") final String user,
-        @Query("status") final List<String> statusList,
-        @Query("tag") final List<String> tagList,
-        @Query("type") final String type
+        @Query("name") String name,
+        @Query("user") String user,
+        @Query("status") List<String> statusList,
+        @Query("tag") List<String> tagList,
+        @Query("type") String type
     );
 
     /**
@@ -94,7 +94,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX + "/{id}")
-    Call<Application> getApplication(@Path("id") final String applicationId);
+    Call<Application> getApplication(@Path("id") String applicationId);
 
     /**
      * Method to delete a application in Genie.
@@ -103,7 +103,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @DELETE(APPLICATION_URL_SUFFIX + "/{id}")
-    Call<Void> deleteApplication(@Path("id") final String applicationId);
+    Call<Void> deleteApplication(@Path("id") String applicationId);
 
     /**
      * Method to delete all applications in Genie.
@@ -121,7 +121,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @PATCH(APPLICATION_URL_SUFFIX + "/{id}")
-    Call<Void> patchApplication(@Path("id") final String applicationId, @Body final JsonPatch patch);
+    Call<Void> patchApplication(@Path("id") String applicationId, @Body JsonPatch patch);
 
     /**
      * Method to get commmands for a application in Genie.
@@ -130,7 +130,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX + "/{id}/commands")
-    Call<List<Command>> getCommandsForApplication(@Path("id") final String applicationId);
+    Call<List<Command>> getCommandsForApplication(@Path("id") String applicationId);
 
     /****************** Methods to manipulate dependencies for a application   *********************/
 
@@ -141,7 +141,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
-    Call<Set<String>> getDependenciesForApplication(@Path("id") final String applicationId);
+    Call<Set<String>> getDependenciesForApplication(@Path("id") String applicationId);
 
     /**
      * Method to add dependencies to a application in Genie.
@@ -152,8 +152,8 @@ public interface ApplicationService {
      */
     @POST(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
     Call<Void> addDependenciesToApplication(
-        @Path("id") final String applicationId,
-        @Body final Set<String> dependencies
+        @Path("id") String applicationId,
+        @Body Set<String> dependencies
     );
 
     /**
@@ -165,8 +165,8 @@ public interface ApplicationService {
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
     Call<Void> updateDependenciesForApplication(
-        @Path("id") final String applicationId,
-        @Body final Set<String> dependencies
+        @Path("id") String applicationId,
+        @Body Set<String> dependencies
     );
 
     /**
@@ -176,7 +176,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @DELETE(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
-    Call<Void> removeAllDependenciesForApplication(@Path("id") final String applicationId);
+    Call<Void> removeAllDependenciesForApplication(@Path("id") String applicationId);
 
     /****************** Methods to manipulate configs for a application   *********************/
 
@@ -187,7 +187,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX + "/{id}/configs")
-    Call<Set<String>> getConfigsForApplication(@Path("id") final String applicationId);
+    Call<Set<String>> getConfigsForApplication(@Path("id") String applicationId);
 
     /**
      * Method to add configs to a application in Genie.
@@ -197,7 +197,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @POST(APPLICATION_URL_SUFFIX + "/{id}/configs")
-    Call<Void> addConfigsToApplication(@Path("id") final String applicationId, @Body final Set<String> configs);
+    Call<Void> addConfigsToApplication(@Path("id") String applicationId, @Body Set<String> configs);
 
     /**
      * Method to update configs for a application in Genie.
@@ -207,7 +207,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}/configs")
-    Call<Void> updateConfigsForApplication(@Path("id") final String applicationId, @Body final Set<String> configs);
+    Call<Void> updateConfigsForApplication(@Path("id") String applicationId, @Body Set<String> configs);
 
     /**
      * Method to delete all configs for a application in Genie.
@@ -216,7 +216,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @DELETE(APPLICATION_URL_SUFFIX + "/{id}/configs")
-    Call<Void> removeAllConfigsForApplication(@Path("id") final String applicationId);
+    Call<Void> removeAllConfigsForApplication(@Path("id") String applicationId);
 
     /****************** Methods to manipulate tags for a application   *********************/
 
@@ -227,7 +227,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX + "/{id}/tags")
-    Call<Set<String>> getTagsForApplication(@Path("id") final String applicationId);
+    Call<Set<String>> getTagsForApplication(@Path("id") String applicationId);
 
     /**
      * Method to add tags to a application in Genie.
@@ -237,7 +237,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @POST(APPLICATION_URL_SUFFIX + "/{id}/tags")
-    Call<Void> addTagsToApplication(@Path("id") final String applicationId, @Body final Set<String> tags);
+    Call<Void> addTagsToApplication(@Path("id") String applicationId, @Body Set<String> tags);
 
     /**
      * Method to update tags for a application in Genie.
@@ -247,7 +247,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @PUT(APPLICATION_URL_SUFFIX + "/{id}/tags")
-    Call<Void> updateTagsForApplication(@Path("id") final String applicationId, @Body final Set<String> tags);
+    Call<Void> updateTagsForApplication(@Path("id") String applicationId, @Body Set<String> tags);
 
     /**
      * Method to delete a tag for a application in Genie.
@@ -257,7 +257,7 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @DELETE(APPLICATION_URL_SUFFIX + "/{id}/tags/{tag}")
-    Call<Void> removeTagForApplication(@Path("id") final String applicationId, @Path("tag") final String tag);
+    Call<Void> removeTagForApplication(@Path("id") String applicationId, @Path("tag") String tag);
 
     /**
      * Method to delete all tags for a application in Genie.
@@ -266,5 +266,5 @@ public interface ApplicationService {
      * @return A callable object.
      */
     @DELETE(APPLICATION_URL_SUFFIX + "/{id}/tags")
-    Call<Void> removeAllTagsForApplication(@Path("id") final String applicationId);
+    Call<Void> removeAllTagsForApplication(@Path("id") String applicationId);
 }

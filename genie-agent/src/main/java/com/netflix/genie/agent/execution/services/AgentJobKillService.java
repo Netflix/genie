@@ -30,13 +30,13 @@ import javax.validation.constraints.NotBlank;
 public interface AgentJobKillService {
     /**
      * Start listening for job termination notification.
+     *
      * @param jobId job id
      */
-    void start(@NotBlank(message = "Job id cannot be blank") final String jobId);
+    void start(@NotBlank(message = "Job id cannot be blank") String jobId);
 
     /**
      * Stop the service.
-     *
      */
     void stop();
 }

@@ -54,7 +54,7 @@ public interface AgentJobService {
      * @throws GenieIdAlreadyExistsException If the id requested along with the job request is already in use
      * @throws ConstraintViolationException  If the arguments fail validation
      */
-    String reserveJobId(@Valid final JobRequest jobRequest, @Valid final AgentClientMetadata agentClientMetadata);
+    String reserveJobId(@Valid JobRequest jobRequest, @Valid AgentClientMetadata agentClientMetadata);
 
     /**
      * Resolve the job specification for job identified by the given id. This method will persist the job specification
@@ -71,7 +71,7 @@ public interface AgentJobService {
      *                                           actually exist
      * @throws ConstraintViolationException      If the arguments fail validation
      */
-    JobSpecification resolveJobSpecification(@NotBlank final String id);
+    JobSpecification resolveJobSpecification(@NotBlank String id);
 
     /**
      * Get a job specification if has been resolved.
@@ -83,7 +83,7 @@ public interface AgentJobService {
      *                                                resolved or saved yet
      * @throws ConstraintViolationException           If the arguments fail validation
      */
-    JobSpecification getJobSpecification(@NotBlank final String id);
+    JobSpecification getJobSpecification(@NotBlank String id);
 
     /**
      * Run the job specification resolution algorithm on the given input but save nothing in the system.
@@ -92,7 +92,7 @@ public interface AgentJobService {
      * @return The job specification that would have been resolved for the given input
      * @throws ConstraintViolationException If the arguments fail validation
      */
-    JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest);
+    JobSpecification dryRunJobSpecificationResolution(@Valid JobRequest jobRequest);
 
     /**
      * Set a job identified by {@code id} to be owned by the agent identified by {@code agentClientMetadata}. The
@@ -106,7 +106,7 @@ public interface AgentJobService {
      *                                         {@link com.netflix.genie.common.dto.JobStatus#RESOLVED}
      * @throws ConstraintViolationException    If the arguments fail validation
      */
-    void claimJob(@NotBlank final String id, @Valid final AgentClientMetadata agentClientMetadata);
+    void claimJob(@NotBlank String id, @Valid AgentClientMetadata agentClientMetadata);
 
     /**
      * Update the status of the job identified with {@code id} to be {@code newStatus} provided that the current status
@@ -126,9 +126,9 @@ public interface AgentJobService {
      * @throws ConstraintViolationException If the arguments fail validation
      */
     void updateJobStatus(
-        @NotBlank final String id,
-        final JobStatus currentStatus,
-        final JobStatus newStatus,
-        @Nullable final String newStatusMessage
+        @NotBlank String id,
+        JobStatus currentStatus,
+        JobStatus newStatus,
+        @Nullable String newStatusMessage
     );
 }

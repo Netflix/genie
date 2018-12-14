@@ -57,7 +57,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @POST(COMMAND_URL_SUFFIX)
-    Call<Void> createCommand(@Body final Command command);
+    Call<Void> createCommand(@Body Command command);
 
     /**
      * Method to update a command in Genie.
@@ -67,7 +67,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}")
-    Call<Void> updateCommand(@Path("id") final String commandId, @Body final Command command);
+    Call<Void> updateCommand(@Path("id") String commandId, @Body Command command);
 
     /**
      * Method to get all commands from Genie filtered based on query params.
@@ -80,10 +80,10 @@ public interface CommandService {
      */
     @GET(COMMAND_URL_SUFFIX)
     Call<JsonNode> getCommands(
-        @Query("name") final String name,
-        @Query("user") final String user,
-        @Query("status") final List<String> statusList,
-        @Query("tag") final List<String> tagList
+        @Query("name") String name,
+        @Query("user") String user,
+        @Query("status") List<String> statusList,
+        @Query("tag") List<String> tagList
     );
 
     /**
@@ -93,7 +93,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}")
-    Call<Command> getCommand(@Path("id") final String commandId);
+    Call<Command> getCommand(@Path("id") String commandId);
 
     /**
      * Method to delete a command in Genie.
@@ -102,7 +102,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}")
-    Call<Void> deleteCommand(@Path("id") final String commandId);
+    Call<Void> deleteCommand(@Path("id") String commandId);
 
     /**
      * Method to delete all commands in Genie.
@@ -120,7 +120,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @PATCH(COMMAND_URL_SUFFIX + "/{id}")
-    Call<Void> patchCommand(@Path("id") final String commandId, @Body final JsonPatch patch);
+    Call<Void> patchCommand(@Path("id") String commandId, @Body JsonPatch patch);
 
     /****************** Methods to manipulate applications and clusters for a command   *********************/
 
@@ -131,7 +131,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}/applications")
-    Call<List<Application>> getApplicationsForCommand(@Path("id") final String commandId);
+    Call<List<Application>> getApplicationsForCommand(@Path("id") String commandId);
 
     /**
      * Method to get clusters for a command in Genie.
@@ -140,7 +140,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}/clusters")
-    Call<List<Cluster>> getClustersForCommand(@Path("id") final String commandId);
+    Call<List<Cluster>> getClustersForCommand(@Path("id") String commandId);
 
     /**
      * Method to add applications to a command in Genie.
@@ -150,7 +150,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @POST(COMMAND_URL_SUFFIX + "/{id}/applications")
-    Call<Void> addApplicationsToCommand(@Path("id") final String commandId, @Body final List<String> applicationIds);
+    Call<Void> addApplicationsToCommand(@Path("id") String commandId, @Body List<String> applicationIds);
 
     /**
      * Method to override and set applications for a command in Genie.
@@ -160,7 +160,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}/applications")
-    Call<Void> setApplicationsForCommand(@Path("id") final String commandId, @Body final List<String> applicationIds);
+    Call<Void> setApplicationsForCommand(@Path("id") String commandId, @Body List<String> applicationIds);
 
     /**
      * Method to delete a application for a command in Genie.
@@ -171,8 +171,8 @@ public interface CommandService {
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/applications/{applicationId}")
     Call<Void> removeApplicationForCommand(
-        @Path("id") final String commandId,
-        @Path("applicationId") final String applicationId
+        @Path("id") String commandId,
+        @Path("applicationId") String applicationId
     );
 
     /**
@@ -182,7 +182,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/applications")
-    Call<Void> removeAllApplicationsForCommand(@Path("id") final String commandId);
+    Call<Void> removeAllApplicationsForCommand(@Path("id") String commandId);
 
     /****************** Methods to manipulate configs for a command   *********************/
 
@@ -193,7 +193,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}/configs")
-    Call<Set<String>> getConfigsForCommand(@Path("id") final String commandId);
+    Call<Set<String>> getConfigsForCommand(@Path("id") String commandId);
 
     /**
      * Method to add configs to a command in Genie.
@@ -203,7 +203,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @POST(COMMAND_URL_SUFFIX + "/{id}/configs")
-    Call<Void> addConfigsToCommand(@Path("id") final String commandId, @Body final Set<String> configs);
+    Call<Void> addConfigsToCommand(@Path("id") String commandId, @Body Set<String> configs);
 
     /**
      * Method to update configs for a command in Genie.
@@ -213,7 +213,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}/configs")
-    Call<Void> updateConfigsForCommand(@Path("id") final String commandId, @Body final Set<String> configs);
+    Call<Void> updateConfigsForCommand(@Path("id") String commandId, @Body Set<String> configs);
 
     /**
      * Method to delete all configs for a command in Genie.
@@ -222,7 +222,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/configs")
-    Call<Void> removeAllConfigsForCommand(@Path("id") final String commandId);
+    Call<Void> removeAllConfigsForCommand(@Path("id") String commandId);
 
     /****************** Methods to manipulate dependencies for a command   *********************/
 
@@ -233,7 +233,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}/dependencies")
-    Call<Set<String>> getDependenciesForCommand(@Path("id") final String commandId);
+    Call<Set<String>> getDependenciesForCommand(@Path("id") String commandId);
 
     /**
      * Method to add dependencies to a command in Genie.
@@ -244,8 +244,8 @@ public interface CommandService {
      */
     @POST(COMMAND_URL_SUFFIX + "/{id}/dependencies")
     Call<Void> addDependenciesToCommand(
-        @Path("id") final String commandId,
-        @Body final Set<String> dependencies
+        @Path("id") String commandId,
+        @Body Set<String> dependencies
     );
 
     /**
@@ -257,8 +257,8 @@ public interface CommandService {
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}/dependencies")
     Call<Void> updateDependenciesForCommand(
-        @Path("id") final String commandId,
-        @Body final Set<String> dependencies
+        @Path("id") String commandId,
+        @Body Set<String> dependencies
     );
 
     /**
@@ -268,7 +268,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/dependencies")
-    Call<Void> removeAllDependenciesForCommand(@Path("id") final String commandId);
+    Call<Void> removeAllDependenciesForCommand(@Path("id") String commandId);
 
     /****************** Methods to manipulate tags for a command   *********************/
 
@@ -279,7 +279,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX + "/{id}/tags")
-    Call<Set<String>> getTagsForCommand(@Path("id") final String commandId);
+    Call<Set<String>> getTagsForCommand(@Path("id") String commandId);
 
     /**
      * Method to add tags to a command in Genie.
@@ -289,7 +289,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @POST(COMMAND_URL_SUFFIX + "/{id}/tags")
-    Call<Void> addTagsToCommand(@Path("id") final String commandId, @Body final Set<String> tags);
+    Call<Void> addTagsToCommand(@Path("id") String commandId, @Body Set<String> tags);
 
     /**
      * Method to update tags for a command in Genie.
@@ -299,7 +299,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @PUT(COMMAND_URL_SUFFIX + "/{id}/tags")
-    Call<Void> updateTagsForCommand(@Path("id") final String commandId, @Body final Set<String> tags);
+    Call<Void> updateTagsForCommand(@Path("id") String commandId, @Body Set<String> tags);
 
     /**
      * Method to delete a tag for a command in Genie.
@@ -309,7 +309,7 @@ public interface CommandService {
      * @return A callable object.
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/tags/{tag}")
-    Call<Void> removeTagForCommand(@Path("id") final String commandId, @Path("tag") final String tag);
+    Call<Void> removeTagForCommand(@Path("id") String commandId, @Path("tag") String tag);
 
     /**
      * Method to delete all tags for a command in Genie.
@@ -318,5 +318,5 @@ public interface CommandService {
      * @return A callable object.
      */
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/tags")
-    Call<Void> removeAllTagsForCommand(@Path("id") final String commandId);
+    Call<Void> removeAllTagsForCommand(@Path("id") String commandId);
 }

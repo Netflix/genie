@@ -45,9 +45,9 @@ public interface JobCoordinatorService {
      */
     String coordinateJob(
         @NotNull(message = "No job request provided. Unable to execute.")
-        @Valid final JobRequest jobRequest,
+        @Valid JobRequest jobRequest,
         @NotNull(message = "No job metadata provided. Unable to execute.")
-        @Valid final JobMetadata jobMetadata
+        @Valid JobMetadata jobMetadata
     ) throws GenieException;
 
     /**
@@ -57,5 +57,5 @@ public interface JobCoordinatorService {
      * @param reason brief reason for requesting the job be killed
      * @throws GenieException if there is an error
      */
-    void killJob(@NotBlank final String jobId, @NotBlank final String reason) throws GenieException;
+    void killJob(@NotBlank String jobId, @NotBlank String reason) throws GenieException;
 }

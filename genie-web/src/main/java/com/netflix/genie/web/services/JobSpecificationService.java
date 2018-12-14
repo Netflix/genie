@@ -41,5 +41,5 @@ public interface JobSpecificationService {
      * @param jobRequest The job request containing all details a user wants to have for their job
      * @return The complete job specification
      */
-    JobSpecification resolveJobSpecification(final String id, @Valid final JobRequest jobRequest);
+    JobSpecification resolveJobSpecification(String id, @Valid JobRequest jobRequest);
 }

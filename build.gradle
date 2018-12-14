@@ -6,7 +6,7 @@ buildscript {
 
     dependencies {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
-        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:6.0.4"
+        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:7.0.0"
         classpath "org.ajoberstar.grgit:grgit-gradle:3.0.0-beta.1"
         classpath "org.ajoberstar:gradle-git-publish:1.0.1"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
@@ -16,6 +16,7 @@ buildscript {
         classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.5"
         classpath "io.franzbecker:gradle-lombok:1.14"
         classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.6"
     }
 }
 
@@ -56,7 +57,7 @@ configure(javaProjects) {
     apply plugin: "nebula.netflixoss"
     apply plugin: "java"
     apply plugin: "checkstyle"
-    apply plugin: "findbugs"
+    apply plugin: "com.github.spotbugs"
     apply plugin: "pmd"
     apply plugin: "io.spring.dependency-management"
     apply plugin: "com.gorylenko.gradle-git-properties"
@@ -65,8 +66,8 @@ configure(javaProjects) {
 
     group = "com.netflix.${githubProjectName}"
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     dependencyManagement {
         imports {
@@ -78,6 +79,7 @@ configure(javaProjects) {
             dependency("cglib:cglib-nodep:3.2.6")
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.springtestdbunit:spring-test-dbunit:1.3.0")
+            dependency("com.github.spotbugs:spotbugs-annotations:3.1.9")
             dependencySet(group: "com.squareup.retrofit2", version: "2.1.0") {
                 entry "retrofit"
                 entry "converter-jackson"
@@ -112,6 +114,7 @@ configure(javaProjects) {
                 entry "grpc-server-spring-boot-starter"
             }
             dependency("net.sf.jtidy:jtidy:r938")
+            dependency("net.jcip:jcip-annotations:1.0")
             dependency("org.apache.commons:commons-configuration2:2.2")
             dependency("org.apache.commons:commons-exec:1.3")
             // For some reason 3.5.3-beta was throwing error with 3.4.x server
@@ -174,7 +177,8 @@ configure(javaProjects) {
          * Annotation Processors
          *******************************/
 
-        annotationProcessor("com.google.code.findbugs:annotations")
+        annotationProcessor("net.jcip:jcip-annotations")
+        annotationProcessor("com.github.spotbugs:spotbugs-annotations")
 
         /*******************************
          * Compile Dependencies
@@ -194,7 +198,8 @@ configure(javaProjects) {
          * Test Dependencies
          *******************************/
 
-        testAnnotationProcessor("com.google.code.findbugs:annotations")
+        testAnnotationProcessor("net.jcip:jcip-annotations")
+        testAnnotationProcessor("com.github.spotbugs:spotbugs-annotations")
 
         testCompile("cglib:cglib-nodep")
         testCompile("org.spockframework:spock-core")
@@ -283,7 +288,7 @@ configure(javaProjects) {
             }
 
             reports.html.setDestination(new File("${reporting.baseDir}/test/${task.name}"))
-            jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
+            jacocoTestReport.getExecutionData().plus(files("$buildDir/jacoco/${task.name}.exec"))
     }
 
     test {
@@ -304,12 +309,28 @@ configure(javaProjects) {
         configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
     }
 
-    findbugs {
-        excludeFilter = new File(project.parent.projectDir, "codequality/findbugs/excludeFilter.xml")
+    spotbugs {
+        excludeFilter = new File(project.parent.projectDir, "codequality/spotbugs/excludeFilter.xml")
+    }
+
+    tasks.withType(com.github.spotbugs.SpotBugsTask) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    pmd {
+        // Gradle 5 upgraded PMD to 6.7 (https://github.com/gradle/gradle/issues/6625)
+        // This caused all kinds of errors in our build. Pin back for now and upgrade at our own pace or look further
+        toolVersion = "5.6.1"
     }
 
     tasks.withType(Pmd) {
-        reports.html.enabled true
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
     }
 
     jacocoTestReport {
@@ -347,16 +368,18 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     }
     afterEvaluate {
         // Exclude generated files from top-level coverage report
-        classDirectories = files(
-                classDirectories.files.collect {
-                    fileTree(
-                            dir: it,
-                            exclude: [
-                                    "**/com/netflix/genie/proto/**",
-                                    "**/com/netflix/genie/web/jpa/entities/*_*",
-                            ]
-                    )
-                }
+        classDirectories.setFrom(
+                files(
+                        classDirectories.files.collect {
+                            fileTree(
+                                    dir: it,
+                                    exclude: [
+                                            "**/com/netflix/genie/proto/**",
+                                            "**/com/netflix/genie/web/jpa/entities/*_*",
+                                    ]
+                            )
+                        }
+                )
         )
     }
 }

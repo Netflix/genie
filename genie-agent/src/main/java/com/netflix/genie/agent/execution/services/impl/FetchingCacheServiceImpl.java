@@ -159,7 +159,7 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
         createDirectoryStructureIfNotExists(cacheResourceVersionDir);
 
         try (
-            final CloseableLock lock = fileLockFactory.getLock(
+            CloseableLock lock = fileLockFactory.getLock(
                 touchCacheResourceVersionLockFile(
                     resourceCacheId,
                     resourceLastModified
@@ -189,8 +189,8 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
                     resourceLastModified
                 );
                 try (
-                    final InputStream in = resource.getInputStream();
-                    final OutputStream out = new FileOutputStream(cachedResourceVersionDownloadFile)
+                    InputStream in = resource.getInputStream();
+                    OutputStream out = new FileOutputStream(cachedResourceVersionDownloadFile)
                 ) {
                     FileCopyUtils.copy(in, out);
                     Files.move(cachedResourceVersionDownloadFile, cachedResourceVersionDataFile);
@@ -290,9 +290,9 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
          * Delete the entire directory for the resource version
          */
         try (
-            final CloseableLock lock = fileLockFactory.getLock(
+            CloseableLock lock = fileLockFactory.getLock(
                 touchCacheResourceVersionLockFile(resourceVersionDir)
-            );
+            )
         ) {
             //critical section begin
             lock.lock();

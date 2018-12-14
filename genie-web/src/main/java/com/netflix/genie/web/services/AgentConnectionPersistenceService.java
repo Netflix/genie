@@ -39,7 +39,7 @@ public interface AgentConnectionPersistenceService {
      */
     void saveAgentConnection(
         @NotBlank String jobId,
-        @NotBlank final String hostname
+        @NotBlank String hostname
     );
 
     /**
@@ -51,7 +51,7 @@ public interface AgentConnectionPersistenceService {
      */
     void removeAgentConnection(
         @NotBlank String jobId,
-        @NotBlank final String hostname
+        @NotBlank String hostname
     );
 
     /**
