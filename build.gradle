@@ -283,7 +283,7 @@ configure(javaProjects) {
             }
 
             reports.html.setDestination(new File("${reporting.baseDir}/test/${task.name}"))
-            jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
+            jacocoTestReport.executionData.from(files("$buildDir/jacoco/${task.name}.exec"))
     }
 
     test {
@@ -353,16 +353,18 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     }
     afterEvaluate {
         // Exclude generated files from top-level coverage report
-        classDirectories = files(
-                classDirectories.files.collect {
-                    fileTree(
-                            dir: it,
-                            exclude: [
-                                    "**/com/netflix/genie/proto/**",
-                                    "**/com/netflix/genie/web/jpa/entities/*_*",
-                            ]
-                    )
-                }
+        classDirectories.from(
+                files(
+                        classDirectories.files.collect {
+                            fileTree(
+                                    dir: it,
+                                    exclude: [
+                                            "**/com/netflix/genie/proto/**",
+                                            "**/com/netflix/genie/web/jpa/entities/*_*",
+                                    ]
+                            )
+                        }
+                )
         )
     }
 }
