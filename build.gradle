@@ -288,7 +288,7 @@ configure(javaProjects) {
             }
 
             reports.html.setDestination(new File("${reporting.baseDir}/test/${task.name}"))
-            jacocoTestReport.executionData.from(files("$buildDir/jacoco/${task.name}.exec"))
+            jacocoTestReport.getExecutionData().plus(files("$buildDir/jacoco/${task.name}.exec"))
     }
 
     test {
@@ -368,7 +368,7 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
     }
     afterEvaluate {
         // Exclude generated files from top-level coverage report
-        classDirectories.from(
+        classDirectories.setFrom(
                 files(
                         classDirectories.files.collect {
                             fileTree(
