@@ -37,6 +37,7 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -56,6 +57,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -96,6 +98,8 @@ public class JobCoordinatorServiceImplUnitTests {
     private MeterRegistry registry;
     private Timer coordinationTimer;
     private Timer setJobEnvironmentTimer;
+    private JobsUsersActiveLimitProperties jobsUsersActiveLimitsProperties;
+    private Provider<JobsUsersActiveLimitProperties> jobsUsersActiveLimitsPropertiesProvider;
 
     /**
      * Setup for the tests.
@@ -110,11 +114,13 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobsProperties = new JobsProperties();
         this.jobsProperties.getLocations().setArchives(BASE_ARCHIVE_LOCATION);
         this.jobsProperties.getMemory().setDefaultJobMemory(MEMORY);
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
+        this.jobsUsersActiveLimitsProperties = new JobsUsersActiveLimitProperties();
+        this.jobsUsersActiveLimitsProperties.setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
         this.applicationPersistenceService = Mockito.mock(ApplicationPersistenceService.class);
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
         this.commandPersistenceService = Mockito.mock(CommandPersistenceService.class);
         this.specificationService = Mockito.mock(JobSpecificationService.class);
+        this.jobsUsersActiveLimitsPropertiesProvider = mockPropertiesProvider();
 
         this.registry = Mockito.mock(MeterRegistry.class);
         this.coordinationTimer = Mockito.mock(Timer.class);
@@ -136,11 +142,16 @@ public class JobCoordinatorServiceImplUnitTests {
             )
             .thenReturn(this.setJobEnvironmentTimer);
 
+        Mockito
+            .when(this.jobsUsersActiveLimitsPropertiesProvider.get())
+            .thenReturn(jobsUsersActiveLimitsProperties);
+
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
             this.jobKillService,
             this.jobStateService,
             this.jobsProperties,
+            this.jobsUsersActiveLimitsPropertiesProvider,
             this.applicationPersistenceService,
             this.jobSearchService,
             this.clusterPersistenceService,
@@ -546,8 +557,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test
     public void canCoordinateIfJobUserJobLimitIsDisabled() throws GenieException {
         final int userActiveJobsLimit = 5;
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(false);
-        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+        this.jobsUsersActiveLimitsProperties.setEnabled(false);
+        this.jobsUsersActiveLimitsProperties.setCount(userActiveJobsLimit);
 
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -648,8 +659,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test(expected = GenieUserLimitExceededException.class)
     public void cantCoordinateJobUserJobLimitIsExceeded() throws GenieException {
         final int userActiveJobsLimit = 5;
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(true);
-        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+        this.jobsUsersActiveLimitsProperties.setEnabled(true);
+        this.jobsUsersActiveLimitsProperties.setCount(userActiveJobsLimit);
 
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -987,5 +998,10 @@ public class JobCoordinatorServiceImplUnitTests {
             .withNumAttachments(2)
             .withTotalSizeOfAttachments(28080L)
             .build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Provider<JobsUsersActiveLimitProperties> mockPropertiesProvider() {
+        return Mockito.mock(Provider.class);
     }
 }

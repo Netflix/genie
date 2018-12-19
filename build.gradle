@@ -108,6 +108,7 @@ configure(javaProjects) {
                 entry "springfox-bean-validators"
             }
             dependency("javax.el:javax.el-api:3.0.1-b06")
+            dependency("javax.inject:javax.inject:1")
             dependency("javax.persistence:javax.persistence-api:2.2")
             dependencySet(group: "net.devh", version: "2.0.1.RELEASE") {
                 entry "grpc-server-spring-boot-autoconfigure"

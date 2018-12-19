@@ -22,6 +22,7 @@ import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -55,6 +56,9 @@ public class PropertyBindingIntegrationTests {
     @Autowired
     private HealthProperties healthProperties;
 
+    @Autowired
+    private JobsUsersActiveLimitProperties jobsUsersActiveLimitProperties;
+
     /**
      * Verify than beans get autowired, and that (non-default) values correspond to the expected set via properties
      * file.
@@ -69,13 +73,6 @@ public class PropertyBindingIntegrationTests {
         Assert.assertThat(jobsProperties.getMax().getStdOutSize(), Matchers.is(512L));
         Assert.assertThat(jobsProperties.getMemory().getMaxSystemMemory(), Matchers.is(1024));
         Assert.assertThat(jobsProperties.getUsers().isCreationEnabled(), Matchers.is(true));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().isEnabled(), Matchers.is(true));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getCount(), Matchers.is(15));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("JaneDoe"), Matchers.is(100));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("janedoe"), Matchers.is(15));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("John-Doe"), Matchers.is(200));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("john-doe"), Matchers.is(15));
-        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getUserLimit("anyone else"), Matchers.is(15));
 
         Assert.assertNotNull(dataServiceRetryProperties);
         Assert.assertThat(dataServiceRetryProperties.getInitialInterval(), Matchers.is(200L));
@@ -83,5 +80,14 @@ public class PropertyBindingIntegrationTests {
         Assert.assertNotNull(healthProperties);
         Assert.assertThat(healthProperties.getMaxCpuLoadPercent(), Matchers.is(33.3));
         Assert.assertThat(healthProperties.getMaxCpuLoadConsecutiveOccurrences(), Matchers.is(5));
+
+        Assert.assertThat(jobsUsersActiveLimitProperties.isEnabled(), Matchers.is(true));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getCount(), Matchers.is(15));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("JaneDoe"), Matchers.is(100));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("janedoe"), Matchers.is(15));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("John-Doe"), Matchers.is(200));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("john-doe"), Matchers.is(15));
+        Assert.assertThat(jobsUsersActiveLimitProperties.getUserLimit("anyone else"), Matchers.is(15));
+
     }
 }

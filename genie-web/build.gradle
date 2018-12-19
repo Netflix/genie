@@ -34,6 +34,7 @@ dependencies {
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")
     compile("javax.persistence:javax.persistence-api")
+    compile("javax.inject:javax.inject")
     compile("net.devh:grpc-server-spring-boot-autoconfigure")
     compile("net.devh:grpc-server-spring-boot-starter")
     compile("org.apache.commons:commons-exec")

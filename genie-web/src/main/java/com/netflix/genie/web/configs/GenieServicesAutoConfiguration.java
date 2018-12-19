@@ -26,6 +26,7 @@ import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.AgentRoutingService;
@@ -53,9 +54,9 @@ import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
+import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.JobSpecificationServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
-import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -63,12 +64,15 @@ import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.retry.support.RetryTemplate;
 
+import javax.inject.Provider;
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.List;
@@ -89,6 +93,14 @@ import java.util.List;
     }
 )
 public class GenieServicesAutoConfiguration {
+
+    @Bean
+    @Scope("prototype")
+    @ConfigurationProperties(prefix = JobsUsersActiveLimitProperties.PROPERTY_PREFIX)
+    JobsUsersActiveLimitProperties jobsUsersActiveLimitProperties() {
+        return new JobsUsersActiveLimitProperties();
+    }
+
 
     /**
      * Get an local implementation of the JobKillService.
@@ -127,7 +139,7 @@ public class GenieServicesAutoConfiguration {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param jobKillServiceV3   Service to kill V3 jobs.
+     * @param jobKillServiceV3      Service to kill V3 jobs.
      * @param jobKillServiceV4      Service to kill V4 jobs.
      * @param jobPersistenceService Job persistence service
      * @return A job kill service instance.
@@ -218,17 +230,18 @@ public class GenieServicesAutoConfiguration {
     /**
      * Get an instance of the JobCoordinatorService.
      *
-     * @param jobPersistenceService         implementation of job persistence service interface
-     * @param jobKillService                The job kill service to use
-     * @param jobStateService               The running job metrics service to use
-     * @param jobSearchService              Implementation of job search service interface
-     * @param jobsProperties                The jobs properties to use
-     * @param applicationPersistenceService Implementation of application service interface
-     * @param clusterPersistenceService     Implementation of cluster service interface
-     * @param commandPersistenceService     Implementation of command service interface
-     * @param specificationService          The job specification service to use
-     * @param registry                      The metrics registry to use
-     * @param genieHostInfo                 Information about the host the Genie process is running on
+     * @param jobPersistenceService                  implementation of job persistence service interface
+     * @param jobKillService                         The job kill service to use
+     * @param jobStateService                        The running job metrics service to use
+     * @param jobSearchService                       Implementation of job search service interface
+     * @param jobsProperties                         The jobs properties to use
+     * @param jobsUsersActiveLimitPropertiesProvider The user limits dynamic properties provider
+     * @param applicationPersistenceService          Implementation of application service interface
+     * @param clusterPersistenceService              Implementation of cluster service interface
+     * @param commandPersistenceService              Implementation of command service interface
+     * @param specificationService                   The job specification service to use
+     * @param registry                               The metrics registry to use
+     * @param genieHostInfo                          Information about the host the Genie process is running on
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
@@ -239,6 +252,7 @@ public class GenieServicesAutoConfiguration {
         @Qualifier("jobMonitoringCoordinator") final JobStateService jobStateService,
         final JobSearchService jobSearchService,
         final JobsProperties jobsProperties,
+        final Provider<JobsUsersActiveLimitProperties> jobsUsersActiveLimitPropertiesProvider,
         final ApplicationPersistenceService applicationPersistenceService,
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
@@ -251,6 +265,7 @@ public class GenieServicesAutoConfiguration {
             jobKillService,
             jobStateService,
             jobsProperties,
+            jobsUsersActiveLimitPropertiesProvider,
             applicationPersistenceService,
             jobSearchService,
             clusterPersistenceService,

@@ -24,6 +24,7 @@ import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -44,6 +45,7 @@ import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -68,6 +70,14 @@ public class ServicesAutoConfigurationUnitTests {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
 
         this.genieServicesAutoConfiguration = new GenieServicesAutoConfiguration();
+    }
+
+    /**
+     * Confirm we can get a JobsUsersActiveLimitProperties instance.
+     */
+    @Test
+    public void canJobsUsersActiveLimitProperties() {
+        Assert.assertNotNull(this.genieServicesAutoConfiguration.jobsUsersActiveLimitProperties());
     }
 
     /**
@@ -113,6 +123,7 @@ public class ServicesAutoConfigurationUnitTests {
                 Mockito.mock(JobStateService.class),
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
+                mockPropertiesProvider(),
                 Mockito.mock(ApplicationPersistenceService.class),
                 Mockito.mock(ClusterPersistenceService.class),
                 Mockito.mock(CommandPersistenceService.class),
@@ -153,5 +164,10 @@ public class ServicesAutoConfigurationUnitTests {
                 GenieObjectMapper.getMapper()
             )
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private Provider<JobsUsersActiveLimitProperties> mockPropertiesProvider() {
+        return Mockito.mock(Provider.class);
     }
 }
