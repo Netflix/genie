@@ -151,7 +151,7 @@ to work.
 |100
 
 |genie.jobs.users.active-limit.overrides.<user-name>
-|The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true.
+|(Dynamic) The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true.
 |-
 
 |genie.jobs.completion-check-back-off.min-interval
