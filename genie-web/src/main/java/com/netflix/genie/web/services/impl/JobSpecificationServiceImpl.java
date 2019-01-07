@@ -45,6 +45,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.validation.annotation.Validated;
@@ -525,7 +526,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
         sortedTags.sort(Comparator.naturalOrder());
         final String joinedString = StringUtils.join(sortedTags, ',');
         // Escape quotes
-        return StringUtils.replaceAll(StringUtils.replaceAll(joinedString, "\'", "\\\'"), "\"", "\\\"");
+        return RegExUtils.replaceAll(RegExUtils.replaceAll(joinedString, "\'", "\\\'"), "\"", "\\\"");
     }
 
     /**

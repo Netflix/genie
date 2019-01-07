@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
 /**
@@ -108,8 +110,8 @@ public class GenieApiAutoConfiguration {
         final RestTemplateBuilder restTemplateBuilder
     ) {
         return restTemplateBuilder
-            .setConnectTimeout(httpProperties.getConnect().getTimeout())
-            .setReadTimeout(httpProperties.getRead().getTimeout())
+            .setConnectTimeout(Duration.of(httpProperties.getConnect().getTimeout(), ChronoUnit.MILLIS))
+            .setReadTimeout(Duration.of(httpProperties.getRead().getTimeout(), ChronoUnit.MILLIS))
             .build();
     }
 

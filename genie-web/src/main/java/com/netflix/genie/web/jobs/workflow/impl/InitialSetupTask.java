@@ -33,6 +33,7 @@ import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
@@ -460,6 +461,6 @@ public class InitialSetupTask extends GenieBaseTask {
         sortedTags.sort(Comparator.naturalOrder());
         final String joinedString = StringUtils.join(sortedTags, ',');
         // Escape quotes
-        return StringUtils.replaceAll(StringUtils.replaceAll(joinedString, "\'", "\\\'"), "\"", "\\\"");
+        return RegExUtils.replaceAll(RegExUtils.replaceAll(joinedString, "\'", "\\\'"), "\"", "\\\"");
     }
 }

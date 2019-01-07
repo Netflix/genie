@@ -24,17 +24,17 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Rule
 import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
-import org.springframework.core.io.PathResource
+import org.springframework.core.io.FileSystemResource
 import spock.lang.Specification
 
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
+
 /**
  * Specifications for the {@link DiskJobFileServiceImpl} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class DiskJobFileServiceImplSpec extends Specification {
@@ -45,7 +45,7 @@ class DiskJobFileServiceImplSpec extends Specification {
     DiskJobFileServiceImpl diskLogService
 
     def setup() {
-        def jobDirRoot = new PathResource(this.temporaryFolder.getRoot().toPath())
+        def jobDirRoot = new FileSystemResource(this.temporaryFolder.getRoot().toPath())
         this.diskLogService = new DiskJobFileServiceImpl(jobDirRoot)
     }
 
@@ -69,12 +69,12 @@ class DiskJobFileServiceImplSpec extends Specification {
         def file1 = UUID.randomUUID().toString() + ".txt"
         def file2 = "GenieLogo.png"
         def file3 =
+            UUID.randomUUID().toString() +
+                separator +
                 UUID.randomUUID().toString() +
-                        separator +
-                        UUID.randomUUID().toString() +
-                        separator +
-                        UUID.randomUUID().toString() +
-                        ".log"
+                separator +
+                UUID.randomUUID().toString() +
+                ".log"
         def jobDir = this.temporaryFolder.getRoot().toPath().resolve(jobId)
         def file1Path = jobDir.resolve(file1)
         def file2Path = jobDir.resolve(file2)
@@ -158,9 +158,9 @@ class DiskJobFileServiceImplSpec extends Specification {
 
         when: "Directory state is read without MD5 it matches expected output"
         def expectedJobDirectoryStateWithoutMd5 = Sets.newHashSet(
-                new JobFileState(file1, file1Length, null),
-                new JobFileState(file2, file2Length, null),
-                new JobFileState(file3, file3Length, null)
+            new JobFileState(file1, file1Length, null),
+            new JobFileState(file2, file2Length, null),
+            new JobFileState(file3, file3Length, null)
         )
         def jobDirectoryState = this.diskLogService.getJobDirectoryFileState(jobId, false)
 
@@ -169,9 +169,9 @@ class DiskJobFileServiceImplSpec extends Specification {
 
         when: "Directory state is read with MD5 it matches expected output"
         def expectedJobDirectoryStateWithMd5 = Sets.newHashSet(
-                new JobFileState(file1, file1Length, DigestUtils.md5Hex(file1ContentsAsBytes)),
-                new JobFileState(file2, file2Length, DigestUtils.md5Hex(file2ContentsAsBytes)),
-                new JobFileState(file3, file3Length, DigestUtils.md5Hex(file3RealContents))
+            new JobFileState(file1, file1Length, DigestUtils.md5Hex(file1ContentsAsBytes)),
+            new JobFileState(file2, file2Length, DigestUtils.md5Hex(file2ContentsAsBytes)),
+            new JobFileState(file3, file3Length, DigestUtils.md5Hex(file3RealContents))
         )
         jobDirectoryState = this.diskLogService.getJobDirectoryFileState(jobId, true)
 
@@ -186,7 +186,7 @@ class DiskJobFileServiceImplSpec extends Specification {
 
         then:
         "Since we wrote bytes in the middle of a file the md5 comparison will fail but the naive one based on " +
-                "size won't"
+            "size won't"
         jobDirectoryState != expectedJobDirectoryStateWithMd5
         jobDirectoryStateWithoutMd5 == expectedJobDirectoryStateWithoutMd5
 
@@ -217,7 +217,7 @@ class DiskJobFileServiceImplSpec extends Specification {
         def resource = this.diskLogService.getJobFileAsResource(jobId, file)
 
         then:
-        resource instanceof PathResource
+        resource instanceof FileSystemResource
         !resource.exists()
 
         when:

@@ -23,7 +23,7 @@ import com.netflix.genie.web.services.JobFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.PathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import javax.annotation.Nullable;
@@ -172,7 +172,7 @@ public class DiskJobFileServiceImpl implements JobFileService {
         final Path jobDirectoryLocation = StringUtils.isBlank(relativePath)
             ? this.jobsDirRoot.resolve(jobId)
             : this.jobsDirRoot.resolve(jobId).resolve(relativePath);
-        return new PathResource(jobDirectoryLocation);
+        return new FileSystemResource(jobDirectoryLocation);
     }
 
     /**
