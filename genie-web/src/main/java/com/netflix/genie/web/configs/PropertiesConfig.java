@@ -20,12 +20,10 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.core.properties.DataServiceRetryProperties;
 import com.netflix.genie.core.properties.HealthProperties;
 import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.core.properties.S3FileTransferProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
 /**
  * Configuration for creating beans for Genie Properties.
@@ -78,19 +76,5 @@ public class PropertiesConfig {
     @ConfigurationProperties("genie.s3filetransfer")
     public S3FileTransferProperties s3FileTransferProperties() {
         return new S3FileTransferProperties();
-    }
-
-    /**
-     * Subset of properties concerned with per-user number of active jobs.
-     * Notice the 'prototype' scope. If this bean is injected via {@link javax.inject.Provider} or Spring's
-     * {@code ObjectFactory}, then values are bound every time, i.e., fast/dynamic properties behavior.
-     *
-     * @return The active job user limit property structure
-     */
-    @Bean
-    @Scope("prototype")
-    @ConfigurationProperties("genie.jobs.users.activeLimit")
-    public JobsUsersActiveLimitProperties jobsUsersActiveLimitProperties() {
-        return new JobsUsersActiveLimitProperties();
     }
 }
