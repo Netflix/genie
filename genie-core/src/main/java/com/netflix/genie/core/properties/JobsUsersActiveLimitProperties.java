@@ -17,13 +17,14 @@
  */
 package com.netflix.genie.core.properties;
 
-import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Properties related to user limits in number of active jobs.
@@ -34,7 +35,18 @@ import java.util.Map;
 @Getter
 @Setter
 @Validated
-public class JobsUsersActiveLimitProperties {
+public class JobsUsersActiveLimitProperties implements EnvironmentAware {
+
+    /**
+     * The property prefix for job user limiting.
+     */
+    public static final String PROPERTY_PREFIX = "genie.jobs.users.activeLimit";
+
+    /**
+     * The property key prefix for per-user limit.
+     */
+    public static final String USER_LIMIT_OVERRIDE_PROPERTY_PREFIX = PROPERTY_PREFIX + ".overrides.";
+
     /**
      * Default value for active user job limit enabled.
      */
@@ -48,7 +60,7 @@ public class JobsUsersActiveLimitProperties {
     private boolean enabled = DEFAULT_ENABLED;
     @Min(value = 1)
     private int count = DEFAULT_COUNT;
-    private Map<String, Integer> overrides = Maps.newHashMap();
+    private AtomicReference<Environment> environment = new AtomicReference<>();
 
     /**
      * Get the maximum number of jobs a user is allowed to run concurrently.
@@ -58,6 +70,22 @@ public class JobsUsersActiveLimitProperties {
      * @return the maximum number of jobs
      */
     public int getUserLimit(final String user) {
-        return overrides.getOrDefault(user, count);
+        final Environment env = this.environment.get();
+        if (env != null) {
+            return env.getProperty(
+                USER_LIMIT_OVERRIDE_PROPERTY_PREFIX + user,
+                Integer.class,
+                this.count
+            );
+        }
+        return this.count;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnvironment(final Environment environment) {
+        this.environment.set(environment);
     }
 }
