@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,8 +32,9 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -174,7 +174,9 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
             builder.append(FileUtils.byteCountToDisplaySize(entry.getSize()));
         }
         builder.append("</tt></td>");
-        final String lastModified = ConcurrentDateFormat.formatRfc1123(Date.from(entry.getLastModified()));
+        final String lastModified = DateTimeFormatter
+            .RFC_1123_DATE_TIME
+            .format(entry.getLastModified().atOffset(ZoneOffset.UTC));
         builder.append("<td align=\"right\"><tt>").append(lastModified).append("</tt></td>");
         builder.append("</tr>");
     }
