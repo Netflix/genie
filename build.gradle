@@ -122,6 +122,10 @@ configure(javaProjects) {
             // https://curator.apache.org/zk-compatibility.html
             dependency("org.apache.zookeeper:zookeeper:3.4.12")
             dependency("org.bitbucket.b_c:jose4j:0.6.3")
+            // Looks like as of Boot 2.1.x this dependency isn't managed by them anymore. This matches whats available
+            // in Spring per
+            // https://github.com/spring-projects/spring-boot/blob/2.1.x/spring-boot-project/spring-boot-dependencies/pom.xml#L67
+            dependency("org.codehaus.groovy:groovy-all:2.5.5")
             dependency("org.codehaus.janino:janino:2.5.16")
             dependency("org.dbunit:dbunit:2.5.4")
             dependencySet(group: "org.jruby", version: "9.1.14.0") {
