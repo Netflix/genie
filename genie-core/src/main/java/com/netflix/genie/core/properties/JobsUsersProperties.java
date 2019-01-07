@@ -33,4 +33,5 @@ import org.springframework.validation.annotation.Validated;
 public class JobsUsersProperties {
     private boolean creationEnabled;
     private boolean runAsUserEnabled;
+    private JobsUsersActiveLimitProperties activeLimit = new JobsUsersActiveLimitProperties();
 }
