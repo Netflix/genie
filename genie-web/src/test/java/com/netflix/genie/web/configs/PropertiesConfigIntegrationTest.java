@@ -23,11 +23,13 @@ import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -51,6 +53,17 @@ public class PropertiesConfigIntegrationTest {
 
     @Autowired
     private HealthProperties healthProperties;
+
+    @Autowired
+    private Environment environment;
+
+    /**
+     * Set up.
+     */
+    @Before
+    public void setup() {
+        jobsProperties.getUsers().getActiveLimit().setEnvironment(environment);
+    }
 
     /**
      * Verify than beans get autowired, and that (non-default) values correspond to the expected set via properties
