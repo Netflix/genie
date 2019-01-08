@@ -295,6 +295,7 @@ configure(javaProjects) {
         testLogging {
             if (System.getenv("CI") != null) {
                 events "passed", "skipped", "failed"
+                exceptionFormat "full"
             } else {
                 events "failed"
             }
