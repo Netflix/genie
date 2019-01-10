@@ -102,7 +102,7 @@ https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Gu
 https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
 
 |genie.jobs.users.activeLimit.*
-|genie.jobs.users.active-limit.*
+|genie.jobs.active-limit.*
 |Modifications to how Spring handled
 https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
 

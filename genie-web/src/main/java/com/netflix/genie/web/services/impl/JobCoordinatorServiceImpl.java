@@ -38,7 +38,7 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
+import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -227,7 +227,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             }
 
             log.info("Checking if can run job {} from user {}", jobRequest.getId(), jobRequest.getUser());
-            final JobsUsersActiveLimitProperties activeLimit = this.jobsProperties.getUsers().getActiveLimit();
+            final JobsActiveLimitProperties activeLimit = this.jobsProperties.getActiveLimit();
             if (activeLimit.isEnabled()) {
                 final long activeJobsLimit = activeLimit.getUserLimit(jobRequest.getUser());
                 final long activeJobsCount = this.jobSearchService.getActiveJobCountForUser(jobRequest.getUser());

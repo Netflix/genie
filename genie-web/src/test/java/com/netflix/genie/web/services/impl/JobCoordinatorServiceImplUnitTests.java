@@ -110,7 +110,7 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobsProperties = new JobsProperties();
         this.jobsProperties.getLocations().setArchives(BASE_ARCHIVE_LOCATION);
         this.jobsProperties.getMemory().setDefaultJobMemory(MEMORY);
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
+        this.jobsProperties.getActiveLimit().setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
         this.applicationPersistenceService = Mockito.mock(ApplicationPersistenceService.class);
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
         this.commandPersistenceService = Mockito.mock(CommandPersistenceService.class);
@@ -546,8 +546,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test
     public void canCoordinateIfJobUserJobLimitIsDisabled() throws GenieException {
         final int userActiveJobsLimit = 5;
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(false);
-        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+        this.jobsProperties.getActiveLimit().setEnabled(false);
+        this.jobsProperties.getActiveLimit().setCount(userActiveJobsLimit);
 
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -648,8 +648,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test(expected = GenieUserLimitExceededException.class)
     public void cantCoordinateJobUserJobLimitIsExceeded() throws GenieException {
         final int userActiveJobsLimit = 5;
-        this.jobsProperties.getUsers().getActiveLimit().setEnabled(true);
-        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+        this.jobsProperties.getActiveLimit().setEnabled(true);
+        this.jobsProperties.getActiveLimit().setCount(userActiveJobsLimit);
 
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
