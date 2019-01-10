@@ -28,21 +28,21 @@ import javax.validation.constraints.Min;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Properties related to user limits in number of active jobs.
+ * Properties related to number of active jobs per user.
  *
  * @author mprimi
  * @since 3.1.0
  */
-@ConfigurationProperties(prefix = JobsUsersActiveLimitProperties.PROPERTY_PREFIX)
+@ConfigurationProperties(prefix = JobsActiveLimitProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
-public class JobsUsersActiveLimitProperties implements EnvironmentAware {
+public class JobsActiveLimitProperties implements EnvironmentAware {
 
     /**
      * The property prefix for job user limiting.
      */
-    public static final String PROPERTY_PREFIX = "genie.jobs.users.active-limit";
+    public static final String PROPERTY_PREFIX = "genie.jobs.active-limit";
 
     /**
      * The property key for whether this feature is enabled or not.

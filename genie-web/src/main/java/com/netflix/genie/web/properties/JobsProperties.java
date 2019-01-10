@@ -61,4 +61,7 @@ public class JobsProperties {
 
     @Valid
     private ExponentialBackOffTriggerProperties completionCheckBackOff = new ExponentialBackOffTriggerProperties();
+
+    @Valid
+    private JobsActiveLimitProperties activeLimit = new JobsActiveLimitProperties();
 }

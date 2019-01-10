@@ -26,21 +26,21 @@ import org.mockito.Mockito;
 import org.springframework.core.env.Environment;
 
 /**
- * Unit tests for JobsUsersActiveLimitProperties.
+ * Unit tests for JobsActiveLimitProperties.
  *
  * @author mprimi
  * @since 3.1.0
  */
 @Category(UnitTest.class)
-public class JobsUsersActiveLimitPropertiesUnitTests {
-    private JobsUsersActiveLimitProperties properties;
+public class JobsActiveLimitPropertiesUnitTests {
+    private JobsActiveLimitProperties properties;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.properties = new JobsUsersActiveLimitProperties();
+        this.properties = new JobsActiveLimitProperties();
     }
 
     /**
@@ -48,9 +48,9 @@ public class JobsUsersActiveLimitPropertiesUnitTests {
      */
     @Test
     public void canConstruct() {
-        Assert.assertEquals(JobsUsersActiveLimitProperties.DEFAULT_ENABLED, this.properties.isEnabled());
-        Assert.assertEquals(JobsUsersActiveLimitProperties.DEFAULT_COUNT, this.properties.getCount());
-        Assert.assertEquals(JobsUsersActiveLimitProperties.DEFAULT_COUNT, this.properties.getUserLimit("SomeUser"));
+        Assert.assertEquals(JobsActiveLimitProperties.DEFAULT_ENABLED, this.properties.isEnabled());
+        Assert.assertEquals(JobsActiveLimitProperties.DEFAULT_COUNT, this.properties.getCount());
+        Assert.assertEquals(JobsActiveLimitProperties.DEFAULT_COUNT, this.properties.getUserLimit("SomeUser"));
     }
 
     /**
@@ -83,7 +83,7 @@ public class JobsUsersActiveLimitPropertiesUnitTests {
         final Environment environment = Mockito.mock(Environment.class);
         Mockito
             .when(environment.getProperty(
-                JobsUsersActiveLimitProperties.USER_LIMIT_OVERRIDE_PROPERTY_PREFIX + userName,
+                JobsActiveLimitProperties.USER_LIMIT_OVERRIDE_PROPERTY_PREFIX + userName,
                 Integer.class,
                 this.properties.getCount())
             )

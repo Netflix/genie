@@ -142,15 +142,15 @@ rights for this to work.
 to work.
 |false
 
-|genie.jobs.users.active-limit.enabled
+|genie.jobs.active-limit.enabled
 |Enables the per-user active job limit. The number of jobs is controlled by the `genie.jobs.users.active-limit.count` property.
 |false
 
-|genie.jobs.users.active-limit.count
+|genie.jobs.active-limit.count
 |The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true. This limit applies to users that don't have an override set via `genie.jobs.users.active-limit.overrides.<user-name>`.
 |100
 
-|genie.jobs.users.active-limit.overrides.<user-name>
+|genie.jobs.active-limit.overrides.<user-name>
 |(Dynamic) The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true.
 |-
 

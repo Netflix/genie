@@ -65,9 +65,9 @@ genie:
     users:
       creationEnabled: false
       runAsUserEnabled: false
-      active-limit:
-        enabled: false
-        count: 100
+    active-limit:
+      enabled: false
+      count: 100
   leader:
     enabled: false
   mail:
