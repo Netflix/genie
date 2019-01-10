@@ -19,6 +19,8 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
@@ -32,7 +34,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @Validated
-public class JobsProperties {
+public class JobsProperties implements EnvironmentAware {
     @NotNull
     private JobsCleanupProperties cleanup = new JobsCleanupProperties();
 
@@ -53,4 +55,15 @@ public class JobsProperties {
 
     @NotNull
     private ExponentialBackOffTriggerProperties completionCheckBackOff = new ExponentialBackOffTriggerProperties();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnvironment(final Environment environment) {
+        //Hack alert: JobsUsersActiveLimitProperties is not a bean and therefore EnvironmentAware is implemented
+        // here and passed down to it.
+        // TODO: remove this and find a cleaner way to make the children aware of environment.
+        this.getUsers().getActiveLimit().setEnvironment(environment);
+    }
 }
