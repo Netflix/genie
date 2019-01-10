@@ -72,9 +72,9 @@ public class PropertyBindingIntegrationTests {
         Assert.assertThat(jobsProperties.getActiveLimit().isEnabled(), Matchers.is(true));
         Assert.assertThat(jobsProperties.getActiveLimit().getCount(), Matchers.is(15));
         Assert.assertThat(jobsProperties.getActiveLimit().getUserLimit("JaneDoe"), Matchers.is(100));
-        Assert.assertThat(jobsProperties.getActiveLimit().getUserLimit("janedoe"), Matchers.is(15));
+        Assert.assertThat(jobsProperties.getActiveLimit().getUserLimit("janedoe"), Matchers.is(100));
         Assert.assertThat(jobsProperties.getActiveLimit().getUserLimit("John-Doe"), Matchers.is(200));
-        Assert.assertThat(jobsProperties.getActiveLimit().getUserLimit("john-doe"), Matchers.is(15));
+        Assert.assertThat(jobsProperties.getActiveLimit().getUserLimit("john-doe"), Matchers.is(200));
         Assert.assertThat(jobsProperties.getActiveLimit().getUserLimit("anyone else"), Matchers.is(15));
 
         Assert.assertNotNull(dataServiceRetryProperties);
