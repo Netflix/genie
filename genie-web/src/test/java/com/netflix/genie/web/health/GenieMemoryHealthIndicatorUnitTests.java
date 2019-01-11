@@ -53,7 +53,7 @@ public class GenieMemoryHealthIndicatorUnitTests {
     @Before
     public void setup() {
         this.jobMetricsService = Mockito.mock(JobMetricsService.class);
-        jobsProperties = new JobsProperties();
+        jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getMemory().setDefaultJobMemory(DEFAULT_JOB_MEMORY);
         jobsProperties.getMemory().setMaxSystemMemory(MAX_SYSTEM_MEMORY);
         jobsProperties.getMemory().setMaxJobMemory(MAX_JOB_MEMORY);

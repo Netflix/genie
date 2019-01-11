@@ -117,7 +117,7 @@ public class JobMonitorUnitTests {
             .when(this.registry.counter("genie.jobs.stdErrTooLarge.rate"))
             .thenReturn(this.stdErrTooLarge);
 
-        final JobsProperties outputMaxProperties = new JobsProperties();
+        final JobsProperties outputMaxProperties = JobsProperties.getJobsPropertiesDefaults();
         outputMaxProperties.getMax().setStdOutSize(MAX_STD_OUT_LENGTH);
         outputMaxProperties.getMax().setStdErrSize(MAX_STD_ERR_LENGTH);
 
@@ -281,7 +281,7 @@ public class JobMonitorUnitTests {
             this.executor,
             this.genieEventBus,
             this.registry,
-            new JobsProperties()
+            JobsProperties.getJobsPropertiesDefaults()
         );
 
         this.monitor.run();

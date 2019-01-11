@@ -107,7 +107,7 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobKillService = Mockito.mock(JobKillService.class);
         this.jobStateService = Mockito.mock(JobStateService.class);
         this.jobSearchService = Mockito.mock(JobSearchService.class);
-        this.jobsProperties = new JobsProperties();
+        this.jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         this.jobsProperties.getLocations().setArchives(BASE_ARCHIVE_LOCATION);
         this.jobsProperties.getMemory().setDefaultJobMemory(MEMORY);
         this.jobsProperties.getActiveLimit().setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);

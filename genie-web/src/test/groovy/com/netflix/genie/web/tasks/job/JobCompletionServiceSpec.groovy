@@ -79,7 +79,7 @@ class JobCompletionServiceSpec extends Specification {
         jobSearchService = Mock(JobSearchService.class)
         mailService = Mock(MailService.class)
         genieFileTransferService = Mock(GenieFileTransferService.class)
-        jobsProperties = new JobsProperties()
+        jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         counterTagsCaptures = new ArrayList<>()
         registry = Mock(MeterRegistry.class)
         errorCounter = Mock(Counter.class)

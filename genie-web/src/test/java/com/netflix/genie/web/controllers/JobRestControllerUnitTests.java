@@ -105,7 +105,7 @@ public class JobRestControllerUnitTests {
         this.hostname = UUID.randomUUID().toString();
         this.restTemplate = Mockito.mock(RestTemplate.class);
         this.genieResourceHttpRequestHandler = Mockito.mock(GenieResourceHttpRequestHandler.class);
-        this.jobsProperties = new JobsProperties();
+        this.jobsProperties = JobsProperties.getJobsPropertiesDefaults();
 
         final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         final Counter counter = Mockito.mock(Counter.class);

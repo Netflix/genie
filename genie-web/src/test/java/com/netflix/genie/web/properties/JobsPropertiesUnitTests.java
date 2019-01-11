@@ -33,6 +33,14 @@ import org.mockito.Mockito;
 @Category(UnitTest.class)
 public class JobsPropertiesUnitTests {
 
+    private JobsCleanupProperties cleanup;
+    private JobsMemoryProperties memory;
+    private JobsForwardingProperties forwarding;
+    private JobsLocationsProperties locations;
+    private JobsMaxProperties max;
+    private JobsUsersProperties users;
+    private ExponentialBackOffTriggerProperties completionBackOff;
+    private JobsActiveLimitProperties activeLimit;
     private JobsProperties properties;
 
     /**
@@ -40,7 +48,24 @@ public class JobsPropertiesUnitTests {
      */
     @Before
     public void setup() {
-        this.properties = new JobsProperties();
+        this.cleanup = Mockito.mock(JobsCleanupProperties.class);
+        this.memory = Mockito.mock(JobsMemoryProperties.class);
+        this.forwarding = Mockito.mock(JobsForwardingProperties.class);
+        this.locations = Mockito.mock(JobsLocationsProperties.class);
+        this.max = Mockito.mock(JobsMaxProperties.class);
+        this.users = Mockito.mock(JobsUsersProperties.class);
+        this.completionBackOff = Mockito.mock(ExponentialBackOffTriggerProperties.class);
+        this.activeLimit = Mockito.mock(JobsActiveLimitProperties.class);
+        this.properties = new JobsProperties(
+            cleanup,
+            forwarding,
+            locations,
+            max,
+            memory,
+            users,
+            completionBackOff,
+            activeLimit
+        );
     }
 
     /**
@@ -48,11 +73,14 @@ public class JobsPropertiesUnitTests {
      */
     @Test
     public void canConstruct() {
+        Assert.assertNotNull(this.properties.getCleanup());
         Assert.assertNotNull(this.properties.getMemory());
         Assert.assertNotNull(this.properties.getForwarding());
         Assert.assertNotNull(this.properties.getLocations());
         Assert.assertNotNull(this.properties.getMax());
         Assert.assertNotNull(this.properties.getUsers());
+        Assert.assertNotNull(this.properties.getCompletionCheckBackOff());
+        Assert.assertNotNull(this.properties.getActiveLimit());
     }
 
     /**
@@ -60,16 +88,13 @@ public class JobsPropertiesUnitTests {
      */
     @Test
     public void canSet() {
-        final JobsMemoryProperties memory = Mockito.mock(JobsMemoryProperties.class);
-        final JobsForwardingProperties forwarding = Mockito.mock(JobsForwardingProperties.class);
-        final JobsLocationsProperties locations = Mockito.mock(JobsLocationsProperties.class);
-        final JobsMaxProperties max = Mockito.mock(JobsMaxProperties.class);
-        final JobsUsersProperties users = Mockito.mock(JobsUsersProperties.class);
-
+        this.properties.setCleanup(cleanup);
         this.properties.setForwarding(forwarding);
         this.properties.setLocations(locations);
         this.properties.setMax(max);
         this.properties.setMemory(memory);
         this.properties.setUsers(users);
+        this.properties.setCompletionCheckBackOff(completionBackOff);
+        this.properties.setActiveLimit(activeLimit);
     }
 }

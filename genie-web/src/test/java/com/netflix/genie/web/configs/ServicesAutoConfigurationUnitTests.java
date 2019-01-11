@@ -112,7 +112,7 @@ public class ServicesAutoConfigurationUnitTests {
                 Mockito.mock(JobKillService.class),
                 Mockito.mock(JobStateService.class),
                 Mockito.mock(JobSearchService.class),
-                new JobsProperties(),
+                JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(ApplicationPersistenceService.class),
                 Mockito.mock(ClusterPersistenceService.class),
                 Mockito.mock(CommandPersistenceService.class),
@@ -147,7 +147,7 @@ public class ServicesAutoConfigurationUnitTests {
                 new GenieHostInfo("localhost"),
                 this.jobSearchService,
                 Mockito.mock(Executor.class),
-                new JobsProperties(),
+                JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(GenieEventBus.class),
                 Mockito.mock(FileSystemResource.class),
                 GenieObjectMapper.getMapper()
