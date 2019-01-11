@@ -69,7 +69,7 @@ public class DiskCleanupTaskUnitTests {
      */
     @Test(expected = IOException.class)
     public void cantConstruct() throws IOException {
-        final JobsProperties properties = new JobsProperties();
+        final JobsProperties properties = JobsProperties.getJobsPropertiesDefaults();
         properties.getUsers().setRunAsUserEnabled(false);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(false);
@@ -103,7 +103,7 @@ public class DiskCleanupTaskUnitTests {
                 scheduler,
                 jobsDir,
                 Mockito.mock(JobSearchService.class),
-                new JobsProperties(),
+                JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
             )
@@ -128,7 +128,7 @@ public class DiskCleanupTaskUnitTests {
                 scheduler,
                 jobsDir,
                 Mockito.mock(JobSearchService.class),
-                new JobsProperties(),
+                JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
             )
@@ -143,7 +143,7 @@ public class DiskCleanupTaskUnitTests {
      */
     @Test
     public void willScheduleOnUnixWithoutSudo() throws IOException {
-        final JobsProperties properties = new JobsProperties();
+        final JobsProperties properties = JobsProperties.getJobsPropertiesDefaults();
         properties.getUsers().setRunAsUserEnabled(false);
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
@@ -171,7 +171,7 @@ public class DiskCleanupTaskUnitTests {
      */
     @Test
     public void canRunWithoutSudo() throws IOException, GenieException {
-        final JobsProperties jobsProperties = new JobsProperties();
+        final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getUsers().setRunAsUserEnabled(false);
 
         // Create some random junk file that should be ignored

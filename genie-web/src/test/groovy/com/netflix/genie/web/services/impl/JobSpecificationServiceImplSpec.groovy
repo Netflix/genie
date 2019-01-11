@@ -148,7 +148,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         def jobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
         jobCommandArgs.addAll(commandArgs)
 
-        def jobsProperties = new JobsProperties()
+        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         Map<Cluster, String> clusterCommandMap = Maps.newHashMap()
         clusterCommandMap.put(cluster1, commandId)
         clusterCommandMap.put(cluster2, commandId)
@@ -218,7 +218,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                 Mock(CommandPersistenceService),
                 Lists.newArrayList(),
                 Mock(MeterRegistry),
-                new JobsProperties()
+                JobsProperties.getJobsPropertiesDefaults()
         )
 
         expect:
@@ -238,7 +238,7 @@ class JobSpecificationServiceImplSpec extends Specification {
     }
 
     def "Can generate correct environment variables"() {
-        def jobsProperties = new JobsProperties()
+        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobSpecificationServiceImpl(
                 Mock(ApplicationPersistenceService),
                 Mock(ClusterPersistenceService),
@@ -329,7 +329,7 @@ class JobSpecificationServiceImplSpec extends Specification {
     }
 
     def "Can convert V4 Criterion to V3 tags"() {
-        def jobsProperties = new JobsProperties()
+        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobSpecificationServiceImpl(
                 Mock(ApplicationPersistenceService),
                 Mock(ClusterPersistenceService),
@@ -409,7 +409,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         def timeout = 10835
 
 
-        def jobsProperties = new JobsProperties()
+        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobSpecificationServiceImpl(
                 Mock(ApplicationPersistenceService),
                 Mock(ClusterPersistenceService),

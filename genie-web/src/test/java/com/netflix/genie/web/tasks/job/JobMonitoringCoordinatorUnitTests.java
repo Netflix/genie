@@ -119,7 +119,7 @@ public class JobMonitoringCoordinatorUnitTests {
             executor,
             new SimpleMeterRegistry(),
             jobsDir,
-            new JobsProperties(),
+            JobsProperties.getJobsPropertiesDefaults(),
             jobSubmitterService
         );
     }

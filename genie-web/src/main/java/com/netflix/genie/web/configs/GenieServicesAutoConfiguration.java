@@ -23,9 +23,17 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
+import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.HealthProperties;
+import com.netflix.genie.web.properties.JobsActiveLimitProperties;
+import com.netflix.genie.web.properties.JobsCleanupProperties;
+import com.netflix.genie.web.properties.JobsForwardingProperties;
+import com.netflix.genie.web.properties.JobsLocationsProperties;
+import com.netflix.genie.web.properties.JobsMaxProperties;
+import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.AgentRoutingService;
@@ -53,9 +61,9 @@ import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
+import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.JobSpecificationServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
-import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -85,10 +93,53 @@ import java.util.List;
         DataServiceRetryProperties.class,
         FileCacheProperties.class,
         HealthProperties.class,
-        JobsProperties.class,
+        JobsCleanupProperties.class,
+        JobsForwardingProperties.class,
+        JobsLocationsProperties.class,
+        JobsMaxProperties.class,
+        JobsMemoryProperties.class,
+        JobsUsersProperties.class,
+        ExponentialBackOffTriggerProperties.class,
+        JobsActiveLimitProperties.class,
     }
 )
 public class GenieServicesAutoConfiguration {
+
+    /**
+     * Collection of properties related to job execution.
+     *
+     * @param cleanup                cleanup properties
+     * @param forwarding             forwarding properties
+     * @param locations              locations properties
+     * @param max                    max properties
+     * @param memory                 memory properties
+     * @param users                  users properties
+     * @param completionCheckBackOff completion back-off properties
+     * @param activeLimit            active limit properties
+     * @return a {@code JobsProperties} instance
+     */
+    @Bean
+    public JobsProperties jobsProperties(
+        final JobsCleanupProperties cleanup,
+        final JobsForwardingProperties forwarding,
+        final JobsLocationsProperties locations,
+        final JobsMaxProperties max,
+        final JobsMemoryProperties memory,
+        final JobsUsersProperties users,
+        final ExponentialBackOffTriggerProperties completionCheckBackOff,
+        final JobsActiveLimitProperties activeLimit
+    ) {
+        return new JobsProperties(
+            cleanup,
+            forwarding,
+            locations,
+            max,
+            memory,
+            users,
+            completionCheckBackOff,
+            activeLimit
+        );
+    }
 
     /**
      * Get an local implementation of the JobKillService.
@@ -127,7 +178,7 @@ public class GenieServicesAutoConfiguration {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param jobKillServiceV3   Service to kill V3 jobs.
+     * @param jobKillServiceV3      Service to kill V3 jobs.
      * @param jobKillServiceV4      Service to kill V4 jobs.
      * @param jobPersistenceService Job persistence service
      * @return A job kill service instance.

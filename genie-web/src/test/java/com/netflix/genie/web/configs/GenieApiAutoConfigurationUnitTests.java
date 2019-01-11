@@ -108,7 +108,7 @@ public class GenieApiAutoConfigurationUnitTests {
     public void cantGetJobsDirWhenJobsDirInvalid() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final String jobsDirLocation = UUID.randomUUID().toString();
-        final JobsProperties jobsProperties = new JobsProperties();
+        final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getLocations().setJobs(jobsDirLocation);
 
         final Resource tmpResource = Mockito.mock(Resource.class);
@@ -159,7 +159,7 @@ public class GenieApiAutoConfigurationUnitTests {
     public void canGetJobsDir() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final String jobsDirLocation = UUID.randomUUID().toString() + "/";
-        final JobsProperties jobsProperties = new JobsProperties();
+        final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getLocations().setJobs(jobsDirLocation);
 
         final Resource jobsDirResource = Mockito.mock(Resource.class);
