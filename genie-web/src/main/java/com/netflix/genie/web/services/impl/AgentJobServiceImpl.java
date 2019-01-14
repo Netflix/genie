@@ -71,6 +71,16 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
+    public void handshake(
+        @Valid final AgentClientMetadata agentMetadata
+    ) {
+        // TODO, NOOP lets all agents through.
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String reserveJobId(
         @Valid final JobRequest jobRequest,
         @Valid final AgentClientMetadata agentClientMetadata

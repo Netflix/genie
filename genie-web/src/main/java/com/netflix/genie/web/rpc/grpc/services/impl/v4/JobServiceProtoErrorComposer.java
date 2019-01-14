@@ -21,6 +21,7 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.exceptions.GenieConversionException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -33,6 +34,7 @@ import com.netflix.genie.proto.ChangeJobStatusError;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobError;
 import com.netflix.genie.proto.ClaimJobResponse;
+import com.netflix.genie.proto.HandshakeResponse;
 import com.netflix.genie.proto.JobSpecificationError;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdError;
@@ -88,6 +90,12 @@ class JobServiceProtoErrorComposer {
             .put(GenieInvalidStatusException.class, ChangeJobStatusError.Type.INCORRECT_CURRENT_STATUS)
             .put(GeniePreconditionException.class, ChangeJobStatusError.Type.INVALID_REQUEST)
             .put(ConstraintViolationException.class, ChangeJobStatusError.Type.INVALID_REQUEST)
+            .build();
+
+    private static final Map<Class<? extends Exception>, HandshakeResponse.Type> HANDSHAKE_ERROR_MAP =
+        ImmutableMap.<Class<? extends Exception>, HandshakeResponse.Type>builder()
+            .put(ConstraintViolationException.class, HandshakeResponse.Type.INVALID_REQUEST)
+            .put(GenieAgentRejectedException.class, HandshakeResponse.Type.REJECTED)
             .build();
 
     /**
@@ -154,6 +162,19 @@ class JobServiceProtoErrorComposer {
             .build();
     }
 
+    /**
+     * Build a {@link HandshakeResponse} out of the given {@link Exception}.
+     *
+     * @param e The server exception
+     * @return The response
+     */
+    HandshakeResponse toProtoHandshakeResponse(final Exception e) {
+        return HandshakeResponse.newBuilder()
+            .setMessage(getMessage(e))
+            .setType(getErrorType(e, HANDSHAKE_ERROR_MAP, HandshakeResponse.Type.SERVER_ERROR))
+            .build();
+    }
+
     private static <T> T getErrorType(
         final Exception e,
         final Map<Class<? extends Exception>, T> typeMap,
@@ -172,5 +193,4 @@ class JobServiceProtoErrorComposer {
             + ":"
             + (e.getMessage() == null ? NO_ERROR_MESSAGE_PROVIDED : e.getMessage());
     }
-
 }

@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
+import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
@@ -39,6 +40,16 @@ import javax.validation.constraints.NotBlank;
 @Validated
 public interface AgentJobService {
 
+    /**
+     * Perform server handshake. Before going any further, ensure the server is reachable and that this agent is
+     * compatible with it.
+     *
+     * @param agentClientMetadata metadata about the client making this request
+     * @throws HandshakeException if the server rejects this client
+     */
+    void handshake(
+        @Valid AgentClientMetadata agentClientMetadata
+    ) throws HandshakeException;
 
     /**
      * Request a given job id to be reserved for this job, send along the job details, to be persisted by the server.

@@ -35,6 +35,7 @@ import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
+import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.JobArchivalData
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
@@ -395,6 +396,20 @@ class JobServiceProtoConverterSpec extends Specification {
         currentStatus == JobStatus.parse(changeJobStatusRequest.getCurrentStatus())
         newStatus == JobStatus.parse(changeJobStatusRequest.getNewStatus())
         message == changeJobStatusRequest.getNewStatusMessage()
+    }
+
+    def "Can convert AgentClientMetadata to HandshakeRequest"() {
+        AgentClientMetadata agentClientMetatada = createAgentClientMetadata()
+
+        when:
+        HandshakeRequest handshakeRequest = converter.toHandshakeRequest(agentClientMetatada)
+
+        then:
+        AgentMetadata agentMetadata = handshakeRequest.getAgentMetadata()
+        agentMetadata != null
+        agentMetadata.getAgentHostname() == agentHostname
+        agentMetadata.getAgentVersion() == agentVersion
+        agentMetadata.getAgentPid() == agentPid
     }
 
     AgentJobRequest createJobRequest(String id, String archiveLocationPrefix) {

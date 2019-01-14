@@ -56,6 +56,16 @@ class AgentJobServiceImplSpec extends Specification {
         )
     }
 
+    def "Can handshake"() {
+        def agentClientMetadata = Mock(AgentClientMetadata)
+
+        when:
+        service.handshake(agentClientMetadata)
+
+        then:
+        noExceptionThrown()
+    }
+
     def "Can reserve job id"() {
         def jobRequest = Mock(JobRequest)
         def agentClientMetadata = Mock(AgentClientMetadata)

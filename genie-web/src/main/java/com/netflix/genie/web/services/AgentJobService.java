@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -44,6 +45,15 @@ import javax.validation.constraints.NotBlank;
  */
 @Validated
 public interface AgentJobService {
+
+    /**
+     * Shake hands and allow a client or reject it based on the supplied {@link AgentClientMetadata}.
+     *
+     * @param agentMetadata The metadata about the agent starting to run a given job
+     * @throws GenieAgentRejectedException       If the server rejects the client based on its metadata
+     * @throws ConstraintViolationException If the arguments fail validation
+     */
+    void handshake(@Valid AgentClientMetadata agentMetadata);
 
     /**
      * Reserve a job id and persist job details in the database based on the supplied {@link JobRequest}.
