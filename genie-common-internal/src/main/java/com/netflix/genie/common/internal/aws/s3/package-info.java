@@ -23,6 +23,6 @@
  * @since 4.0.0
  */
 @ParametersAreNonnullByDefault
-package com.netflix.genie.agent.aws.s3;
+package com.netflix.genie.common.internal.aws.s3;
 
 import javax.annotation.ParametersAreNonnullByDefault;

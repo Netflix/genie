@@ -30,7 +30,6 @@ dependencies {
 
     // Misc
     compile("com.beust:jcommander")
-    compile("com.amazonaws:aws-java-sdk-sts")
     compile("io.grpc:grpc-netty")
     compile("javax.el:javax.el-api")
     compile("org.apache.commons:commons-lang3")

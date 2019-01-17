@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
@@ -27,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -69,7 +71,7 @@ public class S3FileTransferImplUnitTests {
 
     private MeterRegistry registry;
     private S3FileTransferImpl s3FileTransfer;
-    private AmazonS3Client s3Client;
+    private AmazonS3 s3Client;
     private S3FileTransferProperties s3FileTransferProperties;
     private Timer downloadTimer;
     private Timer uploadTimer;
@@ -87,7 +89,9 @@ public class S3FileTransferImplUnitTests {
         this.downloadTimer = Mockito.mock(Timer.class);
         this.uploadTimer = Mockito.mock(Timer.class);
         this.urlFailingStrictValidationCounter = Mockito.mock(Counter.class);
+        final S3ClientFactory s3ClientFactory = Mockito.mock(S3ClientFactory.class);
         this.s3Client = Mockito.mock(AmazonS3Client.class);
+        Mockito.when(s3ClientFactory.getClient(Mockito.any(AmazonS3URI.class))).thenReturn(this.s3Client);
         Mockito.
             when(registry.timer(Mockito.eq(S3FileTransferImpl.DOWNLOAD_TIMER_NAME), Mockito.anySet()))
             .thenReturn(this.downloadTimer);
@@ -98,7 +102,11 @@ public class S3FileTransferImplUnitTests {
             .when(registry.counter(S3FileTransferImpl.STRICT_VALIDATION_COUNTER_NAME))
             .thenReturn(this.urlFailingStrictValidationCounter);
         this.s3FileTransferProperties = Mockito.mock(S3FileTransferProperties.class);
-        this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, this.registry, this.s3FileTransferProperties);
+        this.s3FileTransfer = new S3FileTransferImpl(
+            s3ClientFactory,
+            this.registry,
+            this.s3FileTransferProperties
+        );
     }
 
     /**

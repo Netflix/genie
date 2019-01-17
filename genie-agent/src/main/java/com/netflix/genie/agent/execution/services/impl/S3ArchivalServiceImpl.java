@@ -22,7 +22,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.netflix.genie.agent.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.agent.execution.exceptions.ArchivalException;
 import com.netflix.genie.agent.execution.services.ArchivalService;
 import com.netflix.genie.common.internal.jobs.JobConstants;

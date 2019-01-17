@@ -15,13 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs;
+package com.netflix.genie.common.internal.configs;
 
 import com.amazonaws.regions.AwsRegionProvider;
-import com.netflix.genie.agent.aws.s3.S3ClientFactory;
-import com.netflix.genie.agent.aws.s3.S3ProtocolResolver;
-import com.netflix.genie.agent.aws.s3.S3ProtocolResolverRegistrar;
-import com.netflix.genie.agent.execution.services.ArchivalService;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
+import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
@@ -76,7 +75,6 @@ public class AwsAutoConfigurationIntegrationTest {
             (context) -> {
                 Assertions.assertThat(context).hasSingleBean(AwsRegionProvider.class);
                 Assertions.assertThat(context).hasSingleBean(S3ClientFactory.class);
-                Assertions.assertThat(context).hasSingleBean(ArchivalService.class);
                 Assertions.assertThat(context).hasSingleBean(AwsS3ResourceLoaderProperties.class);
                 Assertions.assertThat(context).hasSingleBean(S3ProtocolResolver.class);
                 Assertions.assertThat(context).hasSingleBean(S3ProtocolResolverRegistrar.class);

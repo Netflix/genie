@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.netflix.genie.common.internal.configs.AwsAutoConfiguration

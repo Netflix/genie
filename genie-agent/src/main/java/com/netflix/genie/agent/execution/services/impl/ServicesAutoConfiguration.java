@@ -18,7 +18,7 @@
 package com.netflix.genie.agent.execution.services.impl;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
-import com.netflix.genie.agent.configs.AwsAutoConfiguration;
+import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
 import com.netflix.genie.agent.execution.services.ArchivalService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
