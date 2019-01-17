@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.configs.aws
 
-import com.amazonaws.ClientConfiguration
-import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.regions.Regions
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
 import com.netflix.genie.test.categories.UnitTest
-import com.netflix.genie.web.properties.AwsCredentialsProperties
+import com.netflix.genie.web.properties.S3FileTransferProperties
+import com.netflix.genie.web.services.impl.S3FileTransferImpl
+import io.micrometer.core.instrument.MeterRegistry
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -34,48 +34,17 @@ import spock.lang.Specification
 @Category(UnitTest.class)
 class GenieAwsS3AutoConfigurationSpec extends Specification {
 
-    def "Can get default S3 client"() {
-        def credentialsProvider = Mock(AWSCredentialsProvider)
-        def clientConfiguration = new ClientConfiguration()
-        String roleArn = null
-        def credentialsProperties = new AwsCredentialsProperties()
-        credentialsProperties.setRole(roleArn)
-        def awsRegionProperties = new AwsCredentialsProperties.SpringCloudAwsRegionProperties()
+    def "Can build S3 File Transfer impl"() {
+        def s3ClientFactory = Mock(S3ClientFactory)
+        def registry = Mock(MeterRegistry)
+        def s3FileTransferProperties = new S3FileTransferProperties()
         def config = new GenieAwsS3AutoConfiguration()
 
         when:
-        def client = config.amazonS3(
-                credentialsProvider,
-                clientConfiguration,
-                awsRegionProperties,
-                credentialsProperties
-        )
+        def impl = config.s3FileTransferImpl(s3ClientFactory, registry, s3FileTransferProperties)
 
         then:
-        client != null
-        client.getRegionName() == Regions.US_EAST_1.getName()
-    }
-
-    def "Can can get S3 client with assumed role"() {
-        def credentialsProvider = Mock(AWSCredentialsProvider)
-        def clientConfiguration = new ClientConfiguration()
-        def roleArn = UUID.randomUUID().toString()
-        def credentialsProperties = new AwsCredentialsProperties()
-        credentialsProperties.setRole(roleArn)
-        def awsRegionProperties = new AwsCredentialsProperties.SpringCloudAwsRegionProperties()
-        awsRegionProperties.setStatic(Regions.US_WEST_1.getName())
-        def config = new GenieAwsS3AutoConfiguration()
-
-        when:
-        def client = config.amazonS3(
-                credentialsProvider,
-                clientConfiguration,
-                awsRegionProperties,
-                credentialsProperties
-        )
-
-        then:
-        client != null
-        client.getRegionName() == Regions.US_WEST_1.getName()
+        impl != null
+        impl instanceof S3FileTransferImpl
     }
 }

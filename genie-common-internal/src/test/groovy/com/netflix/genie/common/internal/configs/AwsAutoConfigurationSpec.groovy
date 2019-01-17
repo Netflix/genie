@@ -15,16 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs
+package com.netflix.genie.common.internal.configs
 
-import com.amazonaws.SdkClientException
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.regions.DefaultAwsRegionProviderChain
 import com.amazonaws.regions.Regions
-import com.netflix.genie.agent.aws.s3.S3ClientFactory
-import com.netflix.genie.agent.execution.services.impl.NoOpArchivalServiceImpl
-import com.netflix.genie.agent.execution.services.impl.S3ArchivalServiceImpl
 import org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionProperties
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -60,25 +54,5 @@ class AwsAutoConfigurationSpec extends Specification {
         true  | Regions.US_WEST_2.getName() | Regions.US_WEST_2.getName()
         true  | null                        | "shouldn't matter"
         false | null                        | Regions.US_EAST_1.getName()
-    }
-
-    def "Can create correct archival service based on valid credentials or not"() {
-        def config = new AwsAutoConfiguration()
-        def awsCredentialsProvider = Mock(AWSCredentialsProvider)
-        def s3ClientFactory = Mock(S3ClientFactory)
-
-        when:
-        def archivalService = config.archivalService(awsCredentialsProvider, s3ClientFactory)
-
-        then:
-        1 * awsCredentialsProvider.getCredentials() >> { throw new SdkClientException("bad credentials") }
-        archivalService instanceof NoOpArchivalServiceImpl
-
-        when:
-        archivalService = config.archivalService(awsCredentialsProvider, s3ClientFactory)
-
-        then:
-        1 * awsCredentialsProvider.getCredentials() >> Mock(AWSCredentials)
-        archivalService instanceof S3ArchivalServiceImpl
     }
 }

@@ -57,6 +57,16 @@ See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more informa
 management endpoints. Switched from default `/actuator`
 |/admin
 
+|genie.aws.s3.buckets.[bucketName].roleARN
+|For the bucket with name `bucketName` the ARN of the role to assume to read/write to that bucket. If a bucket is used
+that isn't listed in this map the default credentials configured will be used
+|
+
+|genie.aws.s3.buckets.[bucketName].region
+|The AWS region the bucket with `bucketName` is in. Clients to talk to this bucket will be created in this region. If
+no value is specified the bucket is assumed to be in the same region as the Genie process.
+|
+
 |genie.grpc.server.enabled
 |Whether to start the gRPC server and services during server startup
 |true
@@ -123,8 +133,10 @@ https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Gu
 
 |genie.aws.credentials.file
 |No longer necessary as `cloud.aws.credentials.useDefaultAwsCredentialsChain` is enabled by default an other Spring
-Cloud AWS properties can be used to configure more specifically other than to assume role which still uses
-`genie.aws.credentials.role`.
+Cloud AWS properties can be used to configure more specifically.
+
+|genie.aws.credentials.role
+|Replaced with `genie.aws.s3.buckets.[bucketName].roleARN` for more specific control
 
 |spring.jackson.date-format
 |Switched to `java.time.Instant` from `java.util.Date` for timestamps. Formatting in ISO8601 supported out of the box

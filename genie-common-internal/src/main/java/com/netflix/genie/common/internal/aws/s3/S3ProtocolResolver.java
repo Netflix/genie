@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.aws.s3;
+package com.netflix.genie.common.internal.aws.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3URI;
@@ -37,7 +37,6 @@ import org.springframework.core.task.TaskExecutor;
  * @author tgianos
  * @since 4.0.0
  */
-// TODO: After development is complete for Agent this may be a valuable thing to move to common and shared with server.
 @Slf4j
 public class S3ProtocolResolver implements ProtocolResolver {
 

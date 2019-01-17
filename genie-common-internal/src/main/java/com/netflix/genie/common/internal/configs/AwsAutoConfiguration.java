@@ -15,19 +15,16 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs;
+package com.netflix.genie.common.internal.configs;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.regions.AwsRegionProvider;
 import com.amazonaws.regions.DefaultAwsRegionProviderChain;
 import com.amazonaws.regions.Regions;
-import com.netflix.genie.agent.aws.s3.S3ClientFactory;
-import com.netflix.genie.agent.aws.s3.S3ProtocolResolver;
-import com.netflix.genie.agent.aws.s3.S3ProtocolResolverRegistrar;
-import com.netflix.genie.agent.execution.services.ArchivalService;
-import com.netflix.genie.agent.execution.services.impl.NoOpArchivalServiceImpl;
-import com.netflix.genie.agent.execution.services.impl.S3ArchivalServiceImpl;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
+import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -44,7 +41,6 @@ import org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionP
 import org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -132,44 +128,6 @@ public class AwsAutoConfiguration {
         final Environment environment
     ) {
         return new S3ClientFactory(awsCredentialsProvider, awsRegionProvider, environment);
-    }
-
-    /**
-     * Provide a lazy S3 based {@link ArchivalService} bean if AWS credentials are present in the context.
-     *
-     * @param awsCredentialsProvider The credentials provider to use
-     * @param s3ClientFactory        The {@link S3ClientFactory} to use to get clients for buckets
-     * @return A {@link S3ArchivalServiceImpl} instance if credentials are valid else a {@link NoOpArchivalServiceImpl}
-     */
-    @Bean
-    @Lazy
-    public ArchivalService archivalService(
-        final AWSCredentialsProvider awsCredentialsProvider,
-        final S3ClientFactory s3ClientFactory
-    ) {
-        /*
-         * TODO: Spring Cloud AWS always provides a credentials provider once it is on the classpath.
-         *
-         * For this reason this block exists to proactively verify that the credentials provided will be valid at
-         * runtime in order to create a working S3 client later on. If the credentials don't work this will fall back
-         * to creating a No Op Archival service implementation.
-         *
-         * Long term we should just have one ArchivalServiceImpl which uses the ResourceLoader and this won't be
-         * necessary.
-         */
-        try {
-            awsCredentialsProvider.getCredentials();
-        } catch (final SdkClientException sdkClientException) {
-            log.warn(
-                "Attempted to validate AWS credentials and failed due to {}. Falling back to no op implementation",
-                sdkClientException.getMessage(),
-                sdkClientException
-            );
-
-            return new NoOpArchivalServiceImpl();
-        }
-
-        return new S3ArchivalServiceImpl(s3ClientFactory);
     }
 
     /**

@@ -9,13 +9,16 @@ dependencies {
     api(project(":genie-common"))
     api(project(":genie-common-external"))
 
+    api("com.amazonaws:aws-java-sdk-sts")
+    api("org.springframework.cloud:spring-cloud-starter-aws")
+
     /*******************************
      * Implementation Dependencies
      *******************************/
 
-    implementation("org.springframework:spring-context")
     implementation("com.google.guava:guava")
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework:spring-context")
 
     /*******************************
      * Provided Dependencies

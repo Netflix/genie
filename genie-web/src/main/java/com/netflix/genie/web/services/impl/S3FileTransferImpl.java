@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -27,6 +26,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.services.FileTransfer;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -63,23 +63,23 @@ public class S3FileTransferImpl implements FileTransfer {
     private static final Pattern S3_KEY_PATTERN
         = Pattern.compile("^[0-9a-zA-Z!\\-_.*'()]+(?:/[0-9a-zA-Z!\\-_.*'()]+)*$");
     private final MeterRegistry registry;
-    private final AmazonS3 amazonS3;
+    private final S3ClientFactory s3ClientFactory;
     private final S3FileTransferProperties s3FileTransferProperties;
     private final Counter urlFailingStrictValidationCounter;
 
     /**
      * Constructor.
      *
-     * @param amazonS3                 The S3 client to use
+     * @param s3ClientFactory          The S3 client factory to use
      * @param registry                 The metrics registry to use
      * @param s3FileTransferProperties Options
      */
     public S3FileTransferImpl(
-        @NotNull final AmazonS3 amazonS3,
+        @NotNull final S3ClientFactory s3ClientFactory,
         @NotNull final MeterRegistry registry,
         @NotNull final S3FileTransferProperties s3FileTransferProperties
     ) {
-        this.amazonS3 = amazonS3;
+        this.s3ClientFactory = s3ClientFactory;
         this.registry = registry;
         this.urlFailingStrictValidationCounter = registry.counter(STRICT_VALIDATION_COUNTER_NAME);
         this.s3FileTransferProperties = s3FileTransferProperties;
@@ -115,10 +115,12 @@ public class S3FileTransferImpl implements FileTransfer {
 
             final AmazonS3URI s3Uri = getS3Uri(srcRemotePath);
             try {
-                this.amazonS3.getObject(
-                    new GetObjectRequest(s3Uri.getBucket(), s3Uri.getKey()),
-                    new File(dstLocalPath)
-                );
+                this.s3ClientFactory
+                    .getClient(s3Uri)
+                    .getObject(
+                        new GetObjectRequest(s3Uri.getBucket(), s3Uri.getKey()),
+                        new File(dstLocalPath)
+                    );
             } catch (final AmazonS3Exception ase) {
                 log.error("Error fetching file {} from s3 due to exception {}", srcRemotePath, ase.toString());
                 throw new GenieServerException("Error downloading file from s3. Filename: " + srcRemotePath, ase);
@@ -147,7 +149,9 @@ public class S3FileTransferImpl implements FileTransfer {
 
             final AmazonS3URI s3Uri = getS3Uri(dstRemotePath);
             try {
-                this.amazonS3.putObject(s3Uri.getBucket(), s3Uri.getKey(), new File(srcLocalPath));
+                this.s3ClientFactory
+                    .getClient(s3Uri)
+                    .putObject(s3Uri.getBucket(), s3Uri.getKey(), new File(srcLocalPath));
             } catch (final AmazonS3Exception ase) {
                 log.error("Error posting file {} to s3 due to exception {}", dstRemotePath, ase.toString());
                 throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath, ase);
@@ -172,7 +176,9 @@ public class S3FileTransferImpl implements FileTransfer {
         try {
             final AmazonS3URI s3Uri = this.getS3Uri(path);
             try {
-                final ObjectMetadata o = this.amazonS3.getObjectMetadata(s3Uri.getBucket(), s3Uri.getKey());
+                final ObjectMetadata o = this.s3ClientFactory
+                    .getClient(s3Uri)
+                    .getObjectMetadata(s3Uri.getBucket(), s3Uri.getKey());
                 lastModTime = o.getLastModified().getTime();
             } catch (final Exception ase) {
                 final String message = String.format("Failed getting the metadata of the s3 file %s", path);

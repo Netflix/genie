@@ -13,6 +13,16 @@ The Spring properties described here are ones that we have overridden from Sprin
 |===
 |Property |Description| Default Value
 
+|genie.aws.s3.buckets.[bucketName].roleARN
+|For the bucket with name `bucketName` the ARN of the role to assume to read/write to that bucket. If a bucket is used
+that isn't listed in this map the default credentials configured will be used
+|
+
+|genie.aws.s3.buckets.[bucketName].region
+|The AWS region the bucket with `bucketName` is in. Clients to talk to this bucket will be created in this region. If
+no value is specified the bucket is assumed to be in the same region as the Genie process.
+|
+
 |genie.aws.credentials.role
 |The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
 attempt to assume this role on the host Genie is running on
