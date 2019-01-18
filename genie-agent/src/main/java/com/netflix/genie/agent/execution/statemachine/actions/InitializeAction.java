@@ -18,8 +18,12 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.HandshakeException;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,10 +35,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class InitializeAction extends BaseStateAction implements StateAction.Initialize {
 
+    private final AgentJobService agentJobService;
+    private final AgentMetadata agentMetadata;
+
     InitializeAction(
-        final ExecutionContext executionContext
+        final ExecutionContext executionContext,
+        final AgentJobService agentJobService,
+        final AgentMetadata agentMetadata
     ) {
         super(executionContext);
+        this.agentJobService = agentJobService;
+        this.agentMetadata = agentMetadata;
     }
 
     @Override
@@ -47,6 +58,18 @@ class InitializeAction extends BaseStateAction implements StateAction.Initialize
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Initializing...");
+
+        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
+            agentMetadata.getAgentHostName(),
+            agentMetadata.getAgentVersion(),
+            Integer.parseInt(agentMetadata.getAgentPid())
+        );
+
+        try {
+            agentJobService.handshake(agentClientMetadata);
+        } catch (final HandshakeException e) {
+            throw new RuntimeException("Could not shake hands with server", e);
+        }
 
         return Events.INITIALIZE_COMPLETE;
     }
