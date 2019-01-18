@@ -55,6 +55,9 @@ dependencies {
     compile("org.springframework.cloud:spring-cloud-starter-zookeeper")
     compile("org.springframework.integration:spring-integration-zookeeper")
     compile("org.springframework.retry:spring-retry")
+    compile("org.apache.maven:maven-artifact:3.5.4") {
+      transitive = false
+    }
 
     /*******************************
      * Provided Dependencies
