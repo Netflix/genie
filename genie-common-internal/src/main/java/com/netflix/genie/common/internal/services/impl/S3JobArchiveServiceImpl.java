@@ -16,15 +16,15 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services.impl;
+package com.netflix.genie.common.internal.services.impl;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
-import com.netflix.genie.agent.execution.exceptions.ArchivalException;
-import com.netflix.genie.agent.execution.services.ArchivalService;
+import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +40,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
- * Implementation of {@link ArchivalService} for S3 destinations.
+ * Implementation of {@link JobArchiveService} for S3 destinations.
  *
  * @author standon
  * @author tgianos
@@ -53,7 +53,7 @@ import java.nio.file.attribute.BasicFileAttributes;
  *        write out the archive data. This would let us have one implementation that is automatically plugable
  *        at a framework/classpath level and save us from hand rolling all our own implementations.
  */
-public class S3ArchivalServiceImpl implements ArchivalService {
+public class S3JobArchiveServiceImpl implements JobArchiveService {
 
     private final S3ClientFactory s3ClientFactory;
 
@@ -62,7 +62,7 @@ public class S3ArchivalServiceImpl implements ArchivalService {
      *
      * @param s3ClientFactory The factory to use to get S3 client instances for a given S3 bucket.
      */
-    public S3ArchivalServiceImpl(final S3ClientFactory s3ClientFactory) {
+    public S3JobArchiveServiceImpl(final S3ClientFactory s3ClientFactory) {
         this.s3ClientFactory = s3ClientFactory;
     }
 
@@ -97,13 +97,13 @@ public class S3ArchivalServiceImpl implements ArchivalService {
      *
      * @param path      path to file/directory to archive.
      * @param targetURI s3 archival location uri for the file/dir
-     * @throws ArchivalException if archival fails
+     * @throws JobArchiveException if archival fails
      */
     @Override
     public void archive(
         @NotNull final Path path,
         @NotNull final URI targetURI
-    ) throws ArchivalException {
+    ) throws JobArchiveException {
         log.info("Archiving to location: {}", targetURI);
 
         final AmazonS3URI s3URI;
@@ -111,7 +111,7 @@ public class S3ArchivalServiceImpl implements ArchivalService {
             s3URI = new AmazonS3URI(targetURI);
         } catch (final IllegalArgumentException iae) {
             log.error("{} is not a valid S3 URI", targetURI);
-            throw new ArchivalException(
+            throw new JobArchiveException(
                 "Error archiving " + path.toString() + " due to " + targetURI + " not being a valid S3 URI",
                 iae
             );
@@ -124,7 +124,7 @@ public class S3ArchivalServiceImpl implements ArchivalService {
             );
         } catch (final Exception e) {
             log.error("Error archiving to location: {} ", targetURI, e);
-            throw new ArchivalException("Error archiving file: " + path.getFileName(), e);
+            throw new JobArchiveException("Error archiving file: " + path.getFileName(), e);
         }
     }
 

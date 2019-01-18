@@ -52,7 +52,6 @@ class AgentExecutionExceptionsSpec extends Specification {
         JobIdUnavailableException.class           | true
         JobReservationException.class             | true
         ChangeJobStatusException.class            | true
-        ArchivalException.class                   | true
         InvalidStateException.class               | false
     }
 }

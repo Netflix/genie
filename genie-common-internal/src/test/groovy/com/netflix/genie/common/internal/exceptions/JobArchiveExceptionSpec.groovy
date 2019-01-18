@@ -20,27 +20,27 @@ package com.netflix.genie.common.internal.exceptions
 import spock.lang.Specification
 
 /**
- * Specifications for the {@link GenieConversionException} class.
+ * Specifications for the {@link JobArchiveException} class.
  *
  * @author tgianos
  * @since 4.0.0
  */
-class GenieConversionExceptionSpec extends Specification {
+class JobArchiveExceptionSpec extends Specification {
 
     def "Can construct"() {
         String message = UUID.randomUUID().toString()
         Throwable cause = new Exception()
-        GenieConversionException exception
+        JobArchiveException exception
 
         when:
-        exception = new GenieConversionException(message)
+        exception = new JobArchiveException(message)
 
         then:
         exception.getMessage() == message
         exception.getCause() == null
 
         when:
-        exception = new GenieConversionException(message, cause)
+        exception = new JobArchiveException(message, cause)
 
         then:
         exception.getMessage() == message

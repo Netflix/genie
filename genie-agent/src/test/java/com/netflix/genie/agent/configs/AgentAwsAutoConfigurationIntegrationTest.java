@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.configs;
 
-import com.netflix.genie.agent.execution.services.ArchivalService;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.assertj.core.api.Assertions;
@@ -63,7 +63,7 @@ public class AgentAwsAutoConfigurationIntegrationTest {
     public void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
-                Assertions.assertThat(context).hasSingleBean(ArchivalService.class);
+                Assertions.assertThat(context).hasSingleBean(JobArchiveService.class);
             }
         );
     }
