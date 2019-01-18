@@ -35,6 +35,7 @@ import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.services.AgentFilterService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.AgentRoutingService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
@@ -458,5 +459,17 @@ public class GenieServicesAutoConfiguration {
             jobsProperties,
             retryTemplate
         );
+    }
+
+    /**
+     * Get a NOOP/fallback {@link AgentFilterService} instance if there isn't already one.
+     *
+     * @see GenieAgentFilterAutoConfiguration
+     * @return An {@link AgentFilterService} instance.
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFilterService.class)
+    public AgentFilterService agentFilterService() {
+        return agentClientMetadata -> { };
     }
 }
