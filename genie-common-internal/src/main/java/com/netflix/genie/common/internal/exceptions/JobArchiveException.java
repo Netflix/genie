@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.agent.execution.exceptions;
+package com.netflix.genie.common.internal.exceptions;
 
 /**
  * Exception thrown in case there is a problem with archiving files.
@@ -24,14 +24,14 @@ package com.netflix.genie.agent.execution.exceptions;
  * @author standon
  * @since 4.0.0
  */
-public class ArchivalException extends Exception {
+public class JobArchiveException extends Exception {
 
     /**
      * Constructor with message.
      *
      * @param message a message
      */
-    public ArchivalException(final String message) {
+    public JobArchiveException(final String message) {
         super(message);
     }
 
@@ -41,7 +41,7 @@ public class ArchivalException extends Exception {
      * @param message a message
      * @param cause   a cause
      */
-    public ArchivalException(final String message, final Throwable cause) {
+    public JobArchiveException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

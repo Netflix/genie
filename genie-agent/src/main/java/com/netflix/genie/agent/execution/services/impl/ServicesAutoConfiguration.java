@@ -19,12 +19,13 @@ package com.netflix.genie.agent.execution.services.impl;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
-import com.netflix.genie.agent.execution.services.ArchivalService;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
+import com.netflix.genie.common.internal.services.impl.NoOpJobArchiveServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -115,14 +116,14 @@ public class ServicesAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link ArchivalService} bean if one does not already exist.
+     * Provide a lazy {@link JobArchiveService} bean if one does not already exist.
      *
-     * @return A {@link NoOpArchivalServiceImpl} instance
+     * @return A {@link NoOpJobArchiveServiceImpl} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(ArchivalService.class)
-    public ArchivalService defaultArchivalService() {
-        return new NoOpArchivalServiceImpl();
+    @ConditionalOnMissingBean(JobArchiveService.class)
+    public JobArchiveService defaultArchivalService() {
+        return new NoOpJobArchiveServiceImpl();
     }
 }

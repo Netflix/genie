@@ -15,29 +15,33 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.common.internal.services.impl;
 
-package com.netflix.genie.agent.execution.services;
-
-import com.netflix.genie.agent.execution.exceptions.ArchivalException;
+import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.services.JobArchiveService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.nio.file.Path;
 
 /**
- * Service to archive a file to a remote location.
- * For a directory recursively archives the contents to a remote location
+ * Implementation of JobArchiveService which does no archival.
  *
  * @author standon
  * @since 4.0.0
  */
-public interface ArchivalService {
+@Slf4j
+public class NoOpJobArchiveServiceImpl implements JobArchiveService {
 
     /**
-     * Archive path to a target location.
+     * No archival is done.
      *
      * @param path      path to the file/dir to archive
      * @param targetURI target uri for the archival location
-     * @throws ArchivalException if archival fails
+     * @throws JobArchiveException On error
      */
-    void archive(Path path, URI targetURI) throws ArchivalException;
+    @Override
+    public void archive(final Path path, final URI targetURI) throws JobArchiveException {
+        log.warn("NoOpArchivalService called. No archival done.");
+    }
 }

@@ -20,9 +20,9 @@ package com.netflix.genie.agent.configs
 import com.amazonaws.SdkClientException
 import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.AWSCredentialsProvider
-import com.netflix.genie.agent.execution.services.impl.NoOpArchivalServiceImpl
-import com.netflix.genie.agent.execution.services.impl.S3ArchivalServiceImpl
+import com.netflix.genie.common.internal.services.impl.NoOpJobArchiveServiceImpl
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
+import com.netflix.genie.common.internal.services.impl.S3JobArchiveServiceImpl
 import spock.lang.Specification
 
 /**
@@ -42,13 +42,13 @@ class AgentAwsAutoConfigurationSpec extends Specification {
 
         then:
         1 * awsCredentialsProvider.getCredentials() >> { throw new SdkClientException("bad credentials") }
-        archivalService instanceof NoOpArchivalServiceImpl
+        archivalService instanceof NoOpJobArchiveServiceImpl
 
         when:
         archivalService = config.archivalService(awsCredentialsProvider, s3ClientFactory)
 
         then:
         1 * awsCredentialsProvider.getCredentials() >> Mock(AWSCredentials)
-        archivalService instanceof S3ArchivalServiceImpl
+        archivalService instanceof S3JobArchiveServiceImpl
     }
 }

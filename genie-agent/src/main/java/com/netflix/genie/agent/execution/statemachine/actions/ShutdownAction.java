@@ -19,8 +19,8 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
-import com.netflix.genie.agent.execution.exceptions.ArchivalException;
-import com.netflix.genie.agent.execution.services.ArchivalService;
+import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
@@ -39,14 +39,14 @@ import java.net.URISyntaxException;
 @Slf4j
 class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
 
-    private final ArchivalService archivalService;
+    private final JobArchiveService jobArchiveService;
 
     ShutdownAction(
         final ExecutionContext executionContext,
-        final ArchivalService archivalService
+        final JobArchiveService jobArchiveService
     ) {
         super(executionContext);
-        this.archivalService = archivalService;
+        this.jobArchiveService = jobArchiveService;
     }
 
     @Override
@@ -69,12 +69,12 @@ class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
                     final File jobDirectory = executionContext.getJobDirectory().get();
                     try {
                         log.info("Attempting to archive job folder to: " + archiveLocation);
-                        archivalService.archive(
+                        jobArchiveService.archive(
                             jobDirectory.toPath(),
                             new URI(archiveLocation)
                         );
                         log.info("Job folder archived to: " + archiveLocation);
-                    } catch (ArchivalException | URISyntaxException e) {
+                    } catch (JobArchiveException | URISyntaxException e) {
                         log.error("Error archiving job folder", e);
                     }
                 }

@@ -19,11 +19,11 @@ package com.netflix.genie.agent.configs;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.netflix.genie.agent.execution.services.ArchivalService;
-import com.netflix.genie.agent.execution.services.impl.NoOpArchivalServiceImpl;
-import com.netflix.genie.agent.execution.services.impl.S3ArchivalServiceImpl;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
+import com.netflix.genie.common.internal.services.JobArchiveService;
+import com.netflix.genie.common.internal.services.impl.NoOpJobArchiveServiceImpl;
+import com.netflix.genie.common.internal.services.impl.S3JobArchiveServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -50,15 +50,16 @@ import org.springframework.context.annotation.Lazy;
 public class AgentAwsAutoConfiguration {
 
     /**
-     * Provide a lazy S3 based {@link ArchivalService} bean if AWS credentials are present in the context.
+     * Provide a lazy S3 based {@link JobArchiveService} bean if AWS credentials are present in the context.
      *
      * @param awsCredentialsProvider The credentials provider to use
      * @param s3ClientFactory        The {@link S3ClientFactory} to use to get clients for buckets
-     * @return A {@link S3ArchivalServiceImpl} instance if credentials are valid else a {@link NoOpArchivalServiceImpl}
+     * @return A {@link S3JobArchiveServiceImpl} instance if credentials are valid else a
+     * {@link NoOpJobArchiveServiceImpl}
      */
     @Bean
     @Lazy
-    public ArchivalService archivalService(
+    public JobArchiveService archivalService(
         final AWSCredentialsProvider awsCredentialsProvider,
         final S3ClientFactory s3ClientFactory
     ) {
@@ -81,9 +82,9 @@ public class AgentAwsAutoConfiguration {
                 sdkClientException
             );
 
-            return new NoOpArchivalServiceImpl();
+            return new NoOpJobArchiveServiceImpl();
         }
 
-        return new S3ArchivalServiceImpl(s3ClientFactory);
+        return new S3JobArchiveServiceImpl(s3ClientFactory);
     }
 }

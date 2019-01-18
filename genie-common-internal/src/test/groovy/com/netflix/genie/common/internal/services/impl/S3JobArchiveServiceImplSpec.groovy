@@ -16,14 +16,14 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services.impl
+package com.netflix.genie.common.internal.services.impl
 
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
-import com.netflix.genie.agent.execution.exceptions.ArchivalException
+import com.netflix.genie.common.internal.exceptions.JobArchiveException
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.Rule
 import org.junit.experimental.categories.Category
@@ -34,12 +34,12 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 @Category(UnitTest)
-class S3ArchivalServiceImplSpec extends Specification {
+class S3JobArchiveServiceImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
     S3ClientFactory s3ClientFactory
     AmazonS3 amazonS3
-    S3ArchivalServiceImpl s3ArchivalService
+    S3JobArchiveServiceImpl s3ArchivalService
 
     File jobDir
     String bucketName = UUID.randomUUID().toString()
@@ -65,7 +65,7 @@ class S3ArchivalServiceImplSpec extends Specification {
     void setup() {
         s3ClientFactory = Mock()
         amazonS3 = Mock()
-        s3ArchivalService = new S3ArchivalServiceImpl(s3ClientFactory)
+        s3ArchivalService = new S3JobArchiveServiceImpl(s3ClientFactory)
         jobDir = temporaryFolder.newFolder("job")
         stdout = new File(jobDir, "stdout")
         stdout.createNewFile()
@@ -180,7 +180,7 @@ class S3ArchivalServiceImplSpec extends Specification {
         s3ArchivalService.archive(jobDir.toPath(), new URI("file://abc"))
 
         then:
-        thrown(ArchivalException)
+        thrown(JobArchiveException)
     }
 
     def "Archival Exception thrown if there is error archiving"() {
@@ -194,7 +194,7 @@ class S3ArchivalServiceImplSpec extends Specification {
             throw new AmazonServiceException("test")
         }
 
-        thrown(ArchivalException)
+        thrown(JobArchiveException)
     }
 
     private String pathRelativeToJobFolderParent(File file) {

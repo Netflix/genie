@@ -19,8 +19,8 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
-import com.netflix.genie.agent.execution.exceptions.ArchivalException
-import com.netflix.genie.agent.execution.services.ArchivalService
+import com.netflix.genie.common.internal.exceptions.JobArchiveException
+import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.test.categories.UnitTest
@@ -28,14 +28,13 @@ import org.junit.Rule
 import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-import spock.lang.Unroll
 
 @Category(UnitTest.class)
 class ShutdownActionSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
     ExecutionContext executionContext
-    ArchivalService archivalService
+    JobArchiveService archivalService
     ShutdownAction action
     JobSpecification jobSpecification
     File jobDir
@@ -43,7 +42,7 @@ class ShutdownActionSpec extends Specification {
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.archivalService = Mock(ArchivalService)
+        this.archivalService = Mock(JobArchiveService)
         this.jobSpecification = Mock(JobSpecification)
         this.jobDir = temporaryFolder.newFolder("job")
         this.action = new ShutdownAction(executionContext, archivalService)
@@ -105,7 +104,7 @@ class ShutdownActionSpec extends Specification {
         2 * jobSpecification.getArchiveLocation() >> Optional.of(sampleS3URI.toString())
         2 * executionContext.getJobDirectory() >> Optional.of(jobDir)
         1 * archivalService.archive(jobDir.toPath(), sampleS3URI) >> {
-            throw new ArchivalException("error")
+            throw new JobArchiveException("error")
         }
         event == Events.SHUTDOWN_COMPLETE
     }

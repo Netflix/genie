@@ -24,7 +24,7 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.agent.execution.services.ArchivalService;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import org.springframework.context.annotation.Bean;
@@ -195,15 +195,15 @@ public class StateMachineActionsAutoConfiguration {
      * Provide a {@link ShutdownAction} bean.
      *
      * @param executionContext The job execution context to use
-     * @param archivalService  Archival service to use
+     * @param jobArchiveService  Archival service to use
      * @return A {@link ShutdownAction} instance
      */
     @Bean
     @Lazy
     public ShutdownAction shutdownAction(
         final ExecutionContext executionContext,
-        final ArchivalService archivalService
+        final JobArchiveService jobArchiveService
     ) {
-        return new ShutdownAction(executionContext, archivalService);
+        return new ShutdownAction(executionContext, jobArchiveService);
     }
 }
