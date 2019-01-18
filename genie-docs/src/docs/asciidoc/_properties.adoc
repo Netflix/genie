@@ -23,6 +23,22 @@ that isn't listed in this map the default credentials configured will be used
 no value is specified the bucket is assumed to be in the same region as the Genie process.
 |
 
+|genie.agent.filter.enabled
+|If set to `true`, enables the built-in agent filter service. The filter behavior is controlled by other active `genie.agent.filter.*` properties.
+|
+
+|genie.agent.filter.version.minimum
+|(Dynamic) The minimum version an agent needs to be (e.g., `1.2.3`) in order to communicate with this server. The filter needs to be enabled for this to take effect.
+|
+
+|genie.agent.filter.version.blacklist
+|(Dynamic) A regex matched against agent version (e.g., `1\.2\..*`), matching agents are rejected. The filter needs to be enabled for this to take effect.
+|
+
+|genie.agent.filter.version.whitelist
+|(Dynamic) A regex matched against agent version (e.g., `1\.2\..*`), agents not matching are rejected. The filter needs to be enabled for this to take effect.
+|
+
 |genie.aws.credentials.role
 |The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
 attempt to assume this role on the host Genie is running on
