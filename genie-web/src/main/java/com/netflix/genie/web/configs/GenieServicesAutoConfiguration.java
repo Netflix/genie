@@ -343,6 +343,7 @@ public class GenieServicesAutoConfiguration {
      *
      * @param jobPersistenceService   The persistence service to use
      * @param jobSpecificationService The specification service to use
+     * @param agentFilterService      The agent filter service to use
      * @param meterRegistry           The metrics registry to use
      * @return An {@link AgentJobServiceImpl} instance.
      */
@@ -351,11 +352,13 @@ public class GenieServicesAutoConfiguration {
     public AgentJobService agentJobService(
         final JobPersistenceService jobPersistenceService,
         final JobSpecificationService jobSpecificationService,
+        final AgentFilterService agentFilterService,
         final MeterRegistry meterRegistry
     ) {
         return new AgentJobServiceImpl(
             jobPersistenceService,
             jobSpecificationService,
+            agentFilterService,
             meterRegistry
         );
     }

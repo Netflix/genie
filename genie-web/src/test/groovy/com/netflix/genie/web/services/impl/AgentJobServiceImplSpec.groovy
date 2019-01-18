@@ -25,6 +25,7 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.web.services.AgentFilterService
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
 import io.micrometer.core.instrument.MeterRegistry
@@ -42,17 +43,20 @@ class AgentJobServiceImplSpec extends Specification {
 
     JobPersistenceService jobPersistenceService
     JobSpecificationService jobSpecificationService
+    AgentFilterService agentFilterService
     MeterRegistry meterRegistry
     AgentJobServiceImpl service
 
     def setup() {
         this.jobPersistenceService = Mock(JobPersistenceService)
         this.jobSpecificationService = Mock(JobSpecificationService)
+        this.agentFilterService = Mock(AgentFilterService)
         this.meterRegistry = Mock(MeterRegistry)
         this.service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                this.meterRegistry
+            jobPersistenceService,
+            jobSpecificationService,
+            agentFilterService,
+            this.meterRegistry
         )
     }
 
@@ -63,7 +67,7 @@ class AgentJobServiceImplSpec extends Specification {
         service.handshake(agentClientMetadata)
 
         then:
-        noExceptionThrown()
+        1 * agentFilterService.acceptOrThrow(agentClientMetadata)
     }
 
     def "Can reserve job id"() {
