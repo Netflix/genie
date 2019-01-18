@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
+import com.netflix.genie.agent.execution.exceptions.HandshakeException
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException
 import com.netflix.genie.agent.execution.exceptions.JobReservationException
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
@@ -50,6 +51,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     AgentJobService service
 
     // Set during setup of individual tests as needed.
+    HandshakeResponse handshakeResponse
     ReserveJobIdResponse reserveJobIdResponse
     JobSpecificationResponse jobSpecificationResponse
     ClaimJobResponse claimJobResponse
@@ -61,6 +63,61 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         this.protoConverter = Mock(JobServiceProtoConverter)
         this.client = JobServiceGrpc.newFutureStub(grpcServerRule.getChannel())
         this.service = new GRpcAgentJobServiceImpl(client, protoConverter)
+    }
+
+    def "Handshake -- successful"() {
+        AgentClientMetadata agentClientMetadata = Mock()
+        HandshakeRequest request = HandshakeRequest.getDefaultInstance()
+        this.handshakeResponse = HandshakeResponse.newBuilder()
+            .setType(HandshakeResponse.Type.ALLOWED)
+            .build()
+
+        when:
+        service.handshake(agentClientMetadata)
+
+        then:
+        1 * protoConverter.toHandshakeRequest(agentClientMetadata) >> request
+    }
+
+    def "Handshake -- rejected"() {
+        AgentClientMetadata agentClientMetadata = Mock()
+        HandshakeRequest request = HandshakeRequest.getDefaultInstance()
+        this.handshakeResponse = HandshakeResponse.newBuilder()
+            .setType(HandshakeResponse.Type.REJECTED)
+            .setMessage("Thou shall not pass")
+            .build()
+
+        when:
+        service.handshake(agentClientMetadata)
+
+        then:
+        1 * protoConverter.toHandshakeRequest(agentClientMetadata) >> request
+        thrown(HandshakeException)
+    }
+
+    @Unroll
+    def "Handshake -- error #error"(HandshakeResponse.Type error) {
+        AgentClientMetadata agentClientMetadata = Mock()
+        HandshakeRequest request = HandshakeRequest.getDefaultInstance()
+        this.handshakeResponse = HandshakeResponse.newBuilder()
+            .setType(error)
+            .setMessage("Some server error")
+            .build()
+
+        when:
+        service.handshake(agentClientMetadata)
+
+        then:
+        1 * protoConverter.toHandshakeRequest(agentClientMetadata) >> request
+        Exception e = thrown(GenieRuntimeException)
+        e.getMessage().contains(error.name())
+
+
+        where:
+        error                                  | _
+        HandshakeResponse.Type.UNKNOWN         | _
+        HandshakeResponse.Type.SERVER_ERROR    | _
+        HandshakeResponse.Type.INVALID_REQUEST | _
     }
 
     def "Reserve job id -- successful"() {
@@ -95,7 +152,6 @@ class GRpcAgentJobServiceImplSpec extends Specification {
 
         then:
         1 * protoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata) >> request
-
         thrown(expectedException)
 
         where:
@@ -446,6 +502,11 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     }
 
     private class TestService extends JobServiceGrpc.JobServiceImplBase {
+        @Override
+        void handshake(final HandshakeRequest request, final StreamObserver<HandshakeResponse> responseObserver) {
+            sendResponse(responseObserver, handshakeResponse)
+        }
+
         @Override
         void reserveJobId(
                 final ReserveJobIdRequest request,

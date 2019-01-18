@@ -19,6 +19,7 @@ package com.netflix.genie.agent.execution.services.impl.grpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
+import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
@@ -37,6 +38,8 @@ import com.netflix.genie.proto.ClaimJobError;
 import com.netflix.genie.proto.ClaimJobRequest;
 import com.netflix.genie.proto.ClaimJobResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
+import com.netflix.genie.proto.HandshakeRequest;
+import com.netflix.genie.proto.HandshakeResponse;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationError;
 import com.netflix.genie.proto.JobSpecificationRequest;
@@ -79,6 +82,44 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
         this.jobServiceProtoConverter = jobServiceProtoConverter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handshake(
+        final AgentClientMetadata agentClientMetadata
+    ) throws HandshakeException {
+        final HandshakeRequest request;
+        try {
+            request = jobServiceProtoConverter.toHandshakeRequest(agentClientMetadata);
+        } catch (final GenieConversionException e) {
+            throw new HandshakeException("Failed to construct request from parameters", e);
+        }
+
+        final HandshakeResponse response = handleResponseFuture(this.client.handshake(request));
+
+        switch (response.getType()) {
+            case ALLOWED:
+                log.info("Successfully shook hand with server");
+                break;
+
+            case REJECTED:
+                log.warn("Server rejected handshake with this agent");
+                throw new HandshakeException("Server rejected client: " + response.getMessage());
+
+            default:
+                throw new GenieRuntimeException(
+                    "Error during handshake: "
+                        + response.getType().name()
+                        + " - "
+                        + response.getMessage()
+                );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String reserveJobId(
         final AgentJobRequest agentJobRequest,
