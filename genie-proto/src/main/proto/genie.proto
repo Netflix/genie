@@ -33,6 +33,7 @@ message PongResponse {
 
 // Job Service
 service JobService {
+    rpc handshake (HandshakeRequest) returns (HandshakeResponse);
     rpc reserveJobId (ReserveJobIdRequest) returns (ReserveJobIdResponse);
     rpc resolveJobSpecification (JobSpecificationRequest) returns (JobSpecificationResponse);
     rpc getJobSpecification (JobSpecificationRequest) returns (JobSpecificationResponse);
@@ -79,6 +80,22 @@ message AgentConfig {
 
 message JobArchivalData {
     string requested_archive_location_prefix = 1;
+}
+
+message HandshakeRequest {
+    AgentMetadata agent_metadata = 1;
+}
+
+message HandshakeResponse {
+    enum Type {
+      UNKNOWN = 0;
+      ALLOWED = 1;
+      REJECTED = 2;
+      SERVER_ERROR = 3;
+      INVALID_REQUEST = 4;
+    }
+    Type type = 1;
+    string message = 2;
 }
 
 message ReserveJobIdRequest {

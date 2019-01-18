@@ -36,6 +36,7 @@ import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.services.AgentFilterService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.AgentRoutingService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
@@ -67,6 +68,7 @@ import com.netflix.genie.web.services.impl.JobSpecificationServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
+import com.netflix.genie.web.util.InspectionReport;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -343,6 +345,7 @@ public class GenieServicesAutoConfiguration {
      *
      * @param jobPersistenceService   The persistence service to use
      * @param jobSpecificationService The specification service to use
+     * @param agentFilterService      The agent filter service to use
      * @param meterRegistry           The metrics registry to use
      * @return An {@link AgentJobServiceImpl} instance.
      */
@@ -351,11 +354,13 @@ public class GenieServicesAutoConfiguration {
     public AgentJobService agentJobService(
         final JobPersistenceService jobPersistenceService,
         final JobSpecificationService jobSpecificationService,
+        final AgentFilterService agentFilterService,
         final MeterRegistry meterRegistry
     ) {
         return new AgentJobServiceImpl(
             jobPersistenceService,
             jobSpecificationService,
+            agentFilterService,
             meterRegistry
         );
     }
@@ -458,6 +463,21 @@ public class GenieServicesAutoConfiguration {
             registry,
             jobsProperties,
             retryTemplate
+        );
+    }
+
+    /**
+     * Get a NOOP/fallback {@link AgentFilterService} instance if there isn't already one.
+     *
+     * @see GenieAgentFilterAutoConfiguration
+     * @return An {@link AgentFilterService} instance.
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFilterService.class)
+    public AgentFilterService agentFilterService() {
+        return agentClientMetadata -> new InspectionReport(
+            InspectionReport.Decision.ACCEPT,
+            "Accepted by default"
         );
     }
 }

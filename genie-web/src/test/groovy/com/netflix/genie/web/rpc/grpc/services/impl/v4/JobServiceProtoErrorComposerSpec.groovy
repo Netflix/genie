@@ -20,6 +20,7 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.common.exceptions.GeniePreconditionException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
@@ -32,6 +33,7 @@ import com.netflix.genie.proto.ChangeJobStatusError
 import com.netflix.genie.proto.ChangeJobStatusResponse
 import com.netflix.genie.proto.ClaimJobError
 import com.netflix.genie.proto.ClaimJobResponse
+import com.netflix.genie.proto.HandshakeResponse
 import com.netflix.genie.proto.JobSpecificationError
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdError
@@ -134,5 +136,22 @@ class JobServiceProtoErrorComposerSpec extends Specification {
         new ConstraintViolationException(MESSAGE, cvs) | ChangeJobStatusError.Type.INVALID_REQUEST
         new IOException(MESSAGE)                       | ChangeJobStatusError.Type.UNKNOWN
         new RuntimeException(MESSAGE)                  | ChangeJobStatusError.Type.UNKNOWN
+    }
+
+    @Unroll
+    def "ToProtoHandshakeResponse for #exception.class.getSimpleName()"() {
+        when:
+        HandshakeResponse response = errorComposer.toProtoHandshakeResponse(exception)
+
+        then:
+        response.getType() == expectedErrorType
+        response.getMessage().contains(exception.class.getCanonicalName())
+        response.getMessage().contains(MESSAGE)
+
+        where:
+        exception                                      | expectedErrorType
+        new GenieAgentRejectedException(MESSAGE)       | HandshakeResponse.Type.REJECTED
+        new ConstraintViolationException(MESSAGE, cvs) | HandshakeResponse.Type.INVALID_REQUEST
+        new RuntimeException(MESSAGE)                  | HandshakeResponse.Type.SERVER_ERROR
     }
 }

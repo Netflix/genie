@@ -52,6 +52,7 @@ class AgentExecutionExceptionsSpec extends Specification {
         JobIdUnavailableException.class           | true
         JobReservationException.class             | true
         ChangeJobStatusException.class            | true
+        HandshakeException.class                  | true
         InvalidStateException.class               | false
     }
 }

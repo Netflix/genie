@@ -27,6 +27,8 @@ import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobRequest;
 import com.netflix.genie.proto.ClaimJobResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
+import com.netflix.genie.proto.HandshakeRequest;
+import com.netflix.genie.proto.HandshakeResponse;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
@@ -77,6 +79,37 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         this.agentJobService = agentJobService;
         this.jobServiceProtoConverter = jobServiceProtoConverter;
         this.protoErrorComposer = protoErrorComposer;
+    }
+
+    /**
+     * This API gives the server a chance to reject a client/agent based on its metadata (version, location, ...).
+     *
+     * @param request          The request containing client metadata
+     * @param responseObserver To send the response
+     */
+    @Override
+    public void handshake(
+        final HandshakeRequest request,
+        final StreamObserver<HandshakeResponse> responseObserver
+    ) {
+        try {
+            final AgentClientMetadata agentMetadata =
+                jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+
+            agentJobService.handshake(agentMetadata);
+
+            responseObserver.onNext(
+                HandshakeResponse.newBuilder()
+                    .setMessage("Agent is allowed to proceed")
+                    .setType(HandshakeResponse.Type.ALLOWED)
+                    .build()
+            );
+
+        } catch (final Exception e) {
+            responseObserver.onNext(protoErrorComposer.toProtoHandshakeResponse(e));
+        }
+
+        responseObserver.onCompleted();
     }
 
     /**

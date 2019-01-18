@@ -22,11 +22,14 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
+import com.netflix.genie.web.services.AgentFilterService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.util.InspectionReport;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -48,6 +51,7 @@ public class AgentJobServiceImpl implements AgentJobService {
 
     private final JobPersistenceService jobPersistenceService;
     private final JobSpecificationService jobSpecificationService;
+    private final AgentFilterService agentFilterService;
     private final MeterRegistry meterRegistry;
 
     /**
@@ -55,16 +59,32 @@ public class AgentJobServiceImpl implements AgentJobService {
      *
      * @param jobPersistenceService   The persistence service to use
      * @param jobSpecificationService The specification service to use
+     * @param agentFilterService      The agent filter service to use
      * @param meterRegistry           The metrics registry to use
      */
     public AgentJobServiceImpl(
         final JobPersistenceService jobPersistenceService,
         final JobSpecificationService jobSpecificationService,
+        final AgentFilterService agentFilterService,
         final MeterRegistry meterRegistry
     ) {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSpecificationService = jobSpecificationService;
+        this.agentFilterService = agentFilterService;
         this.meterRegistry = meterRegistry;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handshake(
+        @Valid final AgentClientMetadata agentClientMetadata
+    ) throws GenieAgentRejectedException {
+        final InspectionReport report = agentFilterService.inspectAgentMetadata(agentClientMetadata);
+        if (report.getDecision() == InspectionReport.Decision.REJECT) {
+            throw new GenieAgentRejectedException("Agent rejected: " + report.getMessage());
+        }
     }
 
     /**

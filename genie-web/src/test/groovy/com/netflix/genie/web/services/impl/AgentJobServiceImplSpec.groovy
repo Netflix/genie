@@ -22,9 +22,13 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.web.services.AgentFilterService
+import com.netflix.genie.web.util.InspectionReport
+import com.netflix.genie.web.util.InspectionReport.Decision
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
 import io.micrometer.core.instrument.MeterRegistry
@@ -42,19 +46,52 @@ class AgentJobServiceImplSpec extends Specification {
 
     JobPersistenceService jobPersistenceService
     JobSpecificationService jobSpecificationService
+    AgentFilterService agentFilterService
     MeterRegistry meterRegistry
     AgentJobServiceImpl service
 
     def setup() {
         this.jobPersistenceService = Mock(JobPersistenceService)
         this.jobSpecificationService = Mock(JobSpecificationService)
+        this.agentFilterService = Mock(AgentFilterService)
         this.meterRegistry = Mock(MeterRegistry)
         this.service = new AgentJobServiceImpl(
-                jobPersistenceService,
-                jobSpecificationService,
-                this.meterRegistry
+            jobPersistenceService,
+            jobSpecificationService,
+            agentFilterService,
+            this.meterRegistry
         )
     }
+
+    def "Can handshake successfully"() {
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def inspectionReport = Mock(InspectionReport)
+
+        when:
+        service.handshake(agentClientMetadata)
+
+        then:
+        1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
+        1 * inspectionReport.getDecision() >> Decision.ACCEPT
+        0 * inspectionReport.getMessage()
+    }
+
+    def "Can handshake rejection"() {
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def inspectionReport = Mock(InspectionReport)
+        String message = "Agent version is deprecated"
+
+        when:
+        service.handshake(agentClientMetadata)
+
+        then:
+        1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
+        1 * inspectionReport.getDecision() >> Decision.REJECT
+        1 * inspectionReport.getMessage() >> message
+        def e = thrown(GenieAgentRejectedException)
+        e.getMessage().contains(message)
+    }
+
 
     def "Can reserve job id"() {
         def jobRequest = Mock(JobRequest)
