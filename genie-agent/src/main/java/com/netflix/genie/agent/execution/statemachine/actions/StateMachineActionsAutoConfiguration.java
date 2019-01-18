@@ -88,12 +88,18 @@ public class StateMachineActionsAutoConfiguration {
      * Provide a lazy {@link InitializeAction} bean.
      *
      * @param executionContext The job execution context to use
+     * @param agentJobService  The agent job service to use
+     * @param agentMetadata    The agent metadata to use
      * @return An {@link InitializeAction} instance
      */
     @Bean
     @Lazy
-    public InitializeAction initializeAction(final ExecutionContext executionContext) {
-        return new InitializeAction(executionContext);
+    public InitializeAction initializeAction(
+        final ExecutionContext executionContext,
+        final AgentJobService agentJobService,
+        final AgentMetadata agentMetadata
+    ) {
+        return new InitializeAction(executionContext, agentJobService, agentMetadata);
     }
 
     /**
