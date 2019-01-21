@@ -15,10 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs;
+package com.netflix.genie.common.internal.configs;
 
 import com.netflix.genie.common.internal.services.JobArchiveService;
-import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
+import com.netflix.genie.common.internal.services.JobArchiver;
+import com.netflix.genie.common.internal.services.impl.NoOpJobArchiverImpl;
+import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -36,22 +38,14 @@ import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoader
  * @since 4.0.0
  */
 @Category(IntegrationTest.class)
-public class AgentAwsAutoConfigurationIntegrationTest {
+public class CommonServicesAutoConfigurationIntegrationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
-                ContextCredentialsAutoConfiguration.class,
-                ContextRegionProviderAutoConfiguration.class,
-                ContextResourceLoaderAutoConfiguration.class,
-                AwsAutoConfiguration.class,
-                AgentAwsAutoConfiguration.class
+                CommonServicesAutoConfiguration.class
             )
         )
         .withPropertyValues(
-            "cloud.aws.credentials.useDefaultAwsCredentialsChain=true",
-            "cloud.aws.region.auto=false",
-            "cloud.aws.region.static=us-east-1",
-            "cloud.aws.stack.auto=false",
             "spring.jmx.enabled=false",
             "spring.main.webApplicationType=none"
         );
@@ -63,8 +57,46 @@ public class AgentAwsAutoConfigurationIntegrationTest {
     public void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
+                Assertions.assertThat(context).hasSingleBean(NoOpJobArchiverImpl.class);
+                Assertions.assertThat(context).hasSingleBean(JobArchiver.class);
                 Assertions.assertThat(context).hasSingleBean(JobArchiveService.class);
             }
         );
+    }
+
+    /**
+     * Make sure when AWS configuration is involved it gives the right configuration.
+     */
+    @Test
+    public void testExpectedContextWithAws() {
+        this.contextRunner
+            .withPropertyValues(
+                "cloud.aws.credentials.useDefaultAwsCredentialsChain=true",
+                "cloud.aws.region.auto=false",
+                "cloud.aws.region.static=us-east-1",
+                "cloud.aws.stack.auto=false"
+            )
+            .withConfiguration(
+                AutoConfigurations.of(
+                    ContextCredentialsAutoConfiguration.class,
+                    ContextRegionProviderAutoConfiguration.class,
+                    ContextResourceLoaderAutoConfiguration.class,
+                    AwsAutoConfiguration.class
+                )
+            )
+            .run(
+                (context) -> {
+                    Assertions.assertThat(context).hasSingleBean(NoOpJobArchiverImpl.class);
+                    Assertions.assertThat(context).hasSingleBean(S3JobArchiverImpl.class);
+                    Assertions.assertThat(context).hasSingleBean(JobArchiveService.class);
+
+                    // TODO: Find a way to test the order
+                    Assertions
+                        .assertThat(context)
+                        .getBeans(JobArchiver.class)
+                        .size()
+                        .isEqualTo(2);
+                }
+            );
     }
 }

@@ -34,12 +34,12 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 @Category(UnitTest)
-class S3JobArchiveServiceImplSpec extends Specification {
+class S3JobArchiverImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
     S3ClientFactory s3ClientFactory
     AmazonS3 amazonS3
-    S3JobArchiveServiceImpl s3ArchivalService
+    S3JobArchiverImpl s3ArchivalService
 
     File jobDir
     String bucketName = UUID.randomUUID().toString()
@@ -65,7 +65,7 @@ class S3JobArchiveServiceImplSpec extends Specification {
     void setup() {
         s3ClientFactory = Mock()
         amazonS3 = Mock()
-        s3ArchivalService = new S3JobArchiveServiceImpl(s3ClientFactory)
+        s3ArchivalService = new S3JobArchiverImpl(s3ClientFactory)
         jobDir = temporaryFolder.newFolder("job")
         stdout = new File(jobDir, "stdout")
         stdout.createNewFile()
@@ -124,7 +124,7 @@ class S3JobArchiveServiceImplSpec extends Specification {
     def "Archive a sample job folder. S3 objects creation calls called for files and empty directories with correct keys"() {
 
         when:
-        s3ArchivalService.archive(jobDir.toPath(), archivalLocationS3URI.getURI())
+        def result = s3ArchivalService.archiveDirectory(jobDir.toPath(), archivalLocationS3URI.getURI())
 
         then:
         1 * s3ClientFactory.getClient(archivalLocationS3URI) >> amazonS3
@@ -172,21 +172,22 @@ class S3JobArchiveServiceImplSpec extends Specification {
                         break
                 }
         }
+        result
     }
 
     def "Archival Exception thrown for non S3 uri"() {
 
         when:
-        s3ArchivalService.archive(jobDir.toPath(), new URI("file://abc"))
+        def result = s3ArchivalService.archiveDirectory(jobDir.toPath(), new URI("file://abc"))
 
         then:
-        thrown(JobArchiveException)
+        !result
     }
 
     def "Archival Exception thrown if there is error archiving"() {
 
         when:
-        s3ArchivalService.archive(jobDir.toPath(), archivalLocationS3URI.getURI())
+        s3ArchivalService.archiveDirectory(jobDir.toPath(), archivalLocationS3URI.getURI())
 
         then:
         1 * s3ClientFactory.getClient(archivalLocationS3URI) >> amazonS3
