@@ -24,8 +24,9 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.exceptions.JobArchiveException;
-import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.services.JobArchiveService;
+import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -47,13 +48,7 @@ import java.nio.file.attribute.BasicFileAttributes;
  * @since 4.0.0
  */
 @Slf4j
-/*
- *  TODO: This implementation should be replaced with a single default implementation that uses the Spring
- *        resource loader to get a Resource object which is an instance of WritableResource. Then use that to
- *        write out the archive data. This would let us have one implementation that is automatically plugable
- *        at a framework/classpath level and save us from hand rolling all our own implementations.
- */
-public class S3JobArchiveServiceImpl implements JobArchiveService {
+public class S3JobArchiverImpl implements JobArchiver {
 
     private final S3ClientFactory s3ClientFactory;
 
@@ -62,7 +57,7 @@ public class S3JobArchiveServiceImpl implements JobArchiveService {
      *
      * @param s3ClientFactory The factory to use to get S3 client instances for a given S3 bucket.
      */
-    public S3JobArchiveServiceImpl(final S3ClientFactory s3ClientFactory) {
+    public S3JobArchiverImpl(final S3ClientFactory s3ClientFactory) {
         this.s3ClientFactory = s3ClientFactory;
     }
 
@@ -95,41 +90,44 @@ public class S3JobArchiveServiceImpl implements JobArchiveService {
      * following structure is created in S3
      * s3://bucketName/file1 contains contents of file1
      *
-     * @param path      path to file/directory to archive.
-     * @param targetURI s3 archival location uri for the file/dir
+     * @param directory path to file/directory to archive.
+     * @param target    s3 archival location uri for the file/dir
      * @throws JobArchiveException if archival fails
      */
     @Override
-    public void archive(
-        @NotNull final Path path,
-        @NotNull final URI targetURI
+    public boolean archiveDirectory(
+        @NotNull final Path directory,
+        @NotNull final URI target
     ) throws JobArchiveException {
-        log.info("Archiving to location: {}", targetURI);
-
+        final String uriString = target.toString();
+        final String directoryString = directory.toString();
         final AmazonS3URI s3URI;
         try {
-            s3URI = new AmazonS3URI(targetURI);
+            s3URI = new AmazonS3URI(target);
         } catch (final IllegalArgumentException iae) {
-            log.error("{} is not a valid S3 URI", targetURI);
-            throw new JobArchiveException(
-                "Error archiving " + path.toString() + " due to " + targetURI + " not being a valid S3 URI",
-                iae
-            );
+            log.debug("{} is not a valid S3 URI", uriString);
+            return false;
         }
+        log.debug(
+            "{} is a valid S3 location. Proceeding to archiving {} to location: {}",
+            directoryString,
+            uriString
+        );
 
         try {
             Files.walkFileTree(
-                path,
-                new FileArchivalVisitor(path, this.s3ClientFactory.getClient(s3URI), s3URI)
+                directory,
+                new FileArchivalVisitor(directory, this.s3ClientFactory.getClient(s3URI), s3URI)
             );
+            return true;
         } catch (final Exception e) {
-            log.error("Error archiving to location: {} ", targetURI, e);
-            throw new JobArchiveException("Error archiving file: " + path.getFileName(), e);
+            log.error("Error archiving to S3 location: {} ", uriString, e);
+            throw new JobArchiveException("Error archiving " + directoryString, e);
         }
     }
 
     /**
-     * This visitor will archive regular files and empty directories to a target S3 location.
+     * This visitor will archiveDirectory regular files and empty directories to a target S3 location.
      * No action for non empty directories.
      */
     static class FileArchivalVisitor implements FileVisitor<Path> {

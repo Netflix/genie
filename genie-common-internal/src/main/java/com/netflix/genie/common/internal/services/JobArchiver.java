@@ -18,27 +18,28 @@
 package com.netflix.genie.common.internal.services;
 
 import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import org.springframework.core.io.WritableResource;
 
 import java.net.URI;
 import java.nio.file.Path;
 
 /**
- * A service which is responsible for taking the files related to running a Genie job and backing them up to a different
- * location.
+ * Implementations of this interface should be able to a write job files to a {@link WritableResource} root location.
  *
- * @author standon
  * @author tgianos
  * @since 4.0.0
  */
-public interface JobArchiveService {
+public interface JobArchiver {
 
     /**
-     * Backup the contents of the given directory to the target location. This will recursively backup ALL the files
-     * and sub-directories within the given directory to the target.
+     * Attempt to archive a directory located at {@code directory} to the {@code target}. All existing data "under"
+     * {@code target} should be assumed to be overwritten/replaced.
      *
-     * @param directory {@link Path} to the directory to archive
-     * @param targetURI target {@link URI} for the root archive location
-     * @throws JobArchiveException if archival fails
+     * @param directory The directory to archive
+     * @param target    The root of a writable location to archive to.
+     * @return {@code false} if this implementation doesn't support archiving to {@code target}. {@code true} if does
+     * support archiving to {@code target} and the archival was successful
+     * @throws JobArchiveException If an exception happened during archival
      */
-    void archiveDirectory(Path directory, URI targetURI) throws JobArchiveException;
+    boolean archiveDirectory(Path directory, URI target) throws JobArchiveException;
 }

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 package com.netflix.genie.common.internal.services.impl;
 
 import com.netflix.genie.common.internal.exceptions.JobArchiveException;
-import com.netflix.genie.common.internal.services.JobArchiveService;
+import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
@@ -28,20 +28,17 @@ import java.nio.file.Path;
  * Implementation of JobArchiveService which does no archival.
  *
  * @author standon
+ * @author tgianos
  * @since 4.0.0
  */
 @Slf4j
-public class NoOpJobArchiveServiceImpl implements JobArchiveService {
+public class NoOpJobArchiverImpl implements JobArchiver {
 
     /**
-     * No archival is done.
-     *
-     * @param path      path to the file/dir to archive
-     * @param targetURI target uri for the archival location
-     * @throws JobArchiveException On error
+     * {@inheritDoc}
      */
     @Override
-    public void archive(final Path path, final URI targetURI) throws JobArchiveException {
-        log.warn("NoOpArchivalService called. No archival done.");
+    public boolean archiveDirectory(final Path directory, final URI target) throws JobArchiveException {
+        return true;
     }
 }

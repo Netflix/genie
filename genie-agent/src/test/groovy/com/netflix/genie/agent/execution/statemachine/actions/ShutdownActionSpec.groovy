@@ -61,7 +61,7 @@ class ShutdownActionSpec extends Specification {
         2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
         2 * jobSpecification.getArchiveLocation() >> Optional.of(sampleS3URI.toString())
         2 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * archivalService.archive(jobDir.toPath(), sampleS3URI)
+        1 * archivalService.archiveDirectory(jobDir.toPath(), sampleS3URI)
         event == Events.SHUTDOWN_COMPLETE
 
     }
@@ -76,7 +76,7 @@ class ShutdownActionSpec extends Specification {
         2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
         1 * jobSpecification.getArchiveLocation() >> Optional.empty()
         0 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        0 * archivalService.archive(_, _)
+        0 * archivalService.archiveDirectory(_, _)
         event == Events.SHUTDOWN_COMPLETE
     }
 
@@ -85,11 +85,11 @@ class ShutdownActionSpec extends Specification {
         when:
         event = action.executeStateAction(executionContext)
 
-        then: "Skip archival for a empty archive location"
+        then: "Skip archival for a empty archiveDirectory location"
         2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
         2 * jobSpecification.getArchiveLocation() >> Optional.of("")
         0 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        0 * archivalService.archive(_, _)
+        0 * archivalService.archiveDirectory(_, _)
         event == Events.SHUTDOWN_COMPLETE
     }
 
@@ -103,7 +103,7 @@ class ShutdownActionSpec extends Specification {
         2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
         2 * jobSpecification.getArchiveLocation() >> Optional.of(sampleS3URI.toString())
         2 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * archivalService.archive(jobDir.toPath(), sampleS3URI) >> {
+        1 * archivalService.archiveDirectory(jobDir.toPath(), sampleS3URI) >> {
             throw new JobArchiveException("error")
         }
         event == Events.SHUTDOWN_COMPLETE
@@ -119,7 +119,7 @@ class ShutdownActionSpec extends Specification {
         2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
         2 * jobSpecification.getArchiveLocation() >> Optional.of("invalid URI")
         2 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        0 * archivalService.archive(jobDir.toPath(), sampleS3URI)
+        0 * archivalService.archiveDirectory(jobDir.toPath(), sampleS3URI)
         event == Events.SHUTDOWN_COMPLETE
     }
 

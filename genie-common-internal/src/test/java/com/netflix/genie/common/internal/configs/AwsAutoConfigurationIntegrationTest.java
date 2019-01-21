@@ -21,6 +21,8 @@ import com.amazonaws.regions.AwsRegionProvider;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
+import com.netflix.genie.common.internal.services.JobArchiver;
+import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
@@ -78,6 +80,8 @@ public class AwsAutoConfigurationIntegrationTest {
                 Assertions.assertThat(context).hasSingleBean(AwsS3ResourceLoaderProperties.class);
                 Assertions.assertThat(context).hasSingleBean(S3ProtocolResolver.class);
                 Assertions.assertThat(context).hasSingleBean(S3ProtocolResolverRegistrar.class);
+                Assertions.assertThat(context).hasSingleBean(S3JobArchiverImpl.class);
+                Assertions.assertThat(context).hasSingleBean(JobArchiver.class);
 
                 // Verify that Spring Cloud AWS still would try to register their S3 protocol resolver
                 Assertions.assertThat(context).hasSingleBean(SimpleStorageProtocolResolverConfigurer.class);

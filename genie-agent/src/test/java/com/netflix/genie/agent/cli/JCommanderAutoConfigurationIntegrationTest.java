@@ -26,6 +26,7 @@ import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConf
 import com.netflix.genie.agent.execution.statemachine.StateMachineAutoConfiguration;
 import com.netflix.genie.agent.execution.statemachine.actions.StateMachineActionsAutoConfiguration;
 import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
+import com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -59,7 +60,8 @@ import java.util.stream.Collectors;
         GRpcAutoConfiguration.class,
         AgentAutoConfiguration.class,
         ServicesAutoConfiguration.class,
-        ValidationAutoConfiguration.class
+        ValidationAutoConfiguration.class,
+        CommonServicesAutoConfiguration.class
     }
 )
 public class JCommanderAutoConfigurationIntegrationTest {

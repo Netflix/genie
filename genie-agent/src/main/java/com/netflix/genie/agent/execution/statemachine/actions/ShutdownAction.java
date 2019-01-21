@@ -69,7 +69,7 @@ class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
                     final File jobDirectory = executionContext.getJobDirectory().get();
                     try {
                         log.info("Attempting to archive job folder to: " + archiveLocation);
-                        jobArchiveService.archive(
+                        this.jobArchiveService.archiveDirectory(
                             jobDirectory.toPath(),
                             new URI(archiveLocation)
                         );

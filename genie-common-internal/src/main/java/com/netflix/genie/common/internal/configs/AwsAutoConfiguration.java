@@ -25,6 +25,8 @@ import com.amazonaws.regions.Regions;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolver;
 import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
+import com.netflix.genie.common.internal.services.JobArchiver;
+import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -41,6 +43,8 @@ import org.springframework.cloud.aws.autoconfigure.context.properties.AwsRegionP
 import org.springframework.cloud.aws.autoconfigure.context.properties.AwsS3ResourceLoaderProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -173,12 +177,25 @@ public class AwsAutoConfiguration {
      * Configurer bean which will add the {@link S3ProtocolResolver} to the set of {@link ProtocolResolver} in the
      * application context.
      *
-     * @param s3ProtocolResolver The implementatin of {@link S3ProtocolResolver} to use
+     * @param s3ProtocolResolver The implementation of {@link S3ProtocolResolver} to use
      * @return A {@link S3ProtocolResolverRegistrar} instance
      */
     @Bean
     @ConditionalOnMissingBean(S3ProtocolResolverRegistrar.class)
     public S3ProtocolResolverRegistrar s3ProtocolResolverRegistrar(final S3ProtocolResolver s3ProtocolResolver) {
         return new S3ProtocolResolverRegistrar(s3ProtocolResolver);
+    }
+
+    /**
+     * Provide an implementation of {@link JobArchiver} to handle archiving
+     * to S3.
+     *
+     * @param s3ClientFactory The factory for creating S3 clients
+     * @return A {@link S3JobArchiverImpl} instance
+     */
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE + 10)
+    public S3JobArchiverImpl s3JobArchiver(final S3ClientFactory s3ClientFactory) {
+        return new S3JobArchiverImpl(s3ClientFactory);
     }
 }
