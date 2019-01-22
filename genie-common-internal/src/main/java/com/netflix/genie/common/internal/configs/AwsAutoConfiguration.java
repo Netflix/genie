@@ -72,6 +72,13 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class AwsAutoConfiguration {
 
     /**
+     * Constant for the precedence of the S3 job archive implementation for others to reference if need be.
+     *
+     * @see Ordered
+     */
+    public static final int S3_JOB_ARCHIVER_PRECEDENCE = Ordered.HIGHEST_PRECEDENCE + 10;
+
+    /**
      * Get an AWS region provider instance. The rules for this basically follow what Spring Cloud AWS does but uses
      * the interface from the AWS SDK instead and provides a sensible default.
      * <p>
@@ -194,7 +201,7 @@ public class AwsAutoConfiguration {
      * @return A {@link S3JobArchiverImpl} instance
      */
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE + 10)
+    @Order(S3_JOB_ARCHIVER_PRECEDENCE)
     public S3JobArchiverImpl s3JobArchiver(final S3ClientFactory s3ClientFactory) {
         return new S3JobArchiverImpl(s3ClientFactory);
     }

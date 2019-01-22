@@ -19,11 +19,12 @@ package com.netflix.genie.common.internal.configs;
 
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
+import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.JobArchiveServiceImpl;
-import com.netflix.genie.common.internal.services.impl.NoOpJobArchiverImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import java.util.List;
@@ -38,14 +39,21 @@ import java.util.List;
 public class CommonServicesAutoConfiguration {
 
     /**
-     * Provide a dummy no-op job archiver for now.
+     * Constant allowing developers to reference the precedence in their own configuration files.
      *
-     * @return A {@link NoOpJobArchiverImpl} instance
+     * @see Ordered
+     */
+    public static final int FILE_SYSTEM_JOB_ARCHIVER_PRECEDENCE = Ordered.LOWEST_PRECEDENCE - 20;
+
+    /**
+     * Provide a {@link JobArchiver} implementation that will copy from one place on the filesystem to another.
+     *
+     * @return A {@link FileSystemJobArchiverImpl} instance
      */
     @Bean
-    @Order // defaults to lowest precedence
-    public NoOpJobArchiverImpl noOpJobArchiver() {
-        return new NoOpJobArchiverImpl();
+    @Order(FILE_SYSTEM_JOB_ARCHIVER_PRECEDENCE)
+    public FileSystemJobArchiverImpl fileSystemJobArchiver() {
+        return new FileSystemJobArchiverImpl();
     }
 
     /**

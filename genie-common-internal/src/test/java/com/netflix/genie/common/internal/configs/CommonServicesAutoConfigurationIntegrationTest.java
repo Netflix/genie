@@ -19,7 +19,7 @@ package com.netflix.genie.common.internal.configs;
 
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
-import com.netflix.genie.common.internal.services.impl.NoOpJobArchiverImpl;
+import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.assertj.core.api.Assertions;
@@ -57,7 +57,7 @@ public class CommonServicesAutoConfigurationIntegrationTest {
     public void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
-                Assertions.assertThat(context).hasSingleBean(NoOpJobArchiverImpl.class);
+                Assertions.assertThat(context).hasSingleBean(FileSystemJobArchiverImpl.class);
                 Assertions.assertThat(context).hasSingleBean(JobArchiver.class);
                 Assertions.assertThat(context).hasSingleBean(JobArchiveService.class);
             }
@@ -86,7 +86,7 @@ public class CommonServicesAutoConfigurationIntegrationTest {
             )
             .run(
                 (context) -> {
-                    Assertions.assertThat(context).hasSingleBean(NoOpJobArchiverImpl.class);
+                    Assertions.assertThat(context).hasSingleBean(FileSystemJobArchiverImpl.class);
                     Assertions.assertThat(context).hasSingleBean(S3JobArchiverImpl.class);
                     Assertions.assertThat(context).hasSingleBean(JobArchiveService.class);
 
