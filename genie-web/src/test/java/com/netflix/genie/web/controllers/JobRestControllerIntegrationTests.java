@@ -33,6 +33,8 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.web.properties.FileCacheProperties;
+import com.netflix.genie.web.properties.JobsLocationsProperties;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +45,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -62,11 +65,14 @@ import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -88,7 +94,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final long SLEEP_TIME = 1000L;
     private static final String SCHEDULER_JOB_NAME_KEY = "schedulerJobName";
     private static final String SCHEDULER_RUN_ID_KEY = "schedulerRunId";
-
     private static final String COMMAND_ARGS_PATH = "commandArgs";
     private static final String STATUS_MESSAGE_PATH = "statusMsg";
     private static final String CLUSTER_NAME_PATH = "clusterName";
@@ -118,30 +123,23 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String JOB_COMMAND_LINK_PATH = "_links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "_links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "_links.applications.href";
-
     private static final long CHECK_DELAY = 500L;
-
     private static final String BASE_DIR
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
     private static final String FILE_DELIMITER = "/";
-
     private static final String LOCALHOST_CLUSTER_TAG = "localhost";
     private static final String BASH_COMMAND_TAG = "bash";
-
     private static final String JOB_NAME = "List * ... Directories bash job";
     private static final String JOB_USER = "genie";
     private static final String JOB_VERSION = "1.0";
     private static final String JOB_DESCRIPTION = "Genie 3 Test Job";
     private static final String JOB_STATUS_MSG = JobStatusMessages.JOB_FINISHED_SUCCESSFULLY;
-
     private static final String APP1_ID = "app1";
     private static final String APP1_NAME = "Application 1";
     private static final String APP1_USER = "genie";
     private static final String APP1_VERSION = "1.0";
-
     private static final String APP2_ID = "app2";
     private static final String APP2_NAME = "Application 2";
-
     private static final String CMD1_ID = "cmd1";
     private static final String CMD1_NAME = "Unix Bash command";
     private static final String CMD1_USER = "genie";
@@ -151,7 +149,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = BASH_COMMAND_TAG + ","
         + "genie.id:" + CMD1_ID + ","
         + "genie.name:" + CMD1_NAME;
-
     private static final String CLUSTER1_ID = "cluster1";
     private static final String CLUSTER1_NAME = "Local laptop";
     private static final String CLUSTER1_USER = "genie";
@@ -164,6 +161,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     // related to charset headers
     private static final String GB18030_TXT = "GB18030.txt";
 
+    /**
+     * A temporary directory to use that will be cleaned up automatically at the end of testing.
+     */
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     private ResourceLoader resourceLoader;
     private JsonNode metadata;
     private String schedulerJobName;
@@ -175,8 +178,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Autowired
     private Resource jobDirResource;
 
-    @Value("${genie.file.cache.location}")
-    private String baseCacheLocation;
+    @Autowired
+    private FileCacheProperties fileCacheProperties;
+
+    @Autowired
+    private JobsLocationsProperties jobsLocationsProperties;
 
     /**
      * {@inheritDoc}
@@ -185,6 +191,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Override
     public void setup() throws Exception {
         super.setup();
+
+        // Re-point archives
+        this.jobsLocationsProperties.setArchives(this.temporaryFolder.newFolder().toURI().toString());
 
         this.schedulerJobName = UUID.randomUUID().toString();
         this.schedulerRunId = UUID.randomUUID().toString();
@@ -224,10 +233,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethodSuccess() throws Exception {
-        this.submitAndCheckJob(1);
+        this.submitAndCheckJob(1, true);
     }
 
-    private void submitAndCheckJob(final int documentationId) throws Exception {
+    private void submitAndCheckJob(final int documentationId, final boolean archiveJob) throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
@@ -263,7 +272,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             commandCriteria
         )
             .withCommandArgs(commandArgs)
-            .withDisableLogArchival(true)
+            .withDisableLogArchival(!archiveJob)
             .withSetupFile(setUpFile)
             .withConfigs(configs)
             .withDependencies(dependencies)
@@ -275,10 +284,18 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.waitForDone(id);
 
         this.checkJobStatus(documentationId, id);
-        this.checkJob(documentationId, id, commandArgs);
+        this.checkJob(documentationId, id, commandArgs, archiveJob);
         this.checkJobOutput(documentationId, id);
         this.checkJobRequest(
-            documentationId, id, commandArgs, setUpFile, clusterTag, commandTag, configFile1, depFile1
+            documentationId,
+            id,
+            commandArgs,
+            setUpFile,
+            clusterTag,
+            commandTag,
+            configFile1,
+            depFile1,
+            archiveJob
         );
         this.checkJobExecution(documentationId, id);
         this.checkJobMetadata(documentationId, id);
@@ -286,6 +303,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.checkJobCommand(documentationId, id);
         this.checkJobApplications(documentationId, id);
         this.checkFindJobs(documentationId, id, JOB_USER);
+        this.checkJobArchive(id, archiveJob);
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
 
@@ -297,7 +315,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         Assert.assertTrue(
             Files.exists(
                 Paths.get(
-                    new URI(this.baseCacheLocation).getPath(),
+                    new URI(this.fileCacheProperties.getLocation()).getPath(),
                     UUID.nameUUIDFromBytes(clusterSetUpFilePath.getBytes(Charset.forName("UTF-8"))).toString()
                 )
             )
@@ -411,7 +429,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString()));
     }
 
-    private void checkJob(final int documentationId, final String id, final List<String> commandArgs) {
+    private void checkJob(
+        final int documentationId,
+        final String id,
+        final List<String> commandArgs,
+        final boolean archiveJob
+    ) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJob/",
             Snippets.ID_PATH_PARAM, // Path parameters
@@ -442,7 +465,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(STATUS_MESSAGE_PATH, Matchers.is(JOB_STATUS_MSG))
             .body(STARTED_PATH, Matchers.not(Instant.EPOCH))
             .body(FINISHED_PATH, Matchers.notNullValue())
-            .body(ARCHIVE_LOCATION_PATH, Matchers.isEmptyOrNullString())
+            .body(ARCHIVE_LOCATION_PATH, archiveJob ? Matchers.notNullValue() : Matchers.isEmptyOrNullString())
             .body(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME))
             .body(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME))
             .body(LINKS_PATH + ".keySet().size()", Matchers.is(9))
@@ -597,7 +620,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String clusterTag,
         final String commandTag,
         final String configFile1,
-        final String depFile1
+        final String depFile1,
+        final boolean archiveJob
     ) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobRequest/",
@@ -633,7 +657,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(COMMAND_CRITERIA_PATH, Matchers.hasSize(1))
             .body(COMMAND_CRITERIA_PATH + "[0]", Matchers.is(commandTag))
             .body(GROUP_PATH, Matchers.nullValue())
-            .body(DISABLE_LOG_ARCHIVAL_PATH, Matchers.is(true))
+            .body(DISABLE_LOG_ARCHIVAL_PATH, Matchers.is(!archiveJob))
             .body(CONFIGS_PATH, Matchers.hasSize(1))
             .body(CONFIGS_PATH + "[0]", Matchers.is(configFile1))
             .body(DEPENDENCIES_PATH, Matchers.hasSize(1))
@@ -832,6 +856,19 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .statusCode(Matchers.is(HttpStatus.CONFLICT.value()));
     }
 
+    private void checkJobArchive(
+        final String id,
+        final boolean jobShouldBeArchived
+    ) throws IOException, URISyntaxException {
+        final Path archiveDirectory = Paths.get(new URI(this.jobsLocationsProperties.getArchives())).resolve(id);
+        if (jobShouldBeArchived) {
+            Assert.assertTrue(Files.exists(archiveDirectory));
+            Assert.assertTrue(Files.isDirectory(archiveDirectory));
+        } else {
+            Assert.assertFalse(Files.exists(archiveDirectory));
+        }
+    }
+
     /**
      * Test the job submit method for success twice to validate the file cache use.
      *
@@ -839,10 +876,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void testSubmitJobMethodTwiceSuccess() throws Exception {
-        submitAndCheckJob(2);
+        submitAndCheckJob(2, true);
         cleanup();
         setup();
-        submitAndCheckJob(3);
+        submitAndCheckJob(3, false);
     }
 
     /**
