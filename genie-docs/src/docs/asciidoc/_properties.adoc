@@ -65,10 +65,6 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |The number of milliseconds before HTTP calls between Genie nodes should time out on attempting to read data
 |10000
 
-|genie.jobs.cleanup.deleteArchiveFile
-|Whether to delete the job directory zip after it has been backed up to save disk space
-|true
-
 |genie.jobs.cleanup.deleteDependencies
 |Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion
 |true

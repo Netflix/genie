@@ -20,8 +20,14 @@ package com.netflix.genie.web.tasks.job
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.google.common.io.Files
-import com.netflix.genie.common.dto.*
+import com.netflix.genie.common.dto.Application
+import com.netflix.genie.common.dto.Cluster
+import com.netflix.genie.common.dto.Command
+import com.netflix.genie.common.dto.Job
+import com.netflix.genie.common.dto.JobRequest
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
+import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.events.JobFinishedEvent
 import com.netflix.genie.web.events.JobFinishedReason
@@ -29,7 +35,6 @@ import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSearchService
 import com.netflix.genie.web.services.MailService
-import com.netflix.genie.web.services.impl.GenieFileTransferService
 import com.netflix.genie.web.util.MetricsConstants
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
@@ -44,6 +49,7 @@ import org.springframework.retry.support.RetryTemplate
 import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit
+
 /**
  * Unit tests for JobCompletionHandler
  *
@@ -60,7 +66,7 @@ class JobCompletionServiceSpec extends Specification {
     JobSearchService jobSearchService
     JobCompletionService jobCompletionService
     MailService mailService
-    GenieFileTransferService genieFileTransferService
+    JobArchiveService jobArchiveService
     JobsProperties jobsProperties
     MeterRegistry registry
     io.micrometer.core.instrument.Timer completionTimer
@@ -78,7 +84,7 @@ class JobCompletionServiceSpec extends Specification {
         jobPersistenceService = Mock(JobPersistenceService.class)
         jobSearchService = Mock(JobSearchService.class)
         mailService = Mock(MailService.class)
-        genieFileTransferService = Mock(GenieFileTransferService.class)
+        jobArchiveService = Mock(JobArchiveService.class)
         jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         counterTagsCaptures = new ArrayList<>()
         registry = Mock(MeterRegistry.class)
@@ -92,12 +98,18 @@ class JobCompletionServiceSpec extends Specification {
             counterTagsCaptures.add((Set<Tag>) args[1])
             return errorCounter
         }
-        jobsProperties.cleanup.deleteArchiveFile = false
         jobsProperties.cleanup.deleteDependencies = false
         jobsProperties.users.runAsUserEnabled = false
-        jobCompletionService = new JobCompletionService(jobPersistenceService, jobSearchService,
-                genieFileTransferService, new FileSystemResource("/tmp"), mailService, registry,
-                jobsProperties, new RetryTemplate())
+        jobCompletionService = new JobCompletionService(
+            jobPersistenceService,
+            jobSearchService,
+            jobArchiveService,
+            new FileSystemResource("/tmp"),
+            mailService,
+            registry,
+            jobsProperties,
+            new RetryTemplate()
+        )
     }
 
     def handleJobCompletion() throws Exception {
@@ -108,13 +120,13 @@ class JobCompletionServiceSpec extends Specification {
         then:
         noExceptionThrown()
         3 * jobSearchService.getJob(jobId) >>
-                { throw new GenieServerException("null") } >>
-                { throw new GenieServerException("null") } >>
-                { throw new GenieServerException("null") }
+            { throw new GenieServerException("null") } >>
+            { throw new GenieServerException("null") } >>
+            { throw new GenieServerException("null") }
         1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableSet.of(
-                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, GenieServerException.class.canonicalName),
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE)
+            Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, GenieServerException.class.canonicalName),
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE)
         )
         0 * errorCounter.increment()
 
@@ -123,10 +135,10 @@ class JobCompletionServiceSpec extends Specification {
         then:
         noExceptionThrown()
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
-                .withId(jobId).withStatus(JobStatus.SUCCEEDED).withCommandArgs(COMMAND_ARGS).build()
+            .withId(jobId).withStatus(JobStatus.SUCCEEDED).withCommandArgs(COMMAND_ARGS).build()
         0 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
         timerTagsCapture == ImmutableSet.of(
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
         0 * errorCounter.increment()
 
@@ -135,32 +147,32 @@ class JobCompletionServiceSpec extends Specification {
         then:
         noExceptionThrown()
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
-                .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
+            .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
         1 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
         1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableSet.of(
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
-                Tag.of(JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString())
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
+            Tag.of(JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString())
         )
         4 * errorCounter.increment()
         counterTagsCaptures.containsAll(ImmutableList.of(
-                ImmutableSet.of(
-                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_FINAL_UPDATE_FAILURE"),
-                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, FileNotFoundException.class.getCanonicalName())
-                ),
-                ImmutableSet.of(
-                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_PROCESS_CLEANUP_FAILURE"),
-                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
-                ),
-                ImmutableSet.of(
-                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_DIRECTORY_FAILURE"),
-                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
+            ImmutableSet.of(
+                Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_FINAL_UPDATE_FAILURE"),
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, FileNotFoundException.class.getCanonicalName())
+            ),
+            ImmutableSet.of(
+                Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_PROCESS_CLEANUP_FAILURE"),
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
+            ),
+            ImmutableSet.of(
+                Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_DIRECTORY_FAILURE"),
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
 
-                ),
-                ImmutableSet.of(
-                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_UPDATE_FAILURE"),
-                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
-                )
+            ),
+            ImmutableSet.of(
+                Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_UPDATE_FAILURE"),
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
+            )
         ))
 
         when:
@@ -168,15 +180,15 @@ class JobCompletionServiceSpec extends Specification {
         then:
         noExceptionThrown()
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
-                .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
+            .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
         1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet())
-                .withId(jobId).withCommandArgs(COMMAND_ARGS).withEmail('admin@netflix.com').build()
+            .withId(jobId).withCommandArgs(COMMAND_ARGS).withEmail('admin@netflix.com').build()
         1 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
         1 * mailService.sendEmail('admin@netflix.com', _ as String, _ as String)
         1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableSet.of(
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
-                Tag.of(JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString())
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
+            Tag.of(JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString())
         )
         3 * errorCounter.increment()
     }
@@ -185,10 +197,10 @@ class JobCompletionServiceSpec extends Specification {
         given:
         def tempDirPath = tmpJobDir.getRoot().getAbsolutePath()
         def dependencyDirs = Arrays.asList(
-                new File(tempDirPath + "/genie/applications/app1/dependencies"),
-                new File(tempDirPath + "/genie/applications/app2/dependencies"),
-                new File(tempDirPath + "/genie/cluster/cluster-x/dependencies"),
-                new File(tempDirPath + "/genie/command/command-y/dependencies"),
+            new File(tempDirPath + "/genie/applications/app1/dependencies"),
+            new File(tempDirPath + "/genie/applications/app2/dependencies"),
+            new File(tempDirPath + "/genie/cluster/cluster-x/dependencies"),
+            new File(tempDirPath + "/genie/command/command-y/dependencies"),
         )
         dependencyDirs.forEach({ d -> Files.createParentDirs(new File(d, "a_dependency")) })
         def jobId = "1"

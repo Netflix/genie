@@ -37,8 +37,8 @@ import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.controllers.DtoConverters;
-import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
+import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -175,7 +175,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             if (!jobRequest.isDisableLogArchival()) {
                 jobBuilder.withArchiveLocation(
                     this.jobsProperties.getLocations().getArchives()
-                        + JobConstants.FILE_PATH_DELIMITER + jobId + ".tar.gz"
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + jobId
                 );
             }
 
