@@ -39,6 +39,5 @@ public class JobsCleanupProperties {
      */
     public static final String PROPERTY_PREFIX = "genie.jobs.cleanup";
 
-    private boolean deleteArchiveFile = true;
     private boolean deleteDependencies = true;
 }

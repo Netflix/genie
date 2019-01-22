@@ -28,7 +28,9 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.exceptions.JobArchiveException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
@@ -38,7 +40,6 @@ import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.MailService;
-import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -49,13 +50,14 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.retry.support.RetryTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -77,11 +79,10 @@ public class JobCompletionService {
     static final String JOB_FINAL_STATE = "jobFinalState";
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
-    private final GenieFileTransferService genieFileTransferService;
+    private final JobArchiveService jobArchiveService;
     private final File baseWorkingDir;
     private final MailService mailServiceImpl;
     private final Executor executor;
-    private final boolean deleteArchiveFile;
     private final boolean deleteDependencies;
     private final boolean runAsUserEnabled;
 
@@ -92,31 +93,30 @@ public class JobCompletionService {
     /**
      * Constructor.
      *
-     * @param jobSearchService         An implementation of the job search service.
-     * @param jobPersistenceService    An implementation of the job persistence service.
-     * @param genieFileTransferService An implementation of the Genie File Transfer service.
-     * @param genieWorkingDir          The working directory where all job directories are created.
-     * @param mailServiceImpl          An implementation of the mail service.
-     * @param registry                 The metrics registry to use
-     * @param jobsProperties           The properties relating to running jobs
-     * @param retryTemplate            Retry template for retrying remote calls
+     * @param jobSearchService      An implementation of the job search service.
+     * @param jobPersistenceService An implementation of the job persistence service.
+     * @param jobArchiveService     An implementation of {@link JobArchiveService}
+     * @param genieWorkingDir       The working directory where all job directories are created.
+     * @param mailServiceImpl       An implementation of the mail service.
+     * @param registry              The metrics registry to use
+     * @param jobsProperties        The properties relating to running jobs
+     * @param retryTemplate         Retry template for retrying remote calls
      * @throws GenieException if there is a problem
      */
     public JobCompletionService(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
-        final GenieFileTransferService genieFileTransferService,
-        @Qualifier("jobsDir") final Resource genieWorkingDir,
+        final JobArchiveService jobArchiveService,
+        final Resource genieWorkingDir,
         final MailService mailServiceImpl,
         final MeterRegistry registry,
         final JobsProperties jobsProperties,
-        @Qualifier("genieRetryTemplate") @NotNull final RetryTemplate retryTemplate
+        @NotNull final RetryTemplate retryTemplate
     ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
-        this.genieFileTransferService = genieFileTransferService;
+        this.jobArchiveService = jobArchiveService;
         this.mailServiceImpl = mailServiceImpl;
-        this.deleteArchiveFile = jobsProperties.getCleanup().isDeleteArchiveFile();
         this.deleteDependencies = jobsProperties.getCleanup().isDeleteDependencies();
         this.runAsUserEnabled = jobsProperties.getUsers().isRunAsUserEnabled();
 
@@ -495,9 +495,8 @@ public class JobCompletionService {
      * @param job The job.
      * @throws GenieException if there is any problem
      */
-    private boolean processJobDir(final Job job) throws GenieException, IOException {
+    private boolean processJobDir(final Job job) throws GenieException {
         log.debug("Got a job finished event. Will process job directory.");
-        boolean result = false;
         final Optional<String> oJobId = job.getId();
 
         // The deletion of dependencies and archiving only happens for job requests which are not Invalid.
@@ -513,67 +512,18 @@ public class JobCompletionService {
                 final Optional<String> archiveLocation = job.getArchiveLocation();
                 if (archiveLocation.isPresent() && !Strings.isNullOrEmpty(archiveLocation.get())) {
                     log.debug("Archiving job directory");
-                    // Create the tar file
-                    final File localArchiveFile = new File(jobDir, "genie/logs/" + jobId + ".tar.gz");
 
-                    final CommandLine commandLine;
-                    if (this.runAsUserEnabled) {
-                        commandLine = new CommandLine("sudo");
-                        commandLine.addArgument("tar");
-                    } else {
-                        commandLine = new CommandLine("tar");
-                    }
-                    commandLine
-                        .addArgument("-c")
-                        .addArgument("-z")
-                        .addArgument("-f")
-                        .addArgument(localArchiveFile.getCanonicalPath())
-                        .addArgument("--exclude")
-                        .addArgument(localArchiveFile.getName())
-                        .addArgument("./");
-
-                    this.executor.setWorkingDirectory(jobDir);
-
-                    log.debug("Archive command : {}", commandLine);
                     try {
-                        this.executor.execute(commandLine);
-                    } catch (Throwable t) {
-                        log.warn("Failed to created archive of job files for job: {}", jobId, t);
-                        incrementErrorCounter("JOB_ARCHIVAL_FAILURE", t);
-                        throw t;
+                        this.jobArchiveService.archiveDirectory(jobDir.toPath(), new URI(archiveLocation.get()));
+                    } catch (final JobArchiveException | URISyntaxException e) {
+                        log.warn("Failed to archive job files for job {} due to {}", jobId, e.getMessage(), e);
+                        incrementErrorCounter("JOB_ARCHIVAL_FAILURE", e);
+                        return false;
                     }
-
-                    // Upload the tar file to remote location
-                    this.genieFileTransferService.putFile(localArchiveFile.getCanonicalPath(), archiveLocation.get());
-
-                    // At this point the archive file is successfully uploaded to archive location specified in the job.
-                    // Now we can delete it from local disk to save space if enabled.
-                    if (this.deleteArchiveFile) {
-                        log.debug("Deleting archive file");
-                        try {
-                            if (this.runAsUserEnabled) {
-                                final CommandLine deleteCommand = new CommandLine("sudo")
-                                    .addArgument("rm")
-                                    .addArgument("-f")
-                                    .addArgument(localArchiveFile.getCanonicalPath());
-
-                                this.executor.setWorkingDirectory(jobDir);
-                                log.debug("Delete command: {}", deleteCommand);
-                                this.executor.execute(deleteCommand);
-                            } else if (!localArchiveFile.delete()) {
-                                log.error("Failed to delete archive file for job: {}", jobId);
-                                incrementErrorCounter("JOB_ARCHIVE_DELETION_FAILURE");
-                            }
-                        } catch (final Exception e) {
-                            log.error("Failed to delete archive file for job: {}", jobId, e);
-                            incrementErrorCounter("JOB_ARCHIVE_DELETION_FAILURE", e);
-                        }
-                    }
-                    result = true;
                 }
             }
         }
-        return result;
+        return true;
     }
 
     /**

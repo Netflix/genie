@@ -63,7 +63,6 @@ public class PropertyBindingIntegrationTests {
     public void testPropertiesValues() {
 
         Assert.assertNotNull(jobsProperties);
-        Assert.assertThat(jobsProperties.getCleanup().isDeleteArchiveFile(), Matchers.is(false));
         Assert.assertThat(jobsProperties.getForwarding().isEnabled(), Matchers.is(true));
         Assert.assertThat(jobsProperties.getLocations().getJobs(), Matchers.is("file:///tmp"));
         Assert.assertThat(jobsProperties.getMax().getStdOutSize(), Matchers.is(512L));

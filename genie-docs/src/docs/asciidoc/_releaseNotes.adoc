@@ -148,6 +148,9 @@ balancer's. This logic is more a framework or execution configuration than anyth
 shouldn't know how it's used. The new mechanism is to provide an `@Order` annotation on beans that fit in the order
 the user wants at runtime via a Spring bean definition.
 
+|genie.jobs.cleanup.deleteArchiveFile
+|Archival is now done in a flat structure to the destination location
+
 |===
 
 === Metric Changes

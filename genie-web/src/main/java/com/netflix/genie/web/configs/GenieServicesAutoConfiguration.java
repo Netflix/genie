@@ -19,6 +19,7 @@ package com.netflix.genie.web.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
@@ -425,14 +426,14 @@ public class GenieServicesAutoConfiguration {
     /**
      * Get an implementation of {@link JobCompletionService} if one hasn't already been defined.
      *
-     * @param jobPersistenceService    The job persistence service to use
-     * @param jobSearchService         The job search service to use
-     * @param genieFileTransferService The file transfer service to use
-     * @param genieWorkingDir          Working directory for genie where it creates jobs directories.
-     * @param mailService              The mail service
-     * @param registry                 Registry
-     * @param jobsProperties           The jobs properties to use
-     * @param retryTemplate            The retry template
+     * @param jobPersistenceService The job persistence service to use
+     * @param jobSearchService      The job search service to use
+     * @param jobArchiveService     The {@link JobArchiveService} implementation to use
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
+     * @param mailService           The mail service
+     * @param registry              Registry
+     * @param jobsProperties        The jobs properties to use
+     * @param retryTemplate         The retry template
      * @return an instance of {@link JobCompletionService}
      * @throws GenieException if the bean fails during construction
      */
@@ -441,17 +442,17 @@ public class GenieServicesAutoConfiguration {
     public JobCompletionService jobCompletionService(
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
-        final GenieFileTransferService genieFileTransferService,
-        final Resource genieWorkingDir,
+        final JobArchiveService jobArchiveService,
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
         final MailService mailService,
         final MeterRegistry registry,
         final JobsProperties jobsProperties,
-        final RetryTemplate retryTemplate
+        @Qualifier("genieRetryTemplate") final RetryTemplate retryTemplate
     ) throws GenieException {
         return new JobCompletionService(
             jobPersistenceService,
             jobSearchService,
-            genieFileTransferService,
+            jobArchiveService,
             genieWorkingDir,
             mailService,
             registry,

@@ -47,17 +47,7 @@ public class JobsCleanupPropertiesUnitTests {
      */
     @Test
     public void canConstruct() {
-        Assert.assertTrue(this.properties.isDeleteArchiveFile());
         Assert.assertTrue(this.properties.isDeleteDependencies());
-    }
-
-    /**
-     * Make sure can set whether to delete the archive file.
-     */
-    @Test
-    public void canSetDeleteArchiveFile() {
-        this.properties.setDeleteArchiveFile(false);
-        Assert.assertFalse(this.properties.isDeleteArchiveFile());
     }
 
     /**

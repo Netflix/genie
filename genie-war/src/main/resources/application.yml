@@ -37,7 +37,6 @@ genie:
     maxCpuLoadPercent: 80
   jobs:
     cleanup:
-      deleteArchiveFile: true
       deleteDependencies: true
     clusters:
       load-balancers:
