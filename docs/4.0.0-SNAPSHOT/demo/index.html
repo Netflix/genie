@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 1.5.8">
 <meta name="description" content="Reference documentation for Netflix OSS Genie">
 <meta name="keywords" content="genie, netflix, documentation, big data, cloud, oss, open source software">
 <meta name="author" content="Tom Gianos">
@@ -698,7 +698,7 @@ b.conum * { color: inherit !important; }
 .literalblock pre, .listingblock pre { background: #333333; }
 
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="icon" href="https://netflix.github.io/genie/assets/img/nficon2016.png" />
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-01-11</span>
+<span id="revdate">2019-01-30</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -882,7 +882,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </div>
 <div class="sect2">
 <h3 id="_port_usages"><a class="anchor" href="#_port_usages"></a><a class="link" href="#_port_usages">2.4. Port Usages</a></h3>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. Genie Endpoints</caption>
 <colgroup>
 <col style="width: 50%;">
@@ -909,7 +909,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 2. Hadoop Interfaces</caption>
 <colgroup>
 <col style="width: 33.3333%;">
@@ -949,7 +949,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </div>
 <div class="sect2">
 <h3 id="_scripts"><a class="anchor" href="#_scripts"></a><a class="link" href="#_scripts">2.5. Scripts</a></h3>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 3. Admin Scripts</caption>
 <colgroup>
 <col style="width: 33.3333%;">
@@ -981,7 +981,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 4. Job Scripts</caption>
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1047,7 +1047,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 <p>Save the below file as <code>docker-compose.yml</code> somewhere on your machine</p>
 </li>
 <li>
-<p><a href="https://netflix.github.io/genie/docs/4.0.0-SNAPSHOT/demo/docker-compose.yml">docker-compose.yml</a></p>
+<p><a href="https://netflix.github.io/genie/docs/{project-version}/demo/docker-compose.yml">docker-compose.yml</a></p>
 </li>
 </ol>
 </div>
@@ -1078,13 +1078,13 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 <div class="olist upperalpha">
 <ol class="upperalpha" type="A">
 <li>
-<p>netflixoss/genie-app:4.0.0-SNAPSHOT</p>
+<p>netflixoss/genie-app:{project-version}</p>
 </li>
 <li>
-<p>netflixoss/genie-demo-apache:4.0.0-SNAPSHOT</p>
+<p>netflixoss/genie-demo-apache:{project-version}</p>
 </li>
 <li>
-<p>netflixoss/genie-demo-client:4.0.0-SNAPSHOT</p>
+<p>netflixoss/genie-demo-client:{project-version}</p>
 </li>
 <li>
 <p>sequenceiq/hadoop-docker:2.7.1</p>
@@ -1097,11 +1097,11 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 <div class="olist upperalpha">
 <ol class="upperalpha" type="A">
 <li>
-<p>genie_demo_app_4.0.0-SNAPSHOT</p>
+<p>genie_demo_app_{project-version}</p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiation of netflixoss/genie-app:4.0.0-SNAPSHOT image</p>
+<p>Instantiation of netflixoss/genie-app:{project-version} image</p>
 </li>
 <li>
 <p>Image from official Genie build which runs Genie app server</p>
@@ -1113,11 +1113,11 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </div>
 </li>
 <li>
-<p>genie_demo_apache_4.0.0-SNAPSHOT</p>
+<p>genie_demo_apache_{project-version}</p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiation of netflixoss/genie-demo-apache:4.0.0-SNAPSHOT</p>
+<p>Instantiation of netflixoss/genie-demo-apache:{project-version}</p>
 </li>
 <li>
 <p>Extension of apache image which includes files used during demo that Genie will download</p>
@@ -1126,11 +1126,11 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </div>
 </li>
 <li>
-<p>genie_demo_client_4.0.0-SNAPSHOT</p>
+<p>genie_demo_client_{project-version}</p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
-<p>Instantiation of netflixoss/genie-demo-client:4.0.0-SNAPSHOT</p>
+<p>Instantiation of netflixoss/genie-demo-client:{project-version}</p>
 </li>
 <li>
 <p>Simulates a client node for Genie which includes several python scripts to configure and run jobs on Genie</p>
@@ -1139,7 +1139,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 </div>
 </li>
 <li>
-<p>genie_demo_hadoop_prod_4.0.0-SNAPSHOT and genie_demo_hadoop_test_4.0.0-SNAPSHOT</p>
+<p>genie_demo_hadoop_prod_{project-version} and genie_demo_hadoop_test_{project-version}</p>
 <div class="olist upperroman">
 <ol class="upperroman" type="I">
 <li>
@@ -1192,7 +1192,7 @@ click a link in the UI and it doesn&#8217;t work try swapping in localhost for t
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>From terminal <code>docker exec -it genie_demo_client_4.0.0-SNAPSHOT /bin/bash</code></p>
+<p>From terminal <code>docker exec -it genie_demo_client_{project-version} /bin/bash</code></p>
 <div class="olist lowerroman">
 <ol class="lowerroman" type="i">
 <li>
@@ -1402,11 +1402,11 @@ methods listed in the <a href="https://netflix.github.io/genie/contact/">Contact
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-01-11 22:44:22 UTC
+Last updated 2019-01-30 22:05:04 UTC
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>
 </body>
 </html>

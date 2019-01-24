@@ -1,6 +1,5 @@
 com.netflix.genie
 com.netflix.genie.agent
-com.netflix.genie.agent.aws.s3
 com.netflix.genie.agent.cli
 com.netflix.genie.agent.configs
 com.netflix.genie.agent.execution
@@ -25,12 +24,17 @@ com.netflix.genie.client.security.oauth2.impl
 com.netflix.genie.common.dto
 com.netflix.genie.common.dto.search
 com.netflix.genie.common.exceptions
+com.netflix.genie.common.internal.aws.s3
+com.netflix.genie.common.internal.configs
+com.netflix.genie.common.internal.dto
 com.netflix.genie.common.internal.dto.v4
 com.netflix.genie.common.internal.dto.v4.converters
 com.netflix.genie.common.internal.dto.v4.files
 com.netflix.genie.common.internal.exceptions
 com.netflix.genie.common.internal.exceptions.unchecked
 com.netflix.genie.common.internal.jobs
+com.netflix.genie.common.internal.services
+com.netflix.genie.common.internal.services.impl
 com.netflix.genie.common.internal.util
 com.netflix.genie.common.util
 com.netflix.genie.security

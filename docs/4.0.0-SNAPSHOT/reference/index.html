@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 1.5.8">
 <meta name="description" content="Reference documentation for Netflix OSS Genie">
 <meta name="keywords" content="genie, netflix, documentation, big data, cloud, oss, open source software">
 <meta name="author" content="Tom Gianos">
@@ -698,7 +698,7 @@ b.conum * { color: inherit !important; }
 .literalblock pre, .listingblock pre { background: #333333; }
 
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="icon" href="https://netflix.github.io/genie/assets/img/nficon2016.png" />
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-01-11</span>
+<span id="revdate">2019-01-30</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -737,7 +737,8 @@ b.conum * { color: inherit !important; }
 </li>
 <li><a href="#_metric_changes">2.4. Metric Changes</a>
 <ul class="sectlevel3">
-<li><a href="#_renamed_2">2.4.1. Renamed</a></li>
+<li><a href="#_added_2">2.4.1. Added</a></li>
+<li><a href="#_renamed_2">2.4.2. Renamed</a></li>
 </ul>
 </li>
 </ul>
@@ -764,7 +765,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_library_upgrades_4">5.2. Library Upgrades</a></li>
 <li><a href="#_property_changes_3">5.3. Property Changes</a>
 <ul class="sectlevel3">
-<li><a href="#_added_2">5.3.1. Added</a></li>
+<li><a href="#_added_3">5.3.1. Added</a></li>
 <li><a href="#_changed_default_value">5.3.2. Changed Default Value</a></li>
 <li><a href="#_removed_2">5.3.3. Removed</a></li>
 <li><a href="#_renamed_3">5.3.4. Renamed</a></li>
@@ -997,7 +998,7 @@ refer to their documentation.
 </div>
 <div class="sect3">
 <h4 id="_added"><a class="anchor" href="#_added"></a><a class="link" href="#_added">2.3.1. Added</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -1041,6 +1042,18 @@ management endpoints. Switched from default <code>/actuator</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/admin</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].roleARN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For the bucket with name <code>bucketName</code> the ARN of the role to assume to read/write to that bucket. If a bucket is used
+that isn&#8217;t listed in this map the default credentials configured will be used</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].region</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS region the bucket with <code>bucketName</code> is in. Clients to talk to this bucket will be created in this region. If
+no value is specified the bucket is assumed to be in the same region as the Genie process.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to start the gRPC server and services during server startup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
@@ -1061,12 +1074,32 @@ whether the <code>maxSyncMessages</code> threshold has been reached or not</p></
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether Spring data repositories are enabled on top of redis as the backend store</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to <code>true</code>, enables the built-in agent filter service. The filter behavior is controlled by other active <code>genie.agent.filter.*</code> properties.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.minimum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Dynamic) The minimum version an agent needs to be (e.g., <code>1.2.3</code>) in order to communicate with this server. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.blacklist</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Dynamic) A regex matched against agent version (e.g., <code>1\.2\..*</code>), matching agents are rejected. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.whitelist</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Dynamic) A regex matched against agent version (e.g., <code>1\.2\..*</code>), agents not matching are rejected. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
 <h4 id="_renamed"><a class="anchor" href="#_renamed"></a><a class="link" href="#_renamed">2.3.2. Renamed</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -1125,7 +1158,7 @@ whether the <code>maxSyncMessages</code> threshold has been reached or not</p></
 </div>
 <div class="sect3">
 <h4 id="_removed"><a class="anchor" href="#_removed"></a><a class="link" href="#_removed">2.3.3. Removed</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -1140,8 +1173,11 @@ whether the <code>maxSyncMessages</code> threshold has been reached or not</p></
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.file</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No longer necessary as <code>cloud.aws.credentials.useDefaultAwsCredentialsChain</code> is enabled by default an other Spring
-Cloud AWS properties can be used to configure more specifically other than to assume role which still uses
-<code>genie.aws.credentials.role</code>.</p></td>
+Cloud AWS properties can be used to configure more specifically.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Replaced with <code>genie.aws.s3.buckets.[bucketName].roleARN</code> for more specific control</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.date-format</p></td>
@@ -1155,6 +1191,10 @@ balancer&#8217;s. This logic is more a framework or execution configuration than
 shouldn&#8217;t know how it&#8217;s used. The new mechanism is to provide an <code>@Order</code> annotation on beans that fit in the order
 the user wants at runtime via a Spring bean definition.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteArchiveFile</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Archival is now done in a flat structure to the destination location</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1165,8 +1205,29 @@ the user wants at runtime via a Spring bean definition.</p></td>
 <p>Switched to <a href="http://micrometer.io/">Micrometer</a></p>
 </div>
 <div class="sect3">
-<h4 id="_renamed_2"><a class="anchor" href="#_renamed_2"></a><a class="link" href="#_renamed_2">2.4.1. Renamed</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<h4 id="_added_2"><a class="anchor" href="#_added_2"></a><a class="link" href="#_added_2">2.4.1. Added</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.agentJob.handshake.counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count usages of 'handshake' protocol, record agent metadata and decision made</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_renamed_2"><a class="anchor" href="#_renamed_2"></a><a class="link" href="#_renamed_2">2.4.2. Renamed</a></h4>
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -1352,14 +1413,14 @@ drop them yourself if they&#8217;re no longer needed.
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot to 2.0.7.RELEASE</p>
+<p>Upgrade Spring Boot to 2.1.2.RELEASE</p>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Finchley.SR2 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Greenwich.RELEASE for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Finchley.SR2/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Greenwich.RELEASE/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1577,8 +1638,8 @@ to Spring Integration Zookeeper. That library is now used.</p>
 <div class="sect2">
 <h3 id="_property_changes_3"><a class="anchor" href="#_property_changes_3"></a><a class="link" href="#_property_changes_3">5.3. Property Changes</a></h3>
 <div class="sect3">
-<h4 id="_added_2"><a class="anchor" href="#_added_2"></a><a class="link" href="#_added_2">5.3.1. Added</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<h4 id="_added_3"><a class="anchor" href="#_added_3"></a><a class="link" href="#_added_3">5.3.1. Added</a></h4>
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -1652,7 +1713,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.0.7.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -1661,7 +1722,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </div>
 <div class="sect3">
 <h4 id="_changed_default_value"><a class="anchor" href="#_changed_default_value"></a><a class="link" href="#_changed_default_value">5.3.2. Changed Default Value</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -1694,7 +1755,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </div>
 <div class="sect3">
 <h4 id="_renamed_3"><a class="anchor" href="#_renamed_3"></a><a class="link" href="#_renamed_3">5.3.4. Renamed</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2211,7 +2272,7 @@ all others are ignored.
 . ver:2.7.1
 . ver:2.7</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -3411,7 +3472,7 @@ downloaded in the root job directory parallel to the run script so they are acce
 </div>
 </div>
 <div class="sect4">
-<h5 id="_strong_the_job_strong"><a class="anchor" href="#_strong_the_job_strong"></a><a class="link" href="#_strong_the_job_strong">6.3.2.2. <strong>The Job</strong></a></h5>
+<h5 id="_the_job"><a class="anchor" href="#_the_job"></a><a class="link" href="#_the_job">6.3.2.2. <strong>The Job</strong></a></h5>
 <div class="paragraph">
 <p>In this case the job was accepted by Genie for processing. Below is the actual job object containing fields the user
 might care about. Some are copied from the initial request (like tags) and some are added by Genie.</p>
@@ -4264,7 +4325,7 @@ decide which cluster to select. Currently <code>JavaScript</code> and <code>Groo
 <div class="paragraph">
 <p>Other properties:</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -4315,7 +4376,7 @@ forces a timeout</p></td>
 <div class="paragraph">
 <p>The contract between the script and the Java code is as follows:</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. Script Inputs</caption>
 <colgroup>
 <col style="width: 50%;">
@@ -4338,7 +4399,7 @@ forces a timeout</p></td>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 2. Script Output</caption>
 <colgroup>
 <col style="width: 50%;">
@@ -4495,7 +4556,7 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/2.0.7.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
@@ -4523,7 +4584,7 @@ Genie and it may be more overhead than you&#8217;re comfortable with.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.0.7.RELEASE/reference/htmlsingle/">Spring Boot</a>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/">Spring Boot</a>
 docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -4531,7 +4592,7 @@ docs as they will go in depth on how to configure the various Spring components 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/2.0.7.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
 default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
 will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
 profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
@@ -4785,54 +4846,103 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/2.0.7.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Finchley.SR2/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
+and the <a href="http://cloud.spring.io/spring-cloud-static/Greenwich.RELEASE/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
 <h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a><a class="link" href="#_default_properties">9.1. Default Properties</a></h3>
 <div class="sect3">
 <h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a><a class="link" href="#_genie_properties">9.1.1. Genie Properties</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<div class="paragraph">
+<p>Properties marked 'dynamic' reflect change of property value in the environment happening at runtime.
+Whereas static properties values are bound during application startup and do not change after the application is up and running.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Property</th>
 <th class="tableblock halign-left valign-top">Description</th>
 <th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Dynamic</th>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].roleARN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For the bucket with name <code>bucketName</code> the ARN of the role to assume to read/write to that bucket. If a bucket is used
+that isn&#8217;t listed in this map the default credentials configured will be used</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].region</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS region the bucket with <code>bucketName</code> is in. Clients to talk to this bucket will be created in this region. If
+no value is specified the bucket is assumed to be in the same region as the Genie process.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If set to <code>true</code>, enables the built-in agent filter service. The filter behavior is controlled by other active <code>genie.agent.filter.*</code> properties.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.minimum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum version an agent needs to be (e.g., <code>1.2.3</code>) in order to communicate with this server. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.blacklist</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A regex matched against agent version (e.g., <code>1\.2\..*</code>), matching agents are rejected. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.whitelist</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A regex matched against agent version (e.g., <code>1\.2\..*</code>), agents not matching are rejected. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
 attempt to assume this role on the host Genie is running on</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.file.cache.location</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Where to store cached files on local disk</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/cache" class="bare">file:///tmp/genie/cache</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to start the gRPC server and services during server startup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
 whether the <code>maxSyncMessages</code> threshold has been reached or not</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">30,000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.grpc.server.services.job-file-sync.maxSyncMessages</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How many messages to receive from the agent before an acknowledgement message is sent back from the server</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.health.maxCpuLoadConsecutiveOccurrences</p></td>
@@ -4840,6 +4950,7 @@ whether the <code>maxSyncMessages</code> threshold has been reached or not</p></
 Health of the system is marked unhealthy if the CPU load of a system goes beyond the threshold 'maxCpuLoadPercent'
 for 'maxCpuLoadConsecutiveOccurrences' consecutive times.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.health.maxCpuLoadPercent</p></td>
@@ -4847,32 +4958,32 @@ for 'maxCpuLoadConsecutiveOccurrences' consecutive times.</p></td>
 Health of the system is marked unhealthy if the CPU load of a system goes beyond this threshold for
 'maxCpuLoadConsecutiveOccurrences' consecutive times.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">80</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.http.connect.timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of milliseconds before HTTP calls between Genie nodes should time out on connection</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.http.read.timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of milliseconds before HTTP calls between Genie nodes should time out on attempting to read data</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteArchiveFile</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to delete the job directory zip after it has been backed up to save disk space</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.destination</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
 <code>genie.jobs.clusters.load-balancers.script.source</code>. The file will be given the same name.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.enabled</p></td>
@@ -4880,310 +4991,370 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 See also: <code>genie.jobs.clusters.load-balancers.script.source</code>
 See also: <code>genie.jobs.clusters.load-balancers.script.destination</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.refreshRate</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
 forces a timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to attempt to forward kill and get output requests for jobs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.port</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The port to forward requests to as it could be different than ELB port</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8080</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.scheme</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The connection protocol to use (http or https)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">http</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.archives</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job archives should be stored. Scheme should be included. Created if doesn&#8217;t exist.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/archives/" class="bare">file:///tmp/genie/archives/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.attachments</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
 doesn&#8217;t exist.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/attachments/" class="bare">file:///tmp/genie/attachments/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.jobs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job working directories will be placed. Created by system if doesn&#8217;t exist.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/jobs/" class="bare">file:///tmp/genie/jobs/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdOutSize</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard output file can grow to before Genie will kill the job</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8589934592</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdErrSize</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard error file can grow to before Genie will kill the job</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8589934592</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.memory.maxSystemMemory</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The total number of MB out of the system memory that Genie can use for running jobs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">30720</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.memory.defaultJobMemory</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The total number of megabytes Genie will assume a job is allocated if not overridden by a command or user at runtime</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.memory.maxJobMemory</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The maximum amount of memory, in megabytes, that a job client can be allocated</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10240</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.creationEnabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether Genie should attempt to create a system user in order to run the job as or not. Genie user must have sudo
 rights for this to work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.runAsUserEnabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether Genie should run the jobs as the user who submitted the job or not. Genie user must have sudo rights for this
 to work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Enables the per-user active job limit. The number of jobs is controlled by the <code>genie.jobs.users.active-limit.count</code> property.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.count</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true. This limit applies to users that don&#8217;t have an override set via <code>genie.jobs.users.active-limit.overrides.&lt;user-name&gt;</code>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.overrides.&lt;user-name&gt;</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Dynamic) The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.min-interval</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The minimum time between checks for job completion in milliseconds. Must be greater than zero.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.max-interval</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most cases is specified as part of the <code>Command</code> entity for a particular job.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.factor</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.leader.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
 determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.fromAddress</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The e-mail address that should be used as the from address when alert emails are sent</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="mailto:no-reply-genie@geniehost.com">no-reply-genie@geniehost.com</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.user</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The user to log into the e-mail server with</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.password</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The password for the e-mail server</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.redis.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable storage of HTTP sessions inside Redis via <a href="http://projects.spring.io/spring-session/">Spring Session</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.initialInterval</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time to wait after initial failure before retrying the first time in milliseconds</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.maxInterval</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The maximum amount of time to wait between retries for the final retry in the back-off policy</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">60000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.noOfRetries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of times to retry requests to before failure</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.s3.noOfRetries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of times to retry requests to S3 before failure</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable oauth2 based security or not for REST APIs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether Ping Federate is being used as the OAuth2 server and Genie should assume default configuration for its tokens</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.jwt.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to assume that the bearer tokens coming with API requests are <a href="https://jwt.io/">JWT</a> tokens or not</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.jwt.keyValue</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The public key used to verify the JWT signature</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether SAML security should be turned on to protect access to the user interface</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.user</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The key in the SAML assertion to get the user name from</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.groups.name</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The key in the SAML assertion to get group information for the user from</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.groups.admin</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The group a user needs to be a member of in order to be granted an admin role</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.idp.serviceProviderMetadataUrl</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The URL where metadata for Genie service SAML configuration can be pulled from</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.name</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the keystore file on the classpath for SAML assertions</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.password</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The password for opening the keystore</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.defaultKey.name</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the default key to use for signing the SAML request</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.defaultKey.password</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The password to open the default key</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.contextPath</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The context path for Genie</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.includeServerPortInRequestURL</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to include the port of the load balancer in the redirect request</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.scheme</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The scheme the load balancer Genie cluster is run behind uses (http or https). Used for SAML post back</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.serverName</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Root context for the Genie load balancer e.g. genie.prod.com</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.serverPort</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The port the load balancer is listening on. Used for SAML post back</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.sp.entityId</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The id that Genie is identified by in the identity provider</p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.sp.entityBaseURL</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Where the SAML assertion should be posted back to. e.g. <a href="https://genie.prod.com" class="bare">https://genie.prod.com</a></p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.x509.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable x509 certificate security on the REST APIs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.swagger.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable <a href="http://swagger.io/">Swagger</a> to be bootstrapped into the Genie service so that the endpoint
 /swagger-ui.html shows API documentation generated by the swagger specification</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.healthIndicatorsToIgnore</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">memory,genieMemory,discoveryComposite</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.lostThreshold</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of times a Genie nodes need to fail health check in order for jobs running on that node to be marked as
 lost and failed by the Genie leader</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.port</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The port to connect to other Genie nodes on</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8080</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.rate</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of milliseconds to wait between health checks to other Genie nodes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.scheme</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The scheme (http or https) for connecting to other Genie nodes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">http</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete old and unused records from the database at a scheduled interval.
 See: <code>genie.tasks.database-cleanup.expression</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.maxDeletedPerTransaction</p></td>
@@ -5192,78 +5363,93 @@ See: <code>genie.tasks.database-cleanup.expression</code></p></td>
  all jobs older than the retention time are deleted.
  This is a soft limit, it could be rounded up to the next multiple of page size.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.pageSize</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The page size used within each cleanup transaction to iterate through the job records</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The cron expression for how often to run the database cleanup task</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.retention</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to retain jobs in the database</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">90</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipJobsCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Jobs table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipClustersCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Clusters table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipFilesCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Files table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipTagsCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Tags table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to remove old job directories on the Genie node or not</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How often to run the disk cleanup task as a cron expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.retention</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to leave old job directories on disk</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.executor.pool.size</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of executor threads available for tasks to be run on within the node in an adhoc manner. Best to set to the
 number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.scheduler.pool.size</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of available threads for the scheduler to use to run tasks on the node at scheduled intervals. Best to set
 to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.leader.path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie leadership election of a given cluster</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/leader/</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.s3filetransfer.strictUrlCheckEnabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to strictly check an S3 URL for illegal characters before attempting to use it</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 </tbody>
 </table>
@@ -5271,9 +5457,9 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">9.1.2. Spring Properties</a></h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/2.0.7.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -5458,7 +5644,7 @@ returned</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.0.7.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
 </tr>
@@ -5470,7 +5656,7 @@ for more information. Currently on classpath only none, redis and jdbc will work
 <div class="paragraph">
 <p>Properties set by default to manipulate various <a href="https://projects.spring.io/spring-cloud/">Spring Cloud</a> libraries.</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -5522,7 +5708,7 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 </div>
 <div class="sect3">
 <h4 id="_grpc_server_properties"><a class="anchor" href="#_grpc_server_properties"></a><a class="link" href="#_grpc_server_properties">9.1.4. gRPC Server properties</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -5552,7 +5738,7 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 <h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a><a class="link" href="#_profile_specific_properties">9.2. Profile Specific Properties</a></h3>
 <div class="sect3">
 <h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a><a class="link" href="#_prod_profile">9.2.1. Prod Profile</a></h4>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -5651,7 +5837,7 @@ collection systems (Atlas, Datadog, Graphite, Ganglia, etc). See <a href="http:/
 ships with no backend system compiled in. It will have to be added if one is desired otherwise metrics are just
 published within the local JVM and available on the Actuator <code>/metrics</code> endpoint.</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 7.1428%;">
 <col style="width: 71.4285%;">
@@ -6194,6 +6380,13 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, healthIndicatorName</code></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.agentJob.handshake.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for calls to the 'handshake' protocol of the Genie Agent Job Service</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentJobServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion, agentHost, handshakeDecision</code></p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -6205,11 +6398,11 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-01-11 22:44:22 UTC
+Last updated 2019-01-30 22:05:04 UTC
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>
 </body>
 </html>
