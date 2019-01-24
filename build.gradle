@@ -6,17 +6,17 @@ buildscript {
 
     dependencies {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
-        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:7.0.0"
-        classpath "org.ajoberstar.grgit:grgit-gradle:3.0.0-beta.1"
-        classpath "org.ajoberstar:gradle-git-publish:1.0.1"
+        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:7.1.0"
+        classpath "org.ajoberstar.grgit:grgit-gradle:3.0.0"
+        classpath "org.ajoberstar:gradle-git-publish:2.0.0"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
-        classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.8"
-        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2"
+        classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2"
+        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.0.0"
         classpath "com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1"
-        classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.5"
+        classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
         classpath "io.franzbecker:gradle-lombok:1.14"
         classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
-        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.6"
+        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.9"
     }
 }
 
