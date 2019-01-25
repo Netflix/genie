@@ -18,6 +18,7 @@ dependencies {
 
     implementation("com.google.guava:guava")
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.apache.tika:tika-core")
     implementation("org.springframework:spring-context")
 
     /*******************************
