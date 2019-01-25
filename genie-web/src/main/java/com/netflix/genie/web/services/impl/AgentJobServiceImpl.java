@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
@@ -30,13 +31,16 @@ import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.util.InspectionReport;
+import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -49,6 +53,11 @@ import java.util.UUID;
 @Transactional
 public class AgentJobServiceImpl implements AgentJobService {
 
+    private static final String AGENT_JOB_SERVICE_METRIC_PREFIX = "genie.services.agentJob.";
+    private static final String HANDSHAKE_COUNTER_METRIC_NAME = AGENT_JOB_SERVICE_METRIC_PREFIX + "handshake.counter";
+    private static final String AGENT_VERSION_METRIC_TAG_NAME = "agentVersion";
+    private static final String AGENT_HOST_METRIC_TAG_NAME = "agentHost";
+    private static final String HANDSHAKE_DECISION_METRIC_TAG_NAME = "handshakeDecision";
     private final JobPersistenceService jobPersistenceService;
     private final JobSpecificationService jobSpecificationService;
     private final AgentFilterService agentFilterService;
@@ -81,10 +90,29 @@ public class AgentJobServiceImpl implements AgentJobService {
     public void handshake(
         @Valid final AgentClientMetadata agentClientMetadata
     ) throws GenieAgentRejectedException {
-        final InspectionReport report = agentFilterService.inspectAgentMetadata(agentClientMetadata);
+
+        final HashSet<Tag> tags = Sets.newHashSet(
+            Tag.of(AGENT_VERSION_METRIC_TAG_NAME, agentClientMetadata.getVersion().orElse("null")),
+            Tag.of(AGENT_HOST_METRIC_TAG_NAME, agentClientMetadata.getHostname().orElse("null"))
+        );
+
+        final InspectionReport report;
+        try {
+            report = agentFilterService.inspectAgentMetadata(agentClientMetadata);
+        } catch (final Exception e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            meterRegistry.counter(HANDSHAKE_COUNTER_METRIC_NAME, tags).increment();
+            throw e;
+        }
+
+        MetricsUtils.addSuccessTags(tags);
+        tags.add(Tag.of(HANDSHAKE_DECISION_METRIC_TAG_NAME, report.getDecision().name()));
+        meterRegistry.counter(HANDSHAKE_COUNTER_METRIC_NAME, tags).increment();
+
         if (report.getDecision() == InspectionReport.Decision.REJECT) {
             throw new GenieAgentRejectedException("Agent rejected: " + report.getMessage());
         }
+
     }
 
     /**

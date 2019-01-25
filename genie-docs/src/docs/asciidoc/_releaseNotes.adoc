@@ -173,6 +173,16 @@ the user wants at runtime via a Spring bean definition.
 
 Switched to http://micrometer.io/[Micrometer]
 
+==== Added
+
+|===
+|Name |Reason
+
+|genie.services.agentJob.handshake.counter
+|Count usages of 'handshake' protocol, record agent metadata and decision made
+
+|===
+
 ==== Renamed
 
 |===

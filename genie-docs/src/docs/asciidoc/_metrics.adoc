@@ -463,6 +463,12 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |HealthCheckMetricsAspect
 |status, exceptionClass, healthIndicatorName
 
+|genie.services.agentJob.handshake.counter
+|Counter for calls to the 'handshake' protocol of the Genie Agent Job Service
+|count
+|AgentJobServiceImpl
+|status, exceptionClass, agentVersion, agentHost, handshakeDecision
+
 |===
 
 (*) Source may add additional tags on a case-by-case basis

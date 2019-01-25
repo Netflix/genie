@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl
 
+import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
@@ -27,11 +28,15 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundEx
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.AgentFilterService
-import com.netflix.genie.web.util.InspectionReport
-import com.netflix.genie.web.util.InspectionReport.Decision
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
+import com.netflix.genie.web.util.InspectionReport
+import com.netflix.genie.web.util.InspectionReport.Decision
+import com.netflix.genie.web.util.MetricsConstants
+import com.netflix.genie.web.util.MetricsUtils
+import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -44,52 +49,112 @@ import spock.lang.Specification
 @Category(UnitTest.class)
 class AgentJobServiceImplSpec extends Specification {
 
+    public static final String version = "1.2.3"
+    public static final String hostname = "127.0.0.1"
+
+
     JobPersistenceService jobPersistenceService
     JobSpecificationService jobSpecificationService
     AgentFilterService agentFilterService
     MeterRegistry meterRegistry
     AgentJobServiceImpl service
+    Counter counter
 
     def setup() {
         this.jobPersistenceService = Mock(JobPersistenceService)
         this.jobSpecificationService = Mock(JobSpecificationService)
         this.agentFilterService = Mock(AgentFilterService)
         this.meterRegistry = Mock(MeterRegistry)
+        this.counter = Mock(Counter)
         this.service = new AgentJobServiceImpl(
             jobPersistenceService,
             jobSpecificationService,
             agentFilterService,
-            this.meterRegistry
+            meterRegistry
         )
     }
 
     def "Can handshake successfully"() {
         def agentClientMetadata = Mock(AgentClientMetadata)
         def inspectionReport = Mock(InspectionReport)
+        Set<Tag> expectedTags = Sets.newHashSet(
+            Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, Decision.ACCEPT.name()),
+            Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
+            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
+            MetricsUtils.SUCCESS_STATUS_TAG
+        )
 
         when:
         service.handshake(agentClientMetadata)
 
         then:
+        1 * agentClientMetadata.getVersion() >> Optional.of(version)
+        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
-        1 * inspectionReport.getDecision() >> Decision.ACCEPT
+        2 * inspectionReport.getDecision() >> Decision.ACCEPT
         0 * inspectionReport.getMessage()
+        1 * meterRegistry.counter("genie.services.agentJob.handshake.counter", _ as Set<Tag>) >> {
+            args ->
+                assert args[1] as Set<Tag> == expectedTags
+                return counter
+        }
+        1 * counter.increment()
     }
 
     def "Can handshake rejection"() {
         def agentClientMetadata = Mock(AgentClientMetadata)
         def inspectionReport = Mock(InspectionReport)
         String message = "Agent version is deprecated"
+        Set<Tag> expectedTags = Sets.newHashSet(
+            Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, Decision.REJECT.name()),
+            Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
+            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
+            MetricsUtils.SUCCESS_STATUS_TAG
+        )
 
         when:
         service.handshake(agentClientMetadata)
 
         then:
+        1 * agentClientMetadata.getVersion() >> Optional.of(version)
+        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
-        1 * inspectionReport.getDecision() >> Decision.REJECT
+        2 * inspectionReport.getDecision() >> Decision.REJECT
         1 * inspectionReport.getMessage() >> message
+        1 * meterRegistry.counter("genie.services.agentJob.handshake.counter", _ as Set<Tag>) >> {
+            args ->
+                assert args[1] as Set<Tag> == expectedTags
+                return counter
+        }
+        1 * counter.increment()
         def e = thrown(GenieAgentRejectedException)
         e.getMessage().contains(message)
+    }
+
+    def "Can handle handshake exception"() {
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def exception = new RuntimeException("...")
+        Set<Tag> expectedTags = Sets.newHashSet(
+            Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
+            Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
+            MetricsUtils.FAILURE_STATUS_TAG,
+            Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
+        )
+
+        when:
+        service.handshake(agentClientMetadata)
+
+        then:
+        thrown(exception.class)
+        1 * agentClientMetadata.getVersion() >> Optional.of(version)
+        1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
+        1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> { throw exception }
+        1 * meterRegistry.counter("genie.services.agentJob.handshake.counter", _ as Set<Tag>) >> {
+            args ->
+                assert args[1] as Set<Tag> == expectedTags
+                return counter
+        }
+        1 * counter.increment()
     }
 
 
