@@ -18,7 +18,7 @@
 package com.netflix.genie.web.util;
 
 /**
- * Used to store contants related to metric names.
+ * Used to store constants related to metric names.
  *
  * @author tgianos
  * @since 3.0.0
