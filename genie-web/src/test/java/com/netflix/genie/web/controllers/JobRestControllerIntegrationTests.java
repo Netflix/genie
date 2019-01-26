@@ -65,7 +65,6 @@ import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -513,6 +512,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             ), // Response Headers
             Snippets.OUTPUT_DIRECTORY_FIELDS
         );
+
         RestAssured
             .given(this.getRequestSpecification())
             .filter(jsonResultFilter)
@@ -859,7 +859,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobArchive(
         final String id,
         final boolean jobShouldBeArchived
-    ) throws IOException, URISyntaxException {
+    ) throws URISyntaxException {
         final Path archiveDirectory = Paths.get(new URI(this.jobsLocationsProperties.getArchives())).resolve(id);
         if (jobShouldBeArchived) {
             Assert.assertTrue(Files.exists(archiveDirectory));

@@ -18,12 +18,17 @@
 package com.netflix.genie.common.internal.services.impl;
 
 import com.google.common.collect.ImmutableList;
+import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -52,8 +57,31 @@ public class JobArchiveServiceImpl implements JobArchiveService {
      */
     @Override
     public void archiveDirectory(final Path directory, final URI target) throws JobArchiveException {
+        // TODO: This relies highly on convention. Might be nicer to better abstract with database
+        //       record that points directly to where the manifest is or other solution?
+        try {
+            final JobDirectoryManifest manifest = new JobDirectoryManifest(directory);
+            final Path manifestDirectoryPath = StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)
+                ? directory
+                : directory.resolve(JobArchiveService.MANIFEST_DIRECTORY);
+            if (Files.notExists(manifestDirectoryPath)) {
+                Files.createDirectories(manifestDirectoryPath);
+            } else if (!Files.isDirectory(manifestDirectoryPath)) {
+                throw new JobArchiveException(
+                    manifestDirectoryPath + " is not a directory. Unable to create job manifest. Unable to archive"
+                );
+            }
+            final Path manifestPath = manifestDirectoryPath.resolve(JobArchiveService.MANIFEST_NAME);
+            Files.write(manifestPath, GenieObjectMapper.getMapper().writeValueAsBytes(manifest));
+            log.debug("Wrote job directory manifest to {}", manifestPath);
+        } catch (final IOException ioe) {
+            throw new JobArchiveException("Unable to create job directory manifest. Unable to archive", ioe);
+        }
+
+        // Attempt to archive the job directory, now including the manifest file, using available implementations
         final String uriString = target.toString();
         for (final JobArchiver archiver : this.jobArchivers) {
+            // TODO: Perhaps we should pass the manifest down to the archive implementations if they want to use it?
             if (archiver.archiveDirectory(directory, target)) {
                 log.debug(
                     "Successfully archived job directory {} to {} using {}",
@@ -65,6 +93,7 @@ public class JobArchiveServiceImpl implements JobArchiveService {
             }
         }
 
+        // For now archival is not considered critical so just log warning
         log.warn(
             "Failed to archive job directory {} to {} using any of the available implementations",
             directory.toString(),
