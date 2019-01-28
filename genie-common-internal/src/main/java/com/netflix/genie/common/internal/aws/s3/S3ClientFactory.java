@@ -25,6 +25,8 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
 import com.google.common.annotations.VisibleForTesting;
@@ -59,6 +61,7 @@ public class S3ClientFactory {
     private final AWSCredentialsProvider awsCredentialsProvider;
     private final Map<String, S3ClientKey> bucketToClientKey;
     private final ConcurrentHashMap<S3ClientKey, AmazonS3> clientCache;
+    private final ConcurrentHashMap<AmazonS3, TransferManager> transferManagerCache;
     private final Map<String, BucketProperties> bucketProperties;
     private final AWSSecurityTokenService stsClient;
     private final Regions defaultRegion;
@@ -100,7 +103,9 @@ public class S3ClientFactory {
 
         // Set the initial size to the number of special cases defined in properties + 1 for the default client
         // NOTE: Should we proactively create all necessary clients or be lazy about it? For now, lazy.
-        this.clientCache = new ConcurrentHashMap<>(this.bucketProperties.size() + 1);
+        final int initialCapacity = this.bucketProperties.size() + 1;
+        this.clientCache = new ConcurrentHashMap<>(initialCapacity);
+        this.transferManagerCache = new ConcurrentHashMap<>(initialCapacity);
 
         String tmpRegion;
         try {
@@ -185,6 +190,16 @@ public class S3ClientFactory {
         return this.clientCache.computeIfAbsent(s3ClientKey, this::buildS3Client);
     }
 
+    /**
+     * Get a {@link TransferManager} instance for use with the given {@code s3URI}.
+     *
+     * @param s3URI The S3 URI this transfer manager will be interacting with
+     * @return An instance of {@link TransferManager} backed by an appropriate S3 client for the given URI
+     */
+    public TransferManager getTransferManager(final AmazonS3URI s3URI) {
+        return this.transferManagerCache.computeIfAbsent(this.getClient(s3URI), this::buildTransferManager);
+    }
+
     private AmazonS3 buildS3Client(final S3ClientKey s3ClientKey) {
         // TODO: Do something about allowing ClientConfiguration to be passed in
         return AmazonS3ClientBuilder
@@ -208,6 +223,11 @@ public class S3ClientFactory {
                     .orElse(this.awsCredentialsProvider)
             )
             .build();
+    }
+
+    private TransferManager buildTransferManager(final AmazonS3 s3Client) {
+        // TODO: Perhaps want to supply more options?
+        return TransferManagerBuilder.standard().withS3Client(s3Client).build();
     }
 
     /**

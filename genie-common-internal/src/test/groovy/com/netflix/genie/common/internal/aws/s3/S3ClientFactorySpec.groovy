@@ -28,7 +28,6 @@ import spock.lang.Specification
  * Specifications for {@link S3ClientFactory}.
  *
  * @author tgianos
- * @since
  */
 class S3ClientFactorySpec extends Specification {
 
@@ -162,6 +161,7 @@ class S3ClientFactorySpec extends Specification {
         factory.stsClient != null
         factory.bucketToClientKey.isEmpty()
         factory.clientCache.isEmpty()
+        factory.transferManagerCache.isEmpty()
 
         when: "A client is requested for a bucket and region combination"
         def amazonS3Client0 = factory.getClient(s3URI)
@@ -181,6 +181,28 @@ class S3ClientFactorySpec extends Specification {
         factory.bucketToClientKey.size() == 1
         factory.clientCache.size() == 1
         amazonS3Client0 == amazonS3Client1
+
+        when: "A transfer manager is requested for the same s3URI"
+        def transferManager1 = factory.getTransferManager(s3URI)
+
+        then: "A new transfer manager is created and cached but reuses the same S3 client"
+        1 * s3URI.getBucket() >> bucket4Name
+        0 * s3URI.getRegion()
+        factory.bucketToClientKey.size() == 1
+        factory.clientCache.size() == 1
+        factory.transferManagerCache.size() == 1
+        transferManager1.getAmazonS3Client() == amazonS3Client1
+        transferManager1.getAmazonS3Client() == amazonS3Client0
+
+        when: "The same S3 URI is used to request a transfer manager"
+        def transferManager2 = factory.getTransferManager(s3URI)
+
+        then: "The same transfer manager is returned"
+        1 * s3URI.getBucket() >> bucket4Name
+        factory.bucketToClientKey.size() == 1
+        factory.clientCache.size() == 1
+        factory.transferManagerCache.size() == 1
+        transferManager2 == transferManager1
 
         when: "A different bucket in the same region is requested"
         def amazonS3Client2 = factory.getClient(s3URI)
