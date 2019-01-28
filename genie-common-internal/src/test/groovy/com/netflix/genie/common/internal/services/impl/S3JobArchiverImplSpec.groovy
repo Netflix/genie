@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.internal.services.impl
 
 import com.amazonaws.AmazonServiceException
-import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3URI
-import com.amazonaws.services.s3.model.PutObjectRequest
+import com.amazonaws.services.s3.transfer.MultipleFileUpload
+import com.amazonaws.services.s3.transfer.TransferManager
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
 import com.netflix.genie.common.internal.exceptions.JobArchiveException
 import com.netflix.genie.test.categories.UnitTest
@@ -30,15 +29,17 @@ import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-import java.nio.file.Path
-import java.nio.file.Paths
-
+/**
+ * Specifications for {@link S3JobArchiverImpl}.
+ *
+ * @author standon
+ */
 @Category(UnitTest)
 class S3JobArchiverImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
     S3ClientFactory s3ClientFactory
-    AmazonS3 amazonS3
+    TransferManager transferManager
     S3JobArchiverImpl s3ArchivalService
 
     File jobDir
@@ -63,146 +64,100 @@ class S3JobArchiverImplSpec extends Specification {
     AmazonS3URI archivalLocationS3URI
 
     void setup() {
-        s3ClientFactory = Mock()
-        amazonS3 = Mock()
-        s3ArchivalService = new S3JobArchiverImpl(s3ClientFactory)
-        jobDir = temporaryFolder.newFolder("job")
-        stdout = new File(jobDir, "stdout")
-        stdout.createNewFile()
-        stdout.write("Stdout content")
+        this.s3ClientFactory = Mock(S3ClientFactory)
+        this.transferManager = Mock(TransferManager)
+        this.s3ArchivalService = new S3JobArchiverImpl(this.s3ClientFactory)
+        this.jobDir = this.temporaryFolder.newFolder()
+        this.stdout = new File(jobDir, "stdout")
+        this.stdout.createNewFile()
+        this.stdout.write("Stdout content")
 
-        stderr = new File(jobDir, "stderr")
-        stderr.createNewFile()
-        stderr.write("Stderr content")
+        this.stderr = new File(this.jobDir, "stderr")
+        this.stderr.createNewFile()
+        this.stderr.write("Stderr content")
 
-        run = new File(jobDir, "run")
-        run.createNewFile()
-        run.write("Run file content")
+        this.run = new File(this.jobDir, "run")
+        this.run.createNewFile()
+        this.run.write("Run file content")
 
-        genieDir = new File(jobDir, "genie")
-        applicationsDir = new File(genieDir, "applications")
-        applicationsDir.mkdirs()
+        this.genieDir = new File(this.jobDir, "genie")
+        this.applicationsDir = new File(this.genieDir, "applications")
+        this.applicationsDir.mkdirs()
 
         //empty dir
-        sparkDir = new File(applicationsDir, "spark")
-        sparkDir.mkdirs()
+        this.sparkDir = new File(this.applicationsDir, "spark")
+        this.sparkDir.mkdirs()
 
-        clustersDir = new File(genieDir, "clusters")
-        clustersDir.mkdirs()
+        this.clustersDir = new File(this.genieDir, "clusters")
+        this.clustersDir.mkdirs()
 
-        hadoopH2Dir = new File(clustersDir, "hadoopH2")
-        hadoopH2Dir.mkdirs()
+        this.hadoopH2Dir = new File(this.clustersDir, "hadoopH2")
+        this.hadoopH2Dir.mkdirs()
 
-        hadoopH2DirConfig = new File(hadoopH2Dir, "config")
-        hadoopH2DirConfig.mkdirs()
+        this.hadoopH2DirConfig = new File(this.hadoopH2Dir, "config")
+        this.hadoopH2DirConfig.mkdirs()
 
-        hadoopCoreSite = new File(hadoopH2DirConfig, "core")
-        hadoopCoreSite.createNewFile()
-        hadoopCoreSite.write("Hadoop core site")
+        this.hadoopCoreSite = new File(this.hadoopH2DirConfig, "core")
+        this.hadoopCoreSite.createNewFile()
+        this.hadoopCoreSite.write("Hadoop core site")
 
-        commandsDir = new File(genieDir, "commands")
-        commandsDir.mkdirs()
+        this.commandsDir = new File(this.genieDir, "commands")
+        this.commandsDir.mkdirs()
 
-        sparkShellSetUp = new File(commandsDir, "setup.sh")
-        sparkShellSetUp.createNewFile()
-        sparkShellSetUp.write("Spark shell set up")
+        this.sparkShellSetUp = new File(this.commandsDir, "setup.sh")
+        this.sparkShellSetUp.createNewFile()
+        this.sparkShellSetUp.write("Spark shell set up")
 
-        logsDir = new File(genieDir, "logs")
-        logsDir.mkdirs()
+        this.logsDir = new File(this.genieDir, "logs")
+        this.logsDir.mkdirs()
 
-        logFile = new File(logsDir, "genie.log")
-        logFile.write("logs")
+        this.logFile = new File(this.logsDir, "genie.log")
+        this.logFile.write("logs")
 
-        archivalLocationS3URI = new AmazonS3URI(
+        this.archivalLocationS3URI = new AmazonS3URI(
             "s3://" + bucketName + File.separator + baseLocation + File.separator + jobDir.getName()
         )
     }
 
-    void cleanup() {
-    }
-
-    def "Archive a sample job folder. S3 objects creation calls called for files and empty directories with correct keys"() {
+    def "Archiving a job folder defers to the S3 Transfer Manager returned by the factory"() {
+        def upload = Mock(MultipleFileUpload)
 
         when:
-        def result = s3ArchivalService.archiveDirectory(jobDir.toPath(), archivalLocationS3URI.getURI())
+        def result = this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.archivalLocationS3URI.getURI())
 
         then:
-        1 * s3ClientFactory.getClient(archivalLocationS3URI) >> amazonS3
-        7 * amazonS3.putObject(_ as PutObjectRequest) >> {
-            PutObjectRequest putObjectRequest ->
-                assert putObjectRequest.getBucketName() == bucketName
-
-                //Name of the file for which the s3 putObject call is invoked
-                String fileName =
-                    putObjectRequest.getFile() == null ?
-                        sparkDir.getName() :
-                        putObjectRequest.getFile().getName()
-
-                switch (fileName) {
-
-                    case stdout.getName():
-                        assert putObjectRequest.getKey() ==
-                            baseLocation + File.separator + pathRelativeToJobFolderParent(stdout)
-                        break
-                    case stderr.getName():
-                        assert putObjectRequest.getKey() ==
-                            baseLocation + File.separator + pathRelativeToJobFolderParent(stderr)
-                        break
-                    case run.getName():
-                        assert putObjectRequest.getKey() ==
-                            baseLocation + File.separator + pathRelativeToJobFolderParent(run)
-                        break
-                    case sparkDir.getName():
-                        assert putObjectRequest.getKey() ==
-                            baseLocation +
-                            File.separator +
-                            pathRelativeToJobFolderParent(sparkDir) + File.separator
-                        break
-                    case hadoopCoreSite.getName():
-                        assert putObjectRequest.getKey() ==
-                            baseLocation + File.separator + pathRelativeToJobFolderParent(hadoopCoreSite)
-                        break
-                    case sparkShellSetUp.getName():
-                        assert putObjectRequest.getKey() ==
-                            baseLocation + File.separator + pathRelativeToJobFolderParent(sparkShellSetUp)
-                        break
-                    case logFile.getName():
-                        assert putObjectRequest.getKey() ==
-                            baseLocation + File.separator + pathRelativeToJobFolderParent(logFile)
-                        break
-                }
-        }
+        1 * this.s3ClientFactory.getTransferManager(_ as AmazonS3URI) >> this.transferManager
+        1 * this.transferManager.uploadDirectory(
+            this.archivalLocationS3URI.getBucket(),
+            this.archivalLocationS3URI.getKey(),
+            this.jobDir,
+            true
+        ) >> upload
+        1 * upload.waitForCompletion()
         result
     }
 
-    def "Archival Exception thrown for non S3 uri"() {
-
+    def "If it is not a valid S3 URI archival is not attempted with this implementation"() {
         when:
-        def result = s3ArchivalService.archiveDirectory(jobDir.toPath(), new URI("file://abc"))
+        def result = this.s3ArchivalService.archiveDirectory(jobDir.toPath(), new URI("file://abc"))
 
         then:
         !result
     }
 
     def "Archival Exception thrown if there is error archiving"() {
-
         when:
-        s3ArchivalService.archiveDirectory(jobDir.toPath(), archivalLocationS3URI.getURI())
+        this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.archivalLocationS3URI.getURI())
 
         then:
-        1 * s3ClientFactory.getClient(archivalLocationS3URI) >> amazonS3
-        1 * amazonS3.putObject(_ as PutObjectRequest) >> {
-            throw new AmazonServiceException("test")
-        }
-
+        1 * this.s3ClientFactory.getTransferManager(_ as AmazonS3URI) >> this.transferManager
+        1 * this.transferManager.uploadDirectory(
+            this.archivalLocationS3URI.getBucket(),
+            this.archivalLocationS3URI.getKey(),
+            this.jobDir,
+            true
+        ) >> { throw new AmazonServiceException("test") }
         thrown(JobArchiveException)
-    }
-
-    private String pathRelativeToJobFolderParent(File file) {
-        Path jobDirPath = Paths.get(jobDir.getAbsolutePath())
-        Path filePath = Paths.get(file.getAbsolutePath())
-
-        return jobDirPath.getParent().relativize(filePath)
     }
 }
 
