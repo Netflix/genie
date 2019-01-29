@@ -91,7 +91,7 @@ configure(javaProjects) {
             dependency("commons-httpclient:commons-httpclient:3.1")
             dependency("commons-io:commons-io:2.6")
             dependency("commons-validator:commons-validator:1.6")
-            dependencySet(group: "io.grpc", version: "1.12.0") {
+            dependencySet(group: "io.grpc", version: "1.10.1") {
                 entry "grpc-core"
                 entry "grpc-netty"
                 entry "grpc-stub"
