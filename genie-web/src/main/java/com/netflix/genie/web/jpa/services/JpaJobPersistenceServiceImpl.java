@@ -54,6 +54,7 @@ import com.netflix.genie.web.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
+import com.netflix.genie.web.jpa.entities.projections.JobStatusProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
@@ -595,6 +596,14 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             newStatus,
             newStatusMessage
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<JobStatus> getJobStatus(@NotBlank(message = "Job id is missing and is required") final String id) {
+        return this.jobRepository.findByUniqueId(id, JobStatusProjection.class).map(JobStatusProjection::getStatus);
     }
 
     private void updateJobStatus(

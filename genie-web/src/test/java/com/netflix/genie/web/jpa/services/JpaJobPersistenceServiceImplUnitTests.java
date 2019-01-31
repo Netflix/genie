@@ -43,8 +43,9 @@ import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
-import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
+import com.netflix.genie.web.jpa.entities.projections.JobStatusProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.IsV4JobProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
@@ -936,5 +937,24 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Mockito.verify(jobEntity, Mockito.times(1)).setStatus(JobStatus.SUCCEEDED);
         Mockito.verify(jobEntity, Mockito.times(1)).setStatusMsg(finalStatusMessage);
         Mockito.verify(jobEntity, Mockito.times(1)).setFinished(Mockito.any(Instant.class));
+    }
+
+    /**
+     * Test {@link JpaJobPersistenceServiceImpl#getJobStatus(String)}.
+     */
+    @Test
+    public void testGetJobStatus() {
+        final String id = UUID.randomUUID().toString();
+        final JobStatus status = JobStatus.RUNNING;
+
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id, JobStatusProjection.class))
+            .thenReturn(Optional.empty())
+            .thenReturn(Optional.of(() -> status));
+        Assert.assertFalse(this.jobPersistenceService.getJobStatus(id).isPresent());
+        Assert.assertThat(
+            this.jobPersistenceService.getJobStatus(id).orElseThrow(IllegalArgumentException::new),
+            Matchers.is(status)
+        );
     }
 }
