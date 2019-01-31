@@ -262,4 +262,12 @@ public interface JobPersistenceService {
     boolean isV4(
         @NotBlank(message = "Id is missing and is required") String id
     );
+
+    /**
+     * Get the status for a job with the given {@code id}.
+     *
+     * @param id The id of the job to get status for
+     * @return The job status or {@link Optional#empty()} if no such job exists
+     */
+    Optional<JobStatus> getJobStatus(@NotBlank(message = "Job id is missing and is required") String id);
 }
