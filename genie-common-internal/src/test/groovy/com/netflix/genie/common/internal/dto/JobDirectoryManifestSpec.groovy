@@ -237,6 +237,7 @@ class JobDirectoryManifestSpec extends Specification {
         Collection<String> expectedChildren
     ) {
         assert entry.getPath() == expectedRelativePath
+        assert entry.getName() == expectedFile.getFileName().toString()
         assert entry.getSize() == Files.size(expectedFile)
         if (isDirectory) {
             assert entry.isDirectory()
