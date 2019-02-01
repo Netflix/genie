@@ -77,4 +77,25 @@ public class ControllerUtilsUnitTests {
             .thenReturn("/api/v3/jobs/{id}/output/**");
         Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is("stdout"));
     }
+
+    /**
+     * Test {@link ControllerUtils#getRequestRoot(HttpServletRequest, String)}.
+     */
+    @Test
+    public void canGetRequestRoot() {
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        final String requestURL = "https://genie.com/api/v3/jobs/1234/output/genie/genie.done";
+        final StringBuffer buffer = new StringBuffer(requestURL);
+        Mockito.when(request.getRequestURL()).thenReturn(buffer);
+
+        Assert.assertThat(ControllerUtils.getRequestRoot(request, ""), Matchers.is(requestURL));
+        Assert.assertThat(
+            ControllerUtils.getRequestRoot(request, ".done"),
+            Matchers.is("https://genie.com/api/v3/jobs/1234/output/genie/genie")
+        );
+        Assert.assertThat(
+            ControllerUtils.getRequestRoot(request, "genie/genie.done"),
+            Matchers.is("https://genie.com/api/v3/jobs/1234/output/")
+        );
+    }
 }
