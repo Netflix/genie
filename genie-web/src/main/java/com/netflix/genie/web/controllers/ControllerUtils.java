@@ -18,6 +18,7 @@
 package com.netflix.genie.web.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -56,5 +57,22 @@ public final class ControllerUtils {
         }
         log.debug("Remaining path = {}", path);
         return path;
+    }
+
+    /**
+     * Given a HTTP {@code request} and a {@code path} this method will return the root of the request minus the path.
+     * Generally the path will be derived from {@link #getRemainingPath(HttpServletRequest)} and this method will be
+     * called subsequently.
+     * <p>
+     * If the request URL is {@code https://myhost/api/v3/jobs/12345/output/genie/run} and the path is {@code genie/run}
+     * this method should return {@code https://myhost/api/v3/jobs/12345/output/}.
+     *
+     * @param request The HTTP request to get information from
+     * @param path    The path that should be removed from the end of the request URL
+     * @return The base of the request
+     */
+    static String getRequestRoot(final HttpServletRequest request, final String path) {
+        final String requestUrl = request.getRequestURL().toString();
+        return StringUtils.removeEnd(requestUrl, path);
     }
 }
