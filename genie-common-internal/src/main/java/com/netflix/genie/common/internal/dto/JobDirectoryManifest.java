@@ -61,6 +61,7 @@ import java.util.Set;
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 public class JobDirectoryManifest {
+    private static final Metadata TIKA_METADATA = new Metadata();
     private static final String ENTRIES_KEY = "entries";
     private static final String EMPTY_STRING = "";
 
@@ -282,12 +283,7 @@ public class JobDirectoryManifest {
                     log.error("Unable to create MD5 for {} due to error", entry, ioe);
                 }
 
-                try (TikaInputStream inputStream = TikaInputStream.get(entry)) {
-                    mimeType = this.tikaConfig.getDetector().detect(inputStream, new Metadata()).toString();
-                } catch (final IOException ioe) {
-                    log.error("Unable to detect mime type for {} due to error", entry, ioe);
-                    mimeType = MediaType.OCTET_STREAM.toString();
-                }
+                mimeType = this.getMimeType(name, entry);
             }
 
             final Set<String> children = Sets.newHashSet();
@@ -318,6 +314,24 @@ public class JobDirectoryManifest {
                 parent,
                 children
             );
+        }
+
+        private String getMimeType(final String name, final Path path) {
+            // TODO: Move configuration of special handling cases to external configuration for flexibility
+            //       probably a map of filename -> type or extension -> type or produced mime-type -> desired mime-type
+            switch (name) {
+                case "stdout":
+                case "stderr":
+                case "run":
+                    return MediaType.TEXT_PLAIN.toString();
+                default:
+                    try (TikaInputStream inputStream = TikaInputStream.get(path)) {
+                        return this.tikaConfig.getDetector().detect(inputStream, TIKA_METADATA).toString();
+                    } catch (final IOException ioe) {
+                        log.error("Unable to detect mime type for {} due to error", path, ioe);
+                        return MediaType.OCTET_STREAM.toString();
+                    }
+            }
         }
     }
 
