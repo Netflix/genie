@@ -62,6 +62,7 @@ import java.util.Set;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class JobDirectoryManifest {
     private static final String ENTRIES_KEY = "entries";
+    private static final String EMPTY_STRING = "";
 
     private final ImmutableMap<String, ManifestEntry> entries;
     private final ImmutableSet<ManifestEntry> files;
@@ -262,6 +263,10 @@ public class JobDirectoryManifest {
             final boolean directory
         ) throws IOException {
             final String path = this.root.relativize(entry).toString();
+            final Path fileName = entry.getFileName();
+            final String name = fileName == null
+                ? EMPTY_STRING
+                : fileName.toString();
             final Instant lastModifiedTime = attributes.lastModifiedTime().toInstant();
             final Instant lastAccessTime = attributes.lastAccessTime().toInstant();
             final Instant creationTime = attributes.creationTime().toInstant();
@@ -302,6 +307,7 @@ public class JobDirectoryManifest {
 
             return new ManifestEntry(
                 path,
+                name,
                 lastModifiedTime,
                 lastAccessTime,
                 creationTime,
@@ -326,6 +332,7 @@ public class JobDirectoryManifest {
     @EqualsAndHashCode(doNotUseGetters = true)
     public static class ManifestEntry {
         private final String path;
+        private final String name;
         private final Instant lastModifiedTime;
         private final Instant lastAccessTime;
         private final Instant creationTime;
@@ -341,6 +348,7 @@ public class JobDirectoryManifest {
          * Constructor.
          *
          * @param path             The relative path to the entry from the root of the job directory
+         * @param name             The name of the entry
          * @param lastModifiedTime The time the entry was last modified
          * @param lastAccessTime   The time the entry was last accessed
          * @param creationTime     The time the entry was created
@@ -354,6 +362,7 @@ public class JobDirectoryManifest {
         @JsonCreator
         public ManifestEntry(
             @JsonProperty(value = "path", required = true) final String path,
+            @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty(value = "lastModifiedTime", required = true) final Instant lastModifiedTime,
             @JsonProperty(value = "lastAccessTime", required = true) final Instant lastAccessTime,
             @JsonProperty(value = "creationTime", required = true) final Instant creationTime,
@@ -365,6 +374,7 @@ public class JobDirectoryManifest {
             @JsonProperty(value = "children", required = true) final Set<String> children
         ) {
             this.path = path;
+            this.name = name;
             this.lastModifiedTime = lastModifiedTime;
             this.lastAccessTime = lastAccessTime;
             this.creationTime = creationTime;
