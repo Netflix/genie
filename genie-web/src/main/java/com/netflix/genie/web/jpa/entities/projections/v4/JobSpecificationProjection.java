@@ -21,6 +21,8 @@ import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
+import com.netflix.genie.web.jpa.entities.projections.JobArchiveLocationProjection;
+import com.netflix.genie.web.jpa.entities.projections.UniqueIdProjection;
 
 import java.util.List;
 import java.util.Map;
@@ -33,13 +35,7 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-public interface JobSpecificationProjection {
-    /**
-     * Get the unique identifier for this entity.
-     *
-     * @return The globally unique identifier of this entity
-     */
-    String getUniqueId();
+public interface JobSpecificationProjection extends UniqueIdProjection, JobArchiveLocationProjection {
 
     /**
      * Get all the configuration files for this job.
@@ -61,13 +57,6 @@ public interface JobSpecificationProjection {
      * @return The setup file
      */
     Optional<FileEntity> getSetupFile();
-
-    /**
-     * Get the job folder archive location agent should use.
-     *
-     * @return The job folder archive location wrapped in an {@link Optional}
-     */
-    Optional<String> getArchiveLocation();
 
     /**
      * Get the job directory location the agent should use.

@@ -79,7 +79,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for JpaJobPersistenceImpl.
+ * Integration tests for {@link JpaJobPersistenceServiceImpl}.
  *
  * @author tgianos
  * @since 3.0.0
@@ -87,8 +87,10 @@ import java.util.UUID;
 @Category(IntegrationTest.class)
 @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase {
+public class JpaJobPersistenceServiceImplIntegrationTests extends DBIntegrationTestBase {
 
+    private static final String JOB_1_ID = "job1";
+    private static final String JOB_2_ID = "job2";
     private static final String JOB_3_ID = "job3";
 
     // Job Request fields
@@ -536,6 +538,47 @@ public class JpaJobPersistenceImplIntegrationTests extends DBIntegrationTestBase
         Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(successStatusMessage)));
         Assert.assertTrue(jobEntity.getStarted().isPresent());
         Assert.assertTrue(jobEntity.getFinished().isPresent());
+    }
+
+    /**
+     * Test {@link JpaJobPersistenceServiceImpl#getJobStatus(String)}.
+     */
+    @Test
+    public void canGetJobStatus() {
+        Assert.assertFalse(this.jobPersistenceService.getJobStatus(UUID.randomUUID().toString()).isPresent());
+        Assert.assertThat(
+            this.jobPersistenceService.getJobStatus(JOB_1_ID).orElseThrow(IllegalStateException::new),
+            Matchers.is(JobStatus.SUCCEEDED)
+        );
+        Assert.assertThat(
+            this.jobPersistenceService.getJobStatus(JOB_2_ID).orElseThrow(IllegalStateException::new),
+            Matchers.is(JobStatus.RUNNING)
+        );
+        Assert.assertThat(
+            this.jobPersistenceService.getJobStatus(JOB_3_ID).orElseThrow(IllegalStateException::new),
+            Matchers.is(JobStatus.RUNNING)
+        );
+    }
+
+    /**
+     * Test {@link JpaJobPersistenceServiceImpl#getJobArchiveLocation(String)}.
+     *
+     * @throws GenieNotFoundException if the test is broken
+     */
+    @Test
+    public void canGetJobArchiveLocation() throws GenieNotFoundException {
+        try {
+            this.jobPersistenceService.getJobArchiveLocation(UUID.randomUUID().toString());
+            Assert.fail();
+        } catch (final GenieNotFoundException gnfe) {
+            // expected
+        }
+
+        Assert.assertFalse(this.jobPersistenceService.getJobArchiveLocation(JOB_3_ID).isPresent());
+        Assert.assertThat(
+            this.jobPersistenceService.getJobArchiveLocation(JOB_1_ID).orElseThrow(IllegalStateException::new),
+            Matchers.is("s3://somebucket/genie/logs/1/")
+        );
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {

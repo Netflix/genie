@@ -20,6 +20,7 @@ package com.netflix.genie.web.jpa.entities;
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.jpa.entities.projections.JobApplicationsProjection;
+import com.netflix.genie.web.jpa.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobClusterProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobCommandProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobExecutionProjection;
@@ -27,8 +28,8 @@ import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobSearchProjection;
-import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.IsV4JobProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.specifications.JpaSpecificationUtils;
 import lombok.AccessLevel;
@@ -133,6 +134,7 @@ public class JobEntity extends BaseEntity implements
     JobSearchProjection,
     V4JobRequestProjection,
     JobSpecificationProjection,
+    JobArchiveLocationProjection,
     IsV4JobProjection {
 
     private static final long serialVersionUID = 2849367731657512224L;
@@ -518,11 +520,6 @@ public class JobEntity extends BaseEntity implements
         return Optional.ofNullable(this.requestedTimeout);
     }
 
-    @Override
-    public Optional<String> getRequestedArchiveLocationPrefix() {
-        return Optional.ofNullable(this.requestedArchiveLocationPrefix);
-    }
-
     /**
      * Set the command criterion.
      *
@@ -713,14 +710,6 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getArchiveLocation() {
-        return Optional.ofNullable(this.archiveLocation);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<String> getClusterName() {
         return Optional.ofNullable(this.clusterName);
     }
@@ -731,6 +720,14 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getCommandName() {
         return Optional.ofNullable(this.commandName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getArchiveLocation() {
+        return Optional.ofNullable(this.archiveLocation);
     }
 
     /**
@@ -904,6 +901,14 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getRequestedAgentConfigExt() {
         return Optional.ofNullable(this.requestedAgentConfigExt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getRequestedArchiveLocationPrefix() {
+        return Optional.ofNullable(this.requestedArchiveLocationPrefix);
     }
 
     /**
