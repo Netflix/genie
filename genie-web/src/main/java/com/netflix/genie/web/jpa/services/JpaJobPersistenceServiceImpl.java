@@ -54,9 +54,10 @@ import com.netflix.genie.web.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
+import com.netflix.genie.web.jpa.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobStatusProjection;
-import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.IsV4JobProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
@@ -184,7 +185,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             final GenieClusterNotFoundException
                 | GenieCommandNotFoundException
                 | GenieApplicationNotFoundException e
-            ) {
+        ) {
             throw new GenieNotFoundException(e.getMessage(), e);
         }
 
@@ -434,7 +435,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             final GenieApplicationNotFoundException
                 | GenieCommandNotFoundException
                 | GenieClusterNotFoundException e
-            ) {
+        ) {
             log.error(
                 "Unable to save Job Specification {} for job {} due to {}",
                 specification,
@@ -468,26 +469,6 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return projection.isResolved()
             ? Optional.of(EntityDtoConverters.toJobSpecificationDto(projection))
             : Optional.empty();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isV4(
-        @NotBlank(message = "Id is missing and is required") final String id
-    ) {
-        log.debug("Read v4 flag from db for job {} ", id);
-        return this.jobRepository
-            .findByUniqueId(id, IsV4JobProjection.class)
-            .orElseThrow(
-                () -> {
-                    final String errorMessage = "No job with id " + id + "exists. Unable to get v4 flag.";
-                    log.error(errorMessage);
-                    return new GenieJobNotFoundException(errorMessage);
-                }
-            ).isV4();
     }
 
     /**
@@ -602,8 +583,46 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
+    public boolean isV4(
+        @NotBlank(message = "Id is missing and is required") final String id
+    ) {
+        log.debug("Read v4 flag from db for job {} ", id);
+        return this.jobRepository
+            .findByUniqueId(id, IsV4JobProjection.class)
+            .orElseThrow(
+                () -> {
+                    final String errorMessage = "No job with id " + id + "exists. Unable to get v4 flag.";
+                    log.error(errorMessage);
+                    return new GenieJobNotFoundException(errorMessage);
+                }
+            ).isV4();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
     public Optional<JobStatus> getJobStatus(@NotBlank(message = "Job id is missing and is required") final String id) {
+        // TODO: Need to decide on consistency of API. Do we throw exception? Return Optional? Runtime or Checked?
+        //       getJobArchiveLocation throws exception cause the underlying return type is already optional. So
+        //       do we return Optional<Optional<String>> that's really weird
         return this.jobRepository.findByUniqueId(id, JobStatusProjection.class).map(JobStatusProjection::getStatus);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> getJobArchiveLocation(
+        @NotBlank(message = "Job id is missing and is required") final String id
+    ) throws GenieNotFoundException {
+        return this.jobRepository
+            .findByUniqueId(id, JobArchiveLocationProjection.class)
+            .map(JobArchiveLocationProjection::getArchiveLocation)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exits."));
     }
 
     private void updateJobStatus(
@@ -810,7 +829,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     private void setRequestedAgentConfigFields(
         final JobEntity jobEntity,
         final AgentConfigRequest requestedAgentConfig
-        ) {
+    ) {
         jobEntity.setInteractive(requestedAgentConfig.isInteractive());
         jobEntity.setArchivingDisabled(requestedAgentConfig.isArchivingDisabled());
         requestedAgentConfig

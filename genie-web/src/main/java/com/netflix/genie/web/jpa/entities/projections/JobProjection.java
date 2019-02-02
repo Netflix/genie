@@ -29,7 +29,7 @@ import java.util.Optional;
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobProjection extends JobCommonFieldsProjection, JobStatusProjection {
+public interface JobProjection extends JobCommonFieldsProjection, JobStatusProjection, JobArchiveLocationProjection {
 
     /**
      * Get the current status message of the job.
@@ -51,13 +51,6 @@ public interface JobProjection extends JobCommonFieldsProjection, JobStatusProje
      * @return The finish date
      */
     Optional<Instant> getFinished();
-
-    /**
-     * Get the location where the job was archived.
-     *
-     * @return The archive location
-     */
-    Optional<String> getArchiveLocation();
 
     /**
      * Get the name of the cluster that is running or did run this job.

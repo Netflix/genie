@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
@@ -270,4 +271,15 @@ public interface JobPersistenceService {
      * @return The job status or {@link Optional#empty()} if no such job exists
      */
     Optional<JobStatus> getJobStatus(@NotBlank(message = "Job id is missing and is required") String id);
+
+    /**
+     * Get the location a job directory was archived to if at all.
+     *
+     * @param id The id of the job to get the location for
+     * @return The archive location or {@link Optional#empty()}
+     * @throws GenieNotFoundException When there is no job with id {@code id}
+     */
+    Optional<String> getJobArchiveLocation(
+        @NotBlank(message = "Job id is missing and is required") String id
+    ) throws GenieNotFoundException;
 }
