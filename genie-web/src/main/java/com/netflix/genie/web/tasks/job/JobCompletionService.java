@@ -152,17 +152,19 @@ public class JobCompletionService {
 
             // Make sure the job isn't already done before doing something
             if (status.isActive()) {
-                try {
-                    this.retryTemplate.execute(context -> this.updateJob(job, event, tags));
-                } catch (final Exception e) {
-                    log.error("Failed updating for job: {}", jobId, e);
-                }
-                // Things that should be done either way
+                // TODO: Need to archive the directory now before we set the job status because of how log serving
+                //       is handled. E.g. once job is in a finished state it will try to serve from archive location
+                //       not from disk. This may slow down job timing. Probably a use case for different states.
                 try {
                     this.retryTemplate.execute(context -> this.processJobDir(job));
                 } catch (final Exception e) {
                     log.error("Failed archiving directory for job: {}", jobId, e);
                     this.incrementErrorCounter("JOB_DIRECTORY_FAILURE", e);
+                }
+                try {
+                    this.retryTemplate.execute(context -> this.updateJob(job, event, tags));
+                } catch (final Exception e) {
+                    log.error("Failed updating for job: {}", jobId, e);
                 }
                 try {
                     this.retryTemplate.execute(context -> sendEmail(jobId));
@@ -521,6 +523,10 @@ public class JobCompletionService {
                         return false;
                     }
                 }
+
+                // TODO: Probably need to schedule deletion of the job directory to save disk space
+                //       Currently this will be handled by DiskCleanupTask so not prioritizing as of
+                //       also this code hopefully will be irrelevent with agent 2/4/18 - TJG
             }
         }
         return true;

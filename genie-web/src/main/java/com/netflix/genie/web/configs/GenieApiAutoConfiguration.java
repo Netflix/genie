@@ -21,15 +21,12 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.RetryProperties;
-import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
-import com.netflix.genie.web.services.JobFileService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -187,30 +184,6 @@ public class GenieApiAutoConfiguration {
         }
 
         return jobsDirResource;
-    }
-
-    /**
-     * Get a static resource handler for Genie job logs.
-     *
-     * @param directoryWriter The directory writer to use for converting directory resources
-     * @param context         The spring application context
-     * @param jobFileService  The job file service to use
-     * @return The genie resource http request handler.
-     */
-    @Bean
-    @ConditionalOnMissingBean(GenieResourceHttpRequestHandler.class)
-    public GenieResourceHttpRequestHandler genieResourceHttpRequestHandler(
-        final DirectoryWriter directoryWriter,
-        final ApplicationContext context,
-        final JobFileService jobFileService
-    ) {
-        final GenieResourceHttpRequestHandler handler = new GenieResourceHttpRequestHandler(
-            directoryWriter,
-            jobFileService
-        );
-        handler.setApplicationContext(context);
-
-        return handler;
     }
 
     /**

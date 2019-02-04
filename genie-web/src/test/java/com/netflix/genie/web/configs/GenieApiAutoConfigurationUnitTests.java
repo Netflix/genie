@@ -20,10 +20,7 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
-import com.netflix.genie.web.resources.writers.DirectoryWriter;
-import com.netflix.genie.web.services.JobFileService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +28,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -172,19 +168,5 @@ public class GenieApiAutoConfigurationUnitTests {
 
         final Resource jobsDir = this.genieApiAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
         Assert.assertNotNull(jobsDir);
-    }
-
-    /**
-     * Make sure we can get a valid genieResourceHttpRequestHandler.
-     */
-    @Test
-    public void canGetGenieResourceHttpRequestHandler() {
-        final DirectoryWriter directoryWriter = Mockito.mock(DirectoryWriter.class);
-        final ApplicationContext context = Mockito.mock(ApplicationContext.class);
-        final JobFileService jobFileService = Mockito.mock(JobFileService.class);
-
-        final GenieResourceHttpRequestHandler handler
-            = this.genieApiAutoConfiguration.genieResourceHttpRequestHandler(directoryWriter, context, jobFileService);
-        Assert.assertThat(handler.getApplicationContext(), Matchers.is(context));
     }
 }
