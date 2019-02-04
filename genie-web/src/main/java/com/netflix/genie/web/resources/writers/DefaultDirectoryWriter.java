@@ -22,6 +22,7 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.catalina.util.TomcatCSS;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.URL;
@@ -45,30 +46,15 @@ import java.util.List;
  */
 public class DefaultDirectoryWriter implements DirectoryWriter {
 
-    private static final String DEFAULT_CSS =
-        "H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} "
-            + "H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} "
-            + "H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} "
-            + "BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} "
-            + "B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} "
-            + "P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}"
-            + "A {color : black;}"
-            + "A.name {color : black;}"
-            + ".line {height: 1px; background-color: #525D76; border: none;}";
-
     /**
-     * {@inheritDoc}
+     * Given the provided information render as an HTML string.
      *
+     * @param directoryName The name of the directory
+     * @param directory     The directory information to serialize
+     * @return A string of valid HTML
      * @see org.apache.catalina.servlets.DefaultServlet
      */
-    @Override
-    public String toHtml(
-        @NotNull final File directory,
-        @URL final String requestURL,
-        final boolean includeParent
-    ) throws IOException {
-        final Directory dir = this.getDirectory(directory, requestURL, includeParent);
-
+    public static String directoryToHTML(final String directoryName, final Directory directory) {
         final StringBuilder builder = new StringBuilder();
 
         // Render the page header
@@ -76,16 +62,16 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         builder.append("<html>");
         builder.append("<head>");
         builder.append("<title>");
-        builder.append(directory.getName());
+        builder.append(directoryName);
         builder.append("</title>");
         builder.append("<style type=\"text/css\"><!--");
-        builder.append(DEFAULT_CSS);
+        builder.append(TomcatCSS.TOMCAT_CSS);
         builder.append("--></style> ");
         builder.append("</head>");
 
         // Body
         builder.append("<body>");
-        builder.append("<h1>").append(directory.getName()).append("</h1>");
+        builder.append("<h1>").append(directoryName).append("</h1>");
 
         builder.append("<HR size=\"1\" noshade=\"noshade\">");
 
@@ -105,24 +91,24 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         builder.append("</tr>");
 
         // Write parent if necessary
-        if (dir.getParent() != null) {
-            this.writeFileHtml(builder, false, dir.getParent(), true);
+        if (directory.getParent() != null) {
+            writeFileHtml(builder, false, directory.getParent(), true);
         }
 
         boolean shade = true;
 
         // Write directories
-        if (dir.getDirectories() != null) {
-            for (final Entry entry : dir.getDirectories()) {
-                this.writeFileHtml(builder, shade, entry, true);
+        if (directory.getDirectories() != null) {
+            for (final Entry entry : directory.getDirectories()) {
+                writeFileHtml(builder, shade, entry, true);
                 shade = !shade;
             }
         }
 
         // Write files
-        if (dir.getFiles() != null) {
-            for (final Entry entry : dir.getFiles()) {
-                this.writeFileHtml(builder, shade, entry, false);
+        if (directory.getFiles() != null) {
+            for (final Entry entry : directory.getFiles()) {
+                writeFileHtml(builder, shade, entry, false);
                 shade = !shade;
             }
         }
@@ -139,20 +125,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         return builder.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toJson(
-        @NotNull final File directory,
-        @URL final String requestURL,
-        final boolean includeParent
-    ) throws Exception {
-        final Directory dir = this.getDirectory(directory, requestURL, includeParent);
-        return GenieObjectMapper.getMapper().writeValueAsString(dir);
-    }
-
-    private void writeFileHtml(
+    private static void writeFileHtml(
         final StringBuilder builder,
         final boolean shade,
         final Entry entry,
@@ -179,6 +152,34 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
             .format(entry.getLastModified().atOffset(ZoneOffset.UTC));
         builder.append("<td align=\"right\"><tt>").append(lastModified).append("</tt></td>");
         builder.append("</tr>");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.apache.catalina.servlets.DefaultServlet
+     */
+    @Override
+    public String toHtml(
+        @NotNull final File directory,
+        @URL final String requestURL,
+        final boolean includeParent
+    ) throws IOException {
+        final Directory dir = this.getDirectory(directory, requestURL, includeParent);
+        return directoryToHTML(directory.getName(), dir);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toJson(
+        @NotNull final File directory,
+        @URL final String requestURL,
+        final boolean includeParent
+    ) throws Exception {
+        final Directory dir = this.getDirectory(directory, requestURL, includeParent);
+        return GenieObjectMapper.getMapper().writeValueAsString(dir);
     }
 
     protected Directory getDirectory(final File directory, final String requestUrl, final boolean includeParent) {
@@ -238,16 +239,28 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         return dir;
     }
 
+    /**
+     * DTO for representing a directory contents.
+     *
+     * @author tgianos
+     * @since 3.0.0
+     */
     @Data
-    static class Directory {
+    public static class Directory {
         private Entry parent;
         private List<Entry> directories;
         private List<Entry> files;
     }
 
+    /**
+     * DTO for representing information about an entry within a job directory.
+     *
+     * @author tgianos
+     * @since 3.0.0
+     */
     @Data
     @EqualsAndHashCode(exclude = {"lastModified"})
-    static class Entry {
+    public static class Entry {
         @NotBlank
         private String name;
         @URL

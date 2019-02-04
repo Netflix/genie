@@ -43,7 +43,7 @@ public class ControllerUtilsUnitTests {
     public void canGetRemainingPath() {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(null);
-        Assert.assertNull(ControllerUtils.getRemainingPath(request));
+        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is(""));
 
         Mockito
             .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))

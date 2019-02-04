@@ -46,6 +46,7 @@ import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
+import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
@@ -62,6 +63,7 @@ import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
+import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.JobSpecificationServiceImpl;
@@ -78,6 +80,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.retry.support.RetryTemplate;
 
 import javax.validation.constraints.NotEmpty;
@@ -469,8 +472,8 @@ public class GenieServicesAutoConfiguration {
     /**
      * Get a NOOP/fallback {@link AgentFilterService} instance if there isn't already one.
      *
-     * @see GenieAgentFilterAutoConfiguration
      * @return An {@link AgentFilterService} instance.
+     * @see GenieAgentFilterAutoConfiguration
      */
     @Bean
     @ConditionalOnMissingBean(AgentFilterService.class)
@@ -479,5 +482,25 @@ public class GenieServicesAutoConfiguration {
             InspectionReport.Decision.ACCEPT,
             "Accepted by default"
         );
+    }
+
+    /**
+     * Provide the default implementation of {@link JobDirectoryServerService} for serving job directory resources.
+     *
+     * @param resourceLoader        The application resource loader used to get references to resources
+     * @param jobPersistenceService The job persistence service used to get information about a job
+     * @param jobFileService        The service responsible for managing the job working directory on disk for V3 Jobs
+     * @param meterRegistry         The meter registry used to keep track of metrics
+     * @return An instance of {@link JobDirectoryServerServiceImpl}
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobDirectoryServerService.class)
+    public JobDirectoryServerService jobDirectoryServerService(
+        final ResourceLoader resourceLoader,
+        final JobPersistenceService jobPersistenceService,
+        final JobFileService jobFileService,
+        final MeterRegistry meterRegistry
+    ) {
+        return new JobDirectoryServerServiceImpl(resourceLoader, jobPersistenceService, jobFileService, meterRegistry);
     }
 }

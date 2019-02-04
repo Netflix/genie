@@ -36,6 +36,7 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -284,7 +285,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         this.checkJobStatus(documentationId, id);
         this.checkJob(documentationId, id, commandArgs, archiveJob);
-        this.checkJobOutput(documentationId, id);
+        if (archiveJob) {
+            this.checkJobOutput(documentationId, id);
+        }
         this.checkJobRequest(
             documentationId,
             id,
@@ -565,8 +568,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .contentType(Matchers.containsString(MediaType.TEXT_HTML_VALUE));
 
         // Check getting a file
-
-        // Check getting a directory as HTML
         final RestDocumentationFilter fileResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobOutput/file/",
             Snippets.ID_PATH_PARAM.and(
@@ -1169,6 +1170,31 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         this.waitForRunning(jobId);
 
+        // Make sure we can get output for a running job
+        RestAssured
+            .given(this.getRequestSpecification())
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", jobId, "")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("parent", Matchers.isEmptyOrNullString())
+            .body("directories[0].name", Matchers.is("genie/"))
+            .body("files[0].name", Matchers.is("run"))
+            .body("files[1].name", Matchers.is("stderr"))
+            .body("files[2].name", Matchers.is("stdout"));
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", jobId, "stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(ContentType.TEXT.toString()));
+
         // Let it run for a couple of seconds
         Thread.sleep(2000);
 
@@ -1347,7 +1373,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             Sets.newHashSet("bash")
         )
             .withCommandArgs(commandArgs)
-            .withDisableLogArchival(true)
             .build();
 
         final String jobId = this.getIdFromLocation(

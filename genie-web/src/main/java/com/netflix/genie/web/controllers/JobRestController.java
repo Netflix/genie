@@ -50,10 +50,10 @@ import com.netflix.genie.web.hateoas.resources.JobRequestResource;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.services.AgentRoutingService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
+import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import io.micrometer.core.instrument.Counter;
@@ -92,7 +92,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.ServletException;
@@ -102,6 +101,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Enumeration;
@@ -127,7 +128,6 @@ public class JobRestController {
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
     private static final String NAME_HEADER_COOKIE = "cookie";
     private static final String JOB_API_TEMPLATE = "/api/v3/jobs/{id}";
-    private static final String EMPTY_STRING = "";
     private static final String COMMA = ",";
 
     private final JobCoordinatorService jobCoordinatorService;
@@ -143,7 +143,7 @@ public class JobRestController {
     private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
     private final String hostname;
     private final RestTemplate restTemplate;
-    private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
+    private final JobDirectoryServerService jobDirectoryServerService;
     private final JobsProperties jobsProperties;
     private final AgentRoutingService agentRoutingService;
     private final JobPersistenceService jobPersistenceService;
@@ -168,8 +168,7 @@ public class JobRestController {
      * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
      * @param genieHostInfo                    Information about the host that the Genie process is running on
      * @param restTemplate                     The rest template for http requests
-     * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
-     *                                         Genie File System.
+     * @param jobDirectoryServerService        The service to handle serving back job directory resources
      * @param jobsProperties                   All the properties associated with jobs
      * @param registry                         The metrics registry to use
      * @param jobPersistenceService            Job persistence service
@@ -191,7 +190,7 @@ public class JobRestController {
         final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
         final GenieHostInfo genieHostInfo,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
-        final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
+        final JobDirectoryServerService jobDirectoryServerService,
         final JobsProperties jobsProperties,
         final MeterRegistry registry,
         final JobPersistenceService jobPersistenceService,
@@ -210,7 +209,7 @@ public class JobRestController {
         this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
         this.hostname = genieHostInfo.getHostname();
         this.restTemplate = restTemplate;
-        this.resourceHttpRequestHandler = resourceHttpRequestHandler;
+        this.jobDirectoryServerService = jobDirectoryServerService;
         this.jobsProperties = jobsProperties;
         this.agentRoutingService = agentRoutingService;
         this.jobPersistenceService = jobPersistenceService;
@@ -556,10 +555,10 @@ public class JobRestController {
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
         if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
-            String jobHostname = null;
+            final String jobHostname;
             try {
-                jobHostname = this.getJobOwnerHostname(id);
-            } catch (GenieJobNotFoundException e) {
+                jobHostname = this.getJobOwnerHostname(id, this.jobPersistenceService.isV4(id));
+            } catch (final GenieJobNotFoundException e) {
                 throw new GenieNotFoundException("Job " + id + " not found", e);
             }
 
@@ -720,18 +719,26 @@ public class JobRestController {
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
-        // TODO: V4 currently doesn't fully support logs so we need to handle these jobs specially in mixed environment
         final boolean isV4 = this.jobPersistenceService.isV4(id);
+        final JobStatus jobStatus = this.jobPersistenceService
+            .getJobStatus(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists."));
         final String path = ControllerUtils.getRemainingPath(request);
+        final URL baseUrl;
+        try {
+            baseUrl = forwardedFrom == null
+                ? new URL(ControllerUtils.getRequestRoot(request, path))
+                : new URL(ControllerUtils.getRequestRoot(forwardedFrom, path));
+        } catch (final MalformedURLException e) {
+            throw new GenieServerException("Unable to parse base request url", e);
+        }
 
         log.info("[getJobOutput] Called to get output path \"{}\" for job with id {}", path, id);
 
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
-        if (!isV4 && this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
-            // TODO: It's possible that could use the JobMonitorCoordinator to check this in memory
-            //       However that could get into problems where the job finished or died
-            //       and it would return false on check if the job with given id is running on that node
-            final String jobHostname = this.jobSearchService.getJobHost(id);
+        // if the job is finished all file serving is done from the archive it doesn't need to be forwarded anywhere
+        if (jobStatus.isActive() && this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
+            final String jobHostname = this.getJobOwnerHostname(id, isV4);
             if (!this.hostname.equals(jobHostname)) {
                 log.info("Job {} is not or was not run on this node. Forwarding to {}", id, jobHostname);
                 final String forwardHost = this.buildForwardHost(jobHostname);
@@ -749,7 +756,7 @@ public class JobRestController {
                             return null;
                         },
                         id,
-                        path == null ? EMPTY_STRING : path
+                        path
                     );
                 } catch (final HttpStatusCodeException e) {
                     log.error("Failed getting the remote job output from {}. Error: {}", forwardHost, e.getMessage());
@@ -764,30 +771,8 @@ public class JobRestController {
             }
         }
 
-        log.info("Job {} is running or was run on this node. Fetching requested resource \"{}\"", id, path);
-        if (StringUtils.isNotBlank(path)) {
-            request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);
-        } else {
-            request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
-        }
-        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, path);
-
-        // TODO: Remove this once V4 logging is fixed
-        if (isV4) {
-            // Replace with dummy V4 job id.
-            log.info(
-                "Requested output for V4 job {}. Currently unsupported. Replacing with dummy job {}",
-                id,
-                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID
-            );
-            request.setAttribute(
-                GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE,
-                GenieResourceHttpRequestHandler.V4_MOCK_JOB_ID
-            );
-        } else {
-            request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_ID_ATTRIBUTE, id);
-        }
-        this.resourceHttpRequestHandler.handleRequest(request, response);
+        log.debug("Fetching requested resource \"{}\"", id, path);
+        this.jobDirectoryServerService.serveResource(id, baseUrl, path, request, response);
     }
 
     private String buildForwardHost(final String jobHostname) {
@@ -855,14 +840,14 @@ public class JobRestController {
      *
      */
     private String getJobOwnerHostname(
-        @NotBlank(message = "No job id entered. Unable to find the job owner.") final String jobId
+        @NotBlank(message = "No job id entered. Unable to find the job owner.") final String jobId,
+        final boolean isV4
     ) throws GenieNotFoundException {
-        if (jobPersistenceService.isV4(jobId)) {
+        if (isV4) {
             return this.agentRoutingService
                 .getHostnameForAgentConnection(jobId)
-                .orElseThrow(() -> new GenieNotFoundException(
-                        "No hostname found for v4 job - " + jobId
-                    )
+                .orElseThrow(
+                    () -> new GenieNotFoundException("No hostname found for v4 job - " + jobId)
                 );
         } else {
             return this.jobSearchService.getJobHost(jobId);
