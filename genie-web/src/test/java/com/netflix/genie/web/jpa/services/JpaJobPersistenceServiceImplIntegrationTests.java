@@ -542,22 +542,20 @@ public class JpaJobPersistenceServiceImplIntegrationTests extends DBIntegrationT
 
     /**
      * Test {@link JpaJobPersistenceServiceImpl#getJobStatus(String)}.
+     *
+     * @throws GenieNotFoundException when the job doesn't exist but should
      */
     @Test
-    public void canGetJobStatus() {
-        Assert.assertFalse(this.jobPersistenceService.getJobStatus(UUID.randomUUID().toString()).isPresent());
-        Assert.assertThat(
-            this.jobPersistenceService.getJobStatus(JOB_1_ID).orElseThrow(IllegalStateException::new),
-            Matchers.is(JobStatus.SUCCEEDED)
-        );
-        Assert.assertThat(
-            this.jobPersistenceService.getJobStatus(JOB_2_ID).orElseThrow(IllegalStateException::new),
-            Matchers.is(JobStatus.RUNNING)
-        );
-        Assert.assertThat(
-            this.jobPersistenceService.getJobStatus(JOB_3_ID).orElseThrow(IllegalStateException::new),
-            Matchers.is(JobStatus.RUNNING)
-        );
+    public void canGetJobStatus() throws GenieNotFoundException {
+        try {
+            this.jobPersistenceService.getJobStatus(UUID.randomUUID().toString());
+            Assert.fail("Should have thrown GenieNotFoundException");
+        } catch (final GenieNotFoundException e) {
+            // expected
+        }
+        Assert.assertThat(this.jobPersistenceService.getJobStatus(JOB_1_ID), Matchers.is(JobStatus.SUCCEEDED));
+        Assert.assertThat(this.jobPersistenceService.getJobStatus(JOB_2_ID), Matchers.is(JobStatus.RUNNING));
+        Assert.assertThat(this.jobPersistenceService.getJobStatus(JOB_3_ID), Matchers.is(JobStatus.RUNNING));
     }
 
     /**

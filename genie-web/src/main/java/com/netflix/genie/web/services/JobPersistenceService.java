@@ -268,9 +268,12 @@ public interface JobPersistenceService {
      * Get the status for a job with the given {@code id}.
      *
      * @param id The id of the job to get status for
-     * @return The job status or {@link Optional#empty()} if no such job exists
+     * @return The job status
+     * @throws GenieNotFoundException If no job with the given {@code id} exists
      */
-    Optional<JobStatus> getJobStatus(@NotBlank(message = "Job id is missing and is required") String id);
+    JobStatus getJobStatus(
+        @NotBlank(message = "Job id is missing and is required") String id
+    ) throws GenieNotFoundException;
 
     /**
      * Get the location a job directory was archived to if at all.

@@ -154,12 +154,11 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     ) throws IOException, ServletException {
         // TODO: Metrics
         // Is the job running or not?
-        final Optional<JobStatus> jobStatusOptional = this.jobPersistenceService.getJobStatus(jobId);
         final JobStatus jobStatus;
-        if (jobStatusOptional.isPresent()) {
-            jobStatus = jobStatusOptional.get();
-        } else {
-            response.sendError(HttpStatus.NOT_FOUND.value());
+        try {
+            jobStatus = this.jobPersistenceService.getJobStatus(jobId);
+        } catch (final GenieNotFoundException e) {
+            response.sendError(HttpStatus.NOT_FOUND.value(), e.getMessage());
             return;
         }
 
