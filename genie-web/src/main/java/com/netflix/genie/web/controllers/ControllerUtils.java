@@ -24,6 +24,8 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Utility methods re-used in various controllers.
@@ -68,16 +70,22 @@ public final class ControllerUtils {
      * Generally the path will be derived from {@link #getRemainingPath(HttpServletRequest)} and this method will be
      * called subsequently.
      * <p>
-     * If the request URL is {@code https://myhost/api/v3/jobs/12345/output/genie/run} and the path is {@code genie/run}
-     * this method should return {@code https://myhost/api/v3/jobs/12345/output/}.
+     * If the request URL is {@code https://myhost/api/v3/jobs/12345/output/genie/run?myparam=4#BLAH} and the path is
+     * {@code genie/run} this method should return {@code https://myhost/api/v3/jobs/12345/output/}.
+     * <p>
+     * All query parameters and references will be stripped off.
      *
      * @param request The HTTP request to get information from
      * @param path    The path that should be removed from the end of the request URL
      * @return The base of the request
+     * @throws MalformedURLException if for some reason the URL provided in {@code request} is invalid
      * @since 4.0.0
      */
-    static String getRequestRoot(final HttpServletRequest request, @Nullable final String path) {
-        return getRequestRoot(request.getRequestURL().toString(), path);
+    static URL getRequestRoot(
+        final HttpServletRequest request,
+        @Nullable final String path
+    ) throws MalformedURLException {
+        return getRequestRoot(new URL(request.getRequestURL().toString()), path);
     }
 
     /**
@@ -85,15 +93,20 @@ public final class ControllerUtils {
      * Generally the path will be derived from {@link #getRemainingPath(HttpServletRequest)} and this method will be
      * called subsequently.
      * <p>
-     * If the request URL is {@code https://myhost/api/v3/jobs/12345/output/genie/run} and the path is {@code genie/run}
-     * this method should return {@code https://myhost/api/v3/jobs/12345/output/}.
+     * If the request URL is {@code https://myhost/api/v3/jobs/12345/output/genie/run?myparam=4#BLAH} and the path is
+     * {@code genie/run} this method should return {@code https://myhost/api/v3/jobs/12345/output/}.
+     * <p>
+     * All query parameters and references will be stripped off.
      *
      * @param request The HTTP request to get information from
      * @param path    The path that should be removed from the end of the request URL
      * @return The base of the request
+     * @throws MalformedURLException If we're unable to create a new valid URL after removing the path
      * @since 4.0.0
      */
-    static String getRequestRoot(final String request, @Nullable final String path) {
-        return StringUtils.removeEnd(request, path);
+    static URL getRequestRoot(final URL request, @Nullable final String path) throws MalformedURLException {
+        final String currentPath = request.getPath();
+        final String newPath = StringUtils.removeEnd(currentPath, path);
+        return new URL(request.getProtocol(), request.getHost(), request.getPort(), newPath);
     }
 }
