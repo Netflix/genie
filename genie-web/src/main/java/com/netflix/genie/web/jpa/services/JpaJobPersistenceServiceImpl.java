@@ -604,11 +604,13 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<JobStatus> getJobStatus(@NotBlank(message = "Job id is missing and is required") final String id) {
-        // TODO: Need to decide on consistency of API. Do we throw exception? Return Optional? Runtime or Checked?
-        //       getJobArchiveLocation throws exception cause the underlying return type is already optional. So
-        //       do we return Optional<Optional<String>> that's really weird
-        return this.jobRepository.findByUniqueId(id, JobStatusProjection.class).map(JobStatusProjection::getStatus);
+    public JobStatus getJobStatus(
+        @NotBlank(message = "Job id is missing and is required") final String id
+    ) throws GenieNotFoundException {
+        return this.jobRepository
+            .findByUniqueId(id, JobStatusProjection.class)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists. Unable to get status."))
+            .getStatus();
     }
 
     /**

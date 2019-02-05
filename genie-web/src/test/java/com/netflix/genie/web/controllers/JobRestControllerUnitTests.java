@@ -545,7 +545,7 @@ public class JobRestControllerUnitTests {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(Optional.of(JobStatus.RUNNING));
+        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
@@ -586,7 +586,7 @@ public class JobRestControllerUnitTests {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(Optional.of(JobStatus.RUNNING));
+        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
@@ -632,7 +632,7 @@ public class JobRestControllerUnitTests {
             );
 
         Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(this.hostname);
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(Optional.of(JobStatus.RUNNING));
+        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
@@ -686,7 +686,7 @@ public class JobRestControllerUnitTests {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(Optional.of(JobStatus.RUNNING));
+        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         final String jobHostName = UUID.randomUUID().toString();
         Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(jobHostName);
@@ -765,7 +765,7 @@ public class JobRestControllerUnitTests {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(Optional.of(JobStatus.RUNNING));
+        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         final String jobHostName = UUID.randomUUID().toString();
         Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(jobHostName);

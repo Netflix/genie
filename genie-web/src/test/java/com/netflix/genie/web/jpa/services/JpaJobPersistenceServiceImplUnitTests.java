@@ -941,9 +941,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
 
     /**
      * Test {@link JpaJobPersistenceServiceImpl#getJobStatus(String)}.
+     *
+     * @throws GenieNotFoundException if the job doesn't exist
      */
     @Test
-    public void testGetJobStatus() {
+    public void testGetJobStatus() throws GenieNotFoundException {
         final String id = UUID.randomUUID().toString();
         final JobStatus status = JobStatus.RUNNING;
 
@@ -951,10 +953,12 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .when(this.jobRepository.findByUniqueId(id, JobStatusProjection.class))
             .thenReturn(Optional.empty())
             .thenReturn(Optional.of(() -> status));
-        Assert.assertFalse(this.jobPersistenceService.getJobStatus(id).isPresent());
-        Assert.assertThat(
-            this.jobPersistenceService.getJobStatus(id).orElseThrow(IllegalArgumentException::new),
-            Matchers.is(status)
-        );
+        try {
+            this.jobPersistenceService.getJobStatus(id);
+            Assert.fail("Should have thrown GenieNotFoundException");
+        } catch (final GenieNotFoundException e) {
+            // expected
+        }
+        Assert.assertThat(this.jobPersistenceService.getJobStatus(id), Matchers.is(status));
     }
 }

@@ -720,9 +720,7 @@ public class JobRestController {
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
         final boolean isV4 = this.jobPersistenceService.isV4(id);
-        final JobStatus jobStatus = this.jobPersistenceService
-            .getJobStatus(id)
-            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists."));
+        final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(id);
         final String path = ControllerUtils.getRemainingPath(request);
         final URL baseUrl;
         try {
