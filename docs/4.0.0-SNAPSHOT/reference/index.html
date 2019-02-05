@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-01-30</span>
+<span id="revdate">2019-06-25</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1413,14 +1413,14 @@ drop them yourself if they&#8217;re no longer needed.
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot to 2.1.2.RELEASE</p>
+<p>Upgrade Spring Boot to 2.1.4.RELEASE</p>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Greenwich.RELEASE for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Greenwich.SR1 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Greenwich.RELEASE/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR1/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1713,7 +1713,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -4556,7 +4556,7 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
@@ -4584,7 +4584,7 @@ Genie and it may be more overhead than you&#8217;re comfortable with.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/">Spring Boot</a>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/htmlsingle/">Spring Boot</a>
 docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -4592,7 +4592,7 @@ docs as they will go in depth on how to configure the various Spring components 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+<a href="http://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
 default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
 will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
 profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
@@ -4846,8 +4846,8 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Greenwich.RELEASE/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
+and the <a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR1/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -5318,10 +5318,28 @@ determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable the task that detects jobs whose agent has gone AWOL, and marks them failed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.refreshInterval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How often the AWOL agent tasks executed, in milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.timeLimit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How long of a leeway to give a job after it agent disconnected and before the job is marked failed, in milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">120000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.healthIndicatorsToIgnore</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">memory,genieMemory,discoveryComposite</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genieMemory,mail,genieAgent</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5440,6 +5458,18 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.user-metrics.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to publish user-tagged metrics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.user-metrics.refresh-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Publish/refresh interval in milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.leader.path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie leadership election of a given cluster</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/leader/</p></td>
@@ -5457,7 +5487,7 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">9.1.2. Spring Properties</a></h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -5644,7 +5674,7 @@ returned</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
 </tr>
@@ -5856,6 +5886,13 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connected.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of agents connected to the server</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentMetricsServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken initialize the job environment (working directory, script) and fork the children</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
@@ -6029,6 +6066,27 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>LocalJobRunner</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.rejected.jobs-limit.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>user, jobsUserLimit</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.agentDisconnected.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current number of agent jobs whose agent is not connected to any node.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentJobCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.agentDisconnected.terminated.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counter of jobs terminated because the agent disappeared for too long</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentJobCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.files.s3.download.timer</code></p></td>
@@ -6220,25 +6278,39 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.errorCounts.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Genie nodes that the current leader failed is presently failing to contact</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.unhealtyHosts.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Genie nodes that the leader has currently marked unhealthy</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">Current amount</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.lostJobs.rate</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.unreachableHost.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time the leader failed to retrieve health status of a remote node (example: socket timeout).</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>host</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.failedHealthcheck.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time the leader retrieved health status of a remote node and one of the (non-ignored) indicators had a status different than UP</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>host, healthIndicator, healthStatus</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.invalidResponse.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time the leader retrieved health status of a remote node and failed to parse the response</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>host</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.jobsMarkedFailed.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.unableToUpdateJob.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of time an exception was raised while trying to update the database status of a lost job</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ClusterCheckerTask</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, host, exceptionClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedClusters.gauge</code></p></td>
@@ -6387,6 +6459,27 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentJobServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, agentVersion, agentHost, handshakeDecision</code></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.user.active-jobs.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of active jobs tagged with owner user.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>UserMetricsTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.user.active-memory.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amount of memory used by active jobs tagged with owner user.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Megabytes</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>UserMetricsTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.user.active-users.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of distinct users with at least one job in RUNNING state.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>UserMetricsTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -6398,7 +6491,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-01-30 22:05:04 UTC
+Last updated 2019-06-25 16:26:44 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
