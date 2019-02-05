@@ -725,8 +725,8 @@ public class JobRestController {
         final URL baseUrl;
         try {
             baseUrl = forwardedFrom == null
-                ? new URL(ControllerUtils.getRequestRoot(request, path))
-                : new URL(ControllerUtils.getRequestRoot(forwardedFrom, path));
+                ? ControllerUtils.getRequestRoot(request, path)
+                : ControllerUtils.getRequestRoot(new URL(forwardedFrom), path);
         } catch (final MalformedURLException e) {
             throw new GenieServerException("Unable to parse base request url", e);
         }

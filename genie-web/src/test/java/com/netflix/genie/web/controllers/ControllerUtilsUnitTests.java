@@ -26,6 +26,9 @@ import org.mockito.Mockito;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.UUID;
 
 /**
  * Unit tests for the ControllerUtils class.
@@ -80,22 +83,35 @@ public class ControllerUtilsUnitTests {
 
     /**
      * Test {@link ControllerUtils#getRequestRoot(HttpServletRequest, String)}.
+     *
+     * @throws MalformedURLException shouldn't happen
      */
     @Test
-    public void canGetRequestRoot() {
+    public void canGetRequestRoot() throws MalformedURLException {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        final String requestURL = "https://genie.com/api/v3/jobs/1234/output/genie/genie.done";
-        final StringBuffer buffer = new StringBuffer(requestURL);
+        final URL requestURL = new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done?query=hi#DIV");
+        final StringBuffer buffer = new StringBuffer(requestURL.toString());
         Mockito.when(request.getRequestURL()).thenReturn(buffer);
 
-        Assert.assertThat(ControllerUtils.getRequestRoot(request, ""), Matchers.is(requestURL));
+        Assert.assertThat(
+            ControllerUtils.getRequestRoot(request, ""),
+            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"))
+        );
+        Assert.assertThat(
+            ControllerUtils.getRequestRoot(request, null),
+            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"))
+        );
+        Assert.assertThat(
+            ControllerUtils.getRequestRoot(request, UUID.randomUUID().toString()),
+            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"))
+        );
         Assert.assertThat(
             ControllerUtils.getRequestRoot(request, ".done"),
-            Matchers.is("https://genie.com/api/v3/jobs/1234/output/genie/genie")
+            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie"))
         );
         Assert.assertThat(
             ControllerUtils.getRequestRoot(request, "genie/genie.done"),
-            Matchers.is("https://genie.com/api/v3/jobs/1234/output/")
+            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/"))
         );
     }
 }
