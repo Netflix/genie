@@ -8,12 +8,14 @@ option java_multiple_files = true;
 option java_package = "com.netflix.genie.proto";
 option java_outer_classname = "GenieProto";
 
-// The Ping service definition.
+//--------------------------------------------------------------------
+// Ping Service
+//
+// This service provides a simple ping-pong protocol between a client
+// and a server, it can be used to test connectivity.
+//--------------------------------------------------------------------
 service PingService {
-
-    // Sends a greeting
-    rpc ping (PingRequest) returns (PongResponse) {
-    }
+    rpc ping (PingRequest) returns (PongResponse);
 }
 
 // The Ping request with client metadata.
@@ -31,7 +33,14 @@ message PongResponse {
     map<string, string> server_metadata = 3;
 }
 
+//--------------------------------------------------------------------
 // Job Service
+//
+// This service handles all functional protocols between agent and
+// server required to successfully execute a job. From reserving an ID
+// to resolving and retrieving a job specification, to job state
+// updates.
+//--------------------------------------------------------------------
 service JobService {
     rpc handshake (HandshakeRequest) returns (HandshakeResponse);
     rpc reserveJobId (ReserveJobIdRequest) returns (ReserveJobIdResponse);
