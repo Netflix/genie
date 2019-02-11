@@ -38,7 +38,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
     JobKillRegistrationRequest request
     JobKillRegistrationResponse response
     JobSearchService jobSearchService = Mock()
-    StreamObserver<SyncResponse> responseObserver = Mock()
+    StreamObserver<JobKillRegistrationResponse> responseObserver = Mock()
 
     void setup() {
         jobId = UUID.randomUUID().toString()
