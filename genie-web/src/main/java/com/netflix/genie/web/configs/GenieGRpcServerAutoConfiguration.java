@@ -18,7 +18,6 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.web.properties.GRpcServerProperties;
-import com.netflix.genie.web.properties.JobFileSyncRpcProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -40,7 +39,6 @@ import javax.annotation.PostConstruct;
 @EnableConfigurationProperties(
     {
         GRpcServerProperties.class,
-        JobFileSyncRpcProperties.class
     }
 )
 @Slf4j
