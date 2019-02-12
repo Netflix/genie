@@ -27,7 +27,7 @@ import com.netflix.genie.web.events.KillJobEvent;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
-import com.netflix.genie.web.util.ExponentialBackOffTrigger;
+import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import com.netflix.genie.web.util.ProcessChecker;
 import com.netflix.genie.web.util.UnixProcessChecker;
 import io.micrometer.core.instrument.Counter;

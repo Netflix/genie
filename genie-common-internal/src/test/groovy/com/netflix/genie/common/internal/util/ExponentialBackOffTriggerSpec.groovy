@@ -16,8 +16,9 @@
  *
  */
 
-package com.netflix.genie.web.util
+package com.netflix.genie.common.internal.util
 
+import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import org.springframework.scheduling.TriggerContext
@@ -29,8 +30,8 @@ class ExponentialBackOffTriggerSpec extends Specification {
 
     @Unroll
     def "NextExecutionTime with type #delayType"(
-            ExponentialBackOffTrigger.DelayType delayType,
-            long[] nextExpectedExecutions
+        ExponentialBackOffTrigger.DelayType delayType,
+        long[] nextExpectedExecutions
     ) {
         setup:
         long min = 1L
