@@ -80,7 +80,8 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     @Parameter(
         names = {"--clusterCriterion"},
         description = "Criterion for cluster selection, can be repeated (see CRITERION SYNTAX)",
-        converter = ArgumentConverters.CriterionConverter.class
+        converter = ArgumentConverters.CriterionConverter.class,
+        splitter = NoopParameterSplitter.class
     )
     private List<Criterion> clusterCriteria = Lists.newArrayList();
 
@@ -136,7 +137,8 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
 
     @Parameter(
         names = {"--jobTag"},
-        description = "Job tag, can be repeated"
+        description = "Job tag, can be repeated",
+        splitter = NoopParameterSplitter.class
     )
     private Set<String> jobTags = Sets.newHashSet();
 
