@@ -87,7 +87,9 @@ export default class Job extends Page {
       { label: "Cluster Name", name: "clusterName", value: "", type: "input" },
       { label: "Cluster ID", name: "clusterId", value: "", type: "input" },
       { label: "Command Name", name: "commandName", value: "", type: "input" },
-      { label: "Command ID", name: "commandId", value: "", type: "input" }
+      { label: "Command ID", name: "commandId", value: "", type: "input" },
+      { label: "Grouping", name: "grouping", value: "", type: "input" },
+      { label: "Grouping Instance", name: "groupingInstance", value: "", type: "input" },
     ];
   }
 
