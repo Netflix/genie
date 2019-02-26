@@ -35,7 +35,7 @@ import java.util.Map;
 public interface TokenService {
 
     /**
-     * A method to retrive oauth tokens from the server.
+     * A method to retrieve oauth tokens from the server.
      *
      * @param params A map of all the fields needed to fetch credentials.
      * @param url    The URL of the IDP from where to get the credentials.

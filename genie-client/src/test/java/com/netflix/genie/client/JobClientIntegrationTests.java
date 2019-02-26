@@ -40,6 +40,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
+import retrofit2.Retrofit;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -90,8 +91,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
     @Before
     public void setup() throws Exception {
         this.resourceLoader = new DefaultResourceLoader();
-        clusterClient = new ClusterClient(getBaseUrl(), null, null);
-        commandClient = new CommandClient(getBaseUrl(), null, null);
+        final Retrofit retrofit = GenieClientUtils.createRetrofitInstance(getBaseUrl(), null, null);
+        clusterClient = new ClusterClient(retrofit);
+        commandClient = new CommandClient(retrofit);
         //applicationClient = new ApplicationClient(getBaseUrl());
         final GenieNetworkConfiguration genieNetworkConfiguration = new GenieNetworkConfiguration();
         genieNetworkConfiguration.setReadTimeout(20000);

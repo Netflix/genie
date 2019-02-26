@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-
 /**
  * Integration Tests for Cluster Client.
  *
@@ -95,8 +94,8 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(cluster.getDescription(), cstr.getDescription());
         Assert.assertEquals(cluster.getConfigs(), cstr.getConfigs());
         Assert.assertEquals(cluster.getSetupFile(), cstr.getSetupFile());
-        Assert.assertEquals(cstr.getTags().contains("foo"), true);
-        Assert.assertEquals(cstr.getTags().contains("bar"), true);
+        Assert.assertTrue(cstr.getTags().contains("foo"));
+        Assert.assertTrue(cstr.getTags().contains("bar"));
         Assert.assertEquals(cluster.getStatus(), cstr.getStatus());
     }
 
@@ -267,7 +266,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertFalse(cluster4.getSetupFile().isPresent());
         Assert.assertFalse(cluster4.getDescription().isPresent());
         Assert.assertEquals(Collections.emptySet(), cluster4.getConfigs());
-        Assert.assertEquals(cluster4.getTags().contains("foo"), false);
+        Assert.assertFalse(cluster4.getTags().contains("foo"));
     }
 
     /**
@@ -294,8 +293,8 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         // Test getTags for cluster
         Set<String> tags = clusterClient.getTagsForCluster("cluster1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
 
         // Test adding a tag for cluster
         final Set<String> moreTags = Sets.newHashSet("pi");
@@ -303,23 +302,23 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         clusterClient.addTagsToCluster("cluster1", moreTags);
         tags = clusterClient.getTagsForCluster("cluster1");
         Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
-        Assert.assertEquals(tags.contains("pi"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
+        Assert.assertTrue(tags.contains("pi"));
 
         // Test removing a tag for cluster
         clusterClient.removeTagFromCluster("cluster1", "bar");
         tags = clusterClient.getTagsForCluster("cluster1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("pi"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("pi"));
 
         // Test update tags for a cluster
         clusterClient.updateTagsForCluster("cluster1", initialTags);
         tags = clusterClient.getTagsForCluster("cluster1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
 
         // Test delete all tags in a cluster
         clusterClient.removeAllTagsForCluster("cluster1");
@@ -349,8 +348,8 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         // Test getConfigs for cluster
         Set<String> configs = clusterClient.getConfigsForCluster("cluster1");
         Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
 
         // Test adding a config for cluster
         final Set<String> moreConfigs = Sets.newHashSet("pi");
@@ -358,16 +357,16 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         clusterClient.addConfigsToCluster("cluster1", moreConfigs);
         configs = clusterClient.getConfigsForCluster("cluster1");
         Assert.assertEquals(3, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
-        Assert.assertEquals(configs.contains("pi"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
+        Assert.assertTrue(configs.contains("pi"));
 
         // Test update configs for a cluster
         clusterClient.updateConfigsForCluster("cluster1", initialConfigs);
         configs = clusterClient.getConfigsForCluster("cluster1");
         Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
 
         // Test delete all configs in a cluster
         clusterClient.removeAllConfigsForCluster("cluster1");
@@ -397,8 +396,8 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         // Test getDependencies for cluster
         Set<String> dependencies = clusterClient.getDependenciesForCluster("cluster1");
         Assert.assertEquals(2, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
 
         // Test adding a dependency for cluster
         final Set<String> moreDependencies = Sets.newHashSet("pi");
@@ -406,16 +405,16 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         clusterClient.addDependenciesToCluster("cluster1", moreDependencies);
         dependencies = clusterClient.getDependenciesForCluster("cluster1");
         Assert.assertEquals(3, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
-        Assert.assertEquals(dependencies.contains("pi"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
+        Assert.assertTrue(dependencies.contains("pi"));
 
         // Test update dependencies for a cluster
         clusterClient.updateDependenciesForCluster("cluster1", initialDependencies);
         dependencies = clusterClient.getDependenciesForCluster("cluster1");
         Assert.assertEquals(2, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
 
         // Test delete all dependencies in a cluster
         clusterClient.removeAllDependenciesForCluster("cluster1");
