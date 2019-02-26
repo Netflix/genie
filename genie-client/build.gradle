@@ -1,29 +1,28 @@
+apply plugin: "java-library"
+
 dependencies {
     /*******************************
-     * Compile Dependencies
+     * API Dependencies
      *******************************/
 
-    compile project(":genie-common")
-    compile project(":genie-common-external")
+    api project(":genie-common")
+    api project(":genie-common-external")
 
-    compile("commons-beanutils:commons-beanutils")
-    compile("com.squareup.okhttp3:okhttp")
-    compile("com.squareup.retrofit2:retrofit")
-    compile("com.squareup.retrofit2:converter-jackson")
-    compile("org.apache.commons:commons-configuration2")
+    api("com.github.fge:json-patch")
+    api("com.squareup.okhttp3:okhttp")
+    api("com.squareup.retrofit2:retrofit")
 
-    // Logging
-    compile("org.slf4j:slf4j-api")
+    /*******************************
+     * Implementation Dependencies
+     *******************************/
 
-    // JSON Patch Support
-    compile("com.github.fge:json-patch")
+    implementation("commons-beanutils:commons-beanutils")
+    implementation("com.squareup.retrofit2:converter-jackson")
+    implementation("org.apache.commons:commons-configuration2")
+    implementation("org.slf4j:slf4j-api")
 
     /*******************************
      * Provided Dependencies
-     *******************************/
-
-    /*******************************
-     * Runtime Dependencies
      *******************************/
 
     /*******************************

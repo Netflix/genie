@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -27,9 +27,11 @@ import com.netflix.genie.common.dto.Command;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import org.apache.commons.lang3.StringUtils;
+import retrofit2.Retrofit;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +44,18 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Slf4j
-public class ApplicationClient extends BaseGenieClient {
+public class ApplicationClient {
 
     private ApplicationService applicationService;
+
+    /**
+     * Constructor.
+     *
+     * @param retrofit The configured {@link Retrofit} client to a Genie server
+     */
+    public ApplicationClient(@NotNull final Retrofit retrofit) {
+        this.applicationService = retrofit.create(ApplicationService.class);
+    }
 
     /**
      * Constructor.
@@ -53,20 +64,21 @@ public class ApplicationClient extends BaseGenieClient {
      * @param interceptors              Any interceptors to configure the client with, can include security ones
      * @param genieNetworkConfiguration The network configuration parameters. Could be null
      * @throws GenieClientException On error
+     * @deprecated Use {@link #ApplicationClient(Retrofit)}
      */
+    @Deprecated
     public ApplicationClient(
         @NotEmpty final String url,
         @Nullable final List<Interceptor> interceptors,
         @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
     ) throws GenieClientException {
-        super(url, interceptors, genieNetworkConfiguration);
-        this.applicationService = this.getService(ApplicationService.class);
+        this(GenieClientUtils.createRetrofitInstance(url, interceptors, genieNetworkConfiguration));
     }
 
     /* CRUD Methods */
 
     /**
-     * Create a application ing genie.
+     * Create an application in genie.
      *
      * @param application A application object.
      * @return The id of the application created.
@@ -77,7 +89,17 @@ public class ApplicationClient extends BaseGenieClient {
         if (application == null) {
             throw new IllegalArgumentException("Application cannot be null.");
         }
-        return getIdFromLocation(applicationService.createApplication(application).execute().headers().get("location"));
+        final String locationHeader = this.applicationService
+            .createApplication(application)
+            .execute()
+            .headers()
+            .get(GenieClientUtils.LOCATION_HEADER);
+
+        if (StringUtils.isBlank(locationHeader)) {
+            throw new GenieClientException("No location header. Unable to get ID");
+        }
+
+        return GenieClientUtils.getIdFromLocation(locationHeader);
     }
 
     /**
@@ -121,7 +143,7 @@ public class ApplicationClient extends BaseGenieClient {
             .get("_embedded");
         if (jNode != null) {
             for (final JsonNode objNode : jNode.get("applicationList")) {
-                final Application application = this.treeToValue(objNode, Application.class);
+                final Application application = GenieClientUtils.treeToValue(objNode, Application.class);
                 applicationList.add(application);
             }
         }

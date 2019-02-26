@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-
 /**
  * Integration Tests for Command Client.
  *
@@ -99,8 +98,8 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(command.getDescription(), cmd.getDescription());
         Assert.assertEquals(command.getConfigs(), cmd.getConfigs());
         Assert.assertEquals(command.getSetupFile(), cmd.getSetupFile());
-        Assert.assertEquals(cmd.getTags().contains("foo"), true);
-        Assert.assertEquals(cmd.getTags().contains("bar"), true);
+        Assert.assertTrue(cmd.getTags().contains("foo"));
+        Assert.assertTrue(cmd.getTags().contains("bar"));
         Assert.assertEquals(command.getStatus(), cmd.getStatus());
     }
 
@@ -278,7 +277,7 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertFalse(command4.getSetupFile().isPresent());
         Assert.assertFalse(command4.getDescription().isPresent());
         Assert.assertEquals(Collections.emptySet(), command4.getConfigs());
-        Assert.assertEquals(command4.getTags().contains("foo"), false);
+        Assert.assertFalse(command4.getTags().contains("foo"));
     }
 
     /**
@@ -305,8 +304,8 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         // Test getTags for command
         Set<String> tags = commandClient.getTagsForCommand("command1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
 
         // Test adding a tag for command
         final Set<String> moreTags = Sets.newHashSet("pi");
@@ -314,23 +313,23 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         commandClient.addTagsToCommand("command1", moreTags);
         tags = commandClient.getTagsForCommand("command1");
         Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
-        Assert.assertEquals(tags.contains("pi"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
+        Assert.assertTrue(tags.contains("pi"));
 
         // Test removing a tag for command
         commandClient.removeTagFromCommand("command1", "bar");
         tags = commandClient.getTagsForCommand("command1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("pi"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("pi"));
 
         // Test update tags for a command
         commandClient.updateTagsForCommand("command1", initialTags);
         tags = commandClient.getTagsForCommand("command1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
 
         // Test delete all tags in a command
         commandClient.removeAllTagsForCommand("command1");
@@ -360,8 +359,8 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         // Test getConfigs for command
         Set<String> configs = commandClient.getConfigsForCommand("command1");
         Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
 
         // Test adding a config for command
         final Set<String> moreConfigs = Sets.newHashSet("pi");
@@ -369,16 +368,16 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         commandClient.addConfigsToCommand("command1", moreConfigs);
         configs = commandClient.getConfigsForCommand("command1");
         Assert.assertEquals(3, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
-        Assert.assertEquals(configs.contains("pi"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
+        Assert.assertTrue(configs.contains("pi"));
 
         // Test update configs for a command
         commandClient.updateConfigsForCommand("command1", initialConfigs);
         configs = commandClient.getConfigsForCommand("command1");
         Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
 
         // Test delete all configs in a command
         commandClient.removeAllConfigsForCommand("command1");
@@ -408,8 +407,8 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         // Test getDependencies for command
         Set<String> dependencies = commandClient.getDependenciesForCommand("command1");
         Assert.assertEquals(2, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
 
         // Test adding a dependency for command
         final Set<String> moreDependencies = Sets.newHashSet("pi");
@@ -417,16 +416,16 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         commandClient.addDependenciesToCommand("command1", moreDependencies);
         dependencies = commandClient.getDependenciesForCommand("command1");
         Assert.assertEquals(3, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
-        Assert.assertEquals(dependencies.contains("pi"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
+        Assert.assertTrue(dependencies.contains("pi"));
 
         // Test update dependencies for a command
         commandClient.updateDependenciesForCommand("command1", initialDependencies);
         dependencies = commandClient.getDependenciesForCommand("command1");
         Assert.assertEquals(2, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
 
         // Test delete all dependencies in a command
         commandClient.removeAllDependenciesForCommand("command1");

@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-
 /**
  * Integration Tests for Application Client.
  *
@@ -93,8 +92,8 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         Assert.assertEquals(application.getDescription(), cmd.getDescription());
         Assert.assertEquals(application.getConfigs(), cmd.getConfigs());
         Assert.assertEquals(application.getSetupFile(), cmd.getSetupFile());
-        Assert.assertEquals(cmd.getTags().contains("foo"), true);
-        Assert.assertEquals(cmd.getTags().contains("bar"), true);
+        Assert.assertTrue(cmd.getTags().contains("foo"));
+        Assert.assertTrue(cmd.getTags().contains("bar"));
         Assert.assertEquals(application.getStatus(), cmd.getStatus());
     }
 
@@ -277,7 +276,7 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         Assert.assertFalse(application4.getSetupFile().isPresent());
         Assert.assertFalse(application4.getDescription().isPresent());
         Assert.assertEquals(Collections.emptySet(), application4.getConfigs());
-        Assert.assertEquals(application4.getTags().contains("foo"), false);
+        Assert.assertFalse(application4.getTags().contains("foo"));
     }
 
     /**
@@ -304,8 +303,8 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         // Test getTags for application
         Set<String> tags = applicationClient.getTagsForApplication("application1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
 
         // Test adding a tag for application
         final Set<String> moreTags = Sets.newHashSet("pi");
@@ -313,23 +312,23 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         applicationClient.addTagsToApplication("application1", moreTags);
         tags = applicationClient.getTagsForApplication("application1");
         Assert.assertEquals(5, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
-        Assert.assertEquals(tags.contains("pi"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
+        Assert.assertTrue(tags.contains("pi"));
 
         // Test removing a tag for application
         applicationClient.removeTagFromApplication("application1", "bar");
         tags = applicationClient.getTagsForApplication("application1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("pi"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("pi"));
 
         // Test update tags for a application
         applicationClient.updateTagsForApplication("application1", initialTags);
         tags = applicationClient.getTagsForApplication("application1");
         Assert.assertEquals(4, tags.size());
-        Assert.assertEquals(tags.contains("foo"), true);
-        Assert.assertEquals(tags.contains("bar"), true);
+        Assert.assertTrue(tags.contains("foo"));
+        Assert.assertTrue(tags.contains("bar"));
 
         // Test delete all tags in a application
         applicationClient.removeAllTagsForApplication("application1");
@@ -359,8 +358,8 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         // Test getConfigs for application
         Set<String> configs = applicationClient.getConfigsForApplication("application1");
         Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
 
         // Test adding a config for application
         final Set<String> moreConfigs = Sets.newHashSet("pi");
@@ -368,16 +367,16 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         applicationClient.addConfigsToApplication("application1", moreConfigs);
         configs = applicationClient.getConfigsForApplication("application1");
         Assert.assertEquals(3, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
-        Assert.assertEquals(configs.contains("pi"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
+        Assert.assertTrue(configs.contains("pi"));
 
         // Test update configs for a application
         applicationClient.updateConfigsForApplication("application1", initialConfigs);
         configs = applicationClient.getConfigsForApplication("application1");
         Assert.assertEquals(2, configs.size());
-        Assert.assertEquals(configs.contains("foo"), true);
-        Assert.assertEquals(configs.contains("bar"), true);
+        Assert.assertTrue(configs.contains("foo"));
+        Assert.assertTrue(configs.contains("bar"));
 
         // Test delete all configs in a application
         applicationClient.removeAllConfigsForApplication("application1");
@@ -407,8 +406,8 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         // Test getDependencies for application
         Set<String> dependencies = applicationClient.getDependenciesForApplication("application1");
         Assert.assertEquals(2, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
 
         // Test adding a dependency for application
         final Set<String> moreDependencies = Sets.newHashSet("pi");
@@ -416,16 +415,16 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         applicationClient.addDependenciesToApplication("application1", moreDependencies);
         dependencies = applicationClient.getDependenciesForApplication("application1");
         Assert.assertEquals(3, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
-        Assert.assertEquals(dependencies.contains("pi"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
+        Assert.assertTrue(dependencies.contains("pi"));
 
         // Test update dependencies for a application
         applicationClient.updateDependenciesForApplication("application1", initialDependencies);
         dependencies = applicationClient.getDependenciesForApplication("application1");
         Assert.assertEquals(2, dependencies.size());
-        Assert.assertEquals(dependencies.contains("foo"), true);
-        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertTrue(dependencies.contains("foo"));
+        Assert.assertTrue(dependencies.contains("bar"));
 
         // Test delete all dependencies in a application
         applicationClient.removeAllDependenciesForApplication("application1");

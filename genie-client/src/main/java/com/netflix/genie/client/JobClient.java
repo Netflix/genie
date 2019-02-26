@@ -39,10 +39,11 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import org.apache.commons.lang3.StringUtils;
-import retrofit2.Response;
+import retrofit2.Retrofit;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ import java.util.Set;
  * @author amsharma
  * @since 3.0.0
  */
-public class JobClient extends BaseGenieClient {
+public class JobClient {
 
     private static final String STATUS = "status";
     private static final String ATTACHMENT = "attachment";
@@ -68,21 +69,35 @@ public class JobClient extends BaseGenieClient {
     /**
      * Constructor.
      *
+     * @param retrofit         The configured {@link Retrofit} client to a Genie server
+     * @param maxStatusRetries The maximum number of retries to check for job status
+     */
+    public JobClient(@NotNull final Retrofit retrofit, final int maxStatusRetries) {
+        this.jobService = retrofit.create(JobService.class);
+        this.maxStatusRetries = maxStatusRetries;
+    }
+
+    /**
+     * Constructor.
+     *
      * @param url                       The endpoint URL of the Genie API. Not null or empty
      * @param interceptors              Any interceptors to configure the client with, can include security ones
      * @param genieNetworkConfiguration The network configuration parameters. Could be null
      * @throws GenieClientException On error
+     * @deprecated Use {@link #JobClient(Retrofit, int)}
      */
+    @Deprecated
     public JobClient(
         @NotEmpty final String url,
         @Nullable final List<Interceptor> interceptors,
         @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
     ) throws GenieClientException {
-        super(url, interceptors, genieNetworkConfiguration);
-        this.jobService = this.getService(JobService.class);
-        this.maxStatusRetries = genieNetworkConfiguration == null
-            ? GenieNetworkConfiguration.DEFAULT_NUM_RETRIES
-            : genieNetworkConfiguration.getMaxStatusRetries();
+        this(
+            GenieClientUtils.createRetrofitInstance(url, interceptors, genieNetworkConfiguration),
+            genieNetworkConfiguration == null
+                ? GenieNetworkConfiguration.DEFAULT_NUM_RETRIES
+                : genieNetworkConfiguration.getMaxStatusRetries()
+        );
     }
 
     /**
@@ -99,7 +114,16 @@ public class JobClient extends BaseGenieClient {
         if (jobRequest == null) {
             throw new IllegalArgumentException("Job Request cannot be null.");
         }
-        return getIdFromLocation(this.jobService.submitJob(jobRequest).execute().headers().get("location"));
+        final String locationHeader = this.jobService
+            .submitJob(jobRequest)
+            .execute()
+            .headers()
+            .get(GenieClientUtils.LOCATION_HEADER);
+
+        if (StringUtils.isBlank(locationHeader)) {
+            throw new GenieClientException("No location header. Unable to get ID");
+        }
+        return GenieClientUtils.getIdFromLocation(locationHeader);
     }
 
     /**
@@ -144,9 +168,17 @@ public class JobClient extends BaseGenieClient {
 
             attachmentFiles.add(part);
         }
+        final String locationHeader = this.jobService
+            .submitJobWithAttachments(jobRequest, attachmentFiles)
+            .execute()
+            .headers()
+            .get(GenieClientUtils.LOCATION_HEADER);
 
-        final Response response = this.jobService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
-        return getIdFromLocation(response.headers().get("location"));
+        if (StringUtils.isBlank(locationHeader)) {
+            throw new GenieClientException("No location header. Unable to get ID");
+        }
+
+        return GenieClientUtils.getIdFromLocation(locationHeader);
     }
 
     /**
@@ -238,7 +270,7 @@ public class JobClient extends BaseGenieClient {
 
         final List<JobSearchResult> jobList = new ArrayList<>();
         for (final JsonNode objNode : jnode) {
-            final JobSearchResult jobSearchResult = this.treeToValue(objNode, JobSearchResult.class);
+            final JobSearchResult jobSearchResult = GenieClientUtils.treeToValue(objNode, JobSearchResult.class);
             jobList.add(jobSearchResult);
         }
         return jobList;
@@ -306,7 +338,7 @@ public class JobClient extends BaseGenieClient {
 
         final List<JobSearchResult> jobList = new ArrayList<>();
         for (final JsonNode objNode : jnode) {
-            final JobSearchResult jobSearchResult = this.treeToValue(objNode, JobSearchResult.class);
+            final JobSearchResult jobSearchResult = GenieClientUtils.treeToValue(objNode, JobSearchResult.class);
             jobList.add(jobSearchResult);
         }
         return jobList;
