@@ -3,6 +3,7 @@ syntax = "proto3";
 package com.netflix.genie.proto;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "com.netflix.genie.proto";
@@ -263,4 +264,52 @@ message JobKillRegistrationRequest {
 }
 
 message JobKillRegistrationResponse {
+}
+
+//--------------------------------------------------------------------
+// Agent Job File Service
+//
+// This service streams files from an agent running a job to the server
+// so they can be served via API.
+//--------------------------------------------------------------------
+
+service JobFileService {
+    rpc pushManifest (stream JobFileManifestMessage) returns (stream google.protobuf.Empty);
+    rpc streamFile (stream AgentJobFileMessage) returns (stream ServerJobFileMessage);
+}
+
+message JobFileManifestMessage {
+    string job_id = 1;
+    string manifest_json_string = 2;
+}
+
+message AgentJobFileMessage {
+    oneof message {
+        FileStreamRegistration file_stream_registration = 1;
+        FileStreamChunk file_stream_chunk = 2;
+    }
+}
+
+message ServerJobFileMessage {
+    oneof message {
+        FileStreamRequest file_stream_request = 1;
+        FileStreamAck file_stream_ack = 2;
+    }
+}
+
+message FileStreamRegistration {
+    string job_id = 1;
+}
+
+message FileStreamChunk {
+    bytes file_chunk = 2;
+}
+
+message FileStreamRequest {
+    string relative_path = 1;
+    uint64 start_offset = 2;
+    uint64 end_offset = 3; // Non inclusive
+}
+
+message FileStreamAck {
 }
