@@ -21,8 +21,12 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.RetryProperties;
+import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver;
+import com.netflix.genie.web.resources.agent.AgentFileProtocolResolverRegistrar;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
+import com.netflix.genie.web.services.AgentFileManifestService;
+import com.netflix.genie.web.services.AgentFileStreamService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -30,6 +34,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ProtocolResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
@@ -71,6 +76,37 @@ public class GenieApiAutoConfiguration {
     @ConditionalOnMissingBean(ResourceLoader.class)
     public ResourceLoader resourceLoader() {
         return new DefaultResourceLoader();
+    }
+
+    /**
+     * Get the protocol resolver that handles files streamed by the agent while a job is running.
+     *
+     * @param agentFileManifestService the file manifest service
+     * @param agentFileStreamService   the file streaming service
+     * @return a {@link AgentFileProtocolResolver}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFileProtocolResolver.class)
+    public AgentFileProtocolResolver agentFileProtocolResolver(
+        final AgentFileManifestService agentFileManifestService,
+        final AgentFileStreamService agentFileStreamService
+    ) {
+        return new AgentFileProtocolResolver(agentFileManifestService, agentFileStreamService);
+    }
+
+    /**
+     * Configurer bean that adds {@link AgentFileProtocolResolver} to the set of {@link ProtocolResolver} in the
+     * application context.
+     *
+     * @param agentFileProtocolResolver The implementation of {@link AgentFileProtocolResolver} to use
+     * @return A {@link AgentFileProtocolResolverRegistrar} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFileProtocolResolverRegistrar.class)
+    public AgentFileProtocolResolverRegistrar agentFileProtocolResolverRegistrar(
+        final AgentFileProtocolResolver agentFileProtocolResolver
+    ) {
+        return new AgentFileProtocolResolverRegistrar(agentFileProtocolResolver);
     }
 
     /**

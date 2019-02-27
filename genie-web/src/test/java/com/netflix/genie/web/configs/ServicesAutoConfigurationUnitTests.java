@@ -19,11 +19,14 @@ package com.netflix.genie.web.configs;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.common.internal.util.FileBufferFactory;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.AgentFileManifestService;
+import com.netflix.genie.web.services.AgentFileStreamService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -168,5 +171,35 @@ public class ServicesAutoConfigurationUnitTests {
 
         service.killJob(UUID.randomUUID().toString(), "test");
         Assert.fail("Expected exception");
+    }
+
+    /**
+     * Can get a bean of {@link AgentFileManifestService}.
+     */
+    @Test
+    public void canGetAgentFileManifestService() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.agentFileManifestService()
+        );
+    }
+
+    /**
+     * Can get a bean of {@link AgentFileStreamService}.
+     */
+    @Test
+    public void canGetAgentFileStreamService() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.agentFileStreamService()
+        );
+    }
+
+    /**
+     * Can get a bean of {@link FileBufferFactory}.
+     */
+    @Test
+    public void canGetFileBufferFactory() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.fileBufferFactory()
+        );
     }
 }

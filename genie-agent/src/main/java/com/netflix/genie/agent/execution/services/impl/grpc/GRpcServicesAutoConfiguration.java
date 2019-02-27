@@ -102,8 +102,9 @@ public class GRpcServicesAutoConfiguration {
     /**
      * Provide a lazy gRPC agent file manifest service bean if one isn't already defined.
      *
-     * @param jobFileServiceStub The stub to use for communication with the server
-     * @param manifestProtoConverter
+     * @param jobFileServiceStub     The stub to use for communication with the server
+     * @param taskScheduler          The task scheduler
+     * @param manifestProtoConverter The converter from/to proto messages to POJO
      * @return A {@link GRpcAgentFileManifestServiceImpl} instance
      */
     @Bean

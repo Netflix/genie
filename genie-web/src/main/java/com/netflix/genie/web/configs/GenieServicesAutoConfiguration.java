@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.common.internal.util.FileBuffer;
+import com.netflix.genie.common.internal.util.FileBufferFactory;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
@@ -36,6 +38,8 @@ import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.services.AgentFileManifestService;
+import com.netflix.genie.web.services.AgentFileStreamService;
 import com.netflix.genie.web.services.AgentFilterService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.AgentRoutingService;
@@ -56,6 +60,8 @@ import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.MailService;
+import com.netflix.genie.web.services.impl.AgentFileManifestServiceImpl;
+import com.netflix.genie.web.services.impl.AgentFileStreamServiceImpl;
 import com.netflix.genie.web.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
@@ -501,10 +507,11 @@ public class GenieServicesAutoConfiguration {
     /**
      * Provide the default implementation of {@link JobDirectoryServerService} for serving job directory resources.
      *
-     * @param resourceLoader        The application resource loader used to get references to resources
-     * @param jobPersistenceService The job persistence service used to get information about a job
-     * @param jobFileService        The service responsible for managing the job working directory on disk for V3 Jobs
-     * @param meterRegistry         The meter registry used to keep track of metrics
+     * @param resourceLoader           The application resource loader used to get references to resources
+     * @param jobPersistenceService    The job persistence service used to get information about a job
+     * @param jobFileService           The service responsible for managing working directories on disk for V3 Jobs
+     * @param agentFileManifestService The service that tracks file manifest for running agent jobs
+     * @param meterRegistry            The meter registry used to keep track of metrics
      * @return An instance of {@link JobDirectoryServerServiceImpl}
      */
     @Bean
@@ -513,8 +520,52 @@ public class GenieServicesAutoConfiguration {
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
         final JobFileService jobFileService,
+        final AgentFileManifestService agentFileManifestService,
         final MeterRegistry meterRegistry
     ) {
-        return new JobDirectoryServerServiceImpl(resourceLoader, jobPersistenceService, jobFileService, meterRegistry);
+        return new JobDirectoryServerServiceImpl(
+            resourceLoader,
+            jobPersistenceService,
+            jobFileService,
+            agentFileManifestService,
+            meterRegistry
+        );
+    }
+
+    /**
+     * Provide the default implementation of {@link AgentFileManifestService} for retrieving the file manifest of
+     * running jobs.
+     *
+     * @return An instance of {@link AgentFileManifestServiceImpl}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFileManifestService.class)
+    public AgentFileManifestService agentFileManifestService(
+    ) {
+        return new AgentFileManifestServiceImpl();
+    }
+
+    /**
+     * Provide the default implementation of {@link AgentFileStreamService} for streaming files from an agent while
+     * running a job.
+     *
+     * @return An instance of {@link AgentFileStreamServiceImpl}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFileStreamService.class)
+    public AgentFileStreamService agentFileStreamService(
+    ) {
+        return new AgentFileStreamServiceImpl();
+    }
+
+    /**
+     * Provide the default implementation of {@link FileBufferFactory} for creating {@link FileBuffer}.
+     *
+     * @return An instance of {@link FileBufferFactory}
+     */
+    @Bean
+    @ConditionalOnMissingBean(FileBufferFactory.class)
+    public FileBufferFactory fileBufferFactory() {
+        return new FileBufferFactory();
     }
 }

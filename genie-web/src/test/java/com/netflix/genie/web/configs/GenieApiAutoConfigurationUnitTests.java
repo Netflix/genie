@@ -20,7 +20,10 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
+import com.netflix.genie.web.services.AgentFileManifestService;
+import com.netflix.genie.web.services.AgentFileStreamService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,6 +66,31 @@ public class GenieApiAutoConfigurationUnitTests {
     @Test
     public void canGetResourceLoader() {
         Assert.assertTrue(this.genieApiAutoConfiguration.resourceLoader() instanceof DefaultResourceLoader);
+    }
+
+    /**
+     * Make sure we get a valid agent file resource protocol resolver.
+     */
+    @Test
+    public void canGetAgentfileProtocolResolver() {
+        Assert.assertNotNull(
+            this.genieApiAutoConfiguration.agentFileProtocolResolver(
+                Mockito.mock(AgentFileManifestService.class),
+                Mockito.mock(AgentFileStreamService.class)
+            )
+        );
+    }
+
+    /**
+     * Make sure we get a valid agent file resource protocol resolver registrar.
+     */
+    @Test
+    public void canGetAgentfileProtocolResolverRegistrar() {
+        Assert.assertNotNull(
+            this.genieApiAutoConfiguration.agentFileProtocolResolverRegistrar(
+                Mockito.mock(AgentFileProtocolResolver.class)
+            )
+        );
     }
 
     /**
