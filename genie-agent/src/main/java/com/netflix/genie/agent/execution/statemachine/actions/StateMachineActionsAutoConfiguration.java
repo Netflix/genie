@@ -21,12 +21,14 @@ import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.AgentFileManifestService;
+import com.netflix.genie.agent.execution.services.AgentFileStreamingService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
+import com.netflix.genie.common.internal.services.JobArchiveService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -174,6 +176,8 @@ public class StateMachineActionsAutoConfiguration {
      * @param agentJobService       The agent job service to use
      * @param agentHeartBeatService The agent heart beat service to use
      * @param agentJobKillService   The agent job kill service to use
+     * @param fileManifestService   The agent file manifest service to use
+     * @param fileStreamingService  The agent file streaming service to use
      * @param cleanupArguments      The cleanup arguments to use
      * @return A {@link SetUpJobAction} instance
      */
@@ -185,6 +189,8 @@ public class StateMachineActionsAutoConfiguration {
         final AgentJobService agentJobService,
         final AgentHeartBeatService agentHeartBeatService,
         final AgentJobKillService agentJobKillService,
+        final AgentFileManifestService fileManifestService,
+        final AgentFileStreamingService fileStreamingService,
         final ArgumentDelegates.CleanupArguments cleanupArguments
     ) {
         return new SetUpJobAction(
@@ -193,6 +199,8 @@ public class StateMachineActionsAutoConfiguration {
             agentJobService,
             agentHeartBeatService,
             agentJobKillService,
+            fileManifestService,
+            fileStreamingService,
             cleanupArguments
         );
     }

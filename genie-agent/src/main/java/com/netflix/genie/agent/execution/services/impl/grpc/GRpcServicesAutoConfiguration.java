@@ -17,12 +17,16 @@
  */
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
+import com.netflix.genie.agent.execution.services.AgentFileManifestService;
+import com.netflix.genie.agent.execution.services.AgentFileStreamingService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
+import com.netflix.genie.proto.JobFileServiceGrpc;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -93,5 +97,44 @@ public class GRpcServicesAutoConfiguration {
         final JobServiceProtoConverter jobServiceProtoConverter
     ) {
         return new GRpcAgentJobServiceImpl(jobServiceFutureStub, jobServiceProtoConverter);
+    }
+
+    /**
+     * Provide a lazy gRPC agent file manifest service bean if one isn't already defined.
+     *
+     * @param jobFileServiceStub The stub to use for communication with the server
+     * @param manifestProtoConverter
+     * @return A {@link GRpcAgentFileManifestServiceImpl} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(AgentFileManifestService.class)
+    public AgentFileManifestService agentFileManifestService(
+        final JobFileServiceGrpc.JobFileServiceStub jobFileServiceStub,
+        @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler,
+        final JobDirectoryManifestProtoConverter manifestProtoConverter
+    ) {
+        return new GRpcAgentFileManifestServiceImpl(
+            jobFileServiceStub,
+            taskScheduler,
+            manifestProtoConverter
+        );
+    }
+
+    /**
+     * Provide a lazy gRPC agent file streaming service bean if one isn't already defined.
+     *
+     * @param jobFileServiceStub The stub to use for communication with the server
+     * @param taskScheduler A task scheduler
+     * @return A {@link GRpcAgentFileStreamingServiceImpl} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(AgentFileStreamingService.class)
+    public AgentFileStreamingService agentFileStreamingService(
+        final JobFileServiceGrpc.JobFileServiceStub jobFileServiceStub,
+        @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler
+    ) {
+        return new GRpcAgentFileStreamingServiceImpl(jobFileServiceStub, taskScheduler);
     }
 }
