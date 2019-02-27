@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -27,7 +28,9 @@ import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
+import com.netflix.genie.web.services.AgentFileManifestService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobPersistenceService;
@@ -75,27 +78,56 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     private final ResourceLoader resourceLoader;
     private final JobPersistenceService jobPersistenceService;
     private final JobFileService jobFileService;
+    private final AgentFileManifestService agentFileManifestService;
     private final MeterRegistry meterRegistry;
     private final LoadingCache<String, ManifestCacheValue> manifestCache;
+    private final GenieResourceHandler.Factory genieResourceHandlerFactory;
 
     /**
      * Constructor.
      *
-     * @param resourceLoader        The application resource loader used to get references to resources
-     * @param jobPersistenceService The job persistence service used to get information about a job
-     * @param jobFileService        The service responsible for managing the job working directory on disk for V3 Jobs
-     * @param meterRegistry         The meter registry used to keep track of metrics
+     * @param resourceLoader           The application resource loader used to get references to resources
+     * @param jobPersistenceService    The job persistence service used to get information about a job
+     * @param jobFileService           The service responsible for managing the job directory for V3 Jobs
+     * @param agentFileManifestService The service providing file manifest for active agent jobs
+     * @param meterRegistry            The meter registry used to keep track of metrics
      */
     public JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
         final JobFileService jobFileService,
+        final AgentFileManifestService agentFileManifestService,
         final MeterRegistry meterRegistry
     ) {
+        this(
+            resourceLoader,
+            jobPersistenceService,
+            jobFileService,
+            agentFileManifestService,
+            meterRegistry,
+            new GenieResourceHandler.Factory()
+        );
+    }
+
+    /**
+     * Constructor that accepts a handler factory mock for easier testing.
+     */
+    @VisibleForTesting
+    JobDirectoryServerServiceImpl(
+        final ResourceLoader resourceLoader,
+        final JobPersistenceService jobPersistenceService,
+        final JobFileService jobFileService,
+        final AgentFileManifestService agentFileManifestService,
+        final MeterRegistry meterRegistry,
+        final GenieResourceHandler.Factory genieResourceHandlerFactory
+    ) {
+
         this.resourceLoader = resourceLoader;
         this.jobPersistenceService = jobPersistenceService;
         this.jobFileService = jobFileService;
+        this.agentFileManifestService = agentFileManifestService;
         this.meterRegistry = meterRegistry;
+        this.genieResourceHandlerFactory = genieResourceHandlerFactory;
 
         // TODO: This is a local cache. It might be valuable to have a shared cluster cache?
         // TODO: May want to tweak parameters or make them configurable
@@ -168,7 +200,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             isV4 = this.jobPersistenceService.isV4(jobId);
         } catch (final GenieJobNotFoundException nfe) {
             // Really after the last check this shouldn't happen but just in case
-            response.sendError(HttpStatus.NOT_FOUND.value());
+            response.sendError(HttpStatus.NOT_FOUND.value(), nfe.getMessage());
             return;
         }
 
@@ -185,11 +217,25 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         }
 
         if (jobStatus.isActive() && isV4) {
-            // This is where we should forward down the gRPC channel for live logs. Not yet supported.
-            response.sendError(
-                HttpStatus.NOT_FOUND.value(),
-                "Logs for V4 jobs are not yet available while the job is still running"
-            );
+
+            final Optional<JobDirectoryManifest> manifest = this.agentFileManifestService.getManifest(jobId);
+            if (!manifest.isPresent()) {
+                log.warn("Manifest not found for active job: {}", jobId);
+                response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), "Could not load manifest for job: " + jobId);
+                return;
+            }
+
+            final URI jobDirRoot;
+            try {
+                jobDirRoot = new URI(AgentFileProtocolResolver.URI_SCHEME, jobId, SLASH, null);
+            } catch (URISyntaxException e) {
+                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+                return;
+            }
+
+            this.handleRequest(baseUri, relativePath, request, response, manifest.get(), jobDirRoot);
+
+
         } else if (jobStatus.isActive() && !isV4) {
             // Active V3 job
 
@@ -236,18 +282,26 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final JobDirectoryManifest manifest,
         final URI jobDirectoryRoot
     ) throws IOException, ServletException {
+        log.debug(
+            "Handle request, baseUri: '{}', relpath: '{}', jobRootUri: '{}'",
+            baseUri,
+            relativePath,
+            jobDirectoryRoot
+        );
         final JobDirectoryManifest.ManifestEntry entry;
         final Optional<JobDirectoryManifest.ManifestEntry> entryOptional = manifest.getEntry(relativePath);
         if (entryOptional.isPresent()) {
             entry = entryOptional.get();
         } else {
-            response.sendError(HttpStatus.NOT_FOUND.value());
+            log.warn("No such entry in job manifest: {}", relativePath);
+            response.sendError(HttpStatus.NOT_FOUND.value(), "Not found: " + relativePath);
             return;
         }
 
         if (entry.isDirectory()) {
             // For now maintain the V3 structure
             // TODO: Once we determine what we want for V4 use v3/v4 flags or some way to differentiate
+            // TODO: there's no unit test covering this section
             final DefaultDirectoryWriter.Directory directory = new DefaultDirectoryWriter.Directory();
             final List<DefaultDirectoryWriter.Entry> files = Lists.newArrayList();
             final List<DefaultDirectoryWriter.Entry> directories = Lists.newArrayList();
@@ -299,11 +353,12 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 GenieObjectMapper.getMapper().writeValue(response.getOutputStream(), directory);
             }
         } else {
-            final Resource jobResource
-                = this.resourceLoader.getResource(jobDirectoryRoot.resolve(entry.getPath()).toString());
+            final URI location = jobDirectoryRoot.resolve(entry.getPath());
+            log.debug("Get resource: {}", location);
+            final Resource jobResource = this.resourceLoader.getResource(location.toString());
             // Every file really should have a media type but if not use text/plain
             final String mediaType = entry.getMimeType().orElse(MediaType.TEXT_PLAIN_VALUE);
-            final ResourceHttpRequestHandler handler = new GenieResourceHandler(mediaType, jobResource);
+            final ResourceHttpRequestHandler handler = this.genieResourceHandlerFactory.get(mediaType, jobResource);
             handler.handleRequest(request, response);
         }
     }
@@ -370,6 +425,15 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         @Override
         protected MediaType getMediaType(final HttpServletRequest request, final Resource resource) {
             return this.mediaType;
+        }
+
+        /**
+         * Simple factory to avoid using 'new' inline, and facilitate mocking and testing.
+         */
+        private static class Factory {
+            ResourceHttpRequestHandler get(final String mediaType, final Resource jobResource) {
+                return new GenieResourceHandler(mediaType, jobResource);
+            }
         }
     }
 
