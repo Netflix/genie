@@ -24,6 +24,8 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
+import com.netflix.genie.agent.execution.services.AgentFileManifestService
+import com.netflix.genie.agent.execution.services.AgentFileStreamingService
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService
 import com.netflix.genie.agent.execution.services.AgentJobKillService
 import com.netflix.genie.agent.execution.services.AgentJobService
@@ -61,6 +63,8 @@ class SetUpJobActionSpec extends Specification {
     AgentJobService agentJobService
     AgentHeartBeatService heartbeatService
     AgentJobKillService killService
+    AgentFileManifestService fileManifestService
+    AgentFileStreamingService fileStreamingService
     ArgumentDelegates.CleanupArguments cleanupArguments
     SetUpJobAction action
 
@@ -126,6 +130,8 @@ class SetUpJobActionSpec extends Specification {
         this.agentJobService = Mock(AgentJobService)
         this.heartbeatService = Mock(AgentHeartBeatService)
         this.killService = Mock(AgentJobKillService)
+        this.fileManifestService = Mock(AgentFileManifestService)
+        this.fileStreamingService = Mock(AgentFileStreamingService)
         this.cleanupArguments = Mock(ArgumentDelegates.CleanupArguments)
 
         this.jobId = UUID.randomUUID().toString()
@@ -220,7 +226,7 @@ class SetUpJobActionSpec extends Specification {
             _ * getEnvironmentVariables() >> jobServerEnvMap
         }
 
-        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService, heartbeatService, killService, cleanupArguments)
+        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService, heartbeatService, killService, fileManifestService, fileStreamingService, cleanupArguments)
     }
 
     void cleanup() {
@@ -245,6 +251,8 @@ class SetUpJobActionSpec extends Specification {
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
         1 * executionContext.setJobDirectory(jobDir)
+        1 * fileManifestService.start(jobId, jobDir.toPath())
+        1 * fileStreamingService.start(jobId, jobDir.toPath())
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
         1 * downloadService.download(manifest)
@@ -308,9 +316,11 @@ class SetUpJobActionSpec extends Specification {
         1 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
         1 * executionContext.setJobDirectory(jobDir)
+        1 * fileManifestService.start(jobId, jobDir.toPath())
+        1 * fileStreamingService.start(jobId, jobDir.toPath())
+        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
         1 * downloadService.download(manifest)
@@ -408,6 +418,8 @@ class SetUpJobActionSpec extends Specification {
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
         1 * executionContext.setJobDirectory(jobDir)
+        1 * fileManifestService.start(jobId, jobDir.toPath())
+        1 * fileStreamingService.start(jobId, jobDir.toPath())
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
         1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
@@ -430,6 +442,8 @@ class SetUpJobActionSpec extends Specification {
         1 * killService.start(jobId)
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setJobDirectory(jobDir)
+        1 * fileManifestService.start(jobId, jobDir.toPath())
+        1 * fileStreamingService.start(jobId, jobDir.toPath())
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         def e = thrown(RuntimeException)
         e.getCause().getClass() == SetUpJobException
@@ -449,6 +463,8 @@ class SetUpJobActionSpec extends Specification {
         1 * killService.start(jobId)
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setJobDirectory(jobDir)
+        1 * fileManifestService.start(jobId, jobDir.toPath())
+        1 * fileStreamingService.start(jobId, jobDir.toPath())
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
         1 * downloadService.download(manifest) >> {throw new DownloadException("")}
@@ -473,6 +489,8 @@ class SetUpJobActionSpec extends Specification {
         1 * killService.start(jobId)
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setJobDirectory(jobDir)
+        1 * fileManifestService.start(jobId, jobDir.toPath())
+        1 * fileStreamingService.start(jobId, jobDir.toPath())
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
         1 * downloadService.download(manifest)
@@ -504,6 +522,8 @@ class SetUpJobActionSpec extends Specification {
         1 * killService.start(jobId)
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setJobDirectory(jobDir)
+        1 * fileManifestService.start(jobId, jobDir.toPath())
+        1 * fileStreamingService.start(jobId, jobDir.toPath())
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
         1 * downloadService.download(manifest)
@@ -555,6 +575,8 @@ class SetUpJobActionSpec extends Specification {
 
         1 * killService.stop()
         1 * heartbeatService.stop()
+        1 * fileManifestService.stop()
+        1 * fileStreamingService.stop()
     }
 
     def "Full cleanup"() {
@@ -597,6 +619,8 @@ class SetUpJobActionSpec extends Specification {
 
         1 * killService.stop()
         1 * heartbeatService.stop()
+        1 * fileManifestService.stop()
+        1 * fileStreamingService.stop()
     }
 
     def "Dependencies cleanup"() {
@@ -657,6 +681,8 @@ class SetUpJobActionSpec extends Specification {
 
         1 * killService.stop()
         1 * heartbeatService.stop()
+        1 * fileManifestService.stop()
+        1 * fileStreamingService.stop()
     }
 
     def "Pre and post action validation"() {
