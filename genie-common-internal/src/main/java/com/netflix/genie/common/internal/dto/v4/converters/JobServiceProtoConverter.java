@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
  * @see com.netflix.genie.proto
  * @since 4.0.0
  */
-@Component
 public class JobServiceProtoConverter {
 
     /**
