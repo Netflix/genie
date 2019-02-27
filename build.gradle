@@ -14,7 +14,7 @@ buildscript {
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.0.0"
         classpath "com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1"
         classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
-        classpath "io.franzbecker:gradle-lombok:1.14"
+        classpath "io.franzbecker:gradle-lombok:2.1"
         classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
         classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.9"
     }
@@ -346,7 +346,7 @@ configure(javaProjects) {
     }
 
     lombok {
-        version = "1.18.2"
+        version = "1.18.4"
     }
 }
 
