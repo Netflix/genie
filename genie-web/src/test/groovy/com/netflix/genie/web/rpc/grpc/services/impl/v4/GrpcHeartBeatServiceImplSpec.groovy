@@ -20,13 +20,16 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.netflix.genie.proto.AgentHeartBeat
 import com.netflix.genie.proto.ServerHeartBeat
+import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.AgentRoutingService
 import io.grpc.stub.StreamObserver
+import org.junit.experimental.categories.Category
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 
 import java.util.concurrent.ScheduledFuture
 
+@Category(UnitTest)
 class GrpcHeartBeatServiceImplSpec extends Specification {
     AgentRoutingService agentRoutingService
     GrpcHeartBeatServiceImpl service
