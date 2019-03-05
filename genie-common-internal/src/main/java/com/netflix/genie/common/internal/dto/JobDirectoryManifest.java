@@ -61,7 +61,6 @@ import java.util.Set;
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 public class JobDirectoryManifest {
-    private static final Metadata TIKA_METADATA = new Metadata();
     private static final String ENTRIES_KEY = "entries";
     private static final String EMPTY_STRING = "";
 
@@ -223,11 +222,13 @@ public class JobDirectoryManifest {
 
         private final Path root;
         private final ImmutableMap.Builder<String, ManifestEntry> builder;
+        private final Metadata metadata;
         private final TikaConfig tikaConfig;
 
         ManifestVisitor(final Path root, final ImmutableMap.Builder<String, ManifestEntry> builder) throws IOException {
             this.root = root;
             this.builder = builder;
+            this.metadata = new Metadata();
             try {
                 this.tikaConfig = new TikaConfig();
             } catch (final TikaException te) {
@@ -326,7 +327,7 @@ public class JobDirectoryManifest {
                     return MediaType.TEXT_PLAIN.toString();
                 default:
                     try (TikaInputStream inputStream = TikaInputStream.get(path)) {
-                        return this.tikaConfig.getDetector().detect(inputStream, TIKA_METADATA).toString();
+                        return this.tikaConfig.getDetector().detect(inputStream, this.metadata).toString();
                     } catch (final IOException ioe) {
                         log.error("Unable to detect mime type for {} due to error", path, ioe);
                         return MediaType.OCTET_STREAM.toString();
