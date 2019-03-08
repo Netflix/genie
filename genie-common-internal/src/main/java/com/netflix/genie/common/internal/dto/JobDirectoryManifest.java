@@ -78,9 +78,20 @@ public class JobDirectoryManifest {
      * @throws IOException If there is an error reading the directory
      */
     public JobDirectoryManifest(final Path directory) throws IOException {
+        this(directory, true);
+    }
+
+    /**
+     * Create a manifest from the given job directory.
+     *
+     * @param directory              The job directory to create a manifest from
+     * @param calculateFileChecksums Whether or not to calculate checksums for each file added to the manifest
+     * @throws IOException If there is an error reading the directory
+     */
+    public JobDirectoryManifest(final Path directory, final boolean calculateFileChecksums) throws IOException {
         // Walk the directory
         final ImmutableMap.Builder<String, ManifestEntry> builder = ImmutableMap.builder();
-        final ManifestVisitor manifestVisitor = new ManifestVisitor(directory, builder);
+        final ManifestVisitor manifestVisitor = new ManifestVisitor(directory, builder, calculateFileChecksums);
         Files.walkFileTree(directory, manifestVisitor);
         this.entries = builder.build();
 
@@ -224,10 +235,16 @@ public class JobDirectoryManifest {
         private final ImmutableMap.Builder<String, ManifestEntry> builder;
         private final Metadata metadata;
         private final TikaConfig tikaConfig;
+        private final boolean checksumFiles;
 
-        ManifestVisitor(final Path root, final ImmutableMap.Builder<String, ManifestEntry> builder) throws IOException {
+        ManifestVisitor(
+            final Path root,
+            final ImmutableMap.Builder<String, ManifestEntry> builder,
+            final boolean checksumFiles
+        ) throws IOException {
             this.root = root;
             this.builder = builder;
+            this.checksumFiles = checksumFiles;
             this.metadata = new Metadata();
             try {
                 this.tikaConfig = new TikaConfig();
@@ -277,11 +294,13 @@ public class JobDirectoryManifest {
             String md5 = null;
             String mimeType = null;
             if (!directory) {
-                try (InputStream data = Files.newInputStream(entry, StandardOpenOption.READ)) {
-                    md5 = DigestUtils.md5Hex(data);
-                } catch (final IOException ioe) {
-                    // For now MD5 isn't critical or required so we'll swallow errors here
-                    log.error("Unable to create MD5 for {} due to error", entry, ioe);
+                if (this.checksumFiles) {
+                    try (InputStream data = Files.newInputStream(entry, StandardOpenOption.READ)) {
+                        md5 = DigestUtils.md5Hex(data);
+                    } catch (final IOException ioe) {
+                        // For now MD5 isn't critical or required so we'll swallow errors here
+                        log.error("Unable to create MD5 for {} due to error", entry, ioe);
+                    }
                 }
 
                 mimeType = this.getMimeType(name, entry);

@@ -23,6 +23,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import javax.annotation.Nullable
 import java.nio.charset.StandardCharsets
@@ -103,19 +104,36 @@ class JobDirectoryManifestSpec extends Specification {
             .forEach({ this.sizeOfFiles += Files.size(it) })
     }
 
-    def "can create a manifest, serialize it, deserialize it and verify correctness"() {
+    @Unroll
+    def "can create a manifest, serialize it, deserialize it and verify correctness (md5: #includeMd5)"() {
         when:
-        def manifest = new JobDirectoryManifest(this.rootPath)
+        def manifest = new JobDirectoryManifest(this.rootPath, includeMd5)
         def json = GenieObjectMapper.getMapper().writeValueAsString(manifest)
         def manifest2 = GenieObjectMapper.getMapper().readValue(json, JobDirectoryManifest.class)
 
         then:
         manifest == manifest2
-        verifyManifest(manifest)
-        verifyManifest(manifest2)
+        verifyManifest(manifest, includeMd5)
+        verifyManifest(manifest2, includeMd5)
+
+        where:
+        includeMd5 | _
+        true       | _
+        false      | _
     }
 
-    void verifyManifest(JobDirectoryManifest manifest) {
+    def "default constructor includes md5"() {
+        when:
+        def manifestDefault = new JobDirectoryManifest(this.rootPath)
+
+        then:
+        manifestDefault.getEntries()
+            .stream()
+            .filter({ e -> !e.isDirectory() })
+            .forEach({ e -> assert e.getMd5().isPresent() })
+    }
+
+    void verifyManifest(JobDirectoryManifest manifest, boolean expectMd5Present) {
         assert manifest.getEntries().size() == 9
         assert manifest.getFiles().size() == 5
         assert manifest.getNumFiles() == 5
@@ -137,7 +155,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.rootPath,
             true,
             null,
-            [this.stderr, this.stdout, this.genieDir, this.clusterDir]
+            [this.stderr, this.stdout, this.genieDir, this.clusterDir],
+            false
         )
         this.verifyEntry(
             manifest.getEntry(this.stdout).orElseThrow({ new IllegalArgumentException() }),
@@ -145,7 +164,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.stdoutPath,
             false,
             this.root,
-            []
+            [],
+            expectMd5Present
         )
         this.verifyEntry(
             manifest.getEntry(this.stderr).orElseThrow({ new IllegalArgumentException() }),
@@ -153,7 +173,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.stderrPath,
             false,
             this.root,
-            []
+            [],
+            expectMd5Present
         )
         this.verifyEntry(
             manifest.getEntry(this.genieDir).orElseThrow({ new IllegalArgumentException() }),
@@ -161,7 +182,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.genieDirPath,
             true,
             this.root,
-            [this.envFile, this.genieSubDir]
+            [this.envFile, this.genieSubDir],
+            false
         )
         this.verifyEntry(
             manifest.getEntry(this.envFile).orElseThrow({ new IllegalArgumentException() }),
@@ -169,7 +191,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.envFilePath,
             false,
             this.genieDir,
-            []
+            [],
+            expectMd5Present
         )
         this.verifyEntry(
             manifest.getEntry(this.genieSubDir).orElseThrow({ new IllegalArgumentException() }),
@@ -177,7 +200,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.genieSubDirPath,
             true,
             this.genieDir,
-            [this.exitFile]
+            [this.exitFile],
+            false
         )
         this.verifyEntry(
             manifest.getEntry(this.exitFile).orElseThrow({ new IllegalArgumentException() }),
@@ -185,7 +209,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.exitFilePath,
             false,
             this.genieSubDir,
-            []
+            [],
+            expectMd5Present
         )
         this.verifyEntry(
             manifest.getEntry(this.clusterDir).orElseThrow({ new IllegalArgumentException() }),
@@ -193,7 +218,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.clusterDirPath,
             true,
             this.root,
-            [this.clusterSetupScript]
+            [this.clusterSetupScript],
+            false
         )
         this.verifyEntry(
             manifest.getEntry(this.clusterSetupScript).orElseThrow({ new IllegalArgumentException() }),
@@ -201,7 +227,8 @@ class JobDirectoryManifestSpec extends Specification {
             this.clusterSetupScriptPath,
             false,
             this.clusterDir,
-            []
+            [],
+            expectMd5Present
         )
 
         assert manifest.getFiles().contains(manifest.getEntry(this.stdout).orElse(null))
@@ -234,7 +261,8 @@ class JobDirectoryManifestSpec extends Specification {
         Path expectedFile,
         boolean isDirectory,
         @Nullable String expectedParent,
-        Collection<String> expectedChildren
+        Collection<String> expectedChildren,
+        boolean expectedMd5Present
     ) {
         assert entry.getPath() == expectedRelativePath
         assert entry.getName() == expectedFile.getFileName().toString()
@@ -245,10 +273,14 @@ class JobDirectoryManifestSpec extends Specification {
             assert !entry.getMimeType().isPresent()
         } else {
             assert !entry.isDirectory()
-            assert entry
-                .getMd5()
-                .orElseThrow({ new IllegalArgumentException() }) == expectedFile.withInputStream {
-                return DigestUtils.md5Hex(it)
+            if (expectedMd5Present) {
+                assert entry
+                    .getMd5()
+                    .orElseThrow({ new IllegalArgumentException() }) == expectedFile.withInputStream {
+                    return DigestUtils.md5Hex(it)
+                }
+            } else {
+                assert !entry.getMd5().isPresent()
             }
             assert entry.getMimeType().isPresent()
         }
