@@ -2,6 +2,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.agent.cli.CliAutoConfiguration,\
   com.netflix.genie.agent.cli.JCommanderAutoConfiguration,\
   com.netflix.genie.agent.configs.AgentAutoConfiguration,\
+  com.netflix.genie.agent.configs.DefaultPropertiesAutoConfiguration,\
   com.netflix.genie.agent.execution.ExecutionAutoConfiguration,\
   com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration,\
   com.netflix.genie.agent.execution.services.impl.ServicesAutoConfiguration,\
