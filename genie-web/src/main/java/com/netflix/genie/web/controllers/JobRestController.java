@@ -324,6 +324,8 @@ public class JobRestController {
             jobRequest.getEmail().ifPresent(builder::withEmail);
             jobRequest.getTimeout().ifPresent(builder::withTimeout);
             jobRequest.getMetadata().ifPresent(builder::withMetadata);
+            jobRequest.getGrouping().ifPresent(builder::withGrouping);
+            jobRequest.getGroupingInstance().ifPresent(builder::withGroupingInstance);
 
             jobRequestWithId = builder.build();
         }

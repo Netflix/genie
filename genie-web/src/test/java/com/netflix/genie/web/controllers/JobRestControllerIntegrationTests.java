@@ -123,6 +123,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String JOB_COMMAND_LINK_PATH = "_links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "_links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "_links.applications.href";
+    private static final String GROUPING_PATH = "grouping";
+    private static final String GROUPING_INSTANCE_PATH = "groupingInstance";
     private static final long CHECK_DELAY = 500L;
     private static final String BASE_DIR
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
@@ -157,6 +159,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = "genie.id:" + CLUSTER1_ID + ","
         + "genie.name:" + CLUSTER1_NAME + ","
         + LOCALHOST_CLUSTER_TAG;
+    private static final String JOB_GROUPING = UUID.randomUUID().toString();
+    private static final String JOB_GROUPING_INSTANCE = UUID.randomUUID().toString();
     // This file is not UTF-8 encoded. It is uploaded to test server behavior
     // related to charset headers
     private static final String GB18030_TXT = "GB18030.txt";
@@ -278,6 +282,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .withMetadata(this.metadata)
+            .withGrouping(JOB_GROUPING)
+            .withGroupingInstance(JOB_GROUPING_INSTANCE)
             .build();
 
         final String id = this.submitJob(documentationId, jobRequest, null);
@@ -470,6 +476,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(ARCHIVE_LOCATION_PATH, archiveJob ? Matchers.notNullValue() : Matchers.isEmptyOrNullString())
             .body(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME))
             .body(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME))
+            .body(GROUPING_PATH, Matchers.is(JOB_GROUPING))
+            .body(GROUPING_INSTANCE_PATH, Matchers.is(JOB_GROUPING_INSTANCE))
             .body(LINKS_PATH + ".keySet().size()", Matchers.is(9))
             .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
             .body(LINKS_PATH, Matchers.hasKey("request"))
@@ -666,7 +674,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(EMAIL_PATH, Matchers.nullValue())
             .body(CPU_PATH, Matchers.nullValue())
             .body(MEMORY_PATH, Matchers.nullValue())
-            .body(APPLICATIONS_PATH, Matchers.empty());
+            .body(APPLICATIONS_PATH, Matchers.empty())
+            .body(GROUPING_PATH, Matchers.is(JOB_GROUPING))
+            .body(GROUPING_INSTANCE_PATH, Matchers.is(JOB_GROUPING_INSTANCE));
     }
 
     private void checkJobExecution(final int documentationId, final String id) {
