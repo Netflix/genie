@@ -1405,7 +1405,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
             .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
             .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
-            .replace("JOB_TAGS_PLACEHOLDER", StringUtils.join(sortedJobTags, ","));
+            .replace("JOB_TAGS_PLACEHOLDER", StringUtils.join(sortedJobTags, ","))
+            .replace("JOB_GROUPING_PLACEHOLDER", JOB_GROUPING)
+            .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE);
 
     }
 

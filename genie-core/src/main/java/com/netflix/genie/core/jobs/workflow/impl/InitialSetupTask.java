@@ -110,7 +110,9 @@ public class InitialSetupTask extends GenieBaseTask {
                 jobId,
                 jobExecEnv.getJobRequest().getName(),
                 jobExecEnv.getMemory(),
-                jobExecEnv.getJobRequest().getTags()
+                jobExecEnv.getJobRequest().getTags(),
+                jobExecEnv.getJobRequest().getGrouping().orElse(""),
+                jobExecEnv.getJobRequest().getGroupingInstance().orElse("")
             );
 
             // create environment variables for the job request
@@ -349,7 +351,9 @@ public class InitialSetupTask extends GenieBaseTask {
         final String jobId,
         final String jobName,
         final int memory,
-        final Set<String> jobTags
+        final Set<String> jobTags,
+        final String grouping,
+        final String groupingInstance
     ) throws GenieException, IOException {
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_JOB_ID_ENV_VAR
@@ -399,6 +403,36 @@ public class InitialSetupTask extends GenieBaseTask {
 
         // Append new line
         writer.write(LINE_SEPARATOR);
+
+        // create environment variable for the job tags
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_JOB_GROUPING_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + grouping
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + LINE_SEPARATOR
+        );
+
+        // Append new line
+        writer.write(LINE_SEPARATOR);
+
+
+        // create environment variable for the job tags
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_JOB_GROUPING_INSTANCE_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + groupingInstance
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + LINE_SEPARATOR
+        );
+
+        // Append new line
+        writer.write(LINE_SEPARATOR);
+
     }
 
     @VisibleForTesting
