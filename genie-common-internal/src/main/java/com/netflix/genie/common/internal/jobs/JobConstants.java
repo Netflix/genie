@@ -268,6 +268,16 @@ public final class JobConstants {
     public static final String GENIE_JOB_TAGS_ENV_VAR = "GENIE_JOB_TAGS";
 
     /**
+     * Environment variable for Genie Job grouping.
+     */
+    public static final String GENIE_JOB_GROUPING_ENV_VAR = "GENIE_JOB_GROUPING";
+
+    /**
+     * Environment variable for Genie Job grouping instance.
+     */
+    public static final String GENIE_JOB_GROUPING_INSTANCE_ENV_VAR = "GENIE_JOB_GROUPING_INSTANCE";
+
+    /**
      * Environment variable for the Genie command tags in the job request.
      */
     public static final String GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR = "GENIE_REQUESTED_COMMAND_TAGS";

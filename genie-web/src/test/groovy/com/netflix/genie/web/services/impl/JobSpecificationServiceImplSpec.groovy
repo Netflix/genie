@@ -179,7 +179,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         jobSpec.getCommand().getId() == commandId
         jobSpec.getApplications().isEmpty()
         !jobSpec.isInteractive()
-        jobSpec.getEnvironmentVariables().size() == 15
+        jobSpec.getEnvironmentVariables().size() == 17
         jobSpec.getArchiveLocation() == Optional.of(requestedArchiveLocationPrefix + File.separator + jobId)
 
         when:
@@ -207,7 +207,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         jobSpecNoArchivalData.getCommand().getId() == commandId
         jobSpecNoArchivalData.getApplications().isEmpty()
         !jobSpecNoArchivalData.isInteractive()
-        jobSpecNoArchivalData.getEnvironmentVariables().size() == 15
+        jobSpecNoArchivalData.getEnvironmentVariables().size() == 17
         jobSpecNoArchivalData.getArchiveLocation() == Optional.empty()
     }
 
@@ -266,6 +266,8 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .build()
         )
         def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        def grouping = UUID.randomUUID().toString()
+        def groupingInstance = UUID.randomUUID().toString()
         def jobRequest = new JobRequest(
                 null,
                 null,
@@ -273,6 +275,8 @@ class JobSpecificationServiceImplSpec extends Specification {
                 new JobMetadata
                         .Builder(jobName, UUID.randomUUID().toString())
                         .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                        .withGrouping(grouping)
+                        .withGroupingInstance(groupingInstance)
                         .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
                 null,
@@ -326,6 +330,8 @@ class JobSpecificationServiceImplSpec extends Specification {
         envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_1") == service.tagsToString(clusterCriteria.get(1).getTags())
         envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR) == "[[" + service.tagsToString(clusterCriteria.get(0).getTags()) + "],[" + service.tagsToString(clusterCriteria.get(1).getTags()) + "]]"
         envVariables.get(JobConstants.GENIE_JOB_TAGS_ENV_VAR) == service.tagsToString(jobRequest.getMetadata().getTags())
+        envVariables.get(JobConstants.GENIE_JOB_GROUPING_ENV_VAR) == grouping
+        envVariables.get(JobConstants.GENIE_JOB_GROUPING_INSTANCE_ENV_VAR) == groupingInstance
     }
 
     def "Can convert V4 Criterion to V3 tags"() {

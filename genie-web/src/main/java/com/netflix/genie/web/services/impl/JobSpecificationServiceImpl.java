@@ -436,6 +436,14 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
         );
         envVariables.put(JobConstants.GENIE_JOB_TAGS_ENV_VAR, this.tagsToString(jobRequest.getMetadata().getTags()));
         envVariables.put(
+            JobConstants.GENIE_JOB_GROUPING_ENV_VAR,
+            jobRequest.getMetadata().getGrouping().orElse("")
+        );
+        envVariables.put(
+            JobConstants.GENIE_JOB_GROUPING_INSTANCE_ENV_VAR,
+            jobRequest.getMetadata().getGroupingInstance().orElse("")
+        );
+        envVariables.put(
             JobConstants.GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR,
             this.tagsToString(jobRequest.getCriteria().getCommandCriterion().getTags())
         );
