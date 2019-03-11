@@ -120,11 +120,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String STD_OUT_SIZE_PATH = "stdOutSize";
     private static final String STD_ERR_SIZE_PATH = "stdErrSize";
     private static final String JOBS_LIST_PATH = EMBEDDED_PATH + ".jobSearchResultList";
+    private static final String GROUPING_PATH = "grouping";
+    private static final String GROUPING_INSTANCE_PATH = "groupingInstance";
     private static final String JOB_COMMAND_LINK_PATH = "_links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "_links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "_links.applications.href";
-    private static final String GROUPING_PATH = "grouping";
-    private static final String GROUPING_INSTANCE_PATH = "groupingInstance";
     private static final long CHECK_DELAY = 500L;
     private static final String BASE_DIR
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
@@ -1480,7 +1480,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .replace("COMMAND_TAGS_PLACEHOLDER", CMD1_TAGS)
             .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
             .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
-            .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS);
+            .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
+            .replace("JOB_GROUPING_PLACEHOLDER", JOB_GROUPING)
+            .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE);
     }
 
     private String getStatus(final String jobId) {
