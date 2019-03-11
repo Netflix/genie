@@ -122,6 +122,8 @@ public class InitialSetupTaskUnitTest {
         final int memory = 1000;
         final String jobTag1 = "jobTag1";
         final String jobTag2 = "jobTag2";
+        final String jobGrouping = "jobGrouping-X";
+        final String jobGroupingInstance = "jobGrouping-X-0001";
         final String cmdCritTag1 = "tagX";
         final String cmdCritTag2 = "tagY";
         final String cmdCritTag3 = "tagZ";
@@ -162,7 +164,7 @@ public class InitialSetupTaskUnitTest {
         this.initialSetupTask.createCommandEnvironmentVariables(mockWriter, mockCommand);
         this.initialSetupTask.createClusterEnvironmentVariables(mockWriter, mockCluster);
         this.initialSetupTask.createJobEnvironmentVariables(mockWriter, jobId, jobName, memory,
-            Sets.newHashSet(jobTag1, jobTag2));
+            Sets.newHashSet(jobTag1, jobTag2), jobGrouping, jobGroupingInstance);
         this.initialSetupTask.createJobRequestEnvironmentVariables(mockWriter, mockJobRequest);
 
         final String expextedOutput = ""
@@ -193,6 +195,10 @@ public class InitialSetupTaskUnitTest {
             + "export GENIE_JOB_MEMORY=" + memory + "\n"
             + "\n"
             + "export GENIE_JOB_TAGS=\"" + jobTag1 + "," + jobTag2 + "\"\n"
+            + "\n"
+            + "export GENIE_JOB_GROUPING=\"" + jobGrouping + "\"\n"
+            + "\n"
+            + "export GENIE_JOB_GROUPING_INSTANCE=\"" + jobGroupingInstance + "\"\n"
             + "\n"
             + "export GENIE_REQUESTED_COMMAND_TAGS=\"" + cmdCritTag1 + "," + cmdCritTag2 + "," + cmdCritTag3 + "\"\n"
             + "\n"
