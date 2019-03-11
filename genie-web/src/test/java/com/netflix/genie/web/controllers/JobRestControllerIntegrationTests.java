@@ -128,6 +128,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String JOB_COMMAND_LINK_PATH = "$._links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "$._links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "$._links.applications.href";
+    private static final String GROUPING_PATH = "$.grouping";
+    private static final String GROUPING_INSTANCE_PATH = "$.groupingInstance";
 
     private static final long CHECK_DELAY = 500L;
 
@@ -172,6 +174,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         + LOCALHOST_CLUSTER_TAG;
     private static final String JOB_TAG1 = UUID.randomUUID().toString();
     private static final String JOB_TAG2 = UUID.randomUUID().toString();
+    private static final String JOB_GROUPING = UUID.randomUUID().toString();
+    private static final String JOB_GROUPING_INSTANCE = UUID.randomUUID().toString();
 
     // This file is not UTF-8 encoded. It is uploaded to test server behavior
     // related to charset headers
@@ -312,6 +316,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDescription(JOB_DESCRIPTION)
             .withMetadata(this.metadata)
             .withTags(Sets.newHashSet(JOB_TAG1, JOB_TAG2))
+            .withGrouping(JOB_GROUPING)
+            .withGroupingInstance(JOB_GROUPING_INSTANCE)
             .build();
 
         final String id = this.submitJob(documentationId, jobRequest, null);
@@ -496,6 +502,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(ARCHIVE_LOCATION_PATH, Matchers.isEmptyOrNullString()))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME)))
+            .andExpect(MockMvcResultMatchers.jsonPath(GROUPING_PATH, Matchers.is(JOB_GROUPING)))
+            .andExpect(MockMvcResultMatchers.jsonPath(GROUPING_INSTANCE_PATH, Matchers.is(JOB_GROUPING_INSTANCE)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(9)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("request")))
@@ -695,6 +703,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(CPU_PATH, Matchers.nullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.nullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_PATH, Matchers.empty()))
+            .andExpect(MockMvcResultMatchers.jsonPath(GROUPING_PATH, Matchers.is(JOB_GROUPING)))
+            .andExpect(MockMvcResultMatchers.jsonPath(GROUPING_INSTANCE_PATH, Matchers.is(JOB_GROUPING_INSTANCE)))
             .andDo(getResultHandler);
     }
 
