@@ -159,6 +159,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = "genie.id:" + CLUSTER1_ID + ","
         + "genie.name:" + CLUSTER1_NAME + ","
         + LOCALHOST_CLUSTER_TAG;
+    private static final String JOB_TAG_1 = "aTag";
+    private static final String JOB_TAG_2 = "zTag";
+    private static final Set<String> JOB_TAGS = Sets.newHashSet(JOB_TAG_1, JOB_TAG_2);
     private static final String JOB_GROUPING = UUID.randomUUID().toString();
     private static final String JOB_GROUPING_INSTANCE = UUID.randomUUID().toString();
     // This file is not UTF-8 encoded. It is uploaded to test server behavior
@@ -282,6 +285,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .withMetadata(this.metadata)
+            .withTags(JOB_TAGS)
             .withGrouping(JOB_GROUPING)
             .withGroupingInstance(JOB_GROUPING_INSTANCE)
             .build();
@@ -476,6 +480,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(ARCHIVE_LOCATION_PATH, archiveJob ? Matchers.notNullValue() : Matchers.isEmptyOrNullString())
             .body(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME))
             .body(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME))
+            .body(TAGS_PATH, Matchers.contains(JOB_TAG_1, JOB_TAG_2))
             .body(GROUPING_PATH, Matchers.is(JOB_GROUPING))
             .body(GROUPING_INSTANCE_PATH, Matchers.is(JOB_GROUPING_INSTANCE))
             .body(LINKS_PATH + ".keySet().size()", Matchers.is(9))
@@ -675,6 +680,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .body(CPU_PATH, Matchers.nullValue())
             .body(MEMORY_PATH, Matchers.nullValue())
             .body(APPLICATIONS_PATH, Matchers.empty())
+            .body(TAGS_PATH, Matchers.contains(JOB_TAG_1, JOB_TAG_2))
             .body(GROUPING_PATH, Matchers.is(JOB_GROUPING))
             .body(GROUPING_INSTANCE_PATH, Matchers.is(JOB_GROUPING_INSTANCE));
     }
@@ -1481,6 +1487,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
             .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
             .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
+            .replace("JOB_TAGS_PLACEHOLDER", JOB_TAG_1 + "," + JOB_TAG_2)
             .replace("JOB_GROUPING_PLACEHOLDER", JOB_GROUPING)
             .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE);
     }

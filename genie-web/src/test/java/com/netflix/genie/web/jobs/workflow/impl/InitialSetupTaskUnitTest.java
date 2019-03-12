@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -129,6 +130,9 @@ public class InitialSetupTaskUnitTest {
         final String commandTag2 = "cmd-foo";
         final String jobName = "The Job";
         final int memory = 1000;
+        final String jobTag1 = "jobTagX";
+        final String jobTag2 = "jobTagY";
+        final Set<String> jobTags = Sets.newHashSet(jobTag1, jobTag2);
         final String jobGrouping = "jobGrouping-X";
         final String jobGroupingInstance = "jobGrouping-X-0001";
         final String cmdCritTag1 = "tagX";
@@ -180,6 +184,7 @@ public class InitialSetupTaskUnitTest {
             jobId,
             jobName,
             memory,
+            jobTags,
             jobGrouping,
             jobGroupingInstance
         );
@@ -213,6 +218,8 @@ public class InitialSetupTaskUnitTest {
             + "export GENIE_JOB_NAME=\"" + jobName + "\"\n"
             + "\n"
             + "export GENIE_JOB_MEMORY=" + memory + "\n"
+            + "\n"
+            + "export GENIE_JOB_TAGS=\"" + jobTag1 + "," + jobTag2 + "\"\n"
             + "\n"
             + "export GENIE_JOB_GROUPING=\"" + jobGrouping + "\"\n"
             + "\n"
