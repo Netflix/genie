@@ -209,7 +209,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             }
             final Path jobDirPath = Paths.get(jobDirRoot);
 
-            final JobDirectoryManifest manifest = new JobDirectoryManifest(jobDirPath);
+            final JobDirectoryManifest manifest = new JobDirectoryManifest(jobDirPath, false);
             this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
         } else {
             // Archived job
