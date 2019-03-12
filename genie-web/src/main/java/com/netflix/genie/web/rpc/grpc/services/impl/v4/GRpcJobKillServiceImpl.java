@@ -23,12 +23,14 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobSearchService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Map;
@@ -40,6 +42,7 @@ import java.util.Map;
  * @author standon
  * @since 4.0.0
  */
+@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @GrpcService(
     value = JobKillServiceGrpc.class,
     interceptors = {

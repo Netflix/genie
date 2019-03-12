@@ -73,6 +73,7 @@ import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.InspectionReport;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -201,6 +202,19 @@ public class GenieServicesAutoConfiguration {
             jobKillServiceV4,
             jobPersistenceService
         );
+    }
+
+    /**
+     * Get a fallback implementation of {@link JobKillServiceV4} in case gRPC is disabled.
+     *
+     * @return a placeholder V4 job kill service for tests.
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobKillServiceV4.class)
+    public JobKillServiceV4 fallbackJobKillServiceV4() {
+        return (jobId, reason) -> {
+            throw new NotImplementedException("Not suppored when using fallback kill service");
+        };
     }
 
     /**
