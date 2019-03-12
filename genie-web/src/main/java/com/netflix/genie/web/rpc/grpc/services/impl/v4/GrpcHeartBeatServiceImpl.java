@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.netflix.genie.proto.AgentHeartBeat;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.ServerHeartBeat;
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentRoutingService;
 import io.grpc.stub.StreamObserver;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.PreDestroy;
@@ -44,6 +46,7 @@ import java.util.concurrent.ScheduledFuture;
  * @author mprimi
  * @since 4.0.0
  */
+@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @GrpcService(
     value = HeartBeatServiceGrpc.class,
     interceptors = {

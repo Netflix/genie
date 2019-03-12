@@ -36,6 +36,7 @@ import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -153,5 +154,19 @@ public class ServicesAutoConfigurationUnitTests {
                 GenieObjectMapper.getMapper()
             )
         );
+    }
+
+    /**
+     * Can get the fallback V4 Kill service.
+     *
+     * @throws GenieException in case of error
+     */
+    @Test(expected = NotImplementedException.class)
+    public void canGetFallbackJobKillServiceV4() throws GenieException {
+        final JobKillServiceV4 service = this.genieServicesAutoConfiguration.fallbackJobKillServiceV4();
+        Assert.assertNotNull(service);
+
+        service.killJob(UUID.randomUUID().toString(), "test");
+        Assert.fail("Expected exception");
     }
 }
