@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -41,7 +40,6 @@ import java.util.Collection;
 @Configuration
 @Slf4j
 @Order(357)
-@PropertySource("classpath:genie-security.properties")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired(required = false)
