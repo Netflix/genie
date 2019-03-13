@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2016 Netflix, Inc.
+#  Copyright 2019 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -78,17 +78,7 @@ genie:
   retry:
     s3:
       noOfRetries: 5
-  security:
-    oauth2:
-      enabled: false
-      pingfederate:
-        enabled: false
-        jwt:
-          enabled: false
-    saml:
-      enabled: false
-    x509:
-      enabled: false
+  smoke: true
   swagger:
     enabled: false
   tasks:

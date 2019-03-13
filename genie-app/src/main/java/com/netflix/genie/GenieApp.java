@@ -30,6 +30,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @since 3.0.0
  */
 @SpringBootApplication(
+    // TODO: We probably should handle these in an environment post processor so that it's universal
     exclude = {
         RedisAutoConfiguration.class,
         GrpcServerAutoConfiguration.class,

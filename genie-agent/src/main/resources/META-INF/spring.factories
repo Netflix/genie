@@ -8,3 +8,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.agent.execution.statemachine.StateMachineAutoConfiguration,\
   com.netflix.genie.agent.execution.statemachine.actions.StateMachineActionsAutoConfiguration,\
   com.netflix.genie.agent.rpc.GRpcAutoConfiguration
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.netflix.genie.agent.configs.processors.GenieDefaultPropertiesPostProcessor

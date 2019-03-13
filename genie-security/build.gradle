@@ -3,6 +3,7 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
+    compile(project(":genie-common-internal"))
     compile(project(":genie-web"))
     compile(project(":genie-ui"))
     compile("org.bitbucket.b_c:jose4j")

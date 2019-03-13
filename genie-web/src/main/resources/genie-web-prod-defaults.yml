@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2016 Netflix, Inc.
+#  Copyright 2019 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 #
 ##
 
+genie:
+  smoke: false
+
 spring:
   datasource:
     url: jdbc:mysql://127.0.0.1/genie?useUnicode=yes&characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=UTC
@@ -27,8 +30,8 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
-#        useLocalSessionState: true
-#        useLocalTransactionState: true
+        # useLocalSessionState: true
+        # useLocalTransactionState: true
         rewriteBatchedStatements: true
         cacheResultSetMetadata: true
         cacheServerConfiguration: true
