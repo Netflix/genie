@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -53,13 +53,13 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Unit Tests for ServicesConfig class.
+ * Unit Tests for {@link GenieServicesAutoConfiguration}.
  *
  * @author amsharma
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class ServicesAutoConfigurationUnitTests {
+public class GenieServicesAutoConfigurationTest {
 
     private JobSearchService jobSearchService;
     private GenieServicesAutoConfiguration genieServicesAutoConfiguration;

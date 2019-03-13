@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Category(UnitTest.class)
-public class StateMachineAutoConfigurationTest {
+public class StateMachineConfigurationTest {
 
     private static final int MIN_ACTION_DURATION_MS = 10;
     private static final int MAX_ACTION_DURATION_MS = 300;
