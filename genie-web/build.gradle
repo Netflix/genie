@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: "org.asciidoctor.convert"
 
 project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
@@ -153,4 +155,12 @@ tasks.withType(Checkstyle) {
 
 tasks.withType(Pmd) {
     exclude metaModelIgnorePattern
+}
+
+processResources {
+    filesMatching("**/*.yml") {
+        filter ReplaceTokens, tokens: [
+                "genie.version": project.version.toString()
+        ]
+    }
 }
