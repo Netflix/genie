@@ -83,7 +83,7 @@ class HandleErrorActionSpec extends Specification {
         Exception exception = new RuntimeException("...")
 
         when:
-        action.executeStateAction(executionContext)
+        def event = action.executeStateAction(executionContext)
 
         then:
         1 * executionContext.getFinalJobStatus() >> Optional.empty()
@@ -91,7 +91,7 @@ class HandleErrorActionSpec extends Specification {
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw exception}
 
-        thrown(exception.class)
+        event == Events.HANDLE_ERROR_COMPLETE
     }
 
     def "Pre and post action validation"() {
