@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -73,6 +74,9 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
                 executionContext.setFinalJobStatus(JobStatus.FAILED);
             } catch (ChangeJobStatusException e) {
                 log.error("Failed to update job status as part of execution error handling");
+            } catch (final Exception e) {
+                log.error("Unrecoverable error during error handling.", e);
+                UserConsole.getLogger().error("Failed remediation step. Shutting down.");
             }
         }
 
