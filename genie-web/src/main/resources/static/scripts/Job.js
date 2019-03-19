@@ -77,19 +77,19 @@ export default class Job extends Page {
         value: "desc",
         type: "sortOption",
         optionValues: ["desc", "asc"]
-      }
-    ];
-  }
-
-  get hiddenFormFields() {
-    return [
+      },
       { label: "Tags", name: "tag", value: "", type: "input" },
       { label: "Cluster Name", name: "clusterName", value: "", type: "input" },
       { label: "Cluster ID", name: "clusterId", value: "", type: "input" },
       { label: "Command Name", name: "commandName", value: "", type: "input" },
       { label: "Command ID", name: "commandId", value: "", type: "input" },
       { label: "Grouping", name: "grouping", value: "", type: "input" },
-      { label: "Grouping Instance", name: "groupingInstance", value: "", type: "input" },
+      {
+        label: "Grouping Instance",
+        name: "groupingInstance",
+        value: "",
+        type: "input"
+      }
     ];
   }
 
@@ -110,6 +110,7 @@ export default class Job extends Page {
       "User",
       "Status",
       "Cluster",
+      "Command",
       "Started (UTC)",
       "Finished (UTC)",
       "Run Time"
