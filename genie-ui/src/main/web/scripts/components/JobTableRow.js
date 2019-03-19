@@ -75,6 +75,9 @@ export default class TableRow extends React.Component {
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           {this.props.row.clusterName}
         </td>
+        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
+          {this.props.row.commandName}
+        </td>
         <td
           onClick={() => this.props.toggleRowDetails(this.props.row.id)}
           className="col-xs-1"

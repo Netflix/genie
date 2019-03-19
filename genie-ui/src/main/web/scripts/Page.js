@@ -53,7 +53,7 @@ export default class Page extends React.Component {
 
   loadPageData(query) {
     if ($.isEmptyObject(query)) {
-      query = { size: 25 };
+      query = { size: 100 };
     }
     const { rowId = null, showSearchForm = "true" } = query;
     this.setState({ query, data: [] });
