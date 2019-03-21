@@ -1,5 +1,6 @@
 import T from "prop-types";
 import React from "react";
+import { Link } from "react-router";
 import { momentFormat, momentDurationFormat } from "../utils";
 import CopyToClipboard from "react-copy-to-clipboard";
 
@@ -55,16 +56,17 @@ export default class TableRow extends React.Component {
         >
           <CopyToClipboard
             onCopy={() => this.setState({ copied: true })}
-            text={`${this.jobsUrl}?id=${this.props.row.id}&rowId=${this.props
-              .row.id}`}
+            text={`${this.jobsUrl}?id=${this.props.row.id}&rowId=${
+              this.props.row.id
+            }`}
           >
             <button className="btn btn-default btn-xs">
               <i className="fa fa-share-alt" aria-hidden="true" />
             </button>
           </CopyToClipboard>
-          {this.state.copied
-            ? <p className="text-muted copied-text">Copied</p>
-            : null}
+          {this.state.copied ? (
+            <p className="text-muted copied-text">Copied</p>
+          ) : null}
         </td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           {this.props.row.user}
@@ -72,11 +74,15 @@ export default class TableRow extends React.Component {
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           {this.props.row.status}
         </td>
-        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
-          {this.props.row.clusterName}
+        <td>
+          <Link to={`clusters?name=${this.props.row.clusterName}`}>
+            {this.props.row.clusterName}
+          </Link>
         </td>
-        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
-          {this.props.row.commandName}
+        <td>
+          <Link to={`commands?name=${this.props.row.commandName}`}>
+            {this.props.row.commandName}
+          </Link>
         </td>
         <td
           onClick={() => this.props.toggleRowDetails(this.props.row.id)}
