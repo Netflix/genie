@@ -22,13 +22,11 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
-import com.netflix.genie.test.categories.UnitTest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
@@ -49,7 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Test the state machine configured for job execution using mock state actions.
  */
 @Slf4j
-@Category(UnitTest.class)
 public class StateMachineAutoConfigurationTest {
 
     private static final int MIN_ACTION_DURATION_MS = 10;

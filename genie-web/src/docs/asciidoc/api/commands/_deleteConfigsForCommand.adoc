@@ -8,7 +8,7 @@ Remove all the configuration file locations for an existing command.
 
 `DELETE /api/v3/commands/{id}/configs`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-delete-configs-for-command/3
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-delete-configs-for-command/3
 :id-base: remove-all-configs-from-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

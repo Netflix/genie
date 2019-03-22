@@ -8,7 +8,7 @@ Get the tags for an application.
 
 `GET /api/v3/applications/{id}/tags`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-add-tags-to-application/4
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-add-tags-to-application/4
 :id-base: get-tags-for-application
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

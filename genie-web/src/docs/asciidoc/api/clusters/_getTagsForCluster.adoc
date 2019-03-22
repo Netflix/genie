@@ -8,7 +8,7 @@ Get the tags for a cluster.
 
 `GET /api/v3/clusters/{id}/tags`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-add-tags-to-cluster/4
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-add-tags-to-cluster/4
 :id-base: get-tags-for-cluster
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

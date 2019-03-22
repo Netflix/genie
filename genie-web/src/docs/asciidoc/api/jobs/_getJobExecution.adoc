@@ -8,7 +8,7 @@ Get metadata about a job execution. Information like where a job was run, its pr
 
 `GET /api/v3/jobs/{id}/execution`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobExecution
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobExecution
 :id-base: get-job-execution
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

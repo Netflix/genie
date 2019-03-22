@@ -18,8 +18,6 @@
 package com.netflix.genie.common.internal.dto.v4
 
 import com.google.common.collect.Sets
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -27,7 +25,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class ExecutionEnvironmentSpec extends Specification {
 
     def "Can create immutable ExecutionEnvironment instance"() {

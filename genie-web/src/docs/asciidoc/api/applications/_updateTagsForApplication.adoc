@@ -11,7 +11,7 @@ by the system.
 
 `PUT /api/v3/applications/{id}/tags`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-update-tags-for-application/3
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-update-tags-for-application/3
 :id-base: update-tags-for-application
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

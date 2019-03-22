@@ -15,16 +15,12 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParameterException
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class PingCommandArgumentsSpec extends Specification {
 
     PingCommand.PingCommandArguments options

@@ -15,17 +15,13 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine
 
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import org.springframework.statemachine.StateMachine
 import org.springframework.statemachine.listener.StateMachineListener
 import org.springframework.statemachine.state.State
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class JobExecutionStateMachineSpec extends Specification {
     StateMachine<States, Events> sm
 

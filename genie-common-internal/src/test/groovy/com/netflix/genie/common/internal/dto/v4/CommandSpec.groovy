@@ -19,9 +19,7 @@ package com.netflix.genie.common.internal.dto.v4
 
 import com.google.common.collect.Lists
 import com.netflix.genie.common.dto.CommandStatus
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 import java.time.Instant
@@ -31,7 +29,6 @@ import java.time.Instant
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class CommandSpec extends Specification {
 
     def "Can build immutable command resource"() {

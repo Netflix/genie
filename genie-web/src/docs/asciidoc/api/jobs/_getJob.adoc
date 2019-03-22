@@ -8,7 +8,7 @@ Get metadata about a specific job.
 
 `GET /api/v3/jobs/{id}`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJob
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJob
 :id-base: get-job
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

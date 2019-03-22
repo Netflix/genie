@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli
 
 import com.google.protobuf.util.Timestamps
@@ -23,19 +22,15 @@ import com.netflix.genie.agent.AgentMetadata
 import com.netflix.genie.proto.PingRequest
 import com.netflix.genie.proto.PingServiceGrpc
 import com.netflix.genie.proto.PongResponse
-import com.netflix.genie.test.categories.UnitTest
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
 import org.apache.commons.lang3.StringUtils
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class PingCommandSpec extends Specification {
 
     final String agentHostName = "agent.com"
-    final String agentVersion = "1.2.3"
     final String agentPid = "54321"
     final String source = agentPid + "@" + agentHostName
 

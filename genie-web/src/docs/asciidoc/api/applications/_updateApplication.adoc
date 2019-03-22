@@ -11,7 +11,7 @@ NOTE: For more fine grained control call the PATCH API.
 
 `PUT /api/v3/applications/{id}`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-update-application/3
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-update-application/3
 :id-base: update-application
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

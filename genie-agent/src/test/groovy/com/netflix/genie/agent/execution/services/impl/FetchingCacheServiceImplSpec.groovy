@@ -15,18 +15,15 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.utils.locks.CloseableLock
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory
-import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Pair
 import org.assertj.core.util.Sets
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
@@ -37,7 +34,6 @@ import spock.lang.Specification
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.locks.ReentrantLock
 
-@Category(UnitTest.class)
 class FetchingCacheServiceImplSpec extends Specification {
 
     ResourceLoader resourceLoader

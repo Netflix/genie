@@ -25,7 +25,6 @@ import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.util.GenieObjectMapper
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.jpa.entities.ApplicationEntity
 import com.netflix.genie.web.jpa.entities.ClusterEntity
@@ -35,7 +34,6 @@ import com.netflix.genie.web.jpa.entities.FileEntity
 import com.netflix.genie.web.jpa.entities.JobEntity
 import com.netflix.genie.web.jpa.entities.TagEntity
 import org.apache.commons.lang3.StringUtils
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 import java.time.Instant
@@ -45,7 +43,6 @@ import java.time.Instant
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class JpaServiceUtilsSpec extends Specification {
 
     def "Can convert application entity to application dto"() {

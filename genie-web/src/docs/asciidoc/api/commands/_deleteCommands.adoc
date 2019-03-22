@@ -11,7 +11,7 @@ ability for users to look up information about their job (where it ran, what it 
 
 `DELETE /api/v3/commands`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-delete-all-commands/4
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-delete-all-commands/4
 :id-base: delete-all-commands
 :!request-headers:
 :!request-path-params:

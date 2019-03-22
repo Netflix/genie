@@ -10,7 +10,7 @@ WARNING: The applications for the ID's must already exist in the system
 
 `POST /api/v3/commands/{id}/applications`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-add-applications-for-a-command/5
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-add-applications-for-a-command/5
 :id-base: add-applications-to-command
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

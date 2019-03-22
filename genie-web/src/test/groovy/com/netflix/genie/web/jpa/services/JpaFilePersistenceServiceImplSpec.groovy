@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.jpa.services
 
-import com.netflix.genie.test.categories.UnitTest
+
 import com.netflix.genie.web.jpa.entities.FileEntity
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository
-import org.junit.experimental.categories.Category
 import org.springframework.dao.DuplicateKeyException
 import spock.lang.Specification
 
@@ -29,7 +28,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class JpaFilePersistenceServiceImplSpec extends Specification {
     def fileRepository = Mock(JpaFileRepository)
     def service = new JpaFilePersistenceServiceImpl(this.fileRepository)

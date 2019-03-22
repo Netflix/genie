@@ -8,7 +8,7 @@ Get the list of applications that were used by the command selected by job to ex
 
 `GET /api/v3/jobs/{id}/applications`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobApplications
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobApplications
 :id-base: get-job-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

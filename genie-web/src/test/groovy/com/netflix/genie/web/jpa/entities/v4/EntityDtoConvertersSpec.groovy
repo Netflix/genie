@@ -412,7 +412,7 @@ class EntityDtoConvertersSpec extends Specification {
 
         def jobArchivalDataRequest = new JobArchivalDataRequest.Builder()
             .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-            .build();
+            .build()
 
         def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder()
             .withExt(metadata)

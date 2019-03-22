@@ -15,19 +15,15 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine
 
 import com.netflix.genie.agent.execution.services.KillService
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import org.springframework.statemachine.StateMachine
 import org.springframework.statemachine.config.StateMachineBuilder
 import org.springframework.statemachine.listener.StateMachineListener
 import org.springframework.statemachine.state.State
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class JobExecutionStateMachineImplSpec extends Specification {
     def "RunAndWaitForStop"() {
         setup:

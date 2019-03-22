@@ -18,11 +18,9 @@
 package com.netflix.genie.web.jpa.services
 
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -30,7 +28,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class JpaBaseServiceSpec extends Specification {
 
     def "Can't get file entity if doesn't exist"() {

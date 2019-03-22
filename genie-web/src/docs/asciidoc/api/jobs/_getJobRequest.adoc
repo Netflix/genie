@@ -8,7 +8,7 @@ Get the original request which spawned the job.
 
 `GET /api/v3/jobs/{id}/request`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobRequest
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobRequest
 :id-base: get-job-request
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

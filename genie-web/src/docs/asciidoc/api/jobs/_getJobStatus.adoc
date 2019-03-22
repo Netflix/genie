@@ -8,7 +8,7 @@ Get the current status of a job.
 
 `GET /api/v3/jobs/{id}/status`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobStatus
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobStatus
 :id-base: get-job-status
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

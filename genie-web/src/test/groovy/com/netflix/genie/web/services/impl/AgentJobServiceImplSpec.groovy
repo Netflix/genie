@@ -26,7 +26,6 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.AgentFilterService
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
@@ -37,7 +36,6 @@ import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -45,7 +43,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class AgentJobServiceImplSpec extends Specification {
 
     public static final String version = "1.2.3"

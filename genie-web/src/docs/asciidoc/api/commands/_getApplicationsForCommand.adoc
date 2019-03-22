@@ -9,7 +9,7 @@ when a job is run with the given command
 
 `GET /api/v3/commands/{id}/applications`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-add-applications-for-a-command/10
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-add-applications-for-a-command/10
 :id-base: get-applications-for-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

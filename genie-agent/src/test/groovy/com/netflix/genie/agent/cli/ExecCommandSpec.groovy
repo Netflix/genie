@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli
 
 import com.google.common.collect.Lists
@@ -25,13 +24,10 @@ import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.agent.execution.statemachine.actions.BaseStateAction
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Triple
-import org.junit.experimental.categories.Category
 import org.springframework.statemachine.action.Action
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class ExecCommandSpec extends Specification {
     ExecCommand.ExecCommandArguments args
     JobExecutionStateMachine stateMachine;

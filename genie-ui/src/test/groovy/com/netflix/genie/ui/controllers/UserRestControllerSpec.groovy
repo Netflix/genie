@@ -18,8 +18,6 @@
 package com.netflix.genie.ui.controllers
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 import javax.servlet.http.HttpServletRequest
@@ -30,7 +28,6 @@ import java.security.Principal
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class UserRestControllerSpec extends Specification {
 
     def "Can get user info"() {

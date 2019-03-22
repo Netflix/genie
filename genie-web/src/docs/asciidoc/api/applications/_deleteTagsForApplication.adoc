@@ -10,7 +10,7 @@ IMPORTANT: The `genie.id:{id}` and `genie.name:{name}` tags will **NOT** be remo
 
 `DELETE /api/v3/applications/{id}/tags`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-delete-tags-for-application/3
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-delete-tags-for-application/3
 :id-base: remove-all-tags-from-application
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

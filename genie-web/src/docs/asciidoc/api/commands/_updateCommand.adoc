@@ -11,7 +11,7 @@ NOTE: For more fine grained control call the PATCH API.
 
 `PUT /api/v3/commands/{id}`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-update-command/3
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-update-command/3
 :id-base: update-command
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

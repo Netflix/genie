@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.utils
 
 import org.springframework.core.io.ClassPathResource

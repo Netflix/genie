@@ -18,14 +18,12 @@
 package com.netflix.genie.web.aspect
 
 import com.google.common.collect.Sets
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.health.GenieCpuHealthIndicator
 import com.netflix.genie.web.util.MetricsConstants
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import org.aspectj.lang.ProceedingJoinPoint
-import org.junit.experimental.categories.Category
 import org.springframework.boot.actuate.health.Health
 import spock.lang.Specification
 
@@ -36,7 +34,6 @@ import java.util.concurrent.TimeUnit
  *
  * @author mprimi* @since 3.2.4
  */
-@Category(UnitTest.class)
 class HealthCheckMetricsAspectSpec extends Specification {
     MeterRegistry registry
     io.micrometer.core.instrument.Timer timer

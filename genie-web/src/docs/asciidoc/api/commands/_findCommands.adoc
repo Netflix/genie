@@ -8,7 +8,7 @@ Find commands using various query parameters.
 
 `GET /api/v3/commands`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-find-commands/8
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-find-commands/8
 :id-base: find-commands
 :!request-headers:
 :!request-path-params:

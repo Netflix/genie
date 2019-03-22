@@ -10,7 +10,7 @@ NOTE: Configurations are stored as a set so any duplicates will be ignored.
 
 `POST /api/v3/clusters/{id}/configs`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-add-configs-to-cluster/3
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-add-configs-to-cluster/3
 :id-base: add-configs-to-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

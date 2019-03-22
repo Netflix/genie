@@ -9,7 +9,7 @@ files were, etc.
 
 `GET /api/v3/jobs/{id}/metadata`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobMetadata
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobMetadata
 :id-base: get-job-metadata
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

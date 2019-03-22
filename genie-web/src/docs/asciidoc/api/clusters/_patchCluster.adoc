@@ -10,7 +10,7 @@ NOTE: For more information about JSON Patch RFC see the http://jsonpatch.com/[we
 
 `PATCH /api/v3/clusters/{id}`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-patch-cluster/3
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-patch-cluster/3
 :id-base: patch-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

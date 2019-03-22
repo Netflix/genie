@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.cli.ArgumentDelegates
@@ -35,17 +34,14 @@ import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.jobs.JobConstants
-import com.netflix.genie.test.categories.UnitTest
 import org.assertj.core.util.Sets
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-@Category(UnitTest.class)
 class SetUpJobActionSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder

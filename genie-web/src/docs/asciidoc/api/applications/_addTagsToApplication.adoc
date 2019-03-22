@@ -10,7 +10,7 @@ NOTE: `genie.id:{id}` and `genie.name:{name}` tags are automatically added by th
 
 `POST /api/v3/applications/{id}/tags`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-add-tags-to-application/3
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-add-tags-to-application/3
 :id-base: add-tags-to-application
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

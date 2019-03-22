@@ -15,17 +15,13 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli
 
 import com.google.common.collect.ImmutableList
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class CommandFactorySpec extends Specification {
 
     CommandFactory factory

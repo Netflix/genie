@@ -17,9 +17,7 @@
  */
 package com.netflix.genie.common.internal.dto.v4
 
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -27,7 +25,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class AgentClientMetadataSpec extends Specification {
 
     def "Can build instance"() {

@@ -18,7 +18,7 @@ provide one it must be unique.
 
 NOTE: This Example is without attachments
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/submitJobWithoutAttachments
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/submitJobWithoutAttachments
 :id-base: submit-job-without-attachments
 :request-headers: {snippet-base}/request-headers.adoc
 :!request-path-params:
@@ -36,7 +36,7 @@ include::../_apiTemplate.adoc[]
 
 NOTE: This example is with attachments
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/4/submitJobWithAttachments
+:snippet-base: {snippets}/job-rest-controller-integration-test/4/submitJobWithAttachments
 :id-base: submit-job-with-attachments
 :request-headers: {snippet-base}/request-headers.adoc
 :!request-path-params:

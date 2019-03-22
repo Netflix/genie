@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.common.internal.dto
 
-
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Rule
@@ -34,6 +33,7 @@ import java.nio.file.Path
  * Specifications for {@link JobDirectoryManifest}.
  *
  * @author tgianos
+ * @since 4.0.0
  */
 class JobDirectoryManifestSpec extends Specification {
 

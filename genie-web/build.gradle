@@ -106,7 +106,7 @@ license {
     exclude "**/com/netflix/genie/web/jpa/entities/*_.java"
 }
 
-test {
+integrationTest {
     outputs.dir snippetsDir
 }
 
@@ -114,7 +114,7 @@ test {
 def genieVersion = project.version.toString()
 
 asciidoctor {
-    dependsOn test
+    dependsOn integrationTest
     inputs.dir snippetsDir
     attributes       \
                   "snippets": snippetsDir,

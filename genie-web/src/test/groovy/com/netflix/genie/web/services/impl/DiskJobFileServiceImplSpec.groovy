@@ -19,10 +19,8 @@ package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Sets
 import com.netflix.genie.common.internal.dto.v4.files.JobFileState
-import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.FileSystemResource
 import spock.lang.Specification
@@ -36,7 +34,6 @@ import java.nio.file.Paths
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class DiskJobFileServiceImplSpec extends Specification {
 
     @Rule

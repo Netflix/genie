@@ -19,7 +19,6 @@ package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -28,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
@@ -54,7 +52,6 @@ import java.util.concurrent.TimeUnit;
  * @author tgianos
  * @since 3.0.0
  */
-@Category(UnitTest.class)
 public class HttpFileTransferImplTest {
 
     private static final String TEST_URL = "http://localhost/myFile.txt";

@@ -35,7 +35,6 @@ import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.common.util.GenieObjectMapper
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.services.ApplicationPersistenceService
 import com.netflix.genie.web.services.ClusterLoadBalancer
@@ -44,7 +43,6 @@ import com.netflix.genie.web.services.CommandPersistenceService
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 import java.time.Instant
@@ -54,7 +52,6 @@ import java.time.Instant
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class JobSpecificationServiceImplSpec extends Specification {
 
     def "Can generate job specification"() {

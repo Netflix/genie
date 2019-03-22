@@ -10,7 +10,7 @@ NOTE: `genie.id:{id}` and `genie.name:{name}` tags are automatically added by th
 
 `POST /api/v3/clusters/{id}/tags`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-add-tags-to-cluster/3
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-add-tags-to-cluster/3
 :id-base: add-tags-to-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

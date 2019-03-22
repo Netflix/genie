@@ -8,7 +8,7 @@ Find clusters using various query parameters.
 
 `GET /api/v3/clusters`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-find-clusters/8
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-find-clusters/8
 :id-base: find-clusters
 :!request-headers:
 :!request-path-params:

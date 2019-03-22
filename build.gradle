@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 buildscript {
     repositories {
         gradlePluginPortal()
@@ -45,7 +47,7 @@ allprojects {
 idea {
     project {
         jdkName = "1.8"
-        languageLevel = "1.8"
+        languageLevel = "8"
         vcs = "Git"
     }
 }
@@ -60,15 +62,28 @@ configure(javaProjects) {
     apply plugin: "com.gorylenko.gradle-git-properties"
     apply plugin: "groovy"
     apply plugin: "io.franzbecker.gradle-lombok"
+    apply plugin: "nebula.facet"
 
     group = "com.netflix.${githubProjectName}"
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
+    facets {
+        smokeTest {
+            parentSourceSet = "test"
+            // includeInCheckLifecycle = false
+        }
+        integTest {
+            parentSourceSet = "test"
+            testTaskName = "integrationTest"
+            // includeInCheckLifecycle = false
+        }
+    }
+
     dependencyManagement {
         imports {
-            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+            mavenBom SpringBootPlugin.BOM_COORDINATES
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
         }
         dependencies {
@@ -215,39 +230,6 @@ configure(javaProjects) {
         testRuntime("org.glassfish:javax.el")
     }
 
-    task unitTests(type: Test, group: "verification") {
-        useJUnit {
-            includeCategories "com.netflix.genie.test.categories.UnitTest"
-            excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
-            excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
-        }
-        outputs.upToDateWhen {
-            return false
-        }
-    }
-
-    task integrationTests(type: Test, group: "verification") {
-        useJUnit {
-            includeCategories "com.netflix.genie.test.categories.IntegrationTest"
-            excludeCategories "com.netflix.genie.test.categories.UnitTest"
-            excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
-        }
-        outputs.upToDateWhen {
-            return false
-        }
-    }
-
-    task documentationTests(type: Test, group: "verification") {
-        useJUnit {
-            includeCategories "com.netflix.genie.test.categories.DocumentationTest"
-            excludeCategories "com.netflix.genie.test.categories.UnitTest"
-            excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
-        }
-        outputs.upToDateWhen {
-            return false
-        }
-    }
-
     task removeGeneratedSources(type: Delete) {
         generatedSourcesDir.deleteDir()
     }
@@ -343,10 +325,6 @@ configure(javaProjects) {
             xml.enabled = true
             csv.enabled = false
         }
-    }
-
-    lombok {
-        version = "1.18.4"
     }
 }
 

@@ -8,7 +8,7 @@ Get the metadata about a command in the system.
 
 `GET /api/v3/commands/{id}`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-create-command-without-id/2
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-create-command-without-id/2
 :id-base: get-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.AgentMetadata
@@ -24,11 +23,8 @@ import com.netflix.genie.agent.execution.exceptions.HandshakeException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class InitializeActionSpec extends Specification {
     ExecutionContext executionContext
     AgentJobService agentJobService

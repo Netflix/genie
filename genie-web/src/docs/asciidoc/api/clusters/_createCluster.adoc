@@ -11,7 +11,7 @@ Create a new cluster in the system.
 IMPORTANT: The id in this example is optional. If you include one Genie will use it. If not it will provide one. If you
 provide one it must be unique.
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-create-cluster-without-id/1
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-create-cluster-without-id/1
 :id-base: create-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :!request-path-params:

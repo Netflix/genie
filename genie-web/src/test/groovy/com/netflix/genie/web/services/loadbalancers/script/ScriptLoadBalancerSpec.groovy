@@ -27,7 +27,6 @@ import com.netflix.genie.common.internal.dto.v4.Cluster
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.util.GenieObjectMapper
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.properties.ScriptLoadBalancerProperties
 import com.netflix.genie.web.services.impl.GenieFileTransferService
 import com.netflix.genie.web.util.MetricsConstants
@@ -35,7 +34,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import org.apache.commons.lang3.StringUtils
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.TaskScheduler
@@ -53,7 +51,6 @@ import java.util.concurrent.TimeUnit
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class ScriptLoadBalancerSpec extends Specification {
 
     @Rule

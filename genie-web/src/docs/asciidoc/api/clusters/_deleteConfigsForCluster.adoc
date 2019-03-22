@@ -8,7 +8,7 @@ Remove all the configuration file locations for an existing cluster.
 
 `DELETE /api/v3/clusters/{id}/configs`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-delete-configs-for-cluster/3
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-delete-configs-for-cluster/3
 :id-base: remove-all-configs-from-cluster
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

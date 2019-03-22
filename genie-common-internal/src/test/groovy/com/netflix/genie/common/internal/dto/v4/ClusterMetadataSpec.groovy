@@ -21,8 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.util.GenieObjectMapper
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -30,7 +28,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class ClusterMetadataSpec extends Specification {
 
     def "Can build immutable ClusterMetadata instance"() {
