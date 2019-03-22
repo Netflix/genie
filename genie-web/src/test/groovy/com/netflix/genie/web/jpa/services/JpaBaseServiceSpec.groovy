@@ -29,7 +29,6 @@ import spock.lang.Specification
  * Specifications for JpaBaseService class.
  *
  * @author tgianos
- * @since 3.3.0
  */
 @Category(UnitTest.class)
 class JpaBaseServiceSpec extends Specification {
@@ -40,11 +39,11 @@ class JpaBaseServiceSpec extends Specification {
             1 * getFile(_ as String) >> Optional.empty()
         }
         def service = new JpaBaseService(
-                Mock(JpaTagPersistenceService),
-                fileService,
-                Mock(JpaApplicationRepository),
-                Mock(JpaClusterRepository),
-                Mock(JpaCommandRepository)
+            Mock(JpaTagPersistenceService),
+            fileService,
+            Mock(JpaApplicationRepository),
+            Mock(JpaClusterRepository),
+            Mock(JpaCommandRepository)
         )
 
         when:
@@ -60,11 +59,11 @@ class JpaBaseServiceSpec extends Specification {
             1 * getTag(_ as String) >> Optional.empty()
         }
         def service = new JpaBaseService(
-                tagService,
-                Mock(JpaFilePersistenceService),
-                Mock(JpaApplicationRepository),
-                Mock(JpaClusterRepository),
-                Mock(JpaCommandRepository)
+            tagService,
+            Mock(JpaFilePersistenceService),
+            Mock(JpaApplicationRepository),
+            Mock(JpaClusterRepository),
+            Mock(JpaCommandRepository)
         )
 
         when:

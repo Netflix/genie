@@ -34,10 +34,10 @@ class JobExecutionStateMachineImplSpec extends Specification {
         def builder = new StateMachineBuilder.Builder<States, Events>()
 
         builder.configureStates()
-                .withStates()
-                .initial(States.READY)
-                .end(States.END)
-                .states(EnumSet.allOf(States.class))
+            .withStates()
+            .initial(States.READY)
+            .end(States.END)
+            .states(EnumSet.allOf(States.class))
 
         builder.configureTransitions()
             .withExternal()

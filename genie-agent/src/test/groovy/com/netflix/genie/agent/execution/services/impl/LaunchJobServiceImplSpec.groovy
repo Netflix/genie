@@ -58,10 +58,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                ["touch", expectedFile.getAbsolutePath()],
-                true
+            temporaryFolder.getRoot(),
+            envMap,
+            ["touch", expectedFile.getAbsolutePath()],
+            true
         )
 
         then:
@@ -85,10 +85,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                ["\${ECHO_COMMAND}", helloWorld],
-                false
+            temporaryFolder.getRoot(),
+            envMap,
+            ["\${ECHO_COMMAND}", helloWorld],
+            false
         )
 
         then:
@@ -113,10 +113,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                ["env"],
-                false
+            temporaryFolder.getRoot(),
+            envMap,
+            ["env"],
+            false
         )
 
         then:
@@ -139,10 +139,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                ["rm", nonExistentFile.absolutePath],
-                false
+            temporaryFolder.getRoot(),
+            envMap,
+            ["rm", nonExistentFile.absolutePath],
+            false
         )
 
         then:
@@ -165,10 +165,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                [uuid],
-                false)
+            temporaryFolder.getRoot(),
+            envMap,
+            [uuid],
+            false)
 
         then:
         thrown(JobLaunchException)
@@ -180,10 +180,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                ["\$COMMAND"],
-                false
+            temporaryFolder.getRoot(),
+            envMap,
+            ["\$COMMAND"],
+            false
         )
 
         then:
@@ -196,10 +196,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                null,
-                envMap,
-                ["echo"],
-                false
+            null,
+            envMap,
+            ["echo"],
+            false
         )
 
         then:
@@ -212,10 +212,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.newFile("foo"),
-                envMap,
-                ["echo"],
-                false
+            temporaryFolder.newFile("foo"),
+            envMap,
+            ["echo"],
+            false
         )
 
         then:
@@ -228,10 +228,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                new File(temporaryFolder.getRoot(), "foo"),
-                envMap,
-                ["echo"],
-                false
+            new File(temporaryFolder.getRoot(), "foo"),
+            envMap,
+            ["echo"],
+            false
         )
 
         then:
@@ -244,10 +244,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                null,
-                ["echo"],
-                false)
+            temporaryFolder.getRoot(),
+            null,
+            ["echo"],
+            false)
 
         then:
         thrown(JobLaunchException)
@@ -259,10 +259,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                null,
-                false)
+            temporaryFolder.getRoot(),
+            envMap,
+            null,
+            false)
 
         then:
         thrown(JobLaunchException)
@@ -274,10 +274,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
         when:
         service.launchProcess(
-                temporaryFolder.getRoot(),
-                envMap,
-                [],
-                false
+            temporaryFolder.getRoot(),
+            envMap,
+            [],
+            false
         )
 
         then:
@@ -404,7 +404,7 @@ class LaunchJobServiceImplSpec extends Specification {
         !stdOut.exists()
     }
 
-    def "Double launch" () {
+    def "Double launch"() {
         setup:
         LaunchJobService service = new LaunchJobServiceImpl()
 
@@ -431,7 +431,7 @@ class LaunchJobServiceImplSpec extends Specification {
         thrown(IllegalStateException)
     }
 
-    def "No launch" () {
+    def "No launch"() {
         setup:
         LaunchJobService service = new LaunchJobServiceImpl()
 

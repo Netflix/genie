@@ -24,7 +24,6 @@ import spock.lang.Specification
  * Specifications for the {@link HttpProperties} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class HttpPropertiesSpec extends Specification {
 

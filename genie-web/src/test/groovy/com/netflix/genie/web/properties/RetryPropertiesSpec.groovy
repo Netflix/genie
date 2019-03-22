@@ -24,7 +24,6 @@ import spock.lang.Specification
  * Specifications for the {@link RetryProperties} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class RetryPropertiesSpec extends Specification {
 

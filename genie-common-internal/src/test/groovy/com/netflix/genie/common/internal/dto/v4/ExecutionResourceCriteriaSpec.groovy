@@ -27,15 +27,14 @@ import spock.lang.Specification
  * Specifications for the {@link ExecutionResourceCriteria} dto.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ExecutionResourceCriteriaSpec extends Specification {
 
     def "Can't modify fields"() {
         def clusterCriteria = Lists.newArrayList(
-                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
-                new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         )
 
         def commandCriterion = new Criterion.Builder().withStatus(CommandStatus.ACTIVE.toString()).build()
@@ -45,16 +44,16 @@ class ExecutionResourceCriteriaSpec extends Specification {
 
         when: "Try to modify the cluster criteria it throws an exception"
         resourceCriteria1
-                .getClusterCriteria()
-                .add(new Criterion.Builder().withStatus(CommandStatus.ACTIVE.toString()).build())
+            .getClusterCriteria()
+            .add(new Criterion.Builder().withStatus(CommandStatus.ACTIVE.toString()).build())
 
         then:
         thrown(RuntimeException)
 
         when: "Try to modify the list of application id's it throws an exception"
         resourceCriteria2
-                .getApplicationIds()
-                .add(UUID.randomUUID().toString())
+            .getApplicationIds()
+            .add(UUID.randomUUID().toString())
 
         then:
         thrown(RuntimeException)
@@ -62,8 +61,8 @@ class ExecutionResourceCriteriaSpec extends Specification {
 
     def "Empty application id's are ignored"() {
         def clusterCriteria = Lists.newArrayList(
-                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
-                new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         )
 
         def commandCriterion = new Criterion.Builder().withStatus(CommandStatus.ACTIVE.toString()).build()
@@ -112,14 +111,14 @@ class ExecutionResourceCriteriaSpec extends Specification {
         def commandCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         def applicationId = UUID.randomUUID().toString()
         base = new ExecutionResourceCriteria(
-                Lists.newArrayList(clusterCriterion),
-                commandCriterion,
-                Lists.newArrayList(applicationId)
+            Lists.newArrayList(clusterCriterion),
+            commandCriterion,
+            Lists.newArrayList(applicationId)
         )
         comparable = new ExecutionResourceCriteria(
-                Lists.newArrayList(clusterCriterion),
-                commandCriterion,
-                Lists.newArrayList(applicationId)
+            Lists.newArrayList(clusterCriterion),
+            commandCriterion,
+            Lists.newArrayList(applicationId)
         )
 
         then:
@@ -149,14 +148,14 @@ class ExecutionResourceCriteriaSpec extends Specification {
         def commandCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         def applicationId = UUID.randomUUID().toString()
         one = new ExecutionResourceCriteria(
-                Lists.newArrayList(clusterCriterion),
-                commandCriterion,
-                Lists.newArrayList(applicationId)
+            Lists.newArrayList(clusterCriterion),
+            commandCriterion,
+            Lists.newArrayList(applicationId)
         )
         two = new ExecutionResourceCriteria(
-                Lists.newArrayList(clusterCriterion),
-                commandCriterion,
-                Lists.newArrayList(applicationId)
+            Lists.newArrayList(clusterCriterion),
+            commandCriterion,
+            Lists.newArrayList(applicationId)
         )
 
         then:
@@ -186,14 +185,14 @@ class ExecutionResourceCriteriaSpec extends Specification {
         def commandCriterion = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         def applicationId = UUID.randomUUID().toString()
         one = new ExecutionResourceCriteria(
-                Lists.newArrayList(clusterCriterion),
-                commandCriterion,
-                Lists.newArrayList(applicationId)
+            Lists.newArrayList(clusterCriterion),
+            commandCriterion,
+            Lists.newArrayList(applicationId)
         )
         two = new ExecutionResourceCriteria(
-                Lists.newArrayList(clusterCriterion),
-                commandCriterion,
-                Lists.newArrayList(applicationId)
+            Lists.newArrayList(clusterCriterion),
+            commandCriterion,
+            Lists.newArrayList(applicationId)
         )
 
         then:
@@ -202,8 +201,8 @@ class ExecutionResourceCriteriaSpec extends Specification {
 
     ExecutionResourceCriteria createExecutionResourceCriteria() {
         def clusterCriteria = Lists.newArrayList(
-                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
-                new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
         )
 
         def commandCriterion = new Criterion.Builder().withStatus(CommandStatus.ACTIVE.toString()).build()

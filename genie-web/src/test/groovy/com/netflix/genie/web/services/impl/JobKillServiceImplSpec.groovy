@@ -28,8 +28,7 @@ import spock.lang.Specification
 /**
  * Tests for JobKillServiceImpl
  *
- * @author standon
- * @since 4.0.0
+ * @author standon* @since 4.0.0
  */
 @Category(UnitTest.class)
 class JobKillServiceImplSpec extends Specification {
@@ -44,7 +43,7 @@ class JobKillServiceImplSpec extends Specification {
         jobKillServiceV4 = Mock()
         jobKillServiceV3 = Mock()
         jobId = UUID.randomUUID().toString()
-        service = new JobKillServiceImpl (jobKillServiceV3, jobKillServiceV4, jobPersistenceService)
+        service = new JobKillServiceImpl(jobKillServiceV3, jobKillServiceV4, jobPersistenceService)
     }
 
     def "Invoke JobKillServiceV3 for a v3 job"() {
@@ -75,7 +74,7 @@ class JobKillServiceImplSpec extends Specification {
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.isV4(jobId) >> { throw new GenieJobNotFoundException()}
+        1 * jobPersistenceService.isV4(jobId) >> { throw new GenieJobNotFoundException() }
         thrown(GenieJobNotFoundException)
 
         when:
@@ -83,7 +82,7 @@ class JobKillServiceImplSpec extends Specification {
 
         then:
         1 * jobPersistenceService.isV4(jobId) >> true
-        1 * jobKillServiceV4.killJob(jobId, "testing") >> { throw new GenieServerException("Error killing v4 job")}
+        1 * jobKillServiceV4.killJob(jobId, "testing") >> { throw new GenieServerException("Error killing v4 job") }
         thrown(GenieServerException)
 
         when:
@@ -91,7 +90,7 @@ class JobKillServiceImplSpec extends Specification {
 
         then:
         1 * jobPersistenceService.isV4(jobId) >> false
-        1 * jobKillServiceV3.killJob(jobId, "testing") >> { throw new GenieServerException("Error killing v3 job")}
+        1 * jobKillServiceV3.killJob(jobId, "testing") >> { throw new GenieServerException("Error killing v3 job") }
         thrown(GenieServerException)
     }
 }

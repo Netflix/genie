@@ -26,7 +26,6 @@ import spock.lang.Specification
  * Specifications for the {@link JobRequestMetadata} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class JobRequestMetadataSpec extends Specification {
@@ -49,10 +48,10 @@ class JobRequestMetadataSpec extends Specification {
 
         when:
         jobRequestMetadata = new JobRequestMetadata(
-                apiClientMetadata,
-                agentClientMetadata,
-                numAttachments,
-                totalSizeOfAttachments
+            apiClientMetadata,
+            agentClientMetadata,
+            numAttachments,
+            totalSizeOfAttachments
         )
 
         then:
@@ -164,10 +163,10 @@ class JobRequestMetadataSpec extends Specification {
 
     JobRequestMetadata createJobRequestMetadata() {
         return new JobRequestMetadata(
-                Mock(ApiClientMetadata),
-                Mock(AgentClientMetadata),
-                RandomSuppliers.INT.get(),
-                RandomSuppliers.LONG.get()
+            Mock(ApiClientMetadata),
+            Mock(AgentClientMetadata),
+            RandomSuppliers.INT.get(),
+            RandomSuppliers.LONG.get()
         )
     }
 }

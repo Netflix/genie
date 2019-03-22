@@ -132,10 +132,10 @@ class FetchingCacheServiceImplSpec extends Specification {
         cache.get(uri, targetFile)
 
         then:
-        1*resource.exists() >> true
-        1*resource.lastModified() >> DEFAULT_RESOURCE_LAST_MODIFIED_TS
-        1*resource.getInputStream() >> new ByteArrayInputStream(fileContents.getBytes())
-        1*resourceLoader.getResource(_ as String) >> resource
+        1 * resource.exists() >> true
+        1 * resource.lastModified() >> DEFAULT_RESOURCE_LAST_MODIFIED_TS
+        1 * resource.getInputStream() >> new ByteArrayInputStream(fileContents.getBytes())
+        1 * resourceLoader.getResource(_ as String) >> resource
         cachedFile.exists()
         cachedFile.getText(StandardCharsets.UTF_8.toString()) == fileContents
         targetFile.exists()
@@ -146,10 +146,10 @@ class FetchingCacheServiceImplSpec extends Specification {
         cache.get(uri, targetFile2)
 
         then:
-        1*resource.exists() >> true
-        1*resource.lastModified() >> DEFAULT_RESOURCE_LAST_MODIFIED_TS + 1
-        1*resource.getInputStream() >> new ByteArrayInputStream(fileContents.getBytes())
-        1*resourceLoader.getResource(_ as String) >> resource
+        1 * resource.exists() >> true
+        1 * resource.lastModified() >> DEFAULT_RESOURCE_LAST_MODIFIED_TS + 1
+        1 * resource.getInputStream() >> new ByteArrayInputStream(fileContents.getBytes())
+        1 * resourceLoader.getResource(_ as String) >> resource
         sleep(2000) //since deletion happens on a separate thread
         resourceVersionDirectory.exists()
         !cachedFile.exists()
@@ -198,26 +198,26 @@ class FetchingCacheServiceImplSpec extends Specification {
     def "GetAll"() {
         setup:
         URI[] uris = [
-                new URI("https://my-server.com/path/to/config/config.xml"),
-                new URI("https://my-server.com/path/to/setup/setup.sh"),
-                new URI("https://my-server.com/path/to/dependencies/bin.tar.gz")
+            new URI("https://my-server.com/path/to/config/config.xml"),
+            new URI("https://my-server.com/path/to/setup/setup.sh"),
+            new URI("https://my-server.com/path/to/dependencies/bin.tar.gz")
         ]
         File[] targetFiles = [
-                temporaryFolder.newFile("config.xml"),
-                temporaryFolder.newFile("setup.sh"),
-                temporaryFolder.newFile("bin.tar.gz")
+            temporaryFolder.newFile("config.xml"),
+            temporaryFolder.newFile("setup.sh"),
+            temporaryFolder.newFile("bin.tar.gz")
         ]
         Resource[] resources = [
-                Mock(Resource),
-                Mock(Resource),
-                Mock(Resource)
+            Mock(Resource),
+            Mock(Resource),
+            Mock(Resource)
         ]
 
         when:
         cache.get(Sets.newHashSet([
-                Pair.of(uris[0], targetFiles[0]),
-                Pair.of(uris[1], targetFiles[1]),
-                Pair.of(uris[2], targetFiles[2]),
+            Pair.of(uris[0], targetFiles[0]),
+            Pair.of(uris[1], targetFiles[1]),
+            Pair.of(uris[2], targetFiles[2]),
         ]))
 
         then:

@@ -94,7 +94,7 @@ class ExecCommandSpec extends Specification {
     def "Exec error"() {
         setup:
         List<Triple<States, Class<? extends Action>, Exception>> actionErrors = Lists.newArrayList(
-                Triple.of(States.SETUP_JOB, BaseStateAction.class, new RuntimeException())
+            Triple.of(States.SETUP_JOB, BaseStateAction.class, new RuntimeException())
         )
         def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 

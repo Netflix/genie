@@ -19,8 +19,8 @@
 package com.netflix.genie.web.util
 
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
+import com.netflix.genie.web.util.InspectionReport.Decision
 import org.apache.commons.lang3.NotImplementedException
-import com.netflix.genie.web.util.InspectionReport.Decision;
 import spock.lang.Specification
 import spock.lang.Unroll
 

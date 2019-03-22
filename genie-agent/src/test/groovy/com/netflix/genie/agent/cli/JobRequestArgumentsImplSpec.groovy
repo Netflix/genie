@@ -79,26 +79,26 @@ class JobRequestArgumentsImplSpec extends Specification {
 
         when:
         jCommander.parse(
-                "--jobDirectoryLocation", "/foo/bar",
-                "--interactive",
-                "--archiveLocationPrefix", archiveLocationPrefix,
-                "--timeout", "10",
-                "--jobId", "FooBar",
-                "--clusterCriterion", "NAME=test",
-                "--clusterCriterion", "NAME=prod",
-                "--commandCriterion", "STATUS=active",
-                "--applicationIds", "app1",
-                "--applicationIds", "app2",
-                "--jobName", "n",
-                "--email", "e",
-                "--grouping", "g",
-                "--groupingInstance", "gi",
-                "--jobDescription", "jd",
-                "--jobTag", "t1",
-                "--jobTag", "t2",
-                "--jobVersion", "1.0",
-                "--jobMetadata", "{\"foo\": false}",
-                "--api-job"
+            "--jobDirectoryLocation", "/foo/bar",
+            "--interactive",
+            "--archiveLocationPrefix", archiveLocationPrefix,
+            "--timeout", "10",
+            "--jobId", "FooBar",
+            "--clusterCriterion", "NAME=test",
+            "--clusterCriterion", "NAME=prod",
+            "--commandCriterion", "STATUS=active",
+            "--applicationIds", "app1",
+            "--applicationIds", "app2",
+            "--jobName", "n",
+            "--email", "e",
+            "--grouping", "g",
+            "--groupingInstance", "gi",
+            "--jobDescription", "jd",
+            "--jobTag", "t1",
+            "--jobTag", "t2",
+            "--jobVersion", "1.0",
+            "--jobMetadata", "{\"foo\": false}",
+            "--api-job"
         )
 
         then:
@@ -109,8 +109,8 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobId() == "FooBar"
         options.jobRequestArguments.getClusterCriteria().size() == 2
         options.jobRequestArguments.getClusterCriteria().containsAll([
-                new Criterion.Builder().withName("prod").build(),
-                new Criterion.Builder().withName("test").build(),
+            new Criterion.Builder().withName("prod").build(),
+            new Criterion.Builder().withName("test").build(),
         ])
         options.jobRequestArguments.getCommandCriterion() == new Criterion.Builder().withStatus("active").build()
         options.jobRequestArguments.getApplicationIds().size() == 2

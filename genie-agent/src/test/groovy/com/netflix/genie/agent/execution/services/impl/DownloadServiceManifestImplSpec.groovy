@@ -36,9 +36,9 @@ class DownloadServiceManifestImplSpec extends Specification {
     def "Build"() {
         when:
         DownloadService.Manifest manifest = new DownloadServiceImpl().newManifestBuilder()
-                .addFileWithTargetFile(uri1, file1)
-                .addFileWithTargetDirectory(uri2, file2.getParentFile())
-                .build()
+            .addFileWithTargetFile(uri1, file1)
+            .addFileWithTargetDirectory(uri2, file2.getParentFile())
+            .build()
 
         then:
         manifest != null
@@ -56,9 +56,9 @@ class DownloadServiceManifestImplSpec extends Specification {
     def "Build with duplicate source"() {
         when:
         DownloadService.Manifest manifest = new DownloadServiceImpl().newManifestBuilder()
-                .addFileWithTargetFile(uri1, file1)
-                .addFileWithTargetFile(uri1, file2)
-                .build()
+            .addFileWithTargetFile(uri1, file1)
+            .addFileWithTargetFile(uri1, file2)
+            .build()
 
         then:
         manifest != null
@@ -97,7 +97,7 @@ class DownloadServiceManifestImplSpec extends Specification {
     def "Build with invalid path-less uri"() {
         when:
         new DownloadServiceImpl().newManifestBuilder()
-                .addFileWithTargetDirectory(new URI("http://foo.com"), file1.getParentFile())
+            .addFileWithTargetDirectory(new URI("http://foo.com"), file1.getParentFile())
 
         then:
         thrown(IllegalArgumentException)
@@ -106,7 +106,7 @@ class DownloadServiceManifestImplSpec extends Specification {
     def "Build with invalid name-less uri"() {
         when:
         new DownloadServiceImpl().newManifestBuilder()
-                .addFileWithTargetDirectory(new URI("http://foo.com/"), file1.getParentFile())
+            .addFileWithTargetDirectory(new URI("http://foo.com/"), file1.getParentFile())
 
         then:
         thrown(IllegalArgumentException)
@@ -115,9 +115,9 @@ class DownloadServiceManifestImplSpec extends Specification {
     def "Lookup target"() {
         setup:
         DownloadService.Manifest manifest = new DownloadServiceImpl().newManifestBuilder()
-                .addFileWithTargetFile(uri1, file1)
-                .addFileWithTargetFile(uri2, file2)
-                .build()
+            .addFileWithTargetFile(uri1, file1)
+            .addFileWithTargetFile(uri2, file2)
+            .build()
         when:
         def f1 = manifest.getTargetLocation(uri1)
         def f2 = manifest.getTargetLocation(uri2)

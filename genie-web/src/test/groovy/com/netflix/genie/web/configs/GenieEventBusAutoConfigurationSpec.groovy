@@ -27,7 +27,6 @@ import spock.lang.Specification
  * Specification for the EventConfig class.
  *
  * @author tgianos
- * @since 3.1.2
  */
 @Category(UnitTest.class)
 class GenieEventBusAutoConfigurationSpec extends Specification {

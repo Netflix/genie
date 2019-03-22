@@ -34,8 +34,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Unit tests for HealthCheckMetricsAspect
  *
- * @author mprimi
- * @since 3.2.4
+ * @author mprimi* @since 3.2.4
  */
 @Category(UnitTest.class)
 class HealthCheckMetricsAspectSpec extends Specification {
@@ -73,8 +72,8 @@ class HealthCheckMetricsAspectSpec extends Specification {
     def testHealthEndpointTimerException() {
         given:
         def expectedTags = Sets.newHashSet(
-                Tag.of("status", "UNKNOWN"),
-                Tag.of("exceptionClass", "java.lang.RuntimeException")
+            Tag.of("status", "UNKNOWN"),
+            Tag.of("exceptionClass", "java.lang.RuntimeException")
         )
         def joinPoint = Mock(ProceedingJoinPoint.class)
         joinPoint.getArgs() >> new Object[0]
@@ -137,12 +136,12 @@ class HealthCheckMetricsAspectSpec extends Specification {
         then:
         1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
         1 * registry.timer(
-                HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME,
-                Sets.newHashSet(
-                        Tag.of("status", "failure"),
-                        Tag.of("exceptionClass", RuntimeException.getCanonicalName()),
-                        Tag.of("healthIndicatorClass", target.getClass().getSimpleName())
-                )
+            HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME,
+            Sets.newHashSet(
+                Tag.of("status", "failure"),
+                Tag.of("exceptionClass", RuntimeException.getCanonicalName()),
+                Tag.of("healthIndicatorClass", target.getClass().getSimpleName())
+            )
         ) >> timer
         thrown(RuntimeException.class)
     }
@@ -192,12 +191,12 @@ class HealthCheckMetricsAspectSpec extends Specification {
         then:
         1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
         1 * registry.timer(
-                HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME,
-                Sets.newHashSet(
-                        Tag.of("status", "failure"),
-                        Tag.of("exceptionClass", RuntimeException.class.getCanonicalName()),
-                        Tag.of("healthIndicatorClass", target.getClass().getSimpleName())
-                )
+            HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME,
+            Sets.newHashSet(
+                Tag.of("status", "failure"),
+                Tag.of("exceptionClass", RuntimeException.class.getCanonicalName()),
+                Tag.of("healthIndicatorClass", target.getClass().getSimpleName())
+            )
         ) >> timer
         thrown(RuntimeException.class)
     }
@@ -206,18 +205,18 @@ class HealthCheckMetricsAspectSpec extends Specification {
         given:
         def joinPoint = Mock(ProceedingJoinPoint.class)
         def detailsMap = [
-                indicator1: new Health.Builder().up().build(),
-                indicator2: new Health.Builder().outOfService().build(),
+            indicator1: new Health.Builder().up().build(),
+            indicator2: new Health.Builder().outOfService().build(),
         ]
         joinPoint.getArgs() >> [detailsMap]
 
         def expectedTags1 = Sets.newHashSet(
-                Tag.of("healthIndicatorName", "indicator1"),
-                Tag.of("status", "UP")
+            Tag.of("healthIndicatorName", "indicator1"),
+            Tag.of("status", "UP")
         )
         def expectedTags2 = Sets.newHashSet(
-                Tag.of("healthIndicatorName", "indicator2"),
-                Tag.of("status", "OUT_OF_SERVICE")
+            Tag.of("healthIndicatorName", "indicator2"),
+            Tag.of("status", "OUT_OF_SERVICE")
         )
 
         def counterTagsCapture = new ArrayList<Set<Tag>>()

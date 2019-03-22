@@ -52,9 +52,9 @@ class ServerArgumentsImplSpec extends Specification {
     def "Parse"() {
         when:
         jCommander.parse(
-                "--serverHost", "server.com",
-                "--serverPort", "1234",
-                "--rpcTimeout", "100"
+            "--serverHost", "server.com",
+            "--serverPort", "1234",
+            "--rpcTimeout", "100"
         )
 
         then:
@@ -66,7 +66,7 @@ class ServerArgumentsImplSpec extends Specification {
     def "InvalidServerHost"() {
         when:
         jCommander.parse(
-                "--serverHost", " ",
+            "--serverHost", " ",
         )
 
         then:
@@ -76,7 +76,7 @@ class ServerArgumentsImplSpec extends Specification {
     def "InvalidServerPort"() {
         when:
         jCommander.parse(
-                "--serverPort", "-190",
+            "--serverPort", "-190",
         )
 
         then:
@@ -86,7 +86,7 @@ class ServerArgumentsImplSpec extends Specification {
     def "InvalidRpcTimeout"() {
         when:
         jCommander.parse(
-                "--rpcTimeout", "-10",
+            "--rpcTimeout", "-10",
         )
 
         then:

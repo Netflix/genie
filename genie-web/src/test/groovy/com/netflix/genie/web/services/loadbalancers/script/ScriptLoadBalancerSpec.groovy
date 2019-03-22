@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit
  * Specifications for the ScriptLoadBalancer class.
  *
  * @author tgianos
- * @since 3.1.0
  */
 @Category(UnitTest.class)
 class ScriptLoadBalancerSpec extends Specification {

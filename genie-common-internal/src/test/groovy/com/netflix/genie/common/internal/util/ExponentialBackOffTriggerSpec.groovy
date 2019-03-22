@@ -43,10 +43,10 @@ class ExponentialBackOffTriggerSpec extends Specification {
             lastCompletionTime() >> new Date(300)
         }
         ExponentialBackOffTrigger trigger = new ExponentialBackOffTrigger(
-                delayType,
-                min,
-                max,
-                factor
+            delayType,
+            min,
+            max,
+            factor
         )
 
         for (Long expectedDelay : nextExpectedExecutions) {
@@ -78,8 +78,8 @@ class ExponentialBackOffTriggerSpec extends Specification {
 
     @Unroll
     def "NextExecutionTime with type #delayType and no previous execution"(
-            ExponentialBackOffTrigger.DelayType delayType,
-            List<Long> nextExpectedExecutions
+        ExponentialBackOffTrigger.DelayType delayType,
+        List<Long> nextExpectedExecutions
     ) {
         setup:
         long min = 10_000L
@@ -91,10 +91,10 @@ class ExponentialBackOffTriggerSpec extends Specification {
             lastCompletionTime() >> null
         }
         ExponentialBackOffTrigger trigger = new ExponentialBackOffTrigger(
-                delayType,
-                min,
-                max,
-                factor
+            delayType,
+            min,
+            max,
+            factor
         )
 
         for (Long expectedDelay : nextExpectedExecutions) {
@@ -120,17 +120,17 @@ class ExponentialBackOffTriggerSpec extends Specification {
     }
 
     @Unroll
-    def "Reject invalid arguments: <#min, #max, #factor>" (
-            long min,
-            long max,
-            float factor
+    def "Reject invalid arguments: <#min, #max, #factor>"(
+        long min,
+        long max,
+        float factor
     ) {
         when:
         new ExponentialBackOffTrigger(
-                ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_SCHEDULING,
-                min,
-                max,
-                factor
+            ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_SCHEDULING,
+            min,
+            max,
+            factor
         )
 
         then:

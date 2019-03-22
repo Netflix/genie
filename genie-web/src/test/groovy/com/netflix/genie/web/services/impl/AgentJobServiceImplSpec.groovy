@@ -44,7 +44,6 @@ import spock.lang.Specification
  * Specifications for the {@link AgentJobServiceImpl} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class AgentJobServiceImplSpec extends Specification {

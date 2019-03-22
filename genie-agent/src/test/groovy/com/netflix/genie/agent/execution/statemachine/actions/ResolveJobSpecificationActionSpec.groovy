@@ -67,11 +67,11 @@ class ResolveJobSpecificationActionSpec extends Specification {
         this.converter = Mock(JobRequestConverter)
         this.agentMetadata = Mock(AgentMetadata)
         this.action = new ResolveJobSpecificationAction(
-                executionContext,
-                arguments,
-                agentJobService,
-                agentMetadata,
-                converter
+            executionContext,
+            arguments,
+            agentJobService,
+            agentMetadata,
+            converter
         )
         this.request = Mock(AgentJobRequest)
         this.command = Mock(JobSpecification.ExecutionResource) {
@@ -180,7 +180,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
 
     def "CLI job -- Conversion exception"() {
         ConstraintViolation constraintViolation = Mock()
-        Exception exception = new JobRequestConverter.ConversionException(Sets.<ConstraintViolation<AgentJobRequest>>newHashSet([constraintViolation]))
+        Exception exception = new JobRequestConverter.ConversionException(Sets.<ConstraintViolation<AgentJobRequest>> newHashSet([constraintViolation]))
 
         when:
         action.executeStateAction(executionContext)

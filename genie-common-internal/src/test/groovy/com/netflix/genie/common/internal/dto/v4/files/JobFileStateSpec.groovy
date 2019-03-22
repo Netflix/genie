@@ -24,7 +24,6 @@ import spock.lang.Specification
  * Specifications for the {@link JobFileState} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class JobFileStateSpec extends Specification {
 

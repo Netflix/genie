@@ -28,17 +28,16 @@ import java.time.Instant
  * Specifications for the {@link Application} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ClusterSpec extends Specification {
 
     def "Can build immutable cluster resource"() {
         def metadata = new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
         ).build()
         def id = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
@@ -48,11 +47,11 @@ class ClusterSpec extends Specification {
 
         when:
         cluster = new Cluster(
-                id,
-                created,
-                updated,
-                resources,
-                metadata
+            id,
+            created,
+            updated,
+            resources,
+            metadata
         )
 
         then:
@@ -64,11 +63,11 @@ class ClusterSpec extends Specification {
 
         when:
         cluster = new Cluster(
-                id,
-                created,
-                updated,
-                null,
-                metadata
+            id,
+            created,
+            updated,
+            null,
+            metadata
         )
 
         then:
@@ -97,11 +96,11 @@ class ClusterSpec extends Specification {
 
         when:
         comparable = new Cluster(
-                UUID.randomUUID().toString(),
-                Instant.now(),
-                Instant.now(),
-                null,
-                Mock(ClusterMetadata)
+            UUID.randomUUID().toString(),
+            Instant.now(),
+            Instant.now(),
+            null,
+            Mock(ClusterMetadata)
         )
 
         then:
@@ -202,10 +201,10 @@ class ClusterSpec extends Specification {
 
     Cluster createCluster() {
         def metadata = new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
         ).build()
         def id = UUID.randomUUID().toString()
         def created = Instant.now()

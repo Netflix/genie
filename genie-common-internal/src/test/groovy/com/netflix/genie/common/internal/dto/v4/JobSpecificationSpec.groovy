@@ -20,9 +20,7 @@ package com.netflix.genie.common.internal.dto.v4
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
-import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.test.categories.UnitTest
-import org.apache.commons.lang3.StringUtils
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -30,7 +28,6 @@ import spock.lang.Specification
  * Specification tests for the {@link JobSpecification} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class JobSpecificationSpec extends Specification {
@@ -69,26 +66,26 @@ class JobSpecificationSpec extends Specification {
         def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
         def applications = Lists.newArrayList(
-                new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
+            new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
         )
         ImmutableMap<String, String> environmentVariables = ImmutableMap.of(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def jobDirectoryLocation = new File(".")
         def archiveLocation = UUID.randomUUID().toString()
 
         when:
         def jobSpecification = new JobSpecification(
-                commandArgs,
-                job,
-                cluster,
-                command,
-                applications,
-                environmentVariables,
-                false,
-                jobDirectoryLocation,
-                archiveLocation
+            commandArgs,
+            job,
+            cluster,
+            command,
+            applications,
+            environmentVariables,
+            false,
+            jobDirectoryLocation,
+            archiveLocation
         )
 
         then:
@@ -116,26 +113,26 @@ class JobSpecificationSpec extends Specification {
         def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
         def applications = Lists.newArrayList(
-                new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
+            new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
         )
         ImmutableMap<String, String> environmentVariables = ImmutableMap.of(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def jobDirectoryLocation = new File(".")
         def archiveLocation = null
 
         when:
         def jobSpecification = new JobSpecification(
-                emptyCommandArgs,
-                job,
-                cluster,
-                command,
-                applications,
-                environmentVariables,
-                false,
-                jobDirectoryLocation,
-                archiveLocation
+            emptyCommandArgs,
+            job,
+            cluster,
+            command,
+            applications,
+            environmentVariables,
+            false,
+            jobDirectoryLocation,
+            archiveLocation
         )
 
         then:
@@ -219,26 +216,26 @@ class JobSpecificationSpec extends Specification {
         def archiveLocation = UUID.randomUUID().toString()
 
         base = new JobSpecification(
-                Lists.newArrayList(commandArg),
-                job,
-                cluster,
-                command,
-                Lists.newArrayList(application),
-                environmentVariables,
-                interactive,
-                jobDirectoryLocation,
-                archiveLocation
+            Lists.newArrayList(commandArg),
+            job,
+            cluster,
+            command,
+            Lists.newArrayList(application),
+            environmentVariables,
+            interactive,
+            jobDirectoryLocation,
+            archiveLocation
         )
         comparable = new JobSpecification(
-                Lists.newArrayList(commandArg),
-                job,
-                cluster,
-                command,
-                Lists.newArrayList(application),
-                environmentVariables,
-                interactive,
-                jobDirectoryLocation,
-                archiveLocation
+            Lists.newArrayList(commandArg),
+            job,
+            cluster,
+            command,
+            Lists.newArrayList(application),
+            environmentVariables,
+            interactive,
+            jobDirectoryLocation,
+            archiveLocation
         )
 
         then:
@@ -274,26 +271,26 @@ class JobSpecificationSpec extends Specification {
         def jobDirectoryLocation = new File(UUID.randomUUID().toString())
         def archiveLocation = UUID.randomUUID().toString()
         one = new JobSpecification(
-                Lists.newArrayList(commandArg),
-                job,
-                cluster,
-                command,
-                Lists.newArrayList(application),
-                environmentVariables,
-                interactive,
-                jobDirectoryLocation,
-                archiveLocation
+            Lists.newArrayList(commandArg),
+            job,
+            cluster,
+            command,
+            Lists.newArrayList(application),
+            environmentVariables,
+            interactive,
+            jobDirectoryLocation,
+            archiveLocation
         )
         two = new JobSpecification(
-                Lists.newArrayList(commandArg),
-                job,
-                cluster,
-                command,
-                Lists.newArrayList(application),
-                environmentVariables,
-                interactive,
-                jobDirectoryLocation,
-                archiveLocation
+            Lists.newArrayList(commandArg),
+            job,
+            cluster,
+            command,
+            Lists.newArrayList(application),
+            environmentVariables,
+            interactive,
+            jobDirectoryLocation,
+            archiveLocation
         )
 
         then:
@@ -329,26 +326,26 @@ class JobSpecificationSpec extends Specification {
         def jobDirectoryLocation = new File(UUID.randomUUID().toString())
         def archiveLocation = UUID.randomUUID().toString()
         one = new JobSpecification(
-                Lists.newArrayList(commandArg),
-                job,
-                cluster,
-                command,
-                Lists.newArrayList(application),
-                environmentVariables,
-                interactive,
-                jobDirectoryLocation,
-                archiveLocation
+            Lists.newArrayList(commandArg),
+            job,
+            cluster,
+            command,
+            Lists.newArrayList(application),
+            environmentVariables,
+            interactive,
+            jobDirectoryLocation,
+            archiveLocation
         )
         two = new JobSpecification(
-                Lists.newArrayList(commandArg),
-                job,
-                cluster,
-                command,
-                Lists.newArrayList(application),
-                environmentVariables,
-                interactive,
-                jobDirectoryLocation,
-                archiveLocation
+            Lists.newArrayList(commandArg),
+            job,
+            cluster,
+            command,
+            Lists.newArrayList(application),
+            environmentVariables,
+            interactive,
+            jobDirectoryLocation,
+            archiveLocation
         )
 
         then:
@@ -366,25 +363,25 @@ class JobSpecificationSpec extends Specification {
         def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
         def applications = Lists.newArrayList(
-                new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
+            new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
         )
         ImmutableMap<String, String> environmentVariables = ImmutableMap.of(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def jobDirectoryLocation = new File(".")
         def archiveLocation = UUID.randomUUID().toString()
 
         return new JobSpecification(
-                commandArgs,
-                job,
-                cluster,
-                command,
-                applications,
-                environmentVariables,
-                false,
-                jobDirectoryLocation,
-                archiveLocation
+            commandArgs,
+            job,
+            cluster,
+            command,
+            applications,
+            environmentVariables,
+            false,
+            jobDirectoryLocation,
+            archiveLocation
         )
     }
 }

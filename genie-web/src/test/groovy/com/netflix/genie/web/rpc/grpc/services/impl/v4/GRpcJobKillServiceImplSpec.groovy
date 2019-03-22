@@ -28,8 +28,7 @@ import spock.lang.Specification
 /**
  * Specifications for the {@link GRpcJobKillServiceImpl} class.
  *
- * @author standon
- * @since 4.0.0
+ * @author standon* @since 4.0.0
  */
 class GRpcJobKillServiceImplSpec extends Specification {
 

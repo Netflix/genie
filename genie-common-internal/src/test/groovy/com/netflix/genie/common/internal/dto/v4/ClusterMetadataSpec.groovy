@@ -29,7 +29,6 @@ import spock.lang.Specification
  * Specifications for the {@link JobMetadata} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ClusterMetadataSpec extends Specification {
@@ -47,10 +46,10 @@ class ClusterMetadataSpec extends Specification {
 
         when:
         clusterMetadata = new ClusterMetadata.Builder(name, user, version, status)
-                .withDescription(description)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .build()
+            .withDescription(description)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .build()
 
         then:
         clusterMetadata.getName() == name
@@ -89,10 +88,10 @@ class ClusterMetadataSpec extends Specification {
         def newTags = Sets.newHashSet(tags)
         newTags.add("     ")
         clusterMetadata = new ClusterMetadata.Builder(name, user, version, status)
-                .withDescription("")
-                .withTags(newTags)
-                .withMetadata(metadata)
-                .build()
+            .withDescription("")
+            .withTags(newTags)
+            .withMetadata(metadata)
+            .build()
 
         then:
         clusterMetadata.getName() == name
@@ -122,10 +121,10 @@ class ClusterMetadataSpec extends Specification {
 
         when:
         comparable = new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
         ).build()
 
         then:
@@ -211,14 +210,14 @@ class ClusterMetadataSpec extends Specification {
 
     ClusterMetadata createClusterMetadata() {
         return new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
         )
-                .withDescription(UUID.randomUUID().toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
-                .build()
+            .withDescription(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+            .build()
     }
 }

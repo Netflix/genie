@@ -25,14 +25,14 @@ import spock.lang.Specification
 /**
  * Unit tests for JobCompletionHandler
  *
- * @author amajumdar
- * @since 3.0.0
+ * @author amajumdar* @since 3.0.0
  */
 @Category(UnitTest.class)
-class JobCompletionHandlerSpec extends Specification{
+class JobCompletionHandlerSpec extends Specification {
     JobCompletionService jobCompletionService = Mock(JobCompletionService)
     JobCompletionHandler jobCompletionHandler = new JobCompletionHandler(jobCompletionService)
-    def testHandleJobCompletion(){
+
+    def testHandleJobCompletion() {
         when:
         jobCompletionHandler.handleJobCompletion(null)
         then:
@@ -42,6 +42,6 @@ class JobCompletionHandlerSpec extends Specification{
         jobCompletionHandler.handleJobCompletion(null)
         then:
         thrown(GenieException)
-        1 * jobCompletionService.handleJobCompletion(null) >> { throw new GenieException(1,"")}
+        1 * jobCompletionService.handleJobCompletion(null) >> { throw new GenieException(1, "") }
     }
 }

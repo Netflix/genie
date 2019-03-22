@@ -31,21 +31,21 @@ class EnvUtilsSpec extends Specification {
 
     static Map<String, String> emptyMap = [:]
     static Map<String, String> fooBarMap = [
-            "foo": "bar",
-            "FOO": "BAR",
-            "F-O-O": "B A R"
+        "foo"  : "bar",
+        "FOO"  : "BAR",
+        "F-O-O": "B A R"
     ]
     static Map<String, String> fooBarMultiLineMap = [
-            "foo": "bar",
-            "FOO": "BAR",
-            "multi-line": "1\n2\n3"
+        "foo"       : "bar",
+        "FOO"       : "BAR",
+        "multi-line": "1\n2\n3"
     ]
     static String testFile = EnvUtilsSpec.class.getSimpleName() + "-test1.txt"
 
     @Unroll
     def "parseEnvStream '#streamString'"(
-            String streamString,
-            Map<String, String> expectedValues
+        String streamString,
+        Map<String, String> expectedValues
     ) {
         setup:
         InputStream stream = new ByteArrayInputStream(streamString.getBytes(StandardCharsets.UTF_8))
@@ -58,22 +58,22 @@ class EnvUtilsSpec extends Specification {
         expectedValues == parsedEnv
 
         where:
-        streamString                                         | expectedValues
-        ""                                                   | emptyMap
-        "\n"                                                 | emptyMap
-        "\n \n"                                              | emptyMap
-        "foo='bar'\nFOO='BAR'\nF-O-O='B A R'\n"              | fooBarMap
-        "\nF-O-O='B A R'\nfoo='bar'\nFOO='BAR'"              | fooBarMap
-        "\nfoo='bar'\nFOO='BAR'\nF-O-O='B A R'\n"            | fooBarMap
-        "\n\nfoo='bar'\n\nFOO='BAR'\n\nF-O-O='B A R'\n\n"    | fooBarMap
-        "\nF-O-O='B A R'\nfoo='bar'\nFOO='BAR'\n"            | fooBarMap
-        "foo='bar'\nmulti-line='1\n2\n3'\n\nFOO='BAR'"       | fooBarMultiLineMap
-        "foo='bar'\nFOO='BAR'\nmulti-line='1\n2\n3'"         | fooBarMultiLineMap
+        streamString                                      | expectedValues
+        ""                                                | emptyMap
+        "\n"                                              | emptyMap
+        "\n \n"                                           | emptyMap
+        "foo='bar'\nFOO='BAR'\nF-O-O='B A R'\n"           | fooBarMap
+        "\nF-O-O='B A R'\nfoo='bar'\nFOO='BAR'"           | fooBarMap
+        "\nfoo='bar'\nFOO='BAR'\nF-O-O='B A R'\n"         | fooBarMap
+        "\n\nfoo='bar'\n\nFOO='BAR'\n\nF-O-O='B A R'\n\n" | fooBarMap
+        "\nF-O-O='B A R'\nfoo='bar'\nFOO='BAR'\n"         | fooBarMap
+        "foo='bar'\nmulti-line='1\n2\n3'\n\nFOO='BAR'"    | fooBarMultiLineMap
+        "foo='bar'\nFOO='BAR'\nmulti-line='1\n2\n3'"      | fooBarMultiLineMap
     }
 
     @Unroll
     def "parseEnvStream error '#streamString'"(
-            String streamString
+        String streamString
     ) {
         setup:
         InputStream stream = new ByteArrayInputStream(streamString.getBytes(StandardCharsets.UTF_8))
@@ -85,12 +85,12 @@ class EnvUtilsSpec extends Specification {
         thrown(EnvUtils.ParseException)
 
         where:
-        streamString       | _
-        "foo"              | _
-        "foo\nfoo"         | _
-        "=foo"             | _
-        "foo='bar\nbar\n"  | _
-        "foo='bar\nbar'x"  | _
+        streamString      | _
+        "foo"             | _
+        "foo\nfoo"        | _
+        "=foo"            | _
+        "foo='bar\nbar\n" | _
+        "foo='bar\nbar'x" | _
     }
 
     def "Parse nonexistent file"() {
@@ -105,9 +105,9 @@ class EnvUtilsSpec extends Specification {
         setup:
         Path tempLocalFile = Files.createTempFile(null, null)
         Files.copy(
-                new ClassPathResource(testFile).getInputStream(),
-                tempLocalFile,
-                StandardCopyOption.REPLACE_EXISTING
+            new ClassPathResource(testFile).getInputStream(),
+            tempLocalFile,
+            StandardCopyOption.REPLACE_EXISTING
         )
 
         when:
@@ -123,9 +123,9 @@ class EnvUtilsSpec extends Specification {
 
     @Unroll
     def "Shell variable substitution: #inputString"(
-            String inputString,
-            String expectedString,
-            Map<String, String> envMap
+        String inputString,
+        String expectedString,
+        Map<String, String> envMap
     ) {
         when:
         String outputString = EnvUtils.expandShellVariables(inputString, envMap)

@@ -49,7 +49,6 @@ import java.time.Instant
  * backwards compatibility.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class DtoConvertersSpec extends Specification {
 
@@ -60,22 +59,22 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = ApplicationStatus.DEPRECATED
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                DtoConverters.GENIE_ID_PREFIX + id,
-                DtoConverters.GENIE_NAME_PREFIX + name
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            DtoConverters.GENIE_ID_PREFIX + id,
+            DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def type = UUID.randomUUID().toString()
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         com.netflix.genie.common.dto.Application v3Application
@@ -83,20 +82,20 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Application = new com.netflix.genie.common.dto.Application.Builder(
-                name,
-                user,
-                version,
-                status
+            name,
+            user,
+            version,
+            status
         )
-                .withId(id)
-                .withType(type)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withDescription(description)
-                .withConfigs(configs)
-                .withDependencies(dependencies)
-                .withSetupFile(setupFile)
-                .build()
+            .withId(id)
+            .withType(type)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withDescription(description)
+            .withConfigs(configs)
+            .withDependencies(dependencies)
+            .withSetupFile(setupFile)
+            .build()
         applicationRequest = DtoConverters.toV4ApplicationRequest(v3Application)
 
         then:
@@ -115,10 +114,10 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Application = new com.netflix.genie.common.dto.Application.Builder(
-                name,
-                user,
-                version,
-                status
+            name,
+            user,
+            version,
+            status
         ).build()
         applicationRequest = DtoConverters.toV4ApplicationRequest(v3Application)
 
@@ -146,22 +145,22 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = ApplicationStatus.DEPRECATED
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                DtoConverters.GENIE_ID_PREFIX + id,
-                DtoConverters.GENIE_NAME_PREFIX + name
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            DtoConverters.GENIE_ID_PREFIX + id,
+            DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def type = UUID.randomUUID().toString()
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         com.netflix.genie.common.dto.Application v3Application
@@ -169,22 +168,22 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Application = new com.netflix.genie.common.dto.Application.Builder(
-                name,
-                user,
-                version,
-                status
+            name,
+            user,
+            version,
+            status
         )
-                .withId(id)
-                .withCreated(created)
-                .withUpdated(updated)
-                .withType(type)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withDescription(description)
-                .withConfigs(configs)
-                .withDependencies(dependencies)
-                .withSetupFile(setupFile)
-                .build()
+            .withId(id)
+            .withCreated(created)
+            .withUpdated(updated)
+            .withType(type)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withDescription(description)
+            .withConfigs(configs)
+            .withDependencies(dependencies)
+            .withSetupFile(setupFile)
+            .build()
         v4Application = DtoConverters.toV4Application(v3Application)
 
         then:
@@ -211,20 +210,20 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = ApplicationStatus.DEPRECATED
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def type = UUID.randomUUID().toString()
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         def created = Instant.now()
@@ -234,20 +233,20 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v4Application = new Application(
-                id,
-                created,
-                updated,
-                new ExecutionEnvironment(
-                        configs,
-                        dependencies,
-                        setupFile
-                ),
-                new ApplicationMetadata.Builder(name, user, version, status)
-                        .withDescription(description)
-                        .withMetadata(metadata)
-                        .withTags(tags)
-                        .withType(type)
-                        .build()
+            id,
+            created,
+            updated,
+            new ExecutionEnvironment(
+                configs,
+                dependencies,
+                setupFile
+            ),
+            new ApplicationMetadata.Builder(name, user, version, status)
+                .withDescription(description)
+                .withMetadata(metadata)
+                .withTags(tags)
+                .withType(type)
+                .build()
         )
         v3Application = DtoConverters.toV3Application(v4Application)
 
@@ -270,11 +269,11 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v4Application = new Application(
-                id,
-                created,
-                updated,
-                null,
-                new ApplicationMetadata.Builder(name, user, version, status).build()
+            id,
+            created,
+            updated,
+            null,
+            new ApplicationMetadata.Builder(name, user, version, status).build()
         )
         v3Application = DtoConverters.toV3Application(v4Application)
 
@@ -302,21 +301,21 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = ClusterStatus.TERMINATED
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                DtoConverters.GENIE_ID_PREFIX + id,
-                DtoConverters.GENIE_NAME_PREFIX + name
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            DtoConverters.GENIE_ID_PREFIX + id,
+            DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         com.netflix.genie.common.dto.Cluster v3Cluster
@@ -324,19 +323,19 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Cluster = new com.netflix.genie.common.dto.Cluster.Builder(
-                name,
-                user,
-                version,
-                status
+            name,
+            user,
+            version,
+            status
         )
-                .withId(id)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withDescription(description)
-                .withConfigs(configs)
-                .withDependencies(dependencies)
-                .withSetupFile(setupFile)
-                .build()
+            .withId(id)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withDescription(description)
+            .withConfigs(configs)
+            .withDependencies(dependencies)
+            .withSetupFile(setupFile)
+            .build()
         clusterRequest = DtoConverters.toV4ClusterRequest(v3Cluster)
 
         then:
@@ -354,10 +353,10 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Cluster = new com.netflix.genie.common.dto.Cluster.Builder(
-                name,
-                user,
-                version,
-                status
+            name,
+            user,
+            version,
+            status
         ).build()
         clusterRequest = DtoConverters.toV4ClusterRequest(v3Cluster)
 
@@ -382,21 +381,21 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = ClusterStatus.TERMINATED
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                DtoConverters.GENIE_ID_PREFIX + id,
-                DtoConverters.GENIE_NAME_PREFIX + name
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            DtoConverters.GENIE_ID_PREFIX + id,
+            DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         com.netflix.genie.common.dto.Cluster v3Cluster
@@ -404,19 +403,19 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Cluster = new com.netflix.genie.common.dto.Cluster.Builder(
-                name,
-                user,
-                version,
-                status
+            name,
+            user,
+            version,
+            status
         )
-                .withId(id)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withDescription(description)
-                .withConfigs(configs)
-                .withDependencies(dependencies)
-                .withSetupFile(setupFile)
-                .build()
+            .withId(id)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withDescription(description)
+            .withConfigs(configs)
+            .withDependencies(dependencies)
+            .withSetupFile(setupFile)
+            .build()
         v4Cluster = DtoConverters.toV4Cluster(v3Cluster)
 
         then:
@@ -440,19 +439,19 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = ClusterStatus.UP
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         def created = Instant.now()
@@ -462,19 +461,19 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v4Cluster = new Cluster(
-                id,
-                created,
-                updated,
-                new ExecutionEnvironment(
-                        configs,
-                        dependencies,
-                        setupFile
-                ),
-                new ClusterMetadata.Builder(name, user, version, status)
-                        .withDescription(description)
-                        .withMetadata(metadata)
-                        .withTags(tags)
-                        .build()
+            id,
+            created,
+            updated,
+            new ExecutionEnvironment(
+                configs,
+                dependencies,
+                setupFile
+            ),
+            new ClusterMetadata.Builder(name, user, version, status)
+                .withDescription(description)
+                .withMetadata(metadata)
+                .withTags(tags)
+                .build()
         )
         v3Cluster = DtoConverters.toV3Cluster(v4Cluster)
 
@@ -496,11 +495,11 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v4Cluster = new Cluster(
-                id,
-                created,
-                updated,
-                null,
-                new ClusterMetadata.Builder(name, user, version, status).build()
+            id,
+            created,
+            updated,
+            null,
+            new ClusterMetadata.Builder(name, user, version, status).build()
         )
         v3Cluster = DtoConverters.toV3Cluster(v4Cluster)
 
@@ -527,10 +526,10 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = CommandStatus.INACTIVE
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                DtoConverters.GENIE_ID_PREFIX + id,
-                DtoConverters.GENIE_NAME_PREFIX + name
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            DtoConverters.GENIE_ID_PREFIX + id,
+            DtoConverters.GENIE_NAME_PREFIX + name
         )
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
@@ -539,13 +538,13 @@ class DtoConvertersSpec extends Specification {
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         def checkDelay = 380_234L
@@ -554,22 +553,22 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
-                name,
-                user,
-                version,
-                status,
-                executable,
-                checkDelay
+            name,
+            user,
+            version,
+            status,
+            executable,
+            checkDelay
         )
-                .withId(id)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withDescription(description)
-                .withConfigs(configs)
-                .withDependencies(dependencies)
-                .withSetupFile(setupFile)
-                .withMemory(memory)
-                .build()
+            .withId(id)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withDescription(description)
+            .withConfigs(configs)
+            .withDependencies(dependencies)
+            .withSetupFile(setupFile)
+            .withMemory(memory)
+            .build()
         commandRequest = DtoConverters.toV4CommandRequest(v3Command)
 
         then:
@@ -592,12 +591,12 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
-                name,
-                user,
-                version,
-                status,
-                executable,
-                checkDelay
+            name,
+            user,
+            version,
+            status,
+            executable,
+            checkDelay
         ).build()
         commandRequest = DtoConverters.toV4CommandRequest(v3Command)
 
@@ -627,10 +626,10 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = CommandStatus.DEPRECATED
         def tags = Sets.newHashSet(
-                DtoConverters.GENIE_ID_PREFIX + id,
-                DtoConverters.GENIE_NAME_PREFIX + name,
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            DtoConverters.GENIE_ID_PREFIX + id,
+            DtoConverters.GENIE_NAME_PREFIX + name,
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
@@ -639,13 +638,13 @@ class DtoConvertersSpec extends Specification {
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         def created = Instant.now()
@@ -656,24 +655,24 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
-                name,
-                user,
-                version,
-                status,
-                binary + ' ' + defaultBinaryArgument,
-                checkDelay
+            name,
+            user,
+            version,
+            status,
+            binary + ' ' + defaultBinaryArgument,
+            checkDelay
         )
-                .withId(id)
-                .withCreated(created)
-                .withUpdated(updated)
-                .withConfigs(configs)
-                .withDependencies(dependencies)
-                .withSetupFile(setupFile)
-                .withMetadata(metadata)
-                .withTags(tags)
-                .withDescription(description)
-                .withMemory(memory)
-                .build()
+            .withId(id)
+            .withCreated(created)
+            .withUpdated(updated)
+            .withConfigs(configs)
+            .withDependencies(dependencies)
+            .withSetupFile(setupFile)
+            .withMetadata(metadata)
+            .withTags(tags)
+            .withDescription(description)
+            .withMemory(memory)
+            .build()
         v4Command = DtoConverters.toV4Command(v3Command)
 
         then:
@@ -698,15 +697,15 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
-                name,
-                user,
-                version,
-                status,
-                binary + ' ' + defaultBinaryArgument,
-                checkDelay
+            name,
+            user,
+            version,
+            status,
+            binary + ' ' + defaultBinaryArgument,
+            checkDelay
         )
-                .withId(id)
-                .build()
+            .withId(id)
+            .build()
         v4Command = DtoConverters.toV4Command(v3Command)
 
         then:
@@ -735,8 +734,8 @@ class DtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = CommandStatus.DEPRECATED
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
@@ -745,13 +744,13 @@ class DtoConvertersSpec extends Specification {
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         def created = Instant.now()
@@ -762,22 +761,22 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v4Command = new Command(
-                id,
-                created,
-                updated,
-                new ExecutionEnvironment(
-                        configs,
-                        dependencies,
-                        setupFile
-                ),
-                new CommandMetadata.Builder(name, user, version, status)
-                        .withDescription(description)
-                        .withMetadata(metadata)
-                        .withTags(tags)
-                        .build(),
-                executable,
-                memory,
-                checkDelay
+            id,
+            created,
+            updated,
+            new ExecutionEnvironment(
+                configs,
+                dependencies,
+                setupFile
+            ),
+            new CommandMetadata.Builder(name, user, version, status)
+                .withDescription(description)
+                .withMetadata(metadata)
+                .withTags(tags)
+                .build(),
+            executable,
+            memory,
+            checkDelay
         )
         v3Command = DtoConverters.toV3Command(v4Command)
 
@@ -802,14 +801,14 @@ class DtoConvertersSpec extends Specification {
 
         when:
         v4Command = new Command(
-                id,
-                created,
-                updated,
-                null,
-                new CommandMetadata.Builder(name, user, version, status).build(),
-                executable,
-                null,
-                checkDelay
+            id,
+            created,
+            updated,
+            null,
+            new CommandMetadata.Builder(name, user, version, status).build(),
+            executable,
+            null,
+            checkDelay
         )
         v3Command = DtoConverters.toV3Command(v4Command)
 
@@ -838,18 +837,18 @@ class DtoConvertersSpec extends Specification {
         def user = UUID.randomUUID().toString()
         def version = UUID.randomUUID().toString()
         def clusterCriteria = Lists.newArrayList(
-                new Criterion.Builder()
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                        .build(),
-                new Criterion.Builder()
-                        .withName(UUID.randomUUID().toString())
-                        .withStatus(UUID.randomUUID().toString())
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                        .build()
-        )
-        def commandCriterion = new Criterion.Builder()
+            new Criterion.Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build(),
+            new Criterion.Builder()
+                .withName(UUID.randomUUID().toString())
+                .withStatus(UUID.randomUUID().toString())
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
+        )
+        def commandCriterion = new Criterion.Builder()
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build()
         def applicationIds = Lists.newArrayList(UUID.randomUUID().toString())
         def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def tags = Sets.newHashSet(UUID.randomUUID().toString())
@@ -865,27 +864,27 @@ class DtoConvertersSpec extends Specification {
         def timeout = 10835
 
         def jobRequest = new JobRequest(
-                id,
-                new ExecutionEnvironment(configs, dependencies, setupFile),
-                commandArgs,
-                new JobMetadata.Builder(name, user, version)
-                        .withTags(tags)
-                        .withGroupingInstance(groupingInstance)
-                        .withGrouping(grouping)
-                        .withGroup(group)
-                        .withEmail(email)
-                        .withMetadata(metadata)
-                        .withDescription(description)
-                        .build(),
-                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
-                null,
-                new AgentConfigRequest
-                        .Builder()
-                        .withTimeoutRequested(timeout)
-                        .withInteractive(true)
-                        .withArchivingDisabled(true)
-                        .build(),
-                null
+            id,
+            new ExecutionEnvironment(configs, dependencies, setupFile),
+            commandArgs,
+            new JobMetadata.Builder(name, user, version)
+                .withTags(tags)
+                .withGroupingInstance(groupingInstance)
+                .withGrouping(grouping)
+                .withGroup(group)
+                .withEmail(email)
+                .withMetadata(metadata)
+                .withDescription(description)
+                .build(),
+            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
+            null,
+            new AgentConfigRequest
+                .Builder()
+                .withTimeoutRequested(timeout)
+                .withInteractive(true)
+                .withArchivingDisabled(true)
+                .build(),
+            null
         )
 
         when:
@@ -923,13 +922,13 @@ class DtoConvertersSpec extends Specification {
         def user = UUID.randomUUID().toString()
         def version = UUID.randomUUID().toString()
         def clusterCriteria = Lists.newArrayList(
-                new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())),
-                new ClusterCriteria(
-                        Sets.newHashSet(
-                                DtoConverters.GENIE_ID_PREFIX + UUID.randomUUID().toString(),
-                                DtoConverters.GENIE_NAME_PREFIX + UUID.randomUUID().toString()
-                        )
+            new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())),
+            new ClusterCriteria(
+                Sets.newHashSet(
+                    DtoConverters.GENIE_ID_PREFIX + UUID.randomUUID().toString(),
+                    DtoConverters.GENIE_NAME_PREFIX + UUID.randomUUID().toString()
                 )
+            )
         )
         def commandCriterion = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def applicationIds = Lists.newArrayList(UUID.randomUUID().toString())
@@ -949,29 +948,29 @@ class DtoConvertersSpec extends Specification {
         def memory = 1512
 
         def v3JobRequest = new com.netflix.genie.common.dto.JobRequest.Builder(
-                name,
-                user,
-                version,
-                clusterCriteria,
-                commandCriterion
+            name,
+            user,
+            version,
+            clusterCriteria,
+            commandCriterion
         )
-                .withId(id)
-                .withCommandArgs(commandArgs)
-                .withApplications(applicationIds)
-                .withTags(tags)
-                .withEmail(email)
-                .withGroup(group)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .withDescription(description)
-                .withMetadata(metadata)
-                .withConfigs(configs)
-                .withDependencies(dependencies)
-                .withSetupFile(setupFile)
-                .withTimeout(timeout)
-                .withCpu(cpu)
-                .withMemory(memory)
-                .build()
+            .withId(id)
+            .withCommandArgs(commandArgs)
+            .withApplications(applicationIds)
+            .withTags(tags)
+            .withEmail(email)
+            .withGroup(group)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .withDescription(description)
+            .withMetadata(metadata)
+            .withConfigs(configs)
+            .withDependencies(dependencies)
+            .withSetupFile(setupFile)
+            .withTimeout(timeout)
+            .withCpu(cpu)
+            .withMemory(memory)
+            .build()
 
         when:
         def v4JobRequest = DtoConverters.toV4JobRequest(v3JobRequest)

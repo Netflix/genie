@@ -74,7 +74,9 @@ class HandleErrorActionSpec extends Specification {
         1 * executionContext.getFinalJobStatus() >> Optional.empty()
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw new ChangeJobStatusException("...")}
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {
+            throw new ChangeJobStatusException("...")
+        }
 
         event == Events.HANDLE_ERROR_COMPLETE
     }
@@ -89,7 +91,7 @@ class HandleErrorActionSpec extends Specification {
         1 * executionContext.getFinalJobStatus() >> Optional.empty()
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RUNNING)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> {throw exception}
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, JobStatus.FAILED, _ as String) >> { throw exception }
 
         event == Events.HANDLE_ERROR_COMPLETE
     }

@@ -36,6 +36,22 @@ final class TestCommands {
     private TestCommands() {
     }
 
+    static List<AgentCommandArguments> allCommandArguments() {
+        return ImmutableList.of(
+            new ExampleCommandArgs1(),
+            new ExampleCommandArgs2()
+        );
+    }
+
+    static Set<String> allCommandNames() {
+        return ImmutableSet.of(
+            ExampleCommand1.NAME,
+            ExampleCommand1.SHORT_NAME,
+            ExampleCommand2.NAME,
+            ExampleCommand2.SHORT_NAME
+        );
+    }
+
     static class ExampleCommand1 implements AgentCommand {
 
         static final String NAME = "example1";
@@ -74,22 +90,5 @@ final class TestCommands {
         public Class<? extends AgentCommand> getConsumerClass() {
             return ExampleCommand2.class;
         }
-    }
-
-
-    static List<AgentCommandArguments> allCommandArguments() {
-        return ImmutableList.of(
-            new ExampleCommandArgs1(),
-            new ExampleCommandArgs2()
-        );
-    }
-
-    static Set<String> allCommandNames() {
-        return ImmutableSet.of(
-            ExampleCommand1.NAME,
-            ExampleCommand1.SHORT_NAME,
-            ExampleCommand2.NAME,
-            ExampleCommand2.SHORT_NAME
-        );
     }
 }

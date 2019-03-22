@@ -27,7 +27,6 @@ import spock.lang.Specification
  * Specifications for the {@link Criterion} DTO.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class CriterionSpec extends Specification {
@@ -62,12 +61,12 @@ class CriterionSpec extends Specification {
 
         when:
         criterion = new Criterion.Builder()
-                .withId(id)
-                .withName(name)
-                .withVersion(version)
-                .withStatus(status)
-                .withTags(tags)
-                .build()
+            .withId(id)
+            .withName(name)
+            .withVersion(version)
+            .withStatus(status)
+            .withTags(tags)
+            .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
@@ -78,11 +77,11 @@ class CriterionSpec extends Specification {
 
         when:
         criterion = new Criterion.Builder()
-                .withName(name)
-                .withVersion(version)
-                .withStatus(status)
-                .withTags(tags)
-                .build()
+            .withName(name)
+            .withVersion(version)
+            .withStatus(status)
+            .withTags(tags)
+            .build()
 
         then:
         !criterion.getId().isPresent()
@@ -93,11 +92,11 @@ class CriterionSpec extends Specification {
 
         when:
         criterion = new Criterion.Builder()
-                .withId(id)
-                .withVersion(version)
-                .withStatus(status)
-                .withTags(tags)
-                .build()
+            .withId(id)
+            .withVersion(version)
+            .withStatus(status)
+            .withTags(tags)
+            .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
@@ -108,11 +107,11 @@ class CriterionSpec extends Specification {
 
         when:
         criterion = new Criterion.Builder()
-                .withId(id)
-                .withName(name)
-                .withStatus(status)
-                .withTags(tags)
-                .build()
+            .withId(id)
+            .withName(name)
+            .withStatus(status)
+            .withTags(tags)
+            .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
@@ -123,11 +122,11 @@ class CriterionSpec extends Specification {
 
         when:
         criterion = new Criterion.Builder()
-                .withId(id)
-                .withName(name)
-                .withVersion(version)
-                .withTags(tags)
-                .build()
+            .withId(id)
+            .withName(name)
+            .withVersion(version)
+            .withTags(tags)
+            .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
@@ -138,11 +137,11 @@ class CriterionSpec extends Specification {
 
         when:
         criterion = new Criterion.Builder()
-                .withId(id)
-                .withName(name)
-                .withVersion(version)
-                .withStatus(status)
-                .build()
+            .withId(id)
+            .withName(name)
+            .withVersion(version)
+            .withStatus(status)
+            .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
@@ -153,12 +152,12 @@ class CriterionSpec extends Specification {
 
         when:
         criterion = new Criterion.Builder()
-                .withId(id)
-                .withName(name)
-                .withVersion(version)
-                .withStatus(status)
-                .withTags(tags)
-                .build()
+            .withId(id)
+            .withName(name)
+            .withVersion(version)
+            .withStatus(status)
+            .withTags(tags)
+            .build()
         tags.add(UUID.randomUUID().toString())
 
         then:
@@ -172,24 +171,24 @@ class CriterionSpec extends Specification {
     def "Empty strings and blank tags are treated as not present"() {
         when:
         new Criterion.Builder()
-                .withId("\t")
-                .withName(" ")
-                .withVersion("\n\t")
-                .withStatus("\n")
-                .withTags(Sets.newHashSet(""))
-                .build()
+            .withId("\t")
+            .withName(" ")
+            .withVersion("\n\t")
+            .withStatus("\n")
+            .withTags(Sets.newHashSet(""))
+            .build()
 
         then:
         thrown(GeniePreconditionException)
 
         when:
         def criterion = new Criterion.Builder()
-                .withId("\t")
-                .withName(" ")
-                .withVersion("\n\t")
-                .withStatus("\n")
-                .withTags(Sets.newHashSet("valid tag", " "))
-                .build()
+            .withId("\t")
+            .withName(" ")
+            .withVersion("\n\t")
+            .withStatus("\n")
+            .withTags(Sets.newHashSet("valid tag", " "))
+            .build()
 
         then:
         !criterion.getId().isPresent()
@@ -217,12 +216,12 @@ class CriterionSpec extends Specification {
 
         when:
         comparable = new Criterion.Builder()
-                .withName(UUID.randomUUID().toString())
-                .withStatus(UUID.randomUUID().toString())
-                .withVersion(UUID.randomUUID().toString())
-                .withId(UUID.randomUUID().toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .build()
+            .withName(UUID.randomUUID().toString())
+            .withStatus(UUID.randomUUID().toString())
+            .withVersion(UUID.randomUUID().toString())
+            .withId(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build()
 
         then:
         base != comparable
@@ -240,19 +239,19 @@ class CriterionSpec extends Specification {
         def id = UUID.randomUUID().toString()
         def tag = UUID.randomUUID().toString()
         base = new Criterion.Builder()
-                .withName(name)
-                .withStatus(status)
-                .withVersion(version)
-                .withId(id)
-                .withTags(Sets.newHashSet(tag))
-                .build()
+            .withName(name)
+            .withStatus(status)
+            .withVersion(version)
+            .withId(id)
+            .withTags(Sets.newHashSet(tag))
+            .build()
         comparable = new Criterion.Builder()
-                .withName(name)
-                .withStatus(status)
-                .withVersion(version)
-                .withId(id)
-                .withTags(Sets.newHashSet(tag))
-                .build()
+            .withName(name)
+            .withStatus(status)
+            .withVersion(version)
+            .withId(id)
+            .withTags(Sets.newHashSet(tag))
+            .build()
 
         then:
         base == comparable
@@ -283,19 +282,19 @@ class CriterionSpec extends Specification {
         def id = UUID.randomUUID().toString()
         def tag = UUID.randomUUID().toString()
         one = new Criterion.Builder()
-                .withName(name)
-                .withStatus(status)
-                .withVersion(version)
-                .withId(id)
-                .withTags(Sets.newHashSet(tag))
-                .build()
+            .withName(name)
+            .withStatus(status)
+            .withVersion(version)
+            .withId(id)
+            .withTags(Sets.newHashSet(tag))
+            .build()
         two = new Criterion.Builder()
-                .withName(name)
-                .withStatus(status)
-                .withVersion(version)
-                .withId(id)
-                .withTags(Sets.newHashSet(tag))
-                .build()
+            .withName(name)
+            .withStatus(status)
+            .withVersion(version)
+            .withId(id)
+            .withTags(Sets.newHashSet(tag))
+            .build()
 
         then:
         one.hashCode() == two.hashCode()
@@ -326,19 +325,19 @@ class CriterionSpec extends Specification {
         def id = UUID.randomUUID().toString()
         def tag = UUID.randomUUID().toString()
         one = new Criterion.Builder()
-                .withName(name)
-                .withStatus(status)
-                .withVersion(version)
-                .withId(id)
-                .withTags(Sets.newHashSet(tag))
-                .build()
+            .withName(name)
+            .withStatus(status)
+            .withVersion(version)
+            .withId(id)
+            .withTags(Sets.newHashSet(tag))
+            .build()
         two = new Criterion.Builder()
-                .withName(name)
-                .withStatus(status)
-                .withVersion(version)
-                .withId(id)
-                .withTags(Sets.newHashSet(tag))
-                .build()
+            .withName(name)
+            .withStatus(status)
+            .withVersion(version)
+            .withId(id)
+            .withTags(Sets.newHashSet(tag))
+            .build()
 
         then:
         one.toString() == two.toString()
@@ -346,11 +345,11 @@ class CriterionSpec extends Specification {
 
     Criterion createCriterion() {
         return new Criterion.Builder()
-                .withName(UUID.randomUUID().toString())
-                .withStatus(UUID.randomUUID().toString())
-                .withVersion(UUID.randomUUID().toString())
-                .withId(UUID.randomUUID().toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .build()
+            .withName(UUID.randomUUID().toString())
+            .withStatus(UUID.randomUUID().toString())
+            .withVersion(UUID.randomUUID().toString())
+            .withId(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build()
     }
 }

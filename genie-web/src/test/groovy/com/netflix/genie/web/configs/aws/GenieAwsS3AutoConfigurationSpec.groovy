@@ -29,7 +29,6 @@ import spock.lang.Specification
  * Specifications for the {@link GenieAwsS3AutoConfiguration} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class GenieAwsS3AutoConfigurationSpec extends Specification {

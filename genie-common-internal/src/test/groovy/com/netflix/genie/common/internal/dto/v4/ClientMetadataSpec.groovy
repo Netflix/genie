@@ -25,7 +25,6 @@ import spock.lang.Specification
  * Specifications for the {@link ClientMetadata} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ClientMetadataSpec extends Specification {

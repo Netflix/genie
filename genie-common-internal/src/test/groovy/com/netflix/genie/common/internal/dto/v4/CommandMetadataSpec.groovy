@@ -29,7 +29,6 @@ import spock.lang.Specification
  * Specifications for the {@link JobMetadata} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class CommandMetadataSpec extends Specification {
@@ -47,10 +46,10 @@ class CommandMetadataSpec extends Specification {
 
         when:
         commandMetadata = new CommandMetadata.Builder(name, user, version, status)
-                .withDescription(description)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .build()
+            .withDescription(description)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .build()
 
         then:
         commandMetadata.getName() == name
@@ -89,10 +88,10 @@ class CommandMetadataSpec extends Specification {
         def newTags = Sets.newHashSet(tags)
         newTags.add("     ")
         commandMetadata = new CommandMetadata.Builder(name, user, version, status)
-                .withDescription("")
-                .withTags(newTags)
-                .withMetadata(metadata)
-                .build()
+            .withDescription("")
+            .withTags(newTags)
+            .withMetadata(metadata)
+            .build()
 
         then:
         commandMetadata.getName() == name
@@ -122,10 +121,10 @@ class CommandMetadataSpec extends Specification {
 
         when:
         comparable = new CommandMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.DEPRECATED
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            CommandStatus.DEPRECATED
         ).build()
 
         then:
@@ -211,14 +210,14 @@ class CommandMetadataSpec extends Specification {
 
     CommandMetadata createCommandMetadata() {
         return new CommandMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            CommandStatus.ACTIVE
         )
-                .withDescription(UUID.randomUUID().toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
-                .build()
+            .withDescription(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+            .build()
     }
 }

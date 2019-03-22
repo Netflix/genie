@@ -19,11 +19,21 @@ package com.netflix.genie.web.jpa.services
 
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
-import com.netflix.genie.common.dto.*
+import com.netflix.genie.common.dto.ApplicationStatus
+import com.netflix.genie.common.dto.ClusterCriteria
+import com.netflix.genie.common.dto.ClusterStatus
+import com.netflix.genie.common.dto.CommandStatus
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
-import com.netflix.genie.web.jpa.entities.*
+import com.netflix.genie.web.jpa.entities.ApplicationEntity
+import com.netflix.genie.web.jpa.entities.ClusterEntity
+import com.netflix.genie.web.jpa.entities.CommandEntity
+import com.netflix.genie.web.jpa.entities.CriterionEntity
+import com.netflix.genie.web.jpa.entities.FileEntity
+import com.netflix.genie.web.jpa.entities.JobEntity
+import com.netflix.genie.web.jpa.entities.TagEntity
 import org.apache.commons.lang3.StringUtils
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
@@ -34,7 +44,6 @@ import java.time.Instant
  * Specifications for the JpaServiceUtils class.
  *
  * @author tgianos
- * @since 3.3.0
  */
 @Category(UnitTest.class)
 class JpaServiceUtilsSpec extends Specification {
@@ -57,20 +66,20 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<TagEntity> tagEntities = tags.collect(
-                {
-                    def tagEntity = new TagEntity()
-                    tagEntity.setTag(it)
-                    tagEntity
-                }
+            {
+                def tagEntity = new TagEntity()
+                tagEntity.setTag(it)
+                tagEntity
+            }
         )
         entity.setTags(tagEntities)
         def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<FileEntity> configEntities = configs.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setConfigs(configEntities)
         def setupFile = UUID.randomUUID().toString()
@@ -79,11 +88,11 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setSetupFile(setupFileEntity)
         def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<FileEntity> dependencyEntities = dependencies.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setDependencies(dependencyEntities)
         entity.setStatus(ApplicationStatus.ACTIVE)
@@ -127,29 +136,29 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
-                {
-                    def tagEntity = new TagEntity()
-                    tagEntity.setTag(it)
-                    tagEntity
-                }
+            {
+                def tagEntity = new TagEntity()
+                tagEntity.setTag(it)
+                tagEntity
+            }
         )
         entity.setTags(tagEntities)
         def confs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> configs = confs.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setConfigs(configs)
         def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> dependencyEntities = dependencies.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setDependencies(dependencyEntities)
 
@@ -191,29 +200,29 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
-                {
-                    def tagEntity = new TagEntity()
-                    tagEntity.setTag(it)
-                    tagEntity
-                }
+            {
+                def tagEntity = new TagEntity()
+                tagEntity.setTag(it)
+                tagEntity
+            }
         )
         entity.setTags(tagEntities)
         def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> configEntities = configs.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setConfigs(configEntities)
         def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> dependencyEntities = dependencies.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setDependencies(dependencyEntities)
         def setupFile = UUID.randomUUID().toString()
@@ -272,11 +281,11 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
-                {
-                    def tagEntity = new TagEntity()
-                    tagEntity.setTag(it)
-                    tagEntity
-                }
+            {
+                def tagEntity = new TagEntity()
+                tagEntity.setTag(it)
+                tagEntity
+            }
         )
         entity.setTags(tagEntities)
         def archiveLocation = UUID.randomUUID().toString()
@@ -392,11 +401,11 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<TagEntity> tagEntities = tags.collect(
-                {
-                    def tagEntity = new TagEntity()
-                    tagEntity.setTag(it)
-                    tagEntity
-                }
+            {
+                def tagEntity = new TagEntity()
+                tagEntity.setTag(it)
+                tagEntity
+            }
         )
         entity.setTags(tagEntities)
         def commandArgs = Lists.newArrayList(UUID.randomUUID().toString())
@@ -406,59 +415,59 @@ class JpaServiceUtilsSpec extends Specification {
         def two = Sets.newHashSet("four", "five", "six")
         def three = Sets.newHashSet("seven", "eight", "nine")
         def clusterCriterias = Lists.newArrayList(
-                new ClusterCriteria(one),
-                new ClusterCriteria(two),
-                new ClusterCriteria(three)
+            new ClusterCriteria(one),
+            new ClusterCriteria(two),
+            new ClusterCriteria(three)
         )
         List<CriterionEntity> clusterCriteriaEntities = clusterCriterias.collect(
-                {
-                    final Set<TagEntity> clusterCriteriaTags = it.tags.collect(
-                            {
-                                new TagEntity(it)
-                            }
-                    )
-                    new CriterionEntity(null, null, null, null, clusterCriteriaTags)
-                }
+            {
+                final Set<TagEntity> clusterCriteriaTags = it.tags.collect(
+                    {
+                        new TagEntity(it)
+                    }
+                )
+                new CriterionEntity(null, null, null, null, clusterCriteriaTags)
+            }
         )
         entity.setClusterCriteria(clusterCriteriaEntities)
 
         def commandCriteria = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         final Set<TagEntity> commandCriterionTags = commandCriteria.collect(
-                {
-                    new TagEntity(it)
-                }
+            {
+                new TagEntity(it)
+            }
         )
         entity.setCommandCriterion(new CriterionEntity(null, null, null, null, commandCriterionTags))
 
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         final Set<FileEntity> configEntities = configs.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setConfigs(configEntities)
 
         def fileDependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         final Set<FileEntity> dependencies = fileDependencies.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setDependencies(dependencies)
 
@@ -482,10 +491,10 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setRequestedMemory(memory)
 
         final List<String> applications = Lists.newArrayList(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         entity.setRequestedApplications(applications)
 

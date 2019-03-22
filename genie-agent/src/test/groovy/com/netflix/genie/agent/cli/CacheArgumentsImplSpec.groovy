@@ -50,7 +50,7 @@ class CacheArgumentsImplSpec extends Specification {
     def "Parse"() {
         when:
         jCommander.parse(
-                "--cacheDirectory", "/foo/bar"
+            "--cacheDirectory", "/foo/bar"
         )
 
         then:
@@ -60,7 +60,7 @@ class CacheArgumentsImplSpec extends Specification {
     def "InvalidLocation"() {
         when:
         jCommander.parse(
-                "--cacheDirectory", " ",
+            "--cacheDirectory", " ",
         )
 
         then:

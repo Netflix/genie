@@ -26,17 +26,16 @@ import spock.lang.Specification
  * Specifications for the {@link ClusterRequest} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ClusterRequestSpec extends Specification {
 
     def "Can build immutable cluster request"() {
         def metadata = new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.OUT_OF_SERVICE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.OUT_OF_SERVICE
         ).build()
         def requestedId = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
@@ -44,9 +43,9 @@ class ClusterRequestSpec extends Specification {
 
         when:
         request = new ClusterRequest.Builder(metadata)
-                .withRequestedId(requestedId)
-                .withResources(resources)
-                .build()
+            .withRequestedId(requestedId)
+            .withResources(resources)
+            .build()
 
         then:
         request.getMetadata() == metadata
@@ -88,8 +87,8 @@ class ClusterRequestSpec extends Specification {
 
         when:
         comparable = new ClusterRequest.Builder(Mock(ClusterMetadata))
-                .withRequestedId(UUID.randomUUID().toString())
-                .toString()
+            .withRequestedId(UUID.randomUUID().toString())
+            .toString()
 
         then:
         base != comparable
@@ -180,10 +179,10 @@ class ClusterRequestSpec extends Specification {
 
     ClusterRequest createClusterRequest() {
         def metadata = new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
         ).build()
         def requestedId = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())

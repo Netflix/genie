@@ -28,8 +28,9 @@ import spock.lang.Specification
 @Category(UnitTest.class)
 class JobExecutionStateMachineSpec extends Specification {
     StateMachine<States, Events> sm
+
     void setup() {
-         sm = Mock()
+        sm = Mock()
     }
 
     void cleanup() {
@@ -39,7 +40,7 @@ class JobExecutionStateMachineSpec extends Specification {
         setup:
         def smImpl = new JobExecutionStateMachineImpl(sm)
         StateMachineListener<States, Events> capturedListener
-        State<States,Events> endState = Mock()
+        State<States, Events> endState = Mock()
 
         when:
         smImpl.start()

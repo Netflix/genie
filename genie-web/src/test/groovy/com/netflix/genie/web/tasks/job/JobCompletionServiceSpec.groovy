@@ -53,8 +53,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Unit tests for JobCompletionHandler
  *
- * @author amajumdar
- * @since 3.0.0
+ * @author amajumdar* @since 3.0.0
  */
 @Category(UnitTest.class)
 class JobCompletionServiceSpec extends Specification {

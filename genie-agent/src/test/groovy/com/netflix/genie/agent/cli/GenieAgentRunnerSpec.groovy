@@ -114,7 +114,7 @@ class GenieAgentRunnerSpec extends Specification {
         1 * argsParser.parse(args)
         1 * argsParser.getSelectedCommand() >> TestCommands.ExampleCommand1.NAME
         1 * argsParser.getCommandNames() >> TestCommands.allCommandNames()
-        1 * cmdFactory.get(TestCommands.ExampleCommand1.NAME) >> { throw new NoSuchBeanDefinitionException("...")}
+        1 * cmdFactory.get(TestCommands.ExampleCommand1.NAME) >> { throw new NoSuchBeanDefinitionException("...") }
         0 * agentCommand.run()
 
         expect:
@@ -130,7 +130,7 @@ class GenieAgentRunnerSpec extends Specification {
         1 * argsParser.getSelectedCommand() >> TestCommands.ExampleCommand1.NAME
         1 * argsParser.getCommandNames() >> TestCommands.allCommandNames()
         1 * cmdFactory.get(TestCommands.ExampleCommand1.NAME) >> agentCommand
-        1 * agentCommand.run() >> {throw new RuntimeException("...")}
+        1 * agentCommand.run() >> { throw new RuntimeException("...") }
 
         expect:
         ExitCode.EXEC_FAIL.getCode() == runner.getExitCode()

@@ -169,7 +169,7 @@ class BaseStateActionSpec extends Specification {
         1 * executionContext.addStateActionError(States.READY, stateAction.getClass() as Class<? extends Action>, exception)
     }
 
-    def "Failing context assertions" () {
+    def "Failing context assertions"() {
         setup:
         def stateAction = new BaseStateAction(executionContext) {
 

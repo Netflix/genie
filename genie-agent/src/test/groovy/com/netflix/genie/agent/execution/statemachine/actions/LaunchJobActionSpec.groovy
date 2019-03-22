@@ -114,7 +114,9 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
         1 * jobSpec.getCommandArgs() >> jobCommandLine
         1 * jobSpec.isInteractive() >> interactive
-        1 * launchJobService.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive) >> {throw exception}
+        1 * launchJobService.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive) >> {
+            throw exception
+        }
         def e = thrown(RuntimeException)
         e.getCause() == exception
     }

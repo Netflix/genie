@@ -23,7 +23,6 @@ import spock.lang.Specification
  * Specifications for {@link GenieHostInfo} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class GenieHostInfoSpec extends Specification {
 

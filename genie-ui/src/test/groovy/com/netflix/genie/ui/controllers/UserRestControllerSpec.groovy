@@ -29,7 +29,6 @@ import java.security.Principal
  * Specifications for the {@link UserRestController} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class UserRestControllerSpec extends Specification {

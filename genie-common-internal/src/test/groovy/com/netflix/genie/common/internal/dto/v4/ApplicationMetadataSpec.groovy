@@ -29,7 +29,6 @@ import spock.lang.Specification
  * Specifications for the {@link JobMetadata} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ApplicationMetadataSpec extends Specification {
@@ -48,11 +47,11 @@ class ApplicationMetadataSpec extends Specification {
 
         when:
         applicationMetadata = new ApplicationMetadata.Builder(name, user, version, status)
-                .withDescription(description)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withType(type)
-                .build()
+            .withDescription(description)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withType(type)
+            .build()
 
         then:
         applicationMetadata.getName() == name
@@ -66,8 +65,8 @@ class ApplicationMetadataSpec extends Specification {
 
         when:
         applicationMetadata = new ApplicationMetadata.Builder(name, user, version, status)
-                .withMetadata(metadataJson)
-                .build()
+            .withMetadata(metadataJson)
+            .build()
 
         then:
         applicationMetadata.getName() == name
@@ -96,11 +95,11 @@ class ApplicationMetadataSpec extends Specification {
         def newTags = Sets.newHashSet(tags)
         newTags.add("     ")
         applicationMetadata = new ApplicationMetadata.Builder(name, user, version, status)
-                .withDescription("")
-                .withTags(newTags)
-                .withMetadata(metadata)
-                .withType("\t")
-                .build()
+            .withDescription("")
+            .withTags(newTags)
+            .withMetadata(metadata)
+            .withType("\t")
+            .build()
 
         then:
         applicationMetadata.getName() == name
@@ -131,10 +130,10 @@ class ApplicationMetadataSpec extends Specification {
 
         when:
         comparable = new ApplicationMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ApplicationStatus.ACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ApplicationStatus.ACTIVE
         ).build()
 
         then:
@@ -220,15 +219,15 @@ class ApplicationMetadataSpec extends Specification {
 
     ApplicationMetadata createApplicationMetadata() {
         return new ApplicationMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ApplicationStatus.ACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ApplicationStatus.ACTIVE
         )
-                .withDescription(UUID.randomUUID().toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
-                .withType(UUID.randomUUID().toString())
-                .build()
+            .withDescription(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .withMetadata(GenieObjectMapper.mapper.readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+            .withType(UUID.randomUUID().toString())
+            .build()
     }
 }

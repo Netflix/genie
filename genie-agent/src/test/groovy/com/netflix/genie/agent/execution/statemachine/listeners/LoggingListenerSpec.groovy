@@ -33,7 +33,7 @@ import spock.lang.Specification
 
 class LoggingListenerSpec extends Specification {
     LoggingListener listener
-    StateMachine<States,Events> stateMachine
+    StateMachine<States, Events> stateMachine
     State<States, Events> state
     State<States, Events> nullState
     Message<Events> event

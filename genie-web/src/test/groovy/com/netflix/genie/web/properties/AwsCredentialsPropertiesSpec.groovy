@@ -23,7 +23,6 @@ import spock.lang.Specification
  * Specifications for {@link AwsCredentialsProperties}.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class AwsCredentialsPropertiesSpec extends Specification {
 
