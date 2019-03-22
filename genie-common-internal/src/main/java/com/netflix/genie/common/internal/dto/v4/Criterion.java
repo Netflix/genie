@@ -67,7 +67,7 @@ public class Criterion {
                 && StringUtils.isBlank(this.version)
                 && StringUtils.isBlank(this.status)
                 && this.tags.isEmpty()
-            ) {
+        ) {
             throw new GeniePreconditionException("Invalid criterion. One of the fields must have a valid value");
         }
     }

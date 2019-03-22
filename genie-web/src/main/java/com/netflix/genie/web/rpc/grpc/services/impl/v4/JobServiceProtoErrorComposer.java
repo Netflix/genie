@@ -98,6 +98,25 @@ class JobServiceProtoErrorComposer {
             .put(GenieAgentRejectedException.class, HandshakeResponse.Type.REJECTED)
             .build();
 
+    private static <T> T getErrorType(
+        final Exception e,
+        final Map<Class<? extends Exception>, T> typeMap,
+        final T defaultValue
+    ) {
+        for (final Map.Entry<Class<? extends Exception>, T> typeMapEntry : typeMap.entrySet()) {
+            if (typeMapEntry.getKey().isInstance(e)) {
+                return typeMapEntry.getValue();
+            }
+        }
+        return defaultValue;
+    }
+
+    private static String getMessage(final Exception e) {
+        return e.getClass().getCanonicalName()
+            + ":"
+            + (e.getMessage() == null ? NO_ERROR_MESSAGE_PROVIDED : e.getMessage());
+    }
+
     /**
      * Build a {@link ReserveJobIdResponse} out of the given {@link Exception}.
      *
@@ -173,24 +192,5 @@ class JobServiceProtoErrorComposer {
             .setMessage(getMessage(e))
             .setType(getErrorType(e, HANDSHAKE_ERROR_MAP, HandshakeResponse.Type.SERVER_ERROR))
             .build();
-    }
-
-    private static <T> T getErrorType(
-        final Exception e,
-        final Map<Class<? extends Exception>, T> typeMap,
-        final T defaultValue
-    ) {
-        for (final Map.Entry<Class<? extends Exception>, T> typeMapEntry : typeMap.entrySet()) {
-            if (typeMapEntry.getKey().isInstance(e)) {
-                return typeMapEntry.getValue();
-            }
-        }
-        return defaultValue;
-    }
-
-    private static String getMessage(final Exception e) {
-        return e.getClass().getCanonicalName()
-            + ":"
-            + (e.getMessage() == null ? NO_ERROR_MESSAGE_PROVIDED : e.getMessage());
     }
 }

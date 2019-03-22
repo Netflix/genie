@@ -91,9 +91,9 @@ public interface AgentJobRequest extends CommonRequest {
         /**
          * Constructor with required parameters.
          *
-         * @param metadata             All user supplied metadata
-         * @param criteria             All user supplied execution criteria
-         * @param requestedAgentConfig The requested configuration of the Genie agent
+         * @param metadata                 All user supplied metadata
+         * @param criteria                 All user supplied execution criteria
+         * @param requestedAgentConfig     The requested configuration of the Genie agent
          * @param requestedJobArchivalData The requested job archival data
          */
         @JsonCreator

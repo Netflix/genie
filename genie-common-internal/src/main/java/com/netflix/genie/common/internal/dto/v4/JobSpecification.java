@@ -127,6 +127,7 @@ public class JobSpecification {
 
     /**
      * Get the archive location for the job folder.
+     *
      * @return archive location for the job folder wrapped in an {@link Optional}
      */
     public Optional<String> getArchiveLocation() {
