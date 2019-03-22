@@ -18,11 +18,9 @@
 package com.netflix.genie.web.configs.aws
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.properties.S3FileTransferProperties
 import com.netflix.genie.web.services.impl.S3FileTransferImpl
 import io.micrometer.core.instrument.MeterRegistry
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -30,7 +28,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class GenieAwsS3AutoConfigurationSpec extends Specification {
 
     def "Can build S3 File Transfer impl"() {

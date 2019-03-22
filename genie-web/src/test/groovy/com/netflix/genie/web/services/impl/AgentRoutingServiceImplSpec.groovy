@@ -15,17 +15,13 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.internal.util.GenieHostInfo
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.AgentConnectionPersistenceService
 import com.netflix.genie.web.services.AgentRoutingService
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class AgentRoutingServiceImplSpec extends Specification {
     private static final String HOSTNAME = "10.1.2.3"
 

@@ -8,7 +8,7 @@ Request for a job to be killed.
 
 `DELETE /api/v3/jobs/{id}`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/killJob
+:snippet-base: {snippets}/job-rest-controller-integration-test/killJob
 :id-base: kill-job
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

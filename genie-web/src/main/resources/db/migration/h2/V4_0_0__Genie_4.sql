@@ -28,31 +28,31 @@ CREATE TABLE `command_executable_arguments` (
 CREATE INDEX `COMMAND_EXECUTABLE_ARGUMENTS_COMMAND_ID_INDEX`
   ON `command_executable_arguments` (`command_id`);
 
-DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
-
-CREATE ALIAS SPLIT_COMMAND_EXECUTABLE AS $$
-import java.sql.Connection;
-import java.sql.ResultSet;
-@CODE
-void splitCommandExecutable(final Connection con) throws Exception {
-	final ResultSet rs = con.createStatement().executeQuery("SELECT `id`, `executable` FROM `commands`;");
-
-	while (rs.next()) {
-	    final long commandId = rs.getLong(1);
-	    final String executable = rs.getString(2);
-      final String[] arguments = executable.split("\\s");
-      for (int i = 0; i < arguments.length; i++) {
-          con
-              .createStatement()
-              .executeUpdate("INSERT INTO `command_executable_arguments` VALUES (" + commandId + ", '" + arguments[i] + "', " + i + ");");
-      }
-	}
-}
-$$;
-
-CALL SPLIT_COMMAND_EXECUTABLE();
-
-DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
+-- DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
+--
+-- CREATE ALIAS SPLIT_COMMAND_EXECUTABLE AS $$
+-- import java.sql.Connection;
+-- import java.sql.ResultSet;
+-- @CODE
+-- void splitCommandExecutable(final Connection con) throws Exception {
+-- 	final ResultSet rs = con.createStatement().executeQuery("SELECT `id`, `executable` FROM `commands`;");
+--
+-- 	while (rs.next()) {
+-- 	    final long commandId = rs.getLong(1);
+-- 	    final String executable = rs.getString(2);
+--       final String[] arguments = executable.split("\\s");
+--       for (int i = 0; i < arguments.length; i++) {
+--           con
+--               .createStatement()
+--               .executeUpdate("INSERT INTO `command_executable_arguments` VALUES (" + commandId + ", '" + arguments[i] + "', " + i + ");");
+--       }
+-- 	}
+-- }
+-- $$;
+--
+-- CALL SPLIT_COMMAND_EXECUTABLE();
+--
+-- DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
 
 ALTER TABLE `applications`
   ADD COLUMN `requested_id` BOOLEAN NOT NULL DEFAULT FALSE;

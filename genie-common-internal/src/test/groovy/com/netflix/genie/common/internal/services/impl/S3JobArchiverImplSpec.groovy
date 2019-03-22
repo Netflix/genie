@@ -23,9 +23,7 @@ import com.amazonaws.services.s3.transfer.MultipleFileUpload
 import com.amazonaws.services.s3.transfer.TransferManager
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory
 import com.netflix.genie.common.internal.exceptions.JobArchiveException
-import com.netflix.genie.test.categories.UnitTest
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
@@ -34,7 +32,6 @@ import spock.lang.Specification
  *
  * @author standon
  */
-@Category(UnitTest)
 class S3JobArchiverImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder

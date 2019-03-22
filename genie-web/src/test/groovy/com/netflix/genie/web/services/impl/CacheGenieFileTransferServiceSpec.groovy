@@ -18,33 +18,31 @@
 package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.exceptions.GenieServerException
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.FileTransferFactory
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 import spock.lang.Unroll
 
 /**
  * Unit tests for CacheGenieFileTransferService.
  *
- * @author amajumdar* @since 7/26/16.
+ * @author amajumdar
+ * @since 7/26/16.
  */
-@Category(UnitTest.class)
 @Unroll
 class CacheGenieFileTransferServiceSpec extends Specification {
     LocalFileTransferImpl localFileTransfer = Mock(LocalFileTransferImpl)
     FileTransferFactory fileTransferFactory = Mock(FileTransferFactory) {
-        get(_) >> localFileTransfer
+        get(_ as String) >> localFileTransfer
     }
     File cachedFile = Mock(File)
     MeterRegistry registry = new SimpleMeterRegistry()
     CacheGenieFileTransferService s =
         Spy(CacheGenieFileTransferService,
             constructorArgs: [fileTransferFactory, "/tmp", localFileTransfer, registry]) {
-            createDirectories(_) >> null
-            deleteFile(_) >> null
+            createDirectories(_ as String) >> null
+            deleteFile(_ as File) >> null
         }
 
     def 'Test getFile'() {

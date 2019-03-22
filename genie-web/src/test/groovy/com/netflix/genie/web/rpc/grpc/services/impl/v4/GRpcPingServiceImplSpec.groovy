@@ -15,19 +15,15 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.google.protobuf.util.Timestamps
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.proto.PingRequest
 import com.netflix.genie.proto.PongResponse
-import com.netflix.genie.test.categories.UnitTest
 import io.grpc.stub.StreamObserver
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
-@Category(UnitTest)
 class GRpcPingServiceImplSpec extends Specification {
     public static final String HOSTNAME = "genie123.netflix.com"
 

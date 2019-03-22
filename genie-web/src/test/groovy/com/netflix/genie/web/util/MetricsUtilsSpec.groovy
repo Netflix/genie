@@ -19,9 +19,7 @@ package com.netflix.genie.web.util
 
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Sets
-import com.netflix.genie.test.categories.UnitTest
 import io.micrometer.core.instrument.Tag
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -30,7 +28,6 @@ import spock.lang.Specification
  * @author mprimi
  * @author tgianos
  */
-@Category(UnitTest.class)
 class MetricsUtilsSpec extends Specification {
     Tag fooBarTag = Tag.of("foo", "bar")
     Set<Tag> initialTags = Sets.newHashSet(fooBarTag)

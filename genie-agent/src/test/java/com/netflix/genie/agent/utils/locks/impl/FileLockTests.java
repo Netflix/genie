@@ -19,9 +19,7 @@ package com.netflix.genie.agent.utils.locks.impl;
 
 import com.netflix.genie.agent.execution.exceptions.LockException;
 import com.netflix.genie.agent.utils.locks.CloseableLock;
-import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
 import java.io.IOException;
@@ -32,7 +30,6 @@ import java.io.IOException;
  * @author standon
  * @since 4.0.0
  */
-@Category(UnitTest.class)
 public class FileLockTests {
 
     /**
@@ -56,8 +53,7 @@ public class FileLockTests {
     /**
      * Make sure close method for a FileLock gets called on exception.
      *
-     * @throws IOException   when the file is bad
-     * @throws LockException when there is a problem getting lock on the file
+     * @throws IOException when the file is bad
      */
     @Test
     public void fileLockClosedOnException() throws IOException {

@@ -8,7 +8,7 @@ Find applications using various query parameters.
 
 `GET /api/v3/applications`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-find-applications/12
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-find-applications/12
 :id-base: find-applications
 :!request-headers:
 :!request-path-params:

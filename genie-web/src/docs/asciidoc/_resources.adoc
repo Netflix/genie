@@ -7,28 +7,28 @@ it will create one if you don't provide it. When you get a resource all fields G
 
 === Application
 
-include::{snippets}/application-rest-controller-integration-tests/can-create-application-without-id/2/response-fields.adoc[]
+include::{snippets}/application-rest-controller-integration-test/can-create-application-without-id/2/response-fields.adoc[]
 
 === Cluster
 
-include::{snippets}/cluster-rest-controller-integration-tests/can-create-cluster-without-id/2/response-fields.adoc[]
+include::{snippets}/cluster-rest-controller-integration-test/can-create-cluster-without-id/2/response-fields.adoc[]
 
 === Command
 
-include::{snippets}/command-rest-controller-integration-tests/can-create-command-without-id/2/response-fields.adoc[]
+include::{snippets}/command-rest-controller-integration-test/can-create-command-without-id/2/response-fields.adoc[]
 
 === Job Request
 
-include::{snippets}/job-rest-controller-integration-tests/1/getJobRequest/response-fields.adoc[]
+include::{snippets}/job-rest-controller-integration-test/1/getJobRequest/response-fields.adoc[]
 
 === Job
 
-include::{snippets}/job-rest-controller-integration-tests/1/getJob/response-fields.adoc[]
+include::{snippets}/job-rest-controller-integration-test/1/getJob/response-fields.adoc[]
 
 === Job Execution
 
-include::{snippets}/job-rest-controller-integration-tests/1/getJobExecution/response-fields.adoc[]
+include::{snippets}/job-rest-controller-integration-test/1/getJobExecution/response-fields.adoc[]
 
 === Job Metadata
 
-include::{snippets}/job-rest-controller-integration-tests/1/getJobMetadata/response-fields.adoc[]
+include::{snippets}/job-rest-controller-integration-test/1/getJobMetadata/response-fields.adoc[]

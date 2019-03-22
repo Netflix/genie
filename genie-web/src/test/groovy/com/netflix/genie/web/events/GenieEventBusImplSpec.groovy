@@ -17,8 +17,7 @@
  */
 package com.netflix.genie.web.events
 
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
+
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener
@@ -31,7 +30,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class GenieEventBusImplSpec extends Specification {
 
     def syncMulticaster = Mock(SimpleApplicationEventMulticaster)

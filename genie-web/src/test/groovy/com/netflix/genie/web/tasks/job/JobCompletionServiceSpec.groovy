@@ -28,7 +28,6 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.services.JobArchiveService
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.events.JobFinishedEvent
 import com.netflix.genie.web.events.JobFinishedReason
 import com.netflix.genie.web.properties.JobsProperties
@@ -42,7 +41,6 @@ import io.micrometer.core.instrument.Tag
 import org.assertj.core.util.Lists
 import org.assertj.core.util.Sets
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.FileSystemResource
 import org.springframework.retry.support.RetryTemplate
@@ -55,7 +53,6 @@ import java.util.concurrent.TimeUnit
  *
  * @author amajumdar* @since 3.0.0
  */
-@Category(UnitTest.class)
 class JobCompletionServiceSpec extends Specification {
     private static final String NAME = UUID.randomUUID().toString()
     private static final String USER = UUID.randomUUID().toString()

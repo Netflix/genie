@@ -17,12 +17,11 @@
  */
 package com.netflix.genie.web.health
 
-import com.netflix.genie.test.categories.UnitTest
+
 import com.netflix.genie.web.properties.HealthProperties
 import com.sun.management.OperatingSystemMXBean
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
-import org.junit.experimental.categories.Category
 import org.springframework.boot.actuate.health.Status
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler
 import spock.lang.Specification
@@ -33,7 +32,6 @@ import spock.lang.Unroll
  *
  * @author amajumdar* @since 3.0.0
  */
-@Category(UnitTest.class)
 @Unroll
 class GenieCpuHealthIndicatorSpec extends Specification {
     OperatingSystemMXBean operatingSystemMXBean

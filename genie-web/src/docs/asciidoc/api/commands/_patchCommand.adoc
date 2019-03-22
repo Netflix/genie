@@ -10,7 +10,7 @@ NOTE: For more information about JSON Patch RFC see the http://jsonpatch.com/[we
 
 `PATCH /api/v3/commands/{id}`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-patch-command/3
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-patch-command/3
 :id-base: patch-command
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

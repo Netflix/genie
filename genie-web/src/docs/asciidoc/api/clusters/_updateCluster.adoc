@@ -11,7 +11,7 @@ NOTE: For more fine grained control call the PATCH API.
 
 `PUT /api/v3/clusters/{id}`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-update-cluster/3
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-update-cluster/3
 :id-base: update-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

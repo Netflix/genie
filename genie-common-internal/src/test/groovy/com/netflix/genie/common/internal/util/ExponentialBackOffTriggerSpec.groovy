@@ -15,17 +15,12 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.internal.util
 
-import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import org.springframework.scheduling.TriggerContext
 import spock.lang.Specification
 import spock.lang.Unroll
 
-@Category(UnitTest)
 class ExponentialBackOffTriggerSpec extends Specification {
 
     @Unroll

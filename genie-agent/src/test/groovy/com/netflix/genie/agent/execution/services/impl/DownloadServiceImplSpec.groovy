@@ -15,23 +15,19 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.services.FetchingCacheService
-import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Pair
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import org.mockito.internal.util.collections.Sets
 import spock.lang.Specification
 
 import java.util.stream.Collectors
 
-@Category(UnitTest)
 class DownloadServiceImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder

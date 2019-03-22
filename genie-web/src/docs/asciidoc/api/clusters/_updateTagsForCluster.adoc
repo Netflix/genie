@@ -11,7 +11,7 @@ by the system.
 
 `PUT /api/v3/clusters/{id}/tags`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-update-tags-for-cluster/3
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-update-tags-for-cluster/3
 :id-base: update-tags-for-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

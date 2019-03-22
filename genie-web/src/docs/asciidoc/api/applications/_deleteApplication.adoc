@@ -8,7 +8,7 @@ Delete an application currently configured in the system.
 
 `DELETE /api/v3/applications/{id}`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-delete-an-application/4
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-delete-an-application/4
 :id-base: delete-application
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

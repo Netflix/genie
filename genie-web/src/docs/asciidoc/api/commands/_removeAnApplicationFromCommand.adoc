@@ -10,7 +10,7 @@ NOTE: This does **NOT** delete the application from the system just un-links it
 
 `DELETE /api/v3/commands/{id}/applications/{applicationId}`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-remove-application-from-a-command/6
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-remove-application-from-a-command/6
 :id-base: remove-an-application-from-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

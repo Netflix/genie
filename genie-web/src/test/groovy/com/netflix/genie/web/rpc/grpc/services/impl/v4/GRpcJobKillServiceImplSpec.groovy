@@ -19,11 +19,11 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
-import com.netflix.genie.proto.*
+import com.netflix.genie.proto.JobKillRegistrationRequest
+import com.netflix.genie.proto.JobKillRegistrationResponse
 import com.netflix.genie.web.services.JobSearchService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
-
 
 /**
  * Specifications for the {@link GRpcJobKillServiceImpl} class.

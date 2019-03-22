@@ -39,8 +39,6 @@ import com.netflix.genie.proto.HandshakeRequest
 import com.netflix.genie.proto.JobArchivalData
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -48,7 +46,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class JobServiceProtoConverterSpec extends Specification {
 
     def id = UUID.randomUUID().toString()

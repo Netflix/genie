@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
@@ -24,12 +23,9 @@ import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 import spock.lang.Unroll
 
-@Category(UnitTest.class)
 class MonitorJobActionSpec extends Specification {
     String id
     ExecutionContext executionContext

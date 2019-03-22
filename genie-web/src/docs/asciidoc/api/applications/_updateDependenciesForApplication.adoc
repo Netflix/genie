@@ -8,7 +8,7 @@ Update the dependency file locations for an existing application
 
 `PUT /api/v3/applications/{id}/dependencies`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-update-dependencies-for-application/3
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-update-dependencies-for-application/3
 :id-base: update-dependencies-for-application
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

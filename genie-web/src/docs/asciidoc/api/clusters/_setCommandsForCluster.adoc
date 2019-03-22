@@ -13,7 +13,7 @@ WARNING: The commands for the ID's must already exist in the system
 
 `PUT /api/v3/clusters/{id}/commands`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-set-commands-for-a-cluster/5
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-set-commands-for-a-cluster/5
 :id-base: set-commands-for-cluster
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.AgentMetadata
@@ -31,16 +30,13 @@ import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.test.categories.UnitTest
 import org.assertj.core.util.Sets
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import javax.validation.ConstraintViolation
 
-@Category(UnitTest)
 class ResolveJobSpecificationActionSpec extends Specification {
     ExecutionContext executionContext
     ArgumentDelegates.JobRequestArguments arguments

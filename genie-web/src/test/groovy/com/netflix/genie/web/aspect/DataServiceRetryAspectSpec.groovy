@@ -21,11 +21,9 @@ import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.jpa.services.JpaJobSearchServiceImpl
 import com.netflix.genie.web.properties.DataServiceRetryProperties
 import org.aspectj.lang.ProceedingJoinPoint
-import org.junit.experimental.categories.Category
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory
 import org.springframework.dao.QueryTimeoutException
 import spock.lang.Specification
@@ -35,7 +33,6 @@ import spock.lang.Specification
  *
  * @author amajumdar* @since 3.0.0
  */
-@Category(UnitTest.class)
 class DataServiceRetryAspectSpec extends Specification {
     def dataServiceRetryAspect
 

@@ -19,9 +19,7 @@ package com.netflix.genie.common.internal.dto.v4
 
 import com.google.common.collect.Lists
 import com.netflix.genie.common.dto.CommandStatus
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -29,7 +27,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class CommandRequestSpec extends Specification {
 
     def "Can build immutable command request"() {

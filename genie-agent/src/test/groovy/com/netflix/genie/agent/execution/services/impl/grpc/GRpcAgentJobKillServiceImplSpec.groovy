@@ -15,24 +15,20 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
 import com.netflix.genie.proto.JobKillServiceGrpc
-import com.netflix.genie.test.categories.UnitTest
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import org.springframework.core.task.TaskExecutor
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class GRpcAgentJobKillServiceImplSpec extends Specification {
 
     @Rule
@@ -60,9 +56,6 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
     }
 
     def "Starting service more than once throws Exception"() {
-
-        JobKillRegistrationRequest request =
-            JobKillRegistrationRequest.newBuilder().setJobId(jobId).build()
 
         when:
         service.start(jobId)

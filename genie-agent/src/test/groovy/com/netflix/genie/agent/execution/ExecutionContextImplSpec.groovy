@@ -15,20 +15,16 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution
 
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Triple
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 import spock.lang.Unroll
 
-@Category(UnitTest.class)
 class ExecutionContextImplSpec extends Specification {
 
     def "Get and set all"() {

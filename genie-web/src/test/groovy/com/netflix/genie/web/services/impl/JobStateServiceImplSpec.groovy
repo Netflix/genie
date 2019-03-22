@@ -22,13 +22,11 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.internal.dto.v4.Application
 import com.netflix.genie.common.internal.dto.v4.Cluster
 import com.netflix.genie.common.internal.dto.v4.Command
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.events.GenieEventBus
 import com.netflix.genie.web.services.JobStateService
 import com.netflix.genie.web.services.JobSubmitterService
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
-import org.junit.experimental.categories.Category
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 
@@ -37,7 +35,6 @@ import spock.lang.Specification
  *
  * @author amajumdar* @since 3.0.0
  */
-@Category(UnitTest.class)
 class JobStateServiceImplSpec extends Specification {
     JobSubmitterService jobSubmitterService = Mock(JobSubmitterService)
     TaskScheduler scheduler = Mock(TaskScheduler)

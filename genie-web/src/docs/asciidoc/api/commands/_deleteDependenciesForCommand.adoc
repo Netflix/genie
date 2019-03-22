@@ -8,7 +8,7 @@ Remove all the dependency file locations for an existing command.
 
 `DELETE /api/v3/commands/{id}/dependencies`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-delete-dependencies-for-command/3
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-delete-dependencies-for-command/3
 :id-base: remove-all-dependencies-from-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

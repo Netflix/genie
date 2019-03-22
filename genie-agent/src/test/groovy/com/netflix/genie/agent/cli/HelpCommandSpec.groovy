@@ -15,14 +15,10 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli
 
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class HelpCommandSpec extends Specification {
     ArgumentParser argsParser
 

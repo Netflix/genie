@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
@@ -31,16 +30,28 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
-import com.netflix.genie.proto.*
-import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.proto.ChangeJobStatusError
+import com.netflix.genie.proto.ChangeJobStatusRequest
+import com.netflix.genie.proto.ChangeJobStatusResponse
+import com.netflix.genie.proto.ClaimJobError
+import com.netflix.genie.proto.ClaimJobRequest
+import com.netflix.genie.proto.ClaimJobResponse
+import com.netflix.genie.proto.DryRunJobSpecificationRequest
+import com.netflix.genie.proto.HandshakeRequest
+import com.netflix.genie.proto.HandshakeResponse
+import com.netflix.genie.proto.JobServiceGrpc
+import com.netflix.genie.proto.JobSpecificationError
+import com.netflix.genie.proto.JobSpecificationRequest
+import com.netflix.genie.proto.JobSpecificationResponse
+import com.netflix.genie.proto.ReserveJobIdError
+import com.netflix.genie.proto.ReserveJobIdRequest
+import com.netflix.genie.proto.ReserveJobIdResponse
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
 import org.junit.Rule
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 import spock.lang.Unroll
 
-@Category(UnitTest.class)
 class GRpcAgentJobServiceImplSpec extends Specification {
 
     @Rule

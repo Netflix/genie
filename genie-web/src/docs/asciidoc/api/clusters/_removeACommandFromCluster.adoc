@@ -10,7 +10,7 @@ NOTE: This does **NOT** delete the command from the system just unlinks it
 
 `DELETE /api/v3/clusters/{id}/commands/{commandId}`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-remove-command-from-a-cluster/6
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-remove-command-from-a-cluster/6
 :id-base: remove-a-command-from-cluster
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

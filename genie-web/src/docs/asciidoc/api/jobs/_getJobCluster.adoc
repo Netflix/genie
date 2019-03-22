@@ -9,7 +9,7 @@ job request.
 
 `GET /api/v3/jobs/{id}/cluster`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobCluster
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobCluster
 :id-base: get-job-cluster
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

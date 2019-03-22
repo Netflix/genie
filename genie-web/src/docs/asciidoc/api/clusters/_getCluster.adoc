@@ -8,7 +8,7 @@ Get the metadata about a cluster in the system.
 
 `GET /api/v3/clusters/{id}`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-create-cluster-without-id/2
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-create-cluster-without-id/2
 :id-base: get-cluster
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

@@ -15,18 +15,14 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine
 
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener
-import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Triple
-import org.junit.experimental.categories.Category
 import org.springframework.statemachine.StateMachine
 import spock.lang.Specification
 
-@Category(UnitTest.class)
 class StateMachineAutoConfigurationSpec extends Specification {
     void setup() {
     }

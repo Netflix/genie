@@ -11,7 +11,7 @@ for users to look up information about their job (where it ran, etc)
 
 `DELETE /api/v3/clusters`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-delete-all-clusters/4
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-delete-all-clusters/4
 :id-base: delete-all-clusters
 :!request-headers:
 :!request-path-params:

@@ -8,7 +8,7 @@ Get the metadata about an application in the system.
 
 `GET /api/v3/applications/{id}`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-create-application-without-id/2
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-create-application-without-id/2
 :id-base: get-application
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

@@ -17,7 +17,7 @@
  */
 
 /**
- * Tests to ensure the app can come up correctly.
+ * Unit tests for main package of the agent OSS app.
  *
  * @author tgianos
  * @since 4.0.0

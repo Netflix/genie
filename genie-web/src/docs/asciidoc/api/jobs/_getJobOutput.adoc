@@ -14,7 +14,7 @@ it will return the file.
 
 NOTE: This is the default behavior for directories if no `Accept` header is present
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobOutput/json
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobOutput/json
 :id-base: get-job-output-json
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc
@@ -35,7 +35,7 @@ include::../_apiTemplate.adoc[]
 NOTE: This would happen automatically if you called from browser due to browser default
 accept header
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobOutput/html
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobOutput/html
 :id-base: get-job-output-html
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc
@@ -53,7 +53,7 @@ include::../_apiTemplate.adoc[]
 
 ==== Getting a file
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobOutput/file
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobOutput/file
 :id-base: get-job-output-file
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

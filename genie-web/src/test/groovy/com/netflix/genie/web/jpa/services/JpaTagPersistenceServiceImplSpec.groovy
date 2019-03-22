@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.jpa.services
 
-import com.netflix.genie.test.categories.UnitTest
+
 import com.netflix.genie.web.jpa.entities.TagEntity
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository
-import org.junit.experimental.categories.Category
 import org.springframework.dao.DuplicateKeyException
 import spock.lang.Specification
 
@@ -29,7 +28,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class JpaTagPersistenceServiceImplSpec extends Specification {
     def tagRepository = Mock(JpaTagRepository)
     def service = new JpaTagPersistenceServiceImpl(this.tagRepository)

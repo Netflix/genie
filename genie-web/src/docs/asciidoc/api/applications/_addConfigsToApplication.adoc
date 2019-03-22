@@ -9,7 +9,7 @@ be ignored.
 
 `POST /api/v3/applications/{id}/configs`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-add-configs-to-application/3
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-add-configs-to-application/3
 :id-base: add-configs-to-application
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

@@ -9,7 +9,7 @@ criteria in the job request.
 
 `GET /api/v3/jobs/{id}/command`
 
-:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobCommand
+:snippet-base: {snippets}/job-rest-controller-integration-test/1/getJobCommand
 :id-base: get-job-command
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

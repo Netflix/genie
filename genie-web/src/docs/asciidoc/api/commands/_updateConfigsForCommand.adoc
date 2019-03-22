@@ -8,7 +8,7 @@ Update the configuration file locations for an existing command. Stored as a set
 
 `PUT /api/v3/commands/{id}/configs`
 
-:snippet-base: {snippets}/command-rest-controller-integration-tests/can-update-configs-for-command/3
+:snippet-base: {snippets}/command-rest-controller-integration-test/can-update-configs-for-command/3
 :id-base: update-configs-for-command
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

@@ -8,7 +8,7 @@ Search the commands that use the given application.
 
 `GET /api/v3/applications/{id}/commands`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-get-commands-for-application/8
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-get-commands-for-application/8
 :id-base: get-commands-for-application
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

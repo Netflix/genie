@@ -8,7 +8,7 @@ Update the configuration file locations for an existing application. Stored as a
 
 `PUT /api/v3/applications/{id}/configs`
 
-:snippet-base: {snippets}/application-rest-controller-integration-tests/can-update-configs-for-application/3
+:snippet-base: {snippets}/application-rest-controller-integration-test/can-update-configs-for-application/3
 :id-base: update-configs-for-application
 :request-headers: {snippet-base}/request-headers.adoc
 :request-path-params: {snippet-base}/path-parameters.adoc

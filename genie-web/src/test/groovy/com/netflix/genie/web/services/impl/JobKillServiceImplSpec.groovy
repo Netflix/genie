@@ -19,10 +19,8 @@ package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
-import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.JobKillServiceV4
 import com.netflix.genie.web.services.JobPersistenceService
-import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -30,7 +28,6 @@ import spock.lang.Specification
  *
  * @author standon* @since 4.0.0
  */
-@Category(UnitTest.class)
 class JobKillServiceImplSpec extends Specification {
     JobKillServiceV3 jobKillServiceV3
     JobKillServiceImpl service

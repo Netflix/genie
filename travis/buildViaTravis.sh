@@ -12,9 +12,9 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   # Build and run all tests, create coverage report
   ${GRADLE} ${GRADLE_OPTIONS} build codeCoverageReport coveralls
   # Re-run genie-web integration tests with MySQL...
-  INTEGRATION_TEST_DB=mysql ${GRADLE} ${GRADLE_OPTIONS} genie-web:integrationTests
+  INTEGRATION_TEST_DB=mysql ${GRADLE} ${GRADLE_OPTIONS} genie-web:integrationTest
   # ... and PostgreSQL
-  INTEGRATION_TEST_DB=postgresql ${GRADLE} ${GRADLE_OPTIONS} genie-web:integrationTests
+  INTEGRATION_TEST_DB=postgresql ${GRADLE} ${GRADLE_OPTIONS} genie-web:integrationTest
   # Build Docker images and compile documentation
   ${GRADLE} ${GRADLE_OPTIONS} javadoc asciidoc dockerBuildAllImages
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then

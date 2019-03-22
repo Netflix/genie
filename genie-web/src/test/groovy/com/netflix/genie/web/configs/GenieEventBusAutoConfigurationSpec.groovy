@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.configs
 
-import com.netflix.genie.test.categories.UnitTest
-import org.junit.experimental.categories.Category
 import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.core.task.SyncTaskExecutor
 import spock.lang.Specification
@@ -28,7 +26,6 @@ import spock.lang.Specification
  *
  * @author tgianos
  */
-@Category(UnitTest.class)
 class GenieEventBusAutoConfigurationSpec extends Specification {
 
     def "Can create Genie Event Bus"() {

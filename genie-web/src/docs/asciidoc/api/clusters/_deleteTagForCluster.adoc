@@ -10,7 +10,7 @@ NOTE: You can't remove the `genie.id:{id}` and `genie.name:{name}` tags. They wi
 
 `DELETE /api/v3/clusters/{id}/tags/{tag}`
 
-:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-delete-tag-for-cluster/3
+:snippet-base: {snippets}/cluster-rest-controller-integration-test/can-delete-tag-for-cluster/3
 :id-base: remove-tag-from-cluster
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc

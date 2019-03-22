@@ -18,10 +18,8 @@
 package com.netflix.genie.web.jobs;
 
 import com.netflix.genie.common.util.GenieObjectMapper;
-import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
 
@@ -31,7 +29,6 @@ import java.io.IOException;
  * @author mprimi
  * @since 3.0.8
  */
-@Category(UnitTest.class)
 public class JobKillReasonFileTest {
 
     private static final String KILL_REASON_STRING = "Test";

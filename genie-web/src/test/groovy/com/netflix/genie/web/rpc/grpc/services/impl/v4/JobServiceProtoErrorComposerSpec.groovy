@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException
