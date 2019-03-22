@@ -31,8 +31,7 @@ import spock.lang.Unroll
 /**
  * Unit tests for GenieCpuHealthIndicator.
  *
- * @author amajumdar
- * @since 3.0.0
+ * @author amajumdar* @since 3.0.0
  */
 @Category(UnitTest.class)
 @Unroll
@@ -46,11 +45,11 @@ class GenieCpuHealthIndicatorSpec extends Specification {
         summary = Mock(DistributionSummary)
         def props = new HealthProperties()
         cpuHealthIndicator = new GenieCpuHealthIndicator(
-                props.getMaxCpuLoadPercent(),
-                1,
-                operatingSystemMXBean,
-                summary,
-                new DefaultManagedTaskScheduler())
+            props.getMaxCpuLoadPercent(),
+            1,
+            operatingSystemMXBean,
+            summary,
+            new DefaultManagedTaskScheduler())
     }
 
     def 'Health should be #status when totalCpuLoad is #cpuLoad'() {
@@ -76,11 +75,11 @@ class GenieCpuHealthIndicatorSpec extends Specification {
         def okOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         okOperatingSystemMXBean.getSystemCpuLoad() >> 0.75
         def indicator = new GenieCpuHealthIndicator(
-                80,
-                1,
-                okOperatingSystemMXBean,
-                DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
-                new DefaultManagedTaskScheduler()
+            80,
+            1,
+            okOperatingSystemMXBean,
+            DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
+            new DefaultManagedTaskScheduler()
         )
         then:
         indicator.health().getStatus() == Status.UP
@@ -88,11 +87,11 @@ class GenieCpuHealthIndicatorSpec extends Specification {
         def outOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         outOperatingSystemMXBean.getSystemCpuLoad() >> 0.85
         indicator = new GenieCpuHealthIndicator(
-                80,
-                1,
-                outOperatingSystemMXBean,
-                DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
-                new DefaultManagedTaskScheduler()
+            80,
+            1,
+            outOperatingSystemMXBean,
+            DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
+            new DefaultManagedTaskScheduler()
         )
         then:
         indicator.health().getStatus() == Status.OUT_OF_SERVICE

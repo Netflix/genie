@@ -53,7 +53,6 @@ import java.time.Instant
  * Specifications for the {@link JobSpecificationServiceImpl} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class JobSpecificationServiceImplSpec extends Specification {
@@ -62,12 +61,12 @@ class JobSpecificationServiceImplSpec extends Specification {
         def jobId = UUID.randomUUID().toString()
         def jobName = UUID.randomUUID().toString()
         def commandArgs = Lists.newArrayList(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def cluster1Id = UUID.randomUUID().toString()
         def cluster2Id = UUID.randomUUID().toString()
@@ -75,53 +74,53 @@ class JobSpecificationServiceImplSpec extends Specification {
         def commandId = UUID.randomUUID().toString()
         def commandTags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def clusterCriteria = Lists.newArrayList(
-                new Criterion
-                        .Builder()
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
-                        .build(),
-                new Criterion
-                        .Builder()
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                        .build()
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .build(),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
         )
         def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
         def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
         def jobRequest = new JobRequest(
-                null,
-                null,
-                commandArgs,
-                new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
-                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
-                null,
-                new AgentConfigRequest.Builder()
-                    .build(),
-                new JobArchivalDataRequest.Builder()
-                    .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-                    .build()
+            null,
+            null,
+            commandArgs,
+            new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
+            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+            null,
+            new AgentConfigRequest.Builder()
+                .build(),
+            new JobArchivalDataRequest.Builder()
+                .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
+                .build()
         )
         def cluster1 = new Cluster(
-                cluster1Id,
-                Instant.now(),
-                Instant.now(),
-                new ExecutionEnvironment(null, null, null),
-                new ClusterMetadata.Builder(
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        ClusterStatus.UP
-                ).withTags(clusterTags).build()
+            cluster1Id,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+            ).withTags(clusterTags).build()
         )
         def cluster2 = new Cluster(
-                cluster2Id,
-                Instant.now(),
-                Instant.now(),
-                new ExecutionEnvironment(null, null, null),
-                new ClusterMetadata.Builder(
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        ClusterStatus.UP
-                ).withTags(clusterTags).build()
+            cluster2Id,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+            ).withTags(clusterTags).build()
         )
 
         def clusters = Sets.newHashSet(cluster1, cluster2)
@@ -130,19 +129,19 @@ class JobSpecificationServiceImplSpec extends Specification {
         def executableArgument1 = UUID.randomUUID().toString()
         def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
         def command = new Command(
-                commandId,
-                Instant.now(),
-                Instant.now(),
-                new ExecutionEnvironment(null, null, null),
-                new CommandMetadata.Builder(
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        CommandStatus.ACTIVE
-                ).withTags(commandTags).build(),
-                executable,
-                null,
-                100L
+            commandId,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.ACTIVE
+            ).withTags(commandTags).build(),
+            executable,
+            null,
+            100L
         )
 
         def jobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
@@ -157,12 +156,12 @@ class JobSpecificationServiceImplSpec extends Specification {
         def applicationService = Mock(ApplicationPersistenceService)
         def commandService = Mock(CommandPersistenceService)
         def service = new JobSpecificationServiceImpl(
-                applicationService,
-                clusterService,
-                commandService,
-                Lists.newArrayList(loadBalancer),
-                new SimpleMeterRegistry(),
-                jobsProperties
+            applicationService,
+            clusterService,
+            commandService,
+            Lists.newArrayList(loadBalancer),
+            new SimpleMeterRegistry(),
+            jobsProperties
         )
 
         when:
@@ -213,12 +212,12 @@ class JobSpecificationServiceImplSpec extends Specification {
 
     def "Can convert tags to string"() {
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationPersistenceService),
-                Mock(ClusterPersistenceService),
-                Mock(CommandPersistenceService),
-                Lists.newArrayList(),
-                Mock(MeterRegistry),
-                JobsProperties.getJobsPropertiesDefaults()
+            Mock(ApplicationPersistenceService),
+            Mock(ClusterPersistenceService),
+            Mock(CommandPersistenceService),
+            Lists.newArrayList(),
+            Mock(MeterRegistry),
+            JobsProperties.getJobsPropertiesDefaults()
         )
 
         expect:
@@ -240,12 +239,12 @@ class JobSpecificationServiceImplSpec extends Specification {
     def "Can generate correct environment variables"() {
         def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationPersistenceService),
-                Mock(ClusterPersistenceService),
-                Mock(CommandPersistenceService),
-                Lists.newArrayList(),
-                Mock(MeterRegistry),
-                jobsProperties
+            Mock(ApplicationPersistenceService),
+            Mock(ClusterPersistenceService),
+            Mock(CommandPersistenceService),
+            Lists.newArrayList(),
+            Mock(MeterRegistry),
+            jobsProperties
         )
         def jobId = UUID.randomUUID().toString()
         def jobName = UUID.randomUUID().toString()
@@ -256,59 +255,59 @@ class JobSpecificationServiceImplSpec extends Specification {
         def commandName = UUID.randomUUID().toString()
         def commandTags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def clusterCriteria = Lists.newArrayList(
-                new Criterion
-                        .Builder()
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
-                        .build(),
-                new Criterion
-                        .Builder()
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                        .build()
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .build(),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
         )
         def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
         def grouping = UUID.randomUUID().toString()
         def groupingInstance = UUID.randomUUID().toString()
         def jobRequest = new JobRequest(
-                null,
-                null,
-                null,
-                new JobMetadata
-                        .Builder(jobName, UUID.randomUUID().toString())
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                        .withGrouping(grouping)
-                        .withGroupingInstance(groupingInstance)
-                        .build(),
-                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
-                null,
-                null,
-                null
+            null,
+            null,
+            null,
+            new JobMetadata
+                .Builder(jobName, UUID.randomUUID().toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .build(),
+            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+            null,
+            null,
+            null
         )
         def cluster = new Cluster(
-                clusterId,
-                Instant.now(),
-                Instant.now(),
-                new ExecutionEnvironment(null, null, null),
-                new ClusterMetadata.Builder(
-                        clusterName,
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        ClusterStatus.UP
-                ).withTags(clusterTags).build()
+            clusterId,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ClusterMetadata.Builder(
+                clusterName,
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+            ).withTags(clusterTags).build()
         )
         def command = new Command(
-                commandId,
-                Instant.now(),
-                Instant.now(),
-                new ExecutionEnvironment(null, null, null),
-                new CommandMetadata.Builder(
-                        commandName,
-                        UUID.randomUUID().toString(),
-                        UUID.randomUUID().toString(),
-                        CommandStatus.ACTIVE
-                ).withTags(commandTags).build(),
-                Lists.newArrayList(UUID.randomUUID().toString()),
-                null,
-                100L
+            commandId,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new CommandMetadata.Builder(
+                commandName,
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.ACTIVE
+            ).withTags(commandTags).build(),
+            Lists.newArrayList(UUID.randomUUID().toString()),
+            null,
+            100L
         )
 
         when:
@@ -337,12 +336,12 @@ class JobSpecificationServiceImplSpec extends Specification {
     def "Can convert V4 Criterion to V3 tags"() {
         def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationPersistenceService),
-                Mock(ClusterPersistenceService),
-                Mock(CommandPersistenceService),
-                Lists.newArrayList(),
-                Mock(MeterRegistry),
-                jobsProperties
+            Mock(ApplicationPersistenceService),
+            Mock(ClusterPersistenceService),
+            Mock(CommandPersistenceService),
+            Lists.newArrayList(),
+            Mock(MeterRegistry),
+            jobsProperties
         )
         def id = UUID.randomUUID().toString()
         def name = UUID.randomUUID().toString()
@@ -388,18 +387,18 @@ class JobSpecificationServiceImplSpec extends Specification {
         def user = UUID.randomUUID().toString()
         def version = UUID.randomUUID().toString()
         def clusterCriteria = Lists.newArrayList(
-                new Criterion.Builder()
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                        .build(),
-                new Criterion.Builder()
-                        .withName(UUID.randomUUID().toString())
-                        .withStatus(UUID.randomUUID().toString())
-                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                        .build()
-        )
-        def commandCriterion = new Criterion.Builder()
+            new Criterion.Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build(),
+            new Criterion.Builder()
+                .withName(UUID.randomUUID().toString())
+                .withStatus(UUID.randomUUID().toString())
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
+        )
+        def commandCriterion = new Criterion.Builder()
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build()
         def applicationIds = Lists.newArrayList(UUID.randomUUID().toString())
         def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def tags = Sets.newHashSet(UUID.randomUUID().toString())
@@ -417,38 +416,38 @@ class JobSpecificationServiceImplSpec extends Specification {
 
         def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationPersistenceService),
-                Mock(ClusterPersistenceService),
-                Mock(CommandPersistenceService),
-                Lists.newArrayList(),
-                Mock(MeterRegistry),
-                jobsProperties
+            Mock(ApplicationPersistenceService),
+            Mock(ClusterPersistenceService),
+            Mock(CommandPersistenceService),
+            Lists.newArrayList(),
+            Mock(MeterRegistry),
+            jobsProperties
         )
 
         def jobRequest = new JobRequest(
-                null,
-                new ExecutionEnvironment(configs, dependencies, setupFile),
-                commandArgs,
-                new JobMetadata.Builder(name, user, version)
-                        .withTags(tags)
-                        .withGroupingInstance(groupingInstance)
-                        .withGrouping(grouping)
-                        .withGroup(group)
-                        .withEmail(email)
-                        .withMetadata(metadata)
-                        .withDescription(description)
-                        .build(),
-                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
-                null,
-                new AgentConfigRequest
-                        .Builder()
-                        .withArchivingDisabled(true)
-                        .withInteractive(true)
-                        .withTimeoutRequested(timeout)
-                        .build(),
-                new JobArchivalDataRequest
-                        .Builder()
-                        .build()
+            null,
+            new ExecutionEnvironment(configs, dependencies, setupFile),
+            commandArgs,
+            new JobMetadata.Builder(name, user, version)
+                .withTags(tags)
+                .withGroupingInstance(groupingInstance)
+                .withGrouping(grouping)
+                .withGroup(group)
+                .withEmail(email)
+                .withMetadata(metadata)
+                .withDescription(description)
+                .build(),
+            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
+            null,
+            new AgentConfigRequest
+                .Builder()
+                .withArchivingDisabled(true)
+                .withInteractive(true)
+                .withTimeoutRequested(timeout)
+                .build(),
+            new JobArchivalDataRequest
+                .Builder()
+                .build()
         )
 
         when:

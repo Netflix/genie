@@ -54,7 +54,6 @@ import java.util.function.Consumer
  * Specifications for {@link EntityDtoConverters}.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class EntityDtoConvertersSpec extends Specification {
 
@@ -76,16 +75,16 @@ class EntityDtoConvertersSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<TagEntity> tagEntities = tags.collect(
-                {
-                    new TagEntity(it)
-                }
+            {
+                new TagEntity(it)
+            }
         )
         entity.setTags(tagEntities)
         def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<FileEntity> configEntities = configs.collect(
-                {
-                    new FileEntity(it)
-                }
+            {
+                new FileEntity(it)
+            }
         )
         entity.setConfigs(configEntities)
         def setupFile = UUID.randomUUID().toString()
@@ -94,9 +93,9 @@ class EntityDtoConvertersSpec extends Specification {
         entity.setSetupFile(setupFileEntity)
         def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<FileEntity> dependencyEntities = dependencies.collect(
-                {
-                    new FileEntity(it)
-                }
+            {
+                new FileEntity(it)
+            }
         )
         entity.setDependencies(dependencyEntities)
         entity.setStatus(ApplicationStatus.ACTIVE)
@@ -140,29 +139,29 @@ class EntityDtoConvertersSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
-                {
-                    def tagEntity = new TagEntity()
-                    tagEntity.setTag(it)
-                    tagEntity
-                }
+            {
+                def tagEntity = new TagEntity()
+                tagEntity.setTag(it)
+                tagEntity
+            }
         )
         entity.setTags(tagEntities)
         def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> configEntities = configs.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setConfigs(configEntities)
         def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> dependencyEntities = dependencies.collect(
-                {
-                    def fileEntity = new FileEntity()
-                    fileEntity.setFile(it)
-                    fileEntity
-                }
+            {
+                def fileEntity = new FileEntity()
+                fileEntity.setFile(it)
+                fileEntity
+            }
         )
         entity.setDependencies(dependencyEntities)
         def setupFile = UUID.randomUUID().toString()
@@ -207,23 +206,23 @@ class EntityDtoConvertersSpec extends Specification {
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
-                {
-                    new TagEntity(it)
-                }
+            {
+                new TagEntity(it)
+            }
         )
         entity.setTags(tagEntities)
         def configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> configEntities = configs.collect(
-                {
-                    new FileEntity(it)
-                }
+            {
+                new FileEntity(it)
+            }
         )
         entity.setConfigs(configEntities)
         def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<FileEntity> dependencyEntities = dependencies.collect(
-                {
-                    new FileEntity(it)
-                }
+            {
+                new FileEntity(it)
+            }
         )
         entity.setDependencies(dependencyEntities)
         def setupFile = UUID.randomUUID().toString()
@@ -231,9 +230,9 @@ class EntityDtoConvertersSpec extends Specification {
         setupFileEntity.setFile(setupFile)
         entity.setSetupFile(setupFileEntity)
         def executable = Lists.newArrayList(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         entity.setExecutable(executable)
         def checkDelay = 2180234L
@@ -272,13 +271,13 @@ class EntityDtoConvertersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def metadataString = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def metadata = GenieObjectMapper
-                .getMapper()
-                .readTree(metadataString)
+            .getMapper()
+            .readTree(metadataString)
         def tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def email = UUID.randomUUID().toString()
         def grouping = UUID.randomUUID().toString()
@@ -286,20 +285,20 @@ class EntityDtoConvertersSpec extends Specification {
 
         def interactive = true
         def commandArgs = Lists.newArrayList(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def jobDirectoryLocation = "/tmp"
 
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
 
@@ -308,72 +307,72 @@ class EntityDtoConvertersSpec extends Specification {
         def commandCriterionVersion = UUID.randomUUID().toString()
         def commandCriterionStatus = UUID.randomUUID().toString()
         def commandCriterionTags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def commandCriterion = new Criterion.Builder()
-                .withId(commandCriterionId)
-                .withName(commandCriterionName)
-                .withVersion(commandCriterionVersion)
-                .withStatus(commandCriterionStatus)
-                .withTags(commandCriterionTags)
-                .build()
+            .withId(commandCriterionId)
+            .withName(commandCriterionName)
+            .withVersion(commandCriterionVersion)
+            .withStatus(commandCriterionStatus)
+            .withTags(commandCriterionTags)
+            .build()
 
         def clusterCriterion0Id = UUID.randomUUID().toString()
         def clusterCriterion0Name = UUID.randomUUID().toString()
         def clusterCriterion0Version = UUID.randomUUID().toString()
         def clusterCriterion0Status = UUID.randomUUID().toString()
         def clusterCriterion0Tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def clusterCriterion0 = new Criterion.Builder()
-                .withId(clusterCriterion0Id)
-                .withName(clusterCriterion0Name)
-                .withVersion(clusterCriterion0Version)
-                .withStatus(clusterCriterion0Status)
-                .withTags(clusterCriterion0Tags)
-                .build()
+            .withId(clusterCriterion0Id)
+            .withName(clusterCriterion0Name)
+            .withVersion(clusterCriterion0Version)
+            .withStatus(clusterCriterion0Status)
+            .withTags(clusterCriterion0Tags)
+            .build()
 
         def clusterCriterion1Id = UUID.randomUUID().toString()
         def clusterCriterion1Name = UUID.randomUUID().toString()
         def clusterCriterion1Version = UUID.randomUUID().toString()
         def clusterCriterion1Status = UUID.randomUUID().toString()
         def clusterCriterion1Tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def clusterCriterion1 = new Criterion.Builder()
-                .withId(clusterCriterion1Id)
-                .withName(clusterCriterion1Name)
-                .withVersion(clusterCriterion1Version)
-                .withStatus(clusterCriterion1Status)
-                .withTags(clusterCriterion1Tags)
-                .build()
+            .withId(clusterCriterion1Id)
+            .withName(clusterCriterion1Name)
+            .withVersion(clusterCriterion1Version)
+            .withStatus(clusterCriterion1Status)
+            .withTags(clusterCriterion1Tags)
+            .build()
 
         def clusterCriterion2Id = UUID.randomUUID().toString()
         def clusterCriterion2Name = UUID.randomUUID().toString()
         def clusterCriterion2Version = UUID.randomUUID().toString()
         def clusterCriterion2Status = UUID.randomUUID().toString()
         def clusterCriterion2Tags = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def clusterCriterion2 = new Criterion.Builder()
-                .withId(clusterCriterion2Id)
-                .withName(clusterCriterion2Name)
-                .withVersion(clusterCriterion2Version)
-                .withStatus(clusterCriterion2Status)
-                .withTags(clusterCriterion2Tags)
-                .build()
+            .withId(clusterCriterion2Id)
+            .withName(clusterCriterion2Name)
+            .withVersion(clusterCriterion2Version)
+            .withStatus(clusterCriterion2Status)
+            .withTags(clusterCriterion2Tags)
+            .build()
         def clusterCriteria = Lists.newArrayList(clusterCriterion0, clusterCriterion1, clusterCriterion2)
 
         def applicationIds = Lists.newArrayList(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
 
         def requestedTimeout = 32_000
@@ -382,65 +381,65 @@ class EntityDtoConvertersSpec extends Specification {
         def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
 
         def requestedEnvironmentVariables = ImmutableMap.of(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
 
         def jobMetadata = new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withMetadata(metadata)
-                .withTags(tags)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .withEmail(email)
-                .build()
+            .withDescription(description)
+            .withMetadata(metadata)
+            .withTags(tags)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .withEmail(email)
+            .build()
 
         def executionResourceCriteria = new ExecutionResourceCriteria(
-                clusterCriteria,
-                commandCriterion,
-                applicationIds
+            clusterCriteria,
+            commandCriterion,
+            applicationIds
         )
 
         def agentConfigRequest = new AgentConfigRequest.Builder()
-                .withInteractive(interactive)
-                .withArchivingDisabled(true)
-                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
-                .withExt(metadata)
-                .withTimeoutRequested(requestedTimeout)
-                .build()
+            .withInteractive(interactive)
+            .withArchivingDisabled(true)
+            .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+            .withExt(metadata)
+            .withTimeoutRequested(requestedTimeout)
+            .build()
 
         def jobArchivalDataRequest = new JobArchivalDataRequest.Builder()
-                .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-                .build();
+            .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
+            .build();
 
         def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder()
-                .withExt(metadata)
-                .withRequestedJobMemory(requestedMemory)
-                .withRequestedJobCpu(requestedCpu)
-                .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
-                .build()
+            .withExt(metadata)
+            .withRequestedJobMemory(requestedMemory)
+            .withRequestedJobCpu(requestedCpu)
+            .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+            .build()
 
         def jobRequest0 = new JobRequest(
-                id,
-                new ExecutionEnvironment(configs, dependencies, setupFile),
-                commandArgs,
-                jobMetadata,
-                executionResourceCriteria,
-                agentEnvironmentRequest,
-                agentConfigRequest,
-                null
+            id,
+            new ExecutionEnvironment(configs, dependencies, setupFile),
+            commandArgs,
+            jobMetadata,
+            executionResourceCriteria,
+            agentEnvironmentRequest,
+            agentConfigRequest,
+            null
         )
         def jobRequest1 = new JobRequest(
-                null,
-                new ExecutionEnvironment(configs, dependencies, setupFile),
-                commandArgs,
-                jobMetadata,
-                executionResourceCriteria,
-                agentEnvironmentRequest,
-                agentConfigRequest,
-                null
+            null,
+            new ExecutionEnvironment(configs, dependencies, setupFile),
+            commandArgs,
+            jobMetadata,
+            executionResourceCriteria,
+            agentEnvironmentRequest,
+            agentConfigRequest,
+            null
         )
 
         def jobRequest2 = new JobRequest(
@@ -480,28 +479,28 @@ class EntityDtoConvertersSpec extends Specification {
         jobEntity.setConfigs(configs.collect({ config -> new FileEntity(config) }).toSet())
         jobEntity.setDependencies(dependencies.collect({ dependency -> new FileEntity(dependency) }).toSet())
         jobEntity.setClusterCriteria(
-                clusterCriteria.
-                        collect(
-                                {
-                                    criterion ->
-                                        new CriterionEntity(
-                                                criterion.getId().orElse(null),
-                                                criterion.getName().orElse(null),
-                                                criterion.getVersion().orElse(null),
-                                                criterion.getStatus().orElse(null),
-                                                criterion.getTags().collect({ tag -> new TagEntity(tag) }).toSet()
-                                        )
-                                }
-                        ).toList()
+            clusterCriteria.
+                collect(
+                    {
+                        criterion ->
+                            new CriterionEntity(
+                                criterion.getId().orElse(null),
+                                criterion.getName().orElse(null),
+                                criterion.getVersion().orElse(null),
+                                criterion.getStatus().orElse(null),
+                                criterion.getTags().collect({ tag -> new TagEntity(tag) }).toSet()
+                            )
+                    }
+                ).toList()
         )
         jobEntity.setCommandCriterion(
-                new CriterionEntity(
-                        commandCriterionId,
-                        commandCriterionName,
-                        commandCriterionVersion,
-                        commandCriterionStatus,
-                        commandCriterionTags.collect({ tag -> new TagEntity(tag) }).toSet()
-                )
+            new CriterionEntity(
+                commandCriterionId,
+                commandCriterionName,
+                commandCriterionVersion,
+                commandCriterionStatus,
+                commandCriterionTags.collect({ tag -> new TagEntity(tag) }).toSet()
+            )
         )
         jobEntity.setInteractive(interactive)
         jobEntity.setArchivingDisabled(true)
@@ -549,8 +548,8 @@ class EntityDtoConvertersSpec extends Specification {
 
     def "Can set string field from json"() {
         def json = GenieObjectMapper
-                .getMapper()
-                .readTree("{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}")
+            .getMapper()
+            .readTree("{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}")
         Consumer<String> consumer = Mock(Consumer)
 
         when:
@@ -570,12 +569,12 @@ class EntityDtoConvertersSpec extends Specification {
         def id = UUID.randomUUID().toString()
 
         def environmentVariables = ImmutableMap.of(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def jobDirectoryLocation = UUID.randomUUID().toString()
         def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
@@ -591,11 +590,11 @@ class EntityDtoConvertersSpec extends Specification {
         def clusterEntity = Mock(ClusterEntity) {
             1 * getUniqueId() >> clusterId
             1 * getConfigs() >> clusterConfigs
-                    .collect({ config -> new FileEntity(config) })
-                    .toSet()
+                .collect({ config -> new FileEntity(config) })
+                .toSet()
             1 * getDependencies() >> clusterDependencies
-                    .collect({ dependency -> new FileEntity(dependency) })
-                    .toSet()
+                .collect({ dependency -> new FileEntity(dependency) })
+                .toSet()
             1 * getSetupFile() >> Optional.ofNullable(new FileEntity(clusterSetupFile))
         }
 
@@ -607,11 +606,11 @@ class EntityDtoConvertersSpec extends Specification {
         def commandEntity = Mock(CommandEntity) {
             1 * getUniqueId() >> commandId
             1 * getConfigs() >> commandConfigs
-                    .collect({ config -> new FileEntity(config) })
-                    .toSet()
+                .collect({ config -> new FileEntity(config) })
+                .toSet()
             1 * getDependencies() >> commandDependencies
-                    .collect({ dependency -> new FileEntity(dependency) })
-                    .toSet()
+                .collect({ dependency -> new FileEntity(dependency) })
+                .toSet()
             1 * getSetupFile() >> Optional.ofNullable(new FileEntity(commandSetupFile))
             1 * getExecutable() >> executable
         }
@@ -623,11 +622,11 @@ class EntityDtoConvertersSpec extends Specification {
         def application0Entity = Mock(ApplicationEntity) {
             1 * getUniqueId() >> application0Id
             1 * getConfigs() >> application0Configs
-                    .collect({ config -> new FileEntity(config) })
-                    .toSet()
+                .collect({ config -> new FileEntity(config) })
+                .toSet()
             1 * getDependencies() >> application0Dependencies
-                    .collect({ dependency -> new FileEntity(dependency) })
-                    .toSet()
+                .collect({ dependency -> new FileEntity(dependency) })
+                .toSet()
             1 * getSetupFile() >> Optional.ofNullable(application0SetupFile)
         }
 
@@ -638,11 +637,11 @@ class EntityDtoConvertersSpec extends Specification {
         def application1Entity = Mock(ApplicationEntity) {
             1 * getUniqueId() >> application1Id
             1 * getConfigs() >> application1Configs
-                    .collect({ config -> new FileEntity(config) })
-                    .toSet()
+                .collect({ config -> new FileEntity(config) })
+                .toSet()
             1 * getDependencies() >> application1Dependencies
-                    .collect({ dependency -> new FileEntity(dependency) })
-                    .toSet()
+                .collect({ dependency -> new FileEntity(dependency) })
+                .toSet()
             1 * getSetupFile() >> Optional.ofNullable(new FileEntity(application1SetupFile))
         }
         def applications = Lists.newArrayList(application0Entity, application1Entity)
@@ -689,11 +688,11 @@ class EntityDtoConvertersSpec extends Specification {
         1 * jobSpecificationProjection.getCommandArgs() >> commandArgs
         1 * jobSpecificationProjection.isInteractive() >> interactive
         1 * jobSpecificationProjection.getConfigs() >> jobConfigs
-                .collect({ config -> new FileEntity(config) })
-                .toSet()
+            .collect({ config -> new FileEntity(config) })
+            .toSet()
         1 * jobSpecificationProjection.getDependencies() >> jobDependencies
-                .collect({ dependency -> new FileEntity(dependency) })
-                .toSet()
+            .collect({ dependency -> new FileEntity(dependency) })
+            .toSet()
         1 * jobSpecificationProjection.getSetupFile() >> Optional.ofNullable(jobSetupFile)
         1 * jobSpecificationProjection.getEnvironmentVariables() >> environmentVariables
         jobSpecification.isInteractive()
@@ -701,46 +700,46 @@ class EntityDtoConvertersSpec extends Specification {
         jobSpecification.getEnvironmentVariables() == environmentVariables
         jobSpecification.getJobDirectoryLocation() == new File(jobDirectoryLocation)
         jobSpecification.getJob() == new JobSpecification.ExecutionResource(
-                id,
-                new ExecutionEnvironment(
-                        jobConfigs,
-                        jobDependencies,
-                        jobSetupFile
-                )
+            id,
+            new ExecutionEnvironment(
+                jobConfigs,
+                jobDependencies,
+                jobSetupFile
+            )
         )
         jobSpecification.getCluster() == new JobSpecification.ExecutionResource(
-                clusterId,
-                new ExecutionEnvironment(
-                        clusterConfigs,
-                        clusterDependencies,
-                        clusterSetupFile
-                )
+            clusterId,
+            new ExecutionEnvironment(
+                clusterConfigs,
+                clusterDependencies,
+                clusterSetupFile
+            )
         )
         jobSpecification.getCommand() == new JobSpecification.ExecutionResource(
-                commandId,
-                new ExecutionEnvironment(
-                        commandConfigs,
-                        commandDependencies,
-                        commandSetupFile
-                )
+            commandId,
+            new ExecutionEnvironment(
+                commandConfigs,
+                commandDependencies,
+                commandSetupFile
+            )
         )
         jobSpecification.getApplications() == Lists.newArrayList(
-                new JobSpecification.ExecutionResource(
-                        application0Id,
-                        new ExecutionEnvironment(
-                                application0Configs,
-                                application0Dependencies,
-                                application0SetupFile
-                        )
-                ),
-                new JobSpecification.ExecutionResource(
-                        application1Id,
-                        new ExecutionEnvironment(
-                                application1Configs,
-                                application1Dependencies,
-                                application1SetupFile
-                        )
+            new JobSpecification.ExecutionResource(
+                application0Id,
+                new ExecutionEnvironment(
+                    application0Configs,
+                    application0Dependencies,
+                    application0SetupFile
                 )
+            ),
+            new JobSpecification.ExecutionResource(
+                application1Id,
+                new ExecutionEnvironment(
+                    application1Configs,
+                    application1Dependencies,
+                    application1SetupFile
+                )
+            )
         )
     }
 

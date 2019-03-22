@@ -29,7 +29,6 @@ import spock.lang.Specification
  *
  * @author mprimi
  * @author tgianos
- * @since 3.3.0
  */
 @Category(UnitTest.class)
 class MetricsUtilsSpec extends Specification {
@@ -43,9 +42,9 @@ class MetricsUtilsSpec extends Specification {
         MetricsUtils.addFailureTagsWithException(initialTags, exception)
         then:
         initialTags == ImmutableSet.of(
-                fooBarTag,
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE),
-                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
+            fooBarTag,
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE),
+            Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
         )
     }
 
@@ -56,7 +55,7 @@ class MetricsUtilsSpec extends Specification {
         MetricsUtils.addSuccessTags(emptyTags)
         then:
         emptyTags == ImmutableSet.of(
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
     }
 
@@ -66,7 +65,7 @@ class MetricsUtilsSpec extends Specification {
         def finalTags = MetricsUtils.newSuccessTagsSet()
         then:
         finalTags == ImmutableSet.of(
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
     }
 
@@ -77,8 +76,8 @@ class MetricsUtilsSpec extends Specification {
         def finalTags = MetricsUtils.newFailureTagsSetForException(exception)
         then:
         finalTags == ImmutableSet.of(
-                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE),
-                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
+            Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE),
+            Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
         )
     }
 }

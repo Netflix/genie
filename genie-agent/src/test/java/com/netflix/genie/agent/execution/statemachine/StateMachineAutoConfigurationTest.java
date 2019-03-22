@@ -776,25 +776,6 @@ public class StateMachineAutoConfigurationTest {
         );
     }
 
-    private class ExecutionPathListener
-        extends StateMachineListenerAdapter<States, Events>
-        implements JobExecutionListener {
-
-        @Override
-        public void stateEntered(final State<States, Events> state) {
-            visitedStates.add(state.getId());
-        }
-
-        @Override
-        public void onExecute(
-            final StateMachine<States, Events> stateMachine,
-            final Action<States, Events> action,
-            final long duration
-        ) {
-            executedActions.add(action);
-        }
-    }
-
     private void cancelJobBeforeEnteringState(final States targetState) {
         this.sm.getStateMachineAccessor().doWithAllRegions(
             function -> function.addStateMachineInterceptor(
@@ -845,7 +826,6 @@ public class StateMachineAutoConfigurationTest {
         );
     }
 
-
     private void assertActionsExecuted(final StateAction... expectedStateActions) {
         Assert.assertEquals(
             Lists.newArrayList(expectedStateActions),
@@ -887,9 +867,9 @@ public class StateMachineAutoConfigurationTest {
         private final Random random;
         private final States state;
         private final Events completionEvent;
+        private final AtomicInteger executionCount;
         private boolean cancelDuringExecution;
         private boolean failAction;
-        private final AtomicInteger executionCount;
 
         TestStateAction(
             final States state,
@@ -943,6 +923,25 @@ public class StateMachineAutoConfigurationTest {
 
         @Override
         public void cleanup() {
+        }
+    }
+
+    private class ExecutionPathListener
+        extends StateMachineListenerAdapter<States, Events>
+        implements JobExecutionListener {
+
+        @Override
+        public void stateEntered(final State<States, Events> state) {
+            visitedStates.add(state.getId());
+        }
+
+        @Override
+        public void onExecute(
+            final StateMachine<States, Events> stateMachine,
+            final Action<States, Events> action,
+            final long duration
+        ) {
+            executedActions.add(action);
         }
     }
 

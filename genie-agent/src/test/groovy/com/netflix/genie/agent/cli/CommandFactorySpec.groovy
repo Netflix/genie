@@ -42,8 +42,8 @@ class CommandFactorySpec extends Specification {
         mockBeanFactory.getBean(TestCommands.ExampleCommand2.class) >> new TestCommands.ExampleCommand2()
         mockApplicationContext.getAutowireCapableBeanFactory() >> mockBeanFactory
         this.factory = new CommandFactory(
-                commandArgs,
-                mockApplicationContext
+            commandArgs,
+            mockApplicationContext
         )
     }
 

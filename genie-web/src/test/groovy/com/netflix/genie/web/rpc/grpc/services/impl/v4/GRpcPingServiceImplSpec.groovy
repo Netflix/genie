@@ -45,10 +45,10 @@ class GRpcPingServiceImplSpec extends Specification {
         def service = new GRpcPingServiceImpl(new GenieHostInfo(HOSTNAME))
         String requestId = UUID.randomUUID().toString()
         PingRequest pingRequest = PingRequest.newBuilder()
-                .setRequestId(requestId)
-                .setTimestamp(Timestamps.fromMillis(System.currentTimeMillis()))
-                .putClientMetadata("foo", "bar")
-                .build()
+            .setRequestId(requestId)
+            .setTimestamp(Timestamps.fromMillis(System.currentTimeMillis()))
+            .putClientMetadata("foo", "bar")
+            .build()
         PongResponse pongResponse = null
 
         when:

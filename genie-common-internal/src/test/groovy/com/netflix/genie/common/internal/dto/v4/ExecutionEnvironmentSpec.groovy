@@ -26,21 +26,20 @@ import spock.lang.Specification
  * Specifications for the {@link ExecutionEnvironment} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ExecutionEnvironmentSpec extends Specification {
 
     def "Can create immutable ExecutionEnvironment instance"() {
         def configs = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def dependencies = Sets.newHashSet(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
         ExecutionEnvironment environment
@@ -74,9 +73,9 @@ class ExecutionEnvironmentSpec extends Specification {
 
         when: "Empty resources are provided they're ignored"
         environment = new ExecutionEnvironment(
-                Sets.newHashSet(" "),
-                Sets.newHashSet("\t", "\n"),
-                ""
+            Sets.newHashSet(" "),
+            Sets.newHashSet("\t", "\n"),
+            ""
         )
 
         then:
@@ -184,9 +183,9 @@ class ExecutionEnvironmentSpec extends Specification {
 
     ExecutionEnvironment createExecutionEnvironment() {
         return new ExecutionEnvironment(
-                Sets.newHashSet(UUID.randomUUID().toString()),
-                Sets.newHashSet(UUID.randomUUID().toString()),
-                UUID.randomUUID().toString()
+            Sets.newHashSet(UUID.randomUUID().toString()),
+            Sets.newHashSet(UUID.randomUUID().toString()),
+            UUID.randomUUID().toString()
         )
     }
 }

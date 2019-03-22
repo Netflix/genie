@@ -41,7 +41,7 @@ class GrpcHeartBeatServiceImplSpec extends Specification {
             1 * scheduleWithFixedDelay(_ as Runnable, _ as Long) >> {
                 args ->
                     this.task = args[0] as Runnable
-                return taskFuture
+                    return taskFuture
             }
         }
         this.agentRoutingService = Mock(AgentRoutingService)

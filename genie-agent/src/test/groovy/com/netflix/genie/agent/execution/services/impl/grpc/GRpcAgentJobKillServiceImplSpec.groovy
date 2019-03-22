@@ -19,7 +19,6 @@
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.services.KillService
-import com.netflix.genie.agent.execution.services.impl.KillServiceImpl
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
 import com.netflix.genie.proto.JobKillServiceGrpc
@@ -150,8 +149,8 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
 
         @Override
         void registerForKillNotification(
-                final JobKillRegistrationRequest request,
-                final StreamObserver<JobKillRegistrationResponse> responseObserver
+            final JobKillRegistrationRequest request,
+            final StreamObserver<JobKillRegistrationResponse> responseObserver
         ) {
             killResponseObserver = responseObserver
         }

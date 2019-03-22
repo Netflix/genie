@@ -30,17 +30,16 @@ import java.time.Instant
  * Specifications for the {@link Application} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class CommandSpec extends Specification {
 
     def "Can build immutable command resource"() {
         def metadata = new CommandMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            CommandStatus.ACTIVE
         ).build()
         def id = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
@@ -53,14 +52,14 @@ class CommandSpec extends Specification {
 
         when:
         command = new Command(
-                id,
-                created,
-                updated,
-                resources,
-                metadata,
-                executable,
-                memory,
-                checkDelay
+            id,
+            created,
+            updated,
+            resources,
+            metadata,
+            executable,
+            memory,
+            checkDelay
         )
 
         then:
@@ -75,14 +74,14 @@ class CommandSpec extends Specification {
 
         when:
         command = new Command(
-                id,
-                created,
-                updated,
-                null,
-                metadata,
-                executable,
-                null,
-                checkDelay
+            id,
+            created,
+            updated,
+            null,
+            metadata,
+            executable,
+            null,
+            checkDelay
         )
 
         then:
@@ -100,14 +99,14 @@ class CommandSpec extends Specification {
         newExecutable.add("\t")
         newExecutable.add("   ")
         command = new Command(
-                id,
-                created,
-                updated,
-                null,
-                metadata,
-                newExecutable,
-                null,
-                checkDelay
+            id,
+            created,
+            updated,
+            null,
+            metadata,
+            newExecutable,
+            null,
+            checkDelay
         )
 
         then:
@@ -139,14 +138,14 @@ class CommandSpec extends Specification {
 
         when:
         comparable = new Command(
-                UUID.randomUUID().toString(),
-                Instant.now(),
-                Instant.now(),
-                null,
-                Mock(CommandMetadata),
-                Lists.newArrayList(UUID.randomUUID().toString()),
-                RandomSuppliers.INT.get(),
-                RandomSuppliers.LONG.get()
+            UUID.randomUUID().toString(),
+            Instant.now(),
+            Instant.now(),
+            null,
+            Mock(CommandMetadata),
+            Lists.newArrayList(UUID.randomUUID().toString()),
+            RandomSuppliers.INT.get(),
+            RandomSuppliers.LONG.get()
         )
 
         then:
@@ -256,10 +255,10 @@ class CommandSpec extends Specification {
 
     Command createCommand() {
         def metadata = new CommandMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            CommandStatus.ACTIVE
         ).build()
         def id = UUID.randomUUID().toString()
         def created = Instant.now()
@@ -268,14 +267,14 @@ class CommandSpec extends Specification {
         def memory = RandomSuppliers.INT.get()
         def checkDelay = RandomSuppliers.LONG.get()
         return new Command(
-                id,
-                created,
-                updated,
-                resources,
-                metadata,
-                Lists.newArrayList(UUID.randomUUID().toString()),
-                memory,
-                checkDelay
+            id,
+            created,
+            updated,
+            resources,
+            metadata,
+            Lists.newArrayList(UUID.randomUUID().toString()),
+            memory,
+            checkDelay
         )
     }
 }

@@ -23,7 +23,6 @@ import spock.lang.Specification
  * Specifications for {@link FileCacheProperties}.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class FileCachePropertiesSpec extends Specification {
 

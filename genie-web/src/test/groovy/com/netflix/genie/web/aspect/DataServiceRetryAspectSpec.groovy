@@ -33,8 +33,7 @@ import spock.lang.Specification
 /**
  * Unit tests for DataServiceRetryAspect
  *
- * @author amajumdar
- * @since 3.0.0
+ * @author amajumdar* @since 3.0.0
  */
 @Category(UnitTest.class)
 class DataServiceRetryAspectSpec extends Specification {
@@ -86,8 +85,8 @@ class DataServiceRetryAspectSpec extends Specification {
         then:
         thrown(GenieServerException.class)
         2 * joinPoint.proceed() >>
-                { throw new QueryTimeoutException(null, null) } >>
-                { throw new QueryTimeoutException(null, null) } >> null
+            { throw new QueryTimeoutException(null, null) } >>
+            { throw new QueryTimeoutException(null, null) } >> null
     }
 
     def testDataServiceMethod() {
@@ -146,7 +145,7 @@ class DataServiceRetryAspectSpec extends Specification {
         then:
         thrown(GenieServerException.class)
         2 * dataService.getJob(id) >>
-                { throw new QueryTimeoutException(null, null) } >>
-                { throw new QueryTimeoutException(null, null) } >> null
+            { throw new QueryTimeoutException(null, null) } >>
+            { throw new QueryTimeoutException(null, null) } >> null
     }
 }

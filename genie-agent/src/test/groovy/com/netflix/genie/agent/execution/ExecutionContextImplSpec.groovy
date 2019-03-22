@@ -36,7 +36,7 @@ class ExecutionContextImplSpec extends Specification {
         ExecutionContext executionContext = new ExecutionContextImpl()
         File directory = Mock()
         JobSpecification spec = Mock()
-        Map<String, String> env = [ "foo": "bar" ]
+        Map<String, String> env = ["foo": "bar"]
         JobStatus finalJobStatus = JobStatus.SUCCEEDED
         Exception exception = new RuntimeException()
         StateAction action1 = Mock(StateAction.SetUpJob)

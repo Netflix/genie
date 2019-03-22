@@ -31,11 +31,11 @@ class RegexRuleSetSpec extends Specification {
     def "Build and match: #inputString"(String inputString, boolean expectAccepted) {
         setup:
         RegexRuleSet ruleset = new RegexRuleSet.Builder(RegexRuleSet.Response.REJECT)
-                .addRule(Pattern.compile(".*foo.*", Pattern.CASE_INSENSITIVE), RegexRuleSet.Response.ACCEPT)
-                .addRule("^ThisParticularString\$", RegexRuleSet.Response.ACCEPT)
-                .addRule(".*1234.*", RegexRuleSet.Response.REJECT)
-                .addRule(".*[0-9]+.*", RegexRuleSet.Response.ACCEPT)
-                .build()
+            .addRule(Pattern.compile(".*foo.*", Pattern.CASE_INSENSITIVE), RegexRuleSet.Response.ACCEPT)
+            .addRule("^ThisParticularString\$", RegexRuleSet.Response.ACCEPT)
+            .addRule(".*1234.*", RegexRuleSet.Response.REJECT)
+            .addRule(".*[0-9]+.*", RegexRuleSet.Response.ACCEPT)
+            .build()
 
         when:
         boolean accepted = ruleset.accept(inputString)
@@ -44,15 +44,15 @@ class RegexRuleSetSpec extends Specification {
         expectAccepted == accepted
 
         where:
-        inputString                  | expectAccepted
-        "aFoo"                       | true
-        "aaFoOaa"                    | true
-        "ThisParticularString"       | true
-        "notThisParticularString"    | false
-        "1234"                       | false
-        "012345"                     | false
-        "654321"                     | true
-        "Bar"                        | false
+        inputString               | expectAccepted
+        "aFoo"                    | true
+        "aaFoOaa"                 | true
+        "ThisParticularString"    | true
+        "notThisParticularString" | false
+        "1234"                    | false
+        "012345"                  | false
+        "654321"                  | true
+        "Bar"                     | false
     }
 
     def "Users whitelist"() {
@@ -62,7 +62,7 @@ class RegexRuleSetSpec extends Specification {
         def whitelist = RegexRuleSet.buildWhitelist(whitelistedUsers)
 
         when:
-        def acceptedUsers = allUsers.toList().stream().filter({u -> whitelist.accept(u)}).collect(Collectors.toSet())
+        def acceptedUsers = allUsers.toList().stream().filter({ u -> whitelist.accept(u) }).collect(Collectors.toSet())
 
         then:
         Sets.newHashSet(whitelistedUsers.toList()) == acceptedUsers
@@ -71,9 +71,9 @@ class RegexRuleSetSpec extends Specification {
     def "IPs blacklist"() {
         setup:
         String[] blacklistedSubnets = [
-                Pattern.compile("^10\\..*"),
-                Pattern.compile("192\\.168\\..*"),
-                Pattern.compile("127\\..*"),
+            Pattern.compile("^10\\..*"),
+            Pattern.compile("192\\.168\\..*"),
+            Pattern.compile("127\\..*"),
         ]
         def blacklist = RegexRuleSet.buildBlacklist(blacklistedSubnets)
 

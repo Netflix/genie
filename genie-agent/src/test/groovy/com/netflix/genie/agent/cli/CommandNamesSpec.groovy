@@ -26,7 +26,7 @@ import java.util.stream.Collectors
 class CommandNamesSpec extends Specification {
 
     @Unroll
-    def "CommandNames #fieldName" (String fieldName, String fieldValue) {
+    def "CommandNames #fieldName"(String fieldName, String fieldValue) {
         expect:
         fieldName.compareToIgnoreCase(fieldValue) == 0
 
@@ -38,8 +38,8 @@ class CommandNamesSpec extends Specification {
         return CommandNames.getCommandNamesFields()
             .stream()
             .map { field ->
-                [field.getName(), (String) field.get(null)] as String[]
-            }
-            .collect(Collectors.toList())
+            [field.getName(), (String) field.get(null)] as String[]
+        }
+        .collect(Collectors.toList())
     }
 }

@@ -25,7 +25,6 @@ import spock.lang.Unroll
  * Specifications for {@link BucketProperties}.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class BucketPropertiesSpec extends Specification {
 

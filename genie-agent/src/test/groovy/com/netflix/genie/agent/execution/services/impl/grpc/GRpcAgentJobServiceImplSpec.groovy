@@ -25,11 +25,11 @@ import com.netflix.genie.agent.execution.exceptions.JobReservationException
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter
+import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.proto.*
 import com.netflix.genie.test.categories.UnitTest
@@ -142,9 +142,9 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         AgentClientMetadata agentClientMetadata = Mock()
         ReserveJobIdRequest request = ReserveJobIdRequest.getDefaultInstance()
         this.reserveJobIdResponse = ReserveJobIdResponse.newBuilder().setError(
-                ReserveJobIdError.newBuilder()
-                    .setType(errorType)
-                    .setMessage("error message")
+            ReserveJobIdError.newBuilder()
+                .setType(errorType)
+                .setMessage("error message")
         ).build()
 
         when:
@@ -187,7 +187,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.reserveJobId(agentJobRequest, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata) >> {throw exception}
+        1 * protoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata) >> { throw exception }
 
         thrown(JobReservationException)
     }
@@ -213,10 +213,10 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     def "Resolve job specification -- handle error #errorType"() {
         this.jobSpecificationResponse = JobSpecificationResponse.newBuilder()
             .setError(
-                JobSpecificationError.newBuilder()
-                    .setType(errorType)
-                    .setMessage("error message")
-            )
+            JobSpecificationError.newBuilder()
+                .setType(errorType)
+                .setMessage("error message")
+        )
             .build()
         JobSpecificationRequest request = JobSpecificationRequest.getDefaultInstance()
 
@@ -271,12 +271,12 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     @Unroll
     def "Get job specification -- handle error #errorType"() {
         this.jobSpecificationResponse = JobSpecificationResponse.newBuilder()
-                .setError(
-                JobSpecificationError.newBuilder()
-                        .setType(errorType)
-                        .setMessage("error message")
+            .setError(
+            JobSpecificationError.newBuilder()
+                .setType(errorType)
+                .setMessage("error message")
         )
-                .build()
+            .build()
         JobSpecificationRequest request = JobSpecificationRequest.getDefaultInstance()
 
         when:
@@ -346,12 +346,12 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     @Unroll
     def "Resolve job specification dry run -- handle error #errorType"() {
         this.jobSpecificationResponse = JobSpecificationResponse.newBuilder()
-                .setError(
-                JobSpecificationError.newBuilder()
-                        .setType(errorType)
-                        .setMessage("error message")
+            .setError(
+            JobSpecificationError.newBuilder()
+                .setType(errorType)
+                .setMessage("error message")
         )
-                .build()
+            .build()
         DryRunJobSpecificationRequest request = DryRunJobSpecificationRequest.getDefaultInstance()
         AgentJobRequest agentJobRequest = Mock()
 
@@ -401,12 +401,12 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     @Unroll
     def "Claim job -- handle error #errorType"() {
         this.claimJobResponse = ClaimJobResponse.newBuilder()
-                .setError(
-                ClaimJobError.newBuilder()
-                        .setType(errorType)
-                        .setMessage("error message")
+            .setError(
+            ClaimJobError.newBuilder()
+                .setType(errorType)
+                .setMessage("error message")
         )
-        .build()
+            .build()
         AgentClientMetadata agentClientMetadata = Mock()
         ClaimJobRequest request = ClaimJobRequest.getDefaultInstance()
 
@@ -457,13 +457,13 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     @Unroll
     def "Change job status -- handle error #errorType"() {
         this.changeJobStatusResponse = ChangeJobStatusResponse.newBuilder()
-                .setSuccessful(false)
-                .setError(
-                    ChangeJobStatusError.newBuilder()
-                        .setType(errorType)
-                        .setMessage("error message")
-                )
-                .build()
+            .setSuccessful(false)
+            .setError(
+            ChangeJobStatusError.newBuilder()
+                .setType(errorType)
+                .setMessage("error message")
+        )
+            .build()
         JobStatus currentStatus = JobStatus.INIT
         JobStatus newStatus = JobStatus.RUNNING
         String message = "..."
@@ -509,55 +509,55 @@ class GRpcAgentJobServiceImplSpec extends Specification {
 
         @Override
         void reserveJobId(
-                final ReserveJobIdRequest request,
-                final StreamObserver<ReserveJobIdResponse> responseObserver
+            final ReserveJobIdRequest request,
+            final StreamObserver<ReserveJobIdResponse> responseObserver
         ) {
             sendResponse(responseObserver, reserveJobIdResponse)
         }
 
         @Override
         void resolveJobSpecification(
-                final JobSpecificationRequest request,
-                final StreamObserver<JobSpecificationResponse> responseObserver
+            final JobSpecificationRequest request,
+            final StreamObserver<JobSpecificationResponse> responseObserver
         ) {
             sendResponse(responseObserver, jobSpecificationResponse)
         }
 
         @Override
         void getJobSpecification(
-                final JobSpecificationRequest request,
-                final StreamObserver<JobSpecificationResponse> responseObserver
+            final JobSpecificationRequest request,
+            final StreamObserver<JobSpecificationResponse> responseObserver
         ) {
             sendResponse(responseObserver, jobSpecificationResponse)
         }
 
         @Override
         void resolveJobSpecificationDryRun(
-                final DryRunJobSpecificationRequest request,
-                final StreamObserver<JobSpecificationResponse> responseObserver
+            final DryRunJobSpecificationRequest request,
+            final StreamObserver<JobSpecificationResponse> responseObserver
         ) {
             sendResponse(responseObserver, jobSpecificationResponse)
         }
 
         @Override
         void claimJob(
-                final ClaimJobRequest request,
-                final StreamObserver<ClaimJobResponse> responseObserver
+            final ClaimJobRequest request,
+            final StreamObserver<ClaimJobResponse> responseObserver
         ) {
             sendResponse(responseObserver, claimJobResponse)
         }
 
         @Override
         void changeJobStatus(
-                final ChangeJobStatusRequest request,
-                final StreamObserver<ChangeJobStatusResponse> responseObserver
+            final ChangeJobStatusRequest request,
+            final StreamObserver<ChangeJobStatusResponse> responseObserver
         ) {
             sendResponse(responseObserver, changeJobStatusResponse)
         }
 
-        private <ResponseType> void  sendResponse(
-                StreamObserver<ResponseType> observer,
-                ResponseType response
+        private <ResponseType> void sendResponse(
+            StreamObserver<ResponseType> observer,
+            ResponseType response
         ) {
             assert response != null
             observer.onNext(response)

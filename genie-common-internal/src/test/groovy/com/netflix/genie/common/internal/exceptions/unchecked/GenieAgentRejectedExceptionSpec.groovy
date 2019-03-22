@@ -22,8 +22,7 @@ import spock.lang.Specification
 /**
  * Specifications for the {@link GenieAgentRejectedException} class.
  *
- * @author mprimi
- * @since 4.0.0
+ * @author mprimi* @since 4.0.0
  */
 class GenieAgentRejectedExceptionSpec extends Specification {
 

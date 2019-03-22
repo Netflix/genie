@@ -69,12 +69,12 @@ class DownloadServiceImplSpec extends Specification {
     def "Download"() {
         setup:
         Map<URI, File> manifestMap = [
-                (new URI("http:/foo/bar.txt")): new File(jobDir, "bar.txt"),
-                (new URI("http:/foo/baz.txt")): new File(jobDir, "baz.txt"),
+            (new URI("http:/foo/bar.txt")): new File(jobDir, "bar.txt"),
+            (new URI("http:/foo/baz.txt")): new File(jobDir, "baz.txt"),
         ]
 
         Set<Pair<URI, File>> entries = manifestMap.entrySet()
-        .stream().map({
+            .stream().map({
             entry -> Pair.of(entry.getKey(), entry.getValue())
         }).collect(Collectors.toSet())
 
@@ -82,7 +82,7 @@ class DownloadServiceImplSpec extends Specification {
         downloadService.download(manifest)
 
         then:
-        1 * manifest.getTargetDirectories() >> manifestMap.values().stream().map({File f -> f.getParentFile()}).collect(Collectors.toSet())
+        1 * manifest.getTargetDirectories() >> manifestMap.values().stream().map({ File f -> f.getParentFile() }).collect(Collectors.toSet())
         1 * manifest.getTargetFiles() >> (Set<File>) manifestMap.values()
         1 * manifest.getEntries() >> entries
         1 * cacheService.get(entries)
@@ -120,7 +120,7 @@ class DownloadServiceImplSpec extends Specification {
     def "Target file exists"() {
         setup:
         Map<URI, File> manifestMap = [
-                (new URI("http:/foo/bar.txt")): new File(jobDir, "bar.txt"),
+            (new URI("http:/foo/bar.txt")): new File(jobDir, "bar.txt"),
         ]
         manifestMap.values().iterator().next().createNewFile()
 
@@ -128,7 +128,7 @@ class DownloadServiceImplSpec extends Specification {
         downloadService.download(manifest)
 
         then:
-        1 * manifest.getTargetDirectories() >> manifestMap.values().stream().map({File f -> f.getParentFile()}).collect(Collectors.toSet())
+        1 * manifest.getTargetDirectories() >> manifestMap.values().stream().map({ File f -> f.getParentFile() }).collect(Collectors.toSet())
         1 * manifest.getTargetFiles() >> (Set<File>) manifestMap.values()
         thrown(DownloadException)
     }
@@ -144,7 +144,7 @@ class DownloadServiceImplSpec extends Specification {
         1 * manifest.getTargetDirectories() >> new HashSet<File>()
         1 * manifest.getTargetFiles() >> new HashSet<File>()
         1 * manifest.getEntries() >> entries
-        1 * cacheService.get(entries) >> {throw new DownloadException("test")}
+        1 * cacheService.get(entries) >> { throw new DownloadException("test") }
         thrown(DownloadException)
     }
 
@@ -159,7 +159,7 @@ class DownloadServiceImplSpec extends Specification {
         1 * manifest.getTargetDirectories() >> new HashSet<File>()
         1 * manifest.getTargetFiles() >> new HashSet<File>()
         1 * manifest.getEntries() >> entries
-        1 * cacheService.get(entries) >> {throw new IOException("test")}
+        1 * cacheService.get(entries) >> { throw new IOException("test") }
         thrown(DownloadException)
     }
 }

@@ -55,7 +55,9 @@ class UserConsoleSpec extends Specification {
         UserConsole.printBanner(environment)
 
         then:
-        1 * environment.getProperty(UserConsole.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> {throw new RuntimeException("error")}
+        1 * environment.getProperty(UserConsole.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> {
+            throw new RuntimeException("error")
+        }
         noExceptionThrown()
     }
 

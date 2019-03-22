@@ -21,7 +21,6 @@ package com.netflix.genie.agent.execution.statemachine.actions
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
@@ -93,7 +92,9 @@ class MonitorJobActionSpec extends Specification {
         then:
         1 * launchJobService.waitFor() >> expectedJobStatus
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, expectedJobStatus, _ as String) >> { throw exception }
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, expectedJobStatus, _ as String) >> {
+            throw exception
+        }
         Exception e = thrown(RuntimeException)
         e.getCause() == exception
     }

@@ -68,35 +68,35 @@ class ArgumentConvertersSpec extends Specification {
         expectedCriterion == criterionConverter.convert(inputString)
 
         where:
-        inputString                                | expectedCriterion
-        "ID=123/NAME=n/STATUS=s/TAGS=tag,tag,tags" |
-                new Criterion.Builder().withId("123").withName("n").withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
-        "NAME=n/STATUS=s"                          |
-                new Criterion.Builder().withName("n").withStatus("s").build()
-        "ID=123/STATUS=s"                          |
-                new Criterion.Builder().withId("123").withStatus("s").build()
-        "STATUS=s/TAGS=tag,tag,tags"               |
-                new Criterion.Builder().withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
-        "ID=123/TAGS=tag,tag,tags"                 |
-                new Criterion.Builder().withId("123").withTags(Sets.newHashSet(["tag", "tags"])).build()
-        "ID=123"                                   |
-                new Criterion.Builder().withId("123").build()
-        "NAME=n"                                   |
-                new Criterion.Builder().withName("n").build()
-        "STATUS=s"                                 |
-                new Criterion.Builder().withStatus("s").build()
-        "TAGS=tag,tag,tags"                        |
-                new Criterion.Builder().withTags(Sets.newHashSet(["tag", "tags"])).build()
-        "ID=123/NAME=n/VERSION=v/STATUS=s/TAGS=tag,tag,tags" |
-                new Criterion.Builder().withId("123").withName("n").withVersion("v").withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
-        "VERSION=v"                                   |
-                new Criterion.Builder().withVersion("v").build()
-        "NAME=n/VERSION=v"                                   |
-                new Criterion.Builder().withName("n").withVersion("v").build()
-        "VERSION=v/STATUS=s"                                   |
-                new Criterion.Builder().withVersion("v").withStatus("s").build()
+        inputString                                              | expectedCriterion
+        "ID=123/NAME=n/STATUS=s/TAGS=tag,tag,tags"               |
+            new Criterion.Builder().withId("123").withName("n").withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
+        "NAME=n/STATUS=s"                                        |
+            new Criterion.Builder().withName("n").withStatus("s").build()
+        "ID=123/STATUS=s"                                        |
+            new Criterion.Builder().withId("123").withStatus("s").build()
+        "STATUS=s/TAGS=tag,tag,tags"                             |
+            new Criterion.Builder().withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
+        "ID=123/TAGS=tag,tag,tags"                               |
+            new Criterion.Builder().withId("123").withTags(Sets.newHashSet(["tag", "tags"])).build()
+        "ID=123"                                                 |
+            new Criterion.Builder().withId("123").build()
+        "NAME=n"                                                 |
+            new Criterion.Builder().withName("n").build()
+        "STATUS=s"                                               |
+            new Criterion.Builder().withStatus("s").build()
+        "TAGS=tag,tag,tags"                                      |
+            new Criterion.Builder().withTags(Sets.newHashSet(["tag", "tags"])).build()
+        "ID=123/NAME=n/VERSION=v/STATUS=s/TAGS=tag,tag,tags"     |
+            new Criterion.Builder().withId("123").withName("n").withVersion("v").withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
+        "VERSION=v"                                              |
+            new Criterion.Builder().withVersion("v").build()
+        "NAME=n/VERSION=v"                                       |
+            new Criterion.Builder().withName("n").withVersion("v").build()
+        "VERSION=v/STATUS=s"                                     |
+            new Criterion.Builder().withVersion("v").withStatus("s").build()
         "ID=123/NAME=n/VERSION=1.2.4/STATUS=s/TAGS=tag,tag,tags" |
-                new Criterion.Builder().withId("123").withName("n").withVersion("1.2.4").withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
+            new Criterion.Builder().withId("123").withName("n").withVersion("1.2.4").withStatus("s").withTags(Sets.newHashSet(["tag", "tags"])).build()
     }
 
     @Unroll
@@ -110,9 +110,9 @@ class ArgumentConvertersSpec extends Specification {
         where:
         inputString                                      | expectedJsonNode
         "{}"                                             |
-                GenieObjectMapper.getMapper().createObjectNode()
+            GenieObjectMapper.getMapper().createObjectNode()
         "{\"strField\": \"value\", \"boolField\": true}" |
-                GenieObjectMapper.getMapper().createObjectNode().put("boolField", true).put("strField", "value")
+            GenieObjectMapper.getMapper().createObjectNode().put("boolField", true).put("strField", "value")
     }
 
     @Unroll

@@ -134,13 +134,13 @@ class SetUpJobActionSpec extends Specification {
         this.jobConfigs = []
         this.jobDeps = []
         this.jobEnv = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> {return jobSetup}
-            _ * getConfigs() >> {return jobConfigs}
-            _ * getDependencies() >> {return jobDeps}
+            _ * getSetupFile() >> { return jobSetup }
+            _ * getConfigs() >> { return jobConfigs }
+            _ * getDependencies() >> { return jobDeps }
         }
         this.job = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> {return jobId}
-            _ * getExecutionEnvironment() >> {return jobEnv}
+            _ * getId() >> { return jobId }
+            _ * getExecutionEnvironment() >> { return jobEnv }
         }
 
         def app1Id = UUID.randomUUID().toString()
@@ -148,13 +148,13 @@ class SetUpJobActionSpec extends Specification {
         this.app1Configs = []
         this.app1Deps = []
         this.app1Env = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> {return app1Setup}
-            _ * getConfigs() >> {return app1Configs}
-            _ * getDependencies() >> {return app1Deps}
+            _ * getSetupFile() >> { return app1Setup }
+            _ * getConfigs() >> { return app1Configs }
+            _ * getDependencies() >> { return app1Deps }
         }
         this.app1 = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> {return app1Id}
-            _ * getExecutionEnvironment() >> {return app1Env}
+            _ * getId() >> { return app1Id }
+            _ * getExecutionEnvironment() >> { return app1Env }
         }
         this.app1Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app1.getId()).toFile()
 
@@ -163,19 +163,19 @@ class SetUpJobActionSpec extends Specification {
         this.app2Configs = []
         this.app2Deps = []
         this.app2Env = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> {return app2Setup}
-            _ * getConfigs() >> {return app2Configs}
-            _ * getDependencies() >> {return app2Deps}
+            _ * getSetupFile() >> { return app2Setup }
+            _ * getConfigs() >> { return app2Configs }
+            _ * getDependencies() >> { return app2Deps }
         }
         this.app2 = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> {return app2Id}
-            _ * getExecutionEnvironment() >> {return app2Env}
+            _ * getId() >> { return app2Id }
+            _ * getExecutionEnvironment() >> { return app2Env }
         }
         this.app2Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app2.getId()).toFile()
 
         this.apps = [
-                app1,
-                app2
+            app1,
+            app2
         ]
 
         def clusterId = UUID.randomUUID().toString()
@@ -183,13 +183,13 @@ class SetUpJobActionSpec extends Specification {
         this.clusterConfigs = []
         this.clusterDeps = []
         this.clusterEnv = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> {return clusterSetup}
-            _ * getConfigs() >> {return clusterConfigs}
-            _ * getDependencies() >> {return clusterDeps}
+            _ * getSetupFile() >> { return clusterSetup }
+            _ * getConfigs() >> { return clusterConfigs }
+            _ * getDependencies() >> { return clusterDeps }
         }
         this.cluster = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> {return clusterId}
-            _ * getExecutionEnvironment() >> {return clusterEnv}
+            _ * getId() >> { return clusterId }
+            _ * getExecutionEnvironment() >> { return clusterEnv }
         }
         this.clusterDir = PathUtils.jobClusterDirectoryPath(jobDir, cluster.getId()).toFile()
 
@@ -198,13 +198,13 @@ class SetUpJobActionSpec extends Specification {
         this.commandConfigs = []
         this.commandDeps = []
         this.commandEnv = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> {return commandSetup}
-            _ * getConfigs() >> {return commandConfigs}
-            _ * getDependencies() >> {return commandDeps}
+            _ * getSetupFile() >> { return commandSetup }
+            _ * getConfigs() >> { return commandConfigs }
+            _ * getDependencies() >> { return commandDeps }
         }
         this.command = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> {return commandId}
-            _ * getExecutionEnvironment() >> {return commandEnv}
+            _ * getId() >> { return commandId }
+            _ * getExecutionEnvironment() >> { return commandEnv }
         }
 
         this.commandDir = PathUtils.jobCommandDirectoryPath(jobDir, command.getId()).toFile()
@@ -224,7 +224,7 @@ class SetUpJobActionSpec extends Specification {
     }
 
     void cleanup() {
-        File file = new File( "created-by-setup-file.txt")
+        File file = new File("created-by-setup-file.txt")
         if (file.exists()) {
             file.delete()
         }
@@ -294,10 +294,10 @@ class SetUpJobActionSpec extends Specification {
         commandConfigs.add(configUri.toString())
         clusterConfigs.add(configUri.toString())
         dummyFile.write(
-                "echo Hello World\n"
-                        + "export SETUP_VARIABLE_KEY='SETUP VARIABLE VALUE'\n"
-                        + "touch created-by-setup-file.txt\n"
-                        + "export TRICKY_VARIABLE=\"'foo\nbar\ny'all'\"\n"
+            "echo Hello World\n"
+                + "export SETUP_VARIABLE_KEY='SETUP VARIABLE VALUE'\n"
+                + "touch created-by-setup-file.txt\n"
+                + "export TRICKY_VARIABLE=\"'foo\nbar\ny'all'\"\n"
         )
 
         when:
@@ -351,11 +351,11 @@ class SetUpJobActionSpec extends Specification {
         envMap.get("SERVER_VARIABLE_KEY") == "SERVER VARIABLE VALUE"
         envMap.get("SETUP_VARIABLE_KEY") == "SETUP VARIABLE VALUE"
         envMap.get("TRICKY_VARIABLE") == "'foo\nbar\ny'all'"
-        new File( "created-by-setup-file.txt").exists()
+        new File("created-by-setup-file.txt").exists()
         PathUtils.composePath(
-                PathUtils.jobGenieDirectoryPath(jobDir),
-                JobConstants.LOGS_PATH_VAR,
-                JobConstants.GENIE_AGENT_ENV_SCRIPT_LOG_FILE_NAME
+            PathUtils.jobGenieDirectoryPath(jobDir),
+            JobConstants.LOGS_PATH_VAR,
+            JobConstants.GENIE_AGENT_ENV_SCRIPT_LOG_FILE_NAME
         ).toFile().getText(StandardCharsets.UTF_8.toString()).count("Hello World") == 5
     }
 
@@ -370,7 +370,9 @@ class SetUpJobActionSpec extends Specification {
         1 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> { throw exception }
+        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> {
+            throw exception
+        }
         def e = thrown(RuntimeException)
         e.getCause() == exception
     }
@@ -451,7 +453,7 @@ class SetUpJobActionSpec extends Specification {
         1 * executionContext.setJobDirectory(jobDir)
         1 * downloadService.newManifestBuilder() >> manifestBuilder
         1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest) >> {throw new DownloadException("")}
+        1 * downloadService.download(manifest) >> { throw new DownloadException("") }
         def e = thrown(RuntimeException)
         e.getCause().getClass() == SetUpJobException
         e.getCause().getCause().getClass() == DownloadException
@@ -488,8 +490,8 @@ class SetUpJobActionSpec extends Specification {
         jobSetup = Optional.of(setupFileUri.toString())
 
         def envFile = PathUtils.composePath(
-                PathUtils.jobGenieDirectoryPath(jobDir),
-                JobConstants.GENIE_AGENT_ENV_SCRIPT_OUTPUT_FILE_NAME
+            PathUtils.jobGenieDirectoryPath(jobDir),
+            JobConstants.GENIE_AGENT_ENV_SCRIPT_OUTPUT_FILE_NAME
         ).toFile()
 
         dummyFile.write("echo \"syntax error!\" >> " + envFile.getAbsolutePath() + "\n")
@@ -517,18 +519,18 @@ class SetUpJobActionSpec extends Specification {
     def "Skip cleanup"() {
         setup:
         File[] dependencies = [
-                jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
-                jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
-                jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
+            jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
+            jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
+            jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
         ].collect { new File(temporaryFolder.getRoot(), it) }
 
         File[] otherFiles = [
-                jobId + "/run",
-                jobId + "/genie/logs/genie.log",
-                jobId + "/genie/logs/env.log",
-                jobId + "/genie/genie.done",
-                jobId + "/stdout",
-                jobId + "/stderr"
+            jobId + "/run",
+            jobId + "/genie/logs/genie.log",
+            jobId + "/genie/logs/env.log",
+            jobId + "/genie/genie.done",
+            jobId + "/stdout",
+            jobId + "/stderr"
         ].collect { new File(temporaryFolder.getRoot(), it) }
 
         def allFiles = dependencies + otherFiles as File[]
@@ -549,7 +551,7 @@ class SetUpJobActionSpec extends Specification {
         1 * executionContext.getJobDirectory() >> Optional.of(new File(temporaryFolder.getRoot(), jobId))
 
         allFiles.each {
-            // Check all directories not deleted, even the empty dependencies one
+                // Check all directories not deleted, even the empty dependencies one
             file -> assert file.exists()
         }
 
@@ -641,17 +643,17 @@ class SetUpJobActionSpec extends Specification {
         1 * executionContext.getJobDirectory() >> Optional.of(new File(temporaryFolder.getRoot(), jobId))
 
         dependencies.each {
-            // Check all dependencies deleted
+                // Check all dependencies deleted
             file -> assert !file.exists()
         }
 
         otherFiles.each {
-            // Check all other files not deleted
+                // Check all other files not deleted
             file -> assert file.exists()
         }
 
         allFiles.each {
-            // Check all directories not deleted, even the empty dependencies one
+                // Check all directories not deleted, even the empty dependencies one
             file -> assert file.getParentFile().exists()
         }
 

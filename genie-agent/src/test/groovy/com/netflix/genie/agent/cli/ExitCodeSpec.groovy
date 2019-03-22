@@ -19,7 +19,7 @@
 package com.netflix.genie.agent.cli
 
 import com.netflix.genie.test.categories.UnitTest
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils
 import org.assertj.core.util.Sets
 import org.junit.experimental.categories.Category
 import spock.lang.Specification

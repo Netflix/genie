@@ -26,17 +26,16 @@ import spock.lang.Specification
  * Specifications for the {@link ApplicationRequest} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ApplicationRequestSpec extends Specification {
 
     def "Can build immutable application request"() {
         def metadata = new ApplicationMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ApplicationStatus.DEPRECATED
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ApplicationStatus.DEPRECATED
         ).build()
         def requestedId = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
@@ -44,9 +43,9 @@ class ApplicationRequestSpec extends Specification {
 
         when:
         request = new ApplicationRequest.Builder(metadata)
-                .withRequestedId(requestedId)
-                .withResources(resources)
-                .build()
+            .withRequestedId(requestedId)
+            .withResources(resources)
+            .build()
 
         then:
         request.getMetadata() == metadata
@@ -88,8 +87,8 @@ class ApplicationRequestSpec extends Specification {
 
         when:
         comparable = new ApplicationRequest.Builder(Mock(ApplicationMetadata))
-                .withRequestedId(UUID.randomUUID().toString())
-                .toString()
+            .withRequestedId(UUID.randomUUID().toString())
+            .toString()
 
         then:
         base != comparable
@@ -180,13 +179,13 @@ class ApplicationRequestSpec extends Specification {
 
     ApplicationRequest createApplicationRequest() {
         def metadata = new ApplicationMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ApplicationStatus.INACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ApplicationStatus.INACTIVE
         )
-                .withType(UUID.randomUUID().toString())
-                .build()
+            .withType(UUID.randomUUID().toString())
+            .build()
         def requestedId = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         return new ApplicationRequest.Builder(metadata).withRequestedId(requestedId).withResources(resources).build()

@@ -18,8 +18,8 @@
 
 package com.netflix.genie.agent.execution.statemachine
 
-import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction
+import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener
 import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Triple
 import org.junit.experimental.categories.Category
@@ -40,20 +40,20 @@ class StateMachineAutoConfigurationSpec extends Specification {
 
         when:
         StateMachine<States, Events> sm = config.stateMachine(
-                config.statesWithActions(
-                    Mock(StateAction.Initialize),
-                    Mock(StateAction.ConfigureAgent),
-                    Mock(StateAction.ResolveJobSpecification),
-                    Mock(StateAction.SetUpJob),
-                    Mock(StateAction.LaunchJob),
-                    Mock(StateAction.MonitorJob),
-                    Mock(StateAction.CleanupJob),
-                    Mock(StateAction.Shutdown),
-                    Mock(StateAction.HandleError)
-                ),
-                new LinkedList<Triple<States,Events,States>>(),
-                new LinkedList<States>(),
-                new LinkedList<JobExecutionListener>()
+            config.statesWithActions(
+                Mock(StateAction.Initialize),
+                Mock(StateAction.ConfigureAgent),
+                Mock(StateAction.ResolveJobSpecification),
+                Mock(StateAction.SetUpJob),
+                Mock(StateAction.LaunchJob),
+                Mock(StateAction.MonitorJob),
+                Mock(StateAction.CleanupJob),
+                Mock(StateAction.Shutdown),
+                Mock(StateAction.HandleError)
+            ),
+            new LinkedList<Triple<States, Events, States>>(),
+            new LinkedList<States>(),
+            new LinkedList<JobExecutionListener>()
         )
 
         then:

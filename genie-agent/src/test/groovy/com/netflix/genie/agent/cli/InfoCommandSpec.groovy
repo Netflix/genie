@@ -23,7 +23,6 @@ import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
-import org.springframework.core.env.Environment
 import org.springframework.core.env.MutablePropertySources
 import spock.lang.Specification
 
@@ -33,7 +32,7 @@ class InfoCommandSpec extends Specification {
     ConfigurableApplicationContext ctx
     AgentMetadata agentMetadata
     ConfigurableEnvironment env
-    Map<String, Object> map = ["Foo" : "foo", "Bar" : new Object(), "Baz" : null]
+    Map<String, Object> map = ["Foo": "foo", "Bar": new Object(), "Baz": null]
 
 
     void setup() {

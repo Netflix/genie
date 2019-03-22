@@ -104,7 +104,7 @@ class CleanupJobActionSpec extends Specification {
         0 * executionContext.setFinalJobStatus(_ as JobStatus)
         0 * executionContext.setCurrentJobStatus(_ as JobStatus)
         1 * executionContext.getCleanupActions() >> cleanupQueue
-        1 * action1.cleanup() >> {throw new RuntimeException()}
+        1 * action1.cleanup() >> { throw new RuntimeException() }
         1 * action2.cleanup()
         0 * action.cleanup()
     }
@@ -142,7 +142,7 @@ class CleanupJobActionSpec extends Specification {
             JobStatus.CLAIMED,
             JobStatus.KILLED,
             _ as String
-        ) >> { throw new ChangeJobStatusException("test")}
+        ) >> { throw new ChangeJobStatusException("test") }
         thrown(RuntimeException)
     }
 

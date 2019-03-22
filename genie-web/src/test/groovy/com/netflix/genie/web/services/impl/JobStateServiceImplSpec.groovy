@@ -35,8 +35,7 @@ import spock.lang.Specification
 /**
  * Test JobStateService
  *
- * @author amajumdar
- * @since 3.0.0
+ * @author amajumdar* @since 3.0.0
  */
 @Category(UnitTest.class)
 class JobStateServiceImplSpec extends Specification {

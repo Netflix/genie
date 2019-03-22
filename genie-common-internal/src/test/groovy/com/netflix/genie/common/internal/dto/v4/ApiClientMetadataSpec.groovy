@@ -25,7 +25,6 @@ import spock.lang.Specification
  * Specifications for the {@link ApiClientMetadata} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ApiClientMetadataSpec extends Specification {
@@ -146,8 +145,8 @@ class ApiClientMetadataSpec extends Specification {
 
     ApiClientMetadata createApiClientMetadata() {
         return new ApiClientMetadata(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
         )
     }
 }

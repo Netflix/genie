@@ -37,7 +37,6 @@ import spock.lang.Specification
  * Specifications for the {@link GRpcJobServiceImpl} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class GRpcJobServiceImplSpec extends Specification {
 
@@ -303,11 +302,11 @@ class GRpcJobServiceImplSpec extends Specification {
         JobStatus newStatus = JobStatus.RUNNING
         String message = "..."
         ChangeJobStatusRequest request = ChangeJobStatusRequest.newBuilder()
-                .setCurrentStatus(currentStatus.name())
-                .setNewStatus(newStatus.name())
-                .setId(id)
-                .setNewStatusMessage(message)
-                .build()
+            .setCurrentStatus(currentStatus.name())
+            .setNewStatus(newStatus.name())
+            .setId(id)
+            .setNewStatusMessage(message)
+            .build()
         ChangeJobStatusResponse responseCapture
 
         when:
@@ -330,11 +329,11 @@ class GRpcJobServiceImplSpec extends Specification {
         JobStatus newStatus = JobStatus.RUNNING
         String message = "..."
         ChangeJobStatusRequest request = ChangeJobStatusRequest.newBuilder()
-                .setCurrentStatus(currentStatus.name())
-                .setNewStatus(newStatus.name())
-                .setId(id)
-                .setNewStatusMessage(message)
-                .build()
+            .setCurrentStatus(currentStatus.name())
+            .setNewStatus(newStatus.name())
+            .setId(id)
+            .setNewStatusMessage(message)
+            .build()
         Exception exception = new GenieInvalidStatusException()
         ChangeJobStatusResponse response = ChangeJobStatusResponse.newBuilder().build()
 
@@ -355,11 +354,11 @@ class GRpcJobServiceImplSpec extends Specification {
         JobStatus newStatus = JobStatus.RUNNING
         String message = "..."
         ChangeJobStatusRequest request = ChangeJobStatusRequest.newBuilder()
-                .setCurrentStatus(invalidStatusName)
-                .setNewStatus(newStatus.name())
-                .setId(id)
-                .setNewStatusMessage(message)
-                .build()
+            .setCurrentStatus(invalidStatusName)
+            .setNewStatus(newStatus.name())
+            .setId(id)
+            .setNewStatusMessage(message)
+            .build()
         ChangeJobStatusResponse response = ChangeJobStatusResponse.newBuilder().build()
 
         when:

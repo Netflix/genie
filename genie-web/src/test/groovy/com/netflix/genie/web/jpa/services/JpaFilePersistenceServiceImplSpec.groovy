@@ -28,7 +28,6 @@ import spock.lang.Specification
  * Unit tests for JpaFilePersistenceServiceImpl.
  *
  * @author tgianos
- * @since 3.3.0
  */
 @Category(UnitTest.class)
 class JpaFilePersistenceServiceImplSpec extends Specification {

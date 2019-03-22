@@ -71,7 +71,6 @@ public class JobKillServiceV3UnitTests {
     /**
      * Setup for the tests.
      *
-     *
      * @throws IOException if the job directory cannot be created
      */
     @Before

@@ -28,20 +28,19 @@ import java.time.Instant
  * Specifications for the {@link Application} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class ApplicationSpec extends Specification {
 
     def "Can build immutable application resource"() {
         def metadata = new ApplicationMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ApplicationStatus.INACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ApplicationStatus.INACTIVE
         )
-                .withType(UUID.randomUUID().toString())
-                .build()
+            .withType(UUID.randomUUID().toString())
+            .build()
         def id = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def created = Instant.now()
@@ -50,11 +49,11 @@ class ApplicationSpec extends Specification {
 
         when:
         application = new Application(
-                id,
-                created,
-                updated,
-                resources,
-                metadata
+            id,
+            created,
+            updated,
+            resources,
+            metadata
         )
 
         then:
@@ -66,11 +65,11 @@ class ApplicationSpec extends Specification {
 
         when:
         application = new Application(
-                id,
-                created,
-                updated,
-                null,
-                metadata
+            id,
+            created,
+            updated,
+            null,
+            metadata
         )
 
         then:
@@ -99,11 +98,11 @@ class ApplicationSpec extends Specification {
 
         when:
         comparable = new Application(
-                UUID.randomUUID().toString(),
-                Instant.now(),
-                Instant.now(),
-                Mock(ExecutionEnvironment),
-                Mock(ApplicationMetadata)
+            UUID.randomUUID().toString(),
+            Instant.now(),
+            Instant.now(),
+            Mock(ExecutionEnvironment),
+            Mock(ApplicationMetadata)
         )
 
         then:
@@ -204,13 +203,13 @@ class ApplicationSpec extends Specification {
 
     Application createApplication() {
         def metadata = new ApplicationMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ApplicationStatus.INACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ApplicationStatus.INACTIVE
         )
-                .withType(UUID.randomUUID().toString())
-                .build()
+            .withType(UUID.randomUUID().toString())
+            .build()
         def id = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def created = Instant.now()

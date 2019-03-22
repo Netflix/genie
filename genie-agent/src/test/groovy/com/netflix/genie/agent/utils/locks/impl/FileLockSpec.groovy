@@ -19,14 +19,13 @@ package com.netflix.genie.agent.utils.locks.impl
 
 import com.netflix.genie.agent.execution.exceptions.LockException
 import org.junit.Rule
-import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
  * Specifications for the {@link FileLock} class.
  *
- * @author standon
- * @since 4.0.0
+ * @author standon* @since 4.0.0
  */
 class FileLockSpec extends Specification {
 

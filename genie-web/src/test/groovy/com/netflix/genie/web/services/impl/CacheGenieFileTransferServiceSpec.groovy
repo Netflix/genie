@@ -29,8 +29,7 @@ import spock.lang.Unroll
 /**
  * Unit tests for CacheGenieFileTransferService.
  *
- * @author amajumdar
- * @since 7/26/16.
+ * @author amajumdar* @since 7/26/16.
  */
 @Category(UnitTest.class)
 @Unroll
@@ -42,11 +41,11 @@ class CacheGenieFileTransferServiceSpec extends Specification {
     File cachedFile = Mock(File)
     MeterRegistry registry = new SimpleMeterRegistry()
     CacheGenieFileTransferService s =
-            Spy(CacheGenieFileTransferService,
-                    constructorArgs: [fileTransferFactory, "/tmp", localFileTransfer, registry]) {
-                createDirectories(_) >> null
-                deleteFile(_) >> null
-            }
+        Spy(CacheGenieFileTransferService,
+            constructorArgs: [fileTransferFactory, "/tmp", localFileTransfer, registry]) {
+            createDirectories(_) >> null
+            deleteFile(_) >> null
+        }
 
     def 'Test getFile'() {
         when:

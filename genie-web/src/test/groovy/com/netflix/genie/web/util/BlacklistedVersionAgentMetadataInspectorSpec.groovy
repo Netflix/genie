@@ -50,12 +50,12 @@ class BlacklistedVersionAgentMetadataInspectorSpec extends Specification {
         !decision.getMessage().isEmpty()
 
         where:
-        agentVersion | blacklistExpression | expectedDecision
-        "1.2.3"      | "^(1\\.2\\.3|1\\.2\\.4)\$"  | Decision.REJECT
-        "1.2.3-RC.2" | "^(1\\.2\\.3|1\\.2\\.4)\$"  | Decision.ACCEPT
-        "1.2.0"      | "^(1\\.2\\.3|1\\.2\\.4)\$"  | Decision.ACCEPT
-        "1.2.0"      | "^(1\\.2\\.3|1\\.2\\.4)\$"  | Decision.ACCEPT
-        "1.2.0"      | "1\\.2\\..*"                | Decision.REJECT
-        "1.2.0-RC.2" | "1\\.2\\..*"                | Decision.REJECT
+        agentVersion | blacklistExpression        | expectedDecision
+        "1.2.3"      | "^(1\\.2\\.3|1\\.2\\.4)\$" | Decision.REJECT
+        "1.2.3-RC.2" | "^(1\\.2\\.3|1\\.2\\.4)\$" | Decision.ACCEPT
+        "1.2.0"      | "^(1\\.2\\.3|1\\.2\\.4)\$" | Decision.ACCEPT
+        "1.2.0"      | "^(1\\.2\\.3|1\\.2\\.4)\$" | Decision.ACCEPT
+        "1.2.0"      | "1\\.2\\..*"               | Decision.REJECT
+        "1.2.0-RC.2" | "1\\.2\\..*"               | Decision.REJECT
     }
 }

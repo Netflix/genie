@@ -28,17 +28,16 @@ import spock.lang.Specification
  * Specifications for the {@link CommandRequest} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class CommandRequestSpec extends Specification {
 
     def "Can build immutable command request"() {
         def metadata = new CommandMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            CommandStatus.ACTIVE
         ).build()
         def requestedId = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
@@ -49,11 +48,11 @@ class CommandRequestSpec extends Specification {
 
         when:
         request = new CommandRequest.Builder(metadata, executable)
-                .withRequestedId(requestedId)
-                .withResources(resources)
-                .withMemory(memory)
-                .withCheckDelay(checkDelay)
-                .build()
+            .withRequestedId(requestedId)
+            .withResources(resources)
+            .withMemory(memory)
+            .withCheckDelay(checkDelay)
+            .build()
 
         then:
         request.getMetadata() == metadata
@@ -80,11 +79,11 @@ class CommandRequestSpec extends Specification {
         newExecutable.add(" ")
         newExecutable.add("")
         request = new CommandRequest.Builder(metadata, newExecutable)
-                .withRequestedId(" ")
-                .withResources(resources)
-                .withMemory(memory)
-                .withCheckDelay(checkDelay)
-                .build()
+            .withRequestedId(" ")
+            .withResources(resources)
+            .withMemory(memory)
+            .withCheckDelay(checkDelay)
+            .build()
 
         then:
         request.getMetadata() == metadata
@@ -113,8 +112,8 @@ class CommandRequestSpec extends Specification {
 
         when:
         comparable = new CommandRequest.Builder(Mock(CommandMetadata), Lists.newArrayList(UUID.randomUUID().toString()))
-                .withRequestedId(UUID.randomUUID().toString())
-                .toString()
+            .withRequestedId(UUID.randomUUID().toString())
+            .toString()
 
         then:
         base != comparable
@@ -208,18 +207,18 @@ class CommandRequestSpec extends Specification {
 
     CommandRequest createCommandRequest() {
         def metadata = new CommandMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            CommandStatus.ACTIVE
         ).build()
         def requestedId = UUID.randomUUID().toString()
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         return new CommandRequest.Builder(metadata, Lists.newArrayList(UUID.randomUUID().toString()))
-                .withRequestedId(requestedId)
-                .withResources(resources)
-                .withMemory(RandomSuppliers.INT.get())
-                .withCheckDelay(RandomSuppliers.LONG.get())
-                .build()
+            .withRequestedId(requestedId)
+            .withResources(resources)
+            .withMemory(RandomSuppliers.INT.get())
+            .withCheckDelay(RandomSuppliers.LONG.get())
+            .build()
     }
 }

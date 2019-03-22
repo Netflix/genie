@@ -23,7 +23,6 @@ import spock.lang.Specification
  * Specifications for the {@link GenieConversionException} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class GenieConversionExceptionSpec extends Specification {
 

@@ -62,8 +62,8 @@ class PathUtilsSpec extends Specification {
 
         where:
         closure                              | entityDirectory | expectedPath
-        PathUtils.&jobEntityDependenciesPath |  entityDirPath  | entityDirPathStr + "/dependencies"
-        PathUtils.&jobEntityConfigPath       |  entityDirPath  | entityDirPathStr + "/config"
+        PathUtils.&jobEntityDependenciesPath | entityDirPath   | entityDirPathStr + "/dependencies"
+        PathUtils.&jobEntityConfigPath       | entityDirPath   | entityDirPathStr + "/config"
     }
 
     @Unroll

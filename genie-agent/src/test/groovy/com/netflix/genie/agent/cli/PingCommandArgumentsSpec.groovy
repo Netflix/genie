@@ -55,10 +55,10 @@ class PingCommandArgumentsSpec extends Specification {
         String requestId = UUID.randomUUID().toString()
         when:
         jCommander.parse(
-                "--serverHost", "server.com",
-                "--serverPort", "1234",
-                "--rpcTimeout", "100",
-                "--requestId", requestId
+            "--serverHost", "server.com",
+            "--serverPort", "1234",
+            "--rpcTimeout", "100",
+            "--requestId", requestId
         )
 
         then:
@@ -71,7 +71,7 @@ class PingCommandArgumentsSpec extends Specification {
     def "InvalidRequestId"() {
         when:
         jCommander.parse(
-                "--requestId", " ",
+            "--requestId", " ",
         )
 
         then:

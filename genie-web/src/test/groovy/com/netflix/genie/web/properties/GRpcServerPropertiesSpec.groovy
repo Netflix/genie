@@ -23,7 +23,6 @@ import spock.lang.Specification
  * Specifications for {@link GRpcServerProperties}.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class GRpcServerPropertiesSpec extends Specification {
 

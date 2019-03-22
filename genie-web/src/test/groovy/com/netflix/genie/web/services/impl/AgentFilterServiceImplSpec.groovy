@@ -19,7 +19,6 @@
 package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.web.util.AgentMetadataInspector
 import com.netflix.genie.web.util.InspectionReport
 import spock.lang.Specification

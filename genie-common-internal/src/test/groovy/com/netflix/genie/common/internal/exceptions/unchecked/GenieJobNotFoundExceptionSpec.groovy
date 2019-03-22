@@ -23,7 +23,6 @@ import spock.lang.Specification
  * Specifications for the {@link GenieJobNotFoundException} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class GenieJobNotFoundExceptionSpec extends Specification {
 

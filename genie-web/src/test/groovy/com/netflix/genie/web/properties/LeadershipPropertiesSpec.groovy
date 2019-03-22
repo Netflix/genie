@@ -18,11 +18,11 @@
 package com.netflix.genie.web.properties
 
 import spock.lang.Specification
+
 /**
  * Specifications for the {@link LeadershipProperties} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class LeadershipPropertiesSpec extends Specification {
 

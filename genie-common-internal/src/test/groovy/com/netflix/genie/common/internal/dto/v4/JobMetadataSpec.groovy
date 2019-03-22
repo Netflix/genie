@@ -28,7 +28,6 @@ import spock.lang.Specification
  * Specifications for the {@link JobMetadata} class.
  *
  * @author tgianos
- * @since 4.0.0
  */
 @Category(UnitTest.class)
 class JobMetadataSpec extends Specification {
@@ -49,14 +48,14 @@ class JobMetadataSpec extends Specification {
 
         when:
         jobUserMetadata = new JobMetadata.Builder(name, user)
-                .withDescription(description)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
 
         then:
         jobUserMetadata.getName() == name
@@ -71,8 +70,8 @@ class JobMetadataSpec extends Specification {
 
         when:
         jobUserMetadata = new JobMetadata.Builder(name, user, version)
-                .withMetadata(metadataJson)
-                .build()
+            .withMetadata(metadataJson)
+            .build()
 
         then:
         jobUserMetadata.getName() == name
@@ -87,7 +86,7 @@ class JobMetadataSpec extends Specification {
 
         when:
         jobUserMetadata = new JobMetadata.Builder(name, user, version)
-                .build()
+            .build()
 
         then:
         jobUserMetadata.getName() == name
@@ -104,14 +103,14 @@ class JobMetadataSpec extends Specification {
         def newTags = Sets.newHashSet(tags)
         newTags.add(" \t")
         jobUserMetadata = new JobMetadata.Builder(name, user)
-                .withDescription(" ")
-                .withTags(newTags)
-                .withMetadata(metadata)
-                .withGroup("\n")
-                .withEmail("")
-                .withGrouping("\t\t")
-                .withGroupingInstance("\n\n")
-                .build()
+            .withDescription(" ")
+            .withTags(newTags)
+            .withMetadata(metadata)
+            .withGroup("\n")
+            .withEmail("")
+            .withGrouping("\t\t")
+            .withGroupingInstance("\n\n")
+            .build()
 
         then:
         jobUserMetadata.getName() == name
@@ -166,23 +165,23 @@ class JobMetadataSpec extends Specification {
         def grouping = UUID.randomUUID().toString()
         def groupingInstance = UUID.randomUUID().toString()
         base = new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withTags(Sets.newHashSet(tag))
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(Sets.newHashSet(tag))
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
         comparable = new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withTags(Sets.newHashSet(tag))
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(Sets.newHashSet(tag))
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
 
         then:
         base == comparable
@@ -219,23 +218,23 @@ class JobMetadataSpec extends Specification {
         def grouping = UUID.randomUUID().toString()
         def groupingInstance = UUID.randomUUID().toString()
         one = new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withTags(Sets.newHashSet(tag))
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(Sets.newHashSet(tag))
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
         two = new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withTags(Sets.newHashSet(tag))
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(Sets.newHashSet(tag))
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
 
         then:
         one.hashCode() == two.hashCode()
@@ -272,23 +271,23 @@ class JobMetadataSpec extends Specification {
         def grouping = UUID.randomUUID().toString()
         def groupingInstance = UUID.randomUUID().toString()
         one = new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withTags(Sets.newHashSet(tag))
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(Sets.newHashSet(tag))
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
         two = new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withTags(Sets.newHashSet(tag))
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(Sets.newHashSet(tag))
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
 
         then:
         one.toString() == two.toString()
@@ -308,13 +307,13 @@ class JobMetadataSpec extends Specification {
         def groupingInstance = UUID.randomUUID().toString()
 
         return new JobMetadata.Builder(name, user, version)
-                .withDescription(description)
-                .withTags(tags)
-                .withMetadata(metadata)
-                .withGroup(group)
-                .withEmail(email)
-                .withGrouping(grouping)
-                .withGroupingInstance(groupingInstance)
-                .build()
+            .withDescription(description)
+            .withTags(tags)
+            .withMetadata(metadata)
+            .withGroup(group)
+            .withEmail(email)
+            .withGrouping(grouping)
+            .withGroupingInstance(groupingInstance)
+            .build()
     }
 }
