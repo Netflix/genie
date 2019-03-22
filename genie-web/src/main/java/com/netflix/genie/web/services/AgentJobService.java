@@ -50,7 +50,7 @@ public interface AgentJobService {
      * Shake hands and allow a client or reject it based on the supplied {@link AgentClientMetadata}.
      *
      * @param agentMetadata The metadata about the agent starting to run a given job
-     * @throws GenieAgentRejectedException       If the server rejects the client based on its metadata
+     * @throws GenieAgentRejectedException  If the server rejects the client based on its metadata
      * @throws ConstraintViolationException If the arguments fail validation
      */
     void handshake(@Valid AgentClientMetadata agentMetadata);

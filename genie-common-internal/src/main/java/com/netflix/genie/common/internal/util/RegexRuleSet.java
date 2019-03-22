@@ -43,6 +43,66 @@ public final class RegexRuleSet {
     }
 
     /**
+     * Factory method to build a whitelist ruleset.
+     * (Whitelist rejects everything except for the given patterns).
+     *
+     * @param patternStrings a set of pattern strings that constitute the whitelist
+     * @return the ruleset
+     */
+    public static RegexRuleSet buildWhitelist(final String... patternStrings) {
+        return buildWhitelist(compilePatternStrings(patternStrings));
+    }
+
+    /**
+     * Factory method to build a whitelist ruleset.
+     * (Whitelist rejects everything except for the given patterns).
+     *
+     * @param patterns a set of patterns that constitute the whitelist
+     * @return the ruleset
+     */
+    public static RegexRuleSet buildWhitelist(final Pattern... patterns) {
+        final Builder builder = new Builder(Response.REJECT);
+        for (final Pattern pattern : patterns) {
+            builder.addRule(pattern, Response.ACCEPT);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Factory method to build a whitelist ruleset.
+     * (Blacklist accepts everything except for the given patterns).
+     *
+     * @param patternStrings a set of pattern strings that constitute the blacklist
+     * @return the ruleset
+     */
+    public static RegexRuleSet buildBlacklist(final String... patternStrings) {
+        return buildBlacklist(compilePatternStrings(patternStrings));
+    }
+
+    /**
+     * Factory method to build a whitelist ruleset.
+     * (Blacklist accepts everything except for the given patterns).
+     *
+     * @param patterns a set of patterns that constitute the blacklist
+     * @return the ruleset
+     */
+    public static RegexRuleSet buildBlacklist(final Pattern... patterns) {
+        final Builder builder = new Builder(Response.ACCEPT);
+        for (final Pattern pattern : patterns) {
+            builder.addRule(pattern, Response.REJECT);
+        }
+        return builder.build();
+    }
+
+    private static Pattern[] compilePatternStrings(final String[] patternStrings) {
+        final Pattern[] patterns = new Pattern[patternStrings.length];
+        for (int i = 0; i < patternStrings.length; i++) {
+            patterns[i] = Pattern.compile(patternStrings[i]);
+        }
+        return patterns;
+    }
+
+    /**
      * Evaluate an input string against the rule set.
      *
      * @param input an input string
@@ -154,65 +214,5 @@ public final class RegexRuleSet {
         public RegexRuleSet build() {
             return new RegexRuleSet(rules, defaultResponse);
         }
-    }
-
-    /**
-     * Factory method to build a whitelist ruleset.
-     * (Whitelist rejects everything except for the given patterns).
-     *
-     * @param patternStrings a set of pattern strings that constitute the whitelist
-     * @return the ruleset
-     */
-    public static RegexRuleSet buildWhitelist(final String... patternStrings) {
-        return buildWhitelist(compilePatternStrings(patternStrings));
-    }
-
-    /**
-     * Factory method to build a whitelist ruleset.
-     * (Whitelist rejects everything except for the given patterns).
-     *
-     * @param patterns a set of patterns that constitute the whitelist
-     * @return the ruleset
-     */
-    public static RegexRuleSet buildWhitelist(final Pattern... patterns) {
-        final Builder builder = new Builder(Response.REJECT);
-        for (final Pattern pattern : patterns) {
-            builder.addRule(pattern, Response.ACCEPT);
-        }
-        return builder.build();
-    }
-
-    /**
-     * Factory method to build a whitelist ruleset.
-     * (Blacklist accepts everything except for the given patterns).
-     *
-     * @param patternStrings a set of pattern strings that constitute the blacklist
-     * @return the ruleset
-     */
-    public static RegexRuleSet buildBlacklist(final String... patternStrings) {
-        return buildBlacklist(compilePatternStrings(patternStrings));
-    }
-
-    /**
-     * Factory method to build a whitelist ruleset.
-     * (Blacklist accepts everything except for the given patterns).
-     *
-     * @param patterns a set of patterns that constitute the blacklist
-     * @return the ruleset
-     */
-    public static RegexRuleSet buildBlacklist(final Pattern... patterns) {
-        final Builder builder = new Builder(Response.ACCEPT);
-        for (final Pattern pattern : patterns) {
-            builder.addRule(pattern, Response.REJECT);
-        }
-        return builder.build();
-    }
-
-    private static Pattern[] compilePatternStrings(final String[] patternStrings) {
-        final Pattern[] patterns = new Pattern[patternStrings.length];
-        for (int i = 0; i < patternStrings.length; i++) {
-            patterns[i] = Pattern.compile(patternStrings[i]);
-        }
-        return patterns;
     }
 }

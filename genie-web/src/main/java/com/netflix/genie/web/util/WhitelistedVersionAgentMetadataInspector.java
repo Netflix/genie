@@ -36,6 +36,7 @@ public class WhitelistedVersionAgentMetadataInspector extends BaseRegexAgentMeta
 
     /**
      * Constructor.
+     *
      * @param agentFilterProperties version filter properties
      */
     public WhitelistedVersionAgentMetadataInspector(final AgentFilterProperties agentFilterProperties) {

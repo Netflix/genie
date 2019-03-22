@@ -105,24 +105,6 @@ public enum ProcessStatus {
     }
 
     /**
-     * Return the status getExitCode for the job.
-     *
-     * @return status for the job
-     */
-    public int getExitCode() {
-        return this.exitCode;
-    }
-
-    /**
-     * Return the getMessage associated with each status getExitCode.
-     *
-     * @return getMessage for status getExitCode
-     */
-    public String getMessage() {
-        return this.message;
-    }
-
-    /**
      * Try to create a ProcessStatus from an exit code,
      * if one doesn't exist an exception will be thrown.
      *
@@ -139,5 +121,23 @@ public enum ProcessStatus {
         // If we got to here no status exists for the error code. Throw exception.
         throw new GeniePreconditionException(
             "No ProcessStatus found for code " + exitCode);
+    }
+
+    /**
+     * Return the status getExitCode for the job.
+     *
+     * @return status for the job
+     */
+    public int getExitCode() {
+        return this.exitCode;
+    }
+
+    /**
+     * Return the getMessage associated with each status getExitCode.
+     *
+     * @return getMessage for status getExitCode
+     */
+    public String getMessage() {
+        return this.message;
     }
 }

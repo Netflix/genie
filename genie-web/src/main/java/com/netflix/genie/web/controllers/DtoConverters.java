@@ -392,7 +392,7 @@ public final class DtoConverters {
 
         final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder =
             new JobArchivalDataRequest
-            .Builder();
+                .Builder();
 
         return new JobRequest(
             v3JobRequest.getId().orElse(null),

@@ -83,6 +83,7 @@ public final class UserConsole {
 
     /**
      * Load and print the Spring banner (if one is configured) to UserConsole.
+     *
      * @param environment the Spring environment
      */
     static void printBanner(final Environment environment) {

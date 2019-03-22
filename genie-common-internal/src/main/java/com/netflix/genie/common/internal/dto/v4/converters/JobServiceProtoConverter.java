@@ -65,202 +65,6 @@ import java.util.stream.Collectors;
 @Component
 public class JobServiceProtoConverter {
 
-    /**
-     * Convert a V4 Job Request DTO into a gRPC reserve job id request to be sent to the server.
-     *
-     * @param jobRequest          The job request to convert
-     * @param agentClientMetadata The metadata about the agent
-     * @return The request that should be sent to the server for a new Job Specification given the parameters
-     * @throws GenieConversionException if conversion fails
-     */
-    public ReserveJobIdRequest toProtoReserveJobIdRequest(
-        final AgentJobRequest jobRequest,
-        final AgentClientMetadata agentClientMetadata
-    ) throws GenieConversionException {
-        final ReserveJobIdRequest.Builder builder = ReserveJobIdRequest.newBuilder();
-        builder.setMetadata(toProtoJobMetadata(jobRequest));
-        builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
-        builder.setAgentConfig(toProtoAgentConfig(jobRequest));
-        builder.setAgentMetadata(toProtoAgentMetadata(agentClientMetadata));
-        builder.setJobArchivalData(toProtoJobArchivalData(jobRequest));
-        return builder.build();
-    }
-
-    /**
-     * Generate a {@link JobSpecificationRequest} from the given job id.
-     *
-     * @param id The job id to generate the request for
-     * @return The request instance
-     */
-    public JobSpecificationRequest toProtoJobSpecificationRequest(final String id) {
-        return JobSpecificationRequest.newBuilder().setId(id).build();
-    }
-
-    /**
-     * Convert a gRPC reserve job id request into a V4 Job Request DTO for use within Genie codebase.
-     *
-     * @param request The request to convert
-     * @return The job request
-     * @throws GenieConversionException if conversion fails
-     */
-    public JobRequest toJobRequestDTO(final ReserveJobIdRequest request) throws GenieConversionException {
-        return toJobRequest(
-            request.getMetadata(),
-            request.getCriteria(),
-            request.getAgentConfig(),
-            request.getJobArchivalData()
-        );
-    }
-
-    /**
-     * Convert a V4 Job Request DTO into a gRPC dry run resolve job specification request to be sent to the server.
-     *
-     * @param jobRequest The job request to convert
-     * @return The request that should be sent to the server for a new Job Specification given the parameters
-     * @throws GenieConversionException if conversion fails
-     */
-    public DryRunJobSpecificationRequest toProtoDryRunJobSpecificationRequest(
-        final AgentJobRequest jobRequest
-    ) throws GenieConversionException {
-        final DryRunJobSpecificationRequest.Builder builder = DryRunJobSpecificationRequest.newBuilder();
-        builder.setMetadata(toProtoJobMetadata(jobRequest));
-        builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
-        builder.setAgentConfig(toProtoAgentConfig(jobRequest));
-        builder.setJobArchivalData(toProtoJobArchivalData(jobRequest));
-        return builder.build();
-    }
-
-    /**
-     * Convert a gRPC request to dry run a job specification resolution into a {@link JobRequest} for use within
-     * Genie server codebase.
-     *
-     * @param request The request to convert
-     * @return The job request
-     * @throws GenieConversionException if conversion fails
-     */
-    public JobRequest toJobRequestDTO(
-        final DryRunJobSpecificationRequest request
-    ) throws GenieConversionException {
-        return toJobRequest(
-            request.getMetadata(),
-            request.getCriteria(),
-            request.getAgentConfig(),
-            request.getJobArchivalData()
-        );
-    }
-
-    /**
-     * Convert a proto {@link AgentMetadata} to an {@link AgentClientMetadata}.
-     *
-     * @param agentMetadata The metadata to convert
-     * @return The immutable DTO representation
-     */
-    public AgentClientMetadata toAgentClientMetadataDTO(final AgentMetadata agentMetadata) {
-        return new AgentClientMetadata(
-            agentMetadata.getAgentHostname(),
-            agentMetadata.getAgentVersion(),
-            agentMetadata.getAgentPid()
-        );
-    }
-
-    /**
-     * Build a {@link JobSpecificationResponse} out of the given {@link JobSpecification}.
-     *
-     * @param jobSpecification The job specification to serialize
-     * @return The response instance
-     */
-    public JobSpecificationResponse toProtoJobSpecificationResponse(final JobSpecification jobSpecification) {
-        return JobSpecificationResponse
-            .newBuilder()
-            .setSpecification(toProtoJobSpecification(jobSpecification))
-            .build();
-    }
-
-    /**
-     * Convert a response from server into a Job Specification DTO which can be used in the codebase free of gRPC.
-     *
-     * @param protoSpec The protobuf specification message
-     * @return A job specification DTO
-     */
-    public JobSpecification toJobSpecificationDTO(
-        final com.netflix.genie.proto.JobSpecification protoSpec
-    ) {
-        return new JobSpecification(
-            protoSpec.getCommandArgsList(),
-            toExecutionResourceDTO(protoSpec.getJob()),
-            toExecutionResourceDTO(protoSpec.getCluster()),
-            toExecutionResourceDTO(protoSpec.getCommand()),
-            protoSpec
-                .getApplicationsList()
-                .stream()
-                .map(JobServiceProtoConverter::toExecutionResourceDTO)
-                .collect(Collectors.toList()),
-            protoSpec.getEnvironmentVariablesMap(),
-            protoSpec.getIsInteractive(),
-            new File(protoSpec.getJobDirectoryLocation()),
-            StringUtils.isBlank(protoSpec.getArchiveLocation()) ? null : protoSpec.getArchiveLocation()
-        );
-    }
-
-    /**
-     * Convert agent metadata and job id into a ClaimJobRequest for the server.
-     *
-     * @param jobId               job id
-     * @param agentClientMetadata agent metadata
-     * @return a ClaimJobRequest
-     */
-    public ClaimJobRequest toProtoClaimJobRequest(
-        final String jobId,
-        final AgentClientMetadata agentClientMetadata
-    ) {
-        return ClaimJobRequest.newBuilder()
-            .setId(jobId)
-            .setAgentMetadata(
-                toProtoAgentMetadata(agentClientMetadata)
-            )
-            .build();
-    }
-
-    /**
-     * Convert parameters into ChangeJobStatusRequest for the server.
-     *
-     * @param jobId            job id
-     * @param currentJobStatus the expected current status on the server
-     * @param newJobStatus     the new current status for this job
-     * @param message          an optional message to record with the state change
-     * @return a ChangeJobStatusRequest
-     */
-    public ChangeJobStatusRequest toProtoChangeJobStatusRequest(
-        final @NotBlank String jobId,
-        final JobStatus currentJobStatus,
-        final JobStatus newJobStatus,
-        final @Nullable String message
-    ) {
-        return ChangeJobStatusRequest.newBuilder()
-            .setId(jobId)
-            .setCurrentStatus(currentJobStatus.name())
-            .setNewStatus(newJobStatus.name())
-            .setNewStatusMessage(message == null ? "" : message)
-            .build();
-    }
-
-    /**
-     * Convert parameters into HandshakeRequest for the server.
-     *
-     * @param agentClientMetadata agent client metadata
-     * @return a {@link HandshakeRequest}
-     * @throws GenieConversionException if the inputs are invalid
-     */
-    public HandshakeRequest toHandshakeRequest(
-        final AgentClientMetadata agentClientMetadata
-    ) throws GenieConversionException {
-        return HandshakeRequest.newBuilder()
-            .setAgentMetadata(
-                toProtoAgentMetadata(agentClientMetadata)
-            )
-            .build();
-    }
-
     private static com.netflix.genie.proto.JobSpecification toProtoJobSpecification(
         final JobSpecification jobSpecification
     ) {
@@ -477,8 +281,8 @@ public class JobServiceProtoConverter {
                 .Builder()
                 .withRequestedArchiveLocationPrefix(
                     StringUtils.isBlank(protoJobArchivalData.getRequestedArchiveLocationPrefix())
-                    ? null
-                    : protoJobArchivalData.getRequestedArchiveLocationPrefix()
+                        ? null
+                        : protoJobArchivalData.getRequestedArchiveLocationPrefix()
                 )
                 .build();
 
@@ -497,5 +301,201 @@ public class JobServiceProtoConverter {
         } catch (GeniePreconditionException e) {
             throw new GenieConversionException("Failed to compose JobRequest", e);
         }
+    }
+
+    /**
+     * Convert a V4 Job Request DTO into a gRPC reserve job id request to be sent to the server.
+     *
+     * @param jobRequest          The job request to convert
+     * @param agentClientMetadata The metadata about the agent
+     * @return The request that should be sent to the server for a new Job Specification given the parameters
+     * @throws GenieConversionException if conversion fails
+     */
+    public ReserveJobIdRequest toProtoReserveJobIdRequest(
+        final AgentJobRequest jobRequest,
+        final AgentClientMetadata agentClientMetadata
+    ) throws GenieConversionException {
+        final ReserveJobIdRequest.Builder builder = ReserveJobIdRequest.newBuilder();
+        builder.setMetadata(toProtoJobMetadata(jobRequest));
+        builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
+        builder.setAgentConfig(toProtoAgentConfig(jobRequest));
+        builder.setAgentMetadata(toProtoAgentMetadata(agentClientMetadata));
+        builder.setJobArchivalData(toProtoJobArchivalData(jobRequest));
+        return builder.build();
+    }
+
+    /**
+     * Generate a {@link JobSpecificationRequest} from the given job id.
+     *
+     * @param id The job id to generate the request for
+     * @return The request instance
+     */
+    public JobSpecificationRequest toProtoJobSpecificationRequest(final String id) {
+        return JobSpecificationRequest.newBuilder().setId(id).build();
+    }
+
+    /**
+     * Convert a gRPC reserve job id request into a V4 Job Request DTO for use within Genie codebase.
+     *
+     * @param request The request to convert
+     * @return The job request
+     * @throws GenieConversionException if conversion fails
+     */
+    public JobRequest toJobRequestDTO(final ReserveJobIdRequest request) throws GenieConversionException {
+        return toJobRequest(
+            request.getMetadata(),
+            request.getCriteria(),
+            request.getAgentConfig(),
+            request.getJobArchivalData()
+        );
+    }
+
+    /**
+     * Convert a V4 Job Request DTO into a gRPC dry run resolve job specification request to be sent to the server.
+     *
+     * @param jobRequest The job request to convert
+     * @return The request that should be sent to the server for a new Job Specification given the parameters
+     * @throws GenieConversionException if conversion fails
+     */
+    public DryRunJobSpecificationRequest toProtoDryRunJobSpecificationRequest(
+        final AgentJobRequest jobRequest
+    ) throws GenieConversionException {
+        final DryRunJobSpecificationRequest.Builder builder = DryRunJobSpecificationRequest.newBuilder();
+        builder.setMetadata(toProtoJobMetadata(jobRequest));
+        builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
+        builder.setAgentConfig(toProtoAgentConfig(jobRequest));
+        builder.setJobArchivalData(toProtoJobArchivalData(jobRequest));
+        return builder.build();
+    }
+
+    /**
+     * Convert a gRPC request to dry run a job specification resolution into a {@link JobRequest} for use within
+     * Genie server codebase.
+     *
+     * @param request The request to convert
+     * @return The job request
+     * @throws GenieConversionException if conversion fails
+     */
+    public JobRequest toJobRequestDTO(
+        final DryRunJobSpecificationRequest request
+    ) throws GenieConversionException {
+        return toJobRequest(
+            request.getMetadata(),
+            request.getCriteria(),
+            request.getAgentConfig(),
+            request.getJobArchivalData()
+        );
+    }
+
+    /**
+     * Convert a proto {@link AgentMetadata} to an {@link AgentClientMetadata}.
+     *
+     * @param agentMetadata The metadata to convert
+     * @return The immutable DTO representation
+     */
+    public AgentClientMetadata toAgentClientMetadataDTO(final AgentMetadata agentMetadata) {
+        return new AgentClientMetadata(
+            agentMetadata.getAgentHostname(),
+            agentMetadata.getAgentVersion(),
+            agentMetadata.getAgentPid()
+        );
+    }
+
+    /**
+     * Build a {@link JobSpecificationResponse} out of the given {@link JobSpecification}.
+     *
+     * @param jobSpecification The job specification to serialize
+     * @return The response instance
+     */
+    public JobSpecificationResponse toProtoJobSpecificationResponse(final JobSpecification jobSpecification) {
+        return JobSpecificationResponse
+            .newBuilder()
+            .setSpecification(toProtoJobSpecification(jobSpecification))
+            .build();
+    }
+
+    /**
+     * Convert a response from server into a Job Specification DTO which can be used in the codebase free of gRPC.
+     *
+     * @param protoSpec The protobuf specification message
+     * @return A job specification DTO
+     */
+    public JobSpecification toJobSpecificationDTO(
+        final com.netflix.genie.proto.JobSpecification protoSpec
+    ) {
+        return new JobSpecification(
+            protoSpec.getCommandArgsList(),
+            toExecutionResourceDTO(protoSpec.getJob()),
+            toExecutionResourceDTO(protoSpec.getCluster()),
+            toExecutionResourceDTO(protoSpec.getCommand()),
+            protoSpec
+                .getApplicationsList()
+                .stream()
+                .map(JobServiceProtoConverter::toExecutionResourceDTO)
+                .collect(Collectors.toList()),
+            protoSpec.getEnvironmentVariablesMap(),
+            protoSpec.getIsInteractive(),
+            new File(protoSpec.getJobDirectoryLocation()),
+            StringUtils.isBlank(protoSpec.getArchiveLocation()) ? null : protoSpec.getArchiveLocation()
+        );
+    }
+
+    /**
+     * Convert agent metadata and job id into a ClaimJobRequest for the server.
+     *
+     * @param jobId               job id
+     * @param agentClientMetadata agent metadata
+     * @return a ClaimJobRequest
+     */
+    public ClaimJobRequest toProtoClaimJobRequest(
+        final String jobId,
+        final AgentClientMetadata agentClientMetadata
+    ) {
+        return ClaimJobRequest.newBuilder()
+            .setId(jobId)
+            .setAgentMetadata(
+                toProtoAgentMetadata(agentClientMetadata)
+            )
+            .build();
+    }
+
+    /**
+     * Convert parameters into ChangeJobStatusRequest for the server.
+     *
+     * @param jobId            job id
+     * @param currentJobStatus the expected current status on the server
+     * @param newJobStatus     the new current status for this job
+     * @param message          an optional message to record with the state change
+     * @return a ChangeJobStatusRequest
+     */
+    public ChangeJobStatusRequest toProtoChangeJobStatusRequest(
+        final @NotBlank String jobId,
+        final JobStatus currentJobStatus,
+        final JobStatus newJobStatus,
+        final @Nullable String message
+    ) {
+        return ChangeJobStatusRequest.newBuilder()
+            .setId(jobId)
+            .setCurrentStatus(currentJobStatus.name())
+            .setNewStatus(newJobStatus.name())
+            .setNewStatusMessage(message == null ? "" : message)
+            .build();
+    }
+
+    /**
+     * Convert parameters into HandshakeRequest for the server.
+     *
+     * @param agentClientMetadata agent client metadata
+     * @return a {@link HandshakeRequest}
+     * @throws GenieConversionException if the inputs are invalid
+     */
+    public HandshakeRequest toHandshakeRequest(
+        final AgentClientMetadata agentClientMetadata
+    ) throws GenieConversionException {
+        return HandshakeRequest.newBuilder()
+            .setAgentMetadata(
+                toProtoAgentMetadata(agentClientMetadata)
+            )
+            .build();
     }
 }

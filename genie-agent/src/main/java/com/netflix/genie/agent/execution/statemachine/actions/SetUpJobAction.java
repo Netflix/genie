@@ -65,11 +65,11 @@ import java.util.regex.Pattern;
 @Slf4j
 class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
-    private DownloadService downloadService;
     private final AgentJobService agentJobService;
     private final AgentHeartBeatService heartbeatService;
     private final AgentJobKillService killService;
     private final ArgumentDelegates.CleanupArguments cleanupArguments;
+    private DownloadService downloadService;
 
     SetUpJobAction(
         final ExecutionContext executionContext,

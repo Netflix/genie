@@ -58,12 +58,10 @@ class ExecutionContextImpl implements ExecutionContext {
     ExecutionContextImpl() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setJobDirectory(final File jobDirectory) {
-        setIfNullOrThrow(jobDirectory, jobDirectoryRef);
+    private static <T> void setIfNullOrThrow(final T value, final AtomicReference<T> reference) {
+        if (!reference.compareAndSet(null, value)) {
+            throw new RuntimeException("Trying to update context object that already has a value");
+        }
     }
 
     /**
@@ -78,8 +76,8 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public void setJobSpecification(final JobSpecification jobSpecification) {
-        setIfNullOrThrow(jobSpecification, jobSpecRef);
+    public void setJobDirectory(final File jobDirectory) {
+        setIfNullOrThrow(jobDirectory, jobDirectoryRef);
     }
 
     /**
@@ -94,8 +92,8 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public void setJobEnvironment(final Map<String, String> jobEnvironment) {
-        setIfNullOrThrow(jobEnvironment, jobEnvironmentRef);
+    public void setJobSpecification(final JobSpecification jobSpecification) {
+        setIfNullOrThrow(jobSpecification, jobSpecRef);
     }
 
     /**
@@ -104,6 +102,14 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public Optional<Map<String, String>> getJobEnvironment() {
         return Optional.ofNullable(jobEnvironmentRef.get());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobEnvironment(final Map<String, String> jobEnvironment) {
+        setIfNullOrThrow(jobEnvironment, jobEnvironmentRef);
     }
 
     /**
@@ -164,17 +170,6 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public void setFinalJobStatus(final JobStatus jobStatus) {
-        if (jobStatus.isActive()) {
-            throw new IllegalArgumentException("Invalid final job status: " + jobStatus);
-        }
-        setIfNullOrThrow(jobStatus, finalJobStatusRef);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<JobStatus> getFinalJobStatus() {
         return Optional.ofNullable(finalJobStatusRef.get());
     }
@@ -183,8 +178,11 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public void setCurrentJobStatus(final JobStatus jobStatus) {
-        currentJobStatusRef.set(jobStatus);
+    public void setFinalJobStatus(final JobStatus jobStatus) {
+        if (jobStatus.isActive()) {
+            throw new IllegalArgumentException("Invalid final job status: " + jobStatus);
+        }
+        setIfNullOrThrow(jobStatus, finalJobStatusRef);
     }
 
     /**
@@ -199,8 +197,8 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public void setClaimedJobId(@NotBlank final String jobId) {
-        setIfNullOrThrow(jobId, claimedJobIdRef);
+    public void setCurrentJobStatus(final JobStatus jobStatus) {
+        currentJobStatusRef.set(jobStatus);
     }
 
     /**
@@ -211,9 +209,11 @@ class ExecutionContextImpl implements ExecutionContext {
         return Optional.ofNullable(claimedJobIdRef.get());
     }
 
-    private static <T> void setIfNullOrThrow(final T value, final AtomicReference<T> reference) {
-        if (!reference.compareAndSet(null, value)) {
-            throw new RuntimeException("Trying to update context object that already has a value");
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setClaimedJobId(@NotBlank final String jobId) {
+        setIfNullOrThrow(jobId, claimedJobIdRef);
     }
 }

@@ -36,6 +36,7 @@ public class BlacklistedVersionAgentMetadataInspector extends BaseRegexAgentMeta
 
     /**
      * Constructor.
+     *
      * @param agentFilterProperties version filter properties
      */
     public BlacklistedVersionAgentMetadataInspector(final AgentFilterProperties agentFilterProperties) {
