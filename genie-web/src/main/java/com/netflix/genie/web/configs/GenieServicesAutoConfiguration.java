@@ -19,6 +19,7 @@ package com.netflix.genie.web.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
@@ -84,9 +85,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.retry.support.RetryTemplate;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Configuration for all the services.
@@ -516,5 +521,30 @@ public class GenieServicesAutoConfiguration {
         final MeterRegistry meterRegistry
     ) {
         return new JobDirectoryServerServiceImpl(resourceLoader, jobPersistenceService, jobFileService, meterRegistry);
+    }
+
+    /**
+     * Get a fallback implementation of {@link AgentFileStreamService} in case gRPC is disabled.
+     *
+     * @return a placeholder agent file stream service for tests.
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFileStreamService.class)
+    public AgentFileStreamService fallbackAgentFileStreamService() {
+        return new AgentFileStreamService() {
+            @Override
+            public Optional<AgentFileResource> getResource(
+                @NotBlank final String jobId,
+                final Path relativePath,
+                final URI uri
+            ) {
+                throw new NotImplementedException("Not supported when using fallback service");
+            }
+
+            @Override
+            public Optional<JobDirectoryManifest> getManifest(final String jobId) {
+                throw new NotImplementedException("Not supported when using fallback service");
+            }
+        };
     }
 }

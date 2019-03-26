@@ -214,4 +214,16 @@ public class GenieServicesAutoConfigurationTest {
             )
         );
     }
+
+    /**
+     * Can get a bean for fallback Agent File Stream service.
+     */
+    @Test
+    public void canGetFallbackAgentFileStreamService() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.fallbackAgentFileStreamService()
+        );
+    }
+
+
 }
