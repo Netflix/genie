@@ -21,8 +21,11 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.RetryProperties;
+import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver;
+import com.netflix.genie.web.resources.agent.AgentFileProtocolResolverRegistrar;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
+import com.netflix.genie.web.services.AgentFileStreamService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -199,5 +202,33 @@ public class GenieApiAutoConfiguration {
         // As a result, everything is served as UTF-8
         characterEncodingFilter.setForceEncoding(true);
         return characterEncodingFilter;
+    }
+
+    /**
+     * Protocol resolver agent file resources.
+     *
+     * @param agentFileStreamService the agent file stream service
+     * @return a {@link AgentFileProtocolResolver}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFileProtocolResolver.class)
+    public AgentFileProtocolResolver agentFileProtocolResolver(
+        final AgentFileStreamService agentFileStreamService
+    ) {
+        return new AgentFileProtocolResolver(agentFileStreamService);
+    }
+
+    /**
+     * Registrar for the {@link AgentFileProtocolResolver}.
+     *
+     * @param agentFileProtocolResolver a protocol {@link AgentFileProtocolResolver} to register
+     * @return a {@link AgentFileProtocolResolverRegistrar}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentFileProtocolResolverRegistrar.class)
+    public AgentFileProtocolResolverRegistrar agentFileProtocolResolverRegistrar(
+        final AgentFileProtocolResolver agentFileProtocolResolver
+    ) {
+        return new AgentFileProtocolResolverRegistrar(agentFileProtocolResolver);
     }
 }

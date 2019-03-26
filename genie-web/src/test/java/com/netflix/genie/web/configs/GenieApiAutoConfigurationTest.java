@@ -19,7 +19,9 @@ package com.netflix.genie.web.configs;
 
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
+import com.netflix.genie.web.services.AgentFileStreamService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -165,5 +167,29 @@ public class GenieApiAutoConfigurationTest {
 
         final Resource jobsDir = this.genieApiAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
         Assert.assertNotNull(jobsDir);
+    }
+
+    /**
+     * Get a valid agent file protocol resolver.
+     */
+    @Test
+    public void canGetAgentFileProtocolResolver() {
+        Assert.assertNotNull(
+            this.genieApiAutoConfiguration.agentFileProtocolResolver(
+                Mockito.mock(AgentFileStreamService.class)
+            )
+        );
+    }
+
+    /**
+     * Get a valid agent file protocol resolver registrar.
+     */
+    @Test
+    public void canGetAgentFileProtocolResolverRegistrar() {
+        Assert.assertNotNull(
+            this.genieApiAutoConfiguration.agentFileProtocolResolverRegistrar(
+                Mockito.mock(AgentFileProtocolResolver.class)
+            )
+        );
     }
 }
