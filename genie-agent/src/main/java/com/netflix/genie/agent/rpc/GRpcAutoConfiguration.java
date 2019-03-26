@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.rpc;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
@@ -122,5 +123,17 @@ public class GRpcAutoConfiguration {
     @Scope("prototype")
     public JobKillServiceGrpc.JobKillServiceFutureStub jobKillClient(final ManagedChannel channel) {
         return JobKillServiceGrpc.newFutureStub(channel);
+    }
+
+    /**
+     * Provide a prototype bean definition for a {@link FileStreamServiceGrpc.FileStreamServiceStub}.
+     *
+     * @param channel The managed channel to use to connect to the Genie server
+     * @return A {@link FileStreamServiceGrpc.FileStreamServiceStub} instance per use
+     */
+    @Bean
+    @Scope("prototype")
+    public FileStreamServiceGrpc.FileStreamServiceStub fileStreamClient(final ManagedChannel channel) {
+        return FileStreamServiceGrpc.newStub(channel);
     }
 }

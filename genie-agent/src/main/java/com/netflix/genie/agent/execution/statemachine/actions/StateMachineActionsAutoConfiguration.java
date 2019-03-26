@@ -21,6 +21,7 @@ import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -174,6 +175,7 @@ public class StateMachineActionsAutoConfiguration {
      * @param agentJobService       The agent job service to use
      * @param agentHeartBeatService The agent heart beat service to use
      * @param agentJobKillService   The agent job kill service to use
+     * @param fileStreamService     The agent file stream service to use
      * @param cleanupArguments      The cleanup arguments to use
      * @return A {@link SetUpJobAction} instance
      */
@@ -185,6 +187,7 @@ public class StateMachineActionsAutoConfiguration {
         final AgentJobService agentJobService,
         final AgentHeartBeatService agentHeartBeatService,
         final AgentJobKillService agentJobKillService,
+        final AgentFileStreamService fileStreamService,
         final ArgumentDelegates.CleanupArguments cleanupArguments
     ) {
         return new SetUpJobAction(
@@ -193,6 +196,7 @@ public class StateMachineActionsAutoConfiguration {
             agentJobService,
             agentHeartBeatService,
             agentJobKillService,
+            fileStreamService,
             cleanupArguments
         );
     }

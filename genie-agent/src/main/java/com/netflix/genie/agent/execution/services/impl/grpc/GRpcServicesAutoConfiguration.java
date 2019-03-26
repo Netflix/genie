@@ -17,11 +17,14 @@
  */
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
+import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
@@ -93,5 +96,28 @@ public class GRpcServicesAutoConfiguration {
         final JobServiceProtoConverter jobServiceProtoConverter
     ) {
         return new GRpcAgentJobServiceImpl(jobServiceFutureStub, jobServiceProtoConverter);
+    }
+
+    /**
+     * Provide a lazy gRPC agent file stream service if one isn't already defined.
+     *
+     * @param fileStreamServiceStub              The stub to use for communications with the server
+     * @param taskScheduler                      The task scheduler to use
+     * @param jobDirectoryManifestProtoConverter The converter to serialize manifests into messages
+     * @return A {@link AgentFileStreamService} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(AgentFileStreamService.class)
+    public AgentFileStreamService agentFileStreamService(
+        final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
+        @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler,
+        final JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter
+    ) {
+        return new GRpcAgentFileStreamServiceImpl(
+            fileStreamServiceStub,
+            taskScheduler,
+            jobDirectoryManifestProtoConverter
+        );
     }
 }

@@ -19,6 +19,7 @@ package com.netflix.genie.agent.rpc;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration;
+import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
@@ -80,6 +81,7 @@ public class GRpcAutoConfigurationIntegrationTest {
             JobServiceGrpc.JobServiceFutureStub.class,
             HeartBeatServiceGrpc.HeartBeatServiceStub.class,
             JobKillServiceGrpc.JobKillServiceFutureStub.class,
+            FileStreamServiceGrpc.FileStreamServiceStub.class,
         };
 
         for (final Class<?> clientStubClass : clientStubClasses) {

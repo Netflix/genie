@@ -18,11 +18,13 @@
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
+import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,6 +68,7 @@ public class GRpcServicesAutoConfigurationIntegrationTest {
             AgentHeartBeatService.class,
             AgentJobKillService.class,
             AgentJobService.class,
+            AgentFileStreamService.class,
         };
 
         for (final Class<?> serviceClass : serviceClasses) {
@@ -104,6 +107,11 @@ public class GRpcServicesAutoConfigurationIntegrationTest {
         @Qualifier("heartBeatServiceTaskExecutor")
         TaskScheduler taskScheduler() {
             return Mockito.mock(TaskScheduler.class);
+        }
+
+        @Bean
+        JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter() {
+            return Mockito.mock(JobDirectoryManifestProtoConverter.class);
         }
     }
 }
