@@ -264,3 +264,40 @@ message JobKillRegistrationRequest {
 
 message JobKillRegistrationResponse {
 }
+
+//--------------------------------------------------------------------
+// FileStream Service
+//
+// This service streams file local to an agent back to the server.
+//--------------------------------------------------------------------
+
+service FileStreamService {
+    rpc sync (stream AgentManifestMessage) returns (stream ServerControlMessage);
+    rpc transmit (stream AgentFileMessage) returns (stream ServerAckMessage);
+}
+
+message AgentManifestMessage {
+    string job_id = 1;
+    string manifest_json = 2;
+}
+
+message ServerControlMessage {
+    oneof message {
+        ServerFileRequestMessage server_file_request = 1;
+    }
+}
+
+message ServerFileRequestMessage {
+    string stream_id = 1;
+    string relative_path = 2;
+    int32 start_offset = 3;
+    int32 end_offset = 4;
+}
+
+message AgentFileMessage {
+    string stream_id = 1;
+    bytes data = 2;
+}
+
+message ServerAckMessage {
+}
