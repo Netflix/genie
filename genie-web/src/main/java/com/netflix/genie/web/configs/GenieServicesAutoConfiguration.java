@@ -37,6 +37,7 @@ import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.services.AgentFileStreamService;
 import com.netflix.genie.web.services.AgentFilterService;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.AgentRoutingService;
@@ -506,10 +507,11 @@ public class GenieServicesAutoConfiguration {
     /**
      * Provide the default implementation of {@link JobDirectoryServerService} for serving job directory resources.
      *
-     * @param resourceLoader        The application resource loader used to get references to resources
-     * @param jobPersistenceService The job persistence service used to get information about a job
-     * @param jobFileService        The service responsible for managing the job working directory on disk for V3 Jobs
-     * @param meterRegistry         The meter registry used to keep track of metrics
+     * @param resourceLoader         The application resource loader used to get references to resources
+     * @param jobPersistenceService  The job persistence service used to get information about a job
+     * @param jobFileService         The service responsible for managing the job working directory on disk for V3 Jobs
+     * @param agentFileStreamService The service to request a file from an agent running a job
+     * @param meterRegistry          The meter registry used to keep track of metrics
      * @return An instance of {@link JobDirectoryServerServiceImpl}
      */
     @Bean
@@ -518,9 +520,16 @@ public class GenieServicesAutoConfiguration {
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
         final JobFileService jobFileService,
+        final AgentFileStreamService agentFileStreamService,
         final MeterRegistry meterRegistry
     ) {
-        return new JobDirectoryServerServiceImpl(resourceLoader, jobPersistenceService, jobFileService, meterRegistry);
+        return new JobDirectoryServerServiceImpl(
+            resourceLoader,
+            jobPersistenceService,
+            jobFileService,
+            agentFileStreamService,
+            meterRegistry
+        );
     }
 
     /**
