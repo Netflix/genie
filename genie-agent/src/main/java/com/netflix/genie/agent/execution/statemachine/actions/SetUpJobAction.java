@@ -26,6 +26,7 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
+import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -68,6 +69,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     private final AgentJobService agentJobService;
     private final AgentHeartBeatService heartbeatService;
     private final AgentJobKillService killService;
+    private final AgentFileStreamService fileManifestService;
     private final ArgumentDelegates.CleanupArguments cleanupArguments;
     private DownloadService downloadService;
 
@@ -77,6 +79,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         final AgentJobService agentJobService,
         final AgentHeartBeatService heartbeatService,
         final AgentJobKillService killService,
+        final AgentFileStreamService fileStreamService,
         final ArgumentDelegates.CleanupArguments cleanupArguments
     ) {
         super(executionContext);
@@ -84,6 +87,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         this.agentJobService = agentJobService;
         this.heartbeatService = heartbeatService;
         this.killService = killService;
+        this.fileManifestService = fileStreamService;
         this.cleanupArguments = cleanupArguments;
     }
 
@@ -128,6 +132,9 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             final File jobDirectory = setupJobDirectory(claimedJobId, jobSpecification);
             executionContext.setJobDirectory(jobDirectory);
 
+            // Start manifest service, allowing server to browse and request files.
+            this.fileManifestService.start(claimedJobId, jobDirectory.toPath());
+
             // Download dependencies, configurations, etc.
             final List<File> setupFiles = downloadResources(jobSpecification, jobDirectory);
 
@@ -161,6 +168,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         // Stop services started during setup
         killService.stop();
         heartbeatService.stop();
+        fileManifestService.stop();
     }
 
     private File setupJobDirectory(
