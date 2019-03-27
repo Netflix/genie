@@ -1,6 +1,6 @@
 import $ from "jquery";
-import moment from "moment";
-
+import moment from "moment-timezone";
+window.moment = moment;
 // var p = {foo: [1,2,3], bar: 42};
 // setting traditional to true generates
 // foo=1&foo=2&foo=3&bar=42
@@ -31,6 +31,8 @@ export const fetch = (
 ) => $.ajax({ global: false, type, headers: { Accept: headers }, url, data });
 
 export const hasChanged = (o1, o2) => {
+  // check if query params have changed or not
+  // this logic determines if need a full page reload
   let changed = false;
   for (const key of Object.keys(o1)) {
     if (
@@ -41,7 +43,6 @@ export const hasChanged = (o1, o2) => {
       break;
     }
   }
-
   if (!changed) {
     for (const key of Object.keys(o2)) {
       if (key !== "showDetails" && (!o1 || o1[key] !== o2[key])) {
@@ -59,8 +60,22 @@ export const nowUtc = () => moment().utc();
 // stringify moment object
 export const milliSeconds = momentObj => `${momentObj}`;
 
-export const momentFormat = (dateStr, format = "MM/DD/YYYY, H:mm:ss") =>
-  dateStr ? moment.utc(dateStr).format(format) : "";
+export const momentFormat = (
+  dateStr,
+  tz = "UTC",
+  format = "MM/DD/YYYY, H:mm:ss"
+) => {
+  // only UTC & PST are supported timezones
+  // default is UTC
+  if (tz == "PST") {
+    return dateStr
+      ? moment.tz(dateStr, "America/Los_Angeles").format(format)
+      : "";
+  } else {
+    let utcDate = dateStr ? moment.utc(dateStr).format(format) : "";
+    return utcDate;
+  }
+};
 
 // https://github.com/moment/moment/issues/1048
 export const momentDurationFormat = (durationStr, format = ":mm:ss") =>

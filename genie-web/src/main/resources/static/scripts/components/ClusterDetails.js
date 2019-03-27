@@ -14,7 +14,10 @@ import $ from "jquery";
 import InfoTable from "./InfoTable";
 
 export default class ClusterDetails extends React.Component {
-  static propTypes = { row: T.object.isRequired };
+  static propTypes = {
+    row: T.object.isRequired,
+    timeZone: T.string.isRequired
+  };
 
   constructor(props) {
     super(props);
@@ -41,7 +44,7 @@ export default class ClusterDetails extends React.Component {
     const { row } = props;
     const clusterUrl = activeClusterUrl(row._links.self.href);
     const commandsUrl = activeCommandUrl(row._links.commands.href);
-    const allCommandsUrl = stripHateoasTemplateUrl(row._links.commands.href)
+    const allCommandsUrl = stripHateoasTemplateUrl(row._links.commands.href);
 
     $.when(fetch(clusterUrl), fetch(commandsUrl)).done((cluster, commands) => {
       cluster[0]._links.commands.href = allCommandsUrl;
@@ -59,25 +62,19 @@ export default class ClusterDetails extends React.Component {
               <tbody>
                 <tr>
                   <td className="col-xs-2 align-right">Description:</td>
-                  <td>
-                    {this.state.cluster.description}
-                  </td>
+                  <td>{this.state.cluster.description}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Setup File:</td>
-                  <td>
-                    {this.state.cluster.setupFile}
-                  </td>
+                  <td>{this.state.cluster.setupFile}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Config:</td>
                   <td>
                     <ul>
-                      {this.state.cluster.configs.map((config, index) =>
-                        <li key={index}>
-                          {config}
-                        </li>
-                      )}
+                      {this.state.cluster.configs.map((config, index) => (
+                        <li key={index}>{config}</li>
+                      ))}
                     </ul>
                   </td>
                 </tr>
@@ -85,32 +82,42 @@ export default class ClusterDetails extends React.Component {
                   <td className="col-xs-2 align-right">Dependencies:</td>
                   <td>
                     <ul>
-                      {this.state.cluster.dependencies.map((data, index) =>
-                        <li key={index}>
-                          {data}
-                        </li>
-                      )}
+                      {this.state.cluster.dependencies.map((data, index) => (
+                        <li key={index}>{data}</li>
+                      ))}
                     </ul>
                   </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2 align-right">Created:</td>
+                  <td className="col-xs-2 align-right">
+                    {`Created (${this.props.timeZone})`}:
+                  </td>
                   <td>
-                    {momentFormat(this.state.cluster.created)}
+                    {momentFormat(
+                      this.state.cluster.created,
+                      this.props.timeZone
+                    )}
                   </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2 align-right">Updated:</td>
+                  <td className="col-xs-2 align-right">
+                    {`Updated (${this.props.timeZone})`}:
+                  </td>
                   <td>
-                    {momentFormat(this.state.cluster.updated)}
+                    {momentFormat(
+                      this.state.cluster.updated,
+                      this.props.timeZone
+                    )}
                   </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Active Commands:</td>
                   <td>
-                    {this.state.commands.length > 0
-                      ? <InfoTable data={this.state.commands} type="commands" />
-                      : <div />}
+                    {this.state.commands.length > 0 ? (
+                      <InfoTable data={this.state.commands} type="commands" />
+                    ) : (
+                      <div />
+                    )}
                   </td>
                 </tr>
                 <tr>

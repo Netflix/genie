@@ -7,6 +7,7 @@ const TableBody = props => {
       key={index}
       row={row}
       toggleRowDetails={props.toggleRowDetails}
+      timeZone={props.timeZone}
     />
   );
 
@@ -21,6 +22,7 @@ const TableBody = props => {
         key={`rowIndex-${index}`}
         row={filteredRow}
         toggleRowDetails={props.toggleRowDetails}
+        timeZone={props.timeZone}
       />
     );
   }
