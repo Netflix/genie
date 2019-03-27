@@ -1,5 +1,6 @@
 import T from "prop-types";
 import React from "react";
+import cookie from "react-cookie";
 import $ from "jquery";
 
 import SearchForm from "./components/SearchForm";
@@ -12,6 +13,7 @@ import Table from "./components/Table";
 import TableHeader from "./components/TableHeader";
 import TableBody from "./components/TableBody";
 import Error from "./components/Error";
+import ToggleTimeZone from "./components/ToggleTimeZone";
 
 import { fetch, hasChanged } from "./utils";
 
@@ -21,13 +23,16 @@ export default class Page extends React.Component {
 
   constructor(props) {
     super(props);
+    //load timezone preference
+    const utcChecked = cookie.load("genie.utcChecked");
     this.state = {
       data: [],
       links: {},
       page: {},
       error: null,
       noSearchResult: false,
-      showSearchForm: true
+      showSearchForm: true,
+      utcChecked: utcChecked == null ? true : JSON.parse(utcChecked) //default preference is UTC
     };
   }
 
@@ -43,12 +48,20 @@ export default class Page extends React.Component {
     }
   }
 
-  toggleRowDetails = id => {
-    this.setState({ rowId: this.state.rowId === id ? null : id });
-  };
+  get timeZone() {
+    return this.state.utcChecked ? "UTC" : "PST";
+  }
 
-  toggleSearchForm = () => {
+  toggleRowDetails = id =>
+    this.setState({ rowId: this.state.rowId === id ? null : id });
+
+  toggleSearchForm = () =>
     this.setState({ showSearchForm: !this.state.showSearchForm });
+
+  toggleTimeZone = utcChecked => {
+    // save tz preference in a cookie for future loads
+    cookie.save("genie.utcChecked", utcChecked);
+    this.setState({ utcChecked });
   };
 
   loadPageData(query) {
@@ -56,7 +69,7 @@ export default class Page extends React.Component {
       query = { size: 100 };
     }
     const { rowId = null, showSearchForm = "true" } = query;
-    this.setState({ query, data: [] });
+    this.setState({ query });
 
     fetch(this.url, query)
       .done(data => {
@@ -81,47 +94,60 @@ export default class Page extends React.Component {
   }
 
   render() {
-    const sideBar = this.state.showSearchForm
-      ? <SearchForm
-          query={this.state.query}
-          formFields={this.formFields}
-          hiddenFormFields={this.hiddenFormFields}
-          toggleSearchForm={this.toggleSearchForm}
-          searchPath={this.searchPath}
-        />
-      : <SearchBar toggleSearchForm={this.toggleSearchForm} />;
+    const sideBar = this.state.showSearchForm ? (
+      <SearchForm
+        query={this.state.query}
+        formFields={this.formFields}
+        hiddenFormFields={this.hiddenFormFields}
+        toggleSearchForm={this.toggleSearchForm}
+        searchPath={this.searchPath}
+      />
+    ) : (
+      <SearchBar toggleSearchForm={this.toggleSearchForm} />
+    );
 
     let resultPanel = null;
     if (this.state.error != null) {
       resultPanel = <Error error={this.state.error} />;
     } else {
       resultPanel =
-        this.state.data.length > 0
-          ? <div
-              className={this.state.showSearchForm ? "col-md-10" : "col-md-12"}
-            >
-              <Table>
-                <TableHeader headers={this.tableHeader} />
-                <TableBody
-                  rows={this.state.data}
-                  rowId={this.state.rowId}
-                  rowType={this.rowType}
-                  detailsTable={this.detailsTable}
-                  toggleRowDetails={this.toggleRowDetails}
-                />
-              </Table>
-              <Pagination
-                page={this.state.page}
-                pageType={this.searchPath}
-                links={this.state.links}
+        this.state.data.length > 0 ? (
+          <div
+            className={this.state.showSearchForm ? "col-md-10" : "col-md-12"}
+          >
+            <Table>
+              <TableHeader headers={this.tableHeader} />
+              <TableBody
+                rows={this.state.data}
+                rowId={this.state.rowId}
+                rowType={this.rowType}
+                detailsTable={this.detailsTable}
+                toggleRowDetails={this.toggleRowDetails}
+                timeZone={this.timeZone}
               />
-            </div>
-          : this.state.noSearchResult ? <NoSearchResult /> : <Loading />; // Default to loading...
+            </Table>
+            <Pagination
+              page={this.state.page}
+              pageType={this.searchPath}
+              links={this.state.links}
+            />
+          </div>
+        ) : this.state.noSearchResult ? (
+          <NoSearchResult />
+        ) : (
+          <Loading />
+        ); // Default to loading...
     }
 
     return (
       <div className="row">
         {sideBar}
+        <div className="timezone-toggle">
+          <ToggleTimeZone
+            checked={this.state.utcChecked}
+            handleChange={this.toggleTimeZone}
+          />
+        </div>
         {resultPanel}
       </div>
     );

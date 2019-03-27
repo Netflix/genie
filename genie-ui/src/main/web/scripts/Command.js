@@ -60,8 +60,8 @@ export default class Command extends Page {
       "Status",
       "Version",
       "Tags",
-      "Created (UTC)",
-      "Updated (UTC)"
+      `Created (${this.timeZone})`,
+      `Updated (${this.timeZone})`
     ];
   }
 

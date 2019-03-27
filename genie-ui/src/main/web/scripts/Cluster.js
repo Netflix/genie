@@ -59,8 +59,8 @@ export default class Cluster extends Page {
       "Status",
       "Version",
       "Tags",
-      "Created (UTC)",
-      "Updated (UTC)"
+      `Created (${this.timeZone})`,
+      `Updated (${this.timeZone})`
     ];
   }
 

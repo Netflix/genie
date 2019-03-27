@@ -111,8 +111,8 @@ export default class Job extends Page {
       "Status",
       "Cluster",
       "Command",
-      "Started (UTC)",
-      "Finished (UTC)",
+      `Started (${this.timeZone})`,
+      `Finished (${this.timeZone})`,
       "Run Time"
     ];
   }

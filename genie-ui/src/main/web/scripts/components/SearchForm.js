@@ -85,7 +85,6 @@ export default class SearchForm extends React.Component {
 
   hasValue = field => field && (field.value > 0 || field.value.length > 0);
 
-  // Mutators
   toggleFormFields = e => {
     e.preventDefault();
     this.setState({
@@ -121,6 +120,7 @@ export default class SearchForm extends React.Component {
   handleSearch = e => {
     e.preventDefault();
     const query = { src: "btn" };
+    //construct query obj from formFields
     for (const [name, field] of Object.entries(this.state.formFields)) {
       if (this.hasValue(field)) {
         if (name === "sortOrder") {
