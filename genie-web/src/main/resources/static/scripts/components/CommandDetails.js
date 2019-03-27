@@ -13,7 +13,10 @@ import $ from "jquery";
 import InfoTable from "./InfoTable";
 
 export default class CommandDetails extends React.Component {
-  static propTypes = { row: T.object.isRequired };
+  static propTypes = {
+    row: T.object.isRequired,
+    timeZone: T.string.isRequired
+  };
 
   constructor(props) {
     super(props);
@@ -43,18 +46,16 @@ export default class CommandDetails extends React.Component {
     const applicationsUrl = row._links.applications.href;
     const allClustersUrl = stripHateoasTemplateUrl(row._links.clusters.href);
 
-    $.when(
-      fetch(commandUrl),
-      fetch(clustersUrl),
-      fetch(applicationsUrl)
-    ).done((command, clusters, applications) => {
-      command[0]._links.clusters.href = allClustersUrl
-      this.setState({
-        command: command[0],
-        clusters: clusters[0],
-        applications: applications[0]
-      });
-    });
+    $.when(fetch(commandUrl), fetch(clustersUrl), fetch(applicationsUrl)).done(
+      (command, clusters, applications) => {
+        command[0]._links.clusters.href = allClustersUrl;
+        this.setState({
+          command: command[0],
+          clusters: clusters[0],
+          applications: applications[0]
+        });
+      }
+    );
   }
 
   render() {
@@ -67,37 +68,27 @@ export default class CommandDetails extends React.Component {
               <tbody>
                 <tr>
                   <td className="col-xs-2 align-right">Description:</td>
-                  <td>
-                    {this.state.command.description}
-                  </td>
+                  <td>{this.state.command.description}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Check Delay:</td>
-                  <td>
-                    {this.state.command.checkDelay}
-                  </td>
+                  <td>{this.state.command.checkDelay}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Setup File:</td>
-                  <td>
-                    {this.state.command.setupFile}
-                  </td>
+                  <td>{this.state.command.setupFile}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Executable:</td>
-                  <td>
-                    {this.state.command.executable}
-                  </td>
+                  <td>{this.state.command.executable}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Config:</td>
                   <td>
                     <ul>
-                      {this.state.command.configs.map((config, index) =>
-                        <li key={index}>
-                          {config}
-                        </li>
-                      )}
+                      {this.state.command.configs.map((config, index) => (
+                        <li key={index}>{config}</li>
+                      ))}
                     </ul>
                   </td>
                 </tr>
@@ -106,43 +97,56 @@ export default class CommandDetails extends React.Component {
                   <td>
                     <ul>
                       {this.state.command.dependencies.map(
-                        (dependency, index) =>
-                          <li key={index}>
-                            {dependency}
-                          </li>
+                        (dependency, index) => (
+                          <li key={index}>{dependency}</li>
+                        )
                       )}
                     </ul>
                   </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2 align-right">Created:</td>
+                  <td className="col-xs-2 align-right">
+                    {`Created (${this.props.timeZone})`}:
+                  </td>
                   <td>
-                    {momentFormat(this.state.command.created)}
+                    {momentFormat(
+                      this.state.command.created,
+                      this.props.timeZone
+                    )}
                   </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2 align-right">Updated:</td>
+                  <td className="col-xs-2 align-right">
+                    {`Updated (${this.props.timeZone})`}:
+                  </td>
                   <td>
-                    {momentFormat(this.state.command.updated)}
+                    {momentFormat(
+                      this.state.command.updated,
+                      this.props.timeZone
+                    )}
                   </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Active Clusters:</td>
                   <td>
-                    {this.state.clusters.length > 0
-                      ? <InfoTable data={this.state.clusters} type="clusters" />
-                      : <div />}
+                    {this.state.clusters.length > 0 ? (
+                      <InfoTable data={this.state.clusters} type="clusters" />
+                    ) : (
+                      <div />
+                    )}
                   </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Applications:</td>
                   <td>
-                    {this.state.applications.length > 0
-                      ? <InfoTable
-                          data={this.state.applications}
-                          type="applications"
-                        />
-                      : <div />}
+                    {this.state.applications.length > 0 ? (
+                      <InfoTable
+                        data={this.state.applications}
+                        type="applications"
+                      />
+                    ) : (
+                      <div />
+                    )}
                   </td>
                 </tr>
                 <tr>

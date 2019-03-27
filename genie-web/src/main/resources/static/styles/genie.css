@@ -153,6 +153,16 @@ div .container {
 .align-right {
     text-align: right;
 }
+
+.timezone-toggle {
+    text-align: right;
+    padding-right: 35px;
+    padding-bottom: 20px;
+}
+
+.timezone-text {
+    padding-right: 10px;
+}
 /*
 a {
     text-decoration: none;

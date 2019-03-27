@@ -7,12 +7,14 @@ import CopyToClipboard from "react-copy-to-clipboard";
 export default class TableRow extends React.Component {
   static propTypes = {
     toggleRowDetails: T.func.isRequired,
+    timeZone: T.string.isRequired,
     row: T.shape({
       id: T.string.isRequired,
       name: T.string.isRequired,
       user: T.string.isRequired,
       status: T.string.isRequired,
-      clusterName: T.string,
+      clusterName: T.string.isRequired,
+      commandName: T.string.isRequired,
       started: T.string,
       finished: T.string,
       runtime: T.string
@@ -88,14 +90,14 @@ export default class TableRow extends React.Component {
           onClick={() => this.props.toggleRowDetails(this.props.row.id)}
           className="col-xs-1"
         >
-          {this.props.row.started ? momentFormat(this.props.row.started) : "NA"}
+          {this.props.row.started ? momentFormat(this.props.row.started, this.props.timeZone) : "NA"}
         </td>
         <td
           onClick={() => this.props.toggleRowDetails(this.props.row.id)}
           className="col-xs-1"
         >
           {this.props.row.finished
-            ? momentFormat(this.props.row.finished)
+            ? momentFormat(this.props.row.finished, this.props.timeZone)
             : "NA"}
         </td>
         <td

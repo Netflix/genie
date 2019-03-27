@@ -31,6 +31,10 @@ var config = {
       {
         test: /\.(ttf|svg|eot|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: "file-loader?name=[path][name].[ext]"
+      },
+      {
+        test: /\.json$/,
+        loader: "json-loader"
       }
     ]
   }

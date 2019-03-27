@@ -9,7 +9,10 @@ import Error from "./Error";
 import $ from "jquery";
 
 export default class JobDetails extends React.Component {
-  static propTypes = { row: T.object.isRequired };
+  static propTypes = {
+    row: T.object.isRequired,
+    timeZone: T.string.isRequired
+  };
 
   constructor(props) {
     super(props);
@@ -35,7 +38,6 @@ export default class JobDetails extends React.Component {
         }
       }
     };
-    window.myState = this.state;
   }
 
   componentDidMount() {
@@ -51,23 +53,17 @@ export default class JobDetails extends React.Component {
     const url = row._links.self.href;
     fetch(url).done(job => {
       this.setState({ job });
-
       $.when(
         fetch(job._links.cluster.href),
         fetch(job._links.command.href),
         fetch(job._links.applications.href)
-      )
-        .done((clusters, commands, applications) => {
-          console.log(applications);
-          this.setState({
-            cluster: clusters[0],
-            command: commands[0],
-            applications: applications[0]
-          });
-        })
-        .fail(xhr => {
-          this.setState({ error: xhr.responseJSON });
+      ).done((clusters, commands, applications) => {
+        this.setState({
+          cluster: clusters[0],
+          command: commands[0],
+          applications: applications[0]
         });
+      });
     });
   }
 
@@ -141,12 +137,20 @@ export default class JobDetails extends React.Component {
                   <td>{this.state.job.statusMsg}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2 align-right">Created:</td>
-                  <td>{momentFormat(this.state.job.created)}</td>
+                  <td className="col-xs-2 align-right">
+                    {`Created (${this.props.timeZone})`}:
+                  </td>
+                  <td>
+                    {momentFormat(this.state.job.created, this.props.timeZone)}
+                  </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2 align-right">Updated:</td>
-                  <td>{momentFormat(this.state.job.updated)}</td>
+                  <td className="col-xs-2 align-right">
+                    {`Updated (${this.props.timeZone})`}:
+                  </td>
+                  <td>
+                    {momentFormat(this.state.job.updated, this.props.timeZone)}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Archive Location:</td>
