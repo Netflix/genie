@@ -2,8 +2,8 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     repositories {
-        gradlePluginPortal()
         jcenter()
+        gradlePluginPortal()
     }
 
     dependencies {
