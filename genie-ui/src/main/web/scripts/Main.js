@@ -55,9 +55,7 @@ export default class App extends React.Component {
       <div>
         <SiteHeader headers={this.props.headers} infos={this.state.infos} />
         <AuthCheck />
-        <div className="container">
-          {this.props.children}
-        </div>
+        <div className="container">{this.props.children}</div>
         <SiteFooter version={this.state.version} />
       </div>
     );
