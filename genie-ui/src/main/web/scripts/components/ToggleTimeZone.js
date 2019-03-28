@@ -48,6 +48,7 @@ export default class ToggleTimeZone extends React.Component {
           </div>
         }
         onColor="#B9090A"
+        offColor="#353331"
         onHandleColor="#FFFFFF"
         handleDiameter={30}
         boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
