@@ -95,13 +95,18 @@ export default class Page extends React.Component {
 
   render() {
     const sideBar = this.state.showSearchForm ? (
-      <SearchForm
-        query={this.state.query}
-        formFields={this.formFields}
-        hiddenFormFields={this.hiddenFormFields}
-        toggleSearchForm={this.toggleSearchForm}
-        searchPath={this.searchPath}
-      />
+      <div>
+        <div className="text-muted search-hint">
+          <i>** Use % for wildcard search</i>
+        </div>
+        <SearchForm
+          query={this.state.query}
+          formFields={this.formFields}
+          hiddenFormFields={this.hiddenFormFields}
+          toggleSearchForm={this.toggleSearchForm}
+          searchPath={this.searchPath}
+        />
+      </div>
     ) : (
       <SearchBar toggleSearchForm={this.toggleSearchForm} />
     );

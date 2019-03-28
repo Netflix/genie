@@ -163,6 +163,11 @@ div .container {
 .timezone-text {
     padding-right: 10px;
 }
+
+.search-hint {
+    padding-left: 20px;
+    padding-bottom: 20px;
+}
 /*
 a {
     text-decoration: none;
