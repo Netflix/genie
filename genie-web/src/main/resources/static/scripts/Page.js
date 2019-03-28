@@ -69,7 +69,8 @@ export default class Page extends React.Component {
       query = { size: 100 };
     }
     const { rowId = null, showSearchForm = "true" } = query;
-    this.setState({ query });
+    // Empty data array indicates page is loading!!
+    this.setState({ query, data: [] });
 
     fetch(this.url, query)
       .done(data => {
