@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,20 +18,27 @@
 package com.netflix.genie.agent.rpc;
 
 import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration;
+import com.netflix.genie.proto.HeartBeatServiceGrpc;
+import com.netflix.genie.proto.JobKillServiceGrpc;
+import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.PingServiceGrpc;
+import io.grpc.ClientInterceptor;
 import io.grpc.ManagedChannel;
+import io.grpc.stub.AbstractStub;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Test for {@link GRpcAutoConfiguration}.
+ * Test for {@link GRpcServicesAutoConfiguration}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
@@ -45,32 +52,60 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class GRpcAutoConfigurationIntegrationTest {
 
     @Autowired
-    private ManagedChannel managedChannel1;
-    @Autowired
-    private ManagedChannel managedChannel2;
-    @Autowired
-    private PingServiceGrpc.PingServiceFutureStub pingServiceClient1;
-    @Autowired
-    private PingServiceGrpc.PingServiceFutureStub pingServiceClient2;
+    private ApplicationContext applicationContext;
 
     /**
      * Check that channel is a singleton.
      */
     @Test
-    public void channel() {
-        Assert.assertNotNull(managedChannel1);
-        Assert.assertNotNull(managedChannel2);
-        Assert.assertSame(managedChannel1, managedChannel2);
+    public void channelBean() {
+        final ManagedChannel channel1 = applicationContext.getBean(ManagedChannel.class);
+        final ManagedChannel channel2 = applicationContext.getBean(ManagedChannel.class);
+        Assert.assertNotNull(channel1);
+        Assert.assertNotNull(channel2);
+        Assert.assertSame(channel1, channel2);
     }
 
     /**
-     * Check that clients are not singletons.
+     * Check that all gRPC client stubs are available in context, that they are prototype and not singletons and that
+     * they all share a single channel singleton.
      */
     @Test
-    public void pingServiceClient() {
-        Assert.assertNotNull(pingServiceClient1);
-        Assert.assertNotNull(pingServiceClient2);
-        Assert.assertNotSame(pingServiceClient1, pingServiceClient2);
+    public void clientsBeans() {
+
+        Assert.assertNotNull(applicationContext);
+
+        final Class<?>[] clientStubClasses = {
+            PingServiceGrpc.PingServiceFutureStub.class,
+            JobServiceGrpc.JobServiceFutureStub.class,
+            HeartBeatServiceGrpc.HeartBeatServiceStub.class,
+            JobKillServiceGrpc.JobKillServiceFutureStub.class,
+        };
+
+        for (final Class<?> clientStubClass : clientStubClasses) {
+            final AbstractStub stub1 = (AbstractStub) applicationContext.getBean(clientStubClass);
+            final AbstractStub stub2 = (AbstractStub) applicationContext.getBean(clientStubClass);
+            Assert.assertNotNull(stub1);
+            Assert.assertNotNull(stub2);
+            Assert.assertNotSame(stub1, stub2);
+            Assert.assertSame(stub1.getChannel(), stub2.getChannel());
+        }
+    }
+
+    /**
+     * Check that interceptor beans are resolved.
+     */
+    @Test
+    public void interceptorBeans() {
+
+        final Class<?>[] interceptorClasses = {
+            ChannelLoggingInterceptor.class,
+        };
+
+        for (final Class<?> interceptorClass : interceptorClasses) {
+            final ClientInterceptor interceptor = (ClientInterceptor) applicationContext.getBean(interceptorClass);
+            Assert.assertNotNull(interceptor);
+        }
     }
 
     @Configuration

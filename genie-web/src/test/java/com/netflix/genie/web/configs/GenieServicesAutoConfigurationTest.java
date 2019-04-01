@@ -22,10 +22,20 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
+import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
+import com.netflix.genie.web.properties.FileCacheProperties;
+import com.netflix.genie.web.properties.JobsActiveLimitProperties;
+import com.netflix.genie.web.properties.JobsCleanupProperties;
+import com.netflix.genie.web.properties.JobsForwardingProperties;
+import com.netflix.genie.web.properties.JobsLocationsProperties;
+import com.netflix.genie.web.properties.JobsMaxProperties;
+import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
+import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobPersistenceService;
@@ -33,6 +43,7 @@ import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
+import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -53,9 +64,8 @@ import java.util.UUID;
  * @author amsharma
  * @since 3.0.0
  */
-public class ServicesAutoConfigurationTest {
+public class GenieServicesAutoConfigurationTest {
 
-    private JobSearchService jobSearchService;
     private GenieServicesAutoConfiguration genieServicesAutoConfiguration;
 
     /**
@@ -63,9 +73,84 @@ public class ServicesAutoConfigurationTest {
      */
     @Before
     public void setUp() {
-        this.jobSearchService = Mockito.mock(JobSearchService.class);
-
         this.genieServicesAutoConfiguration = new GenieServicesAutoConfiguration();
+    }
+
+
+    /**
+     * Can get jobs properties bean.
+     */
+    @Test
+    public void canGetJobPropertiesBean() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.jobsProperties(
+                Mockito.mock(JobsCleanupProperties.class),
+                Mockito.mock(JobsForwardingProperties.class),
+                Mockito.mock(JobsLocationsProperties.class),
+                Mockito.mock(JobsMaxProperties.class),
+                Mockito.mock(JobsMemoryProperties.class),
+                Mockito.mock(JobsUsersProperties.class),
+                Mockito.mock(ExponentialBackOffTriggerProperties.class),
+                Mockito.mock(JobsActiveLimitProperties.class)
+            )
+        );
+    }
+
+    /**
+     * Can get a bean for killing V3 jobs.
+     */
+    @Test
+    public void canGetJobKillServiceV3Bean() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.jobKillServiceV3(
+                new GenieHostInfo("localhost"),
+                Mockito.mock(JobSearchService.class),
+                Mockito.mock(Executor.class),
+                JobsProperties.getJobsPropertiesDefaults(),
+                Mockito.mock(GenieEventBus.class),
+                Mockito.mock(FileSystemResource.class),
+                GenieObjectMapper.getMapper()
+            )
+        );
+    }
+
+    /**
+     * Can get a bean for Job Kill Service.
+     */
+    @Test
+    public void canGetJobKillServiceBean() {
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.jobKillService(
+                Mockito.mock(JobKillServiceV3.class),
+                Mockito.mock(JobKillServiceV4.class),
+                Mockito.mock(JobPersistenceService.class)
+            )
+        );
+    }
+
+    /**
+     * Can get the fallback V4 Kill service.
+     *
+     * @throws GenieException in case of error
+     */
+    @Test(expected = NotImplementedException.class)
+    public void canGetFallbackJobKillServiceV4Bean() throws GenieException {
+        final JobKillServiceV4 service = this.genieServicesAutoConfiguration.fallbackJobKillServiceV4();
+        Assert.assertNotNull(service);
+
+        service.killJob(UUID.randomUUID().toString(), "test");
+        Assert.fail("Expected exception");
+    }
+
+
+    /**
+     * Confirm we can get a GenieFileTransfer instance.
+     *
+     * @throws GenieException If there is any problem.
+     */
+    @Test
+    public void canGetGenieFileTransferServiceBean() throws GenieException {
+        Assert.assertNotNull(this.genieServicesAutoConfiguration.genieFileTransferService(scheme -> null));
     }
 
     /**
@@ -74,8 +159,17 @@ public class ServicesAutoConfigurationTest {
      * @throws GenieException If there is any problem.
      */
     @Test
-    public void canGetGenieFileTransfer() throws GenieException {
-        Assert.assertNotNull(this.genieServicesAutoConfiguration.genieFileTransferService(scheme -> null));
+    public void canGetCacheGenieFileTransferServiceBean() throws GenieException {
+        final FileCacheProperties cacheProperties = Mockito.mock(FileCacheProperties.class);
+        Mockito.when(cacheProperties.getLocation()).thenReturn(".");
+        Assert.assertNotNull(
+            this.genieServicesAutoConfiguration.cacheGenieFileTransferService(
+                Mockito.mock(FileTransferFactory.class),
+                cacheProperties,
+                Mockito.mock(LocalFileTransferImpl.class),
+                Mockito.mock(MeterRegistry.class)
+            )
+        );
     }
 
     /**
@@ -119,51 +213,5 @@ public class ServicesAutoConfigurationTest {
                 new GenieHostInfo(UUID.randomUUID().toString())
             )
         );
-    }
-
-    /**
-     * Can get a bean for Job Kill Service.
-     */
-    @Test
-    public void canGetJobKillServiceBean() {
-        Assert.assertNotNull(
-            this.genieServicesAutoConfiguration.jobKillService(
-                Mockito.mock(JobKillServiceV3.class),
-                Mockito.mock(JobKillServiceV4.class),
-                Mockito.mock(JobPersistenceService.class)
-            )
-        );
-    }
-
-    /**
-     * Can get a bean for killing V3 jobs.
-     */
-    @Test
-    public void canGetJobKillServiceV3Bean() {
-        Assert.assertNotNull(
-            this.genieServicesAutoConfiguration.jobKillServiceV3(
-                new GenieHostInfo("localhost"),
-                this.jobSearchService,
-                Mockito.mock(Executor.class),
-                JobsProperties.getJobsPropertiesDefaults(),
-                Mockito.mock(GenieEventBus.class),
-                Mockito.mock(FileSystemResource.class),
-                GenieObjectMapper.getMapper()
-            )
-        );
-    }
-
-    /**
-     * Can get the fallback V4 Kill service.
-     *
-     * @throws GenieException in case of error
-     */
-    @Test(expected = NotImplementedException.class)
-    public void canGetFallbackJobKillServiceV4() throws GenieException {
-        final JobKillServiceV4 service = this.genieServicesAutoConfiguration.fallbackJobKillServiceV4();
-        Assert.assertNotNull(service);
-
-        service.killJob(UUID.randomUUID().toString(), "test");
-        Assert.fail("Expected exception");
     }
 }
