@@ -30,7 +30,7 @@ import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProvider
 import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
 
 /**
- * Tests for behavior of {@link AwsAutoConfiguration}.
+ * Tests for behavior of {@link CommonServicesAutoConfiguration}.
  *
  * @author tgianos
  * @since 4.0.0

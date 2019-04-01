@@ -24,9 +24,7 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
-import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.proto.PingServiceGrpc;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,18 +41,6 @@ import javax.validation.Validator;
  */
 @Configuration
 public class CliAutoConfiguration {
-
-    /**
-     * Provide a bean for proto conversion of job service objects if one isn't already defined.
-     *
-     * @return A {@link JobServiceProtoConverter} instance.
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobServiceProtoConverter.class)
-    public JobServiceProtoConverter jobServiceProtoConverter() {
-        return new JobServiceProtoConverter();
-    }
-
     /**
      * Provide a bean for cache command line arguments.
      *
