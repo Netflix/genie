@@ -26,6 +26,7 @@ import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConf
 import com.netflix.genie.agent.execution.statemachine.StateMachineAutoConfiguration;
 import com.netflix.genie.agent.execution.statemachine.actions.StateMachineActionsAutoConfiguration;
 import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
+import com.netflix.genie.common.internal.configs.ProtoConvertersAutoConfiguration;
 import com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,7 +59,8 @@ import java.util.stream.Collectors;
         AgentAutoConfiguration.class,
         ServicesAutoConfiguration.class,
         ValidationAutoConfiguration.class,
-        CommonServicesAutoConfiguration.class
+        CommonServicesAutoConfiguration.class,
+        ProtoConvertersAutoConfiguration.class
     }
 )
 // TODO: Do we want this to just use the application context runner and be a unit test or full blown integration test?

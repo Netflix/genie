@@ -45,7 +45,6 @@ import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -62,7 +61,6 @@ import java.util.stream.Collectors;
  * @see com.netflix.genie.proto
  * @since 4.0.0
  */
-@Component
 public class JobServiceProtoConverter {
 
     private static com.netflix.genie.proto.JobSpecification toProtoJobSpecification(
