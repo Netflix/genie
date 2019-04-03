@@ -16,43 +16,23 @@
  *
  */
 
-CREATE TABLE `command_executable_arguments` (
+CREATE TABLE `command_executable_arguments`
+(
   `command_id`     BIGINT(20)    NOT NULL,
   `argument`       VARCHAR(1024) NOT NULL,
   `argument_order` INT(11)       NOT NULL,
   PRIMARY KEY (`command_id`, `argument_order`),
   CONSTRAINT `COMMAND_EXECUTABLE_ARGUMENTS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
-  ON DELETE CASCADE
+    ON DELETE CASCADE
 );
 
 CREATE INDEX `COMMAND_EXECUTABLE_ARGUMENTS_COMMAND_ID_INDEX`
   ON `command_executable_arguments` (`command_id`);
 
--- DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
---
--- CREATE ALIAS SPLIT_COMMAND_EXECUTABLE AS $$
--- import java.sql.Connection;
--- import java.sql.ResultSet;
--- @CODE
--- void splitCommandExecutable(final Connection con) throws Exception {
--- 	final ResultSet rs = con.createStatement().executeQuery("SELECT `id`, `executable` FROM `commands`;");
---
--- 	while (rs.next()) {
--- 	    final long commandId = rs.getLong(1);
--- 	    final String executable = rs.getString(2);
---       final String[] arguments = executable.split("\\s");
---       for (int i = 0; i < arguments.length; i++) {
---           con
---               .createStatement()
---               .executeUpdate("INSERT INTO `command_executable_arguments` VALUES (" + commandId + ", '" + arguments[i] + "', " + i + ");");
---       }
--- 	}
--- }
--- $$;
---
--- CALL SPLIT_COMMAND_EXECUTABLE();
---
--- DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
+DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
+CREATE ALIAS SPLIT_COMMAND_EXECUTABLE FOR "com.netflix.genie.web.jpa.utils.H2Utils.splitV3CommandExecutableForV4";
+CALL SPLIT_COMMAND_EXECUTABLE();
+DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
 
 ALTER TABLE `applications`
   ADD COLUMN `requested_id` BOOLEAN NOT NULL DEFAULT FALSE;
@@ -74,25 +54,27 @@ ALTER TABLE `criteria`
 ALTER TABLE `criteria`
   ADD COLUMN `status` VARCHAR(255) DEFAULT NULL;
 
-CREATE TABLE `job_requested_environment_variables` (
+CREATE TABLE `job_requested_environment_variables`
+(
   `job_id` BIGINT(20)    NOT NULL,
   `name`   VARCHAR(255)  NOT NULL,
   `value`  VARCHAR(1024) NOT NULL,
   PRIMARY KEY (`job_id`, `name`),
   CONSTRAINT `JOB_REQUESTED_ENVIRONMENT_VARIABLES_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
-  ON DELETE CASCADE
+    ON DELETE CASCADE
 );
 
 CREATE INDEX `JOB_REQUESTED_ENVIRONMENT_VARIABLES_JOB_ID_INDEX`
   ON `job_requested_environment_variables` (`job_id`);
 
-CREATE TABLE `job_environment_variables` (
+CREATE TABLE `job_environment_variables`
+(
   `job_id` BIGINT(20)    NOT NULL,
   `name`   VARCHAR(255)  NOT NULL,
   `value`  VARCHAR(1024) NOT NULL,
   PRIMARY KEY (`job_id`, `name`),
   CONSTRAINT `JOB_ENVIRONMENT_VARIABLES_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
-  ON DELETE CASCADE
+    ON DELETE CASCADE
 );
 
 CREATE INDEX `JOB_ENVIRONMENT_VARIABLES_JOB_ID_INDEX`
@@ -158,13 +140,14 @@ ALTER INDEX `JOB_APPLICATIONS_REQUESTED_APPLICATION_ID_INDEX`
 ALTER INDEX `JOB_APPLICATIONS_REQUESTED_JOB_ID_INDEX`
   RENAME TO `JOB_REQUESTED_APPLICATIONS_JOB_ID_INDEX`;
 
-CREATE TABLE `agent_connections` (
-  `id`              BIGINT(20)    NOT NULL     AUTO_INCREMENT,
-  `created`         DATETIME(3)   NOT NULL     DEFAULT CURRENT_TIMESTAMP(3),
-  `updated`         DATETIME(3)   NOT NULL     DEFAULT CURRENT_TIMESTAMP(3),
-  `entity_version`  INT(11)       NOT NULL     DEFAULT '0',
-  `job_id`          VARCHAR(255)  NOT NULL,
-  `server_hostname` VARCHAR(255)  NOT NULL,
+CREATE TABLE `agent_connections`
+(
+  `id`              BIGINT(20)   NOT NULL AUTO_INCREMENT,
+  `created`         DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated`         DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `entity_version`  INT(11)      NOT NULL DEFAULT '0',
+  `job_id`          VARCHAR(255) NOT NULL,
+  `server_hostname` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
 
