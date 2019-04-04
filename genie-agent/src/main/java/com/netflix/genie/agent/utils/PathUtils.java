@@ -210,4 +210,16 @@ public final class PathUtils {
             JobConstants.STDERR_LOG_FILE_NAME
         );
     }
+
+    /**
+     * Compose the path to the agent log file for a job (after it has been relocated inside the job directory).
+     * @param jobDirectory the job directory
+     * @return a Path
+     */
+    public static Path jobAgentLogFilePath(final File jobDirectory) {
+        return composePath(
+            jobGenieLogsDirectoryPath(jobDirectory),
+            JobConstants.GENIE_AGENT_LOG_FILE_NAME
+        );
+    }
 }

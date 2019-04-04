@@ -21,6 +21,7 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.CleanupStrategy;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
@@ -132,6 +133,9 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             final File jobDirectory = setupJobDirectory(claimedJobId, jobSpecification);
             executionContext.setJobDirectory(jobDirectory);
 
+            // Move the agent log file inside the job folder
+            relocateAgentLogFile(jobDirectory);
+
             // Start manifest service, allowing server to browse and request files.
             this.fileManifestService.start(claimedJobId, jobDirectory.toPath());
 
@@ -146,6 +150,16 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         }
 
         return Events.SETUP_JOB_COMPLETE;
+    }
+
+    private void relocateAgentLogFile(final File jobDirectory) {
+        final Path destinationPath = PathUtils.jobAgentLogFilePath(jobDirectory);
+        log.info("Relocating agent log file to: {}", destinationPath);
+        try {
+            UserConsole.relocateLogFile(destinationPath);
+        } catch (IOException e) {
+            log.error("Failed to relocate agent log file", e);
+        }
     }
 
     @Override
