@@ -476,7 +476,13 @@ public final class DtoConverters {
             .collect(Collectors.toSet());
     }
 
-    static ImmutableSet<String> toV3CriterionTags(final Criterion criterion) {
+    /**
+     * Convert a given V4 {@code criterion} to the equivalent representation in V3 set of tags.
+     *
+     * @param criterion The {@link Criterion} to convert
+     * @return A set of String's representing the criterion tags as they would have looked in V3
+     */
+    public static ImmutableSet<String> toV3CriterionTags(final Criterion criterion) {
         final ImmutableSet.Builder<String> tags = ImmutableSet.builder();
         criterion.getId().ifPresent(id -> tags.add(GENIE_ID_PREFIX + id));
         criterion.getName().ifPresent(name -> tags.add(GENIE_NAME_PREFIX + name));
@@ -484,7 +490,13 @@ public final class DtoConverters {
         return tags.build();
     }
 
-    private static ClusterCriteria toClusterCriteria(final Criterion criterion) {
+    /**
+     * Convert the given {@code criterion} to a V3 {@link ClusterCriteria} object.
+     *
+     * @param criterion The {@link Criterion} to convert
+     * @return The V3 criteria object
+     */
+    public static ClusterCriteria toClusterCriteria(final Criterion criterion) {
         return new ClusterCriteria(toV3CriterionTags(criterion));
     }
 

@@ -233,10 +233,7 @@ public final class EntityDtoConverters {
         final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder = new JobArchivalDataRequest.Builder();
         jobRequestProjection
             .getRequestedArchiveLocationPrefix()
-            .ifPresent(
-                requestedArchiveLocationPrefix -> jobArchivalDataRequestBuilder
-                    .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-            );
+            .ifPresent(jobArchivalDataRequestBuilder::withRequestedArchiveLocationPrefix);
 
         // Rebuild the Agent Environment Request
         final AgentEnvironmentRequest.Builder agentEnvironmentRequestBuilder = new AgentEnvironmentRequest.Builder();
@@ -260,7 +257,13 @@ public final class EntityDtoConverters {
         );
     }
 
-    private static Criterion toCriterionDto(final CriterionEntity criterionEntity) {
+    /**
+     * Convert a given {@link CriterionEntity} to the equivalent {@link Criterion} DTO representation.
+     *
+     * @param criterionEntity The entity to convert
+     * @return The DTO representation
+     */
+    public static Criterion toCriterionDto(final CriterionEntity criterionEntity) {
         final Criterion.Builder builder = new Criterion.Builder();
         criterionEntity.getUniqueId().ifPresent(builder::withId);
         criterionEntity.getName().ifPresent(builder::withName);

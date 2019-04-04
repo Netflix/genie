@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommonDTO;
 import com.netflix.genie.common.dto.Job;
@@ -30,11 +29,11 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.BaseEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
-import com.netflix.genie.web.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.projections.BaseProjection;
@@ -42,6 +41,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
+import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -191,14 +191,12 @@ public final class JpaServiceUtils {
             jobRequestProjection
                 .getClusterCriteria()
                 .stream()
-                .map(JpaServiceUtils::toClusterCriteriaDto)
+                .map(EntityDtoConverters::toCriterionDto)
+                .map(DtoConverters::toClusterCriteria)
                 .collect(Collectors.toList()),
-            jobRequestProjection
-                .getCommandCriterion()
-                .getTags()
-                .stream()
-                .map(TagEntity::getTag)
-                .collect(Collectors.toSet())
+            DtoConverters.toV3CriterionTags(
+                EntityDtoConverters.toCriterionDto(jobRequestProjection.getCommandCriterion())
+            )
         )
             .withCreated(jobRequestProjection.getCreated())
             .withId(jobRequestProjection.getUniqueId())
@@ -236,16 +234,6 @@ public final class JpaServiceUtils {
         setDtoMetadata(builder, jobRequestProjection);
 
         return builder.build();
-    }
-
-    private static ClusterCriteria toClusterCriteriaDto(final CriterionEntity clusterCriterionEntity) {
-        return new ClusterCriteria(
-            clusterCriterionEntity
-                .getTags()
-                .stream()
-                .map(TagEntity::getTag)
-                .collect(Collectors.toSet())
-        );
     }
 
     static JobExecution toJobExecutionDto(final JobExecutionProjection jobExecutionProjection) {
