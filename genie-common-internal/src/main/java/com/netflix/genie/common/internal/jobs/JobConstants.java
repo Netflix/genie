@@ -173,6 +173,11 @@ public final class JobConstants {
     public static final String GENIE_AGENT_ENV_SCRIPT_RESOURCE = "genie-env.sh";
 
     /**
+     * Genie Agent log file name (after it is relocated inside the job directory).
+     */
+    public static final String GENIE_AGENT_LOG_FILE_NAME = "agent.log";
+
+    /**
      * File Path prefix to be used while creating directories for application files to local dir.
      **/
     public static final String APPLICATION_PATH_VAR = "applications";

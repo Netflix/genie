@@ -76,5 +76,6 @@ class PathUtilsSpec extends Specification {
         PathUtils.&jobGenieLogsDirectoryPath | jobDirectoryStr + "/genie/logs"
         PathUtils.&jobStdOutPath             | jobDirectoryStr + "/stdout"
         PathUtils.&jobStdErrPath             | jobDirectoryStr + "/stderr"
+        PathUtils.&jobAgentLogFilePath       | jobDirectoryStr + "/genie/logs/agent.log"
     }
 }
