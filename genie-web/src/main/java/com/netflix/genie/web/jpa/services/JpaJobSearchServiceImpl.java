@@ -254,6 +254,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
         log.debug("Called with id {}", id);
         return this.jobRepository

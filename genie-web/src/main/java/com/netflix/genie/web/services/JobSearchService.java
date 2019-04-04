@@ -119,7 +119,9 @@ public interface JobSearchService {
      * @param id The id of the job to get status for
      * @return The job status
      * @throws GenieException When any error, including not found, is encountered
+     * @deprecated Use {@link JobPersistenceService#getJobStatus(String)} instead
      */
+    @Deprecated
     JobStatus getJobStatus(@NotBlank String id) throws GenieException;
 
     /**
