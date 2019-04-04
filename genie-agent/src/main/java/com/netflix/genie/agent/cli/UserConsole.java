@@ -28,8 +28,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Utilities for interacting with the user terminal/console.
@@ -46,12 +51,22 @@ public final class UserConsole {
     private static final String CONSOLE_LOGGER_NAME = "genie-agent";
     /**
      * This string path must match the one present in the log appender configuration consumed by Spring.
+     * It represents the initial location of the agent log file.
      */
     private static final String LOG_FILE_PATH = "/tmp/genie-agent-%s.log";
     /**
      * This system property is set by Spring.
      */
     private static final String PID_SYSTEM_PROPERTY_NAME = "PID";
+
+    /**
+     * Stores the current location of the log file.
+     * The logfile starts in a temporary location but may move inside the job folder during execution.
+     */
+    private static final AtomicReference<Path> CURRENT_LOG_FILE_PATH = new AtomicReference<>(
+        Paths.get(String.format(LOG_FILE_PATH, System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???")))
+    );
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CONSOLE_LOGGER_NAME);
 
     /**
@@ -75,10 +90,7 @@ public final class UserConsole {
     }
 
     static String getLogFilePath() {
-        return String.format(
-            LOG_FILE_PATH,
-            System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???")
-        );
+        return CURRENT_LOG_FILE_PATH.get().toString();
     }
 
     /**
@@ -108,5 +120,32 @@ public final class UserConsole {
             System.err.println("Failed to print banner: " + t.getMessage());
             t.printStackTrace(System.err);
         }
+    }
+
+    /**
+     * Move the log file from the current position to the given destination.
+     * Refuses to move across filesystems. Moving within the same filesystem should not invalidate any open descriptors.
+     *
+     * @param destinationPath destination path
+     * @throws IOException if source and destination are on different filesystem devices, if destination exists, or if
+     *                     the move fails.
+     */
+    public static synchronized void relocateLogFile(final Path destinationPath) throws IOException {
+
+        final Path sourcePath = CURRENT_LOG_FILE_PATH.get();
+        final Path destinationAbsolutePath = destinationPath.toAbsolutePath();
+
+        if (!Files.exists(sourcePath)) {
+            throw new IOException("Log file does not exists: " + sourcePath.toString());
+        } else if (Files.exists(destinationAbsolutePath)) {
+            throw new IOException("Destination already exists: " + destinationAbsolutePath.toString());
+        } else if (!sourcePath.getFileSystem().provider().equals(destinationAbsolutePath.getFileSystem().provider())) {
+            throw new IOException("Source and destination are not in the same filesystem");
+        }
+
+        Files.move(sourcePath, destinationAbsolutePath);
+        CURRENT_LOG_FILE_PATH.set(destinationAbsolutePath);
+
+        getLogger().info("Agent log file relocated to: " + getLogFilePath());
     }
 }
