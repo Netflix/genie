@@ -383,6 +383,7 @@
 
     <criteria
         id="0"
+        name="spark"
     />
     <criteria_tags
         criterion_id="0"
@@ -444,6 +445,8 @@
     />
     <criteria
         id="1"
+        unique_id="cluster1"
+        name="h2query"
     />
     <criteria_tags
         criterion_id="1"
@@ -529,11 +532,11 @@
         id="4"
     />
     <criteria_tags
-        criterion_id="3"
+        criterion_id="4"
         tag_id="17"
     />
     <criteria_tags
-        criterion_id="3"
+        criterion_id="4"
         tag_id="12"
     />
     <jobs_cluster_criteria

@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobMetadata;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -324,9 +325,37 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
      */
     @Test
     public void canGetJobRequest() throws GenieException {
+        final JobRequest job1Request = this.service.getJobRequest(JOB_1_ID);
         Assert.assertThat(
-            this.service.getJobRequest(JOB_1_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            job1Request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
             Matchers.is("-f query.q")
+        );
+        Assert.assertThat(
+            job1Request.getClusterCriterias().size(),
+            Matchers.is(2)
+        );
+        final Set<String> clusterCriterion0Tags = job1Request.getClusterCriterias().get(0).getTags();
+        Assert.assertThat(
+            clusterCriterion0Tags.size(),
+            Matchers.is(4)
+        );
+        Assert.assertThat(
+            clusterCriterion0Tags,
+            Matchers.is(Sets.newHashSet("genie.id:cluster1", "genie.name:h2query", "sla", "yarn"))
+        );
+        final Set<String> clusterCriterion1Tags = job1Request.getClusterCriterias().get(1).getTags();
+        Assert.assertThat(
+            clusterCriterion1Tags.size(),
+            Matchers.is(2)
+        );
+        Assert.assertThat(
+            clusterCriterion1Tags,
+            Matchers.is(Sets.newHashSet("sla", "adhoc"))
+        );
+        final Set<String> commandCriterionTags = job1Request.getCommandCriteria();
+        Assert.assertThat(
+            commandCriterionTags,
+            Matchers.is(Sets.newHashSet("type:spark", "ver:1.6.0", "genie.name:spark"))
         );
         Assert.assertThat(
             this.service.getJobRequest(JOB_2_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
