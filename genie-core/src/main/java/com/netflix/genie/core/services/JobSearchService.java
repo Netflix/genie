@@ -25,6 +25,8 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.UserJobCount;
+import com.netflix.genie.common.dto.UserMemoryAmount;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
@@ -193,4 +195,18 @@ public interface JobSearchService {
      * @throws GenieException If any error occurs
      */
     JobMetadata getJobMetadata(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get the number of active jobs for each user.
+     *
+     * @return A list of {@link UserJobCount}
+     */
+    List<UserJobCount> getActiveJobCountsPerUser();
+
+    /**
+     * Get the amount of memory used by active job for each user.
+     *
+     * @return A list of {@link UserMemoryAmount}
+     */
+    List<UserMemoryAmount> getActiveJobMemoryPerUser();
 }

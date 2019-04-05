@@ -26,6 +26,8 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.UserJobCount;
+import com.netflix.genie.common.dto.UserMemoryAmount;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -378,5 +380,27 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 .findByUniqueId(id, JobMetadataProjection.class)
                 .orElseThrow(() -> new GenieNotFoundException("No job metadata found for id " + id))
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserJobCount> getActiveJobCountsPerUser() {
+        return this.jobRepository.getUsersJobCount(JobStatus.getActiveStatuses())
+            .stream()
+            .map(JpaServiceUtils::toUserJobCountDto)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserMemoryAmount> getActiveJobMemoryPerUser() {
+        return this.jobRepository.getUsersJobsTotalMemory(JobStatus.getActiveStatuses())
+            .stream()
+            .map(JpaServiceUtils::toUserMemoryAmountDto)
+            .collect(Collectors.toList());
     }
 }

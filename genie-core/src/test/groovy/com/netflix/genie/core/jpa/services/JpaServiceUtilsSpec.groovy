@@ -22,6 +22,7 @@ import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.*
 import com.netflix.genie.core.jpa.entities.*
+import com.netflix.genie.core.jpa.entities.projections.UserJobAmountAggregateProjection
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import org.apache.commons.lang3.StringUtils
@@ -524,5 +525,35 @@ class JpaServiceUtilsSpec extends Specification {
         request.getTimeout().orElseGet(RandomSuppliers.INT) == timeout
         request.getMetadata().isPresent()
         this.mapper.writeValueAsString(request.getMetadata().get()) == metadata
+    }
+
+    def "Can convert UserJobAmountAggregateProjection to UserJobCount DTO"() {
+        String user = "some-user"
+        int count = 123
+        UserJobAmountAggregateProjection projection = Mock(UserJobAmountAggregateProjection)
+
+        when:
+        UserJobCount userJobCount = JpaServiceUtils.toUserJobCountDto(projection)
+
+        then:
+        1 * projection.getUser() >> user
+        1 * projection.getAmount() >> count
+        userJobCount.getUser() == user
+        userJobCount.getCount() == count
+    }
+
+    def "Can convert UserJobAmountAggregateProjection to UserMemoryAmount DTO"() {
+        String user = "some-user"
+        int amount = 123
+        UserJobAmountAggregateProjection projection = Mock(UserJobAmountAggregateProjection)
+
+        when:
+        UserMemoryAmount userMemoryAmount = JpaServiceUtils.toUserMemoryAmountDto(projection)
+
+        then:
+        1 * projection.getUser() >> user
+        1 * projection.getAmount() >> amount
+        userMemoryAmount.getUser() == user
+        userMemoryAmount.getAmount() == amount
     }
 }

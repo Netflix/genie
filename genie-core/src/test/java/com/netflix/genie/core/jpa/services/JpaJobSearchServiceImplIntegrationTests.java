@@ -24,6 +24,8 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.UserJobCount;
+import com.netflix.genie.common.dto.UserMemoryAmount;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -447,5 +449,30 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(jobMetadata.getTotalSizeOfAttachments(), Matchers.is(Optional.of(38083L)));
         Assert.assertThat(jobMetadata.getStdErrSize(), Matchers.is(Optional.empty()));
         Assert.assertThat(jobMetadata.getStdOutSize(), Matchers.is(Optional.empty()));
+    }
+
+    /**
+     * Make sure the getting active job counts per user method works.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetActiveJobCountsPerUser() throws GenieException {
+        final List<UserJobCount> jobCounts = this.service.getActiveJobCountsPerUser();
+        Assert.assertThat(jobCounts.size(), Matchers.is(1));
+        Assert.assertThat(jobCounts.get(0), Matchers.equalTo(new UserJobCount("tgianos", 2)));
+    }
+
+
+    /**
+     * Make sure the getting memory used by active job per user method works.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetActiveJobMemoryPerUser() throws GenieException {
+        final List<UserMemoryAmount> jobCounts = this.service.getActiveJobMemoryPerUser();
+        Assert.assertThat(jobCounts.size(), Matchers.is(1));
+        Assert.assertThat(jobCounts.get(0), Matchers.equalTo(new UserMemoryAmount("tgianos", 4096)));
     }
 }

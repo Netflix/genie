@@ -20,11 +20,14 @@ import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.projections.IdProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobHostNameProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
+import com.netflix.genie.core.jpa.entities.projections.UserJobAmountAggregateProjection;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -84,4 +87,26 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      */
     // TODO: Explore deleteFirst{N}ByCreatedBefore
     Slice<IdProjection> findByCreatedBefore(@NotNull final Date date, @NotNull Pageable pageable);
+
+    /**
+     * Produce a count of jobs in the given states for each user.
+     *
+     * @param statuses the job statuses to filter by
+     * @return a set of {@link UserJobAmountAggregateProjection}
+     */
+    @Query("SELECT j.user, COUNT(j) FROM JobEntity j WHERE j.status IN (:statuses) GROUP BY j.user")
+    Set<UserJobAmountAggregateProjection> getUsersJobCount(
+        @Param("statuses") @NotEmpty final Set<JobStatus> statuses
+    );
+
+    /**
+     * Produce a sum of memory used of all jobs in the given states for each user.
+     *
+     * @param statuses the job statuses to filter by
+     * @return a set of {@link UserJobAmountAggregateProjection}
+     */
+    @Query("SELECT j.user, SUM(j.memoryRequested) FROM JobEntity j WHERE j.status IN (:statuses) GROUP BY j.user")
+    Set<UserJobAmountAggregateProjection> getUsersJobsTotalMemory(
+        @Param("statuses") @NotEmpty final Set<JobStatus> statuses
+    );
 }
