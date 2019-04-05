@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.CopyOption;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,6 +32,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumSet;
 
 /**
  * An implementation of {@link JobArchiver} which attempts to copy the job directory somewhere else on the file
@@ -58,7 +60,12 @@ public class FileSystemJobArchiverImpl implements JobArchiver {
 
         try {
             log.debug("Attempting to archive job directory {} to {}", sourceString, targetString);
-            Files.walkFileTree(directory, new JobDirectoryCopier(directory, Paths.get(target)));
+            Files.walkFileTree(
+                directory,
+                EnumSet.of(FileVisitOption.FOLLOW_LINKS),
+                Integer.MAX_VALUE,
+                new JobDirectoryCopier(directory, Paths.get(target))
+            );
             log.debug("Successfully archived job directory {} to {}", sourceString, targetString);
             return true;
         } catch (final IOException ioe) {
