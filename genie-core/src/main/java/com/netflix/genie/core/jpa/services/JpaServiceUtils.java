@@ -29,6 +29,8 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.UserJobCount;
+import com.netflix.genie.common.dto.UserMemoryAmount;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.BaseEntity;
@@ -42,6 +44,7 @@ import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobRequestProjection;
+import com.netflix.genie.core.jpa.entities.projections.UserJobAmountAggregateProjection;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.stream.Collectors;
@@ -311,4 +314,23 @@ public final class JpaServiceUtils {
             entity.setMetadata(null);
         }
     }
+
+    static UserJobCount toUserJobCountDto(
+        final UserJobAmountAggregateProjection userJobAmountAggregateProjection
+    ) {
+        return new UserJobCount(
+            userJobAmountAggregateProjection.getUser(),
+            userJobAmountAggregateProjection.getAmount()
+        );
+    }
+
+    static UserMemoryAmount toUserMemoryAmountDto(
+        final UserJobAmountAggregateProjection userJobAmountAggregateProjection
+    ) {
+        return new UserMemoryAmount(
+            userJobAmountAggregateProjection.getUser(),
+            userJobAmountAggregateProjection.getAmount()
+        );
+    }
+
 }
