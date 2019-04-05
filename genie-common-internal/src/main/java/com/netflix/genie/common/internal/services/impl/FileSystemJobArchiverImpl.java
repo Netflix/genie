@@ -90,7 +90,12 @@ public class FileSystemJobArchiverImpl implements JobArchiver {
             try {
                 Files.copy(dir, newDirectory, COPY_OPTIONS);
             } catch (final IOException ioe) {
-                log.error("Unable to create target directory {}. Skipping source directory subtree", newDirectory, dir);
+                log.error(
+                    "Unable to create target directory {}. Skipping source directory {} subtree",
+                    newDirectory,
+                    dir,
+                    ioe
+                );
                 return FileVisitResult.SKIP_SUBTREE;
             }
             return FileVisitResult.CONTINUE;
