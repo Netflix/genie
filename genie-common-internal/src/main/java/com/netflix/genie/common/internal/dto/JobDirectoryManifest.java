@@ -40,7 +40,10 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystemLoopException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,6 +52,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -92,7 +96,8 @@ public class JobDirectoryManifest {
         // Walk the directory
         final ImmutableMap.Builder<String, ManifestEntry> builder = ImmutableMap.builder();
         final ManifestVisitor manifestVisitor = new ManifestVisitor(directory, builder, calculateFileChecksums);
-        Files.walkFileTree(directory, manifestVisitor);
+        final EnumSet<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+        Files.walkFileTree(directory, options, Integer.MAX_VALUE, manifestVisitor);
         this.entries = builder.build();
 
         final ImmutableSet.Builder<ManifestEntry> filesBuilder = ImmutableSet.builder();
@@ -274,6 +279,24 @@ public class JobDirectoryManifest {
             log.debug("Created manifest entry for file {}", entry);
             this.builder.put(entry.getPath(), entry);
             return FileVisitResult.CONTINUE;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public FileVisitResult visitFileFailed(final Path file, final IOException ioe) {
+            if (ioe instanceof FileSystemLoopException) {
+                log.warn("Detected file system cycle visiting while visiting {}. Skipping.", file, ioe);
+                return FileVisitResult.SKIP_SUBTREE;
+            } else if (ioe instanceof AccessDeniedException) {
+                log.warn("Access denied for file {}. Skipping", file, ioe);
+                return FileVisitResult.SKIP_SUBTREE;
+            } else {
+                log.error("Got unknown error {} while visiting {}. Terminating visitor", ioe.getMessage(), file, ioe);
+                // TODO: Not sure if we should do this or skip subtree or just continue and ignore it?
+                return FileVisitResult.TERMINATE;
+            }
         }
 
         private ManifestEntry buildEntry(

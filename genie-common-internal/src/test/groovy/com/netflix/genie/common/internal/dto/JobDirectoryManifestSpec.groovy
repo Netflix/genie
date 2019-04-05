@@ -33,7 +33,6 @@ import java.nio.file.Path
  * Specifications for {@link JobDirectoryManifest}.
  *
  * @author tgianos
- * @since 4.0.0
  */
 class JobDirectoryManifestSpec extends Specification {
 
@@ -57,16 +56,31 @@ class JobDirectoryManifestSpec extends Specification {
     String clusterDir
     Path clusterSetupScriptPath
     String clusterSetupScript
+    Path symLinkFileRealPath
+    Path symLinkFilePath
+    String symLinkFile
+    Path cyclicSymLinkPath
+    String cyclicSymLink
+    Path stdOutSymLinkPath
+    String stdOutSymLink
     long sizeOfFiles
 
     def setup() {
         this.rootPath = this.temporaryFolder.newFolder().toPath()
+
+        // Valid symlink to outside of job directory
+        this.symLinkFileRealPath = this.temporaryFolder.newFile("realSymFile").toPath()
+        Files.write(this.symLinkFileRealPath, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
+        this.symLinkFilePath = Files.createSymbolicLink(
+            this.rootPath.resolve("symFile"), this.symLinkFileRealPath
+        )
 
         // create a directory structure
         this.stdoutPath = Files.write(
             this.rootPath.resolve("stdout"),
             UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)
         )
+        this.stdOutSymLinkPath = Files.createSymbolicLink(this.rootPath.resolve("stdOutSymLink"), this.stdoutPath)
         this.stderrPath = Files.write(
             this.rootPath.resolve("stderr"),
             UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)
@@ -76,7 +90,7 @@ class JobDirectoryManifestSpec extends Specification {
             this.genieDirPath.resolve("env.sh"),
             "#!/bin/bash".getBytes(StandardCharsets.UTF_8)
         )
-        this.genieSubDirPath = Files.createDirectory(genieDirPath.resolve("subdir"))
+        this.genieSubDirPath = Files.createDirectory(this.genieDirPath.resolve("subdir"))
         this.exitFilePath = Files.write(
             this.genieSubDirPath.resolve("exit"),
             UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)
@@ -86,6 +100,9 @@ class JobDirectoryManifestSpec extends Specification {
             this.clusterDirPath.resolve("clusterSetupFile.sh"),
             "#!/bin/bash\necho \"hello world!\"".getBytes(StandardCharsets.UTF_8)
         )
+
+        // Cyclic symlink
+        this.cyclicSymLinkPath = Files.createSymbolicLink(this.genieDirPath.resolve("testCycle"), this.genieDirPath)
 
         // Get the relative paths
         this.root = this.rootPath.relativize(this.rootPath).toString()
@@ -97,11 +114,21 @@ class JobDirectoryManifestSpec extends Specification {
         this.exitFile = this.rootPath.relativize(this.exitFilePath).toString()
         this.clusterDir = this.rootPath.relativize(this.clusterDirPath).toString()
         this.clusterSetupScript = this.rootPath.relativize(this.clusterSetupScriptPath)
+        this.symLinkFile = this.rootPath.relativize(this.symLinkFilePath)
+        this.stdOutSymLink = this.rootPath.relativize(this.stdOutSymLinkPath)
+        this.cyclicSymLink = this.rootPath.relativize(this.cyclicSymLinkPath)
 
         // Calculate the file sizes
         this.sizeOfFiles = 0L
-        [this.stdoutPath, this.stderrPath, this.envFilePath, this.exitFilePath, this.clusterSetupScriptPath]
-            .forEach({ this.sizeOfFiles += Files.size(it) })
+        [
+            this.stdoutPath,
+            this.stderrPath,
+            this.envFilePath,
+            this.exitFilePath,
+            this.clusterSetupScriptPath,
+            this.symLinkFileRealPath,
+            this.stdoutPath // In here twice to account for symlink to this file
+        ].forEach({ this.sizeOfFiles += Files.size(it) })
     }
 
     @Unroll
@@ -134,9 +161,9 @@ class JobDirectoryManifestSpec extends Specification {
     }
 
     void verifyManifest(JobDirectoryManifest manifest, boolean expectMd5Present) {
-        assert manifest.getEntries().size() == 9
-        assert manifest.getFiles().size() == 5
-        assert manifest.getNumFiles() == 5
+        assert manifest.getEntries().size() == 11
+        assert manifest.getFiles().size() == 7
+        assert manifest.getNumFiles() == 7
         assert manifest.getDirectories().size() == 4
         assert manifest.getNumDirectories() == 4
         assert manifest.hasEntry(this.root)
@@ -148,6 +175,10 @@ class JobDirectoryManifestSpec extends Specification {
         assert manifest.hasEntry(this.exitFile)
         assert manifest.hasEntry(this.clusterDir)
         assert manifest.hasEntry(this.clusterSetupScript)
+        assert manifest.hasEntry(this.symLinkFile)
+        assert manifest.hasEntry(this.stdOutSymLink)
+        // This is to document behavior
+        assert !manifest.hasEntry(this.cyclicSymLink)
 
         this.verifyEntry(
             manifest.getEntry(this.root).orElseThrow({ new IllegalArgumentException() }),
@@ -155,7 +186,7 @@ class JobDirectoryManifestSpec extends Specification {
             this.rootPath,
             true,
             null,
-            [this.stderr, this.stdout, this.genieDir, this.clusterDir],
+            [this.stderr, this.stdout, this.genieDir, this.clusterDir, this.symLinkFile, this.stdOutSymLink],
             false
         )
         this.verifyEntry(
@@ -182,7 +213,10 @@ class JobDirectoryManifestSpec extends Specification {
             this.genieDirPath,
             true,
             this.root,
-            [this.envFile, this.genieSubDir],
+            // Note: the cyclic link will be listed as a child but not have an entry ATM probably resulting in 404
+            //       at runtime but not sure what we can do given how the children are determined today without
+            //       launching recursive visitors
+            [this.envFile, this.genieSubDir, this.cyclicSymLink],
             false
         )
         this.verifyEntry(
@@ -230,12 +264,31 @@ class JobDirectoryManifestSpec extends Specification {
             [],
             expectMd5Present
         )
+        this.verifyEntry(
+            manifest.getEntry(this.symLinkFile).orElseThrow({ new IllegalArgumentException() }),
+            this.symLinkFile,
+            this.symLinkFilePath,
+            false,
+            this.root,
+            [],
+            expectMd5Present
+        )
+        this.verifyEntry(
+            manifest.getEntry(this.stdOutSymLink).orElseThrow({ new IllegalArgumentException() }),
+            this.stdOutSymLink,
+            this.stdOutSymLinkPath,
+            false,
+            this.root,
+            [],
+            expectMd5Present
+        )
 
         assert manifest.getFiles().contains(manifest.getEntry(this.stdout).orElse(null))
         assert manifest.getFiles().contains(manifest.getEntry(this.stderr).orElse(null))
         assert manifest.getFiles().contains(manifest.getEntry(this.envFile).orElse(null))
         assert manifest.getFiles().contains(manifest.getEntry(this.exitFile).orElse(null))
         assert manifest.getFiles().contains(manifest.getEntry(this.clusterSetupScript).orElse(null))
+        assert manifest.getFiles().contains(manifest.getEntry(this.symLinkFile).orElse(null))
 
         assert manifest
             .getDirectories()
