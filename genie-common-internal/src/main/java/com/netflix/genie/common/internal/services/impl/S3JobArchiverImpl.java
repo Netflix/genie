@@ -69,7 +69,8 @@ public class S3JobArchiverImpl implements JobArchiver {
         }
         final String directoryString = directory.toString();
         log.debug(
-            "{} is a valid S3 location. Proceeding to archiving {} to location: {}",
+            "{} is a valid S3 location. Proceeding to archive {} to location: {}",
+            uriString,
             directoryString,
             uriString
         );
