@@ -82,6 +82,11 @@ public final class MetricsConstants {
         public static final String STATUS = "status";
 
         /**
+         * Key to tag the user of a given job.
+         */
+        public static final String USER = "user";
+
+        /**
          * Utility class private constructor.
          */
         private TagKeys() {

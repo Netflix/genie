@@ -364,6 +364,14 @@ number of CPU cores x 2 + 1
 to the number of CPU cores x 2 + 1
 |1
 
+|genie.tasks.userMetrics.enabled
+|Whether or not to enable publishing of user-tagged metrics ('genie.user.*')
+|true
+
+|genie.tasks.userMetrics.rate
+|Interval in milliseconds between data refreshes to publish user metrics
+|5000
+
 |genie.zookeeper.enabled
 |Whether to enable connectivity to Zookeeper
 |false
