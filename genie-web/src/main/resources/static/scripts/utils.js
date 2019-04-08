@@ -1,6 +1,6 @@
 import $ from "jquery";
 import moment from "moment-timezone";
-window.moment = moment;
+
 // var p = {foo: [1,2,3], bar: 42};
 // setting traditional to true generates
 // foo=1&foo=2&foo=3&bar=42
