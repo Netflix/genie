@@ -458,6 +458,18 @@ and system metrics and statistics.
 |HealthCheckMetricsAspect
 |status, exceptionClass, healthIndicatorName
 
+|genie.user.active-jobs.gauge
+|Number of active jobs tagged with owner user.
+|count
+|UserMetricsTask
+|-
+
+|genie.user.active-memory.gauge
+|Amount of memory used by active jobs tagged with owner user.
+|Megabytes
+|UserMetricsTask
+|-
+
 |===
 
 (*) Source may add additional tags on a case-by-case basis

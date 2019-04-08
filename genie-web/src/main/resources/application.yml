@@ -106,6 +106,8 @@ genie:
       enabled: true
       expression: 0 0 0 * * *
       retention: 3
+    userMetrics:
+      enabled: true
     executor:
       pool:
         size: 5
