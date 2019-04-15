@@ -471,8 +471,8 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetActiveJobMemoryPerUser() throws GenieException {
-        final List<UserMemoryAmount> jobCounts = this.service.getActiveJobMemoryPerUser();
-        Assert.assertThat(jobCounts.size(), Matchers.is(1));
-        Assert.assertThat(jobCounts.get(0), Matchers.equalTo(new UserMemoryAmount("tgianos", 4096)));
+        final List<UserMemoryAmount> memoyAmounts = this.service.getActiveJobMemoryPerUser();
+        Assert.assertThat(memoyAmounts.size(), Matchers.is(1));
+        Assert.assertThat(memoyAmounts.get(0), Matchers.equalTo(new UserMemoryAmount("tgianos", 4096)));
     }
 }

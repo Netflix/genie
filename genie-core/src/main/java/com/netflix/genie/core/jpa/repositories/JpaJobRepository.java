@@ -105,7 +105,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses the job statuses to filter by
      * @return a set of {@link UserJobAmountAggregateProjection}
      */
-    @Query("SELECT j.user, SUM(j.memoryRequested) FROM JobEntity j WHERE j.status IN (:statuses) GROUP BY j.user")
+    @Query("SELECT j.user, SUM(j.memoryUsed) FROM JobEntity j WHERE j.status IN (:statuses) GROUP BY j.user")
     Set<UserJobAmountAggregateProjection> getUsersJobsTotalMemory(
         @Param("statuses") @NotEmpty final Set<JobStatus> statuses
     );
