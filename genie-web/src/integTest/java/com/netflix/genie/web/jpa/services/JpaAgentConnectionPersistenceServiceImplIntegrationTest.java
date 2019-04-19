@@ -28,10 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 /**
- * Integration tests for the JpaFilePersistenceServiceImpl class.
+ * Integration tests for the {@link JpaAgentConnectionPersistenceServiceImpl} class.
  *
- * @author tgianos
- * @since 3.3.0
+ * @author mprimi
+ * @since 4.0.0
  */
 @DatabaseTearDown("cleanup.xml")
 public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
@@ -61,7 +61,6 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
             Pair.of(JOB1, HOST1),
             Pair.of(JOB2, HOST2)
         );
-
 
         // Migrate a connection, with delete before update
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST1);
