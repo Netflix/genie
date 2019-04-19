@@ -29,8 +29,7 @@ import java.util.Optional;
  * @author mprimi
  * @since 4.0.0
  */
-public interface JpaAgentConnectionRepository
-    extends JpaIdRepository<AgentConnectionEntity> {
+public interface JpaAgentConnectionRepository extends JpaIdRepository<AgentConnectionEntity> {
 
     /**
      * Find entity by jobId.

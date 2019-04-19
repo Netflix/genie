@@ -94,8 +94,8 @@ public class JpaAgentConnectionPersistenceServiceImpl implements AgentConnection
     }
 
     private AgentConnectionEntity toEntity(
-        final @NotBlank String jobId,
-        final @NotBlank String hostname
+        @NotBlank final String jobId,
+        @NotBlank final String hostname
     ) {
         return new AgentConnectionEntity(jobId, hostname);
     }
