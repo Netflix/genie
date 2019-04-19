@@ -204,8 +204,7 @@ public class JobStateServiceImpl implements JobStateService {
     public int getUsedMemory() {
         // Synchronized to avoid concurrent modification exception
         synchronized (this.jobs) {
-            return this.jobs.values().stream().map(JobInfo::getMemory)
-                .reduce((a, b) -> a + b).orElse(0);
+            return this.jobs.values().stream().map(JobInfo::getMemory).reduce(Integer::sum).orElse(0);
         }
     }
 
