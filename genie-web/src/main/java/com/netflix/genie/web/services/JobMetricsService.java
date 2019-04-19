@@ -37,4 +37,13 @@ public interface JobMetricsService {
      * @return The total memory used by jobs in megabytes
      */
     int getUsedMemory();
+
+    /**
+     * Get the number of agents currently connected to this server.
+     *
+     * @return The number of agents connected to the server
+     */
+    default long getNumActiveAgents() {
+        return 0L;
+    }
 }

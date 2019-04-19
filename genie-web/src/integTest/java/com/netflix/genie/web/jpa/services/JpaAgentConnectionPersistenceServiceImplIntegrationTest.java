@@ -61,6 +61,14 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
             Pair.of(JOB1, HOST1),
             Pair.of(JOB2, HOST2)
         );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
+            Matchers.is(1L)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
+            Matchers.is(1L)
+        );
 
         // Migrate a connection, with delete before update
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST1);
@@ -68,6 +76,14 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
         verifyExpectedConnections(
             Pair.of(JOB1, HOST2),
             Pair.of(JOB2, HOST2)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
+            Matchers.is(0L)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
+            Matchers.is(2L)
         );
 
         // Migrate a connection with update before delete
@@ -77,6 +93,14 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
             Pair.of(JOB1, HOST1),
             Pair.of(JOB2, HOST2)
         );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
+            Matchers.is(1L)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
+            Matchers.is(1L)
+        );
 
         // Migrate a connection, landing on the same server with deletion
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST1);
@@ -84,6 +108,14 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
         verifyExpectedConnections(
             Pair.of(JOB1, HOST1),
             Pair.of(JOB2, HOST2)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
+            Matchers.is(1L)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
+            Matchers.is(1L)
         );
 
         // Migrate a connection, landing on the same server without deletion (unexpected in practice)
@@ -93,11 +125,27 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
             Pair.of(JOB1, HOST1),
             Pair.of(JOB2, HOST2)
         );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
+            Matchers.is(1L)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
+            Matchers.is(1L)
+        );
 
         // Delete all
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.removeAgentConnection(JOB2, HOST2);
         verifyExpectedConnections();
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
+            Matchers.is(0L)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
+            Matchers.is(0L)
+        );
     }
 
     @SafeVarargs
