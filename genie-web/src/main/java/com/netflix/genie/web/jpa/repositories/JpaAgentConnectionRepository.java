@@ -38,4 +38,12 @@ public interface JpaAgentConnectionRepository extends JpaIdRepository<AgentConne
      * @return an optional, containing the entity if it exists
      */
     Optional<AgentConnectionEntity> findByJobId(@NotBlank String jobId);
+
+    /**
+     * Find the number of agents currently connected to the given server identified by {@code serverHostName}.
+     *
+     * @param serverHostName The hostname of the server to get the number of connections for
+     * @return The number of connections on the given server
+     */
+    long countByServerHostnameEquals(@NotBlank String serverHostName);
 }

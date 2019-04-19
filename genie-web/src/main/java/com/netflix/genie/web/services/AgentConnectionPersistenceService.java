@@ -63,4 +63,12 @@ public interface AgentConnectionPersistenceService {
     Optional<String> lookupAgentConnectionServer(
         @NotBlank String jobId
     );
+
+    /**
+     * Get the number of active agent connections on Genie server with the given {@code hostname}.
+     *
+     * @param hostname The server hostname to get the count for
+     * @return The number of agents currently connected to the given server
+     */
+    long getNumAgentConnectionsOnServer(@NotBlank String hostname);
 }
