@@ -13,6 +13,12 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |===
 |Name |Description |Unit |Source |Tags
 
+|genie.agents.connected.gauge
+|The number of agents connected to the server
+|count
+|AgentMetricsServiceImpl
+|-
+
 |genie.jobs.submit.timer
 |Time taken initialize the job environment (working directory, script) and fork the children
 |nanoseconds
