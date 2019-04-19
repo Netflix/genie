@@ -20,10 +20,8 @@ package com.netflix.genie.web.health;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobMetricsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 
@@ -33,7 +31,6 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
-@Component
 public class GenieMemoryHealthIndicator implements HealthIndicator {
 
     private static final String NUMBER_RUNNING_JOBS_KEY = "numRunningJobs";
@@ -51,7 +48,6 @@ public class GenieMemoryHealthIndicator implements HealthIndicator {
      * @param jobMetricsService The metrics service to get status info from
      * @param jobsProperties    The various properties related to running jobs
      */
-    @Autowired
     public GenieMemoryHealthIndicator(
         @NotNull final JobMetricsService jobMetricsService,
         @NotNull final JobsProperties jobsProperties

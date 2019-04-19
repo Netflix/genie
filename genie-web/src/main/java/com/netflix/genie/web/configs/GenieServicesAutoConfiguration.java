@@ -40,6 +40,7 @@ import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.AgentFileStreamService;
 import com.netflix.genie.web.services.AgentFilterService;
 import com.netflix.genie.web.services.AgentJobService;
+import com.netflix.genie.web.services.AgentMetricsService;
 import com.netflix.genie.web.services.AgentRoutingService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.AttachmentService;
@@ -59,6 +60,7 @@ import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.AgentJobServiceImpl;
+import com.netflix.genie.web.services.impl.AgentMetricsServiceImpl;
 import com.netflix.genie.web.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
@@ -555,5 +557,24 @@ public class GenieServicesAutoConfiguration {
                 throw new NotImplementedException("Not supported when using fallback service");
             }
         };
+    }
+
+    /**
+     * Provide an implementation of {@link AgentMetricsService} if one hasn't been provided.
+     *
+     * @param genieHostInfo                     The Genie host information
+     * @param agentConnectionPersistenceService Implementation of {@link AgentConnectionPersistenceService} to get
+     *                                          information about running agents in the ecosystem
+     * @param registry                          The metrics repository
+     * @return An instance of {@link AgentMetricsServiceImpl}
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentMetricsService.class)
+    public AgentMetricsServiceImpl agentMetricsService(
+        final GenieHostInfo genieHostInfo,
+        final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        final MeterRegistry registry
+    ) {
+        return new AgentMetricsServiceImpl(genieHostInfo, agentConnectionPersistenceService, registry);
     }
 }
