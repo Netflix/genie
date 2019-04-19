@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,23 +18,19 @@
 package com.netflix.genie.web.services;
 
 /**
- * A service which returns metrics for active jobs.
+ * Service for collecting metrics about Genie Agents connected to this host.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 4.0.0
  */
-public interface JobMetricsService {
-    /**
-     * Get the number of jobs active on this node.
-     *
-     * @return The number of jobs currently active on this node
-     */
-    int getNumActiveJobs();
+public interface AgentMetricsService {
 
     /**
-     * Get the amount of memory currently used by jobs in MB.
+     * Get the number of agents currently connected to this server.
      *
-     * @return The total memory used by jobs in megabytes
+     * @return The number of agents connected to the server
      */
-    int getUsedMemory();
+    default long getNumConnectedAgents() {
+        return 0L;
+    }
 }
