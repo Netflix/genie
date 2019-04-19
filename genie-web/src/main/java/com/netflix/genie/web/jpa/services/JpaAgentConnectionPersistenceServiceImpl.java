@@ -88,7 +88,6 @@ public class JpaAgentConnectionPersistenceServiceImpl implements AgentConnection
         return agentConnectionEntity.map(AgentConnectionEntity::getServerHostname);
     }
 
-    @Transactional(readOnly = true)
     private Optional<AgentConnectionEntity> getAgentConnection(@NotBlank final String jobId) {
         return this.agentConnectionRepository.findByJobId(jobId);
     }
