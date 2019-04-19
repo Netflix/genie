@@ -22,7 +22,6 @@ import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.scheduling.TaskScheduler;
@@ -52,7 +51,6 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
      * @param registry         Registry
      * @param taskScheduler    task scheduler
      */
-    @Autowired
     public GenieCpuHealthIndicator(
         @NotNull final HealthProperties healthProperties,
         @NotNull final MeterRegistry registry,
