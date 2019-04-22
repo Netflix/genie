@@ -32,7 +32,6 @@ import com.netflix.genie.web.events.KillJobEvent;
 import com.netflix.genie.web.jobs.JobKillReasonFile;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.util.ProcessChecker;
-import com.netflix.genie.web.util.UnixProcessChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
@@ -64,17 +63,19 @@ public class JobKillServiceV3 {
     private final GenieEventBus genieEventBus;
     private final File baseWorkingDir;
     private final ObjectMapper objectMapper;
+    private final ProcessChecker.Factory processCheckerFactory;
 
     /**
      * Constructor.
      *
-     * @param hostname         The name of the host this Genie node is running on
-     * @param jobSearchService The job search service to use to locate job information
-     * @param executor         The executor to use to run system processes
-     * @param runAsUser        True if jobs are run as the user who submitted the job
-     * @param genieEventBus    The system event bus to use
-     * @param genieWorkingDir  The working directory where all job directories are created.
-     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
+     * @param hostname              The name of the host this Genie node is running on
+     * @param jobSearchService      The job search service to use to locate job information
+     * @param executor              The executor to use to run system processes
+     * @param runAsUser             True if jobs are run as the user who submitted the job
+     * @param genieEventBus         The system event bus to use
+     * @param genieWorkingDir       The working directory where all job directories are created.
+     * @param objectMapper          The Jackson ObjectMapper used to serialize from/to JSON
+     * @param processCheckerFactory The process checker factory
      */
     public JobKillServiceV3(
         @NotBlank final String hostname,
@@ -83,7 +84,8 @@ public class JobKillServiceV3 {
         final boolean runAsUser,
         @NotNull final GenieEventBus genieEventBus,
         @NotNull final Resource genieWorkingDir,
-        @NotNull final ObjectMapper objectMapper
+        @NotNull final ObjectMapper objectMapper,
+        @NotNull final ProcessChecker.Factory processCheckerFactory
     ) {
         this.hostname = hostname;
         this.jobSearchService = jobSearchService;
@@ -91,6 +93,7 @@ public class JobKillServiceV3 {
         this.runAsUser = runAsUser;
         this.genieEventBus = genieEventBus;
         this.objectMapper = objectMapper;
+        this.processCheckerFactory = processCheckerFactory;
 
         try {
             this.baseWorkingDir = genieWorkingDir.getFile();
@@ -182,7 +185,7 @@ public class JobKillServiceV3 {
         try {
             // Ensure this process check can't be timed out
             final Instant tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
-            final ProcessChecker processChecker = new UnixProcessChecker(pid, this.executor, tomorrow);
+            final ProcessChecker processChecker = this.processCheckerFactory.get(pid, tomorrow);
             processChecker.checkProcess();
         } catch (final ExecuteException ee) {
             // This means the job was done already
