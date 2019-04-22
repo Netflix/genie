@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import org.apache.commons.exec.ExecuteException;
 
 import java.io.IOException;
+import java.time.Instant;
 
 /**
  * Interface for implementing process checking on various operating systems.
@@ -38,4 +39,19 @@ public interface ProcessChecker {
      * @throws IOException           For any other problem
      */
     void checkProcess() throws GenieTimeoutException, ExecuteException, IOException;
+
+    /**
+     * Interface for Factory of ProcessChecker.
+     */
+    interface Factory {
+
+        /**
+         * Get a new process checker to check on the given PID.
+         *
+         * @param pid     the process id to check on
+         * @param timeout the moment in time after which the check should produce a {@link GenieTimeoutException}
+         * @return a {@link ProcessChecker}
+         */
+        ProcessChecker get(int pid, Instant timeout);
+    }
 }

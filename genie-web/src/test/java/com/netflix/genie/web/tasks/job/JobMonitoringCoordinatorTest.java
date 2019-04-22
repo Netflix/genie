@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.tasks.job;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
@@ -35,9 +36,8 @@ import com.netflix.genie.web.events.JobStartedEvent;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSubmitterService;
+import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.apache.commons.exec.Executor;
-import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -89,6 +89,7 @@ public class JobMonitoringCoordinatorTest {
     private Cluster cluster = Mockito.mock(Cluster.class);
     private Command command = Mockito.mock(Command.class);
     private List<Application> applications = Lists.newArrayList();
+    private ProcessChecker.Factory processCheckerFactory = Mockito.mock(ProcessChecker.Factory.class);
 
     /**
      * Setup for the tests.
@@ -100,7 +101,6 @@ public class JobMonitoringCoordinatorTest {
         this.tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
-        final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
 
@@ -113,11 +113,11 @@ public class JobMonitoringCoordinatorTest {
             this.jobSearchService,
             this.genieEventBus,
             this.scheduler,
-            executor,
             new SimpleMeterRegistry(),
             jobsDir,
             JobsProperties.getJobsPropertiesDefaults(),
-            jobSubmitterService
+            jobSubmitterService,
+            this.processCheckerFactory
         );
     }
 

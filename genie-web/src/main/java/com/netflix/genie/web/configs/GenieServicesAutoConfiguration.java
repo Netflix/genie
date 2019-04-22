@@ -75,6 +75,7 @@ import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.InspectionReport;
+import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -159,13 +160,14 @@ public class GenieServicesAutoConfiguration {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param genieHostInfo    Information about the host the Genie process is running on
-     * @param jobSearchService The job search service to use to locate job information.
-     * @param executor         The executor to use to run system processes.
-     * @param jobsProperties   The jobs properties to use
-     * @param genieEventBus    The application event bus to use to publish system wide events
-     * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
-     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
+     * @param genieHostInfo         Information about the host the Genie process is running on
+     * @param jobSearchService      The job search service to use to locate job information.
+     * @param executor              The executor to use to run system processes.
+     * @param jobsProperties        The jobs properties to use
+     * @param genieEventBus         The application event bus to use to publish system wide events
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
+     * @param objectMapper          The Jackson ObjectMapper used to serialize from/to JSON
+     * @param processCheckerFactory The process checker factory
      * @return A job kill service instance.
      */
     @Bean
@@ -177,7 +179,8 @@ public class GenieServicesAutoConfiguration {
         final JobsProperties jobsProperties,
         final GenieEventBus genieEventBus,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
-        final ObjectMapper objectMapper
+        final ObjectMapper objectMapper,
+        final ProcessChecker.Factory processCheckerFactory
     ) {
         return new JobKillServiceV3(
             genieHostInfo.getHostname(),
@@ -186,7 +189,8 @@ public class GenieServicesAutoConfiguration {
             jobsProperties.getUsers().isRunAsUserEnabled(),
             genieEventBus,
             genieWorkingDir,
-            objectMapper
+            objectMapper,
+            processCheckerFactory
         );
     }
 

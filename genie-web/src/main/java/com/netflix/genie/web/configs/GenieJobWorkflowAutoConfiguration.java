@@ -31,9 +31,14 @@ import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
+import com.netflix.genie.web.util.ProcessChecker;
+import com.netflix.genie.web.util.UnixProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.lang3.SystemUtils;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -187,5 +192,28 @@ public class GenieJobWorkflowAutoConfiguration {
             genieHostInfo.getHostname(),
             registry
         );
+    }
+
+    /**
+     * Create a {@link ProcessChecker.Factory} suitable for UNIX systems.
+     *
+     * @param executor       The executor where checks are executed
+     * @param jobsProperties The jobs properties
+     * @return a {@link ProcessChecker.Factory}
+     */
+    @Bean
+    @ConditionalOnMissingBean(ProcessChecker.Factory.class)
+    public ProcessChecker.Factory processCheckerFactory(
+        final Executor executor,
+        final JobsProperties jobsProperties
+    ) {
+        if (SystemUtils.IS_OS_UNIX) {
+            return new UnixProcessChecker.Factory(
+                executor,
+                jobsProperties.getUsers().isRunAsUserEnabled()
+            );
+        } else {
+            throw new BeanCreationException("No implementation available for non-UNIX systems");
+        }
     }
 }
