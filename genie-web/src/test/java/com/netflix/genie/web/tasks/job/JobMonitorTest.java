@@ -19,11 +19,13 @@ package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.KillJobEvent;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.CommandLine;
@@ -71,6 +73,7 @@ public class JobMonitorTest {
     private Counter unsuccessfulCheckRate;
     private Counter stdOutTooLarge;
     private Counter stdErrTooLarge;
+    private ProcessChecker processChecker;
 
     /**
      * Setup for the tests.
@@ -95,6 +98,7 @@ public class JobMonitorTest {
         this.registry = Mockito.mock(MeterRegistry.class);
         this.stdOut = Mockito.mock(File.class);
         this.stdErr = Mockito.mock(File.class);
+        this.processChecker = Mockito.mock(ProcessChecker.class);
         Mockito
             .when(this.registry.counter("genie.jobs.successfulStatusCheck.rate"))
             .thenReturn(this.successfulCheckRate);
@@ -122,10 +126,10 @@ public class JobMonitorTest {
             this.jobExecution,
             this.stdOut,
             this.stdErr,
-            this.executor,
             this.genieEventBus,
             this.registry,
-            outputMaxProperties
+            outputMaxProperties,
+            this.processChecker
         );
     }
 
@@ -201,16 +205,11 @@ public class JobMonitorTest {
     /**
      * Make sure that a running process doesn't publish anything.
      *
-     * @throws IOException on error
+     * @throws Exception on error
      */
     @Test
-    public void canCheckRunningProcessOnUnixLikeSystem() throws IOException {
+    public void canCheckRunningProcessOnUnixLikeSystem() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        Mockito
-            .when(this.executor.execute(Mockito.any(CommandLine.class)))
-            .thenReturn(0)
-            .thenThrow(new IOException())
-            .thenReturn(0);
 
         Mockito.when(this.stdOut.exists()).thenReturn(false);
         Mockito.when(this.stdErr.exists()).thenReturn(false);
@@ -219,25 +218,25 @@ public class JobMonitorTest {
             this.monitor.run();
         }
 
-        Mockito.verify(this.successfulCheckRate, Mockito.times(2)).increment();
+        Mockito.verify(this.processChecker, Mockito.times(3)).checkProcess();
+        Mockito.verify(this.successfulCheckRate, Mockito.times(3)).increment();
         Mockito
             .verify(this.genieEventBus, Mockito.never())
             .publishSynchronousEvent(Mockito.any(ApplicationEvent.class));
         Mockito
             .verify(this.genieEventBus, Mockito.never())
             .publishAsynchronousEvent(Mockito.any(ApplicationEvent.class));
-        Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(1)).increment();
     }
 
     /**
      * Make sure that a finished process sends event.
      *
-     * @throws IOException on error
+     * @throws Exception on error
      */
     @Test
-    public void canCheckFinishedProcessOnUnixLikeSystem() throws IOException {
+    public void canCheckFinishedProcessOnUnixLikeSystem() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new ExecuteException("done", 1));
+        Mockito.doThrow(new ExecuteException("done", 1)).when(processChecker).checkProcess();
 
         this.monitor.run();
 
@@ -258,9 +257,10 @@ public class JobMonitorTest {
 
     /**
      * Make sure that a timed out process sends event.
+     * @throws Exception in case of error
      */
     @Test
-    public void canTryToKillTimedOutProcess() {
+    public void canTryToKillTimedOutProcess() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         // Set timeout to yesterday to force timeout when check happens
@@ -275,11 +275,13 @@ public class JobMonitorTest {
             this.jobExecution,
             this.stdOut,
             this.stdErr,
-            this.executor,
             this.genieEventBus,
             this.registry,
-            JobsProperties.getJobsPropertiesDefaults()
+            JobsProperties.getJobsPropertiesDefaults(),
+            processChecker
         );
+
+        Mockito.doThrow(new GenieTimeoutException("...")).when(processChecker).checkProcess();
 
         this.monitor.run();
 
@@ -302,12 +304,13 @@ public class JobMonitorTest {
     /**
      * Make sure that an error doesn't publish anything until it runs too many times then it tries to kill the job.
      *
-     * @throws IOException on error
+     * @throws Exception on error
      */
     @Test
-    public void cantGetStatusIfErrorOnUnixLikeSystem() throws IOException {
+    public void cantGetStatusIfErrorOnUnixLikeSystem() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
+
+        Mockito.doThrow(new IOException()).when(processChecker).checkProcess();
 
         // Run six times to force error
         for (int i = 0; i < 6; i++) {

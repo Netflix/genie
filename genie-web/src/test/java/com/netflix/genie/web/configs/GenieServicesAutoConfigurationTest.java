@@ -44,6 +44,7 @@ import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
+import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -109,7 +110,8 @@ public class GenieServicesAutoConfigurationTest {
                 JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(GenieEventBus.class),
                 Mockito.mock(FileSystemResource.class),
-                GenieObjectMapper.getMapper()
+                GenieObjectMapper.getMapper(),
+                Mockito.mock(ProcessChecker.Factory.class)
             )
         );
     }
