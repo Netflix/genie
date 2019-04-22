@@ -31,9 +31,9 @@ import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.DefaultRegistry;
-import org.apache.commons.exec.Executor;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -79,6 +79,7 @@ public class JobMonitoringCoordinatorUnitTests {
     private JobSearchService jobSearchService;
     private GenieEventBus genieEventBus;
     private Date tomorrow;
+    private ProcessChecker.Factory processCheckerFactory;
 
     /**
      * Setup for the tests.
@@ -92,9 +93,9 @@ public class JobMonitoringCoordinatorUnitTests {
         this.tomorrow = cal.getTime();
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
-        final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
+        this.processCheckerFactory = Mockito.mock(ProcessChecker.Factory.class);
 
         final File jobsFile = this.folder.newFolder();
         final Resource jobsDir = Mockito.mock(Resource.class);
@@ -105,11 +106,11 @@ public class JobMonitoringCoordinatorUnitTests {
             this.jobSearchService,
             this.genieEventBus,
             this.scheduler,
-            executor,
             new DefaultRegistry(),
             jobsDir,
             new JobsProperties(),
-            jobSubmitterService
+            jobSubmitterService,
+            this.processCheckerFactory
         );
     }
 

@@ -27,7 +27,6 @@ import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.util.ExponentialBackOffTrigger;
 import com.netflix.genie.core.util.ProcessChecker;
-import com.netflix.genie.core.util.UnixProcessChecker;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
 import com.netflix.spectator.api.Counter;
@@ -35,7 +34,6 @@ import com.netflix.spectator.api.Registry;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.scheduling.Trigger;
 
@@ -43,7 +41,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * Given a process id this class will check if the job client process is running or not.
@@ -82,19 +79,19 @@ public class JobMonitor extends NodeTask {
      * @param execution      The job execution object including the pid
      * @param stdOut         The std out output file
      * @param stdErr         The std err output file
-     * @param executor       The process executor to use
      * @param genieEventBus  The event bus implementation to use
      * @param registry       The metrics event registry
      * @param jobsProperties The properties for jobs
+     * @param processChecker The process checker
      */
     JobMonitor(
         @Valid final JobExecution execution,
         @NotNull final File stdOut,
         @NotNull final File stdErr,
-        @NotNull final Executor executor,
         @NonNull final GenieEventBus genieEventBus,
         @NotNull final Registry registry,
-        @NotNull final JobsProperties jobsProperties
+        @NotNull final JobsProperties jobsProperties,
+        @NotNull final ProcessChecker processChecker
     ) {
         if (!SystemUtils.IS_OS_UNIX) {
             throw new UnsupportedOperationException("Genie doesn't currently support " + SystemUtils.OS_NAME);
@@ -104,10 +101,7 @@ public class JobMonitor extends NodeTask {
         this.id = execution.getId().orElseThrow(IllegalArgumentException::new);
         this.execution = execution;
         this.genieEventBus = genieEventBus;
-
-        final int processId = execution.getProcessId().orElseThrow(IllegalArgumentException::new);
-        final Date timeout = execution.getTimeout().orElseThrow(IllegalArgumentException::new);
-        this.processChecker = new UnixProcessChecker(processId, executor, timeout);
+        this.processChecker = processChecker;
 
         this.stdOut = stdOut;
         this.stdErr = stdErr;

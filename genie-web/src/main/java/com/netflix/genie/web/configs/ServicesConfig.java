@@ -60,6 +60,7 @@ import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.MailServiceImpl;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
+import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.FactoryBean;
@@ -264,13 +265,14 @@ public class ServicesConfig {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param hostName         The name of the host this Genie node is running on.
-     * @param jobSearchService The job search service to use to locate job information.
-     * @param executor         The executor to use to run system processes.
-     * @param jobsProperties   The jobs properties to use
-     * @param genieEventBus    The application event bus to use to publish system wide events
-     * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
-     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
+     * @param hostName              The name of the host this Genie node is running on.
+     * @param jobSearchService      The job search service to use to locate job information.
+     * @param executor              The executor to use to run system processes.
+     * @param jobsProperties        The jobs properties to use
+     * @param genieEventBus         The application event bus to use to publish system wide events
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
+     * @param objectMapper          The Jackson ObjectMapper used to serialize from/to JSON
+     * @param processCheckerFactory The factory of process checkers
      * @return A job kill service instance.
      */
     @Bean
@@ -281,7 +283,8 @@ public class ServicesConfig {
         final JobsProperties jobsProperties,
         final GenieEventBus genieEventBus,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
-        final ObjectMapper objectMapper
+        final ObjectMapper objectMapper,
+        final ProcessChecker.Factory processCheckerFactory
     ) {
         return new LocalJobKillServiceImpl(
             hostName,
@@ -290,7 +293,8 @@ public class ServicesConfig {
             jobsProperties.getUsers().isRunAsUserEnabled(),
             genieEventBus,
             genieWorkingDir,
-            objectMapper
+            objectMapper,
+            processCheckerFactory
         );
     }
 
