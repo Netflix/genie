@@ -38,6 +38,7 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.core.services.TagService;
+import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
@@ -292,7 +293,8 @@ public class ServicesConfigUnitTests {
                 new JobsProperties(),
                 Mockito.mock(GenieEventBus.class),
                 Mockito.mock(FileSystemResource.class),
-                new ObjectMapper()
+                new ObjectMapper(),
+                Mockito.mock(ProcessChecker.Factory.class)
             )
         );
     }

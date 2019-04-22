@@ -45,22 +45,34 @@ public class UnixProcessChecker implements ProcessChecker {
     /**
      * Constructor.
      *
-     * @param pid      The process id to check.
-     * @param executor The executor to use for generating system commands.
-     * @param timeout  The time which after this job should be killed due to timeout
+     * @param pid           The process id to check.
+     * @param executor      The executor to use for generating system commands.
+     * @param timeout       The time which after this job should be killed due to timeout
+     * @param checkWithSudo Whether the checker requires sudo
      */
-    public UnixProcessChecker(@Min(1) final int pid, @NotNull final Executor executor, @NotNull final Date timeout) {
+    UnixProcessChecker(
+        @Min(1) final int pid,
+        @NotNull final Executor executor,
+        @NotNull final Date timeout,
+        final boolean checkWithSudo
+    ) {
         if (!SystemUtils.IS_OS_UNIX) {
             throw new IllegalArgumentException("Not running on a Unix system.");
         }
 
         this.executor = executor;
 
-        // Using PS for now but could instead check for existence of done file if this proves to have bad performance
-        // send output to /dev/null so it doesn't print to the logs
-        this.commandLine = new CommandLine("ps");
-        this.commandLine.addArgument("-p");
-        this.commandLine.addArgument(Integer.toString(pid));
+        // Use POSIX compliant 'kill -0 <PID>' to check if process is still running.
+        if (checkWithSudo) {
+            this.commandLine = new CommandLine("sudo");
+            this.commandLine.addArgument("kill");
+            this.commandLine.addArgument("-0");
+            this.commandLine.addArgument(Integer.toString(pid));
+        } else {
+            this.commandLine = new CommandLine("kill");
+            this.commandLine.addArgument("-0");
+            this.commandLine.addArgument(Integer.toString(pid));
+        }
 
         this.timeout = new Date(timeout.getTime());
         this.dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -78,6 +90,34 @@ public class UnixProcessChecker implements ProcessChecker {
             throw new GenieTimeoutException(
                 "Job has exceeded its timeout time of " + this.dateFormatter.format(this.timeout)
             );
+        }
+    }
+
+    /**
+     * Factory for {@link ProcessChecker} for UNIX systems.
+     */
+    public static class Factory implements ProcessChecker.Factory {
+
+        private final Executor executor;
+        private final boolean checkWithSudo;
+
+        /**
+         * Constructor.
+         *
+         * @param executor      The executor used by process checkers
+         * @param checkWithSudo Whether the check requires sudo
+         */
+        public Factory(final Executor executor, final boolean checkWithSudo) {
+            this.executor = executor;
+            this.checkWithSudo = checkWithSudo;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ProcessChecker get(final int pid, final Date timeout) {
+            return new UnixProcessChecker(pid, this.executor, timeout, this.checkWithSudo);
         }
     }
 }

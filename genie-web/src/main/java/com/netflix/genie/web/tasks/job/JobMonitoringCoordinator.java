@@ -32,10 +32,10 @@ import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.impl.JobStateServiceImpl;
+import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEvent;
@@ -48,6 +48,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
@@ -64,24 +65,24 @@ import java.util.concurrent.ScheduledFuture;
 public class JobMonitoringCoordinator extends JobStateServiceImpl {
     private final String hostName;
     private final JobSearchService jobSearchService;
-    private final Executor executor;
     private final File jobsDir;
     private final JobsProperties jobsProperties;
+    private final ProcessChecker.Factory processCheckerFactory;
 
     private final Counter unableToReAttach;
 
     /**
      * Constructor.
      *
-     * @param hostName            The name of the host this Genie process is running on
-     * @param jobSearchService    The search service to use to find jobs
-     * @param genieEventBus       The Genie event bus to use for publishing events
-     * @param scheduler           The task scheduler to use to register scheduling of job checkers
-     * @param executor            The executor to use to launch processes
-     * @param registry            The metrics registry
-     * @param jobsDir             The directory where job output is stored
-     * @param jobsProperties      The properties pertaining to jobs
-     * @param jobSubmitterService implementation of the job submitter service
+     * @param hostName              The name of the host this Genie process is running on
+     * @param jobSearchService      The search service to use to find jobs
+     * @param genieEventBus         The Genie event bus to use for publishing events
+     * @param scheduler             The task scheduler to use to register scheduling of job checkers
+     * @param registry              The metrics registry
+     * @param jobsDir               The directory where job output is stored
+     * @param jobsProperties        The properties pertaining to jobs
+     * @param jobSubmitterService   implementation of the job submitter service
+     * @param processCheckerFactory The factory of process checkers
      * @throws IOException on error with the filesystem
      */
     @Autowired
@@ -90,18 +91,18 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
         final JobSearchService jobSearchService,
         final GenieEventBus genieEventBus,
         @Qualifier("genieTaskScheduler") final TaskScheduler scheduler,
-        final Executor executor,
         final Registry registry,
         final Resource jobsDir,
         final JobsProperties jobsProperties,
-        final JobSubmitterService jobSubmitterService
+        final JobSubmitterService jobSubmitterService,
+        final ProcessChecker.Factory processCheckerFactory
     ) throws IOException {
         super(jobSubmitterService, scheduler, genieEventBus, registry);
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
-        this.executor = executor;
         this.jobsDir = jobsDir.getFile();
         this.jobsProperties = jobsProperties;
+        this.processCheckerFactory = processCheckerFactory;
 
         // Automatically track the number of jobs running on this node
         this.unableToReAttach = registry.counter("genie.jobs.unableToReAttach.rate");
@@ -187,15 +188,18 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
         final String jobId = jobExecution.getId().orElseThrow(IllegalArgumentException::new);
         final File stdOut = new File(this.jobsDir, jobId + "/" + JobConstants.STDOUT_LOG_FILE_NAME);
         final File stdErr = new File(this.jobsDir, jobId + "/" + JobConstants.STDERR_LOG_FILE_NAME);
+        final int processId = jobExecution.getProcessId().orElseThrow(IllegalArgumentException::new);
+        final Date timeout = jobExecution.getTimeout().orElseThrow(IllegalArgumentException::new);
+        final ProcessChecker processChecker = this.processCheckerFactory.get(processId, timeout);
 
         final JobMonitor monitor = new JobMonitor(
             jobExecution,
             stdOut,
             stdErr,
-            this.executor,
             this.genieEventBus,
             this.registry,
-            this.jobsProperties
+            this.jobsProperties,
+            processChecker
         );
         final ScheduledFuture<?> future;
         switch (monitor.getScheduleType()) {

@@ -59,6 +59,8 @@ import com.netflix.genie.core.services.impl.JobStateServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
+import com.netflix.genie.core.util.ProcessChecker;
+import com.netflix.genie.core.util.UnixProcessChecker;
 import com.netflix.spectator.api.DefaultRegistry;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
@@ -240,12 +242,13 @@ public class ServicesConfigTest {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param hostname         The name of the host this Genie node is running on.
-     * @param jobSearchService The job search service to use to locate job information.
-     * @param executor         The executor to use to run system processes.
-     * @param genieEventBus    The Genie event bus to use
-     * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
-     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
+     * @param hostname              The name of the host this Genie node is running on.
+     * @param jobSearchService      The job search service to use to locate job information.
+     * @param executor              The executor to use to run system processes.
+     * @param genieEventBus         The Genie event bus to use
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
+     * @param objectMapper          The Jackson ObjectMapper used to serialize from/to JSON
+     * @param processCheckerFactory The process checker factory
      * @return A job kill service instance.
      */
     @Bean
@@ -255,7 +258,8 @@ public class ServicesConfigTest {
         final Executor executor,
         final GenieEventBus genieEventBus,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
-        final ObjectMapper objectMapper
+        final ObjectMapper objectMapper,
+        final ProcessChecker.Factory processCheckerFactory
     ) {
         return new LocalJobKillServiceImpl(
             hostname,
@@ -264,7 +268,8 @@ public class ServicesConfigTest {
             false,
             genieEventBus,
             genieWorkingDir,
-            objectMapper
+            objectMapper,
+            processCheckerFactory
         );
     }
 
@@ -512,5 +517,20 @@ public class ServicesConfigTest {
     @Bean
     public FileService fileService(final JpaFileRepository fileRepository) {
         return new JpaFileServiceImpl(fileRepository);
+    }
+
+    /**
+     * Create the process checker bean.
+     *
+     * @param executor       The executorr
+     * @param jobsProperties the jobs properties
+     * @return a process checker factory
+     */
+    @Bean
+    ProcessChecker.Factory processCheckerFactory(
+        final Executor executor,
+        final JobsProperties jobsProperties
+    ) {
+        return new UnixProcessChecker.Factory(executor, jobsProperties.getUsers().isRunAsUserEnabled());
     }
 }
