@@ -37,7 +37,6 @@ import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -161,7 +160,6 @@ public class JobConfig {
      */
     @Bean
     @Order(value = 5)
-    @Autowired
     public WorkflowTask jobProcessorTask(
         final AttachmentService attachmentService,
         final Registry registry,
@@ -182,7 +180,6 @@ public class JobConfig {
      */
     @Bean
     @Order(value = 6)
-    @Autowired
     public WorkflowTask jobKickoffTask(
         final JobsProperties jobsProperties,
         final Executor executor,
@@ -206,7 +203,6 @@ public class JobConfig {
      * @return a {@link ProcessChecker.Factory}
      */
     @Bean
-    @Autowired
     @ConditionalOnMissingBean(ProcessChecker.Factory.class)
     public ProcessChecker.Factory processCheckerFactory(
         final Executor executor,
