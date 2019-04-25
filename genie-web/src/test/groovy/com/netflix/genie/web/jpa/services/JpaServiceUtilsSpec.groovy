@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.dto.UserResourcesSummary
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.jpa.entities.ApplicationEntity
@@ -33,6 +34,7 @@ import com.netflix.genie.web.jpa.entities.CriterionEntity
 import com.netflix.genie.web.jpa.entities.FileEntity
 import com.netflix.genie.web.jpa.entities.JobEntity
 import com.netflix.genie.web.jpa.entities.TagEntity
+import com.netflix.genie.web.jpa.entities.aggregates.UserJobResourcesAggregate
 import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
 
@@ -531,5 +533,32 @@ class JpaServiceUtilsSpec extends Specification {
         request.getTimeout().orElseGet(RandomSuppliers.INT) == timeout
         request.getMetadata().isPresent()
         GenieObjectMapper.getMapper().writeValueAsString(request.getMetadata().get()) == metadata
+    }
+
+    def "Can convert user resources aggregate to a summary DTO"() {
+        UserJobResourcesAggregate aggregate = Mock(UserJobResourcesAggregate)
+        UserResourcesSummary summary
+
+        when:
+        summary = JpaServiceUtils.toUserResourceSummaryDto(aggregate)
+
+        then:
+        1 * aggregate.getUser() >> "username"
+        1 * aggregate.getRunningJobsCount() >> 3L
+        1 * aggregate.getUsedMemory() >> 1024L
+        summary.getUser() == "username"
+        summary.getRunningJobsCount() == 3L
+        summary.getUsedMemory() == 1024L
+
+        when:
+        summary = JpaServiceUtils.toUserResourceSummaryDto(aggregate)
+
+        then:
+        1 * aggregate.getUser() >> null
+        1 * aggregate.getRunningJobsCount() >> null
+        1 * aggregate.getUsedMemory() >> null
+        summary.getUser() == "NULL"
+        summary.getRunningJobsCount() == 0
+        summary.getUsedMemory() == 0
     }
 }
