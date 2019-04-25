@@ -17,12 +17,14 @@ package com.netflix.genie.web.jpa.repositories;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.jpa.entities.JobEntity;
+import com.netflix.genie.web.jpa.entities.aggregates.UserJobResourcesAggregate;
 import com.netflix.genie.web.jpa.entities.projections.AgentHostnameProjection;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -84,4 +86,18 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      */
     // TODO: Explore deleteFirst{N}ByCreatedBefore
     Slice<IdProjection> findByCreatedBefore(@NotNull Instant date, @NotNull Pageable pageable);
+
+    /**
+     * Returns resources usage for each user that has a running job.
+     * Only jobs running on Genie servers are considered (i.e. no Agent jobs)
+     *
+     * @return The user resource aggregates
+     */
+    @Query(
+        "SELECT j.user AS user, COUNT(j) as runningJobsCount, SUM(j.memoryUsed) as usedMemory"
+            + " FROM JobEntity j"
+            + " WHERE j.status = 'RUNNING' AND j.v4 = FALSE"
+            + " GROUP BY j.user"
+    )
+    Set<UserJobResourcesAggregate> getUserJobResourcesAggregates();
 }

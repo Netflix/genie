@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -37,6 +38,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -195,4 +197,11 @@ public interface JobSearchService {
      * @throws GenieException If any error occurs
      */
     JobMetadata getJobMetadata(@NotBlank String id) throws GenieException;
+
+    /**
+     * Get a map of summaries of resources usage for each user with at least one running job.
+     *
+     * @return a map of user resources summaries, keyed on user name
+     */
+    Map<String, UserResourcesSummary> getUserResourcesSummaries();
 }

@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -40,6 +41,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -470,5 +472,19 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
         Assert.assertThat(jobMetadata.getTotalSizeOfAttachments(), Matchers.is(Optional.of(38083L)));
         Assert.assertThat(jobMetadata.getStdErrSize(), Matchers.is(Optional.empty()));
         Assert.assertThat(jobMetadata.getStdOutSize(), Matchers.is(Optional.empty()));
+    }
+
+    /**
+     * Make sure the getting user resource summaries works.
+     *
+     */
+    @Test
+    public void canGetUserResourceSummaries() {
+        final Map<String, UserResourcesSummary> summaries = this.service.getUserResourcesSummaries();
+        Assert.assertThat(summaries.keySet(), Matchers.contains("tgianos"));
+        final UserResourcesSummary userResourcesSummary = summaries.get("tgianos");
+        Assert.assertThat(userResourcesSummary.getUser(), Matchers.is("tgianos"));
+        Assert.assertThat(userResourcesSummary.getRunningJobsCount(), Matchers.is(1L));
+        Assert.assertThat(userResourcesSummary.getUsedMemory(), Matchers.is(0L));
     }
 }
