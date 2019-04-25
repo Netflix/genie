@@ -24,6 +24,7 @@ import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.TasksExecutorPoolProperties;
 import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
+import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.JobPersistenceService;
@@ -31,6 +32,7 @@ import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.TagPersistenceService;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
+import com.netflix.genie.web.tasks.leader.UserMetricsTask;
 import com.netflix.genie.web.tasks.node.DiskCleanupTask;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.DefaultExecutor;
@@ -68,7 +70,8 @@ import java.io.IOException;
         DatabaseCleanupProperties.class,
         DiskCleanupProperties.class,
         TasksExecutorPoolProperties.class,
-        TasksSchedulerPoolProperties.class
+        TasksSchedulerPoolProperties.class,
+        UserMetricsProperties.class
     }
 )
 public class GenieTasksAutoConfiguration {
@@ -243,6 +246,29 @@ public class GenieTasksAutoConfiguration {
             jobsProperties,
             processExecutor,
             registry
+        );
+    }
+
+    /**
+     * If required get a {@link UserMetricsTask} instance for use.
+     *
+     * @param registry              The metrics registry
+     * @param jobSearchService      The job search service
+     * @param userMetricsProperties The properties
+     * @return The {@link UserMetricsTask} instance
+     */
+    @Bean
+    @ConditionalOnProperty(value = UserMetricsProperties.ENABLED_PROPERTY, havingValue = "true")
+    @ConditionalOnMissingBean(UserMetricsTask.class)
+    public UserMetricsTask userMetricsTask(
+        final MeterRegistry registry,
+        final JobSearchService jobSearchService,
+        final UserMetricsProperties userMetricsProperties
+    ) {
+        return new UserMetricsTask(
+            registry,
+            jobSearchService,
+            userMetricsProperties
         );
     }
 }
