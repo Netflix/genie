@@ -491,6 +491,16 @@ to the number of CPU cores x 2 + 1
 |1
 |no
 
+|genie.tasks.user-metrics.enabled
+|Whether or not to publish user-tagged metrics
+|true
+|no
+
+|genie.tasks.user-metrics.refresh-interval
+|Publish/refresh interval in milliseconds
+|30000
+|no
+
 |genie.zookeeper.leader.path
 |The namespace to use for Genie leadership election of a given cluster
 |/genie/leader/
