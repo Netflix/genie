@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -66,6 +67,7 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -381,5 +383,16 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 .findByUniqueId(id, JobMetadataProjection.class)
                 .orElseThrow(() -> new GenieNotFoundException("No job metadata found for id " + id))
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, UserResourcesSummary> getUserResourcesSummaries() {
+        return this.jobRepository.getUserJobResourcesAggregates()
+            .stream()
+            .map(JpaServiceUtils::toUserResourceSummaryDto)
+            .collect(Collectors.toMap(UserResourcesSummary::getUser, userResourcesSummary -> userResourcesSummary));
     }
 }

@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
@@ -36,6 +37,7 @@ import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.entities.aggregates.UserJobResourcesAggregate;
 import com.netflix.genie.web.jpa.entities.projections.BaseProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
@@ -300,5 +302,18 @@ public final class JpaServiceUtils {
         } else {
             entity.setMetadata(null);
         }
+    }
+
+    static UserResourcesSummary toUserResourceSummaryDto(
+        final UserJobResourcesAggregate userJobResourcesAggregate
+    ) {
+        final String user = userJobResourcesAggregate.getUser();
+        final Long jobCount = userJobResourcesAggregate.getRunningJobsCount();
+        final Long memory = userJobResourcesAggregate.getUsedMemory();
+        return new UserResourcesSummary(
+            user == null ? "NULL" : user,
+            jobCount == null ? 0 : jobCount,
+            memory == null ? 0 : memory
+        );
     }
 }

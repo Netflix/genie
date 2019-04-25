@@ -18,10 +18,14 @@
 package com.netflix.genie.web.jpa.services;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.web.jpa.entities.JobEntity;
+import com.netflix.genie.web.jpa.entities.aggregates.UserJobResourcesAggregate;
 import com.netflix.genie.web.jpa.entities.projections.AgentHostnameProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobClusterProjection;
@@ -36,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -205,5 +210,53 @@ public class JpaJobSearchServiceImplTest {
             .thenReturn(Optional.of(jobEntity));
 
         Assert.assertThat(this.service.getJobHost(jobId), Matchers.is(hostName));
+    }
+
+    /**
+     * Make sure that user resources summaries are returned correctly when there is no active job.
+     */
+    @Test
+    public void canGetUserResourceSummariesNoRecords() {
+        Mockito.when(
+            jobRepository.getUserJobResourcesAggregates()
+        ).thenReturn(
+            Sets.newHashSet()
+        );
+        Assert.assertEquals(
+            Maps.newHashMap(),
+            this.service.getUserResourcesSummaries()
+        );
+    }
+
+
+    /**
+     * Make sure that user resources summaries are returned correctly.
+     */
+    @Test
+    public void canGetUserResourceSummaries() {
+        final UserJobResourcesAggregate p1 = Mockito.mock(UserJobResourcesAggregate.class);
+        final UserJobResourcesAggregate p2 = Mockito.mock(UserJobResourcesAggregate.class);
+
+        Mockito.when(p1.getUser()).thenReturn("foo");
+        Mockito.when(p1.getRunningJobsCount()).thenReturn(3L);
+        Mockito.when(p1.getUsedMemory()).thenReturn(1024L);
+
+        Mockito.when(p2.getUser()).thenReturn("bar");
+        Mockito.when(p2.getRunningJobsCount()).thenReturn(5L);
+        Mockito.when(p2.getUsedMemory()).thenReturn(2048L);
+
+        Mockito.when(
+            jobRepository.getUserJobResourcesAggregates()
+        ).thenReturn(
+            Sets.newHashSet(p1, p2)
+        );
+
+        final HashMap<String, UserResourcesSummary> expectedMap = Maps.newHashMap();
+        expectedMap.put("foo", new UserResourcesSummary("foo", 3, 1024));
+        expectedMap.put("bar", new UserResourcesSummary("bar", 5, 2048));
+        Assert.assertEquals(
+            expectedMap,
+            this.service.getUserResourcesSummaries()
+        );
     }
 }
