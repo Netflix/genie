@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.util;
 
+
 /**
  * Used to store constants related to metric names.
  *
@@ -80,6 +81,11 @@ public final class MetricsConstants {
          * Key to tag the status of a request or operation.
          */
         public static final String STATUS = "status";
+
+        /**
+         * Key to tag a username.
+         */
+        public static final String USER = "user";
 
         /**
          * Utility class private constructor.
