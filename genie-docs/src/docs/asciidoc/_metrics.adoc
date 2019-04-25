@@ -475,6 +475,24 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |AgentJobServiceImpl
 |status, exceptionClass, agentVersion, agentHost, handshakeDecision
 
+|genie.user.active-jobs.gauge
+|Number of active jobs tagged with owner user.
+|count
+|UserMetricsTask
+|-
+
+|genie.user.active-memory.gauge
+|Amount of memory used by active jobs tagged with owner user.
+|Megabytes
+|UserMetricsTask
+|-
+
+|genie.user.active-users.gauge
+|Number of distinct users with at least one job in RUNNING state.
+|count
+|UserMetricsTask
+|-
+
 |===
 
 (*) Source may add additional tags on a case-by-case basis

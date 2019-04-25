@@ -18,8 +18,12 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
+import com.netflix.genie.web.properties.UserMetricsProperties;
+import com.netflix.genie.web.services.JobSearchService;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * Unit tests for the TaskConfig class.
@@ -44,4 +48,20 @@ public class GenieTasksAutoConfigurationTest {
     public void canGetTaskScheduler() {
         Assert.assertNotNull(new GenieTasksAutoConfiguration().genieTaskScheduler(new TasksSchedulerPoolProperties()));
     }
+
+    /**
+     * Make sure we get a valid task.
+     */
+    @Test
+    public void canGetUserMetricsTask() {
+        Assert.assertNotNull(
+            new GenieTasksAutoConfiguration().userMetricsTask(
+                Mockito.mock(MeterRegistry.class),
+                Mockito.mock(JobSearchService.class),
+                Mockito.mock(UserMetricsProperties.class)
+            )
+        );
+        Assert.assertNotNull(new GenieTasksAutoConfiguration().genieTaskScheduler(new TasksSchedulerPoolProperties()));
+    }
+
 }
