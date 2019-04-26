@@ -17,8 +17,10 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
+import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.Assert;
@@ -64,4 +66,18 @@ public class GenieTasksAutoConfigurationTest {
         Assert.assertNotNull(new GenieTasksAutoConfiguration().genieTaskScheduler(new TasksSchedulerPoolProperties()));
     }
 
+
+    /**
+     * Make sure we get a valid task.
+     */
+    @Test
+    public void canGetAgentJobCleanupTask() {
+        Assert.assertNotNull(
+            new GenieTasksAutoConfiguration().agentJobCleanupTask(
+                Mockito.mock(JobSearchService.class),
+                Mockito.mock(JobPersistenceService.class),
+                Mockito.mock(AgentCleanupProperties.class)
+            )
+        );
+    }
 }
