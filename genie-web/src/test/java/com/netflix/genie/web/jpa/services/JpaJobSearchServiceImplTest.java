@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -31,6 +32,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobClusterProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobCommandProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
+import com.netflix.genie.web.jpa.entities.projections.UniqueIdProjection;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
@@ -259,4 +261,45 @@ public class JpaJobSearchServiceImplTest {
             this.service.getUserResourcesSummaries()
         );
     }
+
+
+    /**
+     * Make sure that user disconnected agent ids are returned correctly when there is no active job.
+     */
+    @Test
+    public void canGetDisconnectedAgentJobsNoRecords() {
+        Mockito.when(
+            jobRepository.getAgentJobIdsWithNoConnectionInState(JobStatus.getActiveStatuses())
+        ).thenReturn(
+            Sets.newHashSet()
+        );
+        Assert.assertEquals(
+            Sets.newHashSet(),
+            this.service.getActiveDisconnectedAgentJobs()
+        );
+    }
+
+    /**
+     * Make sure that user disconnected agent ids are returned correctly.
+     */
+    @Test
+    public void canGetDisconnectedAgentJobs() {
+        final UniqueIdProjection p1 = Mockito.mock(UniqueIdProjection.class);
+        final UniqueIdProjection p2 = Mockito.mock(UniqueIdProjection.class);
+
+        Mockito.when(p1.getUniqueId()).thenReturn("job1");
+        Mockito.when(p2.getUniqueId()).thenReturn("job2");
+
+        Mockito.when(
+            jobRepository.getAgentJobIdsWithNoConnectionInState(JobStatus.getActiveStatuses())
+        ).thenReturn(
+            Sets.newHashSet(p1, p2)
+        );
+
+        Assert.assertEquals(
+            Sets.newHashSet("job1", "job2"),
+            this.service.getActiveDisconnectedAgentJobs()
+        );
+    }
+
 }

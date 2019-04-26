@@ -422,6 +422,7 @@
         requested_id="true"
         job_directory_location="/tmp/genie/jobs/1"
         resolved="true"
+        v4="false"
     />
     <job_command_arguments
         job_id="1"
@@ -517,6 +518,7 @@
         requested_id="true"
         job_directory_location="/tmp/genie/jobs/2"
         resolved="true"
+        v4="false"
     />
     <job_command_arguments
         job_id="2"
@@ -600,6 +602,7 @@
         requested_id="true"
         job_directory_location="/tmp/genie/jobs/3"
         resolved="true"
+        v4="false"
     />
     <job_command_arguments
         job_id="3"
@@ -646,4 +649,181 @@
 
     <jobs_applications job_id="3" application_id="1" application_order="0"/>
     <jobs_applications job_id="3" application_id="2" application_order="1"/>
+
+    <criteria
+        id="9"
+    />
+    <criteria_tags
+        criterion_id="9"
+        tag_id="6"
+    />
+    <jobs
+        id="4"
+        created="2016-02-24 01:48:00"
+        updated="2016-02-24 02:59:00"
+        entity_version="1"
+        unique_id="agentJob1"
+        genie_user="tgianos"
+        name="testSparkJob2"
+        version="2.4"
+        command_criterion="9"
+        requested_cpu="2"
+        requested_memory="2048"
+        archiving_disabled="true"
+        requested_timeout="608400"
+        num_attachments="1"
+        total_size_of_attachments="382"
+        status="RUNNING"
+        cluster_id="1"
+        command_id="1"
+        agent_hostname="agent.netflix.com"
+        exit_code="-1"
+        process_id="319"
+        check_delay="12000"
+        timeout="2016-03-03 01:49:00"
+        grouping="agentJob1Grouping"
+        grouping_instance="agentJob1GroupingInstance"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/13"
+        resolved="true"
+        v4="true"
+    />
+    <job_command_arguments
+        job_id="4"
+        argument="-f"
+        argument_order="0"
+    />
+    <job_command_arguments
+        job_id="4"
+        argument="spark.jar"
+        argument_order="1"
+    />
+    <criteria
+        id="10"
+    />
+    <criteria_tags
+        criterion_id="10"
+        tag_id="17"
+    />
+    <criteria_tags
+        criterion_id="10"
+        tag_id="12"
+    />
+    <jobs_cluster_criteria
+        job_id="4"
+        criterion_id="10"
+        priority_order="0"
+    />
+    <criteria
+        id="11"
+    />
+    <criteria_tags
+        criterion_id="11"
+        tag_id="11"
+    />
+    <criteria_tags
+        criterion_id="11"
+        tag_id="12"
+    />
+    <jobs_cluster_criteria
+        job_id="4"
+        criterion_id="11"
+        priority_order="1"
+    />
+
+    <jobs_applications job_id="4" application_id="1" application_order="0"/>
+    <jobs_applications job_id="4" application_id="2" application_order="1"/>
+
+    <criteria
+        id="12"
+    />
+    <criteria_tags
+        criterion_id="12"
+        tag_id="6"
+    />
+    <jobs
+        id="5"
+        created="2016-02-24 01:48:00"
+        updated="2016-02-24 02:59:00"
+        entity_version="1"
+        unique_id="agentJob2"
+        genie_user="tgianos"
+        name="testSparkJob2"
+        version="2.4"
+        command_criterion="12"
+        requested_cpu="2"
+        requested_memory="2048"
+        archiving_disabled="true"
+        requested_timeout="608400"
+        num_attachments="1"
+        total_size_of_attachments="382"
+        status="RUNNING"
+        cluster_id="1"
+        command_id="1"
+        agent_hostname="agent.netflix.com"
+        exit_code="-1"
+        process_id="319"
+        check_delay="12000"
+        timeout="2016-03-03 01:49:00"
+        grouping="agentJob2Grouping"
+        grouping_instance="agentJob2GroupingInstance"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/13"
+        resolved="true"
+        v4="true"
+    />
+    <job_command_arguments
+        job_id="5"
+        argument="-f"
+        argument_order="0"
+    />
+    <job_command_arguments
+        job_id="5"
+        argument="spark.jar"
+        argument_order="1"
+    />
+    <criteria
+        id="13"
+    />
+    <criteria_tags
+        criterion_id="13"
+        tag_id="17"
+    />
+    <criteria_tags
+        criterion_id="13"
+        tag_id="12"
+    />
+    <jobs_cluster_criteria
+        job_id="5"
+        criterion_id="13"
+        priority_order="0"
+    />
+    <criteria
+        id="14"
+    />
+    <criteria_tags
+        criterion_id="14"
+        tag_id="11"
+    />
+    <criteria_tags
+        criterion_id="14"
+        tag_id="12"
+    />
+    <jobs_cluster_criteria
+        job_id="5"
+        criterion_id="14"
+        priority_order="1"
+    />
+
+    <jobs_applications job_id="5" application_id="1" application_order="0"/>
+    <jobs_applications job_id="5" application_id="2" application_order="1"/>
+
+    <agent_connections
+        created="2016-02-24 01:48:00"
+        updated="2016-02-24 02:59:00"
+        entity_version="1"
+        job_id="agentJob2"
+        server_hostname="b.netflix.com"
+    />
+
 </dataset>
