@@ -388,6 +388,21 @@ determined by Zookeeper or other mechanism via Spring
 |false
 |no
 
+|genie.tasks.agent-cleanup.enabled
+|Whether to enable the task that detects jobs whose agent has gone AWOL, and marks them failed
+|true
+|no
+
+|genie.tasks.agent-cleanup.refreshInterval
+|How often the AWOL agent tasks executed, in milliseconds
+|10000
+|no
+
+|genie.tasks.agent-cleanup.timeLimit
+|How long of a leeway to give a job after it agent disconnected and before the job is marked failed, in milliseconds
+|120000
+|no
+
 |genie.tasks.cluster-checker.healthIndicatorsToIgnore
 |The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list
