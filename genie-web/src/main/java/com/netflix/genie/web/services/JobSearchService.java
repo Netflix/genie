@@ -204,4 +204,10 @@ public interface JobSearchService {
      * @return a map of user resources summaries, keyed on user name
      */
     Map<String, UserResourcesSummary> getUserResourcesSummaries();
+
+    /**
+     * Get the IDs of all agent jobs that are active but currently not connected to any node.
+     * @return a set of job ids
+     */
+    Set<String> getActiveDisconnectedAgentJobs();
 }

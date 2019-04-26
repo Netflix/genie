@@ -21,10 +21,12 @@ import com.netflix.genie.web.jpa.entities.aggregates.UserJobResourcesAggregate;
 import com.netflix.genie.web.jpa.entities.projections.AgentHostnameProjection;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
+import com.netflix.genie.web.jpa.entities.projections.UniqueIdProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -100,4 +102,21 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
             + " GROUP BY j.user"
     )
     Set<UserJobResourcesAggregate> getUserJobResourcesAggregates();
+
+    /**
+     * Find agent jobs in the given set of states that don't have an entry in the connections table.
+     *
+     * @param statuses the job statuses filter
+     * @return a set of job projections
+     */
+    @Query(
+        "SELECT j"
+            + " FROM JobEntity j"
+            + " WHERE j.status IN (:statuses)"
+            + " AND j.v4 = TRUE"
+            + " AND j.uniqueId NOT IN (SELECT c.jobId FROM AgentConnectionEntity c)"
+    )
+    Set<UniqueIdProjection> getAgentJobIdsWithNoConnectionInState(
+        @Param("statuses") @NotEmpty Set<JobStatus> statuses
+    );
 }
