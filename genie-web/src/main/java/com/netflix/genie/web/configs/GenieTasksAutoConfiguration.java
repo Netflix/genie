@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
@@ -30,6 +31,7 @@ import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.TagPersistenceService;
+import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
 import com.netflix.genie.web.tasks.leader.UserMetricsTask;
@@ -71,7 +73,8 @@ import java.io.IOException;
         DiskCleanupProperties.class,
         TasksExecutorPoolProperties.class,
         TasksSchedulerPoolProperties.class,
-        UserMetricsProperties.class
+        UserMetricsProperties.class,
+        AgentCleanupProperties.class
     }
 )
 public class GenieTasksAutoConfiguration {
@@ -269,6 +272,29 @@ public class GenieTasksAutoConfiguration {
             registry,
             jobSearchService,
             userMetricsProperties
+        );
+    }
+
+    /**
+     * If required, get a {@link AgentJobCleanupTask} instance for use.
+     *
+     * @param jobSearchService       The job search service
+     * @param jobPersistenceService  the job persistence service
+     * @param agentCleanupProperties the agent cleanup properties
+     * @return a {@link AgentJobCleanupTask}
+     */
+    @Bean
+    @ConditionalOnProperty(value = AgentCleanupProperties.ENABLED_PROPERTY, havingValue = "true")
+    @ConditionalOnMissingBean(AgentJobCleanupTask.class)
+    public AgentJobCleanupTask agentJobCleanupTask(
+        final JobSearchService jobSearchService,
+        final JobPersistenceService jobPersistenceService,
+        final AgentCleanupProperties agentCleanupProperties
+    ) {
+        return new AgentJobCleanupTask(
+            jobSearchService,
+            jobPersistenceService,
+            agentCleanupProperties
         );
     }
 }
