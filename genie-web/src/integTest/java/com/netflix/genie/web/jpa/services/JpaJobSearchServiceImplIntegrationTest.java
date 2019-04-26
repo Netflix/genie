@@ -90,7 +90,7 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
                 null,
                 page
             );
-        Assert.assertThat(jobs.getTotalElements(), Matchers.is(3L));
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(5L));
 
         jobs = this.service
             .findJobs(
@@ -111,7 +111,7 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
                 null,
                 page
             );
-        Assert.assertThat(jobs.getTotalElements(), Matchers.is(1L));
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(3L));
         Assert.assertThat(
             jobs
                 .getContent()
@@ -455,7 +455,7 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
     @Test
     public void canGetActiveJobCountForUser() throws GenieException {
         Assert.assertThat(this.service.getActiveJobCountForUser("nobody"), Matchers.is(0L));
-        Assert.assertThat(this.service.getActiveJobCountForUser("tgianos"), Matchers.is(2L));
+        Assert.assertThat(this.service.getActiveJobCountForUser("tgianos"), Matchers.is(4L));
     }
 
     /**
@@ -486,5 +486,16 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
         Assert.assertThat(userResourcesSummary.getUser(), Matchers.is("tgianos"));
         Assert.assertThat(userResourcesSummary.getRunningJobsCount(), Matchers.is(1L));
         Assert.assertThat(userResourcesSummary.getUsedMemory(), Matchers.is(0L));
+    }
+
+    /**
+     * Make sure the getting active agent jobs without an active connection works.
+     *
+     */
+    @Test
+    public void canGetActiveDisconnectedAgentJobs() {
+        final Set<String> jobs = this.service.getActiveDisconnectedAgentJobs();
+        Assert.assertThat(jobs.size(), Matchers.is(1));
+        Assert.assertThat(jobs, Matchers.contains("agentJob1"));
     }
 }
