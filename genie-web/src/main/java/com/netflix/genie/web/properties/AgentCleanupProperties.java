@@ -46,7 +46,7 @@ public class AgentCleanupProperties {
 
     private boolean enabled = true;
 
-    private long refreshInterval = 30_000;
+    private long refreshInterval = 10_000;
 
-
+    private long timeLimit = 120_000;
 }

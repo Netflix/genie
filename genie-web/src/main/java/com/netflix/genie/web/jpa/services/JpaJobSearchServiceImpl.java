@@ -42,6 +42,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobStatusProjection;
+import com.netflix.genie.web.jpa.entities.projections.UniqueIdProjection;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
@@ -70,6 +71,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -394,5 +396,16 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             .stream()
             .map(JpaServiceUtils::toUserResourceSummaryDto)
             .collect(Collectors.toMap(UserResourcesSummary::getUser, userResourcesSummary -> userResourcesSummary));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> getActiveDisconnectedAgentJobs() {
+        return this.jobRepository.getAgentJobIdsWithNoConnectionInState(JobStatus.getActiveStatuses())
+            .stream()
+            .map(UniqueIdProjection::getUniqueId)
+            .collect(Collectors.toSet());
     }
 }
