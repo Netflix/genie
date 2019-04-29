@@ -377,8 +377,7 @@ public class JobRestController {
      * @throws GenieException For any error
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public JobResource getJob(
-        @PathVariable("id") final String id) throws GenieException {
+    public JobResource getJob(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJob] Called for job with id: {}", id);
         return this.jobResourceAssembler.toResource(this.jobSearchService.getJob(id));
     }
@@ -391,9 +390,7 @@ public class JobRestController {
      * @throws GenieException on error
      */
     @GetMapping(value = "/{id}/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JsonNode getJobStatus(
-        @PathVariable("id") final String id) throws GenieException {
-        log.debug("[getJobStatus] Called for job with id: {}", id);
+    public JsonNode getJobStatus(@PathVariable("id") final String id) throws GenieException {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
             .objectNode()
@@ -651,9 +648,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/cluster", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ClusterResource getJobCluster(
-        @PathVariable("id") final String id
-    ) throws GenieException {
+    public ClusterResource getJobCluster(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJobCluster] Called for job with id {}", id);
         return this.clusterResourceAssembler.toResource(this.jobSearchService.getJobCluster(id));
     }
@@ -667,8 +662,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/command", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public CommandResource getJobCommand(
-        @PathVariable("id") final String id) throws GenieException {
+    public CommandResource getJobCommand(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJobCommand] Called for job with id {}", id);
         return this.commandResourceAssembler.toResource(this.jobSearchService.getJobCommand(id));
     }
@@ -682,8 +676,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ApplicationResource> getJobApplications(
-        @PathVariable("id") final String id) throws GenieException {
+    public List<ApplicationResource> getJobApplications(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJobApplications] Called for job with id {}", id);
 
         return this.jobSearchService
