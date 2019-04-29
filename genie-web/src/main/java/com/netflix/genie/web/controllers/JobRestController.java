@@ -394,7 +394,7 @@ public class JobRestController {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
             .objectNode()
-            .set("status", factory.textNode(this.jobSearchService.getJobStatus(id).toString()));
+            .set("status", factory.textNode(this.jobPersistenceService.getJobStatus(id).toString()));
     }
 
     /**
