@@ -120,7 +120,7 @@ public class CommandRestController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createCommand(@RequestBody @Valid final Command command) throws GenieException {
-        log.debug("called to create new command configuration {}", command);
+        log.info("Called to create new command {}", command);
         final String id = this.commandPersistenceService.createCommand(DtoConverters.toV4CommandRequest(command));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -143,7 +143,7 @@ public class CommandRestController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public CommandResource getCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called to get command with id {}", id);
+        log.info("Called to get command with id {}", id);
         return this.commandResourceAssembler.toResource(
             DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id))
         );
@@ -171,8 +171,14 @@ public class CommandRestController {
         @PageableDefault(size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Command> assembler
     ) throws GenieException {
-        log.debug("Called [name | user | status | tags | page]");
-        log.debug("{} | {} | {} | {} | {}", name, user, statuses, tags, page);
+        log.info(
+            "Called [name | user | status | tags | page]\n{} | {} | {} | {} | {}",
+            name,
+            user,
+            statuses,
+            tags,
+            page
+        );
 
         Set<CommandStatus> enumStatuses = null;
         if (statuses != null) {
@@ -298,7 +304,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final JsonPatch patch
     ) throws GenieException {
-        log.debug("Called to patch command {} with patch {}", id, patch);
+        log.info("Called to patch command {} with patch {}", id, patch);
 
         final Command currentCommand = DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id));
 
@@ -323,7 +329,7 @@ public class CommandRestController {
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllCommands() throws GenieException {
-        log.debug("called to delete all commands.");
+        log.warn("Called to delete all commands.");
         this.commandPersistenceService.deleteAllCommands();
     }
 
@@ -336,7 +342,7 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called to delete command with id {}", id);
+        log.info("Called to delete command with id {}", id);
         this.commandPersistenceService.deleteCommand(id);
     }
 
@@ -354,7 +360,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
     ) throws GenieException {
-        log.debug("Called with id {} and config {}", id, configs);
+        log.info("Called with id {} and config {}", id, configs);
         this.commandPersistenceService.addConfigsForCommand(id, configs);
     }
 
@@ -369,7 +375,7 @@ public class CommandRestController {
     @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
+        log.info("Called with id {}", id);
         return this.commandPersistenceService.getConfigsForCommand(id);
     }
 
@@ -388,7 +394,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
     ) throws GenieException {
-        log.debug("Called with id {} and configs {}", id, configs);
+        log.info("Called with id {} and configs {}", id, configs);
         this.commandPersistenceService.updateConfigsForCommand(id, configs);
     }
 
@@ -402,7 +408,7 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
+        log.info("Called with id {}", id);
         this.commandPersistenceService.removeAllConfigsForCommand(id);
     }
 
@@ -420,7 +426,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
     ) throws GenieException {
-        log.debug("Called with id {} and dependencies {}", id, dependencies);
+        log.info("Called with id {} and dependencies {}", id, dependencies);
         this.commandPersistenceService.addDependenciesForCommand(id, dependencies);
     }
 
@@ -435,7 +441,7 @@ public class CommandRestController {
     @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getDependenciesForCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
+        log.info("Called with id {}", id);
         return this.commandPersistenceService.getDependenciesForCommand(id);
     }
 
@@ -454,7 +460,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
     ) throws GenieException {
-        log.debug("Called with id {} and dependencies {}", id, dependencies);
+        log.info("Called with id {} and dependencies {}", id, dependencies);
         this.commandPersistenceService.updateDependenciesForCommand(id, dependencies);
     }
 
@@ -468,7 +474,7 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllDependenciesForCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
+        log.info("Called with id {}", id);
         this.commandPersistenceService.removeAllDependenciesForCommand(id);
     }
 
@@ -486,7 +492,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
     ) throws GenieException {
-        log.debug("Called with id {} and tags {}", id, tags);
+        log.info("Called with id {} and tags {}", id, tags);
         this.commandPersistenceService.addTagsForCommand(id, tags);
     }
 
@@ -501,7 +507,7 @@ public class CommandRestController {
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
+        log.info("Called with id {}", id);
         return DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id)).getTags();
     }
 
@@ -520,7 +526,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
     ) throws GenieException {
-        log.debug("Called with id {} and tags {}", id, tags);
+        log.info("Called with id {} and tags {}", id, tags);
         this.commandPersistenceService.updateTagsForCommand(id, tags);
     }
 
@@ -534,7 +540,7 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllTagsForCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
+        log.info("Called with id {}", id);
         this.commandPersistenceService.removeAllTagsForCommand(id);
     }
 
@@ -552,7 +558,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @PathVariable("tag") final String tag
     ) throws GenieException {
-        log.debug("Called with id {} and tag {}", id, tag);
+        log.info("Called with id {} and tag {}", id, tag);
         this.commandPersistenceService.removeTagForCommand(id, tag);
     }
 
@@ -570,7 +576,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final List<String> applicationIds
     ) throws GenieException {
-        log.debug("Called with id {} and application {}", id, applicationIds);
+        log.info("Called with id {} and application {}", id, applicationIds);
         this.commandPersistenceService.addApplicationsForCommand(id, applicationIds);
     }
 
@@ -587,7 +593,7 @@ public class CommandRestController {
     public List<ApplicationResource> getApplicationsForCommand(
         @PathVariable("id") final String id
     ) throws GenieException {
-        log.debug("Called with id {}", id);
+        log.info("Called with id {}", id);
         return this.commandPersistenceService.getApplicationsForCommand(id)
             .stream()
             .map(DtoConverters::toV3Application)
@@ -609,7 +615,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestBody final List<String> applicationIds
     ) throws GenieException {
-        log.debug("Called with id {} and application {}", id, applicationIds);
+        log.info("Called with id {} and application {}", id, applicationIds);
         this.commandPersistenceService.setApplicationsForCommand(id, applicationIds);
     }
 
@@ -623,7 +629,7 @@ public class CommandRestController {
     @DeleteMapping(value = "/{id}/applications")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllApplicationsForCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id '{}'.", id);
+        log.info("Called with id '{}'", id);
         this.commandPersistenceService.removeApplicationsForCommand(id);
     }
 
@@ -641,7 +647,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @PathVariable("appId") final String appId
     ) throws GenieException {
-        log.debug("Called with id '{}' and app id {}", id, appId);
+        log.info("Called with id '{}' and app id {}", id, appId);
         this.commandPersistenceService.removeApplicationForCommand(id, appId);
     }
 
@@ -660,7 +666,7 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws GenieException {
-        log.debug("Called with id {} and statuses {}", id, statuses);
+        log.info("Called with id {} and statuses {}", id, statuses);
 
         Set<ClusterStatus> enumStatuses = null;
         if (statuses != null) {
