@@ -156,6 +156,9 @@ public class GenieEventBusImpl implements
         this.asyncMulticaster.setBeanClassLoader(classLoader);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setBeanFactory(final BeanFactory beanFactory) {
         this.syncMulticaster.setBeanFactory(beanFactory);
