@@ -28,7 +28,6 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
@@ -275,10 +274,6 @@ public class JobRestController {
         @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
-        if (jobRequest == null) {
-            throw new GeniePreconditionException("No job request entered. Unable to submit.");
-        }
-
         // get client's host from the context
         final String localClientHost;
         if (StringUtils.isNotBlank(clientHost)) {
