@@ -63,6 +63,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -163,10 +164,10 @@ public class CommandRestController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<CommandResource> getCommands(
-        @RequestParam(value = "name", required = false) final String name,
-        @RequestParam(value = "user", required = false) final String user,
-        @RequestParam(value = "status", required = false) final Set<String> statuses,
-        @RequestParam(value = "tag", required = false) final Set<String> tags,
+        @RequestParam(value = "name", required = false) @Nullable final String name,
+        @RequestParam(value = "user", required = false) @Nullable final String user,
+        @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
         @PageableDefault(size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Command> assembler
     ) throws GenieException {
@@ -657,7 +658,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.OK)
     public Set<ClusterResource> getClustersForCommand(
         @PathVariable("id") final String id,
-        @RequestParam(value = "status", required = false) final Set<String> statuses
+        @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws GenieException {
         log.debug("Called with id {} and statuses {}", id, statuses);
 

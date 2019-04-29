@@ -61,6 +61,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
@@ -154,11 +155,11 @@ public class ApplicationRestController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<ApplicationResource> getApplications(
-        @RequestParam(value = "name", required = false) final String name,
-        @RequestParam(value = "user", required = false) final String user,
-        @RequestParam(value = "status", required = false) final Set<String> statuses,
-        @RequestParam(value = "tag", required = false) final Set<String> tags,
-        @RequestParam(value = "type", required = false) final String type,
+        @RequestParam(value = "name", required = false) @Nullable final String name,
+        @RequestParam(value = "user", required = false) @Nullable final String user,
+        @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
+        @RequestParam(value = "type", required = false) @Nullable final String type,
         @PageableDefault(sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Application> assembler
     ) throws GenieException {
@@ -539,7 +540,7 @@ public class ApplicationRestController {
     @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
     public Set<CommandResource> getCommandsForApplication(
         @PathVariable("id") final String id,
-        @RequestParam(value = "status", required = false) final Set<String> statuses
+        @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws GenieException {
         log.debug("Called with id {}", id);
 

@@ -94,6 +94,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -233,8 +234,8 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
         @Valid @RequestBody final JobRequest jobRequest,
-        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false) final String clientHost,
-        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) final String userAgent,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false) @Nullable final String clientHost,
+        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
         log.info("[submitJob] Called json method type to submit job: {}", jobRequest);
@@ -258,8 +259,8 @@ public class JobRestController {
     public ResponseEntity<Void> submitJob(
         @Valid @RequestPart("request") final JobRequest jobRequest,
         @RequestPart("attachment") final MultipartFile[] attachments,
-        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false) final String clientHost,
-        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) final String userAgent,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false) @Nullable final String clientHost,
+        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
         log.info("[submitJob] Called multipart method to submit job: {}", jobRequest);
@@ -269,9 +270,9 @@ public class JobRestController {
 
     private ResponseEntity<Void> handleSubmitJob(
         final JobRequest jobRequest,
-        final MultipartFile[] attachments,
-        final String clientHost,
-        final String userAgent,
+        @Nullable final MultipartFile[] attachments,
+        @Nullable final String clientHost,
+        @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
         if (jobRequest == null) {
@@ -431,21 +432,21 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.OK)
     @SuppressWarnings("checkstyle:parameternumber")
     public PagedResources<JobSearchResultResource> findJobs(
-        @RequestParam(value = "id", required = false) final String id,
-        @RequestParam(value = "name", required = false) final String name,
-        @RequestParam(value = "user", required = false) final String user,
-        @RequestParam(value = "status", required = false) final Set<String> statuses,
-        @RequestParam(value = "tag", required = false) final Set<String> tags,
-        @RequestParam(value = "clusterName", required = false) final String clusterName,
-        @RequestParam(value = "clusterId", required = false) final String clusterId,
-        @RequestParam(value = "commandName", required = false) final String commandName,
-        @RequestParam(value = "commandId", required = false) final String commandId,
-        @RequestParam(value = "minStarted", required = false) final Long minStarted,
-        @RequestParam(value = "maxStarted", required = false) final Long maxStarted,
-        @RequestParam(value = "minFinished", required = false) final Long minFinished,
-        @RequestParam(value = "maxFinished", required = false) final Long maxFinished,
-        @RequestParam(value = "grouping", required = false) final String grouping,
-        @RequestParam(value = "groupingInstance", required = false) final String groupingInstance,
+        @RequestParam(value = "id", required = false) @Nullable final String id,
+        @RequestParam(value = "name", required = false) @Nullable final String name,
+        @RequestParam(value = "user", required = false) @Nullable final String user,
+        @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
+        @RequestParam(value = "clusterName", required = false) @Nullable final String clusterName,
+        @RequestParam(value = "clusterId", required = false) @Nullable final String clusterId,
+        @RequestParam(value = "commandName", required = false) @Nullable final String commandName,
+        @RequestParam(value = "commandId", required = false) @Nullable final String commandId,
+        @RequestParam(value = "minStarted", required = false) @Nullable final Long minStarted,
+        @RequestParam(value = "maxStarted", required = false) @Nullable final Long maxStarted,
+        @RequestParam(value = "minFinished", required = false) @Nullable final Long minFinished,
+        @RequestParam(value = "maxFinished", required = false) @Nullable final Long maxFinished,
+        @RequestParam(value = "grouping", required = false) @Nullable final String grouping,
+        @RequestParam(value = "groupingInstance", required = false) @Nullable final String groupingInstance,
         @PageableDefault(sort = {"created"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
@@ -549,7 +550,8 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void killJob(
         @PathVariable("id") final String id,
-        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
+        @Nullable final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws GenieException, IOException {
@@ -717,7 +719,8 @@ public class JobRestController {
     )
     public void getJobOutput(
         @PathVariable("id") final String id,
-        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
+        @Nullable final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
