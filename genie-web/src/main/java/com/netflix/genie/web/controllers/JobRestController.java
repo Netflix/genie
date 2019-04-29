@@ -262,7 +262,11 @@ public class JobRestController {
         @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
-        log.info("[submitJob] Called multipart method to submit job: {}", jobRequest);
+        log.info(
+            "[submitJob] Called multipart method to submit job: {}, with {} attachments",
+            jobRequest,
+            attachments.length
+        );
         this.submitJobWithAttachmentsRate.increment();
         return this.handleSubmitJob(jobRequest, attachments, clientHost, userAgent, httpServletRequest);
     }
@@ -334,7 +338,12 @@ public class JobRestController {
             numAttachments = attachments.length;
             for (final MultipartFile attachment : attachments) {
                 totalSizeOfAttachments += attachment.getSize();
-                log.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
+                log.info(
+                    "Attachment for job: {} name: {} Size: {}",
+                    jobId,
+                    attachment.getOriginalFilename(),
+                    attachment.getSize()
+                );
                 try {
                     String originalFilename = attachment.getOriginalFilename();
                     if (originalFilename == null) {
@@ -391,6 +400,7 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/status", produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode getJobStatus(@PathVariable("id") final String id) throws GenieException {
+        log.info("[getJobStatus] Called for job with id: {}", id);
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
             .objectNode()
@@ -446,10 +456,8 @@ public class JobRestController {
             "[getJobs] Called with "
                 + "[id | jobName | user | statuses | clusterName "
                 + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | grouping | groupingInstance "
-                + "| page]"
-        );
-        log.info(
-            "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
+                + "| page]\n"
+                + "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
             id,
             name,
             user,
@@ -724,14 +732,14 @@ public class JobRestController {
             throw new GenieServerException("Unable to parse base request url", e);
         }
 
-        log.info("[getJobOutput] Called to get output path \"{}\" for job with id {}", path, id);
+        log.info("[getJobOutput] Called to get output path \"{}\" for job with id \"{}\"", path, id);
 
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
         // if the job is finished all file serving is done from the archive it doesn't need to be forwarded anywhere
         if (jobStatus.isActive() && this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
             final String jobHostname = this.getJobOwnerHostname(id, isV4);
             if (!this.hostname.equals(jobHostname)) {
-                log.info("Job {} is not or was not run on this node. Forwarding to {}", id, jobHostname);
+                log.info("Job {} is not run on this node. Forwarding to {}", id, jobHostname);
                 final String forwardHost = this.buildForwardHost(jobHostname);
                 try {
                     this.restTemplate.execute(
@@ -762,7 +770,7 @@ public class JobRestController {
             }
         }
 
-        log.debug("Fetching requested resource \"{}\"", id, path);
+        log.debug("Fetching requested resource \"{}\" for job \"{}\"", path, id);
         this.jobDirectoryServerService.serveResource(id, baseUrl, path, request, response);
     }
 
