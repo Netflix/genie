@@ -61,6 +61,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
@@ -160,11 +161,11 @@ ClusterRestController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<ClusterResource> getClusters(
-        @RequestParam(value = "name", required = false) final String name,
-        @RequestParam(value = "status", required = false) final Set<String> statuses,
-        @RequestParam(value = "tag", required = false) final Set<String> tags,
-        @RequestParam(value = "minUpdateTime", required = false) final Long minUpdateTime,
-        @RequestParam(value = "maxUpdateTime", required = false) final Long maxUpdateTime,
+        @RequestParam(value = "name", required = false) @Nullable final String name,
+        @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
+        @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
+        @RequestParam(value = "minUpdateTime", required = false) @Nullable final Long minUpdateTime,
+        @RequestParam(value = "maxUpdateTime", required = false) @Nullable final Long maxUpdateTime,
         @PageableDefault(size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Cluster> assembler
     ) throws GenieException {
@@ -588,7 +589,7 @@ ClusterRestController {
     @ResponseStatus(HttpStatus.OK)
     public List<CommandResource> getCommandsForCluster(
         @PathVariable("id") final String id,
-        @RequestParam(value = "status", required = false) final Set<String> statuses
+        @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws GenieException {
         log.debug("Called with id {} status {}", id, statuses);
 
