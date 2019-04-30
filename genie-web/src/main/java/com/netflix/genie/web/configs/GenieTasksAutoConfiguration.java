@@ -281,6 +281,7 @@ public class GenieTasksAutoConfiguration {
      * @param jobSearchService       The job search service
      * @param jobPersistenceService  the job persistence service
      * @param agentCleanupProperties the agent cleanup properties
+     * @param registry               the metrics registry
      * @return a {@link AgentJobCleanupTask}
      */
     @Bean
@@ -289,12 +290,14 @@ public class GenieTasksAutoConfiguration {
     public AgentJobCleanupTask agentJobCleanupTask(
         final JobSearchService jobSearchService,
         final JobPersistenceService jobPersistenceService,
-        final AgentCleanupProperties agentCleanupProperties
+        final AgentCleanupProperties agentCleanupProperties,
+        final MeterRegistry registry
     ) {
         return new AgentJobCleanupTask(
             jobSearchService,
             jobPersistenceService,
-            agentCleanupProperties
+            agentCleanupProperties,
+            registry
         );
     }
 }

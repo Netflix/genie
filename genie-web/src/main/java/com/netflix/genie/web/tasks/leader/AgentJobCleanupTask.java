@@ -18,12 +18,15 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.genie.web.util.MetricsUtils;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -39,10 +42,13 @@ import java.util.Set;
 @Slf4j
 public class AgentJobCleanupTask extends LeadershipTask {
     private static final String STATUS_MESSAGE = "Agent AWOL for too long";
-    private final Map<String, Instant> awolJobDeadlines = Maps.newHashMap();
+    private static final String TERMINATED_COUNTER_METRIC_NAME = "genie.jobs.agentDisconnected.terminated.counter";
+    private static final String DISCONNECTED_GAUGE_METRIC_NAME = "genie.jobs.agentDisconnected.gauge";
+    private final Map<String, Instant> awolJobDeadlines;
     private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
     private final AgentCleanupProperties properties;
+    private final MeterRegistry registry;
 
     /**
      * Constructor.
@@ -50,15 +56,26 @@ public class AgentJobCleanupTask extends LeadershipTask {
      * @param jobSearchService      the job search service
      * @param jobPersistenceService the job persistence service
      * @param properties            the task properties
+     * @param registry              the metrics registry
      */
     public AgentJobCleanupTask(
         final JobSearchService jobSearchService,
         final JobPersistenceService jobPersistenceService,
-        final AgentCleanupProperties properties
+        final AgentCleanupProperties properties,
+        final MeterRegistry registry
     ) {
         this.jobSearchService = jobSearchService;
         this.jobPersistenceService = jobPersistenceService;
         this.properties = properties;
+        this.registry = registry;
+        this.awolJobDeadlines = Maps.newConcurrentMap();
+
+        // Auto-publish number of jobs tracked for shutdown due to agent not being connected.
+        this.registry.gaugeMapSize(
+            DISCONNECTED_GAUGE_METRIC_NAME,
+            Sets.newHashSet(),
+            this.awolJobDeadlines
+        );
     }
 
     /**
@@ -105,8 +122,18 @@ public class AgentJobCleanupTask extends LeadershipTask {
                     );
                     // If marking as failed succeeded, remove it from the map
                     this.awolJobDeadlines.remove(awolJobId);
+                    // Increment counter, tag as successful
+                    this.registry.counter(
+                        TERMINATED_COUNTER_METRIC_NAME,
+                        MetricsUtils.newSuccessTagsSet()
+                    ).increment();
                 } catch (GenieException e) {
                     log.warn("Failed to mark AWOL job {} as failed: ", awolJobId, e);
+                    // Increment counter, tag as failure
+                    this.registry.counter(
+                        TERMINATED_COUNTER_METRIC_NAME,
+                        MetricsUtils.newFailureTagsSetForException(e)
+                    ).increment();
                 }
             } else {
                 // Job is still AWOL, but not past its deadline.
