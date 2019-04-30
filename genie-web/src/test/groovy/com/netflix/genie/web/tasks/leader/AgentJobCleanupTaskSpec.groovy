@@ -24,6 +24,9 @@ import com.netflix.genie.web.properties.AgentCleanupProperties
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSearchService
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
+import com.netflix.genie.web.util.MetricsUtils
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 
 class AgentJobCleanupTaskSpec extends Specification {
@@ -32,20 +35,26 @@ class AgentJobCleanupTaskSpec extends Specification {
     JobSearchService jobSearchService
     JobPersistenceService jobPersistenceService
     AgentCleanupProperties taskProperties
+    MeterRegistry registry
+    Counter counter
 
     void setup() {
         this.jobSearchService = Mock(JobSearchService)
         this.jobPersistenceService = Mock(JobPersistenceService)
         this.taskProperties = Mock(AgentCleanupProperties)
-
+        this.registry = Mock(MeterRegistry)
+        this.counter = Mock(Counter)
         this.task = new AgentJobCleanupTask(
             jobSearchService,
             jobPersistenceService,
-            taskProperties
+            taskProperties,
+            registry
         )
     }
 
     def "Run"() {
+
+        def e = new GenieException(500, "...")
 
         when:
         GenieTaskScheduleType scheduleType = task.getScheduleType()
@@ -70,7 +79,10 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * jobSearchService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
         2 * taskProperties.getTimeLimit() >> 1_000_000L // Make sure it not expiring
         1 * jobPersistenceService.setJobCompletionInformation("j1", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
-        1 * jobPersistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null) >> { throw new GenieException(500, "...")}
+        1 * jobPersistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null) >> { throw e }
+        1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
+        1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newFailureTagsSetForException(e)) >> counter
+        2 * counter.increment()
 
         when:
         task.run()
@@ -78,6 +90,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         then:
         1 * jobSearchService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j2", "j3")
         1 * jobPersistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
+        1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
+        1 * counter.increment()
 
         when:
         task.cleanup()

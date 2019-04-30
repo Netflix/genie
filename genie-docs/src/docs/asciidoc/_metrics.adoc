@@ -169,6 +169,18 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |LocalJobRunner
 |-
 
+|genie.jobs.agentDisconnected.gauge
+|Current number of agent jobs whose agent is not connected to any node.
+|count
+|AgentJobCleanupTask
+|-
+
+|genie.jobs.agentDisconnected.terminated.counter
+|Counter of jobs terminated because the agent disappeared for too long
+|count
+|AgentJobCleanupTask
+|status, exceptionClass
+
 |genie.files.s3.download.timer
 |Time taken to download a file from S3
 |nanoseconds

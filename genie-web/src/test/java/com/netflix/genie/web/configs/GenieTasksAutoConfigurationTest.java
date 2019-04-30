@@ -76,7 +76,8 @@ public class GenieTasksAutoConfigurationTest {
             new GenieTasksAutoConfiguration().agentJobCleanupTask(
                 Mockito.mock(JobSearchService.class),
                 Mockito.mock(JobPersistenceService.class),
-                Mockito.mock(AgentCleanupProperties.class)
+                Mockito.mock(AgentCleanupProperties.class),
+                Mockito.mock(MeterRegistry.class)
             )
         );
     }
