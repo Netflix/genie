@@ -50,7 +50,7 @@ public class SimpleLoggingInterceptor implements ServerInterceptor {
              */
             @Override
             public void request(final int numMessages) {
-                log.info("gRPC call: {}", call.getMethodDescriptor().getFullMethodName());
+                log.debug("gRPC call: {}", call.getMethodDescriptor().getFullMethodName());
                 super.request(numMessages);
             }
 
@@ -60,7 +60,7 @@ public class SimpleLoggingInterceptor implements ServerInterceptor {
             @Override
             public void close(final Status status, final Metadata trailers) {
                 if (!status.isOk()) {
-                    log.error(
+                    log.warn(
                         "gRPC error: {} -> {}: {}",
                         call.getMethodDescriptor().getFullMethodName(),
                         String.valueOf(status.getCode().value()),
