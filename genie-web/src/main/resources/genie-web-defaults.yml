@@ -82,6 +82,8 @@ genie:
   swagger:
     enabled: false
   tasks:
+    agent-cleanup:
+      enabled: true
     cluster-checker:
       scheme: http
       port: 8080
@@ -102,6 +104,8 @@ genie:
     scheduler:
       pool:
         size: 5
+    user-metrics:
+      enabled: true
 
 info:
   genie:
