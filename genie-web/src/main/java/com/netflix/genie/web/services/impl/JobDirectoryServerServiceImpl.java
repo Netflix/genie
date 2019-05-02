@@ -86,11 +86,11 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     /**
      * Constructor.
      *
-     * @param resourceLoader           The application resource loader used to get references to resources
-     * @param jobPersistenceService    The job persistence service used to get information about a job
-     * @param jobFileService           The service responsible for managing the job directory for V3 Jobs
-     * @param agentFileStreamService   The service providing file manifest for active agent jobs
-     * @param meterRegistry            The meter registry used to keep track of metrics
+     * @param resourceLoader         The application resource loader used to get references to resources
+     * @param jobPersistenceService  The job persistence service used to get information about a job
+     * @param jobFileService         The service responsible for managing the job directory for V3 Jobs
+     * @param agentFileStreamService The service providing file manifest for active agent jobs
+     * @param meterRegistry          The meter registry used to keep track of metrics
      */
     public JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
@@ -143,7 +143,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                         // TODO: Probably need more specific exceptions so we can map them to response codes
                         final String archiveLocation = jobPersistenceService
                             .getJobArchiveLocation(key)
-                            .orElseThrow(IllegalArgumentException::new);
+                            .orElseThrow(() -> new JobNotArchivedException("Job " + key + " wasn't archived"));
 
                         final URI jobDirectoryRoot = new URI(archiveLocation + SLASH).normalize();
 
@@ -190,6 +190,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         try {
             jobStatus = this.jobPersistenceService.getJobStatus(jobId);
         } catch (final GenieNotFoundException e) {
+            log.error(e.getMessage(), e);
             response.sendError(HttpStatus.NOT_FOUND.value(), e.getMessage());
             return;
         }
@@ -200,6 +201,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             isV4 = this.jobPersistenceService.isV4(jobId);
         } catch (final GenieJobNotFoundException nfe) {
             // Really after the last check this shouldn't happen but just in case
+            log.error(nfe.getMessage(), nfe);
             response.sendError(HttpStatus.NOT_FOUND.value(), nfe.getMessage());
             return;
         }
@@ -209,6 +211,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         try {
             baseUri = new URI(baseUrl.toString() + SLASH).normalize();
         } catch (final URISyntaxException e) {
+            log.error(e.getMessage(), e);
             response.sendError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Unable to convert " + baseUrl + " to valid URI"
@@ -220,7 +223,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
 
             final Optional<JobDirectoryManifest> manifest = this.agentFileStreamService.getManifest(jobId);
             if (!manifest.isPresent()) {
-                log.warn("Manifest not found for active job: {}", jobId);
+                log.error("Manifest not found for active job: {}", jobId);
                 response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), "Could not load manifest for job: " + jobId);
                 return;
             }
@@ -228,7 +231,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             final URI jobDirRoot;
             try {
                 jobDirRoot = new URI(AgentFileProtocolResolver.URI_SCHEME, jobId, SLASH, null);
-            } catch (URISyntaxException e) {
+            } catch (final URISyntaxException e) {
+                log.error(e.getMessage(), e);
                 response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
                 return;
             }
@@ -236,12 +240,13 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             this.handleRequest(baseUri, relativePath, request, response, manifest.get(), jobDirRoot);
 
 
-        } else if (jobStatus.isActive() && !isV4) {
+        } else if (jobStatus.isActive()) {
             // Active V3 job
 
             // TODO: Manifest creation could be expensive
             final Resource jobDir = this.jobFileService.getJobFileAsResource(jobId, "");
             if (!jobDir.exists()) {
+                log.error("Job directory {} doesn't exist. Unable to serve job contents.", jobDir);
                 response.sendError(HttpStatus.NOT_FOUND.value());
                 return;
             }
@@ -250,7 +255,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 // Make sure the directory ends in a slash. Normalize will ensure only single slash
                 jobDirRoot = new URI(jobDir.getURI().toString() + SLASH).normalize();
             } catch (final URISyntaxException e) {
-                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                log.error(e.getMessage(), e);
+                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
                 return;
             }
             final Path jobDirPath = Paths.get(jobDirRoot);
@@ -266,8 +272,15 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 manifest = cacheValue.getManifest();
                 jobDirRoot = cacheValue.getJobDirectoryRoot();
             } catch (final Exception e) {
-                // TODO: more fine grained exception handling (e.g. job wasn't archived, not found, etc)
-                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+                // TODO: more fine grained exception handling
+                if (e.getCause() instanceof JobNotArchivedException) {
+                    // will be thrown from the manifest loader
+                    log.error(e.getCause().getMessage(), e.getCause());
+                    response.sendError(HttpStatus.NOT_FOUND.value(), e.getCause().getMessage());
+                } else {
+                    log.error(e.getMessage(), e);
+                    response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+                }
                 return;
             }
             this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
@@ -293,7 +306,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         if (entryOptional.isPresent()) {
             entry = entryOptional.get();
         } else {
-            log.warn("No such entry in job manifest: {}", relativePath);
+            log.error("No such entry in job manifest: {}", relativePath);
             response.sendError(HttpStatus.NOT_FOUND.value(), "Not found: " + relativePath);
             return;
         }
@@ -451,5 +464,17 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     private static class ManifestCacheValue {
         private final JobDirectoryManifest manifest;
         private final URI jobDirectoryRoot;
+    }
+
+    /**
+     * Simple exception to represent when a job wasn't archived so it's impossible to get the output.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    private static class JobNotArchivedException extends RuntimeException {
+        JobNotArchivedException(final String message) {
+            super(message);
+        }
     }
 }

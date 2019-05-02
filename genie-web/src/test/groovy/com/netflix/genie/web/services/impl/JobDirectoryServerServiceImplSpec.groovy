@@ -30,6 +30,7 @@ import com.netflix.genie.web.services.JobPersistenceService
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import spock.lang.Specification
 
@@ -144,5 +145,16 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
         1 * handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> handler
         1 * handler.handleRequest(request, response)
+    }
+
+    def "Job done but not archived returns 404"() {
+        when:
+        this.service.serveResource(JOB_ID, BASE_URL, relPath, request, response)
+
+        then:
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.SUCCEEDED
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.jobPersistenceService.getJobArchiveLocation(JOB_ID) >> Optional.empty()
+        1 * response.sendError(HttpStatus.NOT_FOUND.value(), "Job " + JOB_ID + " wasn't archived")
     }
 }
