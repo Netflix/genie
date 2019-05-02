@@ -479,7 +479,10 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body(STATUS_MESSAGE_PATH, Matchers.is(JOB_STATUS_MSG))
             .body(STARTED_PATH, Matchers.not(Instant.EPOCH))
             .body(FINISHED_PATH, Matchers.notNullValue())
-            .body(ARCHIVE_LOCATION_PATH, archiveJob ? Matchers.notNullValue() : Matchers.isEmptyOrNullString())
+            // TODO: Flipped during V4 migration to always be on to replecate expected behavior of V3 until clients
+            //       can be migrated
+//            .body(ARCHIVE_LOCATION_PATH, archiveJob ? Matchers.notNullValue() : Matchers.isEmptyOrNullString())
+            .body(ARCHIVE_LOCATION_PATH, Matchers.notNullValue())
             .body(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME))
             .body(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME))
             .body(TAGS_PATH, Matchers.contains(JOB_TAG_1, JOB_TAG_2))
@@ -880,12 +883,13 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         final boolean jobShouldBeArchived
     ) throws URISyntaxException {
         final Path archiveDirectory = Paths.get(new URI(this.jobsLocationsProperties.getArchives())).resolve(id);
-        if (jobShouldBeArchived) {
-            Assert.assertTrue(Files.exists(archiveDirectory));
-            Assert.assertTrue(Files.isDirectory(archiveDirectory));
-        } else {
-            Assert.assertFalse(Files.exists(archiveDirectory));
-        }
+        // TODO: This is flipped during V4 migration and should be changed back once clients are fixed
+//        if (jobShouldBeArchived) {
+        Assert.assertTrue(Files.exists(archiveDirectory));
+        Assert.assertTrue(Files.isDirectory(archiveDirectory));
+//        } else {
+//            Assert.assertFalse(Files.exists(archiveDirectory));
+//        }
     }
 
     /**

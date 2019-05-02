@@ -172,13 +172,19 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                         )
             );
             jobRequest.getDescription().ifPresent(jobBuilder::withDescription);
-            if (!jobRequest.isDisableLogArchival()) {
-                String archiveRoot = this.jobsProperties.getLocations().getArchives();
-                if (!archiveRoot.endsWith(JobConstants.FILE_PATH_DELIMITER)) {
-                    archiveRoot += JobConstants.FILE_PATH_DELIMITER;
-                }
-                jobBuilder.withArchiveLocation(archiveRoot + jobId);
+
+            // TODO: Disabling this check for now to force archival for all jobs during internal V4 migration.
+            //       Will allow us to reach out to clients who may set this variable but still expect output after
+            //       job completion due to it being served off the node after completion in V3 but now it won't.
+            //       Put this back in once all use cases have been hunted down and users are sure of their expected
+            //       behavior
+//            if (!jobRequest.isDisableLogArchival()) {
+            String archiveRoot = this.jobsProperties.getLocations().getArchives();
+            if (!archiveRoot.endsWith(JobConstants.FILE_PATH_DELIMITER)) {
+                archiveRoot += JobConstants.FILE_PATH_DELIMITER;
             }
+            jobBuilder.withArchiveLocation(archiveRoot + jobId);
+//            }
 
             final JobExecution jobExecution = new JobExecution
                 .Builder(this.hostname)
