@@ -51,6 +51,7 @@ import java.util.Collection;
 )
 @AutoConfigureAfter(
     {
+        GenieTasksAutoConfiguration.class,
         ZookeeperAutoConfiguration.class
     }
 )
