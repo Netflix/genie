@@ -672,11 +672,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), jobRequest, jobEntity);
         jobRequest.getCommandArgs().ifPresent(
             commandArgs ->
-                jobEntity.setCommandArgs(
-                    Lists.newArrayList(
-                        StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE)
-                    )
-                )
+                jobEntity.setCommandArgs(Lists.newArrayList(StringUtils.split(commandArgs)))
         );
         jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
         final FileEntity setupFile = jobRequest.getSetupFile().isPresent()

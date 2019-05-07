@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.Getter;
@@ -62,9 +63,9 @@ public class Job extends CommonDTO {
     @NotNull
     @JsonSerialize(using = ToStringSerializer.class)
     private final Duration runtime;
-    private String commandArgs;
-    private String grouping;
-    private String groupingInstance;
+    private final List<String> commandArgs;
+    private final String grouping;
+    private final String groupingInstance;
 
     /**
      * Constructor used by the builder.
@@ -73,9 +74,7 @@ public class Job extends CommonDTO {
      */
     protected Job(@Valid final Builder builder) {
         super(builder);
-        this.commandArgs = builder.bCommandArgs.isEmpty()
-            ? null
-            : StringUtils.join(builder.bCommandArgs, StringUtils.SPACE);
+        this.commandArgs = ImmutableList.copyOf(builder.bCommandArgs);
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
         this.started = builder.bStarted;
@@ -95,7 +94,9 @@ public class Job extends CommonDTO {
      * @return The command arguments
      */
     public Optional<String> getCommandArgs() {
-        return Optional.ofNullable(this.commandArgs);
+        return this.commandArgs.isEmpty()
+            ? Optional.empty()
+            : Optional.ofNullable(StringUtils.join(this.commandArgs, StringUtils.SPACE));
     }
 
     /**
@@ -230,7 +231,7 @@ public class Job extends CommonDTO {
             super(name, user, version);
             this.bCommandArgs = commandArgs == null
                 ? Lists.newArrayList()
-                : Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE));
+                : Lists.newArrayList(commandArgs);
         }
 
         /**
@@ -248,9 +249,7 @@ public class Job extends CommonDTO {
         public Builder withCommandArgs(@Nullable final String commandArgs) {
             this.bCommandArgs.clear();
             if (commandArgs != null) {
-                this.bCommandArgs.addAll(
-                    Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
-                );
+                this.bCommandArgs.add(commandArgs);
             }
             return this;
         }

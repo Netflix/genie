@@ -18,7 +18,6 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
@@ -52,7 +51,6 @@ import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -164,13 +162,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 .withStatus(JobStatus.INIT)
                 .withStatusMsg("Job Accepted and in initialization phase.");
 
-            jobRequest.getCommandArgs().ifPresent(
-                commandArgs ->
-                    jobBuilder
-                        .withCommandArgs(
-                            Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
-                        )
-            );
+            jobRequest.getCommandArgs().ifPresent(jobBuilder::withCommandArgs);
             jobRequest.getDescription().ifPresent(jobBuilder::withDescription);
 
             // TODO: Disabling this check for now to force archival for all jobs during internal V4 migration.

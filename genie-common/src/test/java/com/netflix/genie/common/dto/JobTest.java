@@ -375,4 +375,36 @@ public class JobTest {
         Assert.assertEquals(job1.hashCode(), job2.hashCode());
         Assert.assertNotEquals(job1.hashCode(), job3.hashCode());
     }
+
+    /**
+     * Test to prove a bug with command args splitting with trailing whitespace was corrected.
+     */
+    @Test
+    public void testCommandArgsEdgeCases() {
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+
+        String commandArgs = " blah ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(" blah ")
+        );
+        commandArgs = " blah    ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(" blah    ")
+        );
+        commandArgs = "  blah blah     blah\nblah\tblah \"blah\" blah  ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("  blah blah     blah\nblah\tblah \"blah\" blah  ")
+        );
+        builder.withCommandArgs(Lists.newArrayList("blah", "blah", "  blah", "\nblah", "\"blah\""));
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("blah blah   blah \nblah \"blah\"")
+        );
+    }
 }
