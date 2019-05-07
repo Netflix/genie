@@ -19,7 +19,6 @@ package com.netflix.genie.web.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
@@ -309,13 +308,7 @@ public class JobRestController {
                 .withDependencies(jobRequest.getDependencies())
                 .withApplications(jobRequest.getApplications());
 
-            jobRequest.getCommandArgs().ifPresent(
-                commandArgs ->
-                    builder
-                        .withCommandArgs(
-                            Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
-                        )
-            );
+            jobRequest.getCommandArgs().ifPresent(builder::withCommandArgs);
             jobRequest.getCpu().ifPresent(builder::withCpu);
             jobRequest.getMemory().ifPresent(builder::withMemory);
             jobRequest.getGroup().ifPresent(builder::withGroup);

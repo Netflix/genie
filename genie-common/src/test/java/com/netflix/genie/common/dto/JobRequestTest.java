@@ -456,4 +456,37 @@ public class JobRequestTest {
         Assert.assertEquals(jobRequest1.hashCode(), jobRequest2.hashCode());
         Assert.assertNotEquals(jobRequest1.hashCode(), jobRequest3.hashCode());
     }
+
+    /**
+     * Test to prove a bug with command args splitting with trailing whitespace was corrected.
+     */
+    @Test
+    public void testCommandArgsEdgeCases() {
+        final JobRequest.Builder builder
+            = new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet());
+
+        String commandArgs = " blah ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(" blah ")
+        );
+        commandArgs = " blah    ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(" blah    ")
+        );
+        commandArgs = "  blah blah     blah\nblah\tblah \"blah\" blah  ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("  blah blah     blah\nblah\tblah \"blah\" blah  ")
+        );
+        builder.withCommandArgs(Lists.newArrayList("blah", "blah", "  blah", "\nblah", "\"blah\""));
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("blah blah   blah \nblah \"blah\"")
+        );
+    }
 }

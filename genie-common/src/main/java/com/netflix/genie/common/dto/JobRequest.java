@@ -55,7 +55,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
 
     private static final long serialVersionUID = 3163971970144435277L;
 
-    private final String commandArgs;
+    private final List<String> commandArgs;
     @Valid
     @NotEmpty(message = "At least one cluster criteria is required")
     private final List<ClusterCriteria> clusterCriterias;
@@ -74,8 +74,8 @@ public class JobRequest extends ExecutionEnvironmentDTO {
     @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final Integer timeout;
     private final List<String> applications;
-    private String grouping;
-    private String groupingInstance;
+    private final String grouping;
+    private final String groupingInstance;
 
     /**
      * Constructor used by the builder build() method.
@@ -85,9 +85,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
     @SuppressWarnings("unchecked")
     JobRequest(@Valid final Builder builder) {
         super(builder);
-        this.commandArgs = builder.bCommandArgs.isEmpty()
-            ? null
-            : StringUtils.join(builder.bCommandArgs, StringUtils.SPACE);
+        this.commandArgs = ImmutableList.copyOf(builder.bCommandArgs);
         this.clusterCriterias = ImmutableList.copyOf(builder.bClusterCriterias);
         this.commandCriteria = ImmutableSet.copyOf(builder.bCommandCriteria);
         this.group = builder.bGroup;
@@ -107,7 +105,9 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      * @return The command arguments
      */
     public Optional<String> getCommandArgs() {
-        return Optional.ofNullable(this.commandArgs);
+        return this.commandArgs.isEmpty()
+            ? Optional.empty()
+            : Optional.ofNullable(StringUtils.join(this.commandArgs, StringUtils.SPACE));
     }
 
     /**
@@ -251,7 +251,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
             super(name, user, version);
             this.bCommandArgs = commandArgs == null
                 ? Lists.newArrayList()
-                : Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE));
+                : Lists.newArrayList(commandArgs);
             this.bClusterCriterias.addAll(clusterCriterias);
             commandCriteria.forEach(
                 criteria -> {
@@ -277,9 +277,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
         public Builder withCommandArgs(@Nullable final String commandArgs) {
             this.bCommandArgs.clear();
             if (commandArgs != null) {
-                this.bCommandArgs.addAll(
-                    Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
-                );
+                this.bCommandArgs.add(commandArgs);
             }
             return this;
         }
