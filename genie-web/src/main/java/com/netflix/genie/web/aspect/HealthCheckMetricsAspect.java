@@ -31,6 +31,7 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -45,7 +46,7 @@ import java.util.concurrent.TimeUnit;
  * @since 3.2.4
  */
 @Aspect
-//@Component
+@Component
 @Slf4j
 public class HealthCheckMetricsAspect {
 
