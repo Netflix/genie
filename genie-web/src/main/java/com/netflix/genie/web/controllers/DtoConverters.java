@@ -390,16 +390,14 @@ public final class DtoConverters {
             .withInteractive(false);
         v3JobRequest.getTimeout().ifPresent(agentConfigBuilder::withTimeoutRequested);
 
-        final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder =
-            new JobArchivalDataRequest
-                .Builder();
+        final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder = new JobArchivalDataRequest.Builder();
 
+        final List<String> commandArgs = Lists.newArrayList();
+        v3JobRequest.getCommandArgs().ifPresent(commandArgs::add);
         return new JobRequest(
             v3JobRequest.getId().orElse(null),
             resources,
-            v3JobRequest.getCommandArgs().isPresent()
-                ? Lists.newArrayList(StringUtils.split(v3JobRequest.getCommandArgs().get(), ' '))
-                : null,
+            commandArgs,
             metadataBuilder.build(),
             criteria,
             agentEnvironmentBuilder.build(),
