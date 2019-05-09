@@ -65,6 +65,7 @@ import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -245,6 +246,34 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         this.submitAndCheckJob(1, true);
     }
 
+    /**
+     * Test to make sure command args are limitted to 10,000 characters.
+     *
+     * @throws Exception On error
+     */
+    @Test
+    public void testForTooManyCommandArgs() throws Exception {
+        final JobRequest tooManyCommandArguments = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(LOCALHOST_CLUSTER_TAG))),
+            Sets.newHashSet(BASH_COMMAND_TAG)
+        )
+            .withCommandArgs(StringUtils.leftPad("bad", 10_001))
+            .build();
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(tooManyCommandArguments))
+            .when()
+            .port(this.port)
+            .post(JOBS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+    }
+
     private void submitAndCheckJob(final int documentationId, final boolean archiveJob) throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
@@ -341,7 +370,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private String submitJob(
         final int documentationId,
         final JobRequest jobRequest,
-        final List<MockMultipartFile> attachments
+        @Nullable final List<MockMultipartFile> attachments
     ) throws Exception {
         if (attachments != null) {
             final RestDocumentationFilter createResultFilter = RestAssuredRestDocumentation.document(
