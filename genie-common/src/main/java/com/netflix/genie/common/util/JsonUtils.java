@@ -23,6 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -64,7 +65,7 @@ public final class JsonUtils {
      * @throws GenieException For any exception during unmarshalling
      */
     public static <T extends Collection> T unmarshall(
-        final String source,
+        @Nullable final String source,
         final TypeReference<T> typeReference
     ) throws GenieException {
         try {

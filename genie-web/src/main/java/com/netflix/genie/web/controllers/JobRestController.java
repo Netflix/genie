@@ -306,9 +306,9 @@ public class JobRestController {
                 .withTags(jobRequest.getTags())
                 .withConfigs(jobRequest.getConfigs())
                 .withDependencies(jobRequest.getDependencies())
-                .withApplications(jobRequest.getApplications());
+                .withApplications(jobRequest.getApplications())
+                .withCommandArgs(jobRequest.getCommandArgsAsList());
 
-            jobRequest.getCommandArgs().ifPresent(builder::withCommandArgs);
             jobRequest.getCpu().ifPresent(builder::withCpu);
             jobRequest.getMemory().ifPresent(builder::withMemory);
             jobRequest.getGroup().ifPresent(builder::withGroup);

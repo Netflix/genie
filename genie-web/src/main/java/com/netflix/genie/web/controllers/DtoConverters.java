@@ -397,9 +397,7 @@ public final class DtoConverters {
         return new JobRequest(
             v3JobRequest.getId().orElse(null),
             resources,
-            v3JobRequest.getCommandArgs().isPresent()
-                ? Lists.newArrayList(StringUtils.split(v3JobRequest.getCommandArgs().get(), ' '))
-                : null,
+            v3JobRequest.getCommandArgsAsList(),
             metadataBuilder.build(),
             criteria,
             agentEnvironmentBuilder.build(),

@@ -19,6 +19,7 @@ package com.netflix.genie.web.jpa.entities;
 
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.util.CommandArgUtils;
 import com.netflix.genie.web.jpa.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobClusterProjection;
@@ -356,9 +357,9 @@ public class JobEntity extends BaseEntity implements
             @JoinColumn(name = "job_id", nullable = false, updatable = false)
         }
     )
-    @Column(name = "argument", length = 10_000, nullable = false, updatable = false)
+    @Column(name = "argument", length = CommandArgUtils.MAX_COMMAND_ARG_LENGTH, nullable = false, updatable = false)
     @OrderColumn(name = "argument_order", nullable = false, updatable = false)
-    private List<@NotBlank @Size(max = 10_000) String> commandArgs = new ArrayList<>();
+    private List<@Size(max = CommandArgUtils.MAX_COMMAND_ARG_LENGTH) String> commandArgs = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(

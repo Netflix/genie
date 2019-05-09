@@ -160,9 +160,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 .withId(jobId)
                 .withTags(jobRequest.getTags())
                 .withStatus(JobStatus.INIT)
-                .withStatusMsg("Job Accepted and in initialization phase.");
+                .withStatusMsg("Job Accepted and in initialization phase.")
+                .withCommandArgs(jobRequest.getCommandArgsAsList());
 
-            jobRequest.getCommandArgs().ifPresent(jobBuilder::withCommandArgs);
             jobRequest.getDescription().ifPresent(jobBuilder::withDescription);
 
             // TODO: Disabling this check for now to force archival for all jobs during internal V4 migration.

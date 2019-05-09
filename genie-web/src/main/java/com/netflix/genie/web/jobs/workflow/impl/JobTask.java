@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.util.CommandArgUtils;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
@@ -49,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 public class JobTask extends GenieBaseTask {
 
     private static final String JOB_TASK_TIMER_NAME = "genie.jobs.tasks.jobTask.timer";
-    private static final String EMPTY_STRING = "";
     private final AttachmentService attachmentService;
     private final GenieFileTransferService fts;
 
@@ -147,7 +147,7 @@ public class JobTask extends GenieBaseTask {
             writer.write(
                 StringUtils.join(jobExecEnv.getCommand().getExecutable(), ' ')
                     + JobConstants.WHITE_SPACE
-                    + jobExecEnv.getJobRequest().getCommandArgs().orElse(EMPTY_STRING)
+                    + CommandArgUtils.rebuildCommandArgString(jobExecEnv.getJobRequest().getCommandArgsAsList())
                     + JobConstants.STDOUT_REDIRECT
                     + "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}/" + JobConstants.STDOUT_LOG_FILE_NAME
                     + JobConstants.STDERR_REDIRECT

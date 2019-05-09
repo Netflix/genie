@@ -65,6 +65,7 @@ import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -341,7 +342,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private String submitJob(
         final int documentationId,
         final JobRequest jobRequest,
-        final List<MockMultipartFile> attachments
+        @Nullable final List<MockMultipartFile> attachments
     ) throws Exception {
         if (attachments != null) {
             final RestDocumentationFilter createResultFilter = RestAssuredRestDocumentation.document(
