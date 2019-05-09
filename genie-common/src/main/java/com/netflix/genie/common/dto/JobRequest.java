@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,7 +54,8 @@ public class JobRequest extends ExecutionEnvironmentDTO {
 
     private static final long serialVersionUID = 3163971970144435277L;
 
-    private final List<String> commandArgs;
+    @Size(max = 10_000, message = "The maximum number of characters for the command arguments is 10,000")
+    private final String commandArgs;
     @Valid
     @NotEmpty(message = "At least one cluster criteria is required")
     private final List<ClusterCriteria> clusterCriterias;
@@ -82,10 +82,9 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      *
      * @param builder The builder to use
      */
-    @SuppressWarnings("unchecked")
     JobRequest(@Valid final Builder builder) {
         super(builder);
-        this.commandArgs = ImmutableList.copyOf(builder.bCommandArgs);
+        this.commandArgs = builder.bCommandArgs;
         this.clusterCriterias = ImmutableList.copyOf(builder.bClusterCriterias);
         this.commandCriteria = ImmutableSet.copyOf(builder.bCommandCriteria);
         this.group = builder.bGroup;
@@ -105,9 +104,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      * @return The command arguments
      */
     public Optional<String> getCommandArgs() {
-        return this.commandArgs.isEmpty()
-            ? Optional.empty()
-            : Optional.ofNullable(StringUtils.join(this.commandArgs, StringUtils.SPACE));
+        return Optional.ofNullable(this.commandArgs);
     }
 
     /**
@@ -183,10 +180,10 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      */
     public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
-        private final List<String> bCommandArgs;
         private final List<ClusterCriteria> bClusterCriterias = new ArrayList<>();
         private final Set<String> bCommandCriteria = new HashSet<>();
         private final List<String> bApplications = new ArrayList<>();
+        private String bCommandArgs;
         private String bGroup;
         private boolean bDisableLogArchival;
         private String bEmail;
@@ -215,7 +212,6 @@ public class JobRequest extends ExecutionEnvironmentDTO {
             @JsonProperty("commandCriteria") final Set<String> commandCriteria
         ) {
             super(name, user, version);
-            this.bCommandArgs = Lists.newArrayList();
             this.bClusterCriterias.addAll(clusterCriterias);
             commandCriteria.forEach(
                 criteria -> {
@@ -237,7 +233,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          * @param commandArgs      The command line arguments for the Job
          * @param clusterCriterias The list of cluster criteria for the Job
          * @param commandCriteria  The list of command criteria for the Job
-         * @see #Builder(String, String, String, List, Set)
+         * @deprecated Use {@link #Builder(String, String, String, List, Set)}
          */
         @Deprecated
         public Builder(
@@ -249,9 +245,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
             final Set<String> commandCriteria
         ) {
             super(name, user, version);
-            this.bCommandArgs = commandArgs == null
-                ? Lists.newArrayList()
-                : Lists.newArrayList(commandArgs);
+            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
             this.bClusterCriterias.addAll(clusterCriterias);
             commandCriteria.forEach(
                 criteria -> {
@@ -263,36 +257,38 @@ public class JobRequest extends ExecutionEnvironmentDTO {
         }
 
         /**
-         * The command arguments to use in conjunction with the command executable selected for this job.
+         * The command arguments to use in conjunction witOh the command executable selected for this job.
          * <p>
          * DEPRECATED: This API will be removed in 4.0.0 in favor of the List based method for improved control over
          * escaping of arguments.
          *
-         * @param commandArgs The command args
+         * @param commandArgs The command args. Max length is 10,000 characters
          * @return The builder
-         * @see #withCommandArgs(List)
          * @since 3.3.0
+         * @deprecated Use {@link #withCommandArgs(List)}
          */
         @Deprecated
         public Builder withCommandArgs(@Nullable final String commandArgs) {
-            this.bCommandArgs.clear();
-            if (commandArgs != null) {
-                this.bCommandArgs.add(commandArgs);
-            }
+            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
             return this;
         }
 
         /**
          * The command arguments to use in conjunction with the command executable selected for this job.
          *
-         * @param commandArgs The command args
+         * @param commandArgs The command args. The maximum combined length of the command args plus one space between
+         *                    each argument must be <= 10,000 characters
          * @return The builder
          * @since 3.3.0
          */
         public Builder withCommandArgs(@Nullable final List<String> commandArgs) {
-            this.bCommandArgs.clear();
             if (commandArgs != null) {
-                this.bCommandArgs.addAll(commandArgs);
+                this.bCommandArgs = StringUtils.join(commandArgs, StringUtils.SPACE);
+                if (StringUtils.isBlank(this.bCommandArgs)) {
+                    this.bCommandArgs = null;
+                }
+            } else {
+                this.bCommandArgs = null;
             }
             return this;
         }

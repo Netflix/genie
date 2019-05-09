@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +61,8 @@ public class Job extends CommonDTO {
     @NotNull
     @JsonSerialize(using = ToStringSerializer.class)
     private final Duration runtime;
-    private final List<String> commandArgs;
+    @Size(max = 10_000, message = "The maximum number of characters for the command arguments is 10,000")
+    private final String commandArgs;
     private final String grouping;
     private final String groupingInstance;
 
@@ -74,7 +73,7 @@ public class Job extends CommonDTO {
      */
     protected Job(@Valid final Builder builder) {
         super(builder);
-        this.commandArgs = ImmutableList.copyOf(builder.bCommandArgs);
+        this.commandArgs = builder.bCommandArgs;
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
         this.started = builder.bStarted;
@@ -94,9 +93,7 @@ public class Job extends CommonDTO {
      * @return The command arguments
      */
     public Optional<String> getCommandArgs() {
-        return this.commandArgs.isEmpty()
-            ? Optional.empty()
-            : Optional.ofNullable(StringUtils.join(this.commandArgs, StringUtils.SPACE));
+        return Optional.ofNullable(this.commandArgs);
     }
 
     /**
@@ -181,7 +178,7 @@ public class Job extends CommonDTO {
      */
     public static class Builder extends CommonDTO.Builder<Builder> {
 
-        private final List<String> bCommandArgs;
+        private String bCommandArgs;
         private JobStatus bStatus = JobStatus.INIT;
         private String bStatusMsg;
         private Instant bStarted;
@@ -207,7 +204,6 @@ public class Job extends CommonDTO {
             @JsonProperty("version") final String version
         ) {
             super(name, user, version);
-            this.bCommandArgs = Lists.newArrayList();
         }
 
         /**
@@ -218,7 +214,7 @@ public class Job extends CommonDTO {
          * @param name        The name to use for the Job
          * @param user        The user to use for the Job
          * @param version     The version to use for the Job
-         * @param commandArgs The command arguments used for this job
+         * @param commandArgs The command arguments used for this job. Max length 10,000 characters
          * @see #Builder(String, String, String)
          */
         @Deprecated
@@ -229,9 +225,7 @@ public class Job extends CommonDTO {
             @Nullable final String commandArgs
         ) {
             super(name, user, version);
-            this.bCommandArgs = commandArgs == null
-                ? Lists.newArrayList()
-                : Lists.newArrayList(commandArgs);
+            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
         }
 
         /**
@@ -240,31 +234,33 @@ public class Job extends CommonDTO {
          * DEPRECATED: This API will be removed in 4.0.0 in favor of the List based method for improved control over
          * escaping of arguments.
          *
-         * @param commandArgs The command args
+         * @param commandArgs The command args. The max length is 10,000 characters
          * @return The builder
-         * @see #withCommandArgs(List)
          * @since 3.3.0
+         * @deprecated See {@link #withCommandArgs(List)}
          */
         @Deprecated
         public Builder withCommandArgs(@Nullable final String commandArgs) {
-            this.bCommandArgs.clear();
-            if (commandArgs != null) {
-                this.bCommandArgs.add(commandArgs);
-            }
+            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
             return this;
         }
 
         /**
          * The command arguments to use in conjunction with the command executable selected for this job.
          *
-         * @param commandArgs The command args
+         * @param commandArgs The command args. The maximum combined size of the command args plus 1 space character
+         *                    between each argument must be <= 10,000 characters
          * @return The builder
          * @since 3.3.0
          */
         public Builder withCommandArgs(@Nullable final List<String> commandArgs) {
-            this.bCommandArgs.clear();
             if (commandArgs != null) {
-                this.bCommandArgs.addAll(commandArgs);
+                this.bCommandArgs = StringUtils.join(commandArgs, StringUtils.SPACE);
+                if (StringUtils.isBlank(this.bCommandArgs)) {
+                    this.bCommandArgs = null;
+                }
+            } else {
+                this.bCommandArgs = null;
             }
             return this;
         }

@@ -66,7 +66,6 @@ import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.services.JobPersistenceService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -670,10 +669,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .getMetadata()
             .ifPresent(metadata -> EntityDtoConverters.setJsonField(metadata, jobEntity::setMetadata));
         JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), jobRequest, jobEntity);
-        jobRequest.getCommandArgs().ifPresent(
-            commandArgs ->
-                jobEntity.setCommandArgs(Lists.newArrayList(StringUtils.split(commandArgs)))
-        );
+        jobRequest.getCommandArgs().ifPresent(commandArgs -> jobEntity.setCommandArgs(Lists.newArrayList(commandArgs)));
         jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
         final FileEntity setupFile = jobRequest.getSetupFile().isPresent()
             ? this.createAndGetFileEntity(jobRequest.getSetupFile().get())
