@@ -982,7 +982,7 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getMetadata().getVersion() == version
         v4JobRequest.getMetadata().getTags() == tags
         v4JobRequest.getCriteria().getApplicationIds() == applicationIds
-        v4JobRequest.getCommandArgs() == commandArgs
+        v4JobRequest.getCommandArgs() == [StringUtils.join(commandArgs, StringUtils.SPACE)] as List
         v4JobRequest.getRequestedAgentEnvironment().getRequestedJobMemory().orElse(null) == memory
         v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().orElse(-1) == timeout
         v4JobRequest.getMetadata().getMetadata().orElse(null) == metadata
