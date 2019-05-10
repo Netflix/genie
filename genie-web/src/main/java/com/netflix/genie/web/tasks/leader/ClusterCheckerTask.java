@@ -29,8 +29,11 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.genie.web.util.MetricsConstants;
+import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.actuate.health.Status;
@@ -55,19 +58,23 @@ import java.util.Set;
 @Slf4j
 public class ClusterCheckerTask extends LeadershipTask {
     private static final String PROPERTY_STATUS = "status";
+    private static final String ERROR_COUNTS_GAUGE_METRIC_NAME = "genie.tasks.clusterChecker.errorCounts.gauge";
+    private static final String LOST_JOBS_RATE_METRIC_NAME = "genie.tasks.clusterChecker.lostJobs.rate";
+    private static final String FAILED_TO_UPDATE_RATE_METRIC_NAME = "genie.tasks.clusterChecker.unableToUpdateJob.rate";
+    private static final String REMOTE_NODE_HEALTH_METRIC_NAME = "genie.tasks.clusterChecker.health.counter";
 
     private final String hostname;
     private final ClusterCheckerProperties properties;
     private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
     private final RestTemplate restTemplate;
+    private final MeterRegistry registry;
     private final String scheme;
     private final String healthEndpoint;
     private final List<String> healthIndicatorsToIgnore;
 
     private final Map<String, Integer> errorCounts = new HashMap<>();
 
-    // TODO: Add metrics
     private final Counter lostJobsCounter;
     private final Counter unableToUpdateJobCounter;
 
@@ -96,14 +103,15 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.jobSearchService = jobSearchService;
         this.jobPersistenceService = jobPersistenceService;
         this.restTemplate = restTemplate;
+        this.registry = registry;
         this.scheme = this.properties.getScheme() + "://";
         this.healthEndpoint = ":" + this.properties.getPort() + webEndpointProperties.getBasePath() + "/health";
         this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
             .trimResults().splitToList(properties.getHealthIndicatorsToIgnore());
         // Keep track of the number of nodes currently unreachable from the the master
-        registry.gauge("genie.tasks.clusterChecker.errorCounts.gauge", this.errorCounts, Map::size);
-        this.lostJobsCounter = registry.counter("genie.tasks.clusterChecker.lostJobs.rate");
-        this.unableToUpdateJobCounter = registry.counter("genie.tasks.clusterChecker.unableToUpdateJob.rate");
+        registry.gauge(ERROR_COUNTS_GAUGE_METRIC_NAME, this.errorCounts, Map::size);
+        this.lostJobsCounter = registry.counter(LOST_JOBS_RATE_METRIC_NAME);
+        this.unableToUpdateJobCounter = registry.counter(FAILED_TO_UPDATE_RATE_METRIC_NAME);
     }
 
     /**
@@ -193,13 +201,42 @@ public class ClusterCheckerTask extends LeadershipTask {
                         TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class)
                     );
                 for (Map.Entry<String, Object> responseEntry : responseMap.entrySet()) {
-                    if (responseEntry.getValue() instanceof Map
-                        && !this.healthIndicatorsToIgnore.contains(responseEntry.getKey())
-                        && !Status.UP.getCode().equals(((Map) responseEntry.getValue()).get(PROPERTY_STATUS))) {
-                        result = false;
-                        break;
+                    if (responseEntry.getValue() instanceof Map) {
+                        final Map indicatorMap = (Map) responseEntry.getValue();
+
+                        final String indicatorName = responseEntry.getKey();
+                        final Object indicatorStatusOrNull = indicatorMap.get(PROPERTY_STATUS);
+
+                        final Status indicatorStatus;
+
+                        if (indicatorStatusOrNull instanceof Status) {
+                            indicatorStatus = (Status) indicatorStatusOrNull;
+                        } else if (indicatorStatusOrNull instanceof String) {
+                            indicatorStatus = new Status((String) indicatorStatusOrNull);
+                        } else {
+                            indicatorStatus = Status.UNKNOWN;
+                        }
+
+                        //Increment counter tagged with target hostname and name of health indicator
+                        final Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
+                        tags.add(Tag.of(MetricsConstants.TagKeys.HOST, host));
+                        tags.add(Tag.of(MetricsConstants.TagKeys.HEALTH_INDICATOR, indicatorName));
+                        tags.add(Tag.of(MetricsConstants.TagKeys.HEALTH_STATUS, indicatorStatus.getCode()));
+                        this.registry.counter(REMOTE_NODE_HEALTH_METRIC_NAME, tags).increment();
+
+                        if (this.healthIndicatorsToIgnore.contains(indicatorName)) {
+                            log.debug("Ignoring indicator: {}", indicatorName);
+                        } else if (Status.UP.equals(indicatorStatus)) {
+                            log.debug("Indicator {} is UP", indicatorName);
+                        } else {
+                            log.warn("Indicator {} is {} for host {}", indicatorName, indicatorStatus, host);
+                            // Mark host as failed but keep iterating to publish metrics.
+                            result = false;
+                        }
                     }
                 }
+            } catch (RuntimeException ex) {
+                throw ex;
             } catch (Exception ex) {
                 log.error("Failed reading the error response when validating host {}", host, ex);
                 result = false;

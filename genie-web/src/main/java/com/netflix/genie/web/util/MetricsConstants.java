@@ -88,6 +88,21 @@ public final class MetricsConstants {
         public static final String USER = "user";
 
         /**
+         * Key to tag a hostname.
+         */
+        public static final String HOST = "host";
+
+        /**
+         * Key to tag a health indicator name.
+         */
+        public static final String HEALTH_INDICATOR = "healthIndicator";
+
+        /**
+         * Key to tag a health indicator status.
+         */
+        public static final String HEALTH_STATUS = "healthStatus";
+
+        /**
          * Utility class private constructor.
          */
         private TagKeys() {

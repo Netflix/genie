@@ -27,6 +27,10 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.genie.web.util.MetricsConstants;
+import com.netflix.genie.web.util.MetricsUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -59,6 +63,7 @@ public class ClusterCheckerTaskTest {
     private RestTemplate restTemplate;
     private String scheme;
     private String healthEndpoint;
+    private MeterRegistry meterRegistry;
 
     /**
      * Setup for the tests.
@@ -72,6 +77,7 @@ public class ClusterCheckerTaskTest {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.restTemplate = Mockito.mock(RestTemplate.class);
+        this.meterRegistry = new SimpleMeterRegistry();
         final WebEndpointProperties serverProperties = Mockito.mock(WebEndpointProperties.class);
         Mockito.when(serverProperties.getBasePath()).thenReturn("/actuator");
         this.task = new ClusterCheckerTask(
@@ -81,7 +87,7 @@ public class ClusterCheckerTaskTest {
             this.jobPersistenceService,
             this.restTemplate,
             serverProperties,
-            new SimpleMeterRegistry()
+            meterRegistry
         );
 
         this.scheme = properties.getScheme() + "://";
@@ -131,7 +137,9 @@ public class ClusterCheckerTaskTest {
                     "",
                     (
                         "{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
-                            + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}"
+                            + "\"db\": { \"status\": \"OUT_OF_SERVICE\"},"
+                            + "\"disk\": { \"status\": \"UP\"}"
+                            + "}"
                     ).getBytes(StandardCharsets.UTF_8),
                     StandardCharsets.UTF_8
                 )
@@ -142,7 +150,9 @@ public class ClusterCheckerTaskTest {
                     "",
                     (
                         "{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
-                            + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}"
+                            + "\"db\": { \"status\": \"OUT_OF_SERVICE\"},"
+                            + "\"disk\": { \"status\": \"UP\"}"
+                            + "}"
                     ).getBytes(StandardCharsets.UTF_8),
                     StandardCharsets.UTF_8
                 )
@@ -153,7 +163,9 @@ public class ClusterCheckerTaskTest {
                     "",
                     (
                         "{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
-                            + "\"db\": { \"status\": \"UP\"}}"
+                            + "\"db\": { \"status\": \"UP\"},"
+                            + "\"disk\": { \"status\": \"UP\"}"
+                            + "}"
                     ).getBytes(StandardCharsets.UTF_8),
                     StandardCharsets.UTF_8
                 )
@@ -164,7 +176,9 @@ public class ClusterCheckerTaskTest {
                     "",
                     (
                         "{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
-                            + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}"
+                            + "\"db\": { \"status\": \"OUT_OF_SERVICE\"},"
+                            + "\"disk\": { \"status\": \"UP\"}"
+                            + "}"
                     ).getBytes(StandardCharsets.UTF_8),
                     StandardCharsets.UTF_8
                 )
@@ -250,6 +264,33 @@ public class ClusterCheckerTaskTest {
                 Mockito.eq(null),
                 Mockito.eq(null)
             );
+
+        final Set<Tag> dbIndicatorTags = MetricsUtils.newSuccessTagsSet();
+        dbIndicatorTags.add(Tag.of(MetricsConstants.TagKeys.HOST, host2));
+        dbIndicatorTags.add(Tag.of(MetricsConstants.TagKeys.HEALTH_INDICATOR, "db"));
+        dbIndicatorTags.add(Tag.of(MetricsConstants.TagKeys.HEALTH_STATUS, "OUT_OF_SERVICE"));
+
+        Assert.assertThat(
+            this.meterRegistry.counter(
+                "genie.tasks.clusterChecker.health.counter",
+                dbIndicatorTags
+            ).count(),
+            Matchers.is(3.0)
+        );
+
+        final Set<Tag> diskIndicatorTags = MetricsUtils.newSuccessTagsSet();
+        diskIndicatorTags.add(Tag.of(MetricsConstants.TagKeys.HOST, host2));
+        diskIndicatorTags.add(Tag.of(MetricsConstants.TagKeys.HEALTH_INDICATOR, "disk"));
+        diskIndicatorTags.add(Tag.of(MetricsConstants.TagKeys.HEALTH_STATUS, "UP"));
+
+        Assert.assertThat(
+            this.meterRegistry.counter(
+                "genie.tasks.clusterChecker.health.counter",
+                diskIndicatorTags
+            ).count(),
+            Matchers.is(4.0)
+        );
+
     }
 
     /**
