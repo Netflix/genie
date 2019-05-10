@@ -349,6 +349,12 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |ClusterCheckerTask
 |-
 
+|genie.tasks.clusterChecker.health.counter
+|Counts the number of time an remote node's health check indicator returned a given status
+|count
+|ClusterCheckerTask
+|host, healthIndicator, healthStatus
+
 |genie.tasks.clusterChecker.lostJobs.rate
 |Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them
 |count
