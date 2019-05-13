@@ -81,6 +81,7 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -117,6 +118,12 @@ import java.util.Optional;
         JobsUsersProperties.class,
         ExponentialBackOffTriggerProperties.class,
         JobsActiveLimitProperties.class,
+    }
+)
+@AutoConfigureAfter(
+    {
+        // TODO: Likely there are more that should be here
+        GenieJobWorkflowAutoConfiguration.class
     }
 )
 public class GenieServicesAutoConfiguration {

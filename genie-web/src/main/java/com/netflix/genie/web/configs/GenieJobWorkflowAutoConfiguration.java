@@ -18,7 +18,6 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.web.jobs.workflow.impl.ClusterTask;
 import com.netflix.genie.web.jobs.workflow.impl.CommandTask;
@@ -60,6 +59,7 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean(name = {"file.system.file", "file.system.null"})
     @Order(value = 2)
+    @ConditionalOnMissingBean(LocalFileTransferImpl.class)
     public LocalFileTransferImpl localFileTransfer() {
         return new LocalFileTransferImpl();
     }
@@ -73,6 +73,7 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean(name = {"file.system.http", "file.system.https"})
     @Order(value = 3)
+    @ConditionalOnMissingBean(HttpFileTransferImpl.class)
     public HttpFileTransferImpl httpFileTransfer(final RestTemplate restTemplate, final MeterRegistry registry) {
         return new HttpFileTransferImpl(restTemplate, registry);
     }
@@ -86,7 +87,8 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean
     @Order(value = 0)
-    public WorkflowTask jobKillLogicTask(final MeterRegistry registry) {
+    @ConditionalOnMissingBean(JobFailureAndKillHandlerLogicTask.class)
+    public JobFailureAndKillHandlerLogicTask jobKillLogicTask(final MeterRegistry registry) {
         return new JobFailureAndKillHandlerLogicTask(registry);
     }
 
@@ -98,7 +100,8 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean
     @Order(value = 1)
-    public WorkflowTask initialSetupTask(final MeterRegistry registry) {
+    @ConditionalOnMissingBean(InitialSetupTask.class)
+    public InitialSetupTask initialSetupTask(final MeterRegistry registry) {
         return new InitialSetupTask(registry);
     }
 
@@ -111,7 +114,8 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean
     @Order(value = 2)
-    public WorkflowTask clusterProcessorTask(
+    @ConditionalOnMissingBean(ClusterTask.class)
+    public ClusterTask clusterProcessorTask(
         final MeterRegistry registry,
         @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
     ) {
@@ -127,7 +131,8 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean
     @Order(value = 3)
-    public WorkflowTask applicationProcessorTask(
+    @ConditionalOnMissingBean(ApplicationTask.class)
+    public ApplicationTask applicationProcessorTask(
         final MeterRegistry registry,
         @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
     ) {
@@ -143,7 +148,8 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean
     @Order(value = 4)
-    public WorkflowTask commandProcessorTask(
+    @ConditionalOnMissingBean(CommandTask.class)
+    public CommandTask commandProcessorTask(
         final MeterRegistry registry,
         @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
     ) {
@@ -160,7 +166,8 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean
     @Order(value = 5)
-    public WorkflowTask jobProcessorTask(
+    @ConditionalOnMissingBean(JobTask.class)
+    public JobTask jobProcessorTask(
         final AttachmentService attachmentService,
         final MeterRegistry registry,
         @Qualifier("genieFileTransferService") final GenieFileTransferService fts
@@ -179,7 +186,8 @@ public class GenieJobWorkflowAutoConfiguration {
      */
     @Bean
     @Order(value = 6)
-    public WorkflowTask jobKickoffTask(
+    @ConditionalOnMissingBean(JobKickoffTask.class)
+    public JobKickoffTask jobKickoffTask(
         final JobsProperties jobsProperties,
         final Executor executor,
         final GenieHostInfo genieHostInfo,
