@@ -109,7 +109,7 @@ genie:
 
 info:
   genie:
-    version: @genie.version@
+    version: 1.2.3
 
 management:
   endpoints:

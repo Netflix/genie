@@ -357,7 +357,7 @@ task codeCoverageReport(type: JacocoReport, group: "Coverage reports") {
                                     dir: it,
                                     exclude: [
                                             "**/com/netflix/genie/proto/**",
-                                            "**/com/netflix/genie/web/jpa/entities/*_*",
+                                            "**/com/netflix/genie/web/data/entities/*_*",
                                     ]
                             )
                         }

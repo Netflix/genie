@@ -5,7 +5,7 @@ apply plugin: "org.asciidoctor.convert"
 project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
 
 ext {
-    metaModelIgnorePattern = "**/com/netflix/genie/web/jpa/entities/*_.java"
+    metaModelIgnorePattern = "**/com/netflix/genie/web/data/entities/*_.java"
     snippetsDir = new File(project.buildDir, "generated-snippets")
 }
 
@@ -103,7 +103,7 @@ license {
     exclude "META-INF/spring.factories"
     exclude "genie-banner.txt"
     exclude "db/**/*.sql"
-    exclude "**/com/netflix/genie/web/jpa/entities/*_.java"
+    exclude "**/com/netflix/genie/web/data/entities/*_.java"
 }
 
 integrationTest {
