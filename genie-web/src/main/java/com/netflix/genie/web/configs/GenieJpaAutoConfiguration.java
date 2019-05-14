@@ -17,23 +17,23 @@
  */
 package com.netflix.genie.web.configs;
 
-import com.netflix.genie.web.jpa.repositories.JpaAgentConnectionRepository;
-import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.jpa.services.JpaAgentConnectionPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaApplicationPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaClusterPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaCommandPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaFilePersistenceService;
-import com.netflix.genie.web.jpa.services.JpaFilePersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaJobPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaJobSearchServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaTagPersistenceService;
-import com.netflix.genie.web.jpa.services.JpaTagPersistenceServiceImpl;
+import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
+import com.netflix.genie.web.data.services.jpa.JpaAgentConnectionPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.jpa.JpaApplicationPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.jpa.JpaClusterPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.jpa.JpaCommandPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.jpa.JpaFilePersistenceService;
+import com.netflix.genie.web.data.services.jpa.JpaFilePersistenceServiceImpl;
+import com.netflix.genie.web.data.services.jpa.JpaJobPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.jpa.JpaJobSearchServiceImpl;
+import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService;
+import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceServiceImpl;
 import com.netflix.genie.web.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
@@ -56,8 +56,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  */
 @Configuration
 // TODO: Create marker class for base classes scanning for compile time check
-@EnableJpaRepositories("com.netflix.genie.web.jpa.repositories")
-@EntityScan("com.netflix.genie.web.jpa.entities")
+@EnableJpaRepositories("com.netflix.genie.web.data.repositories")
+@EntityScan("com.netflix.genie.web.data.entities")
 public class GenieJpaAutoConfiguration {
 
     /**
