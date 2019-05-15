@@ -18,7 +18,7 @@
 package com.netflix.genie.common.internal.services.impl;
 
 import com.google.common.collect.ImmutableList;
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
@@ -60,7 +60,7 @@ public class JobArchiveServiceImpl implements JobArchiveService {
         // TODO: This relies highly on convention. Might be nicer to better abstract with database
         //       record that points directly to where the manifest is or other solution?
         try {
-            final JobDirectoryManifest manifest = new JobDirectoryManifest(directory);
+            final DirectoryManifest manifest = new DirectoryManifest(directory, true);
             final Path manifestDirectoryPath = StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)
                 ? directory
                 : directory.resolve(JobArchiveService.MANIFEST_DIRECTORY);

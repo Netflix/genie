@@ -24,7 +24,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.util.GenieObjectMapper;
@@ -161,9 +161,9 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                         if (!manifestResource.exists()) {
                             throw new GenieNotFoundException("No job manifest exists at " + manifestLocation);
                         }
-                        final JobDirectoryManifest manifest = GenieObjectMapper
+                        final DirectoryManifest manifest = GenieObjectMapper
                             .getMapper()
-                            .readValue(manifestResource.getInputStream(), JobDirectoryManifest.class);
+                            .readValue(manifestResource.getInputStream(), DirectoryManifest.class);
 
                         return new ManifestCacheValue(manifest, jobDirectoryRoot);
                     }
@@ -221,7 +221,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
 
         if (jobStatus.isActive() && isV4) {
 
-            final Optional<JobDirectoryManifest> manifest = this.agentFileStreamService.getManifest(jobId);
+            final Optional<DirectoryManifest> manifest = this.agentFileStreamService.getManifest(jobId);
             if (!manifest.isPresent()) {
                 log.error("Manifest not found for active job: {}", jobId);
                 response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), "Could not load manifest for job: " + jobId);
@@ -261,11 +261,11 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             }
             final Path jobDirPath = Paths.get(jobDirRoot);
 
-            final JobDirectoryManifest manifest = new JobDirectoryManifest(jobDirPath, false);
+            final DirectoryManifest manifest = new DirectoryManifest(jobDirPath, false);
             this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
         } else {
             // Archived job
-            final JobDirectoryManifest manifest;
+            final DirectoryManifest manifest;
             final URI jobDirRoot;
             try {
                 final ManifestCacheValue cacheValue = this.manifestCache.get(jobId);
@@ -292,7 +292,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final String relativePath,
         final HttpServletRequest request,
         final HttpServletResponse response,
-        final JobDirectoryManifest manifest,
+        final DirectoryManifest manifest,
         final URI jobDirectoryRoot
     ) throws IOException, ServletException {
         log.debug(
@@ -301,8 +301,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             relativePath,
             jobDirectoryRoot
         );
-        final JobDirectoryManifest.ManifestEntry entry;
-        final Optional<JobDirectoryManifest.ManifestEntry> entryOptional = manifest.getEntry(relativePath);
+        final DirectoryManifest.ManifestEntry entry;
+        final Optional<DirectoryManifest.ManifestEntry> entryOptional = manifest.getEntry(relativePath);
         if (entryOptional.isPresent()) {
             entry = entryOptional.get();
         } else {
@@ -321,7 +321,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             try {
                 entry.getParent().ifPresent(
                     parentPath -> {
-                        final JobDirectoryManifest.ManifestEntry parentEntry = manifest
+                        final DirectoryManifest.ManifestEntry parentEntry = manifest
                             .getEntry(parentPath)
                             .orElseThrow(IllegalArgumentException::new);
                         directory.setParent(createEntry(parentEntry, baseUri));
@@ -329,7 +329,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 );
 
                 for (final String childPath : entry.getChildren()) {
-                    final JobDirectoryManifest.ManifestEntry childEntry = manifest
+                    final DirectoryManifest.ManifestEntry childEntry = manifest
                         .getEntry(childPath)
                         .orElseThrow(IllegalArgumentException::new);
 
@@ -377,7 +377,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     }
 
     private DefaultDirectoryWriter.Entry createEntry(
-        final JobDirectoryManifest.ManifestEntry manifestEntry,
+        final DirectoryManifest.ManifestEntry manifestEntry,
         final URI baseUri
     ) {
         final DefaultDirectoryWriter.Entry entry = new DefaultDirectoryWriter.Entry();
@@ -462,7 +462,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     @EqualsAndHashCode(doNotUseGetters = true)
     @ToString(doNotUseGetters = true)
     private static class ManifestCacheValue {
-        private final JobDirectoryManifest manifest;
+        private final DirectoryManifest manifest;
         private final URI jobDirectoryRoot;
     }
 

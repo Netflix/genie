@@ -20,7 +20,7 @@ package com.netflix.genie.agent.execution.services.impl.grpc;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import com.netflix.genie.agent.execution.services.AgentFileStreamService;
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
@@ -140,7 +140,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             try {
                 jobFileManifest = manifestProtoConverter.manifestToProtoMessage(
                     this.jobId,
-                    new JobDirectoryManifest(this.jobDirectoryPath, false)
+                    new DirectoryManifest(this.jobDirectoryPath, false)
                 );
             } catch (final IOException e) {
                 log.error("Failed to construct manifest", e);
