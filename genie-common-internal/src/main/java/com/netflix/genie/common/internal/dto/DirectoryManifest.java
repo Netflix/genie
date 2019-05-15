@@ -58,14 +58,14 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * A manifest of all the files and subdirectories in a Genie job working directory.
+ * A manifest of all the files and subdirectories in a directory.
  *
  * @author tgianos
  * @since 4.0.0
  */
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-public class JobDirectoryManifest {
+public class DirectoryManifest {
     private static final String ENTRIES_KEY = "entries";
     private static final String EMPTY_STRING = "";
 
@@ -79,21 +79,11 @@ public class JobDirectoryManifest {
     /**
      * Create a manifest from the given job directory.
      *
-     * @param directory The job directory to create a manifest from
-     * @throws IOException If there is an error reading the directory
-     */
-    public JobDirectoryManifest(final Path directory) throws IOException {
-        this(directory, true);
-    }
-
-    /**
-     * Create a manifest from the given job directory.
-     *
      * @param directory              The job directory to create a manifest from
      * @param calculateFileChecksums Whether or not to calculate checksums for each file added to the manifest
      * @throws IOException If there is an error reading the directory
      */
-    public JobDirectoryManifest(final Path directory, final boolean calculateFileChecksums) throws IOException {
+    public DirectoryManifest(final Path directory, final boolean calculateFileChecksums) throws IOException {
         // Walk the directory
         final ImmutableMap.Builder<String, ManifestEntry> builder = ImmutableMap.builder();
         final ManifestVisitor manifestVisitor = new ManifestVisitor(directory, builder, calculateFileChecksums);
@@ -128,7 +118,7 @@ public class JobDirectoryManifest {
      * @param entries The entries in this manifest
      */
     @JsonCreator
-    public JobDirectoryManifest(
+    public DirectoryManifest(
         @JsonProperty(value = ENTRIES_KEY, required = true) final Set<ManifestEntry> entries
     ) {
         final ImmutableMap.Builder<String, ManifestEntry> builder = ImmutableMap.builder();

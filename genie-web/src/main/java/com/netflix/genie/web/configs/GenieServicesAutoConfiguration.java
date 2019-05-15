@@ -19,7 +19,7 @@ package com.netflix.genie.web.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
@@ -564,7 +564,7 @@ public class GenieServicesAutoConfiguration {
             }
 
             @Override
-            public Optional<JobDirectoryManifest> getManifest(final String jobId) {
+            public Optional<DirectoryManifest> getManifest(final String jobId) {
                 throw new NotImplementedException("Not supported when using fallback service");
             }
         };

@@ -20,12 +20,12 @@ package com.netflix.genie.common.internal.dto.v4.converters
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest
+import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.proto.AgentManifestMessage
 import spock.lang.Specification
 
-class JobDirectoryManifestProtoConverterSpec extends Specification {
+class DirectoryManifestProtoConverterSpec extends Specification {
     ObjectMapper objectMapper
     JobDirectoryManifestProtoConverter converter
     static final String JSON_MANIFEST = "{ fake json serialization of manifest }"
@@ -38,7 +38,7 @@ class JobDirectoryManifestProtoConverterSpec extends Specification {
     def "Manifest to message to manifest"() {
         setup:
         String jobId = "123456"
-        JobDirectoryManifest manifest = Mock(JobDirectoryManifest)
+        DirectoryManifest manifest = Mock(DirectoryManifest)
 
         when:
         AgentManifestMessage message = this.converter.manifestToProtoMessage(jobId, manifest)
@@ -49,16 +49,16 @@ class JobDirectoryManifestProtoConverterSpec extends Specification {
         message.getManifestJson() == JSON_MANIFEST
 
         when:
-        JobDirectoryManifest loadedManifest = converter.toManifest(message)
+        DirectoryManifest loadedManifest = converter.toManifest(message)
 
         then:
-        1 * objectMapper.readValue(JSON_MANIFEST, JobDirectoryManifest.class) >> manifest
+        1 * objectMapper.readValue(JSON_MANIFEST, DirectoryManifest.class) >> manifest
         loadedManifest == manifest
     }
 
     def "Manifest JSON serialization error"() {
         setup:
-        JobDirectoryManifest manifest = Mock(JobDirectoryManifest)
+        DirectoryManifest manifest = Mock(DirectoryManifest)
         Exception exception = new JsonProcessingException("...")
 
         when:
@@ -78,7 +78,7 @@ class JobDirectoryManifestProtoConverterSpec extends Specification {
         this.converter.toManifest(AgentManifestMessage.getDefaultInstance())
 
         then:
-        1 * objectMapper.readValue(_, JobDirectoryManifest.class) >> {throw exception}
+        1 * objectMapper.readValue(_, DirectoryManifest.class) >> {throw exception}
         Exception e = thrown(GenieConversionException)
         e.getCause() == exception
     }

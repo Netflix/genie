@@ -20,7 +20,7 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.google.protobuf.ByteString
 import com.netflix.genie.common.exceptions.GenieTimeoutException
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest
+import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.proto.AgentFileMessage
@@ -50,7 +50,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     StreamObserver<ServerAckMessage> serverTransmitObserver
     AgentManifestMessage manifestMessage
     String jobId
-    JobDirectoryManifest manifest
+    DirectoryManifest manifest
     ByteString data
 
     void setup() {
@@ -71,7 +71,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         this.jobId = UUID.randomUUID().toString()
         this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
-        this.manifest = Spy(new JobDirectoryManifest(this.temporaryFolder.getRoot().toPath()))
+        this.manifest = Spy(new DirectoryManifest(this.temporaryFolder.getRoot().toPath(), true))
     }
 
     void cleanup() {
@@ -79,7 +79,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
     def "Control stream"() {
         setup:
-        Optional<JobDirectoryManifest> m
+        Optional<DirectoryManifest> m
         StreamObserver<AgentManifestMessage> o
 
         when: "Fetch manifest before any agent connected"

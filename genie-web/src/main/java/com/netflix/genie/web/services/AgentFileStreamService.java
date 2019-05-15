@@ -18,7 +18,7 @@
 
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import org.springframework.core.io.Resource;
 
 import javax.validation.constraints.NotBlank;
@@ -55,9 +55,9 @@ public interface AgentFileStreamService {
      * completed, or because the agent is connected to a different node).
      *
      * @param jobId the job id
-     * @return an optional {@link JobDirectoryManifest}
+     * @return an optional {@link DirectoryManifest}
      */
-    Optional<JobDirectoryManifest> getManifest(String jobId);
+    Optional<DirectoryManifest> getManifest(String jobId);
 
     /**
      * A {@link Resource} for files local to a remote agent.

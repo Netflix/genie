@@ -20,7 +20,7 @@ package com.netflix.genie.common.internal.dto.v4.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.proto.AgentManifestMessage;
 import org.springframework.validation.annotation.Validated;
@@ -29,7 +29,7 @@ import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 
 /**
- * Converts {@link JobDirectoryManifest} from/to {@link AgentManifestMessage} in order to transport manifests
+ * Converts {@link DirectoryManifest} from/to {@link AgentManifestMessage} in order to transport manifests
  * over gRPC.
  *
  * @author mprimi
@@ -50,7 +50,7 @@ public class JobDirectoryManifestProtoConverter {
     }
 
     /**
-     * Construct a {@link AgentManifestMessage} from the given {@link JobDirectoryManifest}.
+     * Construct a {@link AgentManifestMessage} from the given {@link DirectoryManifest}.
      *
      * @param claimedJobId the id of the job this file manifest belongs to
      * @param manifest     the manifest
@@ -59,7 +59,7 @@ public class JobDirectoryManifestProtoConverter {
      */
     public AgentManifestMessage manifestToProtoMessage(
         @NotBlank final String claimedJobId,
-        final JobDirectoryManifest manifest
+        final DirectoryManifest manifest
     ) throws GenieConversionException {
         final String manifestJsonString;
         try {
@@ -76,15 +76,15 @@ public class JobDirectoryManifestProtoConverter {
     }
 
     /**
-     * Load a {@link JobDirectoryManifest} from a {@link AgentManifestMessage}.
+     * Load a {@link DirectoryManifest} from a {@link AgentManifestMessage}.
      *
      * @param message the message
-     * @return a {@link JobDirectoryManifest}
+     * @return a {@link DirectoryManifest}
      * @throws GenieConversionException if loading fails
      */
-    public JobDirectoryManifest toManifest(final AgentManifestMessage message) throws GenieConversionException {
+    public DirectoryManifest toManifest(final AgentManifestMessage message) throws GenieConversionException {
         try {
-            return objectMapper.readValue(message.getManifestJson(), JobDirectoryManifest.class);
+            return objectMapper.readValue(message.getManifestJson(), DirectoryManifest.class);
         } catch (final IOException e) {
             throw new GenieConversionException("Failed to load manifest", e);
         }

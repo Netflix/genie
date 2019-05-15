@@ -20,7 +20,7 @@ package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest
+import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver
 import com.netflix.genie.web.services.AgentFileStreamService
@@ -51,8 +51,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     JobDirectoryServerService service
     HttpServletRequest request
     HttpServletResponse response
-    JobDirectoryManifest manifest
-    JobDirectoryManifest.ManifestEntry manifestEntry
+    DirectoryManifest manifest
+    DirectoryManifest.ManifestEntry manifestEntry
     Resource resource
     JobDirectoryServerServiceImpl.GenieResourceHandler.Factory handlerFactory
     JobDirectoryServerServiceImpl.GenieResourceHandler handler
@@ -69,8 +69,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
 
         this.request = Mock(HttpServletRequest)
         this.response = Mock(HttpServletResponse)
-        this.manifest = Mock(JobDirectoryManifest)
-        this.manifestEntry = Mock(JobDirectoryManifest.ManifestEntry)
+        this.manifest = Mock(DirectoryManifest)
+        this.manifestEntry = Mock(DirectoryManifest.ManifestEntry)
         this.resource = Mock(Resource)
     }
 

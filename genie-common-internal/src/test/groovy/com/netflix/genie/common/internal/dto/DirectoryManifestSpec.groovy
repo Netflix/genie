@@ -30,11 +30,11 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * Specifications for {@link JobDirectoryManifest}.
+ * Specifications for {@link DirectoryManifest}.
  *
  * @author tgianos
  */
-class JobDirectoryManifestSpec extends Specification {
+class DirectoryManifestSpec extends Specification {
 
     @Rule
     TemporaryFolder temporaryFolder = new TemporaryFolder()
@@ -134,9 +134,9 @@ class JobDirectoryManifestSpec extends Specification {
     @Unroll
     def "can create a manifest, serialize it, deserialize it and verify correctness (md5: #includeMd5)"() {
         when:
-        def manifest = new JobDirectoryManifest(this.rootPath, includeMd5)
+        def manifest = new DirectoryManifest(this.rootPath, includeMd5)
         def json = GenieObjectMapper.getMapper().writeValueAsString(manifest)
-        def manifest2 = GenieObjectMapper.getMapper().readValue(json, JobDirectoryManifest.class)
+        def manifest2 = GenieObjectMapper.getMapper().readValue(json, DirectoryManifest.class)
 
         then:
         manifest == manifest2
@@ -149,18 +149,7 @@ class JobDirectoryManifestSpec extends Specification {
         false      | _
     }
 
-    def "default constructor includes md5"() {
-        when:
-        def manifestDefault = new JobDirectoryManifest(this.rootPath)
-
-        then:
-        manifestDefault.getEntries()
-            .stream()
-            .filter({ e -> !e.isDirectory() })
-            .forEach({ e -> assert e.getMd5().isPresent() })
-    }
-
-    void verifyManifest(JobDirectoryManifest manifest, boolean expectMd5Present) {
+    void verifyManifest(DirectoryManifest manifest, boolean expectMd5Present) {
         assert manifest.getEntries().size() == 11
         assert manifest.getFiles().size() == 7
         assert manifest.getNumFiles() == 7
@@ -309,7 +298,7 @@ class JobDirectoryManifestSpec extends Specification {
     }
 
     def verifyEntry(
-        JobDirectoryManifest.ManifestEntry entry,
+        DirectoryManifest.ManifestEntry entry,
         String expectedRelativePath,
         Path expectedFile,
         boolean isDirectory,

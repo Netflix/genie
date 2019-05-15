@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest;
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.proto.AgentFileMessage;
@@ -105,7 +105,7 @@ class GRpcAgentFileStreamServiceImpl
      * {@inheritDoc}
      */
     @Override
-    public Optional<JobDirectoryManifest> getManifest(final String jobId) {
+    public Optional<DirectoryManifest> getManifest(final String jobId) {
         final ControlStreamObserver streamObserver = this.jobIdControlStreamMap.get(jobId);
         if (streamObserver != null) {
             return Optional.ofNullable(streamObserver.manifestRef.get());
@@ -126,13 +126,13 @@ class GRpcAgentFileStreamServiceImpl
             return Optional.empty();
         }
 
-        final JobDirectoryManifest manifest = streamObserver.manifestRef.get();
+        final DirectoryManifest manifest = streamObserver.manifestRef.get();
         if (manifest == null) {
             log.warn("Stream record for job id: {} does not have a manifest", jobId);
             return Optional.empty();
         }
 
-        final JobDirectoryManifest.ManifestEntry manifestEntry =
+        final DirectoryManifest.ManifestEntry manifestEntry =
             manifest.getEntry(relativePath.toString()).orElse(null);
 
         if (manifestEntry == null) {
@@ -322,7 +322,7 @@ class GRpcAgentFileStreamServiceImpl
     private static class ControlStreamObserver implements StreamObserver<AgentManifestMessage> {
         private final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService;
         private final StreamObserver<ServerControlMessage> responseObserver;
-        private final AtomicReference<JobDirectoryManifest> manifestRef = new AtomicReference<>();
+        private final AtomicReference<DirectoryManifest> manifestRef = new AtomicReference<>();
         private final AtomicReference<String> jobIdRef = new AtomicReference<>();
 
         ControlStreamObserver(

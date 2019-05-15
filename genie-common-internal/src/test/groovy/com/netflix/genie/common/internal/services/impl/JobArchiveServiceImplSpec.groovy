@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.internal.services.impl
 
-import com.netflix.genie.common.internal.dto.JobDirectoryManifest
+import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.common.internal.services.JobArchiver
@@ -65,7 +65,7 @@ class JobArchiveServiceImplSpec extends Specification {
         Files.exists(manifestPath)
 
         when:
-        def manifest = GenieObjectMapper.getMapper().readValue(manifestPath.toFile(), JobDirectoryManifest)
+        def manifest = GenieObjectMapper.getMapper().readValue(manifestPath.toFile(), DirectoryManifest)
 
         then:
         manifest.getNumDirectories() == 2
