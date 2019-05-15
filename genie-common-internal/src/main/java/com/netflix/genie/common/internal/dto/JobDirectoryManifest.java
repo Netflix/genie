@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -267,6 +268,14 @@ public class JobDirectoryManifest {
             final ManifestEntry entry = this.buildEntry(dir, attrs, true);
             log.debug("Created manifest entry for directory {}", entry);
             this.builder.put(entry.getPath(), entry);
+
+            // Temporary hack To mitigate an ongoing issue.
+            // Building manifests for deep application dependencies directory trees is putting a strain on the
+            // application and causing user errors.
+            // Until a proper fix is in place, skip the dependencies sub-trees.
+            if (JobConstants.DEPENDENCY_FILE_PATH_PREFIX.equals(entry.getName())) {
+                return FileVisitResult.SKIP_SUBTREE;
+            }
             return FileVisitResult.CONTINUE;
         }
 
