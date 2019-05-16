@@ -19,6 +19,7 @@ package com.netflix.genie.common.internal.configs;
 
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import org.assertj.core.api.Assertions;
@@ -95,5 +96,31 @@ public class CommonServicesAutoConfigurationTest {
                         .isEqualTo(2);
                 }
             );
+    }
+
+    /**
+     * Make JobDirectoryManifestService beans are configured as expected.
+     */
+    @Test
+    public void testJobDirectoryManifestServices() {
+        this.contextRunner.run(
+            context -> {
+                // 2 Beans of this type
+                Assertions.assertThat(context).getBeans(JobDirectoryManifestService.class).size().isEqualTo(2);
+                // Get by name
+                Assertions.assertThat(context).getBean(
+                    "checksummingJobDirectoryManifestService",
+                    JobDirectoryManifestService.class
+                ).isNotNull();
+                Assertions.assertThat(context).getBean(
+                    "jobDirectoryManifestService",
+                    JobDirectoryManifestService.class
+                ).isNotNull();
+                // Default is non-checksumming
+                Assertions.assertThat(context).getBean(
+                    JobDirectoryManifestService.class
+                ).isEqualTo(context.getBean("jobDirectoryManifestService"));
+            }
+        );
     }
 }

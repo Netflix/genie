@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
+import com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration;
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
 import org.junit.Assert;
@@ -46,6 +47,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
     classes = {
+        CommonServicesAutoConfiguration.class,
         GRpcAutoConfiguration.class,
         GRpcServicesAutoConfiguration.class,
         GRpcServicesAutoConfigurationIntegrationTest.MockConfig.class

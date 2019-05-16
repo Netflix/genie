@@ -23,6 +23,7 @@ import com.netflix.genie.agent.execution.services.AgentFileStreamService
 import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
+import com.netflix.genie.common.internal.services.JobDirectoryManifestService
 import com.netflix.genie.proto.*
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
@@ -47,16 +48,20 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     FileStreamServiceGrpc.FileStreamServiceStub client
     TaskScheduler taskScheduler
     JobDirectoryManifestProtoConverter converter
+    JobDirectoryManifestService jobDirectoryManifestService
     String jobId
     ScheduledFuture<?> scheduledTask
     RemoteService remoteService
+    DirectoryManifest manifest
 
     void setup() {
         this.jobId = UUID.randomUUID().toString()
+        this.manifest = Mock(DirectoryManifest)
 
         this.scheduledTask = Mock(ScheduledFuture)
         this.taskScheduler = Mock(TaskScheduler)
         this.converter = Mock(JobDirectoryManifestProtoConverter)
+        this.jobDirectoryManifestService = Mock(JobDirectoryManifestService)
 
         this.remoteService = new RemoteService()
         this.grpcServerRule.getServiceRegistry().addService(remoteService)
@@ -64,7 +69,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         this.agentFileStreamService = new GRpcAgentFileStreamServiceImpl(
             client,
             taskScheduler,
-            converter
+            converter,
+            jobDirectoryManifestService
         )
     }
 
@@ -127,7 +133,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         runnableCapture.run()
 
         then: "A sync channel is open and a manifest is transmitted"
-        1 * converter.manifestToProtoMessage(jobId, _ as DirectoryManifest) >> manifestMessage
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
         1 == remoteService.manifestMessageReceived.size()
         manifestMessage == remoteService.manifestMessageReceived.get(0)
@@ -136,14 +143,16 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         runnableCapture.run()
 
         then: "Handle manifest creation exception"
-        1 * converter.manifestToProtoMessage(jobId, _ as DirectoryManifest) >> { throw new IOException("...") }
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> { throw new IOException("...") }
         1 == remoteService.activeSyncStreams.size()
 
         when:
         runnableCapture.run()
 
         then: "Handle manifest message conversion exception"
-        1 * converter.manifestToProtoMessage(jobId, _ as DirectoryManifest) >> {
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> {
             throw new GenieConversionException("...")
         }
         1 == remoteService.activeSyncStreams.size()
@@ -152,7 +161,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         runnableCapture.run()
 
         then: "Another manifest is transmitted over the existing sync channel"
-        1 * converter.manifestToProtoMessage(jobId, _ as DirectoryManifest) >> manifestMessage
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
         2 == remoteService.manifestMessageReceived.size()
         manifestMessage == remoteService.manifestMessageReceived.get(1)
@@ -162,7 +172,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         runnableCapture.run()
 
         then:
-        1 * converter.manifestToProtoMessage(jobId, _ as DirectoryManifest) >> manifestMessage
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
 
         when:
         agentFileStreamService.stop()
@@ -195,7 +206,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         runnableCapture.run()
 
         then: "A sync channel is open and a manifest is transmitted"
-        1 * converter.manifestToProtoMessage(jobId, _ as DirectoryManifest) >> manifestMessage
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
         1 == remoteService.manifestMessageReceived.size()
         manifestMessage == remoteService.manifestMessageReceived.get(0)
@@ -243,7 +255,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         runnableCapture.run()
 
         then: "A sync channel is open and a manifest is transmitted"
-        1 * converter.manifestToProtoMessage(jobId, _ as DirectoryManifest) >> manifestMessage
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
         1 == remoteService.activeSyncStreams.size()
         1 == remoteService.manifestMessageReceived.size()
         manifestMessage == remoteService.manifestMessageReceived.get(0)
