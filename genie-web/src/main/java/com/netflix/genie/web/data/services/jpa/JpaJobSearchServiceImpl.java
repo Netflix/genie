@@ -31,6 +31,9 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.web.data.entities.BaseEntity;
+import com.netflix.genie.web.data.entities.ClusterEntity;
+import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.JobEntity_;
 import com.netflix.genie.web.data.entities.projections.AgentHostnameProjection;
@@ -43,6 +46,7 @@ import com.netflix.genie.web.data.entities.projections.JobProjection;
 import com.netflix.genie.web.data.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.data.entities.projections.JobStatusProjection;
 import com.netflix.genie.web.data.entities.projections.UniqueIdProjection;
+import com.netflix.genie.web.data.repositories.jpa.JpaBaseRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
@@ -133,9 +137,33 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         log.debug("called");
 
         // TODO: Re-write with projections however not currently supported: https://jira.spring.io/browse/DATAJPA-1033
+        //       Update: JIRA still not resolved as of 5/16/19
         final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         final Root<JobEntity> root = countQuery.from(JobEntity.class);
+
+        ClusterEntity clusterEntity = null;
+        if (clusterId != null) {
+            final Optional<ClusterEntity> optionalClusterEntity
+                = this.getEntityOrNull(this.clusterRepository, clusterId, clusterName);
+            if (optionalClusterEntity.isPresent()) {
+                clusterEntity = optionalClusterEntity.get();
+            } else {
+                // Won't find anything matching the query
+                return new PageImpl<>(Lists.newArrayList(), page, 0);
+            }
+        }
+        CommandEntity commandEntity = null;
+        if (commandId != null) {
+            final Optional<CommandEntity> optionalCommandEntity
+                = this.getEntityOrNull(this.commandRepository, commandId, commandName);
+            if (optionalCommandEntity.isPresent()) {
+                commandEntity = optionalCommandEntity.get();
+            } else {
+                // Won't find anything matching the query
+                return new PageImpl<>(Lists.newArrayList(), page, 0);
+            }
+        }
 
         final Predicate whereClause = JpaJobSpecs
             .getFindPredicate(
@@ -147,9 +175,9 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 statuses,
                 tags,
                 clusterName,
-                clusterId == null ? null : this.clusterRepository.findByUniqueId(clusterId).orElse(null),
+                clusterEntity,
                 commandName,
-                commandId == null ? null : this.commandRepository.findByUniqueId(commandId).orElse(null),
+                commandEntity,
                 minStarted,
                 maxStarted,
                 minFinished,
@@ -406,5 +434,24 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             .stream()
             .map(UniqueIdProjection::getUniqueId)
             .collect(Collectors.toSet());
+    }
+
+    private <E extends BaseEntity> Optional<E> getEntityOrNull(
+        final JpaBaseRepository<E> repository,
+        final String id,
+        @Nullable final String name
+    ) {
+        // User is requesting jobs using a given entity. If it doesn't exist short circuit the search
+        final Optional<E> optionalEntity = repository.findByUniqueId(id);
+        if (optionalEntity.isPresent()) {
+            final E entity = optionalEntity.get();
+            // If the name doesn't match user input request we can also short circuit search
+            if (name != null && !entity.getName().equals(name)) {
+                // Won't find anything matching the query
+                return Optional.empty();
+            }
+        }
+
+        return optionalEntity;
     }
 }

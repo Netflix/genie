@@ -30,7 +30,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Specifications for JPA queries.
@@ -99,12 +98,13 @@ public final class JpaJobSpecs {
             predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.user), user));
         }
         if (statuses != null && !statuses.isEmpty()) {
-            final List<Predicate> orPredicates =
-                statuses
-                    .stream()
-                    .map(status -> cb.equal(root.get(JobEntity_.status), status))
-                    .collect(Collectors.toList());
-            predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+            predicates.add(
+                cb.or(
+                    statuses
+                        .stream()
+                        .map(status -> cb.equal(root.get(JobEntity_.status), status)).toArray(Predicate[]::new)
+                )
+            );
         }
         if (tags != null && !tags.isEmpty()) {
             predicates.add(cb.like(root.get(JobEntity_.tagSearchString), JpaSpecificationUtils.getTagLikeString(tags)));
@@ -151,6 +151,6 @@ public final class JpaJobSpecs {
                 )
             );
         }
-        return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }
