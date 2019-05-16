@@ -21,6 +21,7 @@ import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.common.internal.services.JobArchiver
+import com.netflix.genie.common.internal.services.JobDirectoryManifestService
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.apache.commons.lang3.StringUtils
 import org.junit.Rule
@@ -48,7 +49,8 @@ class JobArchiveServiceImplSpec extends Specification {
                 return false
             }
         }
-        def service = new JobArchiveServiceImpl([archiver])
+        JobDirectoryManifestService jobDirectoryManifestService = Mock(JobDirectoryManifestService)
+        def service = new JobArchiveServiceImpl([archiver], jobDirectoryManifestService)
         def jobDirectory = this.temporaryFolder.newFolder().toPath()
         Files.write(jobDirectory.resolve("someFile"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
         Files.createDirectory(jobDirectory.resolve("subDir"))
@@ -57,11 +59,14 @@ class JobArchiveServiceImplSpec extends Specification {
             ? jobDirectory
             : jobDirectory.resolve(JobArchiveService.MANIFEST_DIRECTORY)
         def manifestPath = manifestDirectoryPath.resolve(JobArchiveService.MANIFEST_NAME)
+        def originalManifest = new DirectoryManifest(jobDirectory, true)
 
         when:
         service.archiveDirectory(jobDirectory, target)
 
+
         then:
+        1 * jobDirectoryManifestService.getDirectoryManifest(jobDirectory) >> originalManifest
         Files.exists(manifestPath)
 
         when:
@@ -70,5 +75,6 @@ class JobArchiveServiceImplSpec extends Specification {
         then:
         manifest.getNumDirectories() == 2
         manifest.getNumFiles() == 1
+        manifest == originalManifest
     }
 }

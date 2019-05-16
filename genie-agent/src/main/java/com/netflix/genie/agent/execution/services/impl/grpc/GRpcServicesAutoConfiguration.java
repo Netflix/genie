@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.JobKillServiceGrpc;
@@ -104,6 +105,7 @@ public class GRpcServicesAutoConfiguration {
      * @param fileStreamServiceStub              The stub to use for communications with the server
      * @param taskScheduler                      The task scheduler to use
      * @param jobDirectoryManifestProtoConverter The converter to serialize manifests into messages
+     * @param jobDirectoryManifestService        The job directory manifest service
      * @return A {@link AgentFileStreamService} instance
      */
     @Bean
@@ -112,12 +114,14 @@ public class GRpcServicesAutoConfiguration {
     public AgentFileStreamService agentFileStreamService(
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler,
-        final JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter
+        final JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter,
+        final JobDirectoryManifestService jobDirectoryManifestService
     ) {
         return new GRpcAgentFileStreamServiceImpl(
             fileStreamServiceStub,
             taskScheduler,
-            jobDirectoryManifestProtoConverter
+            jobDirectoryManifestProtoConverter,
+            jobDirectoryManifestService
         );
     }
 }
