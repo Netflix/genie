@@ -423,6 +423,8 @@
         job_directory_location="/tmp/genie/jobs/1"
         resolved="true"
         v4="false"
+        cluster_name="h2query"
+        command_name="spark"
     />
     <job_command_arguments
         job_id="1"
@@ -519,6 +521,8 @@
         job_directory_location="/tmp/genie/jobs/2"
         resolved="true"
         v4="false"
+        cluster_name="h2query"
+        command_name="spark"
     />
     <job_command_arguments
         job_id="2"
@@ -603,6 +607,8 @@
         job_directory_location="/tmp/genie/jobs/3"
         resolved="true"
         v4="false"
+        cluster_name="h2query"
+        command_name="spark"
     />
     <job_command_arguments
         job_id="3"
@@ -687,6 +693,8 @@
         job_directory_location="/tmp/genie/jobs/13"
         resolved="true"
         v4="true"
+        cluster_name="h2query"
+        command_name="spark"
     />
     <job_command_arguments
         job_id="4"
@@ -771,6 +779,8 @@
         job_directory_location="/tmp/genie/jobs/13"
         resolved="true"
         v4="true"
+        cluster_name="h2query"
+        command_name="spark"
     />
     <job_command_arguments
         job_id="5"

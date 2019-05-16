@@ -232,6 +232,193 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
     }
 
     /**
+     * Specific searches for jobs by cluster or command variables which behave special due to joins.
+     */
+    @Test
+    public void canFindJobsByClusterAndCommand() {
+        final String clusterId = "cluster1";
+        final String clusterName = "h2query";
+        final String commandId = "command1";
+        final String commandName = "spark";
+        final Pageable page = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
+        Page<JobSearchResult> jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                UUID.randomUUID().toString(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(0L));
+        Assert.assertTrue(jobs.getContent().isEmpty());
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                UUID.randomUUID().toString(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(0L));
+        Assert.assertTrue(jobs.getContent().isEmpty());
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                clusterId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(5L));
+        Assert.assertThat(jobs.getContent().size(), Matchers.is(5));
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                commandId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(5L));
+        Assert.assertThat(jobs.getContent().size(), Matchers.is(5));
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                clusterId,
+                null,
+                commandId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(5L));
+        Assert.assertThat(jobs.getContent().size(), Matchers.is(5));
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                clusterName,
+                clusterId,
+                commandName,
+                commandId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(5L));
+        Assert.assertThat(jobs.getContent().size(), Matchers.is(5));
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                UUID.randomUUID().toString(),
+                clusterId,
+                commandName,
+                commandId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(0L));
+        Assert.assertTrue(jobs.getContent().isEmpty());
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                clusterName,
+                clusterId,
+                UUID.randomUUID().toString(),
+                commandId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(0L));
+        Assert.assertTrue(jobs.getContent().isEmpty());
+    }
+
+    /**
      * Make sure we can get the correct number of jobs which are active on a given host.
      */
     @Test
@@ -476,7 +663,6 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
 
     /**
      * Make sure the getting user resource summaries works.
-     *
      */
     @Test
     public void canGetUserResourceSummaries() {
@@ -490,7 +676,6 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
 
     /**
      * Make sure the getting active agent jobs without an active connection works.
-     *
      */
     @Test
     public void canGetActiveDisconnectedAgentJobs() {
