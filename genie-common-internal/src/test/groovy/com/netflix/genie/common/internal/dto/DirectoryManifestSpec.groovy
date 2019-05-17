@@ -28,6 +28,7 @@ import javax.annotation.Nullable
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.BasicFileAttributes
 
 /**
  * Specifications for {@link DirectoryManifest}.
@@ -56,6 +57,10 @@ class DirectoryManifestSpec extends Specification {
     String clusterDir
     Path clusterSetupScriptPath
     String clusterSetupScript
+    Path applicationDirPath
+    String applicationDir
+    Path applicationSetupScriptPath
+    String applicationSetupScript
     Path symLinkFileRealPath
     Path symLinkFilePath
     String symLinkFile
@@ -63,6 +68,7 @@ class DirectoryManifestSpec extends Specification {
     String cyclicSymLink
     Path stdOutSymLinkPath
     String stdOutSymLink
+
     long sizeOfFiles
 
     def setup() {
@@ -101,6 +107,12 @@ class DirectoryManifestSpec extends Specification {
             "#!/bin/bash\necho \"hello world!\"".getBytes(StandardCharsets.UTF_8)
         )
 
+        this.applicationDirPath = Files.createDirectory(this.rootPath.resolve("application"))
+        this.applicationSetupScriptPath = Files.write(
+            this.applicationDirPath.resolve("applicationSetupFile.sh"),
+            "#!/bin/bash\necho \"hello world!\"".getBytes(StandardCharsets.UTF_8)
+        )
+
         // Cyclic symlink
         this.cyclicSymLinkPath = Files.createSymbolicLink(this.genieDirPath.resolve("testCycle"), this.genieDirPath)
 
@@ -114,6 +126,8 @@ class DirectoryManifestSpec extends Specification {
         this.exitFile = this.rootPath.relativize(this.exitFilePath).toString()
         this.clusterDir = this.rootPath.relativize(this.clusterDirPath).toString()
         this.clusterSetupScript = this.rootPath.relativize(this.clusterSetupScriptPath)
+        this.applicationDir = this.rootPath.relativize(this.applicationDirPath)
+        this.applicationSetupScript = this.rootPath.relativize(this.applicationSetupScriptPath)
         this.symLinkFile = this.rootPath.relativize(this.symLinkFilePath)
         this.stdOutSymLink = this.rootPath.relativize(this.stdOutSymLinkPath)
         this.cyclicSymLink = this.rootPath.relativize(this.cyclicSymLinkPath)
@@ -126,6 +140,7 @@ class DirectoryManifestSpec extends Specification {
             this.envFilePath,
             this.exitFilePath,
             this.clusterSetupScriptPath,
+            this.applicationSetupScriptPath,
             this.symLinkFileRealPath,
             this.stdoutPath // In here twice to account for symlink to this file
         ].forEach({ this.sizeOfFiles += Files.size(it) })
@@ -134,7 +149,7 @@ class DirectoryManifestSpec extends Specification {
     @Unroll
     def "can create a manifest, serialize it, deserialize it and verify correctness (md5: #includeMd5)"() {
         when:
-        def manifest = new DirectoryManifest(this.rootPath, includeMd5)
+        def manifest = new DirectoryManifest(this.rootPath, includeMd5, new DirectoryManifest.Filter() { })
         def json = GenieObjectMapper.getMapper().writeValueAsString(manifest)
         def manifest2 = GenieObjectMapper.getMapper().readValue(json, DirectoryManifest.class)
 
@@ -149,12 +164,52 @@ class DirectoryManifestSpec extends Specification {
         false      | _
     }
 
+    def "can create a manifest with filter"() {
+        when:
+        def manifest = new DirectoryManifest(this.rootPath, false, new DirectoryManifest.Filter() {
+            @Override
+            boolean includeFile(final Path filePath, final BasicFileAttributes attrs) {
+                return filePath.getFileName().toString() != "env.sh"
+            }
+
+            @Override
+            boolean includeDirectory(final Path dirPath, final BasicFileAttributes attrs) {
+                return dirPath.getFileName().toString() != "cluster"
+            }
+
+            @Override
+            boolean walkDirectory(final Path dirPath, final BasicFileAttributes attrs) {
+                return dirPath.getFileName().toString() != "application"
+            }
+        })
+
+        then:
+        manifest.getEntries().size() == 9
+        manifest.getFiles().size() == 5
+        manifest.getNumFiles() == 5
+        manifest.getDirectories().size() == 4
+        manifest.getNumDirectories() == 4
+        manifest.hasEntry(this.root)
+        manifest.hasEntry(this.stdout)
+        manifest.hasEntry(this.stderr)
+        manifest.hasEntry(this.genieDir)
+        !manifest.hasEntry(this.envFile)
+        manifest.hasEntry(this.genieSubDir)
+        manifest.hasEntry(this.exitFile)
+        !manifest.hasEntry(this.clusterDir)
+        !manifest.hasEntry(this.clusterSetupScript)
+        manifest.hasEntry(this.applicationDir)
+        !manifest.hasEntry(this.applicationSetupScript)
+        manifest.hasEntry(this.symLinkFile)
+        manifest.hasEntry(this.stdOutSymLink)
+    }
+
     void verifyManifest(DirectoryManifest manifest, boolean expectMd5Present) {
-        assert manifest.getEntries().size() == 11
-        assert manifest.getFiles().size() == 7
-        assert manifest.getNumFiles() == 7
-        assert manifest.getDirectories().size() == 4
-        assert manifest.getNumDirectories() == 4
+        assert manifest.getEntries().size() == 13
+        assert manifest.getFiles().size() == 8
+        assert manifest.getNumFiles() == 8
+        assert manifest.getDirectories().size() == 5
+        assert manifest.getNumDirectories() == 5
         assert manifest.hasEntry(this.root)
         assert manifest.hasEntry(this.stdout)
         assert manifest.hasEntry(this.stderr)
@@ -164,6 +219,8 @@ class DirectoryManifestSpec extends Specification {
         assert manifest.hasEntry(this.exitFile)
         assert manifest.hasEntry(this.clusterDir)
         assert manifest.hasEntry(this.clusterSetupScript)
+        assert manifest.hasEntry(this.applicationDir)
+        assert manifest.hasEntry(this.applicationSetupScript)
         assert manifest.hasEntry(this.symLinkFile)
         assert manifest.hasEntry(this.stdOutSymLink)
         // This is to document behavior
@@ -175,7 +232,7 @@ class DirectoryManifestSpec extends Specification {
             this.rootPath,
             true,
             null,
-            [this.stderr, this.stdout, this.genieDir, this.clusterDir, this.symLinkFile, this.stdOutSymLink],
+            [this.stderr, this.stdout, this.genieDir, this.clusterDir, this.applicationDir, this.symLinkFile, this.stdOutSymLink],
             false
         )
         this.verifyEntry(
@@ -254,6 +311,24 @@ class DirectoryManifestSpec extends Specification {
             expectMd5Present
         )
         this.verifyEntry(
+            manifest.getEntry(this.applicationDir).orElseThrow({ new IllegalArgumentException() }),
+            this.applicationDir,
+            this.applicationDirPath,
+            true,
+            this.root,
+            [this.applicationSetupScript],
+            false
+        )
+        this.verifyEntry(
+            manifest.getEntry(this.applicationSetupScript).orElseThrow({ new IllegalArgumentException() }),
+            this.applicationSetupScript,
+            this.applicationSetupScriptPath,
+            false,
+            this.applicationDir,
+            [],
+            expectMd5Present
+        )
+        this.verifyEntry(
             manifest.getEntry(this.symLinkFile).orElseThrow({ new IllegalArgumentException() }),
             this.symLinkFile,
             this.symLinkFilePath,
@@ -277,6 +352,7 @@ class DirectoryManifestSpec extends Specification {
         assert manifest.getFiles().contains(manifest.getEntry(this.envFile).orElse(null))
         assert manifest.getFiles().contains(manifest.getEntry(this.exitFile).orElse(null))
         assert manifest.getFiles().contains(manifest.getEntry(this.clusterSetupScript).orElse(null))
+        assert manifest.getFiles().contains(manifest.getEntry(this.applicationSetupScript).orElse(null))
         assert manifest.getFiles().contains(manifest.getEntry(this.symLinkFile).orElse(null))
 
         assert manifest
@@ -291,6 +367,9 @@ class DirectoryManifestSpec extends Specification {
         assert manifest
             .getDirectories()
             .contains(manifest.getEntry(this.clusterDir).orElse(null))
+        assert manifest
+            .getDirectories()
+            .contains(manifest.getEntry(this.applicationDir).orElse(null))
 
         assert !manifest.getEntry(UUID.randomUUID().toString()).isPresent()
 
