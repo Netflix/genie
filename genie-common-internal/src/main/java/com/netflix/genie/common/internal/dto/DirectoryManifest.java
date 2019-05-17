@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.internal.jobs.JobConstants;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -81,12 +80,22 @@ public class DirectoryManifest {
      *
      * @param directory              The job directory to create a manifest from
      * @param calculateFileChecksums Whether or not to calculate checksums for each file added to the manifest
+     * @param filter                 The filter applied to directories and files included in the manifest
      * @throws IOException If there is an error reading the directory
      */
-    public DirectoryManifest(final Path directory, final boolean calculateFileChecksums) throws IOException {
+    public DirectoryManifest(
+        final Path directory,
+        final boolean calculateFileChecksums,
+        final Filter filter
+    ) throws IOException {
         // Walk the directory
         final ImmutableMap.Builder<String, ManifestEntry> builder = ImmutableMap.builder();
-        final ManifestVisitor manifestVisitor = new ManifestVisitor(directory, builder, calculateFileChecksums);
+        final ManifestVisitor manifestVisitor = new ManifestVisitor(
+            directory,
+            builder,
+            calculateFileChecksums,
+            filter
+        );
         final EnumSet<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
         Files.walkFileTree(directory, options, Integer.MAX_VALUE, manifestVisitor);
         this.entries = builder.build();
@@ -224,6 +233,51 @@ public class DirectoryManifest {
         return this.totalSizeOfFiles;
     }
 
+    /**
+     * This interface defines a filter function used during creation of the manifest.
+     * It can prune entire sub-trees of the directory, optionally including the directory itself, or skip individual
+     * files.
+     * The default implementation accepts all entries and filters none.
+     */
+    public interface Filter {
+
+        /**
+         * Whether to include a given file in the manifest.
+         *
+         * @param filePath the file path
+         * @param attrs    the file attributes
+         * @return true if the file should be included in the manifest, false if it should be excluded.
+         */
+        default boolean includeFile(final Path filePath, BasicFileAttributes attrs) {
+            return true;
+        }
+
+        /**
+         * Whether to include a given directory in the manifest. If a directory is not included, all sub-directories
+         * and files contained are also implicitly excluded.
+         *
+         * @param dirPath the directory path
+         * @param attrs   the directory attributes
+         * @return true if the directory should be included in the manifest, false if it should be excluded.
+         */
+        default boolean includeDirectory(final Path dirPath, BasicFileAttributes attrs) {
+            return true;
+        }
+
+        /**
+         * Whether to recurse into a given directory and add its contents to the manifest. Only evaluated if the
+         * directory is not excluded.
+         *
+         * @param dirPath the directory path
+         * @param attrs   the directory attributes
+         * @return true if the contents of the directory should be included in the manifest, false if they should be
+         * excluded.
+         */
+        default boolean walkDirectory(final Path dirPath, BasicFileAttributes attrs) {
+            return true;
+        }
+    }
+
     @Slf4j
     private static class ManifestVisitor extends SimpleFileVisitor<Path> {
 
@@ -232,15 +286,18 @@ public class DirectoryManifest {
         private final Metadata metadata;
         private final TikaConfig tikaConfig;
         private final boolean checksumFiles;
+        private final Filter filter;
 
         ManifestVisitor(
             final Path root,
             final ImmutableMap.Builder<String, ManifestEntry> builder,
-            final boolean checksumFiles
+            final boolean checksumFiles,
+            final Filter filter
         ) throws IOException {
             this.root = root;
             this.builder = builder;
             this.checksumFiles = checksumFiles;
+            this.filter = filter;
             this.metadata = new Metadata();
             try {
                 this.tikaConfig = new TikaConfig();
@@ -256,17 +313,16 @@ public class DirectoryManifest {
         @Override
         public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
             final ManifestEntry entry = this.buildEntry(dir, attrs, true);
-            log.debug("Created manifest entry for directory {}", entry);
-            this.builder.put(entry.getPath(), entry);
-
-            // Temporary hack To mitigate an ongoing issue.
-            // Building manifests for deep application dependencies directory trees is putting a strain on the
-            // application and causing user errors.
-            // Until a proper fix is in place, skip the dependencies sub-trees.
-            if (JobConstants.DEPENDENCY_FILE_PATH_PREFIX.equals(entry.getName())) {
-                return FileVisitResult.SKIP_SUBTREE;
+            if (this.filter.includeDirectory(dir, attrs)) {
+                this.builder.put(entry.getPath(), entry);
+                log.debug("Created manifest entry for directory {}", entry);
+                if (this.filter.walkDirectory(dir, attrs)) {
+                    return FileVisitResult.CONTINUE;
+                }
             }
-            return FileVisitResult.CONTINUE;
+            log.debug("Skipping directory: {}", dir.toAbsolutePath());
+            return FileVisitResult.SKIP_SUBTREE;
+
         }
 
         /**
@@ -274,9 +330,14 @@ public class DirectoryManifest {
          */
         @Override
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-            final ManifestEntry entry = this.buildEntry(file, attrs, false);
-            log.debug("Created manifest entry for file {}", entry);
-            this.builder.put(entry.getPath(), entry);
+            if (this.filter.includeFile(file, attrs)) {
+                final ManifestEntry entry = this.buildEntry(file, attrs, false);
+                log.debug("Created manifest entry for file {}", entry);
+                this.builder.put(entry.getPath(), entry);
+            } else {
+                log.debug("Skipped manifest entry for file {}", file.toAbsolutePath());
+            }
+
             return FileVisitResult.CONTINUE;
         }
 

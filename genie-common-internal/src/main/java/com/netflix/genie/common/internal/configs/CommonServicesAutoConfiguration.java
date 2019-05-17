@@ -91,7 +91,7 @@ public class CommonServicesAutoConfiguration {
         name = JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN
     )
     public JobDirectoryManifestService checksummingJobDirectoryManifestService() {
-        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, true);
+        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, true, new DirectoryManifest.Filter() { });
     }
 
     /**
@@ -106,6 +106,6 @@ public class CommonServicesAutoConfiguration {
         name = JOB_DIRECTORY_MANIFEST_SERVICE_BEAN
     )
     public JobDirectoryManifestService jobDirectoryManifestService() {
-        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, false);
+        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, false, new DirectoryManifest.Filter() { });
     }
 }

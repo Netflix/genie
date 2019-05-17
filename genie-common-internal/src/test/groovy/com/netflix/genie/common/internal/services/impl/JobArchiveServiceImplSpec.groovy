@@ -59,7 +59,7 @@ class JobArchiveServiceImplSpec extends Specification {
             ? jobDirectory
             : jobDirectory.resolve(JobArchiveService.MANIFEST_DIRECTORY)
         def manifestPath = manifestDirectoryPath.resolve(JobArchiveService.MANIFEST_NAME)
-        def originalManifest = new DirectoryManifest(jobDirectory, true)
+        def originalManifest = new DirectoryManifest(jobDirectory, true, new DirectoryManifest.Filter() {})
 
         when:
         service.archiveDirectory(jobDirectory, target)
