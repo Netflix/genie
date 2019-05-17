@@ -18,6 +18,7 @@
 package com.netflix.genie.common.internal.configs;
 
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
@@ -31,7 +32,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Auto configuration of any services that are common to both the agent and the server.
@@ -74,8 +78,7 @@ public class CommonServicesAutoConfiguration {
     @ConditionalOnMissingBean(JobArchiveService.class)
     public JobArchiveService jobArchiveService(
         final List<JobArchiver> jobArchivers,
-        @Qualifier(JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN)
-        final JobDirectoryManifestService jobDirectoryManifestService
+        @Qualifier(JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN) final JobDirectoryManifestService jobDirectoryManifestService
     ) {
         return new JobArchiveServiceImpl(jobArchivers, jobDirectoryManifestService);
     }
@@ -84,20 +87,24 @@ public class CommonServicesAutoConfiguration {
      * Provide a {@link JobDirectoryManifestService} if no override is defined.
      * The manifest produced by this service include checksum for each entry.
      *
+     * @param directoryManifestFilter the filter to apply when constructing the manifest
      * @return a {@link JobDirectoryManifestService}
      */
     @Bean(name = JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN)
     @ConditionalOnMissingBean(
         name = JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN
     )
-    public JobDirectoryManifestService checksummingJobDirectoryManifestService() {
-        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, true, new DirectoryManifest.Filter() { });
+    public JobDirectoryManifestService checksummingJobDirectoryManifestService(
+        final DirectoryManifest.Filter directoryManifestFilter
+    ) {
+        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, true, directoryManifestFilter);
     }
 
     /**
      * Provide a {@link JobDirectoryManifestService} if no override is defined.
      * The manifest produced by this service do not include checksum for each entry.
      *
+     * @param directoryManifestFilter the filter to apply when constructing the manifest
      * @return a {@link JobDirectoryManifestService}
      */
     @Bean(name = JOB_DIRECTORY_MANIFEST_SERVICE_BEAN)
@@ -105,7 +112,38 @@ public class CommonServicesAutoConfiguration {
     @ConditionalOnMissingBean(
         name = JOB_DIRECTORY_MANIFEST_SERVICE_BEAN
     )
-    public JobDirectoryManifestService jobDirectoryManifestService() {
-        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, false, new DirectoryManifest.Filter() { });
+    public JobDirectoryManifestService jobDirectoryManifestService(
+        final DirectoryManifest.Filter directoryManifestFilter
+    ) {
+        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, false, directoryManifestFilter);
+    }
+
+    /**
+     * Provide a {@link DirectoryManifest.Filter} if no override is defined.
+     * This filter prunes subtrees of 'dependencies' directories (applications, clusters, commands).
+     *
+     * @return a directory manifest filter
+     */
+    @Bean
+    @ConditionalOnMissingBean(DirectoryManifest.Filter.class)
+    public DirectoryManifest.Filter directoryManifestFilter() {
+        return new DirectoryManifest.Filter() {
+            private static final String DEPENDENCIES_DIRECTORIES_PATTERN = ""
+                + ".*/"
+                + JobConstants.GENIE_PATH_VAR
+                + "/.*/"
+                + JobConstants.DEPENDENCY_FILE_PATH_PREFIX;
+            private final Pattern dependenciesDirectoryPattern = Pattern.compile(DEPENDENCIES_DIRECTORIES_PATTERN);
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean walkDirectory(final Path dirPath, final BasicFileAttributes attrs) {
+                return !dependenciesDirectoryPattern.matcher(
+                    dirPath.toAbsolutePath().normalize().toString()
+                ).matches();
+            }
+        };
     }
 }

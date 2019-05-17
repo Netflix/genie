@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.internal.configs;
 
+import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
@@ -120,6 +121,18 @@ public class CommonServicesAutoConfigurationTest {
                 Assertions.assertThat(context).getBean(
                     JobDirectoryManifestService.class
                 ).isEqualTo(context.getBean("jobDirectoryManifestService"));
+            }
+        );
+    }
+
+    /**
+     * Make JobDirectoryManifestService beans are configured as expected.
+     */
+    @Test
+    public void testDirectoryManifestFilter() {
+        this.contextRunner.run(
+            context -> {
+                Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Filter.class);
             }
         );
     }
