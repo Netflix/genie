@@ -21,7 +21,6 @@ import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.common.internal.services.JobArchiver
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.apache.commons.lang3.StringUtils
 import org.junit.Rule
@@ -49,8 +48,8 @@ class JobArchiveServiceImplSpec extends Specification {
                 return false
             }
         }
-        JobDirectoryManifestService jobDirectoryManifestService = Mock(JobDirectoryManifestService)
-        def service = new JobArchiveServiceImpl([archiver], jobDirectoryManifestService)
+        DirectoryManifest.Factory directoryManifestFactory = Mock(DirectoryManifest.Factory)
+        def service = new JobArchiveServiceImpl([archiver], directoryManifestFactory)
         def jobDirectory = this.temporaryFolder.newFolder().toPath()
         Files.write(jobDirectory.resolve("someFile"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
         Files.createDirectory(jobDirectory.resolve("subDir"))
@@ -66,7 +65,7 @@ class JobArchiveServiceImplSpec extends Specification {
 
 
         then:
-        1 * jobDirectoryManifestService.getDirectoryManifest(jobDirectory) >> originalManifest
+        1 * directoryManifestFactory.getDirectoryManifest(jobDirectory, true) >> originalManifest
         Files.exists(manifestPath)
 
         when:

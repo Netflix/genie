@@ -100,27 +100,13 @@ public class CommonServicesAutoConfigurationTest {
     }
 
     /**
-     * Make JobDirectoryManifestService beans are configured as expected.
+     * Make JobDirectoryManifestService beans is configured as expected.
      */
     @Test
-    public void testJobDirectoryManifestServices() {
+    public void testJobDirectoryManifestService() {
         this.contextRunner.run(
             context -> {
-                // 2 Beans of this type
-                Assertions.assertThat(context).getBeans(JobDirectoryManifestService.class).size().isEqualTo(2);
-                // Get by name
-                Assertions.assertThat(context).getBean(
-                    "checksummingJobDirectoryManifestService",
-                    JobDirectoryManifestService.class
-                ).isNotNull();
-                Assertions.assertThat(context).getBean(
-                    "jobDirectoryManifestService",
-                    JobDirectoryManifestService.class
-                ).isNotNull();
-                // Default is non-checksumming
-                Assertions.assertThat(context).getBean(
-                    JobDirectoryManifestService.class
-                ).isEqualTo(context.getBean("jobDirectoryManifestService"));
+                Assertions.assertThat(context).hasSingleBean(JobDirectoryManifestService.class);
             }
         );
     }
@@ -132,11 +118,10 @@ public class CommonServicesAutoConfigurationTest {
     public void testDirectoryManifestFactory() {
         this.contextRunner.run(
             context -> {
-                Assertions.assertThat(context).getBeans(DirectoryManifest.Factory.class).size().isEqualTo(1);
+                Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Factory.class);
             }
         );
     }
-
 
     /**
      * Make JobDirectoryManifestService beans are configured as expected.
