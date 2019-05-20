@@ -75,15 +75,7 @@ public class DirectoryManifest {
     private final int numDirectories;
     private final long totalSizeOfFiles;
 
-    /**
-     * Create a manifest from the given job directory.
-     *
-     * @param directory              The job directory to create a manifest from
-     * @param calculateFileChecksums Whether or not to calculate checksums for each file added to the manifest
-     * @param filter                 The filter applied to directories and files included in the manifest
-     * @throws IOException If there is an error reading the directory
-     */
-    public DirectoryManifest(
+    private DirectoryManifest(
         final Path directory,
         final boolean calculateFileChecksums,
         final Filter filter
@@ -275,6 +267,46 @@ public class DirectoryManifest {
          */
         default boolean walkDirectory(final Path dirPath, BasicFileAttributes attrs) {
             return true;
+        }
+    }
+
+    /**
+     * Factory that encapsulates directory manifest creation.
+     */
+    public static class Factory {
+
+        private static final Filter ACCEPT_ALL_FILTER = new DirectoryManifest.Filter() { };
+        private final Filter filter;
+
+        /**
+         * Constructor with no filters.
+         */
+        public Factory() {
+            this(ACCEPT_ALL_FILTER);
+        }
+
+        /**
+         * Constructor with filter.
+         *
+         * @param filter the manifest filter
+         */
+        public Factory(final Filter filter) {
+            this.filter = filter;
+        }
+
+        /**
+         * Create a manifest from the given job directory.
+         *
+         * @param directory       The job directory to create a manifest from
+         * @param includeChecksum Whether or not to calculate checksums for each file added to the manifest
+         * @return a directory manifest
+         * @throws IOException If there is an error reading the directory
+         */
+        public DirectoryManifest getDirectoryManifest(
+            final Path directory,
+            final boolean includeChecksum
+        ) throws IOException {
+            return new DirectoryManifest(directory, includeChecksum, this.filter);
         }
     }
 

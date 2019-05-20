@@ -71,7 +71,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         this.jobId = UUID.randomUUID().toString()
         this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
-        this.manifest = Spy(new DirectoryManifest(this.temporaryFolder.getRoot().toPath(), true, new DirectoryManifest.Filter() {}))
+        this.manifest = Spy(new DirectoryManifest.Factory().getDirectoryManifest(this.temporaryFolder.getRoot().toPath(), true))
     }
 
     void cleanup() {

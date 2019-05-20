@@ -126,6 +126,19 @@ public class CommonServicesAutoConfigurationTest {
     }
 
     /**
+     * Make sure DirectoryManifest.Factory bean is configured as expected.
+     */
+    @Test
+    public void testDirectoryManifestFactory() {
+        this.contextRunner.run(
+            context -> {
+                Assertions.assertThat(context).getBeans(DirectoryManifest.Factory.class).size().isEqualTo(1);
+            }
+        );
+    }
+
+
+    /**
      * Make JobDirectoryManifestService beans are configured as expected.
      */
     @Test
