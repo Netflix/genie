@@ -22,7 +22,6 @@ import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,20 +42,20 @@ import java.util.List;
 public class JobArchiveServiceImpl implements JobArchiveService {
 
     private final ImmutableList<JobArchiver> jobArchivers;
-    private final JobDirectoryManifestService jobDirectoryManifestService;
+    private final DirectoryManifest.Factory directoryManifestFactory;
 
     /**
      * Constructor.
      *
-     * @param jobArchivers                The ordered list of {@link JobArchiver} implementations to use. Not empty.
-     * @param jobDirectoryManifestService The job directory manifest service
+     * @param jobArchivers             The ordered list of {@link JobArchiver} implementations to use. Not empty.
+     * @param directoryManifestFactory The job directory manifest factory
      */
     public JobArchiveServiceImpl(
         final List<JobArchiver> jobArchivers,
-        final JobDirectoryManifestService jobDirectoryManifestService
+        final DirectoryManifest.Factory directoryManifestFactory
     ) {
         this.jobArchivers = ImmutableList.copyOf(jobArchivers);
-        this.jobDirectoryManifestService = jobDirectoryManifestService;
+        this.directoryManifestFactory = directoryManifestFactory;
     }
 
     /**
@@ -67,7 +66,7 @@ public class JobArchiveServiceImpl implements JobArchiveService {
         // TODO: This relies highly on convention. Might be nicer to better abstract with database
         //       record that points directly to where the manifest is or other solution?
         try {
-            final DirectoryManifest manifest = jobDirectoryManifestService.getDirectoryManifest(directory);
+            final DirectoryManifest manifest = directoryManifestFactory.getDirectoryManifest(directory, true);
             final Path manifestDirectoryPath = StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)
                 ? directory
                 : directory.resolve(JobArchiveService.MANIFEST_DIRECTORY);

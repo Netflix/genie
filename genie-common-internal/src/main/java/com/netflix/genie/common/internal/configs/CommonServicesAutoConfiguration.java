@@ -24,11 +24,9 @@ import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.JobArchiveServiceImpl;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
@@ -53,9 +51,6 @@ public class CommonServicesAutoConfiguration {
      */
     public static final int FILE_SYSTEM_JOB_ARCHIVER_PRECEDENCE = Ordered.LOWEST_PRECEDENCE - 20;
 
-    private static final String JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN = "checksummingJobDirectoryManifestService";
-    private static final String JOB_DIRECTORY_MANIFEST_SERVICE_BEAN = "jobDirectoryManifestService";
-
     /**
      * Provide a {@link JobArchiver} implementation that will copy from one place on the filesystem to another.
      *
@@ -71,47 +66,27 @@ public class CommonServicesAutoConfiguration {
      * Provide a default {@link JobArchiveService} if no override is defined.
      *
      * @param jobArchivers                The ordered available {@link JobArchiver} implementations in the system
-     * @param jobDirectoryManifestService the job directory manifest service
+     * @param directoryManifestFactory the job directory manifest factory
      * @return A {@link JobArchiveServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(JobArchiveService.class)
     public JobArchiveService jobArchiveService(
         final List<JobArchiver> jobArchivers,
-        @Qualifier(JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN) final JobDirectoryManifestService jobDirectoryManifestService
-    ) {
-        return new JobArchiveServiceImpl(jobArchivers, jobDirectoryManifestService);
-    }
-
-    /**
-     * Provide a {@link JobDirectoryManifestService} if no override is defined.
-     * The manifest produced by this service include checksum for each entry.
-     *
-     * @param directoryManifestFactory the factory to produce the manifest if needed
-     * @return a {@link JobDirectoryManifestService}
-     */
-    @Bean(name = JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN)
-    @ConditionalOnMissingBean(
-        name = JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN
-    )
-    public JobDirectoryManifestService checksummingJobDirectoryManifestService(
         final DirectoryManifest.Factory directoryManifestFactory
     ) {
-        return jobDirectoryPath -> directoryManifestFactory.getDirectoryManifest(jobDirectoryPath, true);
+        return new JobArchiveServiceImpl(jobArchivers, directoryManifestFactory);
     }
 
     /**
      * Provide a {@link JobDirectoryManifestService} if no override is defined.
-     * The manifest produced by this service do not include checksum for each entry.
+     * The manifest produced by this service do not include checksum for entries and caches manifests recently created.
      *
      * @param directoryManifestFactory the factory to produce the manifest if needed
      * @return a {@link JobDirectoryManifestService}
      */
-    @Bean(name = JOB_DIRECTORY_MANIFEST_SERVICE_BEAN)
-    @Primary
-    @ConditionalOnMissingBean(
-        name = JOB_DIRECTORY_MANIFEST_SERVICE_BEAN
-    )
+    @Bean
+    @ConditionalOnMissingBean(JobDirectoryManifestService.class)
     public JobDirectoryManifestService jobDirectoryManifestService(
         final DirectoryManifest.Factory directoryManifestFactory
     ) {
