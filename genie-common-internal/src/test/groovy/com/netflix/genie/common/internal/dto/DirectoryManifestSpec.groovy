@@ -149,7 +149,7 @@ class DirectoryManifestSpec extends Specification {
     @Unroll
     def "can create a manifest, serialize it, deserialize it and verify correctness (md5: #includeMd5)"() {
         when:
-        def manifest = new DirectoryManifest(this.rootPath, includeMd5, new DirectoryManifest.Filter() { })
+        def manifest = new DirectoryManifest.Factory().getDirectoryManifest(this.rootPath, includeMd5)
         def json = GenieObjectMapper.getMapper().writeValueAsString(manifest)
         def manifest2 = GenieObjectMapper.getMapper().readValue(json, DirectoryManifest.class)
 
@@ -166,7 +166,7 @@ class DirectoryManifestSpec extends Specification {
 
     def "can create a manifest with filter"() {
         when:
-        def manifest = new DirectoryManifest(this.rootPath, false, new DirectoryManifest.Filter() {
+        def manifest = new DirectoryManifest.Factory(new DirectoryManifest.Filter() {
             @Override
             boolean includeFile(final Path filePath, final BasicFileAttributes attrs) {
                 return filePath.getFileName().toString() != "env.sh"
@@ -181,7 +181,7 @@ class DirectoryManifestSpec extends Specification {
             boolean walkDirectory(final Path dirPath, final BasicFileAttributes attrs) {
                 return dirPath.getFileName().toString() != "application"
             }
-        })
+        }).getDirectoryManifest(this.rootPath, false)
 
         then:
         manifest.getEntries().size() == 9

@@ -87,7 +87,7 @@ public class CommonServicesAutoConfiguration {
      * Provide a {@link JobDirectoryManifestService} if no override is defined.
      * The manifest produced by this service include checksum for each entry.
      *
-     * @param directoryManifestFilter the filter to apply when constructing the manifest
+     * @param directoryManifestFactory the factory to produce the manifest if needed
      * @return a {@link JobDirectoryManifestService}
      */
     @Bean(name = JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN)
@@ -95,16 +95,16 @@ public class CommonServicesAutoConfiguration {
         name = JOB_DIRECTORY_MANIFEST_SERVICE_CS_BEAN
     )
     public JobDirectoryManifestService checksummingJobDirectoryManifestService(
-        final DirectoryManifest.Filter directoryManifestFilter
+        final DirectoryManifest.Factory directoryManifestFactory
     ) {
-        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, true, directoryManifestFilter);
+        return jobDirectoryPath -> directoryManifestFactory.getDirectoryManifest(jobDirectoryPath, true);
     }
 
     /**
      * Provide a {@link JobDirectoryManifestService} if no override is defined.
      * The manifest produced by this service do not include checksum for each entry.
      *
-     * @param directoryManifestFilter the filter to apply when constructing the manifest
+     * @param directoryManifestFactory the factory to produce the manifest if needed
      * @return a {@link JobDirectoryManifestService}
      */
     @Bean(name = JOB_DIRECTORY_MANIFEST_SERVICE_BEAN)
@@ -113,9 +113,23 @@ public class CommonServicesAutoConfiguration {
         name = JOB_DIRECTORY_MANIFEST_SERVICE_BEAN
     )
     public JobDirectoryManifestService jobDirectoryManifestService(
+        final DirectoryManifest.Factory directoryManifestFactory
+    ) {
+        return jobDirectoryPath -> directoryManifestFactory.getDirectoryManifest(jobDirectoryPath, false);
+    }
+
+    /**
+     * Provide a {@link DirectoryManifest.Factory} if no override is defined.
+     *
+     * @param directoryManifestFilter the filter used during manifest creation
+     * @return a directory manifest factory
+     */
+    @Bean
+    @ConditionalOnMissingBean(DirectoryManifest.Factory.class)
+    public DirectoryManifest.Factory directoryManifestFactory(
         final DirectoryManifest.Filter directoryManifestFilter
     ) {
-        return jobDirectoryPath -> new DirectoryManifest(jobDirectoryPath, false, directoryManifestFilter);
+        return new DirectoryManifest.Factory(directoryManifestFilter);
     }
 
     /**
