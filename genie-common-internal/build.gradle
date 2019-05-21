@@ -28,6 +28,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.tika:tika-core")
     implementation("org.springframework:spring-context")
+    implementation("com.github.ben-manes.caffeine:caffeine")
 
     /*******************************
      * Provided Dependencies

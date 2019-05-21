@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.common.internal.configs;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.services.JobArchiveService;
@@ -24,6 +26,8 @@ import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.JobArchiveServiceImpl;
+import com.netflix.genie.common.internal.services.impl.JobDirectoryManifestServiceImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +37,7 @@ import org.springframework.core.annotation.Order;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -83,14 +88,31 @@ public class CommonServicesAutoConfiguration {
      * The manifest produced by this service do not include checksum for entries and caches manifests recently created.
      *
      * @param directoryManifestFactory the factory to produce the manifest if needed
+     * @param cache                    the cache to use
      * @return a {@link JobDirectoryManifestService}
      */
     @Bean
     @ConditionalOnMissingBean(JobDirectoryManifestService.class)
     public JobDirectoryManifestService jobDirectoryManifestService(
-        final DirectoryManifest.Factory directoryManifestFactory
+        final DirectoryManifest.Factory directoryManifestFactory,
+        @Qualifier("jobDirectoryManifestCache") final Cache<Path, DirectoryManifest> cache
     ) {
-        return jobDirectoryPath -> directoryManifestFactory.getDirectoryManifest(jobDirectoryPath, false);
+        return new JobDirectoryManifestServiceImpl(directoryManifestFactory, cache, false);
+    }
+
+    /**
+     * Provide a {@code Cache<Path, DirectoryManifest>} named "jobDirectoryManifestCache" if no override is defined.
+     *
+     * @return a {@link Cache}
+     */
+    @Bean(name = "jobDirectoryManifestCache")
+    @ConditionalOnMissingBean(name = "jobDirectoryManifestCache")
+    public Cache<Path, DirectoryManifest> jobDirectoryManifestCache() {
+        // TODO hardcoded configuration values
+        return Caffeine.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .build();
     }
 
     /**
