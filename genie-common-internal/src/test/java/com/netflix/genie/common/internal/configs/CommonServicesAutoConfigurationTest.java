@@ -112,6 +112,18 @@ public class CommonServicesAutoConfigurationTest {
     }
 
     /**
+     * Make JobDirectoryManifest cache bean is configured as expected.
+     */
+    @Test
+    public void testJobDirectoryManifestCache() {
+        this.contextRunner.run(
+            context -> {
+                Assertions.assertThat(context).getBean("jobDirectoryManifestCache").isNotNull();
+            }
+        );
+    }
+
+    /**
      * Make sure DirectoryManifest.Factory bean is configured as expected.
      */
     @Test
