@@ -576,7 +576,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
                     .forEach(path -> {
                         try {
                             log.debug("Deleting {}", path);
-                            Files.deleteIfExists(path);
+                            FileSystemUtils.deleteRecursively(path);
                         } catch (final IOException e) {
                             log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
                         }
