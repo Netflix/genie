@@ -671,7 +671,7 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
         final UserResourcesSummary userResourcesSummary = summaries.get("tgianos");
         Assert.assertThat(userResourcesSummary.getUser(), Matchers.is("tgianos"));
         Assert.assertThat(userResourcesSummary.getRunningJobsCount(), Matchers.is(1L));
-        Assert.assertThat(userResourcesSummary.getUsedMemory(), Matchers.is(0L));
+        Assert.assertThat(userResourcesSummary.getUsedMemory(), Matchers.is(2048L));
     }
 
     /**
