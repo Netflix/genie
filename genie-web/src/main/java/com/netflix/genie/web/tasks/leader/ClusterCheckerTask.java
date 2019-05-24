@@ -174,11 +174,15 @@ public class ClusterCheckerTask extends LeadershipTask {
         // If node is not healthy, update the entry in errorCounts
         //
         if (this.isNodeHealthy(host)) {
+            log.info("Host {} is no longer unhealthy", host);
             this.errorCounts.remove(host);
         } else {
             if (this.errorCounts.containsKey(host)) {
-                this.errorCounts.put(host, this.errorCounts.get(host) + 1);
+                final int currentCount = this.errorCounts.get(host) + 1;
+                log.info("Host still unhealthy (check #{}): {}", host, currentCount);
+                this.errorCounts.put(host, currentCount);
             } else {
+                log.info("Marking host unhealthy: {}", host);
                 this.errorCounts.put(host, 1);
             }
         }
