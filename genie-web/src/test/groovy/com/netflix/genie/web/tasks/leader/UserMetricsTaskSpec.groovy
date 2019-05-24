@@ -28,6 +28,8 @@ import io.micrometer.core.instrument.Tag
 import org.apache.curator.shaded.com.google.common.collect.Maps
 import spock.lang.Specification
 
+import java.util.concurrent.atomic.AtomicLong
+
 class UserMetricsTaskSpec extends Specification {
     MeterRegistry registry
     JobSearchService jobSearchService
@@ -42,8 +44,6 @@ class UserMetricsTaskSpec extends Specification {
 
     def "Run"() {
         setup:
-        this.task = new UserMetricsTask(registry, jobSearchService, userMetricProperties)
-
         Collection<Tag> fooUserTag = Lists.newArrayList(Tag.of(MetricsConstants.TagKeys.USER, "foo"))
         Collection<Tag> barUserTag = Lists.newArrayList(Tag.of(MetricsConstants.TagKeys.USER, "bar"))
         Collection<Tag> booUserTag = Lists.newArrayList(Tag.of(MetricsConstants.TagKeys.USER, "boo"))
@@ -60,6 +60,26 @@ class UserMetricsTaskSpec extends Specification {
 
         Map<String, UserResourcesSummary> summariesMap3 = Maps.newHashMap()
 
+        AtomicLong activeUsersNumber = null
+        AtomicLong fooJobs = null
+        AtomicLong fooMem = null
+        AtomicLong barJobs = null
+        AtomicLong barMem = null
+        AtomicLong booJobs = null
+        AtomicLong booMem = null
+
+        when:
+        this.task = new UserMetricsTask(registry, jobSearchService, userMetricProperties)
+
+        then:
+        1 * registry.gauge(
+            UserMetricsTask.USER_ACTIVE_USERS_METRIC_NAME,
+            _ as AtomicLong
+        ) >> {
+            args ->
+                activeUsersNumber = args[1] as AtomicLong
+        }
+
         when:
         GenieTaskScheduleType scheduleType = this.task.getScheduleType()
         long refreshInterval = this.task.getFixedRate()
@@ -74,30 +94,33 @@ class UserMetricsTaskSpec extends Specification {
 
         then:
         1 * jobSearchService.getUserResourcesSummaries() >> summariesMap1
+
         1 * registry.gauge(
             UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
             fooUserTag,
-            10
-        )
+            _ as AtomicLong
+        ) >> { args -> fooJobs = args[2] as AtomicLong }
         1 * registry.gauge(
             UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
             barUserTag,
-            20
-        )
+            _ as AtomicLong
+        ) >> { args -> barJobs = args[2] as AtomicLong }
         1 * registry.gauge(
             UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
             fooUserTag,
-            1024
-        )
+            _ as AtomicLong
+        ) >> { args -> fooMem = args[2] as AtomicLong }
         1 * registry.gauge(
             UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
             barUserTag,
-            2048
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_USERS_METRIC_NAME,
-            2
-        )
+            _ as AtomicLong
+        ) >> { args -> barMem = args[2] as AtomicLong }
+
+        activeUsersNumber.get() == 2
+        fooJobs.get() == 10
+        fooMem.get() == 1024
+        barJobs.get() == 20
+        barMem.get() == 2048
 
         when:
         this.task.run()
@@ -106,79 +129,91 @@ class UserMetricsTaskSpec extends Specification {
         1 * jobSearchService.getUserResourcesSummaries() >> summariesMap2
         1 * registry.gauge(
             UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            fooUserTag,
-            30
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            barUserTag,
-            0
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
             booUserTag,
-            1
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            fooUserTag,
-            4096
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            barUserTag,
-            0
-        )
+            _ as AtomicLong
+        ) >> { args -> booJobs = args[2] as AtomicLong }
         1 * registry.gauge(
             UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
             booUserTag,
-            512
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_USERS_METRIC_NAME,
-            2
-        )
+            _ as AtomicLong
+        ) >> { args -> booMem = args[2] as AtomicLong }
+        activeUsersNumber.get() == 2
+        fooJobs.get() == 30
+        fooMem.get() == 4096
+        barJobs.get() == 0
+        barMem.get() == 0
+        booJobs.get() == 1
+        booMem.get() == 512
+
 
         when:
         this.task.run()
 
         then:
         1 * jobSearchService.getUserResourcesSummaries() >> summariesMap3
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            fooUserTag,
-            0
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            booUserTag,
-            0
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            fooUserTag,
-            0
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            booUserTag,
-            0
-        )
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_USERS_METRIC_NAME,
-            0
-        )
+        activeUsersNumber.get() == 0
+        fooJobs.get() == 0
+        fooMem.get() == 0
+        barJobs.get() == 0
+        barMem.get() == 0
+        booJobs.get() == 0
+        booMem.get() == 0
+
+        when:
+        this.task.cleanup()
+
+        then:
+        activeUsersNumber.get() == 0
+        fooJobs.get() == 0
+        fooMem.get() == 0
+        barJobs.get() == 0
+        barMem.get() == 0
+        booJobs.get() == 0
+        booMem.get() == 0
 
         when:
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> summariesMap3
-        0 * registry.gauge(UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME, _, _)
-        0 * registry.gauge(UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME, _, _)
+        1 * jobSearchService.getUserResourcesSummaries() >> summariesMap1
+
         1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_USERS_METRIC_NAME,
-            0
-        )
+            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
+            fooUserTag,
+            _ as AtomicLong
+        ) >> { args -> fooJobs = args[2] as AtomicLong }
+        1 * registry.gauge(
+            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
+            barUserTag,
+            _ as AtomicLong
+        ) >> { args -> barJobs = args[2] as AtomicLong }
+        1 * registry.gauge(
+            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
+            fooUserTag,
+            _ as AtomicLong
+        ) >> { args -> fooMem = args[2] as AtomicLong }
+        1 * registry.gauge(
+            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
+            barUserTag,
+            _ as AtomicLong
+        ) >> { args -> barMem = args[2] as AtomicLong }
+
+        activeUsersNumber.get() == 2
+        fooJobs.get() == 10
+        fooMem.get() == 1024
+        barJobs.get() == 20
+        barMem.get() == 2048
+
+        when:
+        this.task.cleanup()
+
+        then:
+        activeUsersNumber.get() == 0
+        fooJobs.get() == 0
+        fooMem.get() == 0
+        barJobs.get() == 0
+        barMem.get() == 0
+        booJobs.get() == 0
+        booMem.get() == 0
     }
 }
