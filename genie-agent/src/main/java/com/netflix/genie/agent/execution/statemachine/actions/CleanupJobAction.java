@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -57,7 +58,7 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Cleaning up job...");
+        UserConsole.getLogger().info("Cleaning up job...");
 
 
         // If execution was aborted sometimes before the job was launched, the server is due for a job status update.

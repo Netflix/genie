@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.agent.execution.statemachine.listeners;
 
-import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +92,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void transition(final Transition<States, Events> transition) {
-        UserConsole.getLogger().info(
+        log.info(
             "Transitioning from: {} to: {}",
             getStateNameString(transition.getSource()),
             getStateNameString(transition.getTarget())
@@ -140,7 +139,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void stateMachineStarted(final StateMachine<States, Events> stateMachine) {
-        UserConsole.getLogger().info(
+        log.info(
             "Agent execution state machine started"
         );
     }

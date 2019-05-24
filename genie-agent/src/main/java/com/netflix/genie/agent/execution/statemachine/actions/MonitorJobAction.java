@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -60,7 +61,7 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Monitoring job...");
+        UserConsole.getLogger().info("Monitoring job...");
 
         final JobStatus finalJobStatus;
         try {

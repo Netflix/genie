@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -58,7 +59,7 @@ class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Shutting down...");
+        UserConsole.getLogger().info("Shutting down...");
 
         if (executionContext.getJobSpecification().isPresent()) {
             final JobSpecification jobSpecification = executionContext.getJobSpecification().get();

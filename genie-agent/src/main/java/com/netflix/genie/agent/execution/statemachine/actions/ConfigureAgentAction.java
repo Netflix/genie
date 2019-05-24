@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ class ConfigureAgentAction extends BaseStateAction implements StateAction.Config
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Configuring agent...");
+        UserConsole.getLogger().info("Configuring agent...");
         //TODO implement this action
         return Events.CONFIGURE_AGENT_COMPLETE;
     }
