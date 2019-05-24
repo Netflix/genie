@@ -54,8 +54,7 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
     @Override
     public void run(final String... args) throws Exception {
         UserConsole.printBanner(environment);
-        UserConsole.getLogger().info("Genie agent startup complete.");
-        UserConsole.getLogger().info("Agent logging to: {}", UserConsole.getLogFilePath());
+        UserConsole.getLogger().info("Agent (temporarily) logging to: {}", UserConsole.getLogFilePath());
         try {
             internalRun(args);
         } catch (final Throwable t) {
@@ -95,7 +94,7 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
             throw new IllegalArgumentException("Invalid command -- commands available: " + availableCommandsString);
         }
 
-        UserConsole.getLogger().info("Initializing command {}", commandName);
+        UserConsole.getLogger().info("Preparing agent to execute command: '{}'", commandName);
 
         log.info("Initializing command: {}", commandName);
         exitCode = ExitCode.COMMAND_INIT_FAIL;

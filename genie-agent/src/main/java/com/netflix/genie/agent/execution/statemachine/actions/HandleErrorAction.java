@@ -57,7 +57,7 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Handling execution error");
+        UserConsole.getLogger().info("Handling execution error...");
 
         final Optional<JobStatus> finalJobStatus = executionContext.getFinalJobStatus();
         final Optional<String> claimedJobId = executionContext.getClaimedJobId();

@@ -75,7 +75,7 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Resolving job specification...");
+        UserConsole.getLogger().info("Resolving job specification...");
 
         final JobSpecification jobSpecification;
         final String jobId;
@@ -151,7 +151,7 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
             throw new RuntimeException("Failed to claim job id: " + jobId, e);
         }
 
-        UserConsole.getLogger().info("Successfully claimed job '{}'", jobId);
+        UserConsole.getLogger().info("Successfully claimed job id '{}'", jobId);
 
         // Update context
         executionContext.setCurrentJobStatus(JobStatus.CLAIMED);

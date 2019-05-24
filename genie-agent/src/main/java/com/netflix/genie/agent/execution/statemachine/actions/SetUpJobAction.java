@@ -108,7 +108,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     protected Events executeStateAction(
         final ExecutionContext executionContext
     ) {
-        log.info("Setting up job...");
+        UserConsole.getLogger().info("Setting up job...");
 
         final String claimedJobId = executionContext.getClaimedJobId().get();
         final JobSpecification jobSpecification = executionContext.getJobSpecification().get();

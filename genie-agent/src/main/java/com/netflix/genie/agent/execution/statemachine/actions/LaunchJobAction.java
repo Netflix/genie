@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
@@ -68,7 +69,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Launching job...");
+        UserConsole.getLogger().info("Launching job...");
 
 
         final JobSpecification jobSpec = executionContext.getJobSpecification().get();

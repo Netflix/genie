@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.AgentMetadata;
+import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -57,7 +58,7 @@ class InitializeAction extends BaseStateAction implements StateAction.Initialize
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Initializing...");
+        UserConsole.getLogger().info("Initializing job execution...");
 
         final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
             agentMetadata.getAgentHostName(),
