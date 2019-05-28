@@ -343,29 +343,29 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |JobMonitoringCoordinator
 |-
 
-|genie.tasks.clusterChecker.errorCounts.gauge
-|Number of Genie nodes that the current leader failed is presently failing to contact
+|genie.tasks.clusterChecker.unhealtyHosts.gauge
+|Number of Genie nodes that the current leader failed is considering unhealthy
 |Current amount
 |ClusterCheckerTask
 |-
 
-|genie.tasks.clusterChecker.health.counter
-|Counts the number of time an remote node's health check indicator returned a given status
+|genie.tasks.clusterChecker.unreachableHost.counter
+|Counts the number of time the leader failed to get health status of a remote node
+|count
+|ClusterCheckerTask
+|host
+
+|genie.tasks.clusterChecker.failedHealthcheck.counter
+|Number of (non-ignored) healthcheck indicators returning a status different from UP
 |count
 |ClusterCheckerTask
 |host, healthIndicator, healthStatus
 
-|genie.tasks.clusterChecker.lostJobs.rate
+|genie.tasks.clusterChecker.jobsMarkedFailed.counter
 |Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them
 |count
 |ClusterCheckerTask
-|-
-
-|genie.tasks.clusterChecker.unableToUpdateJob.rate
-|Counts the number of time an exception was raised while trying to update the database status of a lost job
-|count
-|ClusterCheckerTask
-|-
+|status, host, exceptionClass
 
 |genie.tasks.databaseCleanup.numDeletedClusters.gauge
 |Number of terminated cluster records purged during the last database cleanup pass
