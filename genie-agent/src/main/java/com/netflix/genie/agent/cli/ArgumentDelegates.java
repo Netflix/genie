@@ -97,6 +97,12 @@ public interface ArgumentDelegates {
         JsonNode getJobMetadata();
 
         boolean isJobRequestedViaAPI();
+
+        List<String> getJobConfigurations();
+
+        List<String> getJobDependencies();
+
+        String getJobSetup();
     }
 
     /**

@@ -18,8 +18,10 @@
 
 package com.netflix.genie.agent.cli;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
@@ -29,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -97,6 +100,14 @@ public class JobRequestConverter {
             .withRequestedArchiveLocationPrefix(jobRequestArguments.getArchiveLocationPrefix())
             .build();
 
+        final List<String> configs = jobRequestArguments.getJobConfigurations();
+        final List<String> deps = jobRequestArguments.getJobDependencies();
+        final ExecutionEnvironment jobExecutionResources = new ExecutionEnvironment(
+            configs.isEmpty() ? null : Sets.newHashSet(configs),
+            deps.isEmpty() ? null : Sets.newHashSet(deps),
+            jobRequestArguments.getJobSetup()
+        );
+
         final AgentJobRequest agentJobRequest = new AgentJobRequest.Builder(
             jobMetadataBuilder.build(),
             criteria,
@@ -105,6 +116,7 @@ public class JobRequestConverter {
         )
             .withCommandArgs(jobRequestArguments.getCommandArguments())
             .withRequestedId(jobRequestArguments.getJobId())
+            .withResources(jobExecutionResources)
             .build();
 
         final Set<ConstraintViolation<AgentJobRequest>> violations = this.validator.validate(agentJobRequest);

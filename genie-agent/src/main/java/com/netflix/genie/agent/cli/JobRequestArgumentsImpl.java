@@ -162,6 +162,29 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     )
     private boolean jobRequestedViaAPI;
 
+    @Parameter(
+        names = {"--jobConfiguration"},
+        description = "URI or path of a job-level configuration file to attach, can be repeated",
+        converter = ArgumentConverters.UriOrLocalPathConverter.class,
+        splitter = NoopParameterSplitter.class
+    )
+    private List<String> jobConfigurations = Lists.newArrayList();
+
+    @Parameter(
+        names = {"--jobDependency"},
+        description = "URI or path of a job-level dependency file to attach, can be repeated",
+        converter = ArgumentConverters.UriOrLocalPathConverter.class,
+        splitter = NoopParameterSplitter.class
+    )
+    private List<String> jobDependencies = Lists.newArrayList();
+
+    @Parameter(
+        names = {"--jobSetup"},
+        description = "URI or path of a job-level setup file to attach. The file is sourced during job setup",
+        converter = ArgumentConverters.UriOrLocalPathConverter.class
+    )
+    private String jobSetup;
+
     JobRequestArgumentsImpl(final MainCommandArguments mainCommandArguments) {
         this.mainCommandArguments = mainCommandArguments;
     }
