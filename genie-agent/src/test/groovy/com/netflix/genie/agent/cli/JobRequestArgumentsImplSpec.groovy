@@ -24,6 +24,8 @@ import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.util.GenieObjectMapper
 import spock.lang.Specification
 
+import java.nio.file.Paths
+
 class JobRequestArgumentsImplSpec extends Specification {
 
     MainCommandArguments commandArguments
@@ -62,6 +64,9 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobVersion() == null
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode()
         !options.jobRequestArguments.isJobRequestedViaAPI()
+        options.jobRequestArguments.getJobConfigurations().isEmpty()
+        options.jobRequestArguments.getJobDependencies().isEmpty()
+        options.jobRequestArguments.getJobSetup() == null
 
         when:
         options.jobRequestArguments.getCommandArguments()
@@ -94,7 +99,12 @@ class JobRequestArgumentsImplSpec extends Specification {
             "--jobTag", "t2",
             "--jobVersion", "1.0",
             "--jobMetadata", "{\"foo\": false}",
-            "--api-job"
+            "--api-job",
+            "--jobConfiguration", "cfg1.cfg",
+            "--jobConfiguration", "cfg2.cfg",
+            "--jobDependency", "dep1.bin",
+            "--jobDependency", "dep2.bin",
+            "--jobSetup", "setup.sh",
         )
 
         then:
@@ -122,6 +132,13 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobVersion() == "1.0"
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode().put("foo", false)
         options.jobRequestArguments.isJobRequestedViaAPI()
+        options.jobRequestArguments.getJobConfigurations().containsAll([fileResource("cfg1.cfg"), fileResource("cfg2.cfg")])
+        options.jobRequestArguments.getJobDependencies().containsAll([fileResource("dep1.bin"), fileResource("dep2.bin")])
+        options.jobRequestArguments.getJobSetup() == fileResource("setup.sh")
+    }
+
+    String fileResource(final String filename) {
+        return "file:" + Paths.get(filename).toAbsolutePath().toString()
     }
 
     def "Unknown parameters throw"() {

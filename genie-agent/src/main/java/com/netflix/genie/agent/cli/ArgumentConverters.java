@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -173,6 +174,59 @@ final class ArgumentConverters {
             } catch (final IOException e) {
                 throw new ParameterException("Failed to parse JSON argument", e);
             }
+        }
+    }
+
+    static final class UriOrLocalPathConverter implements IStringConverter<String> {
+        static final String ATTACHMENT_HELP_MESSAGE = "ATTACHMENTS:\n"
+            + "Different kinds of job-specific files can be attached to a job.\n"
+            + "These are broken down by Genie in 3 categories:\n"
+            + " - Configurations: to configure components or tools (e.g. properties files, XML, YAML. ...)\n"
+            + " - Dependencies: binaries or archives (e.g., jar, tar.gz, ...)\n"
+            + " - Setup: a shell script sourced before executing the job (to set environment, expand archives, ...)\n"
+            + "\n"
+            + "These job attachments are downloaded to the job folder during setup and they are archived after \n"
+            + "execution (conditional on cleanup and archival options).\n"
+            + "\n"
+            + "Attachments can either be valid URIs or paths to local files, example:\n"
+            + "  s3://configurations/hadoop/spark/1.6.1/hive-site.xml\n"
+            + "  http://some-domain.org/some-project/my-config.properties\n"
+            + "  file:///tmp/myscript.presto\n"
+            + "  file:/tmp/query.sql\n"
+            + "  ./myscript.sql (shortcut for file:/${PWD}/myscript.sql)\n";
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String convert(final String value) {
+            final URI uri;
+            try {
+                uri = new URI(value);
+            } catch (URISyntaxException e) {
+                throw new ParameterException("Resource URI or path: '" + value + "'", e);
+            }
+
+            // If URI has a scheme, leave it alone and pass it along.
+            if (uri.getScheme() != null) {
+                return uri.toASCIIString();
+            }
+
+            // Otherwise try to resolve it as an local file path.
+            final URI newUri;
+            try {
+                newUri = new URI(
+                    "file",
+                    uri.getHost(),
+                    Paths.get(value).toAbsolutePath().normalize().toString(),
+                    uri.getQuery(),
+                    uri.getFragment()
+                );
+            } catch (URISyntaxException e) {
+                throw new ParameterException("Failed to construct uri for local resource: '" + value + "'", e);
+            }
+
+            return newUri.toASCIIString();
         }
     }
 }

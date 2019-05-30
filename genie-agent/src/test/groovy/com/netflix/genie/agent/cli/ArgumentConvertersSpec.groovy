@@ -112,6 +112,21 @@ class ArgumentConvertersSpec extends Specification {
     }
 
     @Unroll
+    def "UriOrLocalPathConverter: #uriString"(String uriString, String expectedString) {
+        expect:
+        new ArgumentConverters.UriOrLocalPathConverter().convert(uriString) == expectedString
+
+        where:
+        uriString                   | expectedString
+        "file:///tmp/foo"           | "file:///tmp/foo"
+        "s3://genie/genie/conf.xml" | "s3://genie/genie/conf.xml"
+        "classpath://conf.xml"      | "classpath://conf.xml"
+        "http://www.example.com"    | "http://www.example.com"
+        "/foo/bar"                  | "file:/foo/bar"
+        "/foo/../foo/bar"           | "file:/foo/bar"
+    }
+
+    @Unroll
     def "Conversion error for #converterClass ( \"#inputString\" )"(Class<IStringConverter> converterClass, String inputString) {
 
         when:
@@ -121,11 +136,12 @@ class ArgumentConvertersSpec extends Specification {
         thrown(ParameterException)
 
         where:
-        converterClass                        | inputString
-        ArgumentConverters.URIConverter       | "\n"
-        ArgumentConverters.FileConverter      | ""
-        ArgumentConverters.CriterionConverter | ""
-        ArgumentConverters.CriterionConverter | "///"
-        ArgumentConverters.JSONConverter      | "..."
+        converterClass                             | inputString
+        ArgumentConverters.URIConverter            | "\n"
+        ArgumentConverters.FileConverter           | ""
+        ArgumentConverters.CriterionConverter      | ""
+        ArgumentConverters.CriterionConverter      | "///"
+        ArgumentConverters.JSONConverter           | "..."
+        ArgumentConverters.UriOrLocalPathConverter | "\n"
     }
 }

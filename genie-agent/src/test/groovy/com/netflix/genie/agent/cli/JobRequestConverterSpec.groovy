@@ -67,6 +67,9 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getMetadata().getMetadata() == Optional.ofNullable(jobRequestArgs.getJobMetadata())
         jobRequest.getMetadata().getGroup() == Optional.ofNullable(null)
         jobRequest.getMetadata().getUser() == System.getProperty('user.name')
+        jobRequest.getResources().getConfigs().isEmpty()
+        jobRequest.getResources().getDependencies().isEmpty()
+        !jobRequest.getResources().getSetupFile().isPresent()
         validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
     }
 
@@ -119,6 +122,12 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getMetadata().getMetadata() == Optional.of(metadata)
         1 * jobRequestArgs.getUser() >> "u"
         jobRequest.getMetadata().getUser() == "u"
+        1 * jobRequestArgs.getJobDependencies() >> ["d1", "d2"]
+        jobRequest.getResources().getDependencies() == Sets.newHashSet(["d1", "d2"])
+        1 * jobRequestArgs.getJobConfigurations() >> ["c1", "c2"]
+        jobRequest.getResources().getConfigs() == Sets.newHashSet(["c1", "c2"])
+        1 * jobRequestArgs.getJobSetup() >> "setup.sh"
+        jobRequest.getResources().getSetupFile() == Optional.of("setup.sh")
         1 * validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
     }
 
