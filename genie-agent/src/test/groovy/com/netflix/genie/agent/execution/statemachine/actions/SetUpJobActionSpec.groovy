@@ -260,7 +260,7 @@ class SetUpJobActionSpec extends Specification {
         envMap.get(JobConstants.GENIE_COMMAND_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.COMMAND_PATH_VAR + "/" + command.getId()
         envMap.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
 
-        for (File entityDir : [jobDir, app1Dir, app2Dir, clusterDir, commandDir]) {
+        for (File entityDir : [app1Dir, app2Dir, clusterDir, commandDir]) {
             assert entityDir.exists()
             def confDir = new File(entityDir, JobConstants.CONFIG_FILE_PATH_PREFIX)
             assert confDir.exists()
@@ -324,13 +324,13 @@ class SetUpJobActionSpec extends Specification {
         1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, commandDir)
         1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, clusterDir)
         5 * manifest.getTargetLocation(setupFileUri) >> dummyFile
-        1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(jobDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
+        1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, jobDir)
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(app1Dir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(app2Dir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(commandDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(clusterDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
         0 * manifest.getTargetLocation(dependencyUri)
-        1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(jobDir, JobConstants.CONFIG_FILE_PATH_PREFIX))
+        1 * manifestBuilder.addFileWithTargetDirectory(configUri, jobDir)
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(app1Dir, JobConstants.CONFIG_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(app2Dir, JobConstants.CONFIG_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(commandDir, JobConstants.CONFIG_FILE_PATH_PREFIX))

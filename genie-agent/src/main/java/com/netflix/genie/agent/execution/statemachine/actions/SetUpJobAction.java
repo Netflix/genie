@@ -275,8 +275,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         // Make a list of all entity dirs
         final List<Path> entityDirectories = Lists.newArrayList(
             PathUtils.jobClusterDirectoryPath(jobDirectory, cluster.getId()),
-            PathUtils.jobCommandDirectoryPath(jobDirectory, command.getId()),
-            jobDirectory.toPath()
+            PathUtils.jobCommandDirectoryPath(jobDirectory, command.getId())
         );
 
         applications.stream()
@@ -342,9 +341,50 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             PathUtils.jobCommandDirectoryPath(jobDirectory, commandId);
         addEntitiesFilesToManifest(commandDirectory, downloadManifestBuilder, command, setupFileUris);
 
-        // Job
-        final JobSpecification.ExecutionResource jobRequest = jobSpec.getJob();
-        addEntitiesFilesToManifest(jobDirectory.toPath(), downloadManifestBuilder, jobRequest, setupFileUris);
+        // Job (does not follow convention, downloads everything in the job root folder).
+        try {
+            final Path jobDirectoryPath = jobDirectory.toPath();
+            final ExecutionEnvironment jobExecEnvironment = jobSpec.getJob().getExecutionEnvironment();
+
+            if (jobExecEnvironment.getSetupFile().isPresent()) {
+                final URI setupFileUri = new URI(jobExecEnvironment.getSetupFile().get());
+                log.debug(
+                    "Adding setup file to download manifest: {} -> {}",
+                    setupFileUri,
+                    jobDirectoryPath
+                );
+                downloadManifestBuilder.addFileWithTargetDirectory(
+                    setupFileUri,
+                    jobDirectory
+                );
+                setupFileUris.add(setupFileUri);
+            }
+
+            for (final String dependencyUriString : jobExecEnvironment.getDependencies()) {
+                log.debug(
+                    "Adding dependency to download manifest: {} -> {}",
+                    dependencyUriString,
+                    jobDirectoryPath
+                );
+                downloadManifestBuilder.addFileWithTargetDirectory(
+                    new URI(dependencyUriString), jobDirectory
+                );
+            }
+
+            for (final String configUriString : jobExecEnvironment.getConfigs()) {
+                log.debug(
+                    "Adding config file to download manifest: {} -> {}",
+                    configUriString,
+                    jobDirectoryPath
+                );
+                downloadManifestBuilder.addFileWithTargetDirectory(
+                    new URI(configUriString),
+                    jobDirectory
+                );
+            }
+        } catch (final URISyntaxException e) {
+            throw new SetUpJobException("Failed to compose download manifest", e);
+        }
 
         // Build manifest
         final DownloadService.Manifest manifest = downloadManifestBuilder.build();
