@@ -22,12 +22,16 @@ import com.beust.jcommander.ParameterException
 import com.beust.jcommander.ParametersDelegate
 import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.util.GenieObjectMapper
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import java.nio.file.Paths
 
 class JobRequestArgumentsImplSpec extends Specification {
 
+    @Rule
+    TemporaryFolder temporaryFolder
     MainCommandArguments commandArguments
     TestOptions options
     JCommander jCommander
@@ -76,7 +80,14 @@ class JobRequestArgumentsImplSpec extends Specification {
     }
 
     def "Parse"() {
+        setup:
         def archiveLocationPrefix = "s3://bucket/" + UUID.randomUUID().toString()
+        File cfg1 = temporaryFolder.newFile("cfg1.cfg")
+        File cfg2 = temporaryFolder.newFile("cfg2.cfg")
+        File dep1 = temporaryFolder.newFile("dep1.bin")
+        File dep2 = temporaryFolder.newFile("dep2.jar")
+        File setup = temporaryFolder.newFile("setup.sh")
+
 
         when:
         jCommander.parse(
@@ -100,11 +111,11 @@ class JobRequestArgumentsImplSpec extends Specification {
             "--jobVersion", "1.0",
             "--jobMetadata", "{\"foo\": false}",
             "--api-job",
-            "--jobConfiguration", "cfg1.cfg",
-            "--jobConfiguration", "cfg2.cfg",
-            "--jobDependency", "dep1.bin",
-            "--jobDependency", "dep2.bin",
-            "--jobSetup", "setup.sh",
+            "--jobConfiguration", cfg1.getPath().toString(),
+            "--jobConfiguration", cfg2.getPath().toString(),
+            "--jobDependency", dep1.getPath().toString(),
+            "--jobDependency", dep2.getPath().toString(),
+            "--jobSetup", setup.getPath().toString(),
         )
 
         then:
@@ -132,13 +143,13 @@ class JobRequestArgumentsImplSpec extends Specification {
         options.jobRequestArguments.getJobVersion() == "1.0"
         options.jobRequestArguments.getJobMetadata() == GenieObjectMapper.getMapper().createObjectNode().put("foo", false)
         options.jobRequestArguments.isJobRequestedViaAPI()
-        options.jobRequestArguments.getJobConfigurations().containsAll([fileResource("cfg1.cfg"), fileResource("cfg2.cfg")])
-        options.jobRequestArguments.getJobDependencies().containsAll([fileResource("dep1.bin"), fileResource("dep2.bin")])
-        options.jobRequestArguments.getJobSetup() == fileResource("setup.sh")
+        options.jobRequestArguments.getJobConfigurations().containsAll([fileResource(cfg1), fileResource(cfg2)])
+        options.jobRequestArguments.getJobDependencies().containsAll([fileResource(dep1), fileResource(dep2)])
+        options.jobRequestArguments.getJobSetup() == fileResource(setup)
     }
 
-    String fileResource(final String filename) {
-        return "file:" + Paths.get(filename).toAbsolutePath().toString()
+    String fileResource(final File file) {
+        return "file:" + file.toPath().toAbsolutePath().toString()
     }
 
     def "Unknown parameters throw"() {
@@ -179,6 +190,24 @@ class JobRequestArgumentsImplSpec extends Specification {
         then:
         thrown(ParameterException)
 
+    }
+
+    def "Invalid file references throw ParameterException"() {
+
+        setup:
+        File folder = temporaryFolder.newFolder()
+
+        when:
+        jCommander.parse("--jobDependency", folder.toPath().toString())
+
+        then:
+        thrown(ParameterException)
+
+        when:
+        jCommander.parse("--jobConfiguration", "/file/does/not/exist")
+
+        then:
+        thrown(ParameterException)
     }
 
     class TestOptions {

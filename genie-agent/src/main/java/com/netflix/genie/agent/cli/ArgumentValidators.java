@@ -20,9 +20,17 @@ package com.netflix.genie.agent.cli;
 
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.IValueValidator;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.validators.PositiveInteger;
 import org.apache.commons.lang3.StringUtils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Parameter validators for command-line arguments.
@@ -77,5 +85,56 @@ final class ArgumentValidators {
      * Validates a integer parameter is a positive integer.
      */
     public static class PortValidator extends PositiveInteger {
+    }
+
+    /**
+     * Validates an URI parameter can be parsed as URI.
+     * If the resource type is local file, validate it exists, it is readable, etc.
+     */
+    public static class URIValidator implements IValueValidator<String> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void validate(final String name, final String value) throws ParameterException {
+            // Make sure the value is a valid URI
+            final URI uri;
+            try {
+                uri = new URI(value);
+            } catch (URISyntaxException e) {
+                throw new ParameterException("Invalid URI " + value + " (for option: " + name + ")", e);
+            }
+
+            // If it's a file, make sure it exists, it's a file, it's readable, etc.
+            if (uri.getScheme().equals("file")) {
+                final Path path = Paths.get(uri.getPath());
+
+                if (!Files.exists(path)) {
+                    throw new ParameterException("File " + value + " does not exist (for option: " + name + ")");
+                } else if (!Files.isRegularFile(path)) {
+                    throw new ParameterException("File " + value + " is not a file (for option: " + name + ")");
+                } else if (!Files.isReadable(path)) {
+                    throw new ParameterException("File " + value + " is not readable (for option: " + name + ")");
+                }
+            }
+        }
+    }
+
+    /**
+     * Validates a URI collection parameter by delegating validation to {@link URIValidator}.
+     */
+    public static class URIListValidator implements IValueValidator<List<String>> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void validate(final String name, final List<String> values) throws ParameterException {
+            final URIValidator validator = new URIValidator();
+            for (final String value : values) {
+                validator.validate(name, value);
+            }
+        }
     }
 }
