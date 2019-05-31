@@ -166,6 +166,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
         names = {"--jobConfiguration"},
         description = "URI or path of a job-level configuration file to attach, can be repeated",
         converter = ArgumentConverters.UriOrLocalPathConverter.class,
+        validateValueWith = ArgumentValidators.URIListValidator.class,
         splitter = NoopParameterSplitter.class
     )
     private List<String> jobConfigurations = Lists.newArrayList();
@@ -174,6 +175,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
         names = {"--jobDependency"},
         description = "URI or path of a job-level dependency file to attach, can be repeated",
         converter = ArgumentConverters.UriOrLocalPathConverter.class,
+        validateValueWith = ArgumentValidators.URIListValidator.class,
         splitter = NoopParameterSplitter.class
     )
     private List<String> jobDependencies = Lists.newArrayList();
@@ -181,7 +183,8 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     @Parameter(
         names = {"--jobSetup"},
         description = "URI or path of a job-level setup file to attach. The file is sourced during job setup",
-        converter = ArgumentConverters.UriOrLocalPathConverter.class
+        converter = ArgumentConverters.UriOrLocalPathConverter.class,
+        validateValueWith = ArgumentValidators.URIValidator.class
     )
     private String jobSetup;
 
