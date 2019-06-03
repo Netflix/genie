@@ -47,6 +47,7 @@ import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
+import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -72,6 +73,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
     static final String OVERALL_COORDINATION_TIMER_NAME = "genie.jobs.coordination.timer";
     static final String SET_JOB_ENVIRONMENT_TIMER_NAME = "genie.jobs.submit.localRunner.setJobEnvironment.timer";
+    static final String USER_JOB_LIMIT_EXCEEDED_COUNTER_NAME = "genie.jobs.submit.rejected.jobs-limit.counter";
 
     private static final String NO_ID_FOUND = "No id found";
 
@@ -231,6 +233,15 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 final long activeJobsLimit = activeLimit.getUserLimit(jobRequest.getUser());
                 final long activeJobsCount = this.jobSearchService.getActiveJobCountForUser(jobRequest.getUser());
                 if (activeJobsCount >= activeJobsLimit) {
+
+                    this.registry.counter(
+                        USER_JOB_LIMIT_EXCEEDED_COUNTER_NAME,
+                        MetricsConstants.TagKeys.USER,
+                        jobRequest.getUser(),
+                        MetricsConstants.TagKeys.JOBS_USER_LIMIT,
+                        String.valueOf(activeJobsLimit)
+                    ).increment();
+
                     throw GenieUserLimitExceededException.createForActiveJobsLimit(
                         jobRequest.getUser(),
                         activeJobsCount,

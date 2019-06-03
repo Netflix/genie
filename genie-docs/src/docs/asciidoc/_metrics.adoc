@@ -169,6 +169,12 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |LocalJobRunner
 |-
 
+|genie.jobs.submit.rejected.jobs-limit.counter
+|Count of jobs rejected by the server because the user is exceeding the maximum number of running jobs
+|count
+|JobCoordinatorServiceImpl
+|user, jobsUserLimit
+
 |genie.jobs.agentDisconnected.gauge
 |Current number of agent jobs whose agent is not connected to any node.
 |count

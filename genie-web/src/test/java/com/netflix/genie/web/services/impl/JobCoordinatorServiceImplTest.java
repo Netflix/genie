@@ -44,7 +44,9 @@ import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
+import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
@@ -723,6 +725,18 @@ public class JobCoordinatorServiceImplTest {
             .when(this.jobSearchService.getActiveJobCountForUser(Mockito.any(String.class)))
             .thenReturn(Long.valueOf(userActiveJobsLimit));
 
+        final Counter limitExceededCounter = Mockito.mock(Counter.class);
+
+        Mockito
+            .when(this.registry.counter(
+                Mockito.eq(JobCoordinatorServiceImpl.USER_JOB_LIMIT_EXCEEDED_COUNTER_NAME),
+                Mockito.eq(MetricsConstants.TagKeys.USER),
+                Mockito.eq(jobRequest.getUser()),
+                Mockito.eq(MetricsConstants.TagKeys.JOBS_USER_LIMIT),
+                Mockito.eq(String.valueOf(userActiveJobsLimit))
+            ))
+            .thenReturn(limitExceededCounter);
+
         try {
             this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
         } finally {
@@ -743,6 +757,9 @@ public class JobCoordinatorServiceImplTest {
             Mockito
                 .verify(this.registry, Mockito.times(1))
                 .timer(JobCoordinatorServiceImpl.SET_JOB_ENVIRONMENT_TIMER_NAME, SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(limitExceededCounter, Mockito.times(1))
+                .increment();
         }
     }
 
