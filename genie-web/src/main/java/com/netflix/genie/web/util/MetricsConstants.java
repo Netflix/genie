@@ -103,6 +103,11 @@ public final class MetricsConstants {
         public static final String HEALTH_STATUS = "healthStatus";
 
         /**
+         * Key to tag the user concurrent job limit.
+         */
+        public static final String JOBS_USER_LIMIT = "jobsUserLimit";
+
+        /**
          * Utility class private constructor.
          */
         private TagKeys() {
