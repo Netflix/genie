@@ -379,10 +379,10 @@ public class DirectoryManifest {
         @Override
         public FileVisitResult visitFileFailed(final Path file, final IOException ioe) {
             if (ioe instanceof FileSystemLoopException) {
-                log.warn("Detected file system cycle visiting while visiting {}. Skipping.", file, ioe);
+                log.warn("Detected file system cycle visiting while visiting {}. Skipping.", file);
                 return FileVisitResult.SKIP_SUBTREE;
             } else if (ioe instanceof AccessDeniedException) {
-                log.warn("Access denied for file {}. Skipping", file, ioe);
+                log.warn("Access denied for file {}. Skipping", file);
                 return FileVisitResult.SKIP_SUBTREE;
             } else {
                 log.error("Got unknown error {} while visiting {}. Terminating visitor", ioe.getMessage(), file, ioe);
