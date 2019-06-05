@@ -17,37 +17,35 @@
  */
 package com.netflix.genie.web.tasks.leader
 
-import com.google.common.collect.Lists
 import com.netflix.genie.common.dto.UserResourcesSummary
 import com.netflix.genie.web.properties.UserMetricsProperties
 import com.netflix.genie.web.services.JobSearchService
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
 import com.netflix.genie.web.util.MetricsConstants
+import io.micrometer.core.instrument.Gauge
+import io.micrometer.core.instrument.Meter
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tag
 import org.apache.curator.shaded.com.google.common.collect.Maps
 import spock.lang.Specification
 
-import java.util.concurrent.atomic.AtomicLong
+import java.util.function.ToDoubleFunction
 
 class UserMetricsTaskSpec extends Specification {
     MeterRegistry registry
     JobSearchService jobSearchService
     UserMetricsProperties userMetricProperties
     UserMetricsTask task
+    Map<String, Closure<Double>> gaugesFunctions
 
     void setup() {
         this.registry = Mock(MeterRegistry)
         this.jobSearchService = Mock(JobSearchService)
         this.userMetricProperties = Mock(UserMetricsProperties)
+        this.gaugesFunctions = Maps.newHashMap()
     }
 
     def "Run"() {
         setup:
-        Collection<Tag> fooUserTag = Lists.newArrayList(Tag.of(MetricsConstants.TagKeys.USER, "foo"))
-        Collection<Tag> barUserTag = Lists.newArrayList(Tag.of(MetricsConstants.TagKeys.USER, "bar"))
-        Collection<Tag> booUserTag = Lists.newArrayList(Tag.of(MetricsConstants.TagKeys.USER, "boo"))
-
         Map<String, UserResourcesSummary> summariesMap1 = [
             "foo": new UserResourcesSummary("foo", 10, 1024),
             "bar": new UserResourcesSummary("bar", 20, 2048)
@@ -60,25 +58,15 @@ class UserMetricsTaskSpec extends Specification {
 
         Map<String, UserResourcesSummary> summariesMap3 = Maps.newHashMap()
 
-        AtomicLong activeUsersNumber = null
-        AtomicLong fooJobs = null
-        AtomicLong fooMem = null
-        AtomicLong barJobs = null
-        AtomicLong barMem = null
-        AtomicLong booJobs = null
-        AtomicLong booMem = null
-
         when:
         this.task = new UserMetricsTask(registry, jobSearchService, userMetricProperties)
 
         then:
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_USERS_METRIC_NAME,
-            _ as AtomicLong
-        ) >> {
-            args ->
-                activeUsersNumber = args[1] as AtomicLong
+        1 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
+            args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
+
+        measureActiveUsers() == 0
 
         when:
         GenieTaskScheduleType scheduleType = this.task.getScheduleType()
@@ -94,82 +82,57 @@ class UserMetricsTaskSpec extends Specification {
 
         then:
         1 * jobSearchService.getUserResourcesSummaries() >> summariesMap1
+        4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
+            args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
+        }
 
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            fooUserTag,
-            _ as AtomicLong
-        ) >> { args -> fooJobs = args[2] as AtomicLong }
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            barUserTag,
-            _ as AtomicLong
-        ) >> { args -> barJobs = args[2] as AtomicLong }
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            fooUserTag,
-            _ as AtomicLong
-        ) >> { args -> fooMem = args[2] as AtomicLong }
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            barUserTag,
-            _ as AtomicLong
-        ) >> { args -> barMem = args[2] as AtomicLong }
-
-        activeUsersNumber.get() == 2
-        fooJobs.get() == 10
-        fooMem.get() == 1024
-        barJobs.get() == 20
-        barMem.get() == 2048
+        measureActiveUsers() == 2
+        measureJobs("foo") == 10
+        measureMemory("foo") == 1024
+        measureJobs("bar") == 20
+        measureMemory("bar") == 2048
 
         when:
         this.task.run()
 
         then:
         1 * jobSearchService.getUserResourcesSummaries() >> summariesMap2
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            booUserTag,
-            _ as AtomicLong
-        ) >> { args -> booJobs = args[2] as AtomicLong }
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            booUserTag,
-            _ as AtomicLong
-        ) >> { args -> booMem = args[2] as AtomicLong }
-        activeUsersNumber.get() == 2
-        fooJobs.get() == 30
-        fooMem.get() == 4096
-        barJobs.get() == 0
-        barMem.get() == 0
-        booJobs.get() == 1
-        booMem.get() == 512
+        2 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
+            args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
+        }
 
+        measureActiveUsers() == 2
+        measureJobs("foo") == 30
+        measureMemory("foo") == 4096
+        measureJobs("bar") == 0
+        measureMemory("bar") == 0
+        measureJobs("boo") == 1
+        measureMemory("boo") == 512
 
         when:
         this.task.run()
 
         then:
         1 * jobSearchService.getUserResourcesSummaries() >> summariesMap3
-        activeUsersNumber.get() == 0
-        fooJobs.get() == 0
-        fooMem.get() == 0
-        barJobs.get() == 0
-        barMem.get() == 0
-        booJobs.get() == 0
-        booMem.get() == 0
+        measureActiveUsers() == 0
+        measureJobs("foo") == 0
+        measureMemory("foo") == 0
+        measureJobs("bar") == 0
+        measureMemory("bar") == 0
+        measureJobs("boo") == 0
+        measureMemory("boo") == 0
 
         when:
         this.task.cleanup()
 
         then:
-        activeUsersNumber.get() == 0
-        fooJobs.get() == 0
-        fooMem.get() == 0
-        barJobs.get() == 0
-        barMem.get() == 0
-        booJobs.get() == 0
-        booMem.get() == 0
+        measureActiveUsers() == 0
+        measureJobs("foo") == 0
+        measureMemory("foo") == 0
+        measureJobs("bar") == 0
+        measureMemory("bar") == 0
+        measureJobs("boo") == 0
+        measureMemory("boo") == 0
 
         when:
         this.task.run()
@@ -177,43 +140,50 @@ class UserMetricsTaskSpec extends Specification {
         then:
         1 * jobSearchService.getUserResourcesSummaries() >> summariesMap1
 
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            fooUserTag,
-            _ as AtomicLong
-        ) >> { args -> fooJobs = args[2] as AtomicLong }
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME,
-            barUserTag,
-            _ as AtomicLong
-        ) >> { args -> barJobs = args[2] as AtomicLong }
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            fooUserTag,
-            _ as AtomicLong
-        ) >> { args -> fooMem = args[2] as AtomicLong }
-        1 * registry.gauge(
-            UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME,
-            barUserTag,
-            _ as AtomicLong
-        ) >> { args -> barMem = args[2] as AtomicLong }
+        4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
+            args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
+        }
 
-        activeUsersNumber.get() == 2
-        fooJobs.get() == 10
-        fooMem.get() == 1024
-        barJobs.get() == 20
-        barMem.get() == 2048
+        measureActiveUsers() == 2
+        measureJobs("foo") == 10
+        measureMemory("foo") == 1024
+        measureJobs("bar") == 20
+        measureMemory("bar") == 2048
+        measureJobs("boo") == 0
+        measureMemory("boo") == 0
 
         when:
         this.task.cleanup()
 
         then:
-        activeUsersNumber.get() == 0
-        fooJobs.get() == 0
-        fooMem.get() == 0
-        barJobs.get() == 0
-        barMem.get() == 0
-        booJobs.get() == 0
-        booMem.get() == 0
+        measureActiveUsers() == 0
+        measureJobs("foo") == 0
+        measureMemory("foo") == 0
+        measureJobs("bar") == 0
+        measureMemory("bar") == 0
+        measureJobs("boo") == 0
+        measureMemory("boo") == 0
     }
+
+    Gauge captureGauge(final Meter.Id id, final Object obj, final ToDoubleFunction<Object> f) {
+        String userTagValue = id.getTag(MetricsConstants.TagKeys.USER)
+        String gaugeKey = id.getName() + (userTagValue == null ? "" : ("-" + userTagValue))
+        this.gaugesFunctions.put(gaugeKey, { -> f.applyAsDouble(obj) })
+        return Mock(Gauge)
+    }
+
+    double measureActiveUsers() {
+        return gaugesFunctions.get(UserMetricsTask.USER_ACTIVE_USERS_METRIC_NAME).call()
+    }
+
+    double measureJobs(String user) {
+        String gaugeKey = UserMetricsTask.USER_ACTIVE_JOBS_METRIC_NAME + "-" + user
+        return gaugesFunctions.get(gaugeKey).call()
+    }
+
+    double measureMemory(String user) {
+        String gaugeKey = UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME + "-" + user
+        return gaugesFunctions.get(gaugeKey).call()
+    }
+
 }
