@@ -350,22 +350,28 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |-
 
 |genie.tasks.clusterChecker.unhealtyHosts.gauge
-|Number of Genie nodes that the current leader failed is considering unhealthy
+|Number of Genie nodes that the leader has currently marked unhealthy
 |Current amount
 |ClusterCheckerTask
 |-
 
 |genie.tasks.clusterChecker.unreachableHost.counter
-|Counts the number of time the leader failed to get health status of a remote node
+|Counts the number of time the leader failed to retrieve health status of a remote node (example: socket timeout).
 |count
 |ClusterCheckerTask
 |host
 
 |genie.tasks.clusterChecker.failedHealthcheck.counter
-|Number of (non-ignored) healthcheck indicators returning a status different from UP
+|Counts the number of time the leader retrieved health status of a remote node and one of the (non-ignored) indicators had a status different than UP
 |count
 |ClusterCheckerTask
 |host, healthIndicator, healthStatus
+
+|genie.tasks.clusterChecker.invalidResponse.counter
+|Counts the number of time the leader retrieved health status of a remote node and failed to parse the response
+|count
+|ClusterCheckerTask
+|host
 
 |genie.tasks.clusterChecker.jobsMarkedFailed.counter
 |Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them

@@ -144,16 +144,12 @@ class ClusterCheckerTaskSpec extends Specification {
 
         this.task.getErrorCountsSize() == 3
         this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
+            ClusterCheckerTask.BAD_RESPONSE_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host1
         ).count() == 1
         this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
+            ClusterCheckerTask.BAD_HOST_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2
-        ).count() == 1
-        this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
-            MetricsConstants.TagKeys.HOST, host3
         ).count() == 1
 
         this.meterRegistry.counter(
@@ -174,17 +170,13 @@ class ClusterCheckerTaskSpec extends Specification {
 
         this.task.getErrorCountsSize() == 1
         this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
+            ClusterCheckerTask.BAD_RESPONSE_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host1
         ).count() == 1
         this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
+            ClusterCheckerTask.BAD_HOST_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2
         ).count() == 2
-        this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
-            MetricsConstants.TagKeys.HOST, host3
-        ).count() == 1
 
         this.meterRegistry.counter(
             ClusterCheckerTask.BAD_HEALTH_COUNT_METRIC_NAME,
@@ -210,17 +202,13 @@ class ClusterCheckerTaskSpec extends Specification {
 
         this.task.getErrorCountsSize() == 1
         this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
+            ClusterCheckerTask.BAD_RESPONSE_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host1
         ).count() == 1
         this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
+            ClusterCheckerTask.BAD_HOST_COUNT_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2
         ).count() == 3
-        this.meterRegistry.counter(
-            ClusterCheckerTask.BAD_HOSTS_COUNT_METRIC_NAME,
-            MetricsConstants.TagKeys.HOST, host3
-        ).count() == 1
 
         this.meterRegistry.counter(
             ClusterCheckerTask.BAD_HEALTH_COUNT_METRIC_NAME,
