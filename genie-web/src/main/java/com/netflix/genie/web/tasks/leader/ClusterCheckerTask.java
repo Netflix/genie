@@ -30,6 +30,7 @@ import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.Getter;
@@ -60,9 +61,10 @@ import java.util.Set;
  */
 @Slf4j
 public class ClusterCheckerTask extends LeadershipTask {
-    private static final String BAD_HOSTS_GAUGE_METRIC_NAME = "genie.tasks.clusterChecker.unhealtyHosts.gauge";
-    private static final String BAD_HOSTS_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.unreachableHost.counter";
+    private static final String UNHEALTHY_HOSTS_GAUGE_METRIC_NAME = "genie.tasks.clusterChecker.unhealthyHosts.gauge";
     private static final String BAD_HEALTH_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.failedHealthcheck.counter";
+    private static final String BAD_RESPONSE_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.invalidResponse.counter";
+    private static final String BAD_HOST_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.unreachableHost.counter";
     private static final String FAILED_JOBS_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.jobsMarkedFailed.counter";
 
     private final String hostname;
@@ -108,7 +110,8 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
             .trimResults().splitToList(properties.getHealthIndicatorsToIgnore());
         // Keep track of the number of nodes currently unreachable from the the master
-        registry.gauge(BAD_HOSTS_GAUGE_METRIC_NAME, this.errorCounts, Map::size);
+        Gauge.builder(UNHEALTHY_HOSTS_GAUGE_METRIC_NAME, this.errorCounts, Map::size)
+            .register(registry);
     }
 
     /**
@@ -176,10 +179,10 @@ public class ClusterCheckerTask extends LeadershipTask {
         // If node is not healthy, update the entry in errorCounts
         //
         if (this.isNodeHealthy(host)) {
-            log.info("Host {} is no longer unhealthy", host);
-            this.errorCounts.remove(host);
+            if (this.errorCounts.remove(host) != null) {
+                log.info("Host {} is no longer unhealthy", host);
+            }
         } else {
-            this.registry.counter(BAD_HOSTS_COUNT_METRIC_NAME, MetricsConstants.TagKeys.HOST, host).increment();
             if (this.errorCounts.containsKey(host)) {
                 final int currentCount = this.errorCounts.get(host) + 1;
                 log.info("Host still unhealthy (check #{}): {}", currentCount, host);
@@ -208,6 +211,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         } catch (final RestClientException e) {
             // Other failure to execute the request
             log.warn("Unable to request healtcheck response from host: {}", host, e);
+            this.registry.counter(BAD_HOST_COUNT_METRIC_NAME, MetricsConstants.TagKeys.HOST, host).increment();
             return false;
         }
 
@@ -221,6 +225,7 @@ public class ClusterCheckerTask extends LeadershipTask {
                 );
         } catch (IOException ex) {
             log.warn("Failed to parse healthcheck response from host: {}: {}", host, ex.getMessage());
+            this.registry.counter(BAD_RESPONSE_COUNT_METRIC_NAME, MetricsConstants.TagKeys.HOST, host).increment();
             return false;
         }
 
