@@ -46,17 +46,17 @@ class UserMetricsTaskSpec extends Specification {
 
     def "Run"() {
         setup:
-        Map<String, UserResourcesSummary> summariesMap1 = [
+        Map<String, UserResourcesSummary> fooBarSummariesMap = [
             "foo": new UserResourcesSummary("foo", 10, 1024),
             "bar": new UserResourcesSummary("bar", 20, 2048)
         ]
 
-        Map<String, UserResourcesSummary> summariesMap2 = [
+        Map<String, UserResourcesSummary> fooBooSummariesMap = [
             "foo": new UserResourcesSummary("foo", 30, 4096),
             "boo": new UserResourcesSummary("boo", 1, 512)
         ]
 
-        Map<String, UserResourcesSummary> summariesMap3 = Maps.newHashMap()
+        Map<String, UserResourcesSummary> emptySummariesMap = Maps.newHashMap()
 
         when:
         this.task = new UserMetricsTask(registry, jobSearchService, userMetricProperties)
@@ -66,7 +66,7 @@ class UserMetricsTaskSpec extends Specification {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
 
-        measureActiveUsers() == 0
+        measureActiveUsers() == Double.NaN
 
         when:
         GenieTaskScheduleType scheduleType = this.task.getScheduleType()
@@ -81,7 +81,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> summariesMap1
+        1 * jobSearchService.getUserResourcesSummaries() >> fooBarSummariesMap
         4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
@@ -96,7 +96,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> summariesMap2
+        1 * jobSearchService.getUserResourcesSummaries() >> fooBooSummariesMap
         2 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
@@ -104,8 +104,8 @@ class UserMetricsTaskSpec extends Specification {
         measureActiveUsers() == 2
         measureJobs("foo") == 30
         measureMemory("foo") == 4096
-        measureJobs("bar") == 0
-        measureMemory("bar") == 0
+        measureJobs("bar") == Double.NaN
+        measureMemory("bar") == Double.NaN
         measureJobs("boo") == 1
         measureMemory("boo") == 512
 
@@ -113,32 +113,32 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> summariesMap3
+        1 * jobSearchService.getUserResourcesSummaries() >> emptySummariesMap
         measureActiveUsers() == 0
-        measureJobs("foo") == 0
-        measureMemory("foo") == 0
-        measureJobs("bar") == 0
-        measureMemory("bar") == 0
-        measureJobs("boo") == 0
-        measureMemory("boo") == 0
+        measureJobs("foo") == Double.NaN
+        measureMemory("foo") == Double.NaN
+        measureJobs("bar") == Double.NaN
+        measureMemory("bar") == Double.NaN
+        measureJobs("boo") == Double.NaN
+        measureMemory("boo") == Double.NaN
 
         when:
         this.task.cleanup()
 
         then:
-        measureActiveUsers() == 0
-        measureJobs("foo") == 0
-        measureMemory("foo") == 0
-        measureJobs("bar") == 0
-        measureMemory("bar") == 0
-        measureJobs("boo") == 0
-        measureMemory("boo") == 0
+        measureActiveUsers() == Double.NaN
+        measureJobs("foo") == Double.NaN
+        measureMemory("foo") == Double.NaN
+        measureJobs("bar") == Double.NaN
+        measureMemory("bar") == Double.NaN
+        measureJobs("boo") == Double.NaN
+        measureMemory("boo") == Double.NaN
 
         when:
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> summariesMap1
+        1 * jobSearchService.getUserResourcesSummaries() >> fooBarSummariesMap
 
         4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
@@ -149,20 +149,20 @@ class UserMetricsTaskSpec extends Specification {
         measureMemory("foo") == 1024
         measureJobs("bar") == 20
         measureMemory("bar") == 2048
-        measureJobs("boo") == 0
-        measureMemory("boo") == 0
+        measureJobs("boo") == Double.NaN
+        measureMemory("boo") == Double.NaN
 
         when:
         this.task.cleanup()
 
         then:
-        measureActiveUsers() == 0
-        measureJobs("foo") == 0
-        measureMemory("foo") == 0
-        measureJobs("bar") == 0
-        measureMemory("bar") == 0
-        measureJobs("boo") == 0
-        measureMemory("boo") == 0
+        measureActiveUsers() == Double.NaN
+        measureJobs("foo") == Double.NaN
+        measureMemory("foo") == Double.NaN
+        measureJobs("bar") == Double.NaN
+        measureMemory("bar") == Double.NaN
+        measureJobs("boo") == Double.NaN
+        measureMemory("boo") == Double.NaN
     }
 
     Gauge captureGauge(final Meter.Id id, final Object obj, final ToDoubleFunction<Object> f) {

@@ -19,6 +19,7 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.AtomicDouble;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.services.JobSearchService;
@@ -30,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A task which publishes user metrics.
@@ -44,12 +44,13 @@ public class UserMetricsTask extends LeadershipTask {
     private static final String USER_ACTIVE_JOBS_METRIC_NAME = "genie.user.active-jobs.gauge";
     private static final String USER_ACTIVE_MEMORY_METRIC_NAME = "genie.user.active-memory.gauge";
     private static final String USER_ACTIVE_USERS_METRIC_NAME = "genie.user.active-users.gauge";
+    private static final UserResourcesRecord USER_RECORD_PLACEHOLDER = new UserResourcesRecord("nobody");
     private final MeterRegistry registry;
     private final JobSearchService jobSearchService;
     private final UserMetricsProperties userMetricsProperties;
 
     private final Map<String, UserResourcesRecord> userResourcesRecordMap = Maps.newHashMap();
-    private final AtomicLong activeUsersCount;
+    private final AtomicDouble activeUsersCount;
 
     /**
      * Constructor.
@@ -66,10 +67,10 @@ public class UserMetricsTask extends LeadershipTask {
         this.registry = registry;
         this.jobSearchService = jobSearchService;
         this.userMetricsProperties = userMetricsProperties;
-        this.activeUsersCount = new AtomicLong(0);
+        this.activeUsersCount = new AtomicDouble(Double.NaN);
 
         // Register gauge for count of distinct users with active jobs.
-        Gauge.builder(USER_ACTIVE_USERS_METRIC_NAME, () -> this.getUsersCount())
+        Gauge.builder(USER_ACTIVE_USERS_METRIC_NAME, this::getUsersCount)
             .register(registry);
     }
 
@@ -107,7 +108,7 @@ public class UserMetricsTask extends LeadershipTask {
         usersToReset.removeAll(summaries.keySet());
 
         for (final String user : usersToReset) {
-            // Remove from map, gauge will eventually stop publishing
+            // Remove user. If gauge is polled, it'll return NaN
             this.userResourcesRecordMap.remove(user);
         }
 
@@ -122,54 +123,29 @@ public class UserMetricsTask extends LeadershipTask {
             this.userResourcesRecordMap.computeIfAbsent(
                 userResourcesSummary.getUser(),
                 userName -> {
-                    // Register gauges for a new or returning user.
-                    // N.B. Lifecycle of gauges is controlled by Micrometer and unrelated to the lifecycle
-                    // of the UserResourceRecord. If a gauge with the same ID was previously recorded, it may now get
-                    // reused. Or not. Hence this lambda that will always return the up-to-date value.
-                    Gauge.builder(USER_ACTIVE_JOBS_METRIC_NAME, () -> this.getUserJobCount(userName))
+                    // Register gauges this user user.
+                    // Gauge creation is idempotent so it doesn't matter if the user is new or seen before.
+                    // Registry holds a reference to the gauge so no need to save it.
+                    Gauge.builder(
+                        USER_ACTIVE_JOBS_METRIC_NAME,
+                        () -> this.getUserJobCount(userName)
+                    )
                         .tags(MetricsConstants.TagKeys.USER, userName)
-                        .strongReference(false)
                         .register(registry);
-                    Gauge.builder(USER_ACTIVE_MEMORY_METRIC_NAME, () -> this.getUserMemoryAmount(userName))
+                    Gauge.builder(
+                        USER_ACTIVE_MEMORY_METRIC_NAME,
+                        () -> this.getUserMemoryAmount(userName)
+                    )
                         .tags(MetricsConstants.TagKeys.USER, userName)
-                        .strongReference(false)
                         .register(registry);
 
-                    return new UserResourcesRecord(userName, jobs, memory);
+                    return new UserResourcesRecord(userName);
                 }
 
             ).update(jobs, memory);
         }
 
         log.info("Done publishing user metrics");
-    }
-
-    private Number getUserJobCount(final String userName) {
-        final UserResourcesRecord record = this.userResourcesRecordMap.get(userName);
-        final long jobCount;
-        if (record == null) {
-            jobCount = 0;
-        } else {
-            jobCount = record.jobCount.get();
-        }
-        log.debug("Current jobs count for user '{}' is {}", userName, jobCount);
-        return jobCount;
-    }
-
-    private long getUserMemoryAmount(final String userName) {
-        final UserResourcesRecord record = this.userResourcesRecordMap.get(userName);
-        final long memoryAmount;
-        if (record == null) {
-            memoryAmount = 0;
-        } else {
-            memoryAmount = record.memoryAmount.get();
-        }
-        log.debug("Current memory amount for user '{}' is {}MB", userName, memoryAmount);
-        return memoryAmount;
-    }
-
-    private long getUsersCount() {
-        return activeUsersCount.get();
     }
 
     /**
@@ -183,23 +159,37 @@ public class UserMetricsTask extends LeadershipTask {
         // Reset all users
         this.userResourcesRecordMap.clear();
 
-        // Reset active jobs count
-        this.activeUsersCount.set(0);
+        // Reset active users count
+        this.activeUsersCount.set(Double.NaN);
+    }
+
+    private Number getUserJobCount(final String userName) {
+        final UserResourcesRecord record = this.userResourcesRecordMap.getOrDefault(userName, USER_RECORD_PLACEHOLDER);
+        final double jobCount = record.jobCount.get();
+        log.debug("Current jobs count for user '{}' is {}", userName, (long) jobCount);
+        return jobCount;
+    }
+
+    private Number getUserMemoryAmount(final String userName) {
+        final UserResourcesRecord record = this.userResourcesRecordMap.getOrDefault(userName, USER_RECORD_PLACEHOLDER);
+        final double memoryAmount = record.memoryAmount.get();
+        log.debug("Current memory amount for user '{}' is {}MB", userName, (long) memoryAmount);
+        return memoryAmount;
+    }
+
+    private Number getUsersCount() {
+        return activeUsersCount.get();
     }
 
     private static class UserResourcesRecord {
         private final String userName;
-        private final AtomicLong jobCount;
-        private final AtomicLong memoryAmount;
+        private final AtomicDouble jobCount = new AtomicDouble(Double.NaN);
+        private final AtomicDouble memoryAmount = new AtomicDouble(Double.NaN);
 
         UserResourcesRecord(
-            final String userName,
-            final long initialJobs,
-            final long initialMemory
+            final String userName
         ) {
             this.userName = userName;
-            this.jobCount = new AtomicLong(initialJobs);
-            this.memoryAmount = new AtomicLong(initialMemory);
         }
 
         void update(final long runningJobsCount, final long usedMemory) {
