@@ -97,7 +97,7 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
         if (cpuLoadConsecutiveOccurrences >= maxCpuLoadConsecutiveOccurrences) {
             log.warn("CPU usage {} crossed the threshold of {}", currentCpuLoadPercent, maxCpuLoadPercent);
             return Health
-                .outOfService()
+                .down()
                 .withDetail(CPU_LOAD, currentCpuLoadPercent)
                 .build();
         } else {

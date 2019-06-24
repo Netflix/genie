@@ -73,7 +73,7 @@ public class GenieMemoryHealthIndicator implements HealthIndicator {
         if (availableMemory >= maxJobMemory) {
             builder = Health.up();
         } else {
-            builder = Health.outOfService();
+            builder = Health.down();
         }
 
         return builder
