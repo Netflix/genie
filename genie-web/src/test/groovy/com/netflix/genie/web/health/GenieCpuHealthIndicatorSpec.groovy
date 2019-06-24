@@ -58,9 +58,9 @@ class GenieCpuHealthIndicatorSpec extends Specification {
         cpuHealthIndicator.health().getStatus() == status
         where:
         cpuLoad | count | status
-        90      | 1     | Status.OUT_OF_SERVICE
-        171     | 2     | Status.OUT_OF_SERVICE
-        81.1    | 1     | Status.OUT_OF_SERVICE
+        90      | 1     | Status.DOWN
+        171     | 2     | Status.DOWN
+        81.1    | 1     | Status.DOWN
         80.1    | 0     | Status.UP
         80      | 5     | Status.UP
         20.2    | 1     | Status.UP
@@ -92,6 +92,6 @@ class GenieCpuHealthIndicatorSpec extends Specification {
             new DefaultManagedTaskScheduler()
         )
         then:
-        indicator.health().getStatus() == Status.OUT_OF_SERVICE
+        indicator.health().getStatus() == Status.DOWN
     }
 }

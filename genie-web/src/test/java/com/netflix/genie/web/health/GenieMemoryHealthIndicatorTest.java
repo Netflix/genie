@@ -68,7 +68,7 @@ public class GenieMemoryHealthIndicatorTest {
             .thenReturn(1024, 2048, MAX_SYSTEM_MEMORY - MAX_JOB_MEMORY + 1);
         Assert.assertThat(this.genieMemoryHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
         Assert.assertThat(this.genieMemoryHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
-        Assert.assertThat(this.genieMemoryHealthIndicator.health().getStatus(), Matchers.is(Status.OUT_OF_SERVICE));
+        Assert.assertThat(this.genieMemoryHealthIndicator.health().getStatus(), Matchers.is(Status.DOWN));
     }
 
     /**
