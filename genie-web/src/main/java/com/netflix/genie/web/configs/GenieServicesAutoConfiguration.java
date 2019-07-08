@@ -25,7 +25,6 @@ import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
-import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
 import com.netflix.genie.web.properties.HealthProperties;
@@ -108,7 +107,6 @@ import java.util.Optional;
 @Configuration
 @EnableConfigurationProperties(
     {
-        DataServiceRetryProperties.class,
         FileCacheProperties.class,
         HealthProperties.class,
         JobsCleanupProperties.class,

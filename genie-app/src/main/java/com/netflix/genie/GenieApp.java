@@ -21,7 +21,6 @@ import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * Main Genie Spring Configuration class.
@@ -36,7 +35,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
         GrpcServerAutoConfiguration.class,
     }
 )
-@EnableAspectJAutoProxy
 public class GenieApp {
 
     /**

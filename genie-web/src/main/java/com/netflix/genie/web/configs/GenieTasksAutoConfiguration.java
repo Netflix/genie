@@ -68,13 +68,13 @@ import java.io.IOException;
 @EnableScheduling
 @EnableConfigurationProperties(
     {
+        AgentCleanupProperties.class,
         ClusterCheckerProperties.class,
         DatabaseCleanupProperties.class,
         DiskCleanupProperties.class,
         TasksExecutorPoolProperties.class,
         TasksSchedulerPoolProperties.class,
-        UserMetricsProperties.class,
-        AgentCleanupProperties.class
+        UserMetricsProperties.class
     }
 )
 public class GenieTasksAutoConfiguration {
