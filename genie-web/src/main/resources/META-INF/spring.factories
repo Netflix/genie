@@ -1,6 +1,7 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.configs.GenieAgentFilterAutoConfiguration,\
   com.netflix.genie.web.configs.GenieApiAutoConfiguration,\
+  com.netflix.genie.web.configs.GenieAspectsAutoConfiguration,\
   com.netflix.genie.web.configs.GenieClusterLoadBalancerAutoConfiguration,\
   com.netflix.genie.web.configs.GenieEventBusAutoConfiguration,\
   com.netflix.genie.web.configs.GenieGRpcServerAutoConfiguration,\

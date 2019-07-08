@@ -28,10 +28,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -46,7 +44,6 @@ import java.util.concurrent.TimeUnit;
  * @since 3.2.4
  */
 @Aspect
-@Component
 @Slf4j
 public class HealthCheckMetricsAspect {
 
@@ -64,7 +61,6 @@ public class HealthCheckMetricsAspect {
      *
      * @param registry metrics registry
      */
-    @Autowired
     public HealthCheckMetricsAspect(final MeterRegistry registry) {
         this.registry = registry;
     }

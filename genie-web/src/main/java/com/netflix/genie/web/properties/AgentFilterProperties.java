@@ -32,11 +32,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author mprimi
  * @since 4.0.0
  */
-@ConfigurationProperties
+@ConfigurationProperties(prefix = AgentFilterProperties.PROPERTY_PREFIX)
 @Validated
 public class AgentFilterProperties implements EnvironmentAware {
 
-    private static final String PROPERTY_PREFIX = "genie.agent.filter";
+    /**
+     * Prefix for the properties that will be bound into this object.
+     */
+    static final String PROPERTY_PREFIX = "genie.agent.filter";
 
     /**
      * Property that enables the default implementation of {@link com.netflix.genie.web.services.AgentFilterService}.

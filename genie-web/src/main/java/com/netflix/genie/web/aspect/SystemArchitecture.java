@@ -19,7 +19,6 @@ package com.netflix.genie.web.aspect;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.stereotype.Component;
 
 /**
  * Application pointcut expressions.
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Component;
  * @since 3.0.0
  */
 @Aspect
-@Component
 public class SystemArchitecture {
     /**
      * A join point is in the resource layer if the method is defined

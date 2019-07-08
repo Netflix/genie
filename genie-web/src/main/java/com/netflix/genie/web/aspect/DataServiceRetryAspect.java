@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.ConcurrencyFailureException;
@@ -41,7 +40,6 @@ import org.springframework.retry.RetryListener;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolationException;
 
@@ -52,7 +50,6 @@ import javax.validation.ConstraintViolationException;
  * @since 3.0.0
  */
 @Aspect
-@Component
 @Slf4j
 public class DataServiceRetryAspect implements Ordered {
     private final RetryTemplate retryTemplate;
@@ -62,22 +59,25 @@ public class DataServiceRetryAspect implements Ordered {
      *
      * @param dataServiceRetryProperties retry properties
      */
-    @Autowired
     public DataServiceRetryAspect(final DataServiceRetryProperties dataServiceRetryProperties) {
-        retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(dataServiceRetryProperties.getNoOfRetries(),
-            new ImmutableMap.Builder<Class<? extends Throwable>, Boolean>()
-                .put(CannotGetJdbcConnectionException.class, true)
-                .put(CannotAcquireLockException.class, true)
-                .put(DeadlockLoserDataAccessException.class, true)
-                .put(OptimisticLockingFailureException.class, true)
-                .put(PessimisticLockingFailureException.class, true)
-                .put(ConcurrencyFailureException.class, true)
-                // Will this work for cases where the write queries timeout on the client?
-                .put(QueryTimeoutException.class, true)
-                .put(TransientDataAccessResourceException.class, true)
-                .put(JpaSystemException.class, true)
-                .build()));
+        this.retryTemplate = new RetryTemplate();
+        this.retryTemplate.setRetryPolicy(
+            new SimpleRetryPolicy(
+                dataServiceRetryProperties.getNoOfRetries(),
+                new ImmutableMap.Builder<Class<? extends Throwable>, Boolean>()
+                    .put(CannotGetJdbcConnectionException.class, true)
+                    .put(CannotAcquireLockException.class, true)
+                    .put(DeadlockLoserDataAccessException.class, true)
+                    .put(OptimisticLockingFailureException.class, true)
+                    .put(PessimisticLockingFailureException.class, true)
+                    .put(ConcurrencyFailureException.class, true)
+                    // Will this work for cases where the write queries timeout on the client?
+                    .put(QueryTimeoutException.class, true)
+                    .put(TransientDataAccessResourceException.class, true)
+                    .put(JpaSystemException.class, true)
+                    .build()
+            )
+        );
         final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
         backOffPolicy.setInitialInterval(dataServiceRetryProperties.getInitialInterval());
         backOffPolicy.setMaxInterval(dataServiceRetryProperties.getMaxInterval());
@@ -90,7 +90,7 @@ public class DataServiceRetryAspect implements Ordered {
      * @param retryListeners retry listeners
      */
     public void setRetryListeners(final RetryListener[] retryListeners) {
-        retryTemplate.setListeners(retryListeners);
+        this.retryTemplate.setListeners(retryListeners);
     }
 
     /**
@@ -116,6 +116,9 @@ public class DataServiceRetryAspect implements Ordered {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getOrder() {
         // Currently setting this to 0 since we want the retry to happen before the transaction interceptor.
