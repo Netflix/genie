@@ -105,19 +105,6 @@ class GRpcAgentFileStreamServiceImpl
      * {@inheritDoc}
      */
     @Override
-    public Optional<DirectoryManifest> getManifest(final String jobId) {
-        final ControlStreamObserver streamObserver = this.jobIdControlStreamMap.get(jobId);
-        if (streamObserver != null) {
-            return Optional.ofNullable(streamObserver.manifestRef.get());
-        }
-        log.warn("Stream Record not found for job id: {}", jobId);
-        return Optional.empty();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<AgentFileResource> getResource(final String jobId, final Path relativePath, final URI uri) {
 
         final ControlStreamObserver streamObserver = this.jobIdControlStreamMap.get(jobId);
@@ -137,7 +124,11 @@ class GRpcAgentFileStreamServiceImpl
 
         if (manifestEntry == null) {
             // File does not exist according to manifest
-            log.warn("Requesting a file that does not exist in the manifest for job id: {}: ", jobId, relativePath);
+            log.warn(
+                "Requesting a file ({}) that does not exist in the manifest for job id: {}: ",
+                relativePath,
+                jobId
+            );
             return Optional.of(AgentFileResourceImpl.forNonExistingResource());
         }
 
@@ -198,6 +189,19 @@ class GRpcAgentFileStreamServiceImpl
         );
 
         return Optional.of(resource);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<DirectoryManifest> getManifest(final String jobId) {
+        final ControlStreamObserver streamObserver = this.jobIdControlStreamMap.get(jobId);
+        if (streamObserver != null) {
+            return Optional.ofNullable(streamObserver.manifestRef.get());
+        }
+        log.warn("Stream Record not found for job id: {}", jobId);
+        return Optional.empty();
     }
 
     /**
