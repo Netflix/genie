@@ -26,9 +26,9 @@ import spock.lang.Specification
 
 import java.util.concurrent.ScheduledFuture
 
-class GrpcHeartBeatServiceImplSpec extends Specification {
+class GRpcHeartBeatServiceImplSpec extends Specification {
     AgentRoutingService agentRoutingService
-    GrpcHeartBeatServiceImpl service
+    GRpcHeartBeatServiceImpl service
     StreamObserver<ServerHeartBeat> responseObserver
     TaskScheduler taskScheduler
     ScheduledFuture taskFuture
@@ -45,7 +45,7 @@ class GrpcHeartBeatServiceImplSpec extends Specification {
         }
         this.agentRoutingService = Mock(AgentRoutingService)
         this.responseObserver = Mock(StreamObserver)
-        this.service = new GrpcHeartBeatServiceImpl(agentRoutingService, taskScheduler)
+        this.service = new GRpcHeartBeatServiceImpl(agentRoutingService, taskScheduler)
         assert task != null
     }
 

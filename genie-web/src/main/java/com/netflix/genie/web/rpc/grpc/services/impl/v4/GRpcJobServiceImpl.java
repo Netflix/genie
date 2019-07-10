@@ -34,13 +34,9 @@ import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import com.netflix.genie.proto.ReserveJobIdResponse;
-import com.netflix.genie.web.properties.GRpcServerProperties;
-import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Extension of {@link JobServiceGrpc.JobServiceImplBase} to provide
@@ -49,13 +45,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
  * @author tgianos
  * @since 4.0.0
  */
-@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
-@GrpcService(
-    value = JobServiceGrpc.class,
-    interceptors = {
-        SimpleLoggingInterceptor.class,
-    }
-)
 @Slf4j
 public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
     private final AgentJobService agentJobService;

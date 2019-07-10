@@ -22,6 +22,8 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
+    // TODO: Switch to java-library plugin
+
     compile(project(":genie-common"))
     compile(project(":genie-common-internal"))
     compile(project(":genie-proto"))
@@ -33,12 +35,14 @@ dependencies {
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")
     compile("commons-validator:commons-validator")
+    compile("io.grpc:grpc-core")
+    compile("io.grpc:grpc-netty")
+    compile("io.grpc:grpc-protobuf")
+    compile("io.grpc:grpc-stub")
     compile("io.springfox:springfox-swagger2")
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")
     compile("javax.persistence:javax.persistence-api")
-    compile("net.devh:grpc-server-spring-boot-autoconfigure")
-    compile("net.devh:grpc-server-spring-boot-starter")
     compile("org.apache.commons:commons-exec")
     compile("org.apache.commons:commons-lang3")
     compile("org.apache.httpcomponents:httpclient")

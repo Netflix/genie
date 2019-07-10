@@ -26,7 +26,6 @@ spring:
   autoconfigure:
     exclude:
     - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-    - net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: validate

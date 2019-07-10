@@ -27,6 +27,7 @@ import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
 import com.netflix.genie.web.properties.FileCacheProperties;
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsCleanupProperties;
@@ -83,6 +84,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -228,10 +230,12 @@ public class GenieServicesAutoConfiguration {
      * @return a placeholder V4 job kill service for tests.
      */
     @Bean
+    @ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "false", matchIfMissing = true)
     @ConditionalOnMissingBean(JobKillServiceV4.class)
+    // TODO: Fix entanglement between these services and gRPC tier
     public JobKillServiceV4 fallbackJobKillServiceV4() {
         return (jobId, reason) -> {
-            throw new NotImplementedException("Not suppored when using fallback kill service");
+            throw new NotImplementedException("Not supported when using fallback kill service");
         };
     }
 
@@ -554,6 +558,7 @@ public class GenieServicesAutoConfiguration {
      * @return a placeholder agent file stream service for tests.
      */
     @Bean
+    @ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "false", matchIfMissing = true)
     @ConditionalOnMissingBean(AgentFileStreamService.class)
     public AgentFileStreamService fallbackAgentFileStreamService() {
         return new AgentFileStreamService() {
