@@ -74,16 +74,16 @@ class ExecCommand implements AgentCommand {
         log.info("Running job state machine");
         stateMachine.start();
 
-        final States finalstate;
+        final States finalState;
         try {
-            finalstate = stateMachine.waitForStop();
+            finalState = stateMachine.waitForStop();
         } catch (final Exception e) {
             log.warn("Job state machine execution failed", e);
             throw new RuntimeException("Job execution error", e);
         }
 
-        if (!States.END.equals(finalstate)) {
-            throw new RuntimeException("Job execution failed (final state: " + finalstate + ")");
+        if (!States.END.equals(finalState)) {
+            throw new RuntimeException("Job execution failed (final state: " + finalState + ")");
         }
 
         if (executionContext.hasStateActionError()) {
