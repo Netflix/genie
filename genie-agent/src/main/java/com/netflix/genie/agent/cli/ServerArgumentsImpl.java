@@ -33,7 +33,7 @@ class ServerArgumentsImpl implements ArgumentDelegates.ServerArguments {
         description = "Server hostname or address",
         validateWith = ArgumentValidators.StringValidator.class
     )
-    private String serverHost = "genie.prod.netflix.net";
+    private String serverHost = "localhost";
 
     @Parameter(
         names = {"--serverPort"},

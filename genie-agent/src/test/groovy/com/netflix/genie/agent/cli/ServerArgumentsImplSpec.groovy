@@ -40,7 +40,7 @@ class ServerArgumentsImplSpec extends Specification {
         jCommander.parse()
 
         then:
-        "genie.prod.netflix.net" == options.serverArguments.getServerHost()
+        "localhost" == options.serverArguments.getServerHost()
         7979 == options.serverArguments.getServerPort()
         30L == options.serverArguments.getRpcTimeout()
     }
