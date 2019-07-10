@@ -17,7 +17,6 @@
  */
 package com.netflix.genie;
 
-import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -32,7 +31,6 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
     // TODO: We probably should handle these in an environment post processor so that it's universal
     exclude = {
         RedisAutoConfiguration.class,
-        GrpcServerAutoConfiguration.class,
     }
 )
 public class GenieApp {

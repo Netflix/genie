@@ -22,15 +22,10 @@ import com.google.common.collect.Maps;
 import com.netflix.genie.proto.AgentHeartBeat;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.ServerHeartBeat;
-import com.netflix.genie.web.properties.GRpcServerProperties;
-import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentRoutingService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.PreDestroy;
@@ -46,34 +41,34 @@ import java.util.concurrent.ScheduledFuture;
  * @author mprimi
  * @since 4.0.0
  */
-@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
-@GrpcService(
-    value = HeartBeatServiceGrpc.class,
-    interceptors = {
-        SimpleLoggingInterceptor.class,
-    }
-)
 @Slf4j
-class GrpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImplBase {
+public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImplBase {
 
     private static final long HEART_BEAT_PERIOD_MILLIS = 5_000L; // TODO make configurable
-    private final TaskScheduler taskScheduler;
     private final Map<String, AgentStreamRecord> activeStreamsMap = Maps.newHashMap();
     private final ScheduledFuture<?> sendHeartbeatsFuture;
     private final AgentRoutingService agentRoutingService;
 
-    GrpcHeartBeatServiceImpl(
+    /**
+     * Constructor.
+     *
+     * @param agentRoutingService The {@link AgentRoutingService} implementation to use
+     * @param taskScheduler       The {@link TaskScheduler} instance to use
+     */
+    public GRpcHeartBeatServiceImpl(
         final AgentRoutingService agentRoutingService,
-        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler
+        final TaskScheduler taskScheduler
     ) {
         this.agentRoutingService = agentRoutingService;
-        this.taskScheduler = taskScheduler;
-        this.sendHeartbeatsFuture = this.taskScheduler.scheduleWithFixedDelay(
+        this.sendHeartbeatsFuture = taskScheduler.scheduleWithFixedDelay(
             this::sendHeartbeats,
             HEART_BEAT_PERIOD_MILLIS
         );
     }
 
+    /**
+     * Shutdown this service.
+     */
     @PreDestroy
     public synchronized void shutdown() {
         if (sendHeartbeatsFuture != null) {
@@ -217,11 +212,11 @@ class GrpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImpl
     }
 
     private static class RequestObserver implements StreamObserver<AgentHeartBeat> {
-        private final GrpcHeartBeatServiceImpl grpcHeartBeatService;
+        private final GRpcHeartBeatServiceImpl grpcHeartBeatService;
         private final String streamId;
 
         RequestObserver(
-            final GrpcHeartBeatServiceImpl grpcHeartBeatService,
+            final GRpcHeartBeatServiceImpl grpcHeartBeatService,
             final String streamId
         ) {
 

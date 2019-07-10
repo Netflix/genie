@@ -30,17 +30,12 @@ import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.ServerAckMessage;
 import com.netflix.genie.proto.ServerControlMessage;
 import com.netflix.genie.proto.ServerFileRequestMessage;
-import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.resources.agent.AgentFileResourceImpl;
-import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentFileStreamService;
 import com.netflix.genie.web.util.StreamBuffer;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.Nullable;
@@ -72,15 +67,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author mprimi
  * @since 4.0.0
  */
-@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
-@GrpcService(
-    value = FileStreamServiceGrpc.class,
-    interceptors = {
-        SimpleLoggingInterceptor.class,
-    }
-)
 @Slf4j
-class GRpcAgentFileStreamServiceImpl
+public class GRpcAgentFileStreamServiceImpl
     extends FileStreamServiceGrpc.FileStreamServiceImplBase
     implements AgentFileStreamService {
 
@@ -93,9 +81,15 @@ class GRpcAgentFileStreamServiceImpl
     private final JobDirectoryManifestProtoConverter converter;
     private final TaskScheduler taskScheduler;
 
-    GRpcAgentFileStreamServiceImpl(
+    /**
+     * Constructor.
+     *
+     * @param converter     The {@link JobDirectoryManifestProtoConverter} instance to use
+     * @param taskScheduler A {@link TaskScheduler} instance to use
+     */
+    public GRpcAgentFileStreamServiceImpl(
         final JobDirectoryManifestProtoConverter converter,
-        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler
+        final TaskScheduler taskScheduler
     ) {
         this.converter = converter;
         this.taskScheduler = taskScheduler;

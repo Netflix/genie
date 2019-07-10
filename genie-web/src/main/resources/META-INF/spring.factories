@@ -4,7 +4,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.configs.GenieAspectsAutoConfiguration,\
   com.netflix.genie.web.configs.GenieClusterLoadBalancerAutoConfiguration,\
   com.netflix.genie.web.configs.GenieEventBusAutoConfiguration,\
-  com.netflix.genie.web.configs.GenieGRpcServerAutoConfiguration,\
   com.netflix.genie.web.configs.GenieHealthAutoConfiguration,\
   com.netflix.genie.web.configs.GenieJobWorkflowAutoConfiguration,\
   com.netflix.genie.web.configs.GenieJpaAutoConfiguration,\
@@ -15,6 +14,8 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.configs.GenieTasksAutoConfiguration,\
   com.netflix.genie.web.configs.GenieValidationAutoConfiguration,\
   com.netflix.genie.web.configs.aws.GenieAwsApiAutoConfiguration,\
-  com.netflix.genie.web.configs.aws.GenieAwsS3AutoConfiguration
+  com.netflix.genie.web.configs.aws.GenieAwsS3AutoConfiguration,\
+  com.netflix.genie.web.configs.grpc.GenieGRpcServerAutoConfiguration,\
+  com.netflix.genie.web.configs.grpc.GenieGRpcServicesAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\
   com.netflix.genie.web.configs.processors.GenieDefaultPropertiesPostProcessor

@@ -39,10 +39,6 @@ import com.netflix.genie.proto.JobSpecificationError;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdError;
 import com.netflix.genie.proto.ReserveJobIdResponse;
-import com.netflix.genie.web.properties.GRpcServerProperties;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
@@ -53,10 +49,7 @@ import java.util.Map;
  * @author mprimi
  * @since 4.0.0
  */
-@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
-@Component
-@Lazy
-class JobServiceProtoErrorComposer {
+public class JobServiceProtoErrorComposer {
 
     private static final String NO_ERROR_MESSAGE_PROVIDED = "Unknown error";
 

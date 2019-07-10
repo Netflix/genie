@@ -22,12 +22,8 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.proto.PingRequest;
 import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.proto.PongResponse;
-import com.netflix.genie.web.properties.GRpcServerProperties;
-import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Map;
 
@@ -37,19 +33,17 @@ import java.util.Map;
  * @author mprimi
  * @since 4.0.0
  */
-@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
-@GrpcService(
-    value = PingServiceGrpc.class,
-    interceptors = {
-        SimpleLoggingInterceptor.class,
-    }
-)
 @Slf4j
 public class GRpcPingServiceImpl extends PingServiceGrpc.PingServiceImplBase {
 
     private final String hostName;
 
-    GRpcPingServiceImpl(final GenieHostInfo genieHostInfo) {
+    /**
+     * Constructor.
+     *
+     * @param genieHostInfo The information about the host that this Genie instance is running on
+     */
+    public GRpcPingServiceImpl(final GenieHostInfo genieHostInfo) {
         this.hostName = genieHostInfo.getHostname();
     }
 
