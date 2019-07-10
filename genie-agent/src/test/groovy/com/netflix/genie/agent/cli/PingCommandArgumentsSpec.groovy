@@ -41,7 +41,7 @@ class PingCommandArgumentsSpec extends Specification {
         jCommander.parse()
 
         then:
-        "genie.prod.netflix.net" == options.getServerHost()
+        "localhost" == options.getServerHost()
         7979 == options.getServerPort()
         30L == options.getRpcTimeout()
         null == options.getRequestId()

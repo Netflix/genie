@@ -40,7 +40,7 @@ class HeartBeatCommandArgumentsSpec extends Specification {
         jCommander.parse()
 
         then:
-        "genie.prod.netflix.net" == options.getServerArguments().getServerHost()
+        "localhost" == options.getServerArguments().getServerHost()
         7979 == options.getServerArguments().getServerPort()
         30L == options.getServerArguments().getRpcTimeout()
         0 == options.getRunDuration()
