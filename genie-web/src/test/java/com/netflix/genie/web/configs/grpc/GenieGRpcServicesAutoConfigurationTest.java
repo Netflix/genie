@@ -24,7 +24,6 @@ import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.PingServiceGrpc;
-import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcAgentFileStreamServiceImpl;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcHeartBeatServiceImpl;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcJobServiceImpl;
@@ -71,7 +70,6 @@ public class GenieGRpcServicesAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context.containsBean("heartBeatServiceTaskScheduler")).isFalse();
                     Assertions.assertThat(context).doesNotHaveBean(JobServiceProtoErrorComposer.class);
-                    Assertions.assertThat(context).doesNotHaveBean(SimpleLoggingInterceptor.class);
                     Assertions
                         .assertThat(context)
                         .doesNotHaveBean(FileStreamServiceGrpc.FileStreamServiceImplBase.class);
@@ -102,7 +100,6 @@ public class GenieGRpcServicesAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context.containsBean("heartBeatServiceTaskScheduler")).isTrue();
                     Assertions.assertThat(context).hasSingleBean(JobServiceProtoErrorComposer.class);
-                    Assertions.assertThat(context).hasSingleBean(SimpleLoggingInterceptor.class);
                     Assertions
                         .assertThat(context)
                         .hasSingleBean(FileStreamServiceGrpc.FileStreamServiceImplBase.class);
@@ -149,7 +146,6 @@ public class GenieGRpcServicesAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context.containsBean("heartBeatServiceTaskScheduler")).isTrue();
                     Assertions.assertThat(context).hasSingleBean(JobServiceProtoErrorComposer.class);
-                    Assertions.assertThat(context).hasSingleBean(SimpleLoggingInterceptor.class);
                     Assertions
                         .assertThat(context)
                         .hasSingleBean(FileStreamServiceGrpc.FileStreamServiceImplBase.class);
@@ -182,7 +178,6 @@ public class GenieGRpcServicesAutoConfigurationTest {
                         .doesNotHaveBean(GRpcPingServiceImpl.class);
 
                     Assertions.assertThat(context.containsBean("userJobServiceProtoErrorComposer")).isTrue();
-                    Assertions.assertThat(context.containsBean("userSimpleLoggingInterceptor")).isTrue();
                 }
             );
     }
@@ -232,11 +227,6 @@ public class GenieGRpcServicesAutoConfigurationTest {
         @Bean
         public JobServiceProtoErrorComposer userJobServiceProtoErrorComposer() {
             return Mockito.mock(JobServiceProtoErrorComposer.class);
-        }
-
-        @Bean
-        public SimpleLoggingInterceptor userSimpleLoggingInterceptor() {
-            return Mockito.mock(SimpleLoggingInterceptor.class);
         }
 
         @Bean

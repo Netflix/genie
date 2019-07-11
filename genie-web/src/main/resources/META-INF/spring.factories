@@ -15,6 +15,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.configs.GenieValidationAutoConfiguration,\
   com.netflix.genie.web.configs.aws.GenieAwsApiAutoConfiguration,\
   com.netflix.genie.web.configs.aws.GenieAwsS3AutoConfiguration,\
+  com.netflix.genie.web.configs.grpc.GenieGRpcInterceptorsAutoConfiguration,\
   com.netflix.genie.web.configs.grpc.GenieGRpcServerAutoConfiguration,\
   com.netflix.genie.web.configs.grpc.GenieGRpcServicesAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\
