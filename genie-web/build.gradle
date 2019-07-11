@@ -120,10 +120,7 @@ def genieVersion = project.version.toString()
 asciidoctor {
     dependsOn integrationTest
     inputs.dir snippetsDir
-    attributes        \
-                   "snippets" : snippetsDir ,
-    "revnumber" : genieVersion ,
-    "docinfo1" : ""
+    attributes.putAll(["snippets": snippetsDir, "revnumber": genieVersion, "docinfo1": ""])
 
     // See: https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/154
     def capturedOutput = []
