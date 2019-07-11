@@ -26,7 +26,6 @@ import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.web.properties.GRpcServerProperties;
-import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcAgentFileStreamServiceImpl;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcHeartBeatServiceImpl;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcJobKillServiceImpl;
@@ -42,7 +41,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -81,18 +79,6 @@ public class GenieGRpcServicesAutoConfiguration {
     @ConditionalOnMissingBean(JobServiceProtoErrorComposer.class)
     public JobServiceProtoErrorComposer jobServiceProtoErrorComposer() {
         return new JobServiceProtoErrorComposer();
-    }
-
-    /**
-     * An interceptor which writes requests to the logs.
-     *
-     * @return Instance of {@link SimpleLoggingInterceptor}
-     */
-    @Bean
-    @ConditionalOnMissingBean(SimpleLoggingInterceptor.class)
-    @Order // Defaults to lowest precedence when stored in a list
-    public SimpleLoggingInterceptor simpleLoggingInterceptor() {
-        return new SimpleLoggingInterceptor();
     }
 
     /**
