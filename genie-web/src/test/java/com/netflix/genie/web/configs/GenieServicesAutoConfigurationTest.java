@@ -47,7 +47,6 @@ import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -130,20 +129,6 @@ public class GenieServicesAutoConfigurationTest {
         );
     }
 
-    /**
-     * Can get the fallback V4 Kill service.
-     *
-     * @throws GenieException in case of error
-     */
-    @Test(expected = NotImplementedException.class)
-    public void canGetFallbackJobKillServiceV4Bean() throws GenieException {
-        final JobKillServiceV4 service = this.genieServicesAutoConfiguration.fallbackJobKillServiceV4();
-        Assert.assertNotNull(service);
-
-        service.killJob(UUID.randomUUID().toString(), "test");
-        Assert.fail("Expected exception");
-    }
-
 
     /**
      * Confirm we can get a GenieFileTransfer instance.
@@ -216,16 +201,4 @@ public class GenieServicesAutoConfigurationTest {
             )
         );
     }
-
-    /**
-     * Can get a bean for fallback Agent File Stream service.
-     */
-    @Test
-    public void canGetFallbackAgentFileStreamService() {
-        Assert.assertNotNull(
-            this.genieServicesAutoConfiguration.fallbackAgentFileStreamService()
-        );
-    }
-
-
 }

@@ -60,42 +60,11 @@ public class GenieGRpcServicesAutoConfigurationTest {
             .withUserConfiguration(RequiredBeans.class);
 
     /**
-     * No beans created.
-     */
-    @Test
-    public void configurationNotAppliedIfNotEnabled() {
-        this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=false")
-            .run(
-                context -> {
-                    Assertions.assertThat(context.containsBean("heartBeatServiceTaskScheduler")).isFalse();
-                    Assertions.assertThat(context).doesNotHaveBean(JobServiceProtoErrorComposer.class);
-                    Assertions
-                        .assertThat(context)
-                        .doesNotHaveBean(FileStreamServiceGrpc.FileStreamServiceImplBase.class);
-                    Assertions
-                        .assertThat(context)
-                        .doesNotHaveBean(HeartBeatServiceGrpc.HeartBeatServiceImplBase.class);
-                    Assertions
-                        .assertThat(context)
-                        .doesNotHaveBean(JobKillServiceGrpc.JobKillServiceImplBase.class);
-                    Assertions
-                        .assertThat(context)
-                        .doesNotHaveBean(JobServiceGrpc.JobServiceImplBase.class);
-                    Assertions
-                        .assertThat(context)
-                        .doesNotHaveBean(PingServiceGrpc.PingServiceImplBase.class);
-                }
-            );
-    }
-
-    /**
      * Default beans created.
      */
     @Test
     public void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
         this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=true")
             .run(
                 context -> {
                     Assertions.assertThat(context.containsBean("heartBeatServiceTaskScheduler")).isTrue();
@@ -140,7 +109,6 @@ public class GenieGRpcServicesAutoConfigurationTest {
     @Test
     public void expectedBeansExistWhenUserOverrides() {
         this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=true")
             .withUserConfiguration(UserConfig.class)
             .run(
                 context -> {

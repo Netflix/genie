@@ -59,11 +59,6 @@ attempt to assume this role on the host Genie is running on
 |file:///tmp/genie/cache
 |no
 
-|genie.grpc.server.enabled
-|Whether to start the gRPC server and services during server startup
-|true
-|no
-
 |genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds
 |How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
 whether the `maxSyncMessages` threshold has been reached or not

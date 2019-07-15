@@ -67,10 +67,6 @@ that isn't listed in this map the default credentials configured will be used
 no value is specified the bucket is assumed to be in the same region as the Genie process.
 |
 
-|genie.grpc.server.enabled
-|Whether to start the gRPC server and services during server startup
-|true
-
 |genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds
 |How many milliseconds to wait between checks whether some acknowledgement should be sent to the agent regardless of
 whether the `maxSyncMessages` threshold has been reached or not
