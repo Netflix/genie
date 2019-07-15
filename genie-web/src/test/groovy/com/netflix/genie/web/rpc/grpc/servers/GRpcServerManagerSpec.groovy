@@ -98,4 +98,23 @@ class GRpcServerManagerSpec extends Specification {
         }
         noExceptionThrown()
     }
+
+    def "can get port"() {
+        def port = 38_323
+        def server = Mock(Server) {
+            getPort() >> port
+        }
+
+        when:
+        def manager = new GRpcServerManager(server)
+
+        then:
+        1 * server.start()
+
+        when:
+        def runningPort = manager.getServerPort()
+
+        then:
+        runningPort == port
+    }
 }

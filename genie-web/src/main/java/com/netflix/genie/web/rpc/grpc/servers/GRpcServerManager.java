@@ -72,4 +72,16 @@ public class GRpcServerManager implements AutoCloseable {
             log.error("Unable to shutdown gRPC server due to being interrupted", ie);
         }
     }
+
+    /**
+     * Get the port the gRPC {@link Server} is listening on.
+     *
+     * @return The port or -1 if the server isn't currently listening on any port.
+     */
+    public int getServerPort() {
+        // Note: Since you can't construct one of these managers without it starting the server the
+        //       IllegalStateException defined in getPort() of the server shouldn't be possible here so it's not
+        //       documented as being thrown
+        return this.server.getPort();
+    }
 }
