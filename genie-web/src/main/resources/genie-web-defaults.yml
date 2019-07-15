@@ -106,7 +106,7 @@ genie:
 
 info:
   genie:
-    version: 1.2.3
+    version: @genie.version@
 
 management:
   endpoints:
