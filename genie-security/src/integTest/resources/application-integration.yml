@@ -34,8 +34,12 @@ genie:
       archives: /archive/location
       jobs: file:///tmp/genie/jobs/
 
+grpc:
+  server:
+    port: 0
+
 spring:
   autoconfigure:
     exclude:
-    - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 

@@ -43,22 +43,11 @@ public class GenieGRpcInterceptorsAutoConfigurationTest {
             );
 
     /**
-     * No beans created.
-     */
-    @Test
-    public void configurationNotAppliedIfNotEnabled() {
-        this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=false")
-            .run(context -> Assertions.assertThat(context).doesNotHaveBean(SimpleLoggingInterceptor.class));
-    }
-
-    /**
      * Default beans created.
      */
     @Test
     public void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
         this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=true")
             .run(context -> Assertions.assertThat(context).hasSingleBean(SimpleLoggingInterceptor.class));
     }
 
@@ -68,7 +57,6 @@ public class GenieGRpcInterceptorsAutoConfigurationTest {
     @Test
     public void expectedBeansExistWhenUserOverrides() {
         this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=true")
             .withUserConfiguration(UserConfig.class)
             .run(
                 context -> {

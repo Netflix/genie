@@ -17,10 +17,8 @@
  */
 package com.netflix.genie.web.configs.grpc;
 
-import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -32,7 +30,6 @@ import org.springframework.core.annotation.Order;
  * @since 4.0.0
  */
 @Configuration
-@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 public class GenieGRpcInterceptorsAutoConfiguration {
 
     /**

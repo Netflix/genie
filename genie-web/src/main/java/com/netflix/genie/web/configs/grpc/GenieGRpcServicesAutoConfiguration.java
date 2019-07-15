@@ -25,7 +25,6 @@ import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.PingServiceGrpc;
-import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcAgentFileStreamServiceImpl;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcHeartBeatServiceImpl;
 import com.netflix.genie.web.rpc.grpc.services.impl.v4.GRpcJobKillServiceImpl;
@@ -38,7 +37,6 @@ import com.netflix.genie.web.services.JobSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -51,7 +49,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  * @since 4.0.0
  */
 @Configuration
-@ConditionalOnProperty(value = GRpcServerProperties.ENABLED_PROPERTY, havingValue = "true")
 @Slf4j
 public class GenieGRpcServicesAutoConfiguration {
 

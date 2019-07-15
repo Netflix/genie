@@ -45,28 +45,11 @@ public class GenieGRpcServerAutoConfigurationTest {
             );
 
     /**
-     * No beans should be created.
-     */
-    @Test
-    public void configurationNotAppliedIfNotEnabled() {
-        this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=false")
-            .run(
-                context -> {
-                    Assertions.assertThat(context).doesNotHaveBean(GRpcServerProperties.class);
-                    Assertions.assertThat(context).doesNotHaveBean(Server.class);
-                    Assertions.assertThat(context).doesNotHaveBean(GRpcServerManager.class);
-                }
-            );
-    }
-
-    /**
      * Default beans should be created.
      */
     @Test
     public void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
         this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=true")
             .run(
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(GRpcServerProperties.class);
@@ -82,7 +65,6 @@ public class GenieGRpcServerAutoConfigurationTest {
     @Test
     public void expectedBeansExistWhenUserOverrides() {
         this.contextRunner
-            .withPropertyValues("genie.grpc.server.enabled=true")
             .withUserConfiguration(UserConfig.class)
             .run(
                 context -> {
