@@ -51,6 +51,7 @@ com.netflix.genie.ui.controllers
 com.netflix.genie.web.aspect
 com.netflix.genie.web.configs
 com.netflix.genie.web.configs.aws
+com.netflix.genie.web.configs.grpc
 com.netflix.genie.web.configs.processors
 com.netflix.genie.web.controllers
 com.netflix.genie.web.data.entities
@@ -73,6 +74,7 @@ com.netflix.genie.web.properties
 com.netflix.genie.web.resources.agent
 com.netflix.genie.web.resources.writers
 com.netflix.genie.web.rpc.grpc.interceptors
+com.netflix.genie.web.rpc.grpc.servers
 com.netflix.genie.web.rpc.grpc.services.impl.v4
 com.netflix.genie.web.services
 com.netflix.genie.web.services.impl
