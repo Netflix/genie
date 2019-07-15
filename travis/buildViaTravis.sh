@@ -5,7 +5,7 @@
 set -e
 
 GRADLE=./gradlew
-GRADLE_OPTIONS='--no-daemon --stacktrace'
+GRADLE_OPTIONS='--stacktrace'
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   echo -e "Build Pull Request #$TRAVIS_PULL_REQUEST => Branch [$TRAVIS_BRANCH]"
