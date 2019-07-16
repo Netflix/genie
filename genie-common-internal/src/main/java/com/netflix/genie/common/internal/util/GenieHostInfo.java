@@ -29,7 +29,7 @@ import lombok.ToString;
  */
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
-@ToString
+@ToString(doNotUseGetters = true)
 public class GenieHostInfo {
     private final String hostname;
 
