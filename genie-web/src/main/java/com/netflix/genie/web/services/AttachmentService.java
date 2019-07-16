@@ -21,10 +21,13 @@ import com.netflix.genie.common.exceptions.GenieException;
 import org.springframework.validation.annotation.Validated;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.Map;
 
 /**
- * APIs for dealing with attachments sent in with Genie jobs. Implementations will handle where to store them and
+ * APIs for dealing with attachments sent in with Genie requests. Implementations will handle where to store them and
  * how to retrieve them when requested.
  *
  * @author tgianos
@@ -40,7 +43,9 @@ public interface AttachmentService {
      * @param filename The name of the attachment
      * @param content  A stream to access the contents of the attachment
      * @throws GenieException For any error during the save process
+     * @deprecated Use {@link #saveAll(Map)} instead
      */
+    @Deprecated
     void save(String jobId, String filename, InputStream content) throws GenieException;
 
     /**
@@ -49,7 +54,9 @@ public interface AttachmentService {
      * @param jobId       The id of the job to get the attachments for.
      * @param destination The directory to copy the attachments into
      * @throws GenieException For any error during the copy process
+     * @deprecated Use {@link #copyAll(String, Path)} instead
      */
+    @Deprecated
     void copy(String jobId, File destination) throws GenieException;
 
     /**
@@ -57,6 +64,36 @@ public interface AttachmentService {
      *
      * @param jobId The id of the job to delete the attachments for
      * @throws GenieException For any error during the delete process
+     * @deprecated Use {@link #deleteAll(String)} instead
      */
+    @Deprecated
     void delete(String jobId) throws GenieException;
+
+    /**
+     * Save all attachments for a given request.
+     *
+     * @param attachments The map of filename to contents for all attachments. All input streams will be closed after
+     *                    this method returns
+     * @return A unique identifier that can be used to reference the attachments later
+     * @throws IOException If unable to save any of the attachments
+     */
+    String saveAll(Map<String, InputStream> attachments) throws IOException;
+
+    /**
+     * Copy all attachments associated with the given id into the provided {@literal destination}.
+     *
+     * @param id          The id that was returned from the original call to {@link #saveAll(Map)}
+     * @param destination The destination where the attachments should be copied. Must be a directory if it already
+     *                    exists. If it doesn't exist it will be created.
+     * @throws IOException If the copy fails for any reason
+     */
+    void copyAll(String id, Path destination) throws IOException;
+
+    /**
+     * Delete all the attachments that were associated with the given {@literal id}.
+     *
+     * @param id The id that was returned from the original call to {@link #saveAll(Map)}
+     * @throws IOException On error during deletion
+     */
+    void deleteAll(String id) throws IOException;
 }
