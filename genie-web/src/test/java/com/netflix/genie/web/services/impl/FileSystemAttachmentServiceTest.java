@@ -17,10 +17,12 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,7 +33,12 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -80,10 +87,9 @@ public class FileSystemAttachmentServiceTest {
      * Make sure it can't copy if the destination isn't a directory.
      *
      * @throws GenieException on error
-     * @throws IOException    on error
      */
     @Test(expected = GeniePreconditionException.class)
-    public void cantCopyIfDestinationIsntDirectory() throws GenieException, IOException {
+    public void cantCopyIfDestinationIsntDirectory() throws GenieException {
         final File destination = Mockito.mock(File.class);
         Mockito.when(destination.exists()).thenReturn(true);
         Mockito.when(destination.isDirectory()).thenReturn(false);
@@ -132,6 +138,55 @@ public class FileSystemAttachmentServiceTest {
         attachments.forEach(file -> Assert.assertFalse(file.exists()));
     }
 
+    /**
+     * Test that all exceptions can be saved at once.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void testAttachmentLifecycle() throws IOException {
+        final Path sourceDirectory = this.folder.newFolder().toPath();
+        final int numAttachments = 10;
+        final Set<Path> sourceAttachments = this.createAttachments(sourceDirectory, numAttachments);
+        final Map<String, InputStream> attachments = Maps.newHashMap();
+        for (final Path attachment : sourceAttachments) {
+            final Path filename = attachment.getFileName();
+            if (filename != null) {
+                attachments.put(filename.toString(), Files.newInputStream(attachment));
+            }
+        }
+        final String id = this.service.saveAll(attachments);
+        final Path expectedAttachmentDirectory = this.folder.getRoot().toPath().resolve(id);
+        Assert.assertTrue(Files.exists(expectedAttachmentDirectory));
+        Assert.assertThat(Files.list(expectedAttachmentDirectory).count(), Matchers.is((long) numAttachments));
+        for (final Path attachment : sourceAttachments) {
+            Assert.assertTrue(
+                FileUtils.contentEquals(
+                    attachment.toFile(),
+                    expectedAttachmentDirectory.resolve(attachment.getFileName()).toFile()
+                )
+            );
+        }
+
+        // Attachments saved successfully lets try to copy
+        final Path copyDirectory = this.folder.newFolder().toPath();
+        this.service.copyAll(id, copyDirectory);
+        Assert.assertTrue(Files.exists(copyDirectory));
+        Assert.assertThat(Files.list(copyDirectory).count(), Matchers.is((long) numAttachments));
+        for (final Path attachment : sourceAttachments) {
+            Assert.assertTrue(
+                FileUtils.contentEquals(
+                    attachment.toFile(),
+                    copyDirectory.resolve(attachment.getFileName()).toFile()
+                )
+            );
+        }
+
+        // Delete Them
+        this.service.deleteAll(id);
+        Assert.assertFalse(Files.exists(expectedAttachmentDirectory));
+    }
+
     private Set<File> saveAttachments(final String jobId) throws GenieException, IOException {
         final Set<File> attachments = Sets.newHashSet();
         for (int i = 0; i < 10; i++) {
@@ -162,5 +217,16 @@ public class FileSystemAttachmentServiceTest {
                 fis.close();
             }
         }
+    }
+
+    private Set<Path> createAttachments(final Path targetDirectory, final int numAttachments) throws IOException {
+        final Set<Path> attachments = Sets.newHashSet();
+        for (int i = 0; i < numAttachments; i++) {
+            final Path attachment = targetDirectory.resolve(UUID.randomUUID().toString());
+            Files.write(attachment, ("Select * FROM my_table where id = " + i + ";").getBytes(StandardCharsets.UTF_8));
+            attachments.add(attachment);
+        }
+
+        return attachments;
     }
 }

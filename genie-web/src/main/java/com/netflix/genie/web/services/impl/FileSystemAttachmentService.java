@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -30,6 +31,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Implementation of the AttachmentService interface which saves and retrieves attachments from the local filesystem.
@@ -40,7 +45,7 @@ import java.nio.file.Files;
 @Slf4j
 public class FileSystemAttachmentService implements AttachmentService {
 
-    private File attachmentDirectory;
+    private final Path attachmentDirectory;
 
     /**
      * Constructor.
@@ -48,7 +53,16 @@ public class FileSystemAttachmentService implements AttachmentService {
      * @param attachmentsDirectory The directory to use or null if want to default to system temp directory
      */
     public FileSystemAttachmentService(final String attachmentsDirectory) {
-        this.createAttachmentDirectory(attachmentsDirectory);
+        String attachmentsDirectoryPath = attachmentsDirectory;
+        if (!attachmentsDirectoryPath.endsWith(File.separator)) {
+            attachmentsDirectoryPath = attachmentsDirectory + File.separator;
+        }
+
+        try {
+            this.attachmentDirectory = Files.createDirectories(Paths.get(new URI(attachmentsDirectoryPath)));
+        } catch (final IOException | URISyntaxException e) {
+            throw new IllegalArgumentException("Unable to create attachment directory: " + attachmentsDirectoryPath, e);
+        }
     }
 
     /**
@@ -60,10 +74,8 @@ public class FileSystemAttachmentService implements AttachmentService {
         final String filename,
         final InputStream content
     ) throws GenieException {
-        final File attachment = new File(attachmentDirectory, jobId + "/" + filename);
         try {
-            FileUtils.copyInputStreamToFile(content, attachment);
-            log.info("Saved {} to {}", filename, attachment.getAbsolutePath());
+            this.writeAttachments(jobId, ImmutableMap.of(filename, content));
         } catch (final IOException ioe) {
             throw new GenieServerException("Failed to save attachment", ioe);
         }
@@ -77,13 +89,10 @@ public class FileSystemAttachmentService implements AttachmentService {
         if (destination.exists() && !destination.isDirectory()) {
             throw new GeniePreconditionException(destination + " is not a directory and it needs to be.");
         }
-        final File source = new File(attachmentDirectory, jobId);
-        if (source.exists() && source.isDirectory()) {
-            try {
-                FileUtils.copyDirectory(source, destination);
-            } catch (final IOException ioe) {
-                throw new GenieServerException("Failed to copy attachment directory", ioe);
-            }
+        try {
+            this.copyAll(jobId, destination.toPath());
+        } catch (final IOException ioe) {
+            throw new GenieServerException("Failed to copy attachment directory", ioe);
         }
     }
 
@@ -92,32 +101,56 @@ public class FileSystemAttachmentService implements AttachmentService {
      */
     @Override
     public void delete(final String jobId) throws GenieException {
-        final File jobDir = new File(attachmentDirectory, jobId);
-        if (jobDir.exists()) {
-            try {
-                FileUtils.deleteDirectory(jobDir);
-            } catch (final IOException ioe) {
-                throw new GenieServerException("Failed to delete directory " + jobId, ioe);
-            }
+        try {
+            this.deleteAll(jobId);
+        } catch (final IOException ioe) {
+            throw new GenieServerException("Failed to delete directory " + jobId, ioe);
         }
     }
 
-    private void createAttachmentDirectory(final String attachmentsDirectory) {
-        String attachmentsDirectoryPath = attachmentsDirectory;
-        if (!attachmentsDirectoryPath.endsWith(File.separator)) {
-            attachmentsDirectoryPath = attachmentsDirectory + File.separator;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String saveAll(final Map<String, InputStream> attachments) throws IOException {
+        final String requestId = UUID.randomUUID().toString();
+        this.writeAttachments(requestId, attachments);
+        return requestId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void copyAll(final String id, final Path destination) throws IOException {
+        Files.createDirectories(destination);
+        final Path attachmentDir = this.attachmentDirectory.resolve(id);
+        if (Files.exists(attachmentDir) && Files.isDirectory(attachmentDir)) {
+            // Lets use this cause I don't feel like writing a visitor
+            FileUtils.copyDirectory(attachmentDir.toFile(), destination.toFile());
         }
-        try {
-            final File dir = new File(new URI(attachmentsDirectoryPath));
-            if (!dir.exists()) {
-                Files.createDirectories(dir.toPath());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteAll(final String id) throws IOException {
+        final Path attachmentDir = this.attachmentDirectory.resolve(id);
+        FileUtils.deleteDirectory(attachmentDir.toFile());
+    }
+
+    private void writeAttachments(final String id, final Map<String, InputStream> attachments) throws IOException {
+        final Path requestDir = Files.createDirectories(this.attachmentDirectory.resolve(id));
+
+        for (final Map.Entry<String, InputStream> entry : attachments.entrySet()) {
+            // Sanitize the filename
+            final Path fileName = Paths.get(entry.getKey()).getFileName();
+            final Path file = requestDir.resolve(fileName);
+            try (InputStream contents = entry.getValue()) {
+                final long byteCount = Files.copy(contents, file);
+                log.debug("Wrote {} bytes for attachment {} to {}", byteCount, fileName, file);
             }
-            this.attachmentDirectory = dir;
-        } catch (IOException | URISyntaxException e) {
-            throw new IllegalArgumentException(
-                "Failed to create attachments directory " + attachmentsDirectoryPath,
-                e
-            );
         }
     }
 }
