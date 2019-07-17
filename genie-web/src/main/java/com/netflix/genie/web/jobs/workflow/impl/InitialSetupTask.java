@@ -27,7 +27,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.jobs.JobConstants;
-import com.netflix.genie.web.controllers.DtoConverters;
+import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;

@@ -25,7 +25,7 @@ import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
 import com.netflix.genie.common.internal.jobs.JobConstants;
-import com.netflix.genie.web.controllers.DtoConverters;
+import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.junit.Assert;

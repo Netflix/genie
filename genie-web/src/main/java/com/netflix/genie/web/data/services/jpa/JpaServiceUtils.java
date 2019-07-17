@@ -30,7 +30,7 @@ import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.web.controllers.DtoConverters;
+import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.BaseEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
