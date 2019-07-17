@@ -34,6 +34,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationResourceAssembler implements ResourceAssembler<Application, ApplicationResource> {
 
+    private static final String COMMANDS_LINK = "commands";
+
     /**
      * {@inheritDoc}
      */
@@ -56,7 +58,7 @@ public class ApplicationResourceAssembler implements ResourceAssembler<Applicati
                     ControllerLinkBuilder
                         .methodOn(ApplicationRestController.class)
                         .getCommandsForApplication(id, null)
-                ).withRel("commands")
+                ).withRel(COMMANDS_LINK)
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

@@ -34,6 +34,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobResourceAssembler implements ResourceAssembler<Job, JobResource> {
 
+    private static final String REQUEST_LINK = "request";
+    private static final String EXECUTION_LINK = "execution";
+    private static final String OUTPUT_LINK = "output";
+    private static final String STATUS_LINK = "status";
+    private static final String METADATA_LINK = "metadata";
+    private static final String CLUSTER_LINK = "cluster";
+    private static final String COMMAND_LINK = "command";
+    private static final String APPLICATIONS_LINK = "applications";
+
     /**
      * {@inheritDoc}
      */
@@ -69,13 +78,12 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
 //                ).withRel("output")
 //            );
 
-            final String output = "output";
             jobResource.add(
                 ControllerLinkBuilder
                     .linkTo(JobRestController.class)
                     .slash(id)
-                    .slash(output)
-                    .withRel(output)
+                    .slash(OUTPUT_LINK)
+                    .withRel(OUTPUT_LINK)
             );
 
             jobResource.add(
@@ -83,7 +91,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobRequest(id)
-                ).withRel("request")
+                ).withRel(REQUEST_LINK)
             );
 
             jobResource.add(
@@ -91,7 +99,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobExecution(id)
-                ).withRel("execution")
+                ).withRel(EXECUTION_LINK)
             );
 
             jobResource.add(
@@ -99,7 +107,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobMetadata(id)
-                ).withRel("metadata")
+                ).withRel(METADATA_LINK)
             );
 
             jobResource.add(
@@ -107,7 +115,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobStatus(id)
-                ).withRel("status")
+                ).withRel(STATUS_LINK)
             );
 
             jobResource.add(
@@ -115,7 +123,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobCluster(id)
-                ).withRel("cluster")
+                ).withRel(CLUSTER_LINK)
             );
 
             jobResource.add(
@@ -123,7 +131,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobCommand(id)
-                ).withRel("command")
+                ).withRel(COMMAND_LINK)
             );
 
             jobResource.add(
@@ -131,7 +139,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobApplications(id)
-                ).withRel("applications")
+                ).withRel(APPLICATIONS_LINK)
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

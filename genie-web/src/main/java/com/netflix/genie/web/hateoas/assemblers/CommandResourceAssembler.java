@@ -34,6 +34,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommandResourceAssembler implements ResourceAssembler<Command, CommandResource> {
 
+    private static final String APPLICATIONS_LINK = "applications";
+    private static final String CLUSTERS_LINK = "clusters";
+
     /**
      * {@inheritDoc}
      */
@@ -56,7 +59,7 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
                     ControllerLinkBuilder
                         .methodOn(CommandRestController.class)
                         .getApplicationsForCommand(id)
-                ).withRel("applications")
+                ).withRel(APPLICATIONS_LINK)
             );
 
             commandResource.add(
@@ -64,7 +67,7 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
                     ControllerLinkBuilder
                         .methodOn(CommandRestController.class)
                         .getClustersForCommand(id, null)
-                ).withRel("clusters")
+                ).withRel(CLUSTERS_LINK)
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception
