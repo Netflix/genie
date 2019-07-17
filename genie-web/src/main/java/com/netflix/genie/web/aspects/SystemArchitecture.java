@@ -30,10 +30,10 @@ import org.aspectj.lang.annotation.Pointcut;
 public class SystemArchitecture {
     /**
      * A join point is in the resource layer if the method is defined
-     * in a type in the com.netflix.genie.web.controllers package or any sub-package
+     * in a type in the com.netflix.genie.web.api.rest.v3.controllers package or any sub-package
      * under that.
      */
-    @Pointcut("within(com.netflix.genie.web.controllers..*)")
+    @Pointcut("within(com.netflix.genie.web.apis.rest.v3.controllers..*)")
     public void inResourceLayer() {
     }
 
@@ -60,7 +60,7 @@ public class SystemArchitecture {
      * This definition assumes that interfaces are placed in the
      * "resources" package, and that implementation types are in sub-packages.
      */
-    @Pointcut("execution(* com.netflix.genie.web.controllers.*.*(..))")
+    @Pointcut("execution(* com.netflix.genie.web.apis.rest.v3.controllers.*.*(..))")
     public void resourceOperation() {
     }
 

@@ -22,7 +22,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.web.controllers.DtoConverters;
+import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import com.netflix.genie.web.properties.ScriptLoadBalancerProperties;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;

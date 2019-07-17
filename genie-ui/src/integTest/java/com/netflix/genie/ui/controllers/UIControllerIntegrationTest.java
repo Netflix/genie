@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.ui.controllers;
 
-import com.netflix.genie.web.controllers.GenieExceptionMapper;
+import com.netflix.genie.web.apis.rest.v3.controllers.GenieExceptionMapper;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;

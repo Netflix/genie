@@ -76,7 +76,7 @@ public class GenieSwaggerAutoConfiguration {
                 )
             )
             .select()
-            .apis(RequestHandlerSelectors.basePackage("com.netflix.genie.web.controllers"))
+            .apis(RequestHandlerSelectors.basePackage("com.netflix.genie.web.apis.rest.v3.controllers"))
             .paths(PathSelectors.any())
             .build()
             .pathMapping("/")

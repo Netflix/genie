@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.ui.controllers;
 
-import com.netflix.genie.web.controllers.ControllerUtils;
+import com.netflix.genie.web.apis.rest.v3.controllers.ControllerUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -19,7 +19,7 @@ package com.netflix.genie.web.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.web.controllers.ClusterRestController;
+import com.netflix.genie.web.apis.rest.v3.controllers.ClusterRestController;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
