@@ -23,7 +23,6 @@ import com.netflix.genie.web.controllers.ClusterRestController;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.stereotype.Component;
 
 /**
  * Assembles Cluster resources out of clusters.
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@Component
 public class ClusterResourceAssembler implements ResourceAssembler<Cluster, ClusterResource> {
 
     private static final String COMMANDS_LINK = "commands";

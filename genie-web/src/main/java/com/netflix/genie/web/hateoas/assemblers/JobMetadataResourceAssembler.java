@@ -23,7 +23,6 @@ import com.netflix.genie.web.controllers.JobRestController;
 import com.netflix.genie.web.hateoas.resources.JobMetadataResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.stereotype.Component;
 
 /**
  * Assembles Job Request resources out of JobRequest DTOs.
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.3.5
  */
-@Component
 public class JobMetadataResourceAssembler implements ResourceAssembler<JobMetadata, JobMetadataResource> {
 
     private static final String JOB_LINK = "job";
