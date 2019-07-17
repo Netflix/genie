@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.aspect
+package com.netflix.genie.web.aspects
 
 import com.google.common.collect.Sets
 import com.netflix.genie.web.health.GenieCpuHealthIndicator

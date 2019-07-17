@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.aspect;
+package com.netflix.genie.web.aspects;
 
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -100,7 +100,7 @@ public class DataServiceRetryAspect implements Ordered {
      * @return return the data method response
      * @throws GenieException any exception thrown by the data service method
      */
-    @Around("com.netflix.genie.web.aspect.SystemArchitecture.dataOperation()")
+    @Around("com.netflix.genie.web.aspects.SystemArchitecture.dataOperation()")
     public Object profile(final ProceedingJoinPoint pjp) throws GenieException {
         try {
             return retryTemplate.execute(context -> pjp.proceed());

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
  */
 
 /**
- * Various Spring aspects for Genie web.
+ * Tests for this package.
  *
- * @author amajumdar
- * @since 3.0.0
+ * @author tgianos
+ * @since 4.0.0
  */
-package com.netflix.genie.web.aspect;
+@ParametersAreNonnullByDefault
+package com.netflix.genie.web.configs.aspects;
+
+import javax.annotation.ParametersAreNonnullByDefault;

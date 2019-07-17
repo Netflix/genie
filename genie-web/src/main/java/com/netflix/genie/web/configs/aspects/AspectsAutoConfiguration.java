@@ -15,11 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.configs;
+package com.netflix.genie.web.configs.aspects;
 
-import com.netflix.genie.web.aspect.DataServiceRetryAspect;
-import com.netflix.genie.web.aspect.HealthCheckMetricsAspect;
-import com.netflix.genie.web.aspect.SystemArchitecture;
+import com.netflix.genie.web.aspects.DataServiceRetryAspect;
+import com.netflix.genie.web.aspects.HealthCheckMetricsAspect;
+import com.netflix.genie.web.aspects.SystemArchitecture;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -41,7 +41,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
     }
 )
 @EnableAspectJAutoProxy
-public class GenieAspectsAutoConfiguration {
+public class AspectsAutoConfiguration {
 
     /**
      * An aspect for retrying data layer API calls.
