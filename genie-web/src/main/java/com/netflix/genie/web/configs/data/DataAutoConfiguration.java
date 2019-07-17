@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.configs;
+package com.netflix.genie.web.configs.data;
 
 import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
@@ -49,7 +49,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
- * Auto configuration of JPA related services and beans for Genie.
+ * Default auto configuration of data related services and beans for Genie.
  *
  * @author tgianos
  * @since 4.0.0
@@ -58,7 +58,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 // TODO: Create marker class for base classes scanning for compile time check
 @EnableJpaRepositories("com.netflix.genie.web.data.repositories")
 @EntityScan("com.netflix.genie.web.data.entities")
-public class GenieJpaAutoConfiguration {
+public class DataAutoConfiguration {
 
     /**
      * The JPA based implementation of the {@link ApplicationPersistenceService} interface.

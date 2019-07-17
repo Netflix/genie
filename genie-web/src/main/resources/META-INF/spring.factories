@@ -1,5 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.configs.aspects.AspectsAutoConfiguration,\
+  com.netflix.genie.web.configs.data.DataAutoConfiguration,\
   com.netflix.genie.web.configs.hateoas.HateoasAutoConfiguration,\
   com.netflix.genie.web.configs.GenieAgentFilterAutoConfiguration,\
   com.netflix.genie.web.configs.GenieApiAutoConfiguration,\
@@ -7,7 +8,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.configs.GenieEventBusAutoConfiguration,\
   com.netflix.genie.web.configs.GenieHealthAutoConfiguration,\
   com.netflix.genie.web.configs.GenieJobWorkflowAutoConfiguration,\
-  com.netflix.genie.web.configs.GenieJpaAutoConfiguration,\
   com.netflix.genie.web.configs.GenieLeadershipAutoConfiguration,\
   com.netflix.genie.web.configs.GenieMailAutoConfiguration,\
   com.netflix.genie.web.configs.GenieServicesAutoConfiguration,\
