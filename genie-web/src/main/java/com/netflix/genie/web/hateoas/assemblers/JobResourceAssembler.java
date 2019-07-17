@@ -23,7 +23,6 @@ import com.netflix.genie.web.controllers.JobRestController;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.stereotype.Component;
 
 /**
  * Assembles Job resources out of job DTOs.
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@Component
 public class JobResourceAssembler implements ResourceAssembler<Job, JobResource> {
 
     private static final String REQUEST_LINK = "request";

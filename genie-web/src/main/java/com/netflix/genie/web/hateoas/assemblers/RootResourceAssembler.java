@@ -28,7 +28,6 @@ import com.netflix.genie.web.hateoas.resources.RootResource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.stereotype.Component;
 
 /**
  * Assembles root resource from a JsonNode.
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@Component
 public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootResource> {
 
     private static final String APPLICATIONS_LINK = "applications";

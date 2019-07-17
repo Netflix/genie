@@ -23,7 +23,6 @@ import com.netflix.genie.web.controllers.ApplicationRestController;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.stereotype.Component;
 
 /**
  * Assembles Application resources out of applications.
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@Component
 public class ApplicationResourceAssembler implements ResourceAssembler<Application, ApplicationResource> {
 
     private static final String COMMANDS_LINK = "commands";
