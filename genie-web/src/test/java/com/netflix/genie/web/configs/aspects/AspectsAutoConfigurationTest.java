@@ -15,11 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.configs;
+package com.netflix.genie.web.configs.aspects;
 
-import com.netflix.genie.web.aspect.DataServiceRetryAspect;
-import com.netflix.genie.web.aspect.HealthCheckMetricsAspect;
-import com.netflix.genie.web.aspect.SystemArchitecture;
+import com.netflix.genie.web.aspects.DataServiceRetryAspect;
+import com.netflix.genie.web.aspects.HealthCheckMetricsAspect;
+import com.netflix.genie.web.aspects.SystemArchitecture;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -32,18 +32,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Tests for {@link GenieAspectsAutoConfiguration}.
+ * Tests for {@link AspectsAutoConfiguration}.
  *
  * @author tgianos
  * @since 4.0.0
  */
-public class GenieAspectsAutoConfigurationTest {
+public class AspectsAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
-                    GenieAspectsAutoConfiguration.class
+                    AspectsAutoConfiguration.class
                 )
             )
             .withUserConfiguration(UserConfig.class);

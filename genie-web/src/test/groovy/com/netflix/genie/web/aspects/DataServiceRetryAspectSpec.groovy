@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.aspect
+package com.netflix.genie.web.aspects
 
 import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.common.exceptions.GenieServerException
