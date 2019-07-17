@@ -19,11 +19,11 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.web.data.services.ClusterPersistenceService;
+import com.netflix.genie.web.data.services.FilePersistenceService;
+import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.TagPersistenceService;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
-import com.netflix.genie.web.services.ClusterPersistenceService;
-import com.netflix.genie.web.services.FilePersistenceService;
-import com.netflix.genie.web.services.JobPersistenceService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.genie.web.util.MetricsUtils;

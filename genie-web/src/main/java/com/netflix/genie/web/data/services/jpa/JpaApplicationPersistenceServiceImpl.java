@@ -45,7 +45,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.web.data.repositories.jpa.specifications.JpaCommandSpecs;
-import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;

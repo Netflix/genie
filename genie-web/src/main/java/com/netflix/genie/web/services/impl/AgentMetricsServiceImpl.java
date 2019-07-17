@@ -18,7 +18,7 @@
 package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.services.AgentMetricsService;
 import io.micrometer.core.instrument.MeterRegistry;
 

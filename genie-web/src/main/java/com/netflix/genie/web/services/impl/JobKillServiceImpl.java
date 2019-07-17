@@ -18,9 +18,9 @@
 package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
-import com.netflix.genie.web.services.JobPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;

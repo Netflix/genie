@@ -23,9 +23,9 @@ import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.util.GenieHostInfo
+import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.properties.ClusterCheckerProperties
-import com.netflix.genie.web.services.JobPersistenceService
-import com.netflix.genie.web.services.JobSearchService
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
 import com.netflix.genie.web.util.MetricsConstants
 import io.micrometer.core.instrument.MeterRegistry
@@ -100,7 +100,7 @@ class ClusterCheckerTaskSpec extends Specification {
         def restException = new RestClientException("blah")
         def outOfServiceHealthException = Mock(HttpStatusCodeException) {
             getStatusCode() >> HttpStatus.SERVICE_UNAVAILABLE
-            getResponseBodyAsString() >>  "{" +
+            getResponseBodyAsString() >> "{" +
                 "\"status\":\"OUT_OF_SERVICE\", " +
                 "\"details\": {" +
                 "  \"db\": { \"status\": \"OUT_OF_SERVICE\"}," +
@@ -119,7 +119,7 @@ class ClusterCheckerTaskSpec extends Specification {
 
         def outOfServiceButHealthyException = Mock(HttpStatusCodeException) {
             getStatusCode() >> HttpStatus.SERVICE_UNAVAILABLE
-            getResponseBodyAsString() >>  "{" +
+            getResponseBodyAsString() >> "{" +
                 "\"status\":\"OUT_OF_SERVICE\", " +
                 "\"details\": {" +
                 "  \"db\": { \"status\": \"UP\"}," +
@@ -223,7 +223,7 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.HEALTH_STATUS, "OUT_OF_SERVICE"
         ).count() == 0
 
-        1 * this.jobSearchService.getAllActiveJobsOnHost(host2) >> [ job1, job2 ]
+        1 * this.jobSearchService.getAllActiveJobsOnHost(host2) >> [job1, job2]
         1 * this.jobPersistenceService.setJobCompletionInformation(
             job1.getId().get(),
             JobExecution.LOST_EXIT_CODE,

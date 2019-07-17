@@ -18,8 +18,8 @@
 package com.netflix.genie.web.tasks.leader
 
 import com.netflix.genie.common.dto.UserResourcesSummary
+import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.properties.UserMetricsProperties
-import com.netflix.genie.web.services.JobSearchService
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
 import com.netflix.genie.web.util.MetricsConstants
 import io.micrometer.core.instrument.Gauge

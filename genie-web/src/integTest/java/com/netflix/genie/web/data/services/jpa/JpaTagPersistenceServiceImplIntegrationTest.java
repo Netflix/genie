@@ -24,7 +24,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
 import com.netflix.genie.web.data.entities.TagEntity;
-import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;

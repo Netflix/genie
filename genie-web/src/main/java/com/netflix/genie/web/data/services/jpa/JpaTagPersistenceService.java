@@ -18,7 +18,7 @@
 package com.netflix.genie.web.data.services.jpa;
 
 import com.netflix.genie.web.data.entities.TagEntity;
-import com.netflix.genie.web.services.TagPersistenceService;
+import com.netflix.genie.web.data.services.TagPersistenceService;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

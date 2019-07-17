@@ -26,8 +26,8 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
+import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.services.AgentFilterService
-import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
 import com.netflix.genie.web.util.InspectionReport
 import com.netflix.genie.web.util.InspectionReport.Decision

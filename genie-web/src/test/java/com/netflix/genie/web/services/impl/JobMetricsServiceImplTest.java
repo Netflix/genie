@@ -19,7 +19,7 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.web.services.JobSearchService;
+import com.netflix.genie.web.data.services.JobSearchService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;

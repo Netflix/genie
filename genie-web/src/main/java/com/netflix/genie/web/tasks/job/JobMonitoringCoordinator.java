@@ -25,12 +25,12 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.JobStartedEvent;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.impl.JobStateServiceImpl;
 import com.netflix.genie.web.util.ProcessChecker;
@@ -75,14 +75,14 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
     /**
      * Constructor.
      *
-     * @param genieHostInfo       Information about the host the Genie process is currently running on
-     * @param jobSearchService    The search service to use to find jobs
-     * @param genieEventBus       The Genie event bus to use for publishing events
-     * @param scheduler           The task scheduler to use to register scheduling of job checkers
-     * @param registry            The metrics registry
-     * @param jobsDir             The directory where job output is stored
-     * @param jobsProperties      The properties pertaining to jobs
-     * @param jobSubmitterService implementation of the job submitter service
+     * @param genieHostInfo         Information about the host the Genie process is currently running on
+     * @param jobSearchService      The search service to use to find jobs
+     * @param genieEventBus         The Genie event bus to use for publishing events
+     * @param scheduler             The task scheduler to use to register scheduling of job checkers
+     * @param registry              The metrics registry
+     * @param jobsDir               The directory where job output is stored
+     * @param jobsProperties        The properties pertaining to jobs
+     * @param jobSubmitterService   implementation of the job submitter service
      * @param processCheckerFactory The factory of process checkers
      * @throws IOException on error with the filesystem
      */

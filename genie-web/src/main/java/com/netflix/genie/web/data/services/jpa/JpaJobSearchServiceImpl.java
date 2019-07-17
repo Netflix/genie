@@ -51,7 +51,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.repositories.jpa.specifications.JpaJobSpecs;
-import com.netflix.genie.web.services.JobSearchService;
+import com.netflix.genie.web.data.services.JobSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

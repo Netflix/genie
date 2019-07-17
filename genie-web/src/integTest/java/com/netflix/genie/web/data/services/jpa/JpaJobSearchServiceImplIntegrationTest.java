@@ -30,7 +30,7 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
-import com.netflix.genie.web.services.JobSearchService;
+import com.netflix.genie.web.data.services.JobSearchService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;

@@ -28,11 +28,11 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.services.JobArchiveService
+import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.events.JobFinishedEvent
 import com.netflix.genie.web.events.JobFinishedReason
 import com.netflix.genie.web.properties.JobsProperties
-import com.netflix.genie.web.services.JobPersistenceService
-import com.netflix.genie.web.services.JobSearchService
 import com.netflix.genie.web.services.MailService
 import com.netflix.genie.web.util.MetricsConstants
 import io.micrometer.core.instrument.Counter

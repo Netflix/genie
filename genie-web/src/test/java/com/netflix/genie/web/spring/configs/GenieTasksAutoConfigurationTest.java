@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.spring.configs;
 
+import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
-import com.netflix.genie.web.services.JobPersistenceService;
-import com.netflix.genie.web.services.JobSearchService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.Assert;
 import org.junit.Test;

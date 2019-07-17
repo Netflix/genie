@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services;
+package com.netflix.genie.web.data.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.ApplicationStatus;

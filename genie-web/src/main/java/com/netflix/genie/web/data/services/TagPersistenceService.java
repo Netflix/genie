@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services;
+package com.netflix.genie.web.data.services;
 
 import org.springframework.validation.annotation.Validated;
 

@@ -18,7 +18,7 @@
 package com.netflix.genie.web.data.services.jpa;
 
 import com.netflix.genie.web.data.entities.FileEntity;
-import com.netflix.genie.web.services.FilePersistenceService;
+import com.netflix.genie.web.data.services.FilePersistenceService;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
