@@ -34,6 +34,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest, JobRequestResource> {
 
+    private static final String JOB_LINK = "job";
+    private static final String EXECUTION_LINK = "execution";
+    private static final String OUTPUT_LINK = "output";
+    private static final String STATUS_LINK = "status";
+    private static final String METADATA_LINK = "metadata";
+
     /**
      * {@inheritDoc}
      */
@@ -56,7 +62,7 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJob(id)
-                ).withRel("job")
+                ).withRel(JOB_LINK)
             );
 
             jobRequestResource.add(
@@ -64,11 +70,11 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobExecution(id)
-                ).withRel("execution")
+                ).withRel(EXECUTION_LINK)
             );
 
             // TODO: https://github.com/spring-projects/spring-hateoas/issues/186 should be fixed in .20 currently .19
-//            jobResource.add(
+//            jobRequestResource.add(
 //                ControllerLinkBuilder.linkTo(
 //                    JobRestController.class,
 //                    JobRestController.class.getMethod(
@@ -78,20 +84,19 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
 //                        HttpServletRequest.class,
 //                        HttpServletResponse.class
 //                    ),
-//                    job.getId(),
+//                    id,
 //                    null,
 //                    null,
 //                    null
 //                ).withRel("output")
 //            );
 
-            final String output = "output";
             jobRequestResource.add(
                 ControllerLinkBuilder
                     .linkTo(JobRestController.class)
                     .slash(id)
-                    .slash(output)
-                    .withRel(output)
+                    .slash(OUTPUT_LINK)
+                    .withRel(OUTPUT_LINK)
             );
 
             jobRequestResource.add(
@@ -99,7 +104,7 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobStatus(id)
-                ).withRel("status")
+                ).withRel(STATUS_LINK)
             );
 
             jobRequestResource.add(
@@ -107,7 +112,7 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobMetadata(id)
-                ).withRel("metadata")
+                ).withRel(METADATA_LINK)
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

@@ -34,6 +34,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobMetadataResourceAssembler implements ResourceAssembler<JobMetadata, JobMetadataResource> {
 
+    private static final String JOB_LINK = "job";
+    private static final String REQUEST_LINK = "request";
+    private static final String OUTPUT_LINK = "output";
+    private static final String STATUS_LINK = "status";
+    private static final String EXECUTION_LINK = "execution";
+
     /**
      * {@inheritDoc}
      */
@@ -56,7 +62,7 @@ public class JobMetadataResourceAssembler implements ResourceAssembler<JobMetada
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJob(id)
-                ).withRel("job")
+                ).withRel(JOB_LINK)
             );
 
             jobMetadataResource.add(
@@ -64,16 +70,15 @@ public class JobMetadataResourceAssembler implements ResourceAssembler<JobMetada
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobRequest(id)
-                ).withRel("request")
+                ).withRel(REQUEST_LINK)
             );
 
-            final String output = "output";
             jobMetadataResource.add(
                 ControllerLinkBuilder
                     .linkTo(JobRestController.class)
                     .slash(id)
-                    .slash(output)
-                    .withRel(output)
+                    .slash(OUTPUT_LINK)
+                    .withRel(OUTPUT_LINK)
             );
 
             jobMetadataResource.add(
@@ -81,7 +86,7 @@ public class JobMetadataResourceAssembler implements ResourceAssembler<JobMetada
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobStatus(id)
-                ).withRel("status")
+                ).withRel(STATUS_LINK)
             );
 
             jobMetadataResource.add(
@@ -89,7 +94,7 @@ public class JobMetadataResourceAssembler implements ResourceAssembler<JobMetada
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobExecution(id)
-                ).withRel("execution")
+                ).withRel(EXECUTION_LINK)
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception

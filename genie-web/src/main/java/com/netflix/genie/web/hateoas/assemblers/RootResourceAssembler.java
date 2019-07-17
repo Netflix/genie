@@ -39,6 +39,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootResource> {
 
+    private static final String APPLICATIONS_LINK = "applications";
+    private static final String COMMANDS_LINK = "commands";
+    private static final String CLUSTERS_LINK = "clusters";
+    private static final String JOBS_LINK = "jobs";
+
     /**
      * {@inheritDoc}
      */
@@ -61,7 +66,7 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
                     ControllerLinkBuilder
                         .methodOn(ApplicationRestController.class)
                         .createApplication(null)
-                ).withRel("applications")
+                ).withRel(APPLICATIONS_LINK)
             );
 
             rootResource.add(
@@ -69,7 +74,7 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
                     ControllerLinkBuilder
                         .methodOn(CommandRestController.class)
                         .createCommand(null)
-                ).withRel("commands")
+                ).withRel(COMMANDS_LINK)
             );
 
             rootResource.add(
@@ -77,7 +82,7 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
                     ControllerLinkBuilder
                         .methodOn(ClusterRestController.class)
                         .createCluster(null)
-                ).withRel("clusters")
+                ).withRel(CLUSTERS_LINK)
             );
 
             rootResource.add(
@@ -85,7 +90,7 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .submitJob(null, null, null, null)
-                ).withRel("jobs")
+                ).withRel(JOBS_LINK)
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception
