@@ -15,11 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.hateoas.assemblers;
+package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.netflix.genie.web.hateoas.resources.RootResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.resources.RootResource;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;

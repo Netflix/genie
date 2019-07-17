@@ -18,7 +18,7 @@
 package com.netflix.genie.web.spring.configs.grpc;
 
 import com.netflix.genie.web.properties.GRpcServerProperties;
-import com.netflix.genie.web.rpc.grpc.servers.GRpcServerManager;
+import com.netflix.genie.web.agent.apis.rpc.servers.GRpcServerManager;
 import io.grpc.Server;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

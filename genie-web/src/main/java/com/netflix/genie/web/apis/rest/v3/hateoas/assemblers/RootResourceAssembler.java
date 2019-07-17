@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.hateoas.assemblers;
+package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -24,7 +24,7 @@ import com.netflix.genie.web.apis.rest.v3.controllers.ClusterRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.CommandRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.RootRestController;
-import com.netflix.genie.web.hateoas.resources.RootResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.resources.RootResource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;

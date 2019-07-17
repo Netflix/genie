@@ -18,6 +18,7 @@
 
 package com.netflix.genie.web.properties;
 
+import com.netflix.genie.web.agent.services.AgentFilterService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -27,7 +28,7 @@ import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Properties for the {@link com.netflix.genie.web.services.AgentFilterService}.
+ * Properties for the {@link AgentFilterService}.
  *
  * @author mprimi
  * @since 4.0.0
@@ -42,7 +43,7 @@ public class AgentFilterProperties implements EnvironmentAware {
     static final String PROPERTY_PREFIX = "genie.agent.filter";
 
     /**
-     * Property that enables the default implementation of {@link com.netflix.genie.web.services.AgentFilterService}.
+     * Property that enables the default implementation of {@link AgentFilterService}.
      */
     public static final String VERSION_FILTER_ENABLED_PROPERTY = PROPERTY_PREFIX + ".enabled";
     private static final String MINIMUM_VERSION_PROPERTY = PROPERTY_PREFIX + ".version.minimum";

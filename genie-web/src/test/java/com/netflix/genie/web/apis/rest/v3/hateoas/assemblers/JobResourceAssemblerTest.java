@@ -15,10 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.hateoas.assemblers;
+package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.web.hateoas.resources.JobResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobResource;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;

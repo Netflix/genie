@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.health;
 
-import com.netflix.genie.web.services.AgentMetricsService;
+import com.netflix.genie.web.agent.services.AgentMetricsService;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 

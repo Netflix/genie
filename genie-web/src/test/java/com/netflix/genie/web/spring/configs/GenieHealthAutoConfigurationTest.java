@@ -20,7 +20,7 @@ package com.netflix.genie.web.spring.configs;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
 import com.netflix.genie.web.health.GenieMemoryHealthIndicator;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.AgentMetricsService;
+import com.netflix.genie.web.agent.services.AgentMetricsService;
 import com.netflix.genie.web.services.JobMetricsService;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

@@ -22,4 +22,4 @@
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.hateoas.resources;
+package com.netflix.genie.web.apis.rest.v3.hateoas.resources;

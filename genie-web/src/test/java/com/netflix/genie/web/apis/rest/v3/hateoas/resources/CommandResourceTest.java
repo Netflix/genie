@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.hateoas.resources;
+package com.netflix.genie.web.apis.rest.v3.hateoas.resources;
 
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;

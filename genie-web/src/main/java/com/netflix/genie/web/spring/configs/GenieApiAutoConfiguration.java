@@ -18,14 +18,14 @@
 package com.netflix.genie.web.spring.configs;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
+import com.netflix.genie.web.agent.resources.AgentFileProtocolResolverRegistrar;
+import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.RetryProperties;
-import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver;
-import com.netflix.genie.web.resources.agent.AgentFileProtocolResolverRegistrar;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
-import com.netflix.genie.web.services.AgentFileStreamService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

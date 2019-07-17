@@ -27,11 +27,11 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.hateoas.resources.ClusterResource;
-import com.netflix.genie.web.hateoas.resources.CommandResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -80,8 +80,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/v3/clusters")
 @Slf4j
-public class
-ClusterRestController {
+public class ClusterRestController {
 
     private final ClusterPersistenceService clusterPersistenceService;
     private final ClusterResourceAssembler clusterResourceAssembler;

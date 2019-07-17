@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.hateoas.resources;
+package com.netflix.genie.web.apis.rest.v3.hateoas.resources;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
