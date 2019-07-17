@@ -17,15 +17,15 @@
  */
 package com.netflix.genie.web.spring.configs.hateoas;
 
-import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.JobExecutionResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.JobMetadataResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.JobRequestResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
-import com.netflix.genie.web.hateoas.assemblers.RootResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;

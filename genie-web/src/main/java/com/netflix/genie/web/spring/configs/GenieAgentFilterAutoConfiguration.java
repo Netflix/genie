@@ -17,13 +17,14 @@
  */
 package com.netflix.genie.web.spring.configs;
 
+import com.netflix.genie.web.agent.services.AgentFilterService;
+import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
+import com.netflix.genie.web.agent.utils.AgentMetadataInspector;
+import com.netflix.genie.web.agent.utils.BlacklistedVersionAgentMetadataInspector;
+import com.netflix.genie.web.agent.utils.MinimumVersionAgentMetadataInspector;
+import com.netflix.genie.web.agent.utils.WhitelistedVersionAgentMetadataInspector;
 import com.netflix.genie.web.properties.AgentFilterProperties;
-import com.netflix.genie.web.services.AgentFilterService;
-import com.netflix.genie.web.services.impl.AgentFilterServiceImpl;
-import com.netflix.genie.web.util.AgentMetadataInspector;
-import com.netflix.genie.web.util.BlacklistedVersionAgentMetadataInspector;
-import com.netflix.genie.web.util.MinimumVersionAgentMetadataInspector;
-import com.netflix.genie.web.util.WhitelistedVersionAgentMetadataInspector;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -61,9 +62,8 @@ public class GenieAgentFilterAutoConfiguration {
      * @return An {@link AgentFilterService} instance.
      */
     @Bean
-    public AgentFilterService agentFilterService(
-        final List<AgentMetadataInspector> agentMetadataInspectorsList
-    ) {
+    @ConditionalOnMissingBean(AgentFilterService.class)
+    public AgentFilterServiceImpl agentFilterService(final List<AgentMetadataInspector> agentMetadataInspectorsList) {
         return new AgentFilterServiceImpl(agentMetadataInspectorsList);
     }
 
@@ -71,10 +71,11 @@ public class GenieAgentFilterAutoConfiguration {
      * A {@link AgentMetadataInspector} that only accepts agents whose version matches a given regex.
      *
      * @param agentFilterProperties the agent filter properties
-     * @return a {@link AgentMetadataInspector}
+     * @return a {@link WhitelistedVersionAgentMetadataInspector} instance
      */
     @Bean
-    public AgentMetadataInspector whitelistedVersionAgentMetadataInspector(
+    @ConditionalOnMissingBean(WhitelistedVersionAgentMetadataInspector.class)
+    public WhitelistedVersionAgentMetadataInspector whitelistedVersionAgentMetadataInspector(
         final AgentFilterProperties agentFilterProperties
     ) {
         return new WhitelistedVersionAgentMetadataInspector(
@@ -86,15 +87,14 @@ public class GenieAgentFilterAutoConfiguration {
      * A {@link AgentMetadataInspector} that rejects agents whose version matches a given regex.
      *
      * @param agentFilterProperties the agent filter properties
-     * @return a {@link AgentMetadataInspector}
+     * @return a {@link BlacklistedVersionAgentMetadataInspector}
      */
     @Bean
-    public AgentMetadataInspector blacklistedVersionAgentMetadataInspector(
+    @ConditionalOnMissingBean(BlacklistedVersionAgentMetadataInspector.class)
+    public BlacklistedVersionAgentMetadataInspector blacklistedVersionAgentMetadataInspector(
         final AgentFilterProperties agentFilterProperties
     ) {
-        return new BlacklistedVersionAgentMetadataInspector(
-            agentFilterProperties
-        );
+        return new BlacklistedVersionAgentMetadataInspector(agentFilterProperties);
     }
 
     /**
@@ -104,12 +104,11 @@ public class GenieAgentFilterAutoConfiguration {
      * @return a {@link AgentMetadataInspector}
      */
     @Bean
-    public AgentMetadataInspector minimumVersionAgentMetadataInspector(
+    @ConditionalOnMissingBean(MinimumVersionAgentMetadataInspector.class)
+    public MinimumVersionAgentMetadataInspector minimumVersionAgentMetadataInspector(
         final AgentFilterProperties agentFilterProperties
     ) {
-        return new MinimumVersionAgentMetadataInspector(
-            agentFilterProperties
-        );
+        return new MinimumVersionAgentMetadataInspector(agentFilterProperties);
     }
 
 }

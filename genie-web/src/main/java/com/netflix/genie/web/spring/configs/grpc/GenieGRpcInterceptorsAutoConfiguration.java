@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.spring.configs.grpc;
 
-import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
+import com.netflix.genie.web.agent.apis.rpc.v4.interceptors.SimpleLoggingInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

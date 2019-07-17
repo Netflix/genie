@@ -22,9 +22,9 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService
+import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
+import com.netflix.genie.web.agent.services.AgentFileStreamService
 import com.netflix.genie.web.data.services.JobPersistenceService
-import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver
-import com.netflix.genie.web.services.AgentFileStreamService
 import com.netflix.genie.web.services.JobDirectoryServerService
 import com.netflix.genie.web.services.JobFileService
 import io.micrometer.core.instrument.MeterRegistry

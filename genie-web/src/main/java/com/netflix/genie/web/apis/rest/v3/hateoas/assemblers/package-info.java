@@ -21,4 +21,4 @@
  *
  * @author tgianos
  */
-package com.netflix.genie.web.hateoas.assemblers;
+package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;

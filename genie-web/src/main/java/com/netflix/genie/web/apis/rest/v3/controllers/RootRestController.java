@@ -19,8 +19,8 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.netflix.genie.web.hateoas.assemblers.RootResourceAssembler;
-import com.netflix.genie.web.hateoas.resources.RootResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.resources.RootResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;

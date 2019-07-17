@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.spring.configs;
 
-import com.netflix.genie.web.services.AgentFilterService;
-import com.netflix.genie.web.util.AgentMetadataInspector;
-import com.netflix.genie.web.util.BlacklistedVersionAgentMetadataInspector;
-import com.netflix.genie.web.util.MinimumVersionAgentMetadataInspector;
-import com.netflix.genie.web.util.WhitelistedVersionAgentMetadataInspector;
+import com.netflix.genie.web.agent.services.AgentFilterService;
+import com.netflix.genie.web.agent.utils.AgentMetadataInspector;
+import com.netflix.genie.web.agent.utils.BlacklistedVersionAgentMetadataInspector;
+import com.netflix.genie.web.agent.utils.MinimumVersionAgentMetadataInspector;
+import com.netflix.genie.web.agent.utils.WhitelistedVersionAgentMetadataInspector;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;

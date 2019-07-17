@@ -15,12 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.hateoas.assemblers;
+package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
-import com.netflix.genie.web.hateoas.resources.JobRequestResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobRequestResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 

@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.spring.configs;
 
+import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
+import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.resources.agent.AgentFileProtocolResolver;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
-import com.netflix.genie.web.services.AgentFileStreamService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
