@@ -18,6 +18,11 @@
 package com.netflix.genie.web.spring.configs;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.data.services.ClusterPersistenceService;
+import com.netflix.genie.web.data.services.FilePersistenceService;
+import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.TagPersistenceService;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
@@ -26,11 +31,6 @@ import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.TasksExecutorPoolProperties;
 import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
-import com.netflix.genie.web.services.ClusterPersistenceService;
-import com.netflix.genie.web.services.FilePersistenceService;
-import com.netflix.genie.web.services.JobPersistenceService;
-import com.netflix.genie.web.services.JobSearchService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;

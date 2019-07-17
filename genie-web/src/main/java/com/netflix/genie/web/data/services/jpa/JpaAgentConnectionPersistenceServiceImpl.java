@@ -20,7 +20,7 @@ package com.netflix.genie.web.data.services.jpa;
 
 import com.netflix.genie.web.data.entities.AgentConnectionEntity;
 import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
-import com.netflix.genie.web.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 

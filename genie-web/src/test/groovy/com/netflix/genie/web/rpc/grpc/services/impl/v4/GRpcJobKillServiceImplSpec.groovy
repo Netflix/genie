@@ -21,7 +21,7 @@ import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
-import com.netflix.genie.web.services.JobSearchService
+import com.netflix.genie.web.data.services.JobSearchService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
 

@@ -24,9 +24,9 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
-import com.netflix.genie.web.services.JobPersistenceService;
-import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -199,10 +199,10 @@ public class ClusterCheckerTask extends LeadershipTask {
         // are UP.
         String responseContent;
         try {
-             responseContent = this.restTemplate.getForObject(
-                 this.scheme + host + this.healthEndpoint,
-                 String.class
-             );
+            responseContent = this.restTemplate.getForObject(
+                this.scheme + host + this.healthEndpoint,
+                String.class
+            );
             log.debug("Healtcheck retrieved successfully from: {}", host);
         } catch (final HttpStatusCodeException e) {
             // Healthcheck returning status != 2xx should still contain a payload with health details.

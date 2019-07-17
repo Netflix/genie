@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services;
+package com.netflix.genie.web.data.services;
 
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -207,6 +207,7 @@ public interface JobSearchService {
 
     /**
      * Get the IDs of all agent jobs that are active but currently not connected to any node.
+     *
      * @return a set of job ids
      */
     Set<String> getActiveDisconnectedAgentJobs();

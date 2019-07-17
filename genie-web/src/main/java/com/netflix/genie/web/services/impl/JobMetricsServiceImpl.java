@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.services.JobMetricsService;
-import com.netflix.genie.web.services.JobSearchService;
 
 import javax.validation.constraints.NotNull;
 

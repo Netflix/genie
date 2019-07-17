@@ -18,7 +18,7 @@
 package com.netflix.genie.web.data.services.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
-import com.netflix.genie.web.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hamcrest.Matchers;
 import org.junit.Assert;

@@ -23,8 +23,8 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
+import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.services.JobKillServiceV4;
-import com.netflix.genie.web.services.JobSearchService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 

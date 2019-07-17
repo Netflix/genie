@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services;
+package com.netflix.genie.web.data.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
