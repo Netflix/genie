@@ -30,7 +30,7 @@ import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.services.JobSpecificationService;
-import com.netflix.genie.web.agent.utils.InspectionReport;
+import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
