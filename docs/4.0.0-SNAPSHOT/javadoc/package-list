@@ -64,6 +64,7 @@ com.netflix.genie.web.data.repositories.jpa.specifications
 com.netflix.genie.web.data.services.jpa
 com.netflix.genie.web.data.utils
 com.netflix.genie.web.events
+com.netflix.genie.web.exceptions.checked
 com.netflix.genie.web.hateoas.assemblers
 com.netflix.genie.web.hateoas.resources
 com.netflix.genie.web.health
