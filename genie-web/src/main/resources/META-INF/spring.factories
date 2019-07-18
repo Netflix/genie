@@ -1,23 +1,23 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.netflix.genie.web.spring.configs.aspects.AspectsAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.data.DataAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.hateoas.HateoasAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieAgentFilterAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieApiAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieClusterLoadBalancerAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieEventBusAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieHealthAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieJobWorkflowAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieLeadershipAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieMailAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieServicesAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieSwaggerAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieTasksAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.GenieValidationAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.aws.GenieAwsApiAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.aws.GenieAwsS3AutoConfiguration,\
-  com.netflix.genie.web.spring.configs.grpc.GenieGRpcInterceptorsAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.grpc.GenieGRpcServerAutoConfiguration,\
-  com.netflix.genie.web.spring.configs.grpc.GenieGRpcServicesAutoConfiguration
+  com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers.AgentRpcServersAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.AgentRpcEndpointsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.interceptors.AgentRpcInterceptorsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.agent.inspectors.AgentInspectorsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.agent.resources.AgentResourcesAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.agent.services.AgentServicesAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.apis.ApisAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas.HateoasAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.aspects.AspectsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.events.EventsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.health.HealthAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.jobs.JobsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.services.ServicesAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.tasks.leader.LeaderAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.tasks.node.NodeAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.MailAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.SwaggerAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\
   com.netflix.genie.web.spring.processors.GenieDefaultPropertiesPostProcessor

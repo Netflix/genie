@@ -15,30 +15,23 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.agent.services;
+package com.netflix.genie.web.agent.inspectors;
 
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
-import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 
 /**
- * Service to block agent/clients that the server wants to refuse service to.
- * For example, blacklist clients running a deprecated or incompatible versions.
- *
- * @author mprimi
- * @since 4.0.0
+ * Component that inspects an Agent client metadata and makes decision on whether it is allowed to proceed.
  */
 @Validated
-public interface AgentFilterService {
-
+public interface AgentMetadataInspector {
     /**
-     * Inspect the Agent metadata and decide whether to allow this client to proceed.
+     * Perform inspection of an Agent client metadata.
      *
      * @param agentClientMetadata the agent client metadata
-     * @return an inspection report
+     * @return the inspection outcome
      */
-    InspectionReport inspectAgentMetadata(@Valid AgentClientMetadata agentClientMetadata);
-
+    InspectionReport inspect(@Valid AgentClientMetadata agentClientMetadata);
 }

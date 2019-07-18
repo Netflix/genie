@@ -18,8 +18,8 @@
 package com.netflix.genie.web.agent.services.impl
 
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
-import com.netflix.genie.web.agent.utils.AgentMetadataInspector
-import com.netflix.genie.web.agent.utils.InspectionReport
+import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector
+import com.netflix.genie.web.agent.inspectors.InspectionReport
 import spock.lang.Specification
 
 class AgentFilterServiceImplSpec extends Specification {

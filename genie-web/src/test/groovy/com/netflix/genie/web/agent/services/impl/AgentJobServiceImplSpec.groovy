@@ -26,11 +26,10 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
+import com.netflix.genie.web.agent.inspectors.InspectionReport
 import com.netflix.genie.web.agent.services.AgentFilterService
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
-import com.netflix.genie.web.agent.utils.InspectionReport
-import com.netflix.genie.web.agent.utils.InspectionReport.Decision
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.Counter
@@ -74,7 +73,7 @@ class AgentJobServiceImplSpec extends Specification {
         def agentClientMetadata = Mock(AgentClientMetadata)
         def inspectionReport = Mock(InspectionReport)
         Set<Tag> expectedTags = Sets.newHashSet(
-            Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, Decision.ACCEPT.name()),
+            Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, InspectionReport.Decision.ACCEPT.name()),
             Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
             Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
             MetricsUtils.SUCCESS_STATUS_TAG
@@ -87,7 +86,7 @@ class AgentJobServiceImplSpec extends Specification {
         1 * agentClientMetadata.getVersion() >> Optional.of(version)
         1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
-        2 * inspectionReport.getDecision() >> Decision.ACCEPT
+        2 * inspectionReport.getDecision() >> InspectionReport.Decision.ACCEPT
         0 * inspectionReport.getMessage()
         1 * meterRegistry.counter("genie.services.agentJob.handshake.counter", _ as Set<Tag>) >> {
             args ->
@@ -102,7 +101,7 @@ class AgentJobServiceImplSpec extends Specification {
         def inspectionReport = Mock(InspectionReport)
         String message = "Agent version is deprecated"
         Set<Tag> expectedTags = Sets.newHashSet(
-            Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, Decision.REJECT.name()),
+            Tag.of(AgentJobServiceImpl.HANDSHAKE_DECISION_METRIC_TAG_NAME, InspectionReport.Decision.REJECT.name()),
             Tag.of(AgentJobServiceImpl.AGENT_VERSION_METRIC_TAG_NAME, version),
             Tag.of(AgentJobServiceImpl.AGENT_HOST_METRIC_TAG_NAME, hostname),
             MetricsUtils.SUCCESS_STATUS_TAG
@@ -115,7 +114,7 @@ class AgentJobServiceImplSpec extends Specification {
         1 * agentClientMetadata.getVersion() >> Optional.of(version)
         1 * agentClientMetadata.getHostname() >> Optional.of(hostname)
         1 * agentFilterService.inspectAgentMetadata(agentClientMetadata) >> inspectionReport
-        2 * inspectionReport.getDecision() >> Decision.REJECT
+        2 * inspectionReport.getDecision() >> InspectionReport.Decision.REJECT
         1 * inspectionReport.getMessage() >> message
         1 * meterRegistry.counter("genie.services.agentJob.handshake.counter", _ as Set<Tag>) >> {
             args ->

@@ -62,8 +62,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
- * An implementation of the ClusterLoadBalancer interface which uses user a supplied script to make decisions based
- * on the list of clusters and the job request supplied.
+ * An implementation of the {@link ClusterLoadBalancer} interface which uses user a supplied script to make decisions
+ * based on the list of clusters and the job request supplied.
  * <p>
  * The contract between the script and the Java code is that the script will be supplied global variables
  * {@code clusters} and {@code jobRequest} which will be JSON strings representing the list (array) of clusters
