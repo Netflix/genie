@@ -32,7 +32,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.ApiClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
@@ -852,7 +852,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             + "\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\", "
             + "\"" + UUID.randomUUID().toString() + "\": \"\""
             + "}";
-        final AgentEnvironmentRequest agentEnvironmentRequest = new AgentEnvironmentRequest
+        final JobEnvironmentRequest jobEnvironmentRequest = new JobEnvironmentRequest
             .Builder()
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
             .withExt(GenieObjectMapper.getMapper().readTree(agentEnvironmentExt))
@@ -886,7 +886,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             ),
             jobMetadata,
             criteria,
-            agentEnvironmentRequest,
+            jobEnvironmentRequest,
             agentConfigRequest,
             jobArchivalDataRequest
         );

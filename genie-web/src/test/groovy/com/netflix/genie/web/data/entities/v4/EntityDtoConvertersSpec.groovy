@@ -25,11 +25,11 @@ import com.netflix.genie.common.dto.ApplicationStatus
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
-import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest
 import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest
+import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
@@ -414,7 +414,7 @@ class EntityDtoConvertersSpec extends Specification {
             .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
             .build()
 
-        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder()
+        def jobEnvironmentRequest = new JobEnvironmentRequest.Builder()
             .withExt(metadata)
             .withRequestedJobMemory(requestedMemory)
             .withRequestedJobCpu(requestedCpu)
@@ -427,7 +427,7 @@ class EntityDtoConvertersSpec extends Specification {
             commandArgs,
             jobMetadata,
             executionResourceCriteria,
-            agentEnvironmentRequest,
+            jobEnvironmentRequest,
             agentConfigRequest,
             null
         )
@@ -437,7 +437,7 @@ class EntityDtoConvertersSpec extends Specification {
             commandArgs,
             jobMetadata,
             executionResourceCriteria,
-            agentEnvironmentRequest,
+            jobEnvironmentRequest,
             agentConfigRequest,
             null
         )
@@ -448,7 +448,7 @@ class EntityDtoConvertersSpec extends Specification {
             commandArgs,
             jobMetadata,
             executionResourceCriteria,
-            agentEnvironmentRequest,
+            jobEnvironmentRequest,
             agentConfigRequest,
             jobArchivalDataRequest
         )

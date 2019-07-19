@@ -983,16 +983,16 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getMetadata().getTags() == tags
         v4JobRequest.getCriteria().getApplicationIds() == applicationIds
         v4JobRequest.getCommandArgs() == [StringUtils.join(commandArgs, StringUtils.SPACE)] as List
-        v4JobRequest.getRequestedAgentEnvironment().getRequestedJobMemory().orElse(null) == memory
+        v4JobRequest.getRequestedJobEnvironment().getRequestedJobMemory().orElse(null) == memory
         v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().orElse(-1) == timeout
         v4JobRequest.getMetadata().getMetadata().orElse(null) == metadata
         v4JobRequest.getMetadata().getGrouping().orElse(null) == grouping
         v4JobRequest.getMetadata().getGroupingInstance().orElse(null) == groupingInstance
         v4JobRequest.getMetadata().getGroup().orElse(null) == group
         v4JobRequest.getMetadata().getDescription().orElse(null) == description
-        v4JobRequest.getRequestedAgentEnvironment().getRequestedJobCpu().orElse(null) == cpu
+        v4JobRequest.getRequestedJobEnvironment().getRequestedJobCpu().orElse(null) == cpu
         !v4JobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().isPresent()
-        !v4JobRequest.getRequestedAgentEnvironment().getExt().isPresent()
+        !v4JobRequest.getRequestedJobEnvironment().getExt().isPresent()
         v4JobRequest.getResources().getDependencies() == dependencies
         v4JobRequest.getResources().getConfigs() == configs
         v4JobRequest.getResources().getSetupFile().orElse(null) == setupFile

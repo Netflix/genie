@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
@@ -236,14 +236,14 @@ public final class EntityDtoConverters {
             .ifPresent(jobArchivalDataRequestBuilder::withRequestedArchiveLocationPrefix);
 
         // Rebuild the Agent Environment Request
-        final AgentEnvironmentRequest.Builder agentEnvironmentRequestBuilder = new AgentEnvironmentRequest.Builder();
+        final JobEnvironmentRequest.Builder jobEnvironmentRequestBuilder = new JobEnvironmentRequest.Builder();
         jobRequestProjection
             .getRequestedAgentEnvironmentExt()
-            .ifPresent(ext -> setJsonField(ext, agentEnvironmentRequestBuilder::withExt));
-        agentEnvironmentRequestBuilder
+            .ifPresent(ext -> setJsonField(ext, jobEnvironmentRequestBuilder::withExt));
+        jobEnvironmentRequestBuilder
             .withRequestedEnvironmentVariables(jobRequestProjection.getRequestedEnvironmentVariables());
-        jobRequestProjection.getRequestedCpu().ifPresent(agentEnvironmentRequestBuilder::withRequestedJobCpu);
-        jobRequestProjection.getRequestedMemory().ifPresent(agentEnvironmentRequestBuilder::withRequestedJobMemory);
+        jobRequestProjection.getRequestedCpu().ifPresent(jobEnvironmentRequestBuilder::withRequestedJobCpu);
+        jobRequestProjection.getRequestedMemory().ifPresent(jobEnvironmentRequestBuilder::withRequestedJobMemory);
 
         return new JobRequest(
             requestedId,
@@ -251,7 +251,7 @@ public final class EntityDtoConverters {
             jobRequestProjection.getCommandArgs(),
             jobMetadataBuilder.build(),
             executionResourceCriteria,
-            agentEnvironmentRequestBuilder.build(),
+            jobEnvironmentRequestBuilder.build(),
             agentConfigRequestBuilder.build(),
             jobArchivalDataRequestBuilder.build()
         );

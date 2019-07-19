@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Fields that allow manipulation of the Genie Agent execution container environment.
+ * Fields that allow manipulation of the Genie job execution container environment.
  *
  * @author tgianos
  * @since 4.0.0
@@ -42,9 +42,9 @@ import java.util.Optional;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-@JsonDeserialize(builder = AgentEnvironmentRequest.Builder.class)
+@JsonDeserialize(builder = JobEnvironmentRequest.Builder.class)
 @SuppressWarnings("checkstyle:finalclass")
-public class AgentEnvironmentRequest {
+public class JobEnvironmentRequest {
     @Min(value = 1, message = "Number of CPU's requested can't be less than 1")
     private final Integer requestedJobCpu;
     @Min(value = 1, message = "Amount of memory requested has to be greater than 1 MB and preferably much more")
@@ -57,7 +57,7 @@ public class AgentEnvironmentRequest {
         requestedEnvironmentVariables;
     private final JsonNode ext;
 
-    private AgentEnvironmentRequest(final Builder builder) {
+    private JobEnvironmentRequest(final Builder builder) {
         this.requestedJobCpu = builder.bRequestedJobCpu;
         this.requestedJobMemory = builder.bRequestedJobMemory;
         this.requestedEnvironmentVariables = ImmutableMap.copyOf(builder.bRequestedEnvironmentVariables);
@@ -101,7 +101,7 @@ public class AgentEnvironmentRequest {
     }
 
     /**
-     * Builder to create an immutable {@link AgentEnvironmentRequest} instance.
+     * Builder to create an immutable {@link JobEnvironmentRequest} instance.
      *
      * @author tgianos
      * @since 4.0.0
@@ -163,12 +163,12 @@ public class AgentEnvironmentRequest {
         }
 
         /**
-         * Build a new immutable instance of an {@link AgentEnvironmentRequest}.
+         * Build a new immutable instance of an {@link JobEnvironmentRequest}.
          *
          * @return An instance containing the fields set in this builder
          */
-        public AgentEnvironmentRequest build() {
-            return new AgentEnvironmentRequest(this);
+        public JobEnvironmentRequest build() {
+            return new JobEnvironmentRequest(this);
         }
     }
 }

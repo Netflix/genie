@@ -51,7 +51,7 @@ class JobRequestSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
         )
-        def requestedAgentEnvironment = new AgentEnvironmentRequest.Builder()
+        def requestedJobEnvironment = new JobEnvironmentRequest.Builder()
             .withRequestedJobCpu(3)
             .withRequestedJobMemory(10_000)
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
@@ -76,7 +76,7 @@ class JobRequestSpec extends Specification {
             .withRequestedId(requestedId)
             .withCommandArgs(commandArgs)
             .withResources(jobResources)
-            .withRequestedAgentEnvironment(requestedAgentEnvironment)
+            .withRequestedAgentEnvironment(requestedJobEnvironment)
             .withRequestedAgentConfig(requestedAgentConfig)
             .withRequestedJobArchivalData(requestedJobArchivalData)
             .build()
@@ -88,7 +88,7 @@ class JobRequestSpec extends Specification {
         jobRequest.getCommandArgs() == commandArgs
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
-        jobRequest.getRequestedAgentEnvironment() == requestedAgentEnvironment
+        jobRequest.getRequestedJobEnvironment() == requestedJobEnvironment
         jobRequest.getRequestedJobArchivalData() == requestedJobArchivalData
 
         when:
@@ -100,7 +100,7 @@ class JobRequestSpec extends Specification {
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
-        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
         jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
 
@@ -118,7 +118,7 @@ class JobRequestSpec extends Specification {
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
-        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
         jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
 
@@ -136,7 +136,7 @@ class JobRequestSpec extends Specification {
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
-        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
         jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
     }
@@ -262,7 +262,7 @@ class JobRequestSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
         )
-        def requestedAgentEnvironment = new AgentEnvironmentRequest.Builder()
+        def requestedJobEnvironment = new JobEnvironmentRequest.Builder()
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
             .withRequestedJobCpu(2)
             .withRequestedJobMemory(10_000)
@@ -289,7 +289,7 @@ class JobRequestSpec extends Specification {
             commandArgs,
             metadata,
             criteria,
-            requestedAgentEnvironment,
+            requestedJobEnvironment,
             requestedAgentConfig,
             requestedJobArchivalData
         )
@@ -301,7 +301,7 @@ class JobRequestSpec extends Specification {
         jobRequest.getCommandArgs() == commandArgs
         jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
-        jobRequest.getRequestedAgentEnvironment() == requestedAgentEnvironment
+        jobRequest.getRequestedJobEnvironment() == requestedJobEnvironment
         jobRequest.getRequestedJobArchivalData() == requestedJobArchivalData
 
         when:
@@ -322,7 +322,7 @@ class JobRequestSpec extends Specification {
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
-        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
         jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
 
@@ -345,7 +345,7 @@ class JobRequestSpec extends Specification {
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
         jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
-        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedJobEnvironment() == new JobEnvironmentRequest.Builder().build()
         jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
         jobRequest.getRequestedJobArchivalData() == new JobArchivalDataRequest.Builder().build()
     }
@@ -381,11 +381,11 @@ class JobRequestSpec extends Specification {
         when:
         def jobMetadata = Mock(JobMetadata)
         def criteria = Mock(ExecutionResourceCriteria)
-        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder().build()
+        def jobEnvironmentRequest = new JobEnvironmentRequest.Builder().build()
         def agentConfigRequest = new AgentConfigRequest.Builder().build()
         def jobArchivalDataRequest = new JobArchivalDataRequest.Builder().build()
-        base = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
-        comparable = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        base = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        comparable = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
 
         then:
         base == comparable
@@ -412,11 +412,11 @@ class JobRequestSpec extends Specification {
         when:
         def jobMetadata = Mock(JobMetadata)
         def criteria = Mock(ExecutionResourceCriteria)
-        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder().build()
+        def jobEnvironmentRequest = new JobEnvironmentRequest.Builder().build()
         def agentConfigRequest = new AgentConfigRequest.Builder().build()
         def jobArchivalDataRequest = new JobArchivalDataRequest.Builder().build()
-        one = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
-        two = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        one = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        two = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
 
         then:
         one.hashCode() == two.hashCode()
@@ -443,11 +443,11 @@ class JobRequestSpec extends Specification {
         when:
         def jobMetadata = Mock(JobMetadata)
         def criteria = Mock(ExecutionResourceCriteria)
-        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder().build()
+        def jobEnvironmentRequest = new JobEnvironmentRequest.Builder().build()
         def agentConfigRequest = new AgentConfigRequest.Builder().build()
         def jobArchivalDataRequest = new JobArchivalDataRequest.Builder().build()
-        one = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
-        two = new JobRequest(null, null, null, jobMetadata, criteria, agentEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        one = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
+        two = new JobRequest(null, null, null, jobMetadata, criteria, jobEnvironmentRequest, agentConfigRequest, jobArchivalDataRequest)
 
         then:
         one.toString() == two.toString()
@@ -474,7 +474,7 @@ class JobRequestSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
         )
-        def requestedAgentEnvironment = new AgentEnvironmentRequest.Builder()
+        def requestedJobEnvironment = new JobEnvironmentRequest.Builder()
             .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
             .withRequestedJobCpu(RandomSuppliers.INT.get())
             .withRequestedJobMemory(RandomSuppliers.INT.get())
@@ -498,7 +498,7 @@ class JobRequestSpec extends Specification {
             commandArgs,
             metadata,
             criteria,
-            requestedAgentEnvironment,
+            requestedJobEnvironment,
             requestedAgentConfig,
             requestedJobArchivalData
         )
