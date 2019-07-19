@@ -29,11 +29,11 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
@@ -335,7 +335,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         this.setJobMetadataFields(jobEntity, jobRequest.getMetadata());
         this.setExecutionEnvironmentFields(jobEntity, jobRequest.getResources());
         this.setExecutionResourceCriteriaFields(jobEntity, jobRequest.getCriteria());
-        this.setRequestedAgentEnvironmentFields(jobEntity, jobRequest.getRequestedAgentEnvironment());
+        this.setRequestedJobEnvironmentFields(jobEntity, jobRequest.getRequestedJobEnvironment());
         this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
         this.setRequestedJobArchivalData(jobEntity, jobRequest.getRequestedJobArchivalData());
         this.setRequestMetadataFields(jobEntity, jobRequestMetadata);
@@ -807,14 +807,14 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setRequestedApplications(criteria.getApplicationIds());
     }
 
-    private void setRequestedAgentEnvironmentFields(
+    private void setRequestedJobEnvironmentFields(
         final JobEntity jobEntity,
-        final AgentEnvironmentRequest requestedAgentEnvironment
+        final JobEnvironmentRequest requestedJobEnvironment
     ) {
-        jobEntity.setRequestedEnvironmentVariables(requestedAgentEnvironment.getRequestedEnvironmentVariables());
-        requestedAgentEnvironment.getRequestedJobMemory().ifPresent(jobEntity::setRequestedMemory);
-        requestedAgentEnvironment.getRequestedJobCpu().ifPresent(jobEntity::setRequestedCpu);
-        final Optional<JsonNode> agentEnvironmentExt = requestedAgentEnvironment.getExt();
+        jobEntity.setRequestedEnvironmentVariables(requestedJobEnvironment.getRequestedEnvironmentVariables());
+        requestedJobEnvironment.getRequestedJobMemory().ifPresent(jobEntity::setRequestedMemory);
+        requestedJobEnvironment.getRequestedJobCpu().ifPresent(jobEntity::setRequestedCpu);
+        final Optional<JsonNode> agentEnvironmentExt = requestedJobEnvironment.getExt();
         agentEnvironmentExt.ifPresent(
             jsonNode -> EntityDtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentEnvironmentExt)
         );

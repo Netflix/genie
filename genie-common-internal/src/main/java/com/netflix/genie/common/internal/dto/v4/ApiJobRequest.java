@@ -63,7 +63,7 @@ public interface ApiJobRequest extends CommonRequest {
      *
      * @return The requested agent environment
      */
-    AgentEnvironmentRequest getRequestedAgentEnvironment();
+    JobEnvironmentRequest getRequestedJobEnvironment();
 
     /**
      * Get the requested agent configuration.
@@ -91,7 +91,7 @@ public interface ApiJobRequest extends CommonRequest {
         private final JobMetadata bMetadata;
         private final ExecutionResourceCriteria bCriteria;
         private final List<String> bCommandArgs = Lists.newArrayList();
-        private AgentEnvironmentRequest bRequestedAgentEnvironment;
+        private JobEnvironmentRequest bRequestedJobEnvironment;
         private AgentConfigRequest bRequestedAgentConfig;
         private JobArchivalDataRequest bRequestedJobArchivalData;
 
@@ -129,13 +129,13 @@ public interface ApiJobRequest extends CommonRequest {
         /**
          * Set the information provided by a user for the Agent execution environment.
          *
-         * @param requestedAgentEnvironment the requested Genie Agent environment parameters
+         * @param requestedJobEnvironment the requested Genie job environment parameters
          * @return The builder
          */
         public Builder withRequestedAgentEnvironment(
-            @Nullable final AgentEnvironmentRequest requestedAgentEnvironment
+            @Nullable final JobEnvironmentRequest requestedJobEnvironment
         ) {
-            this.bRequestedAgentEnvironment = requestedAgentEnvironment;
+            this.bRequestedJobEnvironment = requestedJobEnvironment;
             return this;
         }
 

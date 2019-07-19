@@ -23,7 +23,6 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
@@ -37,6 +36,7 @@ import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -380,9 +380,9 @@ public final class DtoConverters {
             v3JobRequest.getApplications()
         );
 
-        final AgentEnvironmentRequest.Builder agentEnvironmentBuilder = new AgentEnvironmentRequest.Builder();
-        v3JobRequest.getCpu().ifPresent(agentEnvironmentBuilder::withRequestedJobCpu);
-        v3JobRequest.getMemory().ifPresent(agentEnvironmentBuilder::withRequestedJobMemory);
+        final JobEnvironmentRequest.Builder jobEnvironmentBuilder = new JobEnvironmentRequest.Builder();
+        v3JobRequest.getCpu().ifPresent(jobEnvironmentBuilder::withRequestedJobCpu);
+        v3JobRequest.getMemory().ifPresent(jobEnvironmentBuilder::withRequestedJobMemory);
 
         final AgentConfigRequest.Builder agentConfigBuilder = new AgentConfigRequest
             .Builder()
@@ -400,7 +400,7 @@ public final class DtoConverters {
             commandArgs,
             metadataBuilder.build(),
             criteria,
-            agentEnvironmentBuilder.build(),
+            jobEnvironmentBuilder.build(),
             agentConfigBuilder.build(),
             jobArchivalDataRequestBuilder.build()
         );

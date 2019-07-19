@@ -53,7 +53,7 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
     @Valid
     private final ExecutionResourceCriteria criteria;
     @Valid
-    private final AgentEnvironmentRequest requestedAgentEnvironment;
+    private final JobEnvironmentRequest requestedJobEnvironment;
     @Valid
     private final AgentConfigRequest requestedAgentConfig;
     @Valid
@@ -79,7 +79,7 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
             builder.getBCommandArgs(),
             builder.getBMetadata(),
             builder.getBCriteria(),
-            builder.getBRequestedAgentEnvironment(),
+            builder.getBRequestedJobEnvironment(),
             builder.getBRequestedAgentConfig(),
             builder.getBRequestedJobArchivalData()
         );
@@ -88,15 +88,15 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
     /**
      * Constructor.
      *
-     * @param requestedId               The requested id of the job if one was provided by the user
-     * @param resources                 The execution resources (if any) provided by the user
-     * @param commandArgs               Any command args provided by the user
-     * @param metadata                  Any metadata related to the job provided by the user
-     * @param criteria                  The criteria used by the server to determine execution resources
-     *                                  (cluster, command, etc)
-     * @param requestedAgentEnvironment The optional agent environment request parameters
-     * @param requestedAgentConfig      The optional configuration options for the Genie Agent
-     * @param requestedJobArchivalData  The optional configuration options for archiving the job folder by the agent
+     * @param requestedId              The requested id of the job if one was provided by the user
+     * @param resources                The execution resources (if any) provided by the user
+     * @param commandArgs              Any command args provided by the user
+     * @param metadata                 Any metadata related to the job provided by the user
+     * @param criteria                 The criteria used by the server to determine execution resources
+     *                                 (cluster, command, etc)
+     * @param requestedJobEnvironment  The optional job environment request parameters
+     * @param requestedAgentConfig     The optional configuration options for the Genie Agent
+     * @param requestedJobArchivalData The optional configuration options for archiving the job folder by the agent
      */
     public JobRequest(
         @Nullable final String requestedId,
@@ -104,7 +104,7 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
         @Nullable final List<String> commandArgs,
         final JobMetadata metadata,
         final ExecutionResourceCriteria criteria,
-        @Nullable final AgentEnvironmentRequest requestedAgentEnvironment,
+        @Nullable final JobEnvironmentRequest requestedJobEnvironment,
         @Nullable final AgentConfigRequest requestedAgentConfig,
         @Nullable final JobArchivalDataRequest requestedJobArchivalData
     ) {
@@ -117,9 +117,9 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
         );
         this.metadata = metadata;
         this.criteria = criteria;
-        this.requestedAgentEnvironment = requestedAgentEnvironment == null
-            ? new AgentEnvironmentRequest.Builder().build()
-            : requestedAgentEnvironment;
+        this.requestedJobEnvironment = requestedJobEnvironment == null
+            ? new JobEnvironmentRequest.Builder().build()
+            : requestedJobEnvironment;
         this.requestedAgentConfig = requestedAgentConfig == null
             ? new AgentConfigRequest.Builder().build()
             : requestedAgentConfig;
