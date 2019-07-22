@@ -126,7 +126,7 @@ public class JobRestController {
     private static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
     private static final String NAME_HEADER_COOKIE = "cookie";
-    private static final String JOB_API_TEMPLATE = "/api/v3/jobs/{id}";
+    private static final String JOB_API_BASE_PATH = "/api/v3/jobs/";
     private static final String COMMA = ",";
 
     private final JobCoordinatorService jobCoordinatorService;
@@ -565,15 +565,14 @@ public class JobRestController {
                 try {
                     //Need to forward job
                     this.restTemplate.execute(
-                        forwardHost + JOB_API_TEMPLATE,
+                        forwardHost + JOB_API_BASE_PATH + id,
                         HttpMethod.DELETE,
                         forwardRequest -> copyRequestHeaders(request, forwardRequest),
                         (final ClientHttpResponse forwardResponse) -> {
                             response.setStatus(HttpStatus.ACCEPTED.value());
                             copyResponseHeaders(response, forwardResponse);
                             return null;
-                        },
-                        id
+                        }
                     );
                 } catch (HttpStatusCodeException e) {
                     log.error("Failed killing job on {}. Error: {}", forwardHost, e.getMessage());
@@ -736,7 +735,7 @@ public class JobRestController {
                 final String forwardHost = this.buildForwardHost(jobHostname);
                 try {
                     this.restTemplate.execute(
-                        forwardHost + JOB_API_TEMPLATE + "/output/{path}",
+                        forwardHost + JOB_API_BASE_PATH + id + "/output/" + path,
                         HttpMethod.GET,
                         forwardRequest -> copyRequestHeaders(request, forwardRequest),
                         (ResponseExtractor<Void>) forwardResponse -> {
@@ -746,9 +745,7 @@ public class JobRestController {
                             // the stream so this should resolve memory problems if the file returned is large
                             ByteStreams.copy(forwardResponse.getBody(), response.getOutputStream());
                             return null;
-                        },
-                        id,
-                        path
+                        }
                     );
                 } catch (final HttpStatusCodeException e) {
                     log.error("Failed getting the remote job output from {}. Error: {}", forwardHost, e.getMessage());
