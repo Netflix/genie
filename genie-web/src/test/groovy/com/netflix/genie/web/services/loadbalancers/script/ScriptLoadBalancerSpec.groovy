@@ -32,18 +32,22 @@ import com.netflix.genie.web.services.impl.GenieFileTransferService
 import com.netflix.genie.web.util.MetricsConstants
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
+import io.micrometer.core.instrument.Timer
 import org.apache.commons.lang3.StringUtils
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.env.Environment
+import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.script.CompiledScript
 import java.nio.file.Paths
 import java.time.Instant
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 /**
@@ -173,6 +177,11 @@ class ScriptLoadBalancerSpec extends Specification {
             Long.class,
             300_000L
         ) >> 300_000L
+        1 * environment.getProperty(
+            ScriptLoadBalancerProperties.TIMEOUT_PROPERTY,
+            Long.class,
+            5000L
+        ) >> 5000L
         1 * scheduler.scheduleWithFixedDelay(_ as Runnable, 300_000L)
 
         when: "Try to select after before update"
@@ -187,10 +196,9 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * selectTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         when: "refresh is called but fails"
-        loadBalancer.refresh()
+        loadBalancer.loader.refresh()
 
         then: "Metrics are recorded"
-        1 * environment.getProperty(ScriptLoadBalancerProperties.TIMEOUT_PROPERTY, Long.class, _ as Long) >> 5_000L
         1 * environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY) >> null
         1 * registry.timer(
             ScriptLoadBalancer.UPDATE_TIMER_NAME,
@@ -215,10 +223,9 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * selectTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         when: "Call refresh again"
-        loadBalancer.refresh()
+        loadBalancer.loader.refresh()
 
         then: "Refresh successfully configures the script"
-        1 * environment.getProperty(ScriptLoadBalancerProperties.TIMEOUT_PROPERTY, Long.class, _ as Long) >> 5_000L
         1 * environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY) >> file
         1 * environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY) >> destDir
         1 * fileTransferService.getFile(file, file)
@@ -255,5 +262,111 @@ class ScriptLoadBalancerSpec extends Specification {
         type         | file
         "JavaScript" | Paths.get(this.class.getResource("loadBalance.js").file).toUri().toString()
         "Groovy"     | Paths.get(this.class.getResource("loadBalance.groovy").file).toUri().toString()
+    }
+
+    def "Can handle script errors and misbehavior"() {
+
+        ScriptLoadBalancer.Loader loader = Mock(ScriptLoadBalancer.Loader)
+        ScriptLoadBalancer.Evaluator evaluator = Mock(ScriptLoadBalancer.Evaluator)
+        MeterRegistry registry = Mock(MeterRegistry)
+        Timer timer = Mock(Timer)
+        CompiledScript script = Mock(CompiledScript)
+        Exception e = new ExecutionException("...")
+
+        ScriptLoadBalancer loadBalancer = new ScriptLoadBalancer(
+            loader,
+            evaluator,
+            registry
+        )
+
+        Cluster cluster
+        Iterable<Tag> tags
+
+        when: "Script not loaded"
+        cluster = loadBalancer.selectCluster(Sets.newHashSet(), jobRequest)
+
+        then:
+        1 * loader.get() >> null
+        0 * evaluator.evaluate(_, _, _)
+        1 * registry.timer(ScriptLoadBalancer.SELECT_TIMER_NAME, !null as Iterable<Tag>) >> {
+            args ->
+                tags = (args[1] as Iterable<Tag>)
+                return timer
+        }
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+        tags != null
+        tags.size() == 1
+        tags.contains(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_NOT_CONFIGURED))
+        cluster == null
+
+        when: "Script returns null"
+        cluster = loadBalancer.selectCluster(Sets.newHashSet(), jobRequest)
+
+        then:
+        1 * loader.get() >> script
+        1 * evaluator.evaluate(script, jobRequest, _) >> null
+        1 * registry.timer(ScriptLoadBalancer.SELECT_TIMER_NAME, !null as Iterable<Tag>) >> {
+            args ->
+                tags = (args[1] as Iterable<Tag>)
+                return timer
+        }
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+        tags != null
+        tags.size() == 1
+        tags.contains(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_NO_PREFERENCE))
+        cluster == null
+
+        when: "Script returns a valid cluster"
+        cluster = loadBalancer.selectCluster(clustersGood, jobRequest)
+
+        then:
+        1 * loader.get() >> script
+        1 * evaluator.evaluate(script, jobRequest, _) >> "2"
+        1 * registry.timer(ScriptLoadBalancer.SELECT_TIMER_NAME, !null as Iterable<Tag>) >> {
+            args ->
+                tags = (args[1] as Iterable<Tag>)
+                return timer
+        }
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+        tags != null
+        tags.size() == 1
+        tags.contains(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FOUND))
+        clustersGood.contains(cluster)
+        cluster.getId() == "2"
+
+        when: "Script returns an invalid cluster"
+        cluster = loadBalancer.selectCluster(clustersGood, jobRequest)
+
+        then:
+        1 * loader.get() >> script
+        1 * evaluator.evaluate(script, jobRequest, _) >> "xxx"
+        1 * registry.timer(ScriptLoadBalancer.SELECT_TIMER_NAME, !null as Iterable<Tag>) >> {
+            args ->
+                tags = (args[1] as Iterable<Tag>)
+                return timer
+        }
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+        tags != null
+        tags.size() == 1
+        tags.contains(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_NOT_FOUND))
+        cluster == null
+
+        when: "Script evaluation throws exception"
+        cluster = loadBalancer.selectCluster(clustersGood, jobRequest)
+
+        then:
+        1 * loader.get() >> script
+        1 * evaluator.evaluate(script, jobRequest, _) >> { throw e }
+        1 * registry.timer(ScriptLoadBalancer.SELECT_TIMER_NAME, !null as Iterable<Tag>) >> {
+            args ->
+                tags = (args[1] as Iterable<Tag>)
+                return timer
+        }
+        1 * timer.record(_, TimeUnit.NANOSECONDS)
+        tags != null
+        tags.size() == 2
+        tags.contains(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FAILED))
+        tags.contains(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.class.getCanonicalName()))
+        cluster == null
     }
 }

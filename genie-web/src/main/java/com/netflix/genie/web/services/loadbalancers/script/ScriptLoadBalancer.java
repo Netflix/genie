@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.loadbalancers.script;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
@@ -37,6 +38,7 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -55,9 +57,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -69,12 +72,11 @@ import java.util.stream.Collectors;
  * {@code clusters} and {@code jobRequest} which will be JSON strings representing the list (array) of clusters
  * matching the cluster criteria tags and the job request that kicked off this evaluation. The code expects the script
  * to either return the id of the cluster if one is selected or null if none was selected.
- *
+ * <p>
  * Note: this LoadBalancer implementation intentionally returns 'null' (a.k.a. 'no preference') in case of error,
  * rather throwing an exception. For example if the script cannot be loaded, or if an invalid cluster is returned.
  * TODO: this logic of falling back to 'no preference' in case of error should be moved out of this implementation
  * and into the service using this interface.
- * TODO: test coverage could be improved, but would require some refactoring to simplify
  *
  * @author tgianos
  * @since 3.1.0
@@ -97,18 +99,9 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     private static final String CLUSTERS_BINDING = "clusters";
     private static final String JOB_REQUEST_BINDING = "jobRequest";
 
-    private final AtomicBoolean isUpdating = new AtomicBoolean();
-    private final AtomicBoolean isConfigured = new AtomicBoolean();
-    private final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-
-    private final AsyncTaskExecutor asyncTaskExecutor;
-    private final GenieFileTransferService fileTransferService;
-    private final Environment environment;
-    private final ObjectMapper mapper;
     private final MeterRegistry registry;
-
-    private final AtomicReference<CompiledScript> script = new AtomicReference<>(null);
-    private final AtomicLong timeoutLength = new AtomicLong(DEFAULT_TIMEOUT_LENGTH);
+    private final Loader loader;
+    private final Evaluator evaluator;
 
     /**
      * Constructor.
@@ -128,20 +121,29 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
-        this.asyncTaskExecutor = asyncTaskExecutor;
-        this.fileTransferService = fileTransferService;
-        this.environment = environment;
-        this.mapper = mapper;
-        this.registry = registry;
-
-        // Schedule the task to run with the configured refresh rate
-        // Task will be stopped when the system stops
-        final long refreshRate = this.environment.getProperty(
-            ScriptLoadBalancerProperties.REFRESH_RATE_PROPERTY,
-            Long.class,
-            300_000L
+        this(
+            new Loader(taskScheduler, environment, fileTransferService, registry),
+            new Evaluator(
+                mapper,
+                asyncTaskExecutor,
+                environment.getProperty(
+                    ScriptLoadBalancerProperties.TIMEOUT_PROPERTY,
+                    Long.class,
+                    DEFAULT_TIMEOUT_LENGTH
+                )
+            ),
+            registry
         );
-        taskScheduler.scheduleWithFixedDelay(this::refresh, refreshRate);
+    }
+
+    private ScriptLoadBalancer(
+        final Loader loader,
+        final Evaluator evaluator,
+        final MeterRegistry registry
+    ) {
+        this.loader = loader;
+        this.evaluator = evaluator;
+        this.registry = registry;
     }
 
     /**
@@ -155,54 +157,41 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         final long selectStart = System.nanoTime();
         log.debug("Called");
         final Set<Tag> tags = Sets.newHashSet();
+
         try {
-            if (this.isConfigured.get() && this.script.get() != null) {
-                log.debug("Evaluating script for job {}", jobRequest.getId().orElse("without id"));
-                final Bindings bindings = new SimpleBindings();
-                // TODO: For now for backwards compatibility with balancer scripts continue writing Clusters out in
-                //       V3 format. Change to V4 once stabalize a bit more
-                bindings.put(
-                    CLUSTERS_BINDING,
-                    this.mapper.writeValueAsString(
-                        clusters
-                            .stream()
-                            .map(DtoConverters::toV3Cluster)
-                            .collect(Collectors.toSet())
-                    )
-                );
-                bindings.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
-
-                // Run as callable and timeout after the configured timeout length
-                final String clusterId = this.asyncTaskExecutor
-                    .submit(() -> (String) this.script.get().eval(bindings))
-                    .get(this.timeoutLength.get(), TimeUnit.MILLISECONDS);
-
-                // Find the cluster if not null
-                if (clusterId != null) {
-                    for (final Cluster cluster : clusters) {
-                        if (clusterId.equals(cluster.getId())) {
-                            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FOUND));
-                            return cluster;
-                        }
-                    }
-                    log.warn("Script returned a cluster not in the input list: {}", clusterId);
-                    tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND));
-                    return null; // Should throw
-                } else {
-                    tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NO_PREFERENCE));
-                    log.debug("Script returned null, no preference");
-                    return null;
-                }
-            } else {
+            final CompiledScript script = this.loader.get();
+            if (script == null) {
                 log.debug("Script not configured");
                 tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_CONFIGURED));
-                return null; // Should throw
+                return null; // Could throw if a script is expected when invoked
             }
+
+            final String clusterId = this.evaluator.evaluate(script, jobRequest, clusters);
+
+            if (clusterId == null) {
+                tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NO_PREFERENCE));
+                log.debug("Script returned null, no preference");
+                return null;
+            }
+
+            for (final Cluster cluster : clusters) {
+                if (clusterId.equals(cluster.getId())) {
+                    tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FOUND));
+                    return cluster;
+                }
+            }
+
+            log.warn("Script returned a cluster not in the input list: {}", clusterId);
+            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND));
+            return null; // Should throw
+
+
         } catch (final Exception e) {
             tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED));
             tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName()));
             log.error("Unable to execute script due to {}", e.getMessage(), e);
             return null; // Should throw
+
         } finally {
             this.registry
                 .timer(SELECT_TIMER_NAME, tags)
@@ -210,103 +199,177 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         }
     }
 
-    /**
-     * Check if the script file needs to be refreshed.
-     */
-    public void refresh() {
-        log.debug("Refreshing");
-        final long updateStart = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet();
-        try {
-            this.isUpdating.set(true);
+    protected static class Evaluator {
 
-            // Update the script timeout
-            this.timeoutLength.set(
-                this.environment.getProperty(
-                    ScriptLoadBalancerProperties.TIMEOUT_PROPERTY,
-                    Long.class,
-                    DEFAULT_TIMEOUT_LENGTH
+        private final ObjectMapper mapper;
+        private final AsyncTaskExecutor asyncTaskExecutor;
+        private final long timeoutLength;
+
+        protected Evaluator(
+            final ObjectMapper mapper,
+            final AsyncTaskExecutor asyncTaskExecutor,
+            final long timeoutLength
+        ) {
+            this.mapper = mapper;
+            this.asyncTaskExecutor = asyncTaskExecutor;
+            this.timeoutLength = timeoutLength;
+        }
+
+        protected String evaluate(
+            final CompiledScript script,
+            final @NonNull JobRequest jobRequest,
+            final Set<Cluster> clusters
+        ) throws JsonProcessingException, InterruptedException, ExecutionException, TimeoutException {
+
+            final Bindings bindings = new SimpleBindings();
+            // TODO: For now for backwards compatibility with balancer scripts continue writing Clusters out in
+            //       V3 format. Change to V4 once stabalize a bit more
+            bindings.put(
+                CLUSTERS_BINDING,
+                this.mapper.writeValueAsString(
+                    clusters
+                        .stream()
+                        .map(DtoConverters::toV3Cluster)
+                        .collect(Collectors.toSet())
                 )
             );
+            bindings.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
 
-            final String scriptFileSourceValue = this.environment
-                .getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY);
-            if (StringUtils.isBlank(scriptFileSourceValue)) {
-                throw new IllegalStateException(
-                    "Invalid empty value for script source file property: "
-                        + ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY
-                );
-            }
-            final String scriptFileSource = new URI(scriptFileSourceValue).toString();
+            // Run as callable and timeout after the configured timeout length
+            final String clusterId = this.asyncTaskExecutor
+                .submit(() -> (String) script.eval(bindings))
+                .get(timeoutLength, TimeUnit.MILLISECONDS);
 
-            final String scriptFileDestinationValue =
-                this.environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY);
-            if (StringUtils.isBlank(scriptFileDestinationValue)) {
-                throw new IllegalStateException(
-                    "Invalid empty value for script destination directory property: "
-                        + ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY
-                );
-            }
-            final Path scriptDestinationDirectory = Paths.get(new URI(scriptFileDestinationValue));
+            log.debug("Script evaluated with result: {}", clusterId);
 
-            // Check the validity of the destination directory
-            if (!Files.exists(scriptDestinationDirectory)) {
-                Files.createDirectories(scriptDestinationDirectory);
-            } else if (!Files.isDirectory(scriptDestinationDirectory)) {
-                throw new IllegalStateException(
-                    "The script destination directory " + scriptDestinationDirectory + " exists but is not a directory"
-                );
-            }
+            return clusterId;
+        }
+    }
 
-            final String fileName = StringUtils.substringAfterLast(scriptFileSource, SLASH);
-            if (StringUtils.isBlank(fileName)) {
-                throw new IllegalStateException("No file name found from " + scriptFileSource);
-            }
+    protected static class Loader {
+        private final AtomicBoolean isUpdating = new AtomicBoolean();
+        private final AtomicBoolean isConfigured = new AtomicBoolean();
+        private final AtomicReference<CompiledScript> script = new AtomicReference<>(null);
+        private final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
-            final String scriptExtension = StringUtils.substringAfterLast(fileName, PERIOD);
-            if (StringUtils.isBlank(scriptExtension)) {
-                throw new IllegalStateException("No file extension available in " + fileName);
-            }
+        private final Environment environment;
+        private final MeterRegistry registry;
+        private final GenieFileTransferService fileTransferService;
 
-            final Path scriptDestinationPath = scriptDestinationDirectory.resolve(fileName);
 
-            // Download and cache the file (if it's not already there)
-            this.fileTransferService.getFile(scriptFileSource, scriptDestinationPath.toUri().toString());
+        protected Loader(
+            final TaskScheduler taskScheduler,
+            final Environment environment,
+            final GenieFileTransferService fileTransferService,
+            final MeterRegistry registry
+        ) {
+            this.environment = environment;
+            this.registry = registry;
+            this.fileTransferService = fileTransferService;
 
-            final ScriptEngine engine = this.scriptEngineManager.getEngineByExtension(scriptExtension);
-            // We want a compilable engine so we can cache the script
-            if (!(engine instanceof Compilable)) {
-                throw new IllegalArgumentException(
-                    "Script engine must be of type " + Compilable.class.getName()
-                );
-            }
-            final Compilable compilable = (Compilable) engine;
-            try (
-                InputStream fis = Files.newInputStream(scriptDestinationPath);
-                InputStreamReader reader = new InputStreamReader(fis, UTF_8)
-            ) {
-                log.debug("Compiling {}", scriptFileSource);
-                this.script.set(compilable.compile(reader));
-            }
-
-            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_OK));
-
-            this.isConfigured.set(true);
-        } catch (final GenieException | IOException | ScriptException | RuntimeException | URISyntaxException e) {
-            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED));
-            tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getName()));
-            log.error(
-                "Refreshing the load balancing script for ScriptLoadBalancer failed due to {}",
-                e.getMessage(),
-                e
+            // Schedule the task to run with the configured refresh rate
+            // Task will be stopped when the system stops
+            final long refreshRate = environment.getProperty(
+                ScriptLoadBalancerProperties.REFRESH_RATE_PROPERTY,
+                Long.class,
+                300_000L
             );
-            this.isConfigured.set(false);
-        } finally {
-            this.isUpdating.set(false);
-            this.registry
-                .timer(UPDATE_TIMER_NAME, tags)
-                .record(System.nanoTime() - updateStart, TimeUnit.NANOSECONDS);
-            log.debug("Refresh completed");
+            taskScheduler.scheduleWithFixedDelay(this::refresh, refreshRate);
+        }
+
+        protected void refresh() {
+            log.debug("Refreshing");
+            final long updateStart = System.nanoTime();
+            final Set<Tag> tags = Sets.newHashSet();
+            try {
+                this.isUpdating.set(true);
+
+                final String scriptFileSourceValue = this.environment
+                    .getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY);
+                if (StringUtils.isBlank(scriptFileSourceValue)) {
+                    throw new IllegalStateException(
+                        "Invalid empty value for script source file property: "
+                            + ScriptLoadBalancerProperties.SCRIPT_FILE_SOURCE_PROPERTY
+                    );
+                }
+                final String scriptFileSource = new URI(scriptFileSourceValue).toString();
+
+                final String scriptFileDestinationValue =
+                    this.environment.getProperty(ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY);
+                if (StringUtils.isBlank(scriptFileDestinationValue)) {
+                    throw new IllegalStateException(
+                        "Invalid empty value for script destination directory property: "
+                            + ScriptLoadBalancerProperties.SCRIPT_FILE_DESTINATION_PROPERTY
+                    );
+                }
+                final Path scriptDestinationDirectory = Paths.get(new URI(scriptFileDestinationValue));
+
+                // Check the validity of the destination directory
+                if (!Files.exists(scriptDestinationDirectory)) {
+                    Files.createDirectories(scriptDestinationDirectory);
+                } else if (!Files.isDirectory(scriptDestinationDirectory)) {
+                    throw new IllegalStateException(
+                        "The script destination directory "
+                            + scriptDestinationDirectory
+                            + " exists but is not a directory"
+                    );
+                }
+
+                final String fileName = StringUtils.substringAfterLast(scriptFileSource, SLASH);
+                if (StringUtils.isBlank(fileName)) {
+                    throw new IllegalStateException("No file name found from " + scriptFileSource);
+                }
+
+                final String scriptExtension = StringUtils.substringAfterLast(fileName, PERIOD);
+                if (StringUtils.isBlank(scriptExtension)) {
+                    throw new IllegalStateException("No file extension available in " + fileName);
+                }
+
+                final Path scriptDestinationPath = scriptDestinationDirectory.resolve(fileName);
+
+                // Download and cache the file (if it's not already there)
+                this.fileTransferService.getFile(scriptFileSource, scriptDestinationPath.toUri().toString());
+
+                final ScriptEngine engine = this.scriptEngineManager.getEngineByExtension(scriptExtension);
+                // We want a compilable engine so we can cache the script
+                if (!(engine instanceof Compilable)) {
+                    throw new IllegalArgumentException(
+                        "Script engine must be of type " + Compilable.class.getName()
+                    );
+                }
+                final Compilable compilable = (Compilable) engine;
+                try (
+                    InputStream fis = Files.newInputStream(scriptDestinationPath);
+                    InputStreamReader reader = new InputStreamReader(fis, UTF_8)
+                ) {
+                    log.debug("Compiling {}", scriptFileSource);
+                    this.script.set(compilable.compile(reader));
+                }
+
+                tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_OK));
+
+                this.isConfigured.set(true);
+            } catch (final GenieException | IOException | ScriptException | RuntimeException | URISyntaxException e) {
+                tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED));
+                tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getName()));
+                log.error(
+                    "Refreshing the load balancing script for ScriptLoadBalancer failed due to {}",
+                    e.getMessage(),
+                    e
+                );
+                this.isConfigured.set(false);
+            } finally {
+                this.isUpdating.set(false);
+                this.registry
+                    .timer(UPDATE_TIMER_NAME, tags)
+                    .record(System.nanoTime() - updateStart, TimeUnit.NANOSECONDS);
+                log.debug("Refresh completed");
+            }
+        }
+
+        @Nullable
+        protected CompiledScript get() {
+            return script.get();
         }
     }
 }
