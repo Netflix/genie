@@ -191,7 +191,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             log.info("Finding possible clusters and commands for job {}", jobRequest.getId().orElse(NO_ID_FOUND));
             final JobSpecification jobSpecification;
             try {
-                jobSpecification = this.jobResolverService.resolveJobSpecification(
+                jobSpecification = this.jobResolverService.resolveJob(
                     jobId,
                     DtoConverters.toV4JobRequest(jobRequest)
                 );

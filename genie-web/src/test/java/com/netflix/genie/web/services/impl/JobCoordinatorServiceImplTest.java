@@ -169,7 +169,7 @@ public class JobCoordinatorServiceImplTest {
 
         Mockito
             .when(
-                this.specificationService.resolveJobSpecification(
+                this.specificationService.resolveJob(
                     Mockito.anyString(),
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
@@ -263,7 +263,7 @@ public class JobCoordinatorServiceImplTest {
 
         Mockito
             .when(
-                this.specificationService.resolveJobSpecification(
+                this.specificationService.resolveJob(
                     Mockito.anyString(),
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
@@ -391,7 +391,7 @@ public class JobCoordinatorServiceImplTest {
 
         Mockito
             .when(
-                this.specificationService.resolveJobSpecification(
+                this.specificationService.resolveJob(
                     Mockito.anyString(),
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
@@ -492,7 +492,7 @@ public class JobCoordinatorServiceImplTest {
 
         Mockito
             .when(
-                this.specificationService.resolveJobSpecification(
+                this.specificationService.resolveJob(
                     Mockito.anyString(),
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
@@ -612,7 +612,7 @@ public class JobCoordinatorServiceImplTest {
 
         Mockito
             .when(
-                this.specificationService.resolveJobSpecification(
+                this.specificationService.resolveJob(
                     Mockito.anyString(),
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
@@ -714,7 +714,7 @@ public class JobCoordinatorServiceImplTest {
 
         Mockito
             .when(
-                this.specificationService.resolveJobSpecification(
+                this.specificationService.resolveJob(
                     Mockito.anyString(),
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
@@ -834,7 +834,7 @@ public class JobCoordinatorServiceImplTest {
 
         Mockito
             .when(
-                this.specificationService.resolveJobSpecification(
+                this.specificationService.resolveJob(
                     Mockito.anyString(),
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )

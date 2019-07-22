@@ -163,7 +163,7 @@ public class JobResolverServiceImpl implements JobResolverService {
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification resolveJobSpecification(final String id, @Valid final JobRequest jobRequest) {
+    public JobSpecification resolveJob(final String id, @Valid final JobRequest jobRequest) {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
