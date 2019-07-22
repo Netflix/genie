@@ -25,7 +25,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.validation.Valid;
 
 /**
- * Service API definition and helper methods for working with Genie Job Specifications to be used by the Agent.
+ * Service API for taking inputs from a user and resolving them to concrete information that the Genie system will use
+ * to execute the users job.
  *
  * @author tgianos
  * @since 4.0.0
@@ -35,11 +36,11 @@ import javax.validation.Valid;
 public interface JobResolverService {
 
     /**
-     * Given a job request resolve all the details needed for a complete job specification can be run by the user.
+     * Given a job request resolve all the details needed to run a job.
      *
      * @param id         The id of the job
      * @param jobRequest The job request containing all details a user wants to have for their job
      * @return The complete job specification
      */
-    JobSpecification resolveJobSpecification(String id, @Valid JobRequest jobRequest);
+    JobSpecification resolveJob(String id, @Valid JobRequest jobRequest);
 }

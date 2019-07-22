@@ -135,7 +135,7 @@ public class AgentJobServiceImpl implements AgentJobService {
         final JobRequest jobRequest = this.jobPersistenceService
             .getJobRequest(id)
             .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
-        final JobSpecification jobSpecification = this.jobResolverService.resolveJobSpecification(id, jobRequest);
+        final JobSpecification jobSpecification = this.jobResolverService.resolveJob(id, jobRequest);
         this.jobPersistenceService.saveJobSpecification(id, jobSpecification);
         return jobSpecification;
     }
@@ -159,7 +159,7 @@ public class AgentJobServiceImpl implements AgentJobService {
     @Override
     @Transactional(readOnly = true)
     public JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest) {
-        return this.jobResolverService.resolveJobSpecification(
+        return this.jobResolverService.resolveJob(
             jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()),
             jobRequest
         );

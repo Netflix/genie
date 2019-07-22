@@ -162,7 +162,7 @@ class JobResolverServiceImplSpec extends Specification {
         )
 
         when:
-        def jobSpec = service.resolveJobSpecification(jobId, jobRequest)
+        def jobSpec = service.resolveJob(jobId, jobRequest)
 
         then:
         1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
@@ -190,7 +190,7 @@ class JobResolverServiceImplSpec extends Specification {
                 .build(),
             null
         )
-        def jobSpecNoArchivalData = service.resolveJobSpecification(jobId, jobRequestNoArchivalData)
+        def jobSpecNoArchivalData = service.resolveJob(jobId, jobRequestNoArchivalData)
 
         then:
         1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap

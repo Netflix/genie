@@ -183,7 +183,7 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(jobRequest)
-        1 * this.jobSpecificationService.resolveJobSpecification(jobId, jobRequest) >> jobSpecificationMock
+        1 * this.jobSpecificationService.resolveJob(jobId, jobRequest) >> jobSpecificationMock
         1 * jobPersistenceService.saveJobSpecification(jobId, jobSpecificationMock)
         jobSpecification == jobSpecificationMock
     }
@@ -220,7 +220,7 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobRequest.getRequestedId() >> Optional.empty()
-        1 * jobSpecificationService.resolveJobSpecification(_ as String, jobRequest) >> jobSpecificationMock
+        1 * jobSpecificationService.resolveJob(_ as String, jobRequest) >> jobSpecificationMock
         jobSpecification == jobSpecificationMock
 
         when:
@@ -228,7 +228,7 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobRequest.getRequestedId() >> Optional.of(id)
-        1 * jobSpecificationService.resolveJobSpecification(id, jobRequest) >> jobSpecificationMock
+        1 * jobSpecificationService.resolveJob(id, jobRequest) >> jobSpecificationMock
         jobSpecification == jobSpecificationMock
     }
 
