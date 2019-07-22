@@ -48,11 +48,11 @@ import spock.lang.Specification
 import java.time.Instant
 
 /**
- * Specifications for the {@link JobSpecificationServiceImpl} class.
+ * Specifications for the {@link JobResolverServiceImpl} class.
  *
  * @author tgianos
  */
-class JobSpecificationServiceImplSpec extends Specification {
+class JobResolverServiceImplSpec extends Specification {
 
     def "Can generate job specification"() {
         def jobId = UUID.randomUUID().toString()
@@ -152,7 +152,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         def loadBalancer = Mock(ClusterLoadBalancer)
         def applicationService = Mock(ApplicationPersistenceService)
         def commandService = Mock(CommandPersistenceService)
-        def service = new JobSpecificationServiceImpl(
+        def service = new JobResolverServiceImpl(
             applicationService,
             clusterService,
             commandService,
@@ -208,7 +208,7 @@ class JobSpecificationServiceImplSpec extends Specification {
     }
 
     def "Can convert tags to string"() {
-        def service = new JobSpecificationServiceImpl(
+        def service = new JobResolverServiceImpl(
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),
@@ -235,7 +235,7 @@ class JobSpecificationServiceImplSpec extends Specification {
 
     def "Can generate correct environment variables"() {
         def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        def service = new JobSpecificationServiceImpl(
+        def service = new JobResolverServiceImpl(
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),
@@ -332,7 +332,7 @@ class JobSpecificationServiceImplSpec extends Specification {
 
     def "Can convert V4 Criterion to V3 tags"() {
         def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        def service = new JobSpecificationServiceImpl(
+        def service = new JobResolverServiceImpl(
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),
@@ -412,7 +412,7 @@ class JobSpecificationServiceImplSpec extends Specification {
 
 
         def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        def service = new JobSpecificationServiceImpl(
+        def service = new JobResolverServiceImpl(
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),

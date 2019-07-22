@@ -29,7 +29,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificat
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
-import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -59,7 +59,7 @@ public class AgentJobServiceImpl implements AgentJobService {
     private static final String AGENT_HOST_METRIC_TAG_NAME = "agentHost";
     private static final String HANDSHAKE_DECISION_METRIC_TAG_NAME = "handshakeDecision";
     private final JobPersistenceService jobPersistenceService;
-    private final JobSpecificationService jobSpecificationService;
+    private final JobResolverService jobResolverService;
     private final AgentFilterService agentFilterService;
     private final MeterRegistry meterRegistry;
 
@@ -67,18 +67,18 @@ public class AgentJobServiceImpl implements AgentJobService {
      * Constructor.
      *
      * @param jobPersistenceService   The persistence service to use
-     * @param jobSpecificationService The specification service to use
+     * @param jobResolverService The specification service to use
      * @param agentFilterService      The agent filter service to use
      * @param meterRegistry           The metrics registry to use
      */
     public AgentJobServiceImpl(
         final JobPersistenceService jobPersistenceService,
-        final JobSpecificationService jobSpecificationService,
+        final JobResolverService jobResolverService,
         final AgentFilterService agentFilterService,
         final MeterRegistry meterRegistry
     ) {
         this.jobPersistenceService = jobPersistenceService;
-        this.jobSpecificationService = jobSpecificationService;
+        this.jobResolverService = jobResolverService;
         this.agentFilterService = agentFilterService;
         this.meterRegistry = meterRegistry;
     }
@@ -135,7 +135,7 @@ public class AgentJobServiceImpl implements AgentJobService {
         final JobRequest jobRequest = this.jobPersistenceService
             .getJobRequest(id)
             .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
-        final JobSpecification jobSpecification = this.jobSpecificationService.resolveJobSpecification(id, jobRequest);
+        final JobSpecification jobSpecification = this.jobResolverService.resolveJobSpecification(id, jobRequest);
         this.jobPersistenceService.saveJobSpecification(id, jobSpecification);
         return jobSpecification;
     }
@@ -159,7 +159,7 @@ public class AgentJobServiceImpl implements AgentJobService {
     @Override
     @Transactional(readOnly = true)
     public JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest) {
-        return this.jobSpecificationService.resolveJobSpecification(
+        return this.jobResolverService.resolveJobSpecification(
             jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()),
             jobRequest
         );
