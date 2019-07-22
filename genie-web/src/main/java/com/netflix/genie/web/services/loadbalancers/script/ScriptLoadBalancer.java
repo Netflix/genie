@@ -70,6 +70,12 @@ import java.util.stream.Collectors;
  * matching the cluster criteria tags and the job request that kicked off this evaluation. The code expects the script
  * to either return the id of the cluster if one is selected or null if none was selected.
  *
+ * Note: this LoadBalancer implementation intentionally returns 'null' (a.k.a. 'no preference') in case of error,
+ * rather throwing an exception. For example if the script cannot be loaded, or if an invalid cluster is returned.
+ * TODO: this logic of falling back to 'no preference' in case of error should be moved out of this implementation
+ * and into the service using this interface.
+ * TODO: test coverage could be improved, but would require some refactoring to simplify
+ *
  * @author tgianos
  * @since 3.1.0
  */
@@ -83,6 +89,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     static final String STATUS_TAG_NOT_CONFIGURED = "not configured";
     static final String STATUS_TAG_FOUND = "found";
     static final String STATUS_TAG_FAILED = "failed";
+    static final String STATUS_TAG_NO_PREFERENCE = "no preference";
     private static final long DEFAULT_TIMEOUT_LENGTH = 5_000L;
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final String SLASH = "/";
@@ -178,22 +185,24 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                             return cluster;
                         }
                     }
+                    log.warn("Script returned a cluster not in the input list: {}", clusterId);
+                    tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND));
+                    return null; // Should throw
+                } else {
+                    tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NO_PREFERENCE));
+                    log.debug("Script returned null, no preference");
+                    return null;
                 }
-                log.warn("Script returned a cluster not in the input list: {}", clusterId);
             } else {
-                log.debug("Script returned null");
+                log.debug("Script not configured");
                 tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_CONFIGURED));
-                return null;
+                return null; // Should throw
             }
-
-            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND));
-            // Defer to any subsequent load balancer in the chain
-            return null;
         } catch (final Exception e) {
             tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED));
             tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName()));
             log.error("Unable to execute script due to {}", e.getMessage(), e);
-            return null;
+            return null; // Should throw
         } finally {
             this.registry
                 .timer(SELECT_TIMER_NAME, tags)
