@@ -29,7 +29,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificat
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import com.netflix.genie.web.agent.services.AgentFilterService
 import com.netflix.genie.web.data.services.JobPersistenceService
-import com.netflix.genie.web.services.JobSpecificationService
+import com.netflix.genie.web.services.JobResolverService
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.Counter
@@ -49,7 +49,7 @@ class AgentJobServiceImplSpec extends Specification {
 
 
     JobPersistenceService jobPersistenceService
-    JobSpecificationService jobSpecificationService
+    JobResolverService jobSpecificationService
     AgentFilterService agentFilterService
     MeterRegistry meterRegistry
     AgentJobServiceImpl service
@@ -57,7 +57,7 @@ class AgentJobServiceImplSpec extends Specification {
 
     def setup() {
         this.jobPersistenceService = Mock(JobPersistenceService)
-        this.jobSpecificationService = Mock(JobSpecificationService)
+        this.jobSpecificationService = Mock(JobResolverService)
         this.agentFilterService = Mock(AgentFilterService)
         this.meterRegistry = Mock(MeterRegistry)
         this.counter = Mock(Counter)

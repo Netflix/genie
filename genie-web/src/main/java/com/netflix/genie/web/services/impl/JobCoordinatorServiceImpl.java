@@ -45,7 +45,7 @@ import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobKillService;
-import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -84,7 +84,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final JobSearchService jobSearchService;
     private final ClusterPersistenceService clusterPersistenceService;
     private final CommandPersistenceService commandPersistenceService;
-    private final JobSpecificationService specificationService;
+    private final JobResolverService jobResolverService;
     private final JobsProperties jobsProperties;
     private final String hostname;
 
@@ -103,7 +103,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * @param jobSearchService              Implementation of job search service
      * @param clusterPersistenceService     Implementation of cluster service interface
      * @param commandPersistenceService     Implementation of command service interface
-     * @param specificationService          The job specification service to use
+     * @param jobResolverService            The job specification service to use
      * @param registry                      The registry
      * @param hostname                      The name of the host this Genie instance is running on
      */
@@ -116,7 +116,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         @NotNull final JobSearchService jobSearchService,
         @NotNull final ClusterPersistenceService clusterPersistenceService,
         @NotNull final CommandPersistenceService commandPersistenceService,
-        @NotNull final JobSpecificationService specificationService,
+        @NotNull final JobResolverService jobResolverService,
         @NotNull final MeterRegistry registry,
         @NotBlank final String hostname
     ) {
@@ -127,7 +127,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         this.jobSearchService = jobSearchService;
         this.clusterPersistenceService = clusterPersistenceService;
         this.commandPersistenceService = commandPersistenceService;
-        this.specificationService = specificationService;
+        this.jobResolverService = jobResolverService;
         this.jobsProperties = jobsProperties;
         this.hostname = hostname;
 
@@ -191,12 +191,12 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             log.info("Finding possible clusters and commands for job {}", jobRequest.getId().orElse(NO_ID_FOUND));
             final JobSpecification jobSpecification;
             try {
-                jobSpecification = this.specificationService.resolveJobSpecification(
+                jobSpecification = this.jobResolverService.resolveJobSpecification(
                     jobId,
                     DtoConverters.toV4JobRequest(jobRequest)
                 );
             } catch (final RuntimeException re) {
-                //TODO: Here for now as we figure out what to do with exceptions for JobSpecificationServiceImpl
+                //TODO: Here for now as we figure out what to do with exceptions for JobResolverServiceImpl
                 throw new GeniePreconditionException(re.getMessage(), re);
             }
             final Cluster cluster = this.clusterPersistenceService.getCluster(jobSpecification.getCluster().getId());

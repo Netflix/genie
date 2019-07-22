@@ -49,7 +49,7 @@ import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
-import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.MailService;
@@ -61,7 +61,7 @@ import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
-import com.netflix.genie.web.services.impl.JobSpecificationServiceImpl;
+import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
 import com.netflix.genie.web.services.impl.RandomizedClusterLoadBalancerImpl;
@@ -298,7 +298,7 @@ public class ServicesAutoConfiguration {
      * @param applicationPersistenceService Implementation of application service interface
      * @param clusterPersistenceService     Implementation of cluster service interface
      * @param commandPersistenceService     Implementation of command service interface
-     * @param specificationService          The job specification service to use
+     * @param jobResolverService            The job specification service to use
      * @param registry                      The metrics registry to use
      * @param genieHostInfo                 Information about the host the Genie process is running on
      * @return An instance of the JobCoordinatorService.
@@ -314,7 +314,7 @@ public class ServicesAutoConfiguration {
         final ApplicationPersistenceService applicationPersistenceService,
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
-        final JobSpecificationService specificationService,
+        final JobResolverService jobResolverService,
         final MeterRegistry registry,
         final GenieHostInfo genieHostInfo
     ) {
@@ -327,7 +327,7 @@ public class ServicesAutoConfiguration {
             jobSearchService,
             clusterPersistenceService,
             commandPersistenceService,
-            specificationService,
+            jobResolverService,
             registry,
             genieHostInfo.getHostname()
         );
@@ -372,7 +372,7 @@ public class ServicesAutoConfiguration {
     }
 
     /**
-     * Get an implementation of {@link JobSpecificationService} if one hasn't already been defined.
+     * Get an implementation of {@link JobResolverService} if one hasn't already been defined.
      *
      * @param applicationPersistenceService The service to use to manipulate applications
      * @param clusterPersistenceService     The service to use to manipulate clusters
@@ -380,11 +380,11 @@ public class ServicesAutoConfiguration {
      * @param clusterLoadBalancers          The load balancer implementations to use
      * @param registry                      The metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
-     * @return A {@link JobSpecificationServiceImpl} instance
+     * @return A {@link JobResolverServiceImpl} instance
      */
     @Bean
-    @ConditionalOnMissingBean(JobSpecificationService.class)
-    public JobSpecificationService jobSpecificationService(
+    @ConditionalOnMissingBean(JobResolverService.class)
+    public JobResolverService jobResolverService(
         final ApplicationPersistenceService applicationPersistenceService,
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
@@ -392,7 +392,7 @@ public class ServicesAutoConfiguration {
         final MeterRegistry registry,
         final JobsProperties jobsProperties
     ) {
-        return new JobSpecificationServiceImpl(
+        return new JobResolverServiceImpl(
             applicationPersistenceService,
             clusterPersistenceService,
             commandPersistenceService,

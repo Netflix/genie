@@ -38,7 +38,7 @@ import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
-import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.Counter;
@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the JobSpecificationService APIs.
+ * Implementation of the JobResolverService APIs.
  *
  * @author tgianos
  * @since 4.0.0
@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Validated
 @ParametersAreNonnullByDefault
-public class JobSpecificationServiceImpl implements JobSpecificationService {
+public class JobResolverServiceImpl implements JobResolverService {
 
     /**
      * How long it takes to completely resolve a job specification given inputs.
@@ -137,7 +137,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
      * @param registry                      The metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
      */
-    public JobSpecificationServiceImpl(
+    public JobResolverServiceImpl(
         final ApplicationPersistenceService applicationPersistenceService,
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,

@@ -40,7 +40,7 @@ import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
-import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
@@ -195,7 +195,7 @@ public class ServicesAutoConfigurationTest {
                 Mockito.mock(ApplicationPersistenceService.class),
                 Mockito.mock(ClusterPersistenceService.class),
                 Mockito.mock(CommandPersistenceService.class),
-                Mockito.mock(JobSpecificationService.class),
+                Mockito.mock(JobResolverService.class),
                 Mockito.mock(MeterRegistry.class),
                 new GenieHostInfo(UUID.randomUUID().toString())
             )

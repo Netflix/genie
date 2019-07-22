@@ -32,7 +32,7 @@ import javax.validation.Valid;
  */
 @ParametersAreNonnullByDefault
 @Validated
-public interface JobSpecificationService {
+public interface JobResolverService {
 
     /**
      * Given a job request resolve all the details needed for a complete job specification can be run by the user.

@@ -42,7 +42,7 @@ import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobKillService;
-import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -90,7 +90,7 @@ public class JobCoordinatorServiceImplTest {
     private ApplicationPersistenceService applicationPersistenceService;
     private ClusterPersistenceService clusterPersistenceService;
     private CommandPersistenceService commandPersistenceService;
-    private JobSpecificationService specificationService;
+    private JobResolverService specificationService;
     private JobsProperties jobsProperties;
     private MeterRegistry registry;
     private Timer coordinationTimer;
@@ -113,7 +113,7 @@ public class JobCoordinatorServiceImplTest {
         this.applicationPersistenceService = Mockito.mock(ApplicationPersistenceService.class);
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
         this.commandPersistenceService = Mockito.mock(CommandPersistenceService.class);
-        this.specificationService = Mockito.mock(JobSpecificationService.class);
+        this.specificationService = Mockito.mock(JobResolverService.class);
 
         this.registry = Mockito.mock(MeterRegistry.class);
         this.coordinationTimer = Mockito.mock(Timer.class);
