@@ -162,7 +162,8 @@ class JobResolverServiceImplSpec extends Specification {
         )
 
         when:
-        def jobSpec = service.resolveJob(jobId, jobRequest)
+        def resolvedJob = service.resolveJob(jobId, jobRequest)
+        def jobSpec = resolvedJob.getJobSpecification()
 
         then:
         1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
@@ -190,7 +191,8 @@ class JobResolverServiceImplSpec extends Specification {
                 .build(),
             null
         )
-        def jobSpecNoArchivalData = service.resolveJob(jobId, jobRequestNoArchivalData)
+        def resolvedJobNoArchivalData = service.resolveJob(jobId, jobRequestNoArchivalData)
+        def jobSpecNoArchivalData = resolvedJobNoArchivalData.getJobSpecification()
 
         then:
         1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
@@ -308,7 +310,13 @@ class JobResolverServiceImplSpec extends Specification {
         )
 
         when:
-        def envVariables = service.generateEnvironmentVariables(jobId, jobRequest, cluster, command)
+        def envVariables = service.generateEnvironmentVariables(
+            jobId,
+            jobRequest,
+            cluster,
+            command,
+            jobsProperties.getMemory().getDefaultJobMemory()
+        )
 
         then:
         envVariables.get("GENIE_VERSION") == "4"

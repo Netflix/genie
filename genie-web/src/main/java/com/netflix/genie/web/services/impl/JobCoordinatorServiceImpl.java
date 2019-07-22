@@ -194,7 +194,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 jobSpecification = this.jobResolverService.resolveJob(
                     jobId,
                     DtoConverters.toV4JobRequest(jobRequest)
-                );
+                ).getJobSpecification();
             } catch (final RuntimeException re) {
                 //TODO: Here for now as we figure out what to do with exceptions for JobResolverServiceImpl
                 throw new GeniePreconditionException(re.getMessage(), re);

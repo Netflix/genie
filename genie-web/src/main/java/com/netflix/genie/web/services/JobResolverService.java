@@ -18,7 +18,7 @@
 package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
-import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -40,7 +40,7 @@ public interface JobResolverService {
      *
      * @param id         The id of the job
      * @param jobRequest The job request containing all details a user wants to have for their job
-     * @return The complete job specification
+     * @return The completely resolved job information within a {@link ResolvedJob} instance
      */
-    JobSpecification resolveJob(String id, @Valid JobRequest jobRequest);
+    ResolvedJob resolveJob(String id, @Valid JobRequest jobRequest);
 }
