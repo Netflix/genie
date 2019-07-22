@@ -29,6 +29,7 @@ import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -36,6 +37,7 @@ import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.JobResolverService;
@@ -163,7 +165,7 @@ public class JobResolverServiceImpl implements JobResolverService {
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification resolveJob(final String id, @Valid final JobRequest jobRequest) {
+    public ResolvedJob resolveJob(final String id, @Valid final JobRequest jobRequest) {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -191,6 +193,11 @@ public class JobResolverServiceImpl implements JobResolverService {
             final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
             commandArgs.addAll(jobRequest.getCommandArgs());
 
+            final int jobMemory = this.resolveJobMemory(jobRequest, command);
+
+            final Map<String, String> environmentVariables
+                = this.generateEnvironmentVariables(id, jobRequest, cluster, command, jobMemory);
+
             //TODO: Set the default job location as a server property?
             final JobSpecification jobSpecification = new JobSpecification(
                 commandArgs,
@@ -198,7 +205,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 new JobSpecification.ExecutionResource(cluster.getId(), cluster.getResources()),
                 new JobSpecification.ExecutionResource(command.getId(), command.getResources()),
                 applicationResources,
-                this.generateEnvironmentVariables(id, jobRequest, cluster, command),
+                environmentVariables,
                 jobRequest.getRequestedAgentConfig().isInteractive(),
                 jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY),
                 toArchiveLocation(
@@ -209,8 +216,13 @@ public class JobResolverServiceImpl implements JobResolverService {
                     id)
             );
 
+            final JobEnvironment jobEnvironment = new JobEnvironment
+                .Builder(jobMemory)
+                .withEnvironmentVariables(environmentVariables)
+                .build();
+
             MetricsUtils.addSuccessTags(tags);
-            return jobSpecification;
+            return new ResolvedJob(jobSpecification, jobEnvironment);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw new RuntimeException(t);
@@ -425,7 +437,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id,
         final JobRequest jobRequest,
         final Cluster cluster,
-        final Command command
+        final Command command,
+        final int memory
     ) {
         final ImmutableMap.Builder<String, String> envVariables = ImmutableMap.builder();
         envVariables.put("GENIE_VERSION", "4");
@@ -437,10 +450,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         envVariables.put(JobConstants.GENIE_COMMAND_TAGS_ENV_VAR, this.tagsToString(command.getMetadata().getTags()));
         envVariables.put(JobConstants.GENIE_JOB_ID_ENV_VAR, id);
         envVariables.put(JobConstants.GENIE_JOB_NAME_ENV_VAR, jobRequest.getMetadata().getName());
-        envVariables.put(
-            JobConstants.GENIE_JOB_MEMORY_ENV_VAR,
-            String.valueOf(command.getMemory().orElse(this.defaultMemory))
-        );
+        envVariables.put(JobConstants.GENIE_JOB_MEMORY_ENV_VAR, String.valueOf(memory));
         envVariables.put(JobConstants.GENIE_JOB_TAGS_ENV_VAR, this.tagsToString(jobRequest.getMetadata().getTags()));
         envVariables.put(
             JobConstants.GENIE_JOB_GROUPING_ENV_VAR,
@@ -562,5 +572,12 @@ public class JobResolverServiceImpl implements JobResolverService {
         } else {
             return requestedArchiveLocationPrefix + File.separator + jobId;
         }
+    }
+
+    private int resolveJobMemory(final JobRequest jobRequest, final Command command) {
+        return jobRequest
+            .getRequestedJobEnvironment()
+            .getRequestedJobMemory()
+            .orElse(command.getMemory().orElse(this.defaultMemory));
     }
 }

@@ -34,12 +34,14 @@ import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobResolverService;
@@ -260,6 +262,8 @@ public class JobCoordinatorServiceImplTest {
             new File("/tmp/genie/jobs/" + JOB_1_ID),
             archiveLocation
         );
+        final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
 
         Mockito
             .when(
@@ -268,7 +272,7 @@ public class JobCoordinatorServiceImplTest {
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
             )
-            .thenReturn(jobSpecification);
+            .thenReturn(resolvedJob);
 
         Mockito.when(this.jobStateService.getUsedMemory()).thenReturn(0);
 
@@ -388,6 +392,8 @@ public class JobCoordinatorServiceImplTest {
             new File("/tmp/genie/jobs/" + JOB_1_ID),
             archiveLocation
         );
+        final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
 
         Mockito
             .when(
@@ -396,7 +402,7 @@ public class JobCoordinatorServiceImplTest {
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
             )
-            .thenReturn(jobSpecification);
+            .thenReturn(resolvedJob);
 
         try {
             this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
@@ -489,6 +495,8 @@ public class JobCoordinatorServiceImplTest {
             new File("/tmp/genie/jobs/" + JOB_1_ID),
             archiveLocation
         );
+        final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
 
         Mockito
             .when(
@@ -497,7 +505,7 @@ public class JobCoordinatorServiceImplTest {
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
             )
-            .thenReturn(jobSpecification);
+            .thenReturn(resolvedJob);
 
         Mockito
             .when(this.jobStateService.getUsedMemory())
@@ -609,6 +617,8 @@ public class JobCoordinatorServiceImplTest {
             new File("/tmp/genie/jobs/" + JOB_1_ID),
             archiveLocation
         );
+        final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
 
         Mockito
             .when(
@@ -617,7 +627,7 @@ public class JobCoordinatorServiceImplTest {
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
             )
-            .thenReturn(jobSpecification);
+            .thenReturn(resolvedJob);
 
         Mockito
             .when(this.jobSearchService.getActiveJobCountForUser(Mockito.any(String.class)))
@@ -711,6 +721,8 @@ public class JobCoordinatorServiceImplTest {
             new File("/tmp/genie/jobs/" + JOB_1_ID),
             archiveLocation
         );
+        final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
 
         Mockito
             .when(
@@ -719,7 +731,7 @@ public class JobCoordinatorServiceImplTest {
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
             )
-            .thenReturn(jobSpecification);
+            .thenReturn(resolvedJob);
 
         Mockito
             .when(this.jobSearchService.getActiveJobCountForUser(Mockito.any(String.class)))
@@ -831,6 +843,8 @@ public class JobCoordinatorServiceImplTest {
             new File("/tmp/genie/jobs/" + JOB_1_ID),
             archiveLocation
         );
+        final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
 
         Mockito
             .when(
@@ -839,7 +853,7 @@ public class JobCoordinatorServiceImplTest {
                     Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class)
                 )
             )
-            .thenReturn(jobSpecification);
+            .thenReturn(resolvedJob);
 
         Mockito
             .doThrow(new RuntimeException())

@@ -26,11 +26,11 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
+import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobResolverService;
-import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -66,10 +66,10 @@ public class AgentJobServiceImpl implements AgentJobService {
     /**
      * Constructor.
      *
-     * @param jobPersistenceService   The persistence service to use
-     * @param jobResolverService The specification service to use
-     * @param agentFilterService      The agent filter service to use
-     * @param meterRegistry           The metrics registry to use
+     * @param jobPersistenceService The persistence service to use
+     * @param jobResolverService    The specification service to use
+     * @param agentFilterService    The agent filter service to use
+     * @param meterRegistry         The metrics registry to use
      */
     public AgentJobServiceImpl(
         final JobPersistenceService jobPersistenceService,
@@ -135,7 +135,9 @@ public class AgentJobServiceImpl implements AgentJobService {
         final JobRequest jobRequest = this.jobPersistenceService
             .getJobRequest(id)
             .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
-        final JobSpecification jobSpecification = this.jobResolverService.resolveJob(id, jobRequest);
+        final JobSpecification jobSpecification = this.jobResolverService
+            .resolveJob(id, jobRequest)
+            .getJobSpecification();
         this.jobPersistenceService.saveJobSpecification(id, jobSpecification);
         return jobSpecification;
     }
@@ -162,7 +164,7 @@ public class AgentJobServiceImpl implements AgentJobService {
         return this.jobResolverService.resolveJob(
             jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()),
             jobRequest
-        );
+        ).getJobSpecification();
     }
 
     /**

@@ -29,6 +29,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificat
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import com.netflix.genie.web.agent.services.AgentFilterService
 import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.services.JobResolverService
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
@@ -169,6 +170,7 @@ class AgentJobServiceImplSpec extends Specification {
     def "Can Resolve Job Specification"() {
         def jobId = UUID.randomUUID().toString()
         def jobRequest = Mock(JobRequest)
+        def resolvedJobMock = Mock(ResolvedJob)
         def jobSpecificationMock = Mock(JobSpecification)
 
         when:
@@ -183,7 +185,8 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(jobRequest)
-        1 * this.jobSpecificationService.resolveJob(jobId, jobRequest) >> jobSpecificationMock
+        1 * this.jobSpecificationService.resolveJob(jobId, jobRequest) >> resolvedJobMock
+        1 * resolvedJobMock.getJobSpecification() >> jobSpecificationMock
         1 * jobPersistenceService.saveJobSpecification(jobId, jobSpecificationMock)
         jobSpecification == jobSpecificationMock
     }
@@ -213,6 +216,7 @@ class AgentJobServiceImplSpec extends Specification {
         def jobRequest = Mock(JobRequest)
 
         def jobSpecificationMock = Mock(JobSpecification)
+        def resolvedJobMock = Mock(ResolvedJob)
         def id = UUID.randomUUID().toString()
 
         when:
@@ -220,7 +224,8 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobRequest.getRequestedId() >> Optional.empty()
-        1 * jobSpecificationService.resolveJob(_ as String, jobRequest) >> jobSpecificationMock
+        1 * jobSpecificationService.resolveJob(_ as String, jobRequest) >> resolvedJobMock
+        1 * resolvedJobMock.getJobSpecification() >> jobSpecificationMock
         jobSpecification == jobSpecificationMock
 
         when:
@@ -228,7 +233,8 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobRequest.getRequestedId() >> Optional.of(id)
-        1 * jobSpecificationService.resolveJob(id, jobRequest) >> jobSpecificationMock
+        1 * jobSpecificationService.resolveJob(id, jobRequest) >> resolvedJobMock
+        1 * resolvedJobMock.getJobSpecification() >> jobSpecificationMock
         jobSpecification == jobSpecificationMock
     }
 
