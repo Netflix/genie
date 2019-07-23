@@ -176,6 +176,9 @@ public class FileSystemAttachmentService implements AttachmentService {
     }
 
     private Set<URI> writeAttachments(final String id, final Set<Resource> attachments) throws IOException {
+        if (attachments.isEmpty()) {
+            return ImmutableSet.of();
+        }
         final Path requestDir = Files.createDirectories(this.attachmentDirectory.resolve(id));
         final ImmutableSet.Builder<URI> uris = ImmutableSet.builder();
 
