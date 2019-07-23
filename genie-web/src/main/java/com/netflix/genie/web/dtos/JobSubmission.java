@@ -57,7 +57,7 @@ import java.util.Set;
     }
 )
 @SuppressWarnings("FinalClass")
-public class ApiJobSubmission {
+public class JobSubmission {
 
     @NotNull
     @Valid
@@ -68,14 +68,14 @@ public class ApiJobSubmission {
     @NotNull
     private final Set<Resource> attachments;
 
-    private ApiJobSubmission(final Builder builder) {
+    private JobSubmission(final Builder builder) {
         this.jobRequest = builder.bJobRequest;
         this.jobRequestMetadata = builder.bJobRequestMetadata;
         this.attachments = ImmutableSet.copyOf(builder.bAttachments);
     }
 
     /**
-     * Builder for {@link ApiJobSubmission} instances.
+     * Builder for {@link JobSubmission} instances.
      *
      * @author tgianos
      * @since 4.0.0
@@ -120,12 +120,12 @@ public class ApiJobSubmission {
         }
 
         /**
-         * Build an immutable {@link ApiJobSubmission} instance based on the current contents of this builder.
+         * Build an immutable {@link JobSubmission} instance based on the current contents of this builder.
          *
-         * @return An {@link ApiJobSubmission} instance
+         * @return An {@link JobSubmission} instance
          */
-        public ApiJobSubmission build() {
-            return new ApiJobSubmission(this);
+        public JobSubmission build() {
+            return new JobSubmission(this);
         }
 
         private void setAttachments(@Nullable final Collection<Resource> attachments) {

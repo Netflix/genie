@@ -24,11 +24,11 @@ import org.springframework.core.io.Resource
 import spock.lang.Specification
 
 /**
- * Specifications for {@link ApiJobSubmission}.
+ * Specifications for {@link JobSubmission}.
  *
  * @author tgianos
  */
-class ApiJobSubmissionSpec extends Specification {
+class JobSubmissionSpec extends Specification {
 
     def "Can build"() {
         def jobRequest = Mock(JobRequest)
@@ -36,7 +36,7 @@ class ApiJobSubmissionSpec extends Specification {
         def attachment1 = Mock(Resource)
         def attachment2 = Mock(Resource)
 
-        def builder = new ApiJobSubmission.Builder(jobRequest, jobRequestMetadata)
+        def builder = new JobSubmission.Builder(jobRequest, jobRequestMetadata)
 
         when:
         def submission1 = builder.build()
