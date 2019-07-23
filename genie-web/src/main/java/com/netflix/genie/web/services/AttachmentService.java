@@ -18,13 +18,16 @@
 package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * APIs for dealing with attachments sent in with Genie requests. Implementations will handle where to store them and
@@ -96,4 +99,23 @@ public interface AttachmentService {
      * @throws IOException On error during deletion
      */
     void deleteAll(String id) throws IOException;
+
+    /**
+     * Given the id of a job and the set of attachments associated with that job this API should save the attachments
+     * somewhere that the agent can access as job dependencies once the job runs.
+     *
+     * @param jobId       The id of the job these attachments are for
+     * @param attachments The attachments sent by the user
+     * @return The set of {@link URI} where the attachments were saved
+     * @throws IOException on error when an attachment is attempted to be saved to the underlying storage
+     */
+    Set<URI> saveAttachments(String jobId, Set<Resource> attachments) throws IOException;
+
+    /**
+     * Given the id of a job delete all the attachments that were saved for it.
+     *
+     * @param jobId The id of the job to delete attachments for
+     * @throws IOException on error while deleting the attachments
+     */
+    void deleteAttachments(String jobId) throws IOException;
 }
