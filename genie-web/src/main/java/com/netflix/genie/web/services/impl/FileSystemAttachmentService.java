@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -154,8 +155,15 @@ public class FileSystemAttachmentService implements AttachmentService {
      * {@inheritDoc}
      */
     @Override
-    public Set<URI> saveAttachments(final String jobId, final Set<Resource> attachments) throws IOException {
-        return this.writeAttachments(jobId, attachments);
+    public Set<URI> saveAttachments(
+        final String jobId,
+        final Set<Resource> attachments
+    ) throws SaveAttachmentException {
+        try {
+            return this.writeAttachments(jobId, attachments);
+        } catch (final IOException ioe) {
+            throw new SaveAttachmentException(ioe);
+        }
     }
 
     /**
