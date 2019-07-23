@@ -18,6 +18,7 @@
 package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 
@@ -107,9 +108,9 @@ public interface AttachmentService {
      * @param jobId       The id of the job these attachments are for
      * @param attachments The attachments sent by the user
      * @return The set of {@link URI} where the attachments were saved
-     * @throws IOException on error when an attachment is attempted to be saved to the underlying storage
+     * @throws SaveAttachmentException on error when an attachment is attempted to be saved to the underlying storage
      */
-    Set<URI> saveAttachments(String jobId, Set<Resource> attachments) throws IOException;
+    Set<URI> saveAttachments(String jobId, Set<Resource> attachments) throws SaveAttachmentException;
 
     /**
      * Given the id of a job delete all the attachments that were saved for it.

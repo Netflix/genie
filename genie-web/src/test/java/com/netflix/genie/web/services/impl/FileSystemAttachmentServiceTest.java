@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -193,10 +194,11 @@ public class FileSystemAttachmentServiceTest {
     /**
      * Test that all attachments are saved successfully to disk and can be deleted.
      *
-     * @throws IOException on error
+     * @throws SaveAttachmentException on error running service API
+     * @throws IOException             on error creating test attachments
      */
     @Test
-    public void testSaveAndDeleteAttachments() throws IOException {
+    public void testSaveAndDeleteAttachments() throws SaveAttachmentException, IOException {
         final String jobId = UUID.randomUUID().toString();
         final Path sourceDirectory = this.folder.newFolder().toPath();
         final int numAttachments = 5;
