@@ -29,11 +29,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
+import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -41,6 +43,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Tests for the file system implementation of the attachment service.
@@ -139,7 +142,7 @@ public class FileSystemAttachmentServiceTest {
     }
 
     /**
-     * Test that all exceptions can be saved at once.
+     * Test that all attachments can be saved at once.
      *
      * @throws IOException on error
      */
@@ -184,6 +187,39 @@ public class FileSystemAttachmentServiceTest {
 
         // Delete Them
         this.service.deleteAll(id);
+        Assert.assertFalse(Files.exists(expectedAttachmentDirectory));
+    }
+
+    /**
+     * Test that all attachments are saved successfully to disk and can be deleted.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void testSaveAndDeleteAttachments() throws IOException {
+        final String jobId = UUID.randomUUID().toString();
+        final Path sourceDirectory = this.folder.newFolder().toPath();
+        final int numAttachments = 5;
+        final Set<Path> sourceAttachments = this.createAttachments(sourceDirectory, numAttachments);
+        final Set<URI> attachmentURIs = this.service.saveAttachments(
+            jobId,
+            sourceAttachments.stream().map(FileSystemResource::new).collect(Collectors.toSet())
+        );
+        final Path expectedAttachmentDirectory = this.folder.getRoot().toPath().resolve(jobId);
+        Assert.assertTrue(Files.exists(expectedAttachmentDirectory));
+        Assert.assertThat(Files.list(expectedAttachmentDirectory).count(), Matchers.is((long) numAttachments));
+        Assert.assertThat(attachmentURIs.size(), Matchers.is(numAttachments));
+        for (final Path attachment : sourceAttachments) {
+            Assert.assertTrue(
+                FileUtils.contentEquals(
+                    attachment.toFile(),
+                    expectedAttachmentDirectory.resolve(attachment.getFileName()).toFile()
+                )
+            );
+        }
+
+        // Delete the attachments
+        this.service.deleteAttachments(jobId);
         Assert.assertFalse(Files.exists(expectedAttachmentDirectory));
     }
 

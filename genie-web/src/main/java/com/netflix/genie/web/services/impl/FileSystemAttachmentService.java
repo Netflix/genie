@@ -17,14 +17,17 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.Resource;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +37,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the AttachmentService interface which saves and retrieves attachments from the local filesystem.
@@ -75,7 +80,7 @@ public class FileSystemAttachmentService implements AttachmentService {
         final InputStream content
     ) throws GenieException {
         try {
-            this.writeAttachments(jobId, ImmutableMap.of(filename, content));
+            this.writeAttachments(jobId, ImmutableSet.of(new AttachmentResource(filename, content)));
         } catch (final IOException ioe) {
             throw new GenieServerException("Failed to save attachment", ioe);
         }
@@ -114,7 +119,13 @@ public class FileSystemAttachmentService implements AttachmentService {
     @Override
     public String saveAll(final Map<String, InputStream> attachments) throws IOException {
         final String requestId = UUID.randomUUID().toString();
-        this.writeAttachments(requestId, attachments);
+        this.writeAttachments(
+            requestId,
+            attachments
+                .entrySet()
+                .stream()
+                .map(entry -> new AttachmentResource(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet()));
         return requestId;
     }
 
@@ -136,21 +147,83 @@ public class FileSystemAttachmentService implements AttachmentService {
      */
     @Override
     public void deleteAll(final String id) throws IOException {
-        final Path attachmentDir = this.attachmentDirectory.resolve(id);
+        this.deleteAttachments(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<URI> saveAttachments(final String jobId, final Set<Resource> attachments) throws IOException {
+        return this.writeAttachments(jobId, attachments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteAttachments(final String jobId) throws IOException {
+        final Path attachmentDir = this.attachmentDirectory.resolve(jobId);
         FileUtils.deleteDirectory(attachmentDir.toFile());
     }
 
-    private void writeAttachments(final String id, final Map<String, InputStream> attachments) throws IOException {
+    private Set<URI> writeAttachments(final String id, final Set<Resource> attachments) throws IOException {
         final Path requestDir = Files.createDirectories(this.attachmentDirectory.resolve(id));
+        final ImmutableSet.Builder<URI> uris = ImmutableSet.builder();
 
-        for (final Map.Entry<String, InputStream> entry : attachments.entrySet()) {
+        for (final Resource attachment : attachments) {
+            final String rawFilename = attachment.getFilename() == null
+                ? UUID.randomUUID().toString()
+                : attachment.getFilename();
             // Sanitize the filename
-            final Path fileName = Paths.get(entry.getKey()).getFileName();
+            final Path fileName = Paths.get(rawFilename).getFileName();
             final Path file = requestDir.resolve(fileName);
-            try (InputStream contents = entry.getValue()) {
+            try (InputStream contents = attachment.getInputStream()) {
                 final long byteCount = Files.copy(contents, file);
                 log.debug("Wrote {} bytes for attachment {} to {}", byteCount, fileName, file);
             }
+            uris.add(file.toUri());
+        }
+        return uris.build();
+    }
+
+    /**
+     * Temporary class for backwards compatibility till we delete all unused APIs.
+     */
+    @SuppressWarnings("FinalClass")
+    private static class AttachmentResource extends AbstractResource {
+        private final String filename;
+        private final InputStream contents;
+
+        private AttachmentResource(final String filename, final InputStream contents) {
+            this.filename = filename;
+            this.contents = contents;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getFilename() {
+            return this.filename;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        @Nonnull
+        public String getDescription() {
+            return "Temporary resource for " + this.filename;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        @Nonnull
+        public InputStream getInputStream() throws IOException {
+            return this.contents;
         }
     }
 }
