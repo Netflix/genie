@@ -23,6 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.apache.commons.io.FileUtils;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -223,6 +224,25 @@ public class FileSystemAttachmentServiceTest {
         // Delete the attachments
         this.service.deleteAttachments(jobId);
         Assert.assertFalse(Files.exists(expectedAttachmentDirectory));
+    }
+
+    /**
+     * Make sure when there are no attachments sent in it does nothing to the file system.
+     *
+     * @throws SaveAttachmentException on error running service API
+     * @throws IOException             listing file system resources
+     */
+    @Test
+    public void emptyAttachmentsIsANoOp() throws SaveAttachmentException, IOException {
+        final Set<Path> currentContents = Files.list(this.folder.getRoot().toPath()).collect(Collectors.toSet());
+        final Set<URI> uris = this.service.saveAttachments(
+            UUID.randomUUID().toString(),
+            Sets.newHashSet()
+        );
+        Assertions.assertThat(uris).isEmpty();
+        Assertions
+            .assertThat(Files.list(this.folder.getRoot().toPath()).collect(Collectors.toSet()))
+            .isEqualTo(currentContents);
     }
 
     private Set<File> saveAttachments(final String jobId) throws GenieException, IOException {
