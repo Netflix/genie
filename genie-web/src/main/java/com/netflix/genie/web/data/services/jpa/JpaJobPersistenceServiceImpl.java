@@ -41,7 +41,6 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
@@ -382,26 +381,6 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 "A job with id " + jobEntity.getUniqueId() + " already exists. Unable to reserve id.",
                 e
             );
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String saveJobRequest(
-        @Valid final JobRequest jobRequest,
-        @Valid final JobRequestMetadata jobRequestMetadata
-    ) {
-        // TODO: Remove this in favor of saveJobSubmission once that API is stable
-        log.debug("Attempting to save job request {} with request metadata {}", jobRequest, jobRequestMetadata);
-        // Persist. Catch exception if the ID is reused
-        try {
-            return this.saveJobSubmission(new JobSubmission.Builder(jobRequest, jobRequestMetadata).build());
-        } catch (final IdAlreadyExistsException e) {
-            throw new GenieIdAlreadyExistsException(e);
-        } catch (final SaveAttachmentException e) {
-            throw new GenieRuntimeException(e);
         }
     }
 

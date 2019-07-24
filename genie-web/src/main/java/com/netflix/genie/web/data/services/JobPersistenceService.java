@@ -24,12 +24,10 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
-import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
@@ -183,20 +181,6 @@ public interface JobPersistenceService {
     String saveJobSubmission(@Valid JobSubmission jobSubmission) throws
         IdAlreadyExistsException,
         SaveAttachmentException;
-
-    /**
-     * Save the job request information.
-     *
-     * @param jobRequest         All the metadata provided by the user about the job
-     * @param jobRequestMetadata Metadata about the request gathered by the system not provided by the user
-     * @return The id that was reserved in the system for this job
-     * @throws GenieIdAlreadyExistsException When the requested ID is already in use
-     * @throws GenieRuntimeException         On other type of error
-     */
-    String saveJobRequest(
-        @Valid JobRequest jobRequest,
-        @Valid JobRequestMetadata jobRequestMetadata
-    );
 
     /**
      * Get the original request for a job.

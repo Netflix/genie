@@ -45,7 +45,6 @@ import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
@@ -470,55 +469,24 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     }
 
     /**
-     * Test the V4 {@link JobPersistenceService#saveJobRequest(JobRequest, JobRequestMetadata)} method.
-     *
-     * @throws GenieException on error
-     * @throws IOException    on JSON error
-     */
-    @Test
-    public void canSaveAndRetrieveJobRequest() throws GenieException, IOException {
-        final String job0Id = UUID.randomUUID().toString();
-        final String job3Id = UUID.randomUUID().toString();
-        final JobRequest jobRequest0 = this.createJobRequest(job0Id, UUID.randomUUID().toString());
-        final JobRequest jobRequest1 = this.createJobRequest(null, UUID.randomUUID().toString());
-        final JobRequest jobRequest2 = this.createJobRequest(JOB_3_ID, UUID.randomUUID().toString());
-        final JobRequest jobRequest3 = this.createJobRequest(job3Id, null);
-        final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata(
-            NUM_ATTACHMENTS,
-            TOTAL_SIZE_ATTACHMENTS
-        );
-
-        String id = this.jobPersistenceService.saveJobRequest(jobRequest0, jobRequestMetadata);
-        Assert.assertThat(id, Matchers.is(job0Id));
-        this.validateSavedJobSubmission(id, jobRequest0, jobRequestMetadata);
-
-        id = this.jobPersistenceService.saveJobRequest(jobRequest1, jobRequestMetadata);
-        Assert.assertThat(id, Matchers.notNullValue());
-        this.validateSavedJobSubmission(id, jobRequest1, jobRequestMetadata);
-
-        try {
-            this.jobPersistenceService.saveJobRequest(jobRequest2, jobRequestMetadata);
-            Assert.fail();
-        } catch (final GenieIdAlreadyExistsException e) {
-            // Expected
-        }
-
-        id = this.jobPersistenceService.saveJobRequest(jobRequest3, jobRequestMetadata);
-        Assert.assertThat(id, Matchers.is(job3Id));
-        this.validateSavedJobSubmission(id, jobRequest3, jobRequestMetadata);
-    }
-
-    /**
      * Make sure saving and retrieving a job specification works as expected.
      *
-     * @throws GenieException on error
-     * @throws IOException    on json error
+     * @throws GenieException           on error
+     * @throws IOException              on json error
+     * @throws IdAlreadyExistsException If the job ID is already taken
+     * @throws SaveAttachmentException  If the attachments can't be saved. God I hate checked exceptions.
      */
     @Test
-    public void canSaveAndRetrieveJobSpecification() throws GenieException, IOException {
-        final String jobId = this.jobPersistenceService.saveJobRequest(
-            this.createJobRequest(null, UUID.randomUUID().toString()),
-            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+    public void canSaveAndRetrieveJobSpecification() throws
+        GenieException,
+        IdAlreadyExistsException,
+        SaveAttachmentException,
+        IOException {
+        final String jobId = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(
+                this.createJobRequest(null, UUID.randomUUID().toString()),
+                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+            ).build()
         );
 
         final JobRequest jobRequest = this.jobPersistenceService
@@ -536,9 +504,11 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             Matchers.is(jobSpecification)
         );
 
-        final String jobId2 = this.jobPersistenceService.saveJobRequest(
-            this.createJobRequest(null, null),
-            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+        final String jobId2 = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(
+                this.createJobRequest(null, null),
+                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+            ).build()
         );
 
         final JobRequest jobRequest2 = this.jobPersistenceService
@@ -557,14 +527,22 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     /**
      * Make sure {@link JpaJobPersistenceServiceImpl#claimJob(String, AgentClientMetadata)} works as expected.
      *
-     * @throws GenieException on error
-     * @throws IOException    on json error
+     * @throws GenieException           on error
+     * @throws IOException              on json error
+     * @throws IdAlreadyExistsException If the job ID is already taken
+     * @throws SaveAttachmentException  If the attachments can't be saved.
      */
     @Test
-    public void canClaimJobAndUpdateStatus() throws GenieException, IOException {
-        final String jobId = this.jobPersistenceService.saveJobRequest(
-            this.createJobRequest(null, UUID.randomUUID().toString()),
-            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+    public void canClaimJobAndUpdateStatus() throws
+        GenieException,
+        IdAlreadyExistsException,
+        SaveAttachmentException,
+        IOException {
+        final String jobId = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(
+                this.createJobRequest(null, UUID.randomUUID().toString()),
+                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+            ).build()
         );
 
         final JobRequest jobRequest = this.jobPersistenceService
@@ -611,14 +589,22 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     /**
      * Test the {@link JpaJobPersistenceServiceImpl#updateJobStatus(String, JobStatus, JobStatus, String)} method.
      *
-     * @throws GenieException on error
-     * @throws IOException    on error
+     * @throws GenieException           on error
+     * @throws IOException              on error
+     * @throws IdAlreadyExistsException If the job ID is already taken
+     * @throws SaveAttachmentException  If the attachments can't be saved
      */
     @Test
-    public void canUpdateJobStatus() throws GenieException, IOException {
-        final String jobId = this.jobPersistenceService.saveJobRequest(
-            this.createJobRequest(null, UUID.randomUUID().toString()),
-            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+    public void canUpdateJobStatus() throws
+        GenieException,
+        IdAlreadyExistsException,
+        SaveAttachmentException,
+        IOException {
+        final String jobId = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(
+                this.createJobRequest(null, UUID.randomUUID().toString()),
+                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+            ).build()
         );
 
         final JobRequest jobRequest = this.jobPersistenceService
