@@ -33,6 +33,7 @@ import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.JobResolverService;
@@ -150,11 +151,9 @@ public class AgentJobServiceImpl implements AgentJobService {
         final JobRequest jobRequest = this.jobPersistenceService
             .getJobRequest(id)
             .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
-        final JobSpecification jobSpecification = this.jobResolverService
-            .resolveJob(id, jobRequest)
-            .getJobSpecification();
-        this.jobPersistenceService.saveJobSpecification(id, jobSpecification);
-        return jobSpecification;
+        final ResolvedJob resolvedJob = this.jobResolverService.resolveJob(id, jobRequest);
+        this.jobPersistenceService.saveResolvedJob(id, resolvedJob);
+        return resolvedJob.getJobSpecification();
     }
 
     /**

@@ -37,6 +37,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import spock.lang.Specification
+
 /**
  * Specifications for the {@link com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl} class.
  *
@@ -186,7 +187,7 @@ class AgentJobServiceImplSpec extends Specification {
         1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(jobRequest)
         1 * this.jobSpecificationService.resolveJob(jobId, jobRequest) >> resolvedJobMock
         1 * resolvedJobMock.getJobSpecification() >> jobSpecificationMock
-        1 * jobPersistenceService.saveJobSpecification(jobId, jobSpecificationMock)
+        1 * jobPersistenceService.saveResolvedJob(jobId, resolvedJobMock)
         jobSpecification == jobSpecificationMock
     }
 
