@@ -108,6 +108,11 @@ public final class MetricsConstants {
         public static final String JOBS_USER_LIMIT = "jobsUserLimit";
 
         /**
+         * Key to tag the load balancer class used.
+         */
+        public static final String LOAD_BALANCER_CLASS = "loadBalancerClass";
+
+        /**
          * Utility class private constructor.
          */
         private TagKeys() {

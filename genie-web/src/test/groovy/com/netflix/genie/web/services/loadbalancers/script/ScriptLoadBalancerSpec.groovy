@@ -241,9 +241,14 @@ class ScriptLoadBalancerSpec extends Specification {
         then: "Can successfully find a cluster"
         cluster != null
         cluster.getId() == "1"
+        cluster.getMetadata().getName() == "g"
         1 * registry.timer(
             ScriptLoadBalancer.SELECT_TIMER_NAME,
-            ImmutableSet.of(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FOUND))
+            ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FOUND),
+                Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, "g"),
+                Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "1")
+            )
         ) >> selectTimer
         1 * selectTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
@@ -329,8 +334,10 @@ class ScriptLoadBalancerSpec extends Specification {
         }
         1 * timer.record(_, TimeUnit.NANOSECONDS)
         tags != null
-        tags.size() == 1
+        tags.size() == 3
         tags.contains(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FOUND))
+        tags.contains(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName()))
+        tags.contains(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()))
         clustersGood.contains(cluster)
         cluster.getId() == "2"
 
