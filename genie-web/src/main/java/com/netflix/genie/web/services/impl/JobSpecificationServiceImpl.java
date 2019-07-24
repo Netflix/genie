@@ -375,7 +375,14 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                             selectedCluster.getId(),
                             loadBalancerClass
                         );
-                        counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_SUCCESS));
+                        counterTags.addAll(
+                            Lists.newArrayList(
+                                Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_SUCCESS),
+                                Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, selectedCluster.getId()),
+                                Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, selectedCluster.getMetadata().getName()),
+                                Tag.of(MetricsConstants.TagKeys.LOAD_BALANCER_CLASS, loadBalancerClass)
+                            )
+                        );
                         this.registry.counter(SELECT_LOAD_BALANCER_COUNTER_NAME, counterTags).increment();
                         cluster = selectedCluster;
                         break;

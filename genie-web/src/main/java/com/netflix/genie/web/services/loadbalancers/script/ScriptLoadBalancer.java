@@ -177,6 +177,8 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
             for (final Cluster cluster : clusters) {
                 if (clusterId.equals(cluster.getId())) {
                     tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FOUND));
+                    tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName()));
+                    tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()));
                     return cluster;
                 }
             }
