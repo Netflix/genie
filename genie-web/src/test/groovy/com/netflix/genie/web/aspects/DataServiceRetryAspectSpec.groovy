@@ -21,8 +21,13 @@ import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
+import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.data.services.JobSearchService
+import com.netflix.genie.web.data.services.jpa.JpaJobPersistenceServiceImpl
 import com.netflix.genie.web.data.services.jpa.JpaJobSearchServiceImpl
+import com.netflix.genie.web.dtos.JobSubmission
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
 import com.netflix.genie.web.properties.DataServiceRetryProperties
 import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory
@@ -30,9 +35,9 @@ import org.springframework.dao.QueryTimeoutException
 import spock.lang.Specification
 
 /**
- * Unit tests for DataServiceRetryAspect
+ * Unit tests for {@link DataServiceRetryAspect}.
  *
- * @author amajumdar* @since 3.0.0
+ * @author amajumdar
  */
 class DataServiceRetryAspectSpec extends Specification {
     DataServiceRetryAspect dataServiceRetryAspect
@@ -145,5 +150,27 @@ class DataServiceRetryAspectSpec extends Specification {
         2 * dataService.getJob(id) >>
             { throw new QueryTimeoutException(null, null) } >>
             { throw new QueryTimeoutException(null, null) } >> null
+    }
+
+    def testSaveJobSubmission() {
+        def jobSubmission = Mock(JobSubmission.class)
+        def dataService = Mock(JpaJobPersistenceServiceImpl.class)
+        AspectJProxyFactory factory = new AspectJProxyFactory(dataService)
+        factory.addAspect(dataServiceRetryAspect)
+        JobPersistenceService dataServiceProxy = factory.getProxy()
+
+        when:
+        dataServiceProxy.saveJobSubmission(jobSubmission)
+
+        then:
+        thrown(IdAlreadyExistsException.class)
+        1 * dataService.saveJobSubmission(jobSubmission) >> { throw new IdAlreadyExistsException("conflict") }
+
+        when:
+        dataServiceProxy.saveJobSubmission(jobSubmission)
+
+        then:
+        thrown(SaveAttachmentException.class)
+        1 * dataService.saveJobSubmission(jobSubmission) >> { throw new SaveAttachmentException("bad") }
     }
 }

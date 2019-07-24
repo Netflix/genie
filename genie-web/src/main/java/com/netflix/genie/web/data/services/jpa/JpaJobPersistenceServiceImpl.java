@@ -65,6 +65,10 @@ import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import com.netflix.genie.web.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -72,15 +76,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -93,13 +100,16 @@ import java.util.stream.Collectors;
     rollbackFor = {
         GenieException.class,
         GenieRuntimeException.class,
-        ConstraintViolationException.class
+        ConstraintViolationException.class,
+        IdAlreadyExistsException.class,
+        SaveAttachmentException.class
     }
 )
 @Slf4j
 public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobPersistenceService {
 
     private final JpaJobRepository jobRepository;
+    private final AttachmentService attachmentService;
 
     /**
      * Constructor.
@@ -110,6 +120,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
      * @param jobRepository          The {@link JpaJobRepository} to use
+     * @param attachmentService      The {@link AttachmentService} implementation to use to persist attachments before
+     *                               converting them to dependencies of the job
      */
     public JpaJobPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
@@ -117,7 +129,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository,
-        final JpaJobRepository jobRepository
+        final JpaJobRepository jobRepository,
+        final AttachmentService attachmentService
     ) {
         super(
             tagPersistenceService,
@@ -127,6 +140,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             commandRepository
         );
         this.jobRepository = jobRepository;
+        this.attachmentService = attachmentService;
     }
 
     /**
@@ -321,19 +335,30 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * {@inheritDoc}
      */
     @Override
-    public String saveJobRequest(
-        @Valid final JobRequest jobRequest,
-        @Valid final JobRequestMetadata jobRequestMetadata
-    ) {
-        log.debug("Attempting to save job request {} with request metadata {}", jobRequest, jobRequestMetadata);
+    @Nonnull
+    public String saveJobSubmission(
+        @Valid final JobSubmission jobSubmission
+    ) throws IdAlreadyExistsException, SaveAttachmentException {
+        log.debug("Attempting to save job submission {}", jobSubmission);
         // TODO: Metrics
         final JobEntity jobEntity = new JobEntity();
 
+        final JobRequest jobRequest = jobSubmission.getJobRequest();
+        final JobRequestMetadata jobRequestMetadata = jobSubmission.getJobRequestMetadata();
+
+        // Create the unique id if one doesn't already exist
         this.setUniqueId(jobEntity, jobRequest.getRequestedId().orElse(null));
+
+        // Do we have attachments? Save them so the agent can access them later.
+        final Set<URI> attachmentURIs = this.attachmentService.saveAttachments(
+            jobEntity.getUniqueId(),
+            jobSubmission.getAttachments()
+        );
+
         jobEntity.setCommandArgs(jobRequest.getCommandArgs());
 
         this.setJobMetadataFields(jobEntity, jobRequest.getMetadata());
-        this.setExecutionEnvironmentFields(jobEntity, jobRequest.getResources());
+        this.setExecutionEnvironmentFields(jobEntity, jobRequest.getResources(), attachmentURIs);
         this.setExecutionResourceCriteriaFields(jobEntity, jobRequest.getCriteria());
         this.setRequestedJobEnvironmentFields(jobEntity, jobRequest.getRequestedJobEnvironment());
         this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
@@ -347,17 +372,36 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         try {
             final String id = this.jobRepository.save(jobEntity).getUniqueId();
             log.debug(
-                "Saved job request {} with request metadata {} under job id {}",
-                jobRequest,
-                jobRequestMetadata,
+                "Saved job submission {} under job id {}",
+                jobSubmission,
                 id
             );
             return id;
         } catch (final DataIntegrityViolationException e) {
-            throw new GenieIdAlreadyExistsException(
+            throw new IdAlreadyExistsException(
                 "A job with id " + jobEntity.getUniqueId() + " already exists. Unable to reserve id.",
                 e
             );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String saveJobRequest(
+        @Valid final JobRequest jobRequest,
+        @Valid final JobRequestMetadata jobRequestMetadata
+    ) {
+        // TODO: Remove this in favor of saveJobSubmission once that API is stable
+        log.debug("Attempting to save job request {} with request metadata {}", jobRequest, jobRequestMetadata);
+        // Persist. Catch exception if the ID is reused
+        try {
+            return this.saveJobSubmission(new JobSubmission.Builder(jobRequest, jobRequestMetadata).build());
+        } catch (final IdAlreadyExistsException e) {
+            throw new GenieIdAlreadyExistsException(e);
+        } catch (final SaveAttachmentException e) {
+            throw new GenieRuntimeException(e);
         }
     }
 
@@ -424,9 +468,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
             entity.setEnvironmentVariables(specification.getEnvironmentVariables());
             entity.setJobDirectoryLocation(specification.getJobDirectoryLocation().getAbsolutePath());
-            specification.getArchiveLocation().ifPresent(
-                archiveLocation -> entity.setArchiveLocation(archiveLocation)
-            );
+            specification.getArchiveLocation().ifPresent(entity::setArchiveLocation);
             entity.setResolved(true);
             entity.setStatus(JobStatus.RESOLVED);
             log.debug("Saved job specification {} for job with id {}", specification, id);
@@ -779,7 +821,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
     private void setExecutionEnvironmentFields(
         final JobEntity jobEntity,
-        final ExecutionEnvironment executionEnvironment
+        final ExecutionEnvironment executionEnvironment,
+        @Nullable final Set<URI> savedAttachments
     ) {
         final FileEntity setupFile = executionEnvironment.getSetupFile().isPresent()
             ? this.createAndGetFileEntity(executionEnvironment.getSetupFile().get())
@@ -788,7 +831,15 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             jobEntity.setSetupFile(setupFile);
         }
         jobEntity.setConfigs(this.createAndGetFileEntities(executionEnvironment.getConfigs()));
-        jobEntity.setDependencies(this.createAndGetFileEntities(executionEnvironment.getDependencies()));
+        final Set<FileEntity> dependencies = this.createAndGetFileEntities(executionEnvironment.getDependencies());
+        if (savedAttachments != null) {
+            dependencies.addAll(
+                this.createAndGetFileEntities(
+                    savedAttachments.stream().map(URI::toString).collect(Collectors.toSet())
+                )
+            );
+        }
+        jobEntity.setDependencies(dependencies);
     }
 
     private void setExecutionResourceCriteriaFields(
