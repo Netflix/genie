@@ -50,6 +50,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.services.AttachmentService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -107,7 +108,8 @@ public class JpaJobPersistenceServiceImplTest {
             this.applicationRepository,
             this.clusterRepository,
             this.commandRepository,
-            this.jobRepository
+            this.jobRepository,
+            Mockito.mock(AttachmentService.class)
         );
     }
 
@@ -787,10 +789,9 @@ public class JpaJobPersistenceServiceImplTest {
      */
     @Test(expected = GenieJobNotFoundException.class)
     public void v4JobNotFoundThrowsException() {
-        final JobEntity jobEntity = null;
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
-            .thenReturn(Optional.ofNullable(jobEntity));
+            .thenReturn(Optional.empty());
 
         this.jobPersistenceService.isV4(UUID.randomUUID().toString());
     }

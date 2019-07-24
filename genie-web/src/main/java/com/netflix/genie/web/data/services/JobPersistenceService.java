@@ -34,8 +34,12 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -154,6 +158,31 @@ public interface JobPersistenceService {
     );
 
     // V4 APIs
+
+    /**
+     * Save the given job submission information in the underlying data store.
+     * <p>
+     * The job record will be created with initial state of {@link JobStatus#RESERVED} meaning that the unique id
+     * returned by this API has been reserved within Genie and no other job can use it. If
+     * {@link JobSubmission#getAttachments()} contains some attachments these attachments will be persisted to a
+     * configured storage system (i.e. local disk, S3, etc) and added to the set of dependencies for the job.
+     * The underlying attachment storage system must be accessible by the agent process configured by the system. For
+     * example if the server is set up to write attachments to local disk but the agent is not running locally but
+     * instead on the remote system it will not be able to access those attachments (as dependencies) and fail.
+     * See {@link com.netflix.genie.web.services.AttachmentService} for more information.
+     *
+     * @param jobSubmission All the information the system has gathered regarding the job submission from the user
+     *                      either via the API or via the agent CLI
+     * @return The unique id of the job within the Genie ecosystem
+     * @throws IdAlreadyExistsException If the id the user requested already exists in the system for another job
+     * @throws SaveAttachmentException  If attachments were sent in with the job submission and they were unable to be
+     *                                  persisted to an underlying storage mechanism meant to share the data with an
+     *                                  agent process
+     */
+    @Nonnull
+    String saveJobSubmission(@Valid JobSubmission jobSubmission) throws
+        IdAlreadyExistsException,
+        SaveAttachmentException;
 
     /**
      * Save the job request information.

@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -81,7 +83,7 @@ public class DataServiceRetryAspect implements Ordered {
         final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
         backOffPolicy.setInitialInterval(dataServiceRetryProperties.getInitialInterval());
         backOffPolicy.setMaxInterval(dataServiceRetryProperties.getMaxInterval());
-        retryTemplate.setBackOffPolicy(backOffPolicy);
+        this.retryTemplate.setBackOffPolicy(backOffPolicy);
     }
 
     /**
@@ -98,13 +100,25 @@ public class DataServiceRetryAspect implements Ordered {
      *
      * @param pjp join point
      * @return return the data method response
-     * @throws GenieException any exception thrown by the data service method
+     * @throws GenieException           any exception thrown by the data service method
+     * @throws IdAlreadyExistsException When a resource is attempted to be saved but has an unique id conflict
+     * @throws SaveAttachmentException  When a job attachment is attempted to be saved to underlying storage but
+     *                                  can't be
      */
     @Around("com.netflix.genie.web.aspects.SystemArchitecture.dataOperation()")
-    public Object profile(final ProceedingJoinPoint pjp) throws GenieException {
+    public Object profile(final ProceedingJoinPoint pjp) throws
+        GenieException,
+        IdAlreadyExistsException,
+        SaveAttachmentException {
         try {
             return retryTemplate.execute(context -> pjp.proceed());
-        } catch (GenieException | GenieRuntimeException | ConstraintViolationException e) {
+        } catch (
+            GenieException
+                | GenieRuntimeException
+                | ConstraintViolationException
+                | IdAlreadyExistsException
+                | SaveAttachmentException e
+        ) {
             throw e;
         } catch (Throwable e) {
             // TODO: We need to be careful about this as it throws a checked exception via aspect and could impact

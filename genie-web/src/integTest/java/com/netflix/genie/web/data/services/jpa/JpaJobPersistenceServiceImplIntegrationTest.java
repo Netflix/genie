@@ -32,7 +32,6 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.ApiClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
@@ -41,6 +40,7 @@ import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
@@ -56,16 +56,30 @@ import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
@@ -75,6 +89,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Integration tests for {@link JpaJobPersistenceServiceImpl}.
@@ -150,6 +165,12 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     private static final Instant STARTED = Instant.now();
     private static final JobStatus STATUS = JobStatus.RUNNING;
     private static final String STATUS_MSG = UUID.randomUUID().toString();
+
+    /**
+     * Creates a temporary folder to use for these tests that is cleaned up after tests are run.
+     */
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Autowired
     private JobPersistenceService jobPersistenceService;
@@ -320,6 +341,135 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     }
 
     /**
+     * Test the V4 {@link JobPersistenceService#saveJobSubmission(JobSubmission)} method.
+     *
+     * @throws GeniePreconditionException On error creating a job request
+     * @throws IdAlreadyExistsException   on error saving to database on id conflict
+     * @throws SaveAttachmentException    When the attachment can't be saved to the implementation of AttachmentService
+     * @throws IOException                on filesystem error
+     * @throws GenieException             On any other error
+     */
+    @Test
+    public void canSaveAndVerifyJobSubmissionWithoutAttachments() throws
+        GeniePreconditionException,
+        IdAlreadyExistsException,
+        SaveAttachmentException,
+        IOException,
+        GenieException {
+        final String job0Id = UUID.randomUUID().toString();
+        final String job3Id = UUID.randomUUID().toString();
+        final JobRequest jobRequest0 = this.createJobRequest(job0Id, UUID.randomUUID().toString());
+        final JobRequest jobRequest1 = this.createJobRequest(null, UUID.randomUUID().toString());
+        final JobRequest jobRequest2 = this.createJobRequest(JOB_3_ID, UUID.randomUUID().toString());
+        final JobRequest jobRequest3 = this.createJobRequest(job3Id, null);
+        final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata(
+            NUM_ATTACHMENTS,
+            TOTAL_SIZE_ATTACHMENTS
+        );
+
+        String id = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(jobRequest0, jobRequestMetadata).build()
+        );
+        Assert.assertThat(id, Matchers.is(job0Id));
+        this.validateSavedJobSubmission(id, jobRequest0, jobRequestMetadata);
+
+        id = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(jobRequest1, jobRequestMetadata).build()
+        );
+        Assert.assertThat(id, Matchers.notNullValue());
+        this.validateSavedJobSubmission(id, jobRequest1, jobRequestMetadata);
+
+        try {
+            this.jobPersistenceService.saveJobSubmission(
+                new JobSubmission.Builder(jobRequest2, jobRequestMetadata).build()
+            );
+            Assert.fail();
+        } catch (final IdAlreadyExistsException e) {
+            // Expected
+        }
+
+        id = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(jobRequest3, jobRequestMetadata).build()
+        );
+        Assert.assertThat(id, Matchers.is(job3Id));
+        this.validateSavedJobSubmission(id, jobRequest3, jobRequestMetadata);
+    }
+
+    /**
+     * Test the V4 {@link JobPersistenceService#saveJobSubmission(JobSubmission)} method with attachments.
+     *
+     * @throws GeniePreconditionException On error creating a job request
+     * @throws IdAlreadyExistsException   on error saving to database on id conflict
+     * @throws SaveAttachmentException    When the attachment can't be saved to the implementation of AttachmentService
+     * @throws IOException                on filesystem error
+     */
+    @Test
+    public void canSaveAndVerifyJobSubmissionWithAttachments() throws
+        GeniePreconditionException,
+        IdAlreadyExistsException,
+        SaveAttachmentException,
+        IOException {
+        final JobRequest jobRequest = this.createJobRequest(null, null);
+        final Path attachmentSource = this.folder.newFolder().toPath();
+        final int numAttachments = 6;
+        long totalAttachmentSize = 0L;
+        final Set<Resource> attachments = Sets.newHashSet();
+        for (int i = 0; i < numAttachments; i++) {
+            final Path attachment = attachmentSource.resolve(UUID.randomUUID().toString());
+            Files.write(attachment, ("Select * FROM my_table where id = " + i + ";").getBytes(StandardCharsets.UTF_8));
+            attachments.add(new FileSystemResource(attachment));
+            totalAttachmentSize += Files.size(attachment);
+        }
+        final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata(
+            numAttachments,
+            totalAttachmentSize
+        );
+
+        // Save the job submission
+        final String id = this.jobPersistenceService.saveJobSubmission(
+            new JobSubmission.Builder(jobRequest, jobRequestMetadata).withAttachments(attachments).build()
+        );
+
+        // TODO: Assumption on bean type of the AttachmentService to be the local file system
+        // Going to assume that most other verification of parameters other than attachments is done in
+        // canSaveAndVerifyJobSubmissionWithoutAttachments()
+        final JobRequest savedJobRequest = this.jobPersistenceService
+            .getJobRequest(id)
+            .orElseThrow(IllegalStateException::new);
+
+        // We should have all the original dependencies
+        Assertions
+            .assertThat(savedJobRequest.getResources().getDependencies())
+            .containsAll(jobRequest.getResources().getDependencies());
+
+        // Filter out the original dependencies so we're left with just the attachments
+        final Set<URI> attachmentURIs = savedJobRequest
+            .getResources()
+            .getDependencies()
+            .stream()
+            .filter(dependency -> !jobRequest.getResources().getDependencies().contains(dependency))
+            .map(
+                dependency -> {
+                    try {
+                        return new URI(dependency);
+                    } catch (URISyntaxException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
+            )
+            .collect(Collectors.toSet());
+
+        Assertions.assertThat(attachmentURIs).size().isEqualTo(numAttachments);
+        long finalAttachmentsSize = 0L;
+        for (final URI attachmentURI : attachmentURIs) {
+            final Path attachment = Paths.get(attachmentURI);
+            Assertions.assertThat(Files.exists(attachment)).isTrue();
+            finalAttachmentsSize += Files.size(attachment);
+        }
+        Assertions.assertThat(finalAttachmentsSize).isEqualTo(totalAttachmentSize);
+    }
+
+    /**
      * Test the V4 {@link JobPersistenceService#saveJobRequest(JobRequest, JobRequestMetadata)} method.
      *
      * @throws GenieException on error
@@ -333,15 +483,18 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final JobRequest jobRequest1 = this.createJobRequest(null, UUID.randomUUID().toString());
         final JobRequest jobRequest2 = this.createJobRequest(JOB_3_ID, UUID.randomUUID().toString());
         final JobRequest jobRequest3 = this.createJobRequest(job3Id, null);
-        final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata();
+        final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata(
+            NUM_ATTACHMENTS,
+            TOTAL_SIZE_ATTACHMENTS
+        );
 
         String id = this.jobPersistenceService.saveJobRequest(jobRequest0, jobRequestMetadata);
         Assert.assertThat(id, Matchers.is(job0Id));
-        this.validateSavedJobRequest(id, jobRequest0, jobRequestMetadata);
+        this.validateSavedJobSubmission(id, jobRequest0, jobRequestMetadata);
 
         id = this.jobPersistenceService.saveJobRequest(jobRequest1, jobRequestMetadata);
         Assert.assertThat(id, Matchers.notNullValue());
-        this.validateSavedJobRequest(id, jobRequest1, jobRequestMetadata);
+        this.validateSavedJobSubmission(id, jobRequest1, jobRequestMetadata);
 
         try {
             this.jobPersistenceService.saveJobRequest(jobRequest2, jobRequestMetadata);
@@ -352,8 +505,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         id = this.jobPersistenceService.saveJobRequest(jobRequest3, jobRequestMetadata);
         Assert.assertThat(id, Matchers.is(job3Id));
-        this.validateSavedJobRequest(id, jobRequest3, jobRequestMetadata);
-
+        this.validateSavedJobSubmission(id, jobRequest3, jobRequestMetadata);
     }
 
     /**
@@ -366,7 +518,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     public void canSaveAndRetrieveJobSpecification() throws GenieException, IOException {
         final String jobId = this.jobPersistenceService.saveJobRequest(
             this.createJobRequest(null, UUID.randomUUID().toString()),
-            this.createJobRequestMetadata()
+            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
         );
 
         final JobRequest jobRequest = this.jobPersistenceService
@@ -386,7 +538,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final String jobId2 = this.jobPersistenceService.saveJobRequest(
             this.createJobRequest(null, null),
-            this.createJobRequestMetadata()
+            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
         );
 
         final JobRequest jobRequest2 = this.jobPersistenceService
@@ -412,7 +564,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     public void canClaimJobAndUpdateStatus() throws GenieException, IOException {
         final String jobId = this.jobPersistenceService.saveJobRequest(
             this.createJobRequest(null, UUID.randomUUID().toString()),
-            this.createJobRequestMetadata()
+            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
         );
 
         final JobRequest jobRequest = this.jobPersistenceService
@@ -466,7 +618,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     public void canUpdateJobStatus() throws GenieException, IOException {
         final String jobId = this.jobPersistenceService.saveJobRequest(
             this.createJobRequest(null, UUID.randomUUID().toString()),
-            this.createJobRequestMetadata()
+            this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
         );
 
         final JobRequest jobRequest = this.jobPersistenceService
@@ -720,7 +872,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         );
     }
 
-    private void validateSavedJobRequest(
+    private void validateSavedJobSubmission(
         final String id,
         final JobRequest jobRequest,
         final JobRequestMetadata jobRequestMetadata
@@ -892,7 +1044,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         );
     }
 
-    private JobRequestMetadata createJobRequestMetadata() {
+    private JobRequestMetadata createJobRequestMetadata(final int numAttachments, final long totalAttachmentSize) {
         final String agentVersion = UUID.randomUUID().toString();
         final int agentPid = RandomSuppliers.INT.get();
         final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
@@ -908,8 +1060,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         return new JobRequestMetadata(
             apiClientMetadata,
             agentClientMetadata,
-            NUM_ATTACHMENTS,
-            TOTAL_SIZE_ATTACHMENTS
+            numAttachments,
+            totalAttachmentSize
         );
     }
 

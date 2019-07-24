@@ -42,6 +42,7 @@ import com.netflix.genie.web.data.services.jpa.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.web.data.services.jpa.JpaJobSearchServiceImpl;
 import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService;
 import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceServiceImpl;
+import com.netflix.genie.web.services.AttachmentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -179,6 +180,8 @@ public class DataAutoConfiguration {
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
      * @param jobRepository          The {@link JpaJobRepository} to use
+     * @param attachmentService      The {@link AttachmentService} implementation to use to store attachments for a job
+     *                               before they are converted to dependencies
      * @return Instance of {@link JpaJobPersistenceServiceImpl}
      */
     @Bean
@@ -189,7 +192,8 @@ public class DataAutoConfiguration {
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository,
-        final JpaJobRepository jobRepository
+        final JpaJobRepository jobRepository,
+        final AttachmentService attachmentService
     ) {
         return new JpaJobPersistenceServiceImpl(
             tagPersistenceService,
@@ -197,7 +201,8 @@ public class DataAutoConfiguration {
             applicationRepository,
             clusterRepository,
             commandRepository,
-            jobRepository
+            jobRepository,
+            attachmentService
         );
     }
 
