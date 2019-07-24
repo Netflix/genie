@@ -21,7 +21,6 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
-import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
@@ -29,6 +28,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificat
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import com.netflix.genie.web.agent.services.AgentFilterService
 import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.services.JobResolverService
 import com.netflix.genie.web.util.MetricsConstants
@@ -37,7 +37,6 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import spock.lang.Specification
-
 /**
  * Specifications for the {@link com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl} class.
  *
@@ -163,7 +162,7 @@ class AgentJobServiceImplSpec extends Specification {
         def id = service.reserveJobId(jobRequest, agentClientMetadata)
 
         then:
-        1 * jobPersistenceService.saveJobRequest(jobRequest, _ as JobRequestMetadata) >> reservedId
+        1 * jobPersistenceService.saveJobSubmission(_ as JobSubmission) >> reservedId
         id == reservedId
     }
 

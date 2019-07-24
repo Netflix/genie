@@ -24,12 +24,17 @@ import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -124,7 +129,17 @@ public class AgentJobServiceImpl implements AgentJobService {
         @Valid final AgentClientMetadata agentClientMetadata
     ) {
         final JobRequestMetadata jobRequestMetadata = new JobRequestMetadata(null, agentClientMetadata, 0, 0);
-        return this.jobPersistenceService.saveJobRequest(jobRequest, jobRequestMetadata);
+        try {
+            return this.jobPersistenceService.saveJobSubmission(
+                new JobSubmission.Builder(jobRequest, jobRequestMetadata).build()
+            );
+        } catch (final IdAlreadyExistsException e) {
+            // TODO: How to handle this?
+            throw new GenieIdAlreadyExistsException(e);
+        } catch (final SaveAttachmentException e) {
+            // this really shouldn't happen as there are no attachments with an agent cli job
+            throw new GenieRuntimeException(e);
+        }
     }
 
     /**
