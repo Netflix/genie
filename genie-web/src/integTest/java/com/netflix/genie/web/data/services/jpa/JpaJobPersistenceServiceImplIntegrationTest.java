@@ -40,6 +40,7 @@ import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
@@ -56,6 +57,7 @@ import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.assertj.core.api.Assertions;
@@ -498,7 +500,12 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             jobRequest, UUID.randomUUID().toString()
         );
 
-        this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+        final ResolvedJob resolvedJob = new ResolvedJob(
+            jobSpecification,
+            new JobEnvironment.Builder(1_512).build()
+        );
+
+        this.jobPersistenceService.saveResolvedJob(jobId, resolvedJob);
         Assert.assertThat(
             this.jobPersistenceService.getJobSpecification(jobId).orElse(null),
             Matchers.is(jobSpecification)
@@ -517,7 +524,11 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final JobSpecification jobSpecification2 = this.createJobSpecification(jobId2, jobRequest2, null);
 
-        this.jobPersistenceService.saveJobSpecification(jobId2, jobSpecification2);
+        final ResolvedJob resolvedJob1 = new ResolvedJob(
+            jobSpecification2,
+            new JobEnvironment.Builder(1_1512).build()
+        );
+        this.jobPersistenceService.saveResolvedJob(jobId2, resolvedJob1);
         Assert.assertThat(
             this.jobPersistenceService.getJobSpecification(jobId2).orElse(null),
             Matchers.is(jobSpecification2)
@@ -554,7 +565,11 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             jobRequest,
             UUID.randomUUID().toString());
 
-        this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+        final ResolvedJob resolvedJob = new ResolvedJob(
+            jobSpecification,
+            new JobEnvironment.Builder(1_512).build()
+        );
+        this.jobPersistenceService.saveResolvedJob(jobId, resolvedJob);
 
         final JobEntity preClaimedJob = this.jobRepository
             .findByUniqueId(jobId)
@@ -616,7 +631,11 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             jobRequest,
             UUID.randomUUID().toString());
 
-        this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+        final ResolvedJob resolvedJob = new ResolvedJob(
+            jobSpecification,
+            new JobEnvironment.Builder(1_512).build()
+        );
+        this.jobPersistenceService.saveResolvedJob(jobId, resolvedJob);
 
         final String agentHostname = UUID.randomUUID().toString();
         final String agentVersion = UUID.randomUUID().toString();
@@ -1054,7 +1073,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     private JobSpecification createJobSpecification(
         final String jobId,
         final JobRequest jobRequest,
-        final String archiveLocation
+        @Nullable final String archiveLocation
     ) throws GenieException {
         final String clusterId = "cluster1";
         final String commandId = "command1";

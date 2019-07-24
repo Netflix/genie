@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyCla
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.springframework.validation.annotation.Validated;
@@ -192,10 +193,10 @@ public interface JobPersistenceService {
     Optional<JobRequest> getJobRequest(@NotBlank(message = "Id is missing and is required") String id);
 
     /**
-     * Save the given job specification details for a job. Sets the job status to {@link JobStatus#RESOLVED}.
+     * Save the given resolved details for a job. Sets the job status to {@link JobStatus#RESOLVED}.
      *
-     * @param id            The id of the job
-     * @param specification The job specification
+     * @param id          The id of the job
+     * @param resolvedJob The resolved information for the job
      * @throws GenieJobNotFoundException         When the job identified by {@code id} can't be found and the
      *                                           specification can't be saved
      * @throws GenieClusterNotFoundException     When the cluster specified in the job specification doesn't actually
@@ -205,9 +206,9 @@ public interface JobPersistenceService {
      * @throws GenieApplicationNotFoundException When an application specified in the job specification doesn't
      *                                           actually exist
      */
-    void saveJobSpecification(
+    void saveResolvedJob(
         @NotBlank(message = "Id is missing and is required") String id,
-        @Valid JobSpecification specification
+        @Valid ResolvedJob resolvedJob
     );
 
     /**

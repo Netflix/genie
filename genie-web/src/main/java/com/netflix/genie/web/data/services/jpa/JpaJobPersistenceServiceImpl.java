@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
@@ -65,6 +66,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.AttachmentService;
@@ -400,14 +402,15 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * {@inheritDoc}
      */
     @Override
-    public void saveJobSpecification(
+    public void saveResolvedJob(
         @NotBlank(message = "Id is missing and is required") final String id,
-        @Valid final JobSpecification specification
+        @Valid final ResolvedJob resolvedJob
     ) {
-        log.debug("Requested to save job specification {} for job with id {}", specification, id);
+        log.debug("Requested to save resolved information {} for job with id {}", resolvedJob, id);
         final JobEntity entity = this.jobRepository
             .findByUniqueId(id)
-            .orElseThrow(() -> {
+            .orElseThrow(
+                () -> {
                     final String error = "No job found with id " + id + ". Unable to save job specification";
                     log.error(error);
                     return new GenieJobNotFoundException(error);
@@ -417,8 +420,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         try {
             if (entity.isResolved()) {
                 log.error(
-                    "Attempted to save job specification {} for job {} that was already resolved",
-                    specification,
+                    "Attempted to save resolved job information {} for job {} that was already resolved",
+                    resolvedJob,
                     id
                 );
                 // This job has already been resolved there's nothing further to save
@@ -427,38 +430,45 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             // Make sure if the job is resolvable otherwise don't do anything
             if (!entity.getStatus().isResolvable()) {
                 log.error(
-                    "Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't save job spec",
+                    "Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't save resolved info",
                     id,
                     entity.getStatus(),
                     JobStatus.getResolvableStatuses()
                 );
                 return;
             }
+            final JobSpecification jobSpecification = resolvedJob.getJobSpecification();
             this.setExecutionResources(
                 entity,
-                specification.getCluster().getId(),
-                specification.getCommand().getId(),
-                specification
+                jobSpecification.getCluster().getId(),
+                jobSpecification.getCommand().getId(),
+                jobSpecification
                     .getApplications()
                     .stream()
                     .map(JobSpecification.ExecutionResource::getId)
                     .collect(Collectors.toList())
             );
 
-            entity.setEnvironmentVariables(specification.getEnvironmentVariables());
-            entity.setJobDirectoryLocation(specification.getJobDirectoryLocation().getAbsolutePath());
-            specification.getArchiveLocation().ifPresent(entity::setArchiveLocation);
+            entity.setEnvironmentVariables(jobSpecification.getEnvironmentVariables());
+            entity.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
+            jobSpecification.getArchiveLocation().ifPresent(entity::setArchiveLocation);
+
+            final JobEnvironment jobEnvironment = resolvedJob.getJobEnvironment();
+            entity.setMemoryUsed(jobEnvironment.getMemory());
+
+            // TODO: There's probably some other fields we want to use from jobEnvironment
+
             entity.setResolved(true);
             entity.setStatus(JobStatus.RESOLVED);
-            log.debug("Saved job specification {} for job with id {}", specification, id);
+            log.debug("Saved resolved information {} for job with id {}", resolvedJob, id);
         } catch (
             final GenieApplicationNotFoundException
                 | GenieCommandNotFoundException
                 | GenieClusterNotFoundException e
         ) {
             log.error(
-                "Unable to save Job Specification {} for job {} due to {}",
-                specification,
+                "Unable to save resolved job information {} for job {} due to {}",
+                resolvedJob,
                 id,
                 e.getMessage(),
                 e
@@ -586,7 +596,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         //       further update it? In the private method below used in Genie 3 it's just swallowed and is a no-op
 
         // TODO: Should we prevent updating status for statuses already covered by "reserveJobId" and
-        //      "saveJobSpecification"?
+        //      "saveResolvedJob"?
 
         this.updateJobStatus(jobEntity, newStatus, newStatusMessage);
 
