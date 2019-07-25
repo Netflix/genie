@@ -43,6 +43,7 @@ public class AgentConfigRequest {
     @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final Integer timeoutRequested;
     private final boolean interactive;
+    // TODO: Switch to Path
     private final File requestedJobDirectoryLocation;
     private final JsonNode ext;
 
