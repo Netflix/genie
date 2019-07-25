@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.web.services;
 
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.Nonnull;
 import javax.validation.Valid;
 
 /**
@@ -31,16 +33,29 @@ import javax.validation.Valid;
  * @author tgianos
  * @since 4.0.0
  */
-@ParametersAreNonnullByDefault
 @Validated
 public interface JobResolverService {
 
     /**
-     * Given a job request resolve all the details needed to run a job.
+     * Given the id of a job that was successfully submitted to the system this API will attempt to resolve all the
+     * concrete details (cluster, command, resources, etc) needed for the system to actually launch the job. Once these
+     * details are determined they are persisted and the job is marked as {@link JobStatus#RESOLVED}.
+     *
+     * @param id The id of the job to resolve. The job must exist and its status must return {@literal true} from
+     *           {@link JobStatus#isResolvable()}
+     * @return A {@link ResolvedJob} instance containing all the concrete information needed to execute the job
+     * @throws GenieJobNotFoundException When there is no job with {@literal id} in the system
+     */
+    @Nonnull
+    ResolvedJob resolveJob(String id) throws GenieJobNotFoundException; // TODO: Fix exception type thrown
+
+    /**
+     * Given a job request resolve all the details needed to run a job. This API is stateless and saves nothing.
      *
      * @param id         The id of the job
      * @param jobRequest The job request containing all details a user wants to have for their job
      * @return The completely resolved job information within a {@link ResolvedJob} instance
      */
+    @Nonnull
     ResolvedJob resolveJob(String id, @Valid JobRequest jobRequest);
 }

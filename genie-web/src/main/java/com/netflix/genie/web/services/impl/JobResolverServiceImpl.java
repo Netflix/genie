@@ -21,7 +21,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.dto.v4.Application;
@@ -33,10 +35,13 @@ import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -50,13 +55,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.TargetClassAware;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -72,47 +81,42 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Validated
-@ParametersAreNonnullByDefault
 public class JobResolverServiceImpl implements JobResolverService {
 
     /**
-     * How long it takes to completely resolve a job specification given inputs.
+     * How long it takes to completely resolve a job given inputs.
      */
-    private static final String RESOLVE_JOB_SPECIFICATION_TIMER = "genie.services.specification.resolve.timer";
+    private static final String RESOLVE_JOB_TIMER = "genie.services.jobResolver.resolve.timer";
 
     /**
      * How long it takes to query the database for cluster command combinations matching supplied criteria.
      */
     private static final String CLUSTER_COMMAND_QUERY_TIMER_NAME
-        = "genie.services.specification.clusterCommandQuery.timer";
+        = "genie.services.jobResolver.clusterCommandQuery.timer";
 
     /**
      * How long it takes to select a cluster from the set of clusters returned by database query.
      */
-    private static final String SELECT_CLUSTER_TIMER_NAME
-        = "genie.services.specification.selectCluster.timer";
+    private static final String SELECT_CLUSTER_TIMER_NAME = "genie.services.jobResolver.selectCluster.timer";
 
     /**
      * How long it takes to select a command for a given cluster.
      */
-    private static final String SELECT_COMMAND_TIMER_NAME
-        = "genie.services.specification.selectCommand.timer";
+    private static final String SELECT_COMMAND_TIMER_NAME = "genie.services.jobResolver.selectCommand.timer";
 
     /**
      * How long it takes to select the applications for a given command.
      */
-    private static final String SELECT_APPLICATIONS_TIMER_NAME
-        = "genie.services.specification.selectApplications.timer";
+    private static final String SELECT_APPLICATIONS_TIMER_NAME = "genie.services.jobResolver.selectApplications.timer";
 
     /**
      * How many times a cluster load balancer is invoked.
      */
-    private static final String SELECT_LOAD_BALANCER_COUNTER_NAME
-        = "genie.services.specification.loadBalancer.counter";
-
-    private static final File DEFAULT_JOB_DIRECTORY = new File("/tmp/genie/jobs");
+    private static final String SELECT_LOAD_BALANCER_COUNTER_NAME = "genie.services.jobResolver.loadBalancer.counter";
 
     private static final String NO_ID_FOUND = "No id found";
+    private static final Tag SAVED_TAG = Tag.of("saved", "true");
+    private static final Tag NOT_SAVED_TAG = Tag.of("saved", "false");
 
     private static final String LOAD_BALANCER_STATUS_SUCCESS = "success";
     private static final String LOAD_BALANCER_STATUS_NO_PREFERENCE = "no preference";
@@ -122,9 +126,12 @@ public class JobResolverServiceImpl implements JobResolverService {
     private final ApplicationPersistenceService applicationPersistenceService;
     private final ClusterPersistenceService clusterPersistenceService;
     private final CommandPersistenceService commandPersistenceService;
-    private final List<ClusterLoadBalancer> clusterLoadBalancers;
+    private final JobPersistenceService jobPersistenceService;
+    private final List<ClusterLoadBalancer> clusterLoadBalancerImpls;
     private final MeterRegistry registry;
     private final int defaultMemory;
+    // TODO: Switch to path
+    private final File defaultJobDirectory;
 
     private final Counter noClusterSelectedCounter;
     private final Counter noClusterFoundCounter;
@@ -132,105 +139,165 @@ public class JobResolverServiceImpl implements JobResolverService {
     /**
      * Constructor.
      *
-     * @param applicationPersistenceService The service to use to manipulate applications
-     * @param clusterPersistenceService     The service to use to manipulate clusters
-     * @param commandPersistenceService     The service to use to manipulate commands
-     * @param clusterLoadBalancers          The load balancer implementations to use
-     * @param registry                      The metrics repository to use
+     * @param applicationPersistenceService The {@link ApplicationPersistenceService} to use to manipulate applications
+     * @param clusterPersistenceService     The {@link ClusterPersistenceService} to use to manipulate clusters
+     * @param commandPersistenceService     The {@link CommandPersistenceService} to use to manipulate commands
+     * @param jobPersistenceService         The {@link JobPersistenceService} instance to use
+     * @param clusterLoadBalancerImpls      The {@link ClusterLoadBalancer} implementations to use
+     * @param registry                      The {@link MeterRegistry }metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
      */
     public JobResolverServiceImpl(
         final ApplicationPersistenceService applicationPersistenceService,
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
-        @NotEmpty final List<ClusterLoadBalancer> clusterLoadBalancers,
+        final JobPersistenceService jobPersistenceService,
+        @NotEmpty final List<ClusterLoadBalancer> clusterLoadBalancerImpls,
         final MeterRegistry registry,
         final JobsProperties jobsProperties
     ) {
         this.applicationPersistenceService = applicationPersistenceService;
         this.clusterPersistenceService = clusterPersistenceService;
         this.commandPersistenceService = commandPersistenceService;
-        this.clusterLoadBalancers = clusterLoadBalancers;
+        this.jobPersistenceService = jobPersistenceService;
+        this.clusterLoadBalancerImpls = clusterLoadBalancerImpls;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
+
+        final String jobDirProperty = jobsProperties.getLocations().getJobs();
+        try {
+            this.defaultJobDirectory = Paths.get(new URI(jobDirProperty)).toFile();
+        } catch (final URISyntaxException e) {
+            throw new IllegalArgumentException("Job directory location property is invalid: " + jobDirProperty);
+        }
 
         // Metrics
         this.registry = registry;
         this.noClusterSelectedCounter
-            = this.registry.counter("genie.services.specification.selectCluster.noneSelected.counter");
+            = this.registry.counter("genie.services.jobResolver.selectCluster.noneSelected.counter");
         this.noClusterFoundCounter
-            = this.registry.counter("genie.services.specification.selectCluster.noneFound.counter");
+            = this.registry.counter("genie.services.jobResolver.selectCluster.noneFound.counter");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResolvedJob resolveJob(final String id, @Valid final JobRequest jobRequest) {
+    @Nonnull
+    @Transactional
+    // TODO: Finalize exceptions thrown in here
+    public ResolvedJob resolveJob(final String id) throws GenieJobNotFoundException {
         final long start = System.nanoTime();
-        final Set<Tag> tags = Sets.newHashSet();
+        final Set<Tag> tags = Sets.newHashSet(SAVED_TAG);
         try {
-            log.info(
-                "Received request to resolve a job specification for job id {} and parameters {}",
-                id,
-                jobRequest
-            );
-            final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
-                jobRequest.getCriteria().getClusterCriteria(),
-                jobRequest.getCriteria().getCommandCriterion()
-            );
-            // Resolve the cluster for the job request based on the tags specified
-            final Cluster cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
-            // Resolve the command for the job request based on command tags and cluster chosen
-            final Command command = this.getCommand(clustersAndCommandsForJob.get(cluster), id);
-            // Resolve the applications to use based on the command that was selected
-            final List<JobSpecification.ExecutionResource> applicationResources = Lists.newArrayList();
-            for (final Application application : this.getApplications(id, jobRequest, command)) {
-                applicationResources.add(
-                    new JobSpecification.ExecutionResource(application.getId(), application.getResources())
-                );
+            log.info("Received request to resolve a job with id {}", id);
+            final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(id);
+            if (!jobStatus.isResolvable()) {
+                throw new IllegalArgumentException("Job " + id + " is already resolved: " + jobStatus);
             }
 
-            final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
-            commandArgs.addAll(jobRequest.getCommandArgs());
+            final JobRequest jobRequest = this.jobPersistenceService
+                .getJobRequest(id)
+                .orElseThrow(() -> new GenieJobNotFoundException("No job with id " + id + " exists."));
 
-            final int jobMemory = this.resolveJobMemory(jobRequest, command);
-
-            final Map<String, String> environmentVariables
-                = this.generateEnvironmentVariables(id, jobRequest, cluster, command, jobMemory);
-
-            //TODO: Set the default job location as a server property?
-            final JobSpecification jobSpecification = new JobSpecification(
-                commandArgs,
-                new JobSpecification.ExecutionResource(id, jobRequest.getResources()),
-                new JobSpecification.ExecutionResource(cluster.getId(), cluster.getResources()),
-                new JobSpecification.ExecutionResource(command.getId(), command.getResources()),
-                applicationResources,
-                environmentVariables,
-                jobRequest.getRequestedAgentConfig().isInteractive(),
-                jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY),
-                toArchiveLocation(
-                    jobRequest
-                        .getRequestedJobArchivalData()
-                        .getRequestedArchiveLocationPrefix()
-                        .orElse(null),
-                    id)
-            );
-
-            final JobEnvironment jobEnvironment = new JobEnvironment
-                .Builder(jobMemory)
-                .withEnvironmentVariables(environmentVariables)
-                .build();
-
+            final ResolvedJob resolvedJob = this.resolve(id, jobRequest);
+            this.jobPersistenceService.saveResolvedJob(id, resolvedJob);
             MetricsUtils.addSuccessTags(tags);
-            return new ResolvedJob(jobSpecification, jobEnvironment);
+            return resolvedJob;
+        } catch (final GenieJobNotFoundException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw e;
+        } catch (final GenieNotFoundException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw new GenieRuntimeException(e);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw new RuntimeException(t);
         } finally {
             this.registry
-                .timer(RESOLVE_JOB_SPECIFICATION_TIMER, tags)
+                .timer(RESOLVE_JOB_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Nonnull
+    public ResolvedJob resolveJob(final String id, @Valid final JobRequest jobRequest) {
+        final long start = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet(NOT_SAVED_TAG);
+        try {
+            log.info(
+                "Received request to resolve a job for id {} and request {}",
+                id,
+                jobRequest
+            );
+
+            final ResolvedJob resolvedJob = this.resolve(id, jobRequest);
+            MetricsUtils.addSuccessTags(tags);
+            return resolvedJob;
+        } catch (final Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw new RuntimeException(t);
+        } finally {
+            this.registry
+                .timer(RESOLVE_JOB_TIMER, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private ResolvedJob resolve(final String id, final JobRequest jobRequest) throws GenieException {
+        final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
+            jobRequest.getCriteria().getClusterCriteria(),
+            jobRequest.getCriteria().getCommandCriterion()
+        );
+        // Resolve the cluster for the job request based on the tags specified
+        final Cluster cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
+        // Resolve the command for the job request based on command tags and cluster chosen
+        final Command command = this.getCommand(clustersAndCommandsForJob.get(cluster), id);
+        // Resolve the applications to use based on the command that was selected
+        final List<JobSpecification.ExecutionResource> applicationResources = Lists.newArrayList();
+        for (final Application application : this.getApplications(id, jobRequest, command)) {
+            applicationResources.add(
+                new JobSpecification.ExecutionResource(application.getId(), application.getResources())
+            );
+        }
+
+        final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
+        commandArgs.addAll(jobRequest.getCommandArgs());
+
+        final int jobMemory = this.resolveJobMemory(jobRequest, command);
+
+        final Map<String, String> environmentVariables
+            = this.generateEnvironmentVariables(id, jobRequest, cluster, command, jobMemory);
+
+        final JobSpecification jobSpecification = new JobSpecification(
+            commandArgs,
+            new JobSpecification.ExecutionResource(id, jobRequest.getResources()),
+            new JobSpecification.ExecutionResource(cluster.getId(), cluster.getResources()),
+            new JobSpecification.ExecutionResource(command.getId(), command.getResources()),
+            applicationResources,
+            environmentVariables,
+            jobRequest.getRequestedAgentConfig().isInteractive(),
+            jobRequest
+                .getRequestedAgentConfig()
+                .getRequestedJobDirectoryLocation()
+                .orElse(this.defaultJobDirectory),
+            toArchiveLocation(
+                jobRequest
+                    .getRequestedJobArchivalData()
+                    .getRequestedArchiveLocationPrefix()
+                    .orElse(null),
+                id)
+        );
+
+        final JobEnvironment jobEnvironment = new JobEnvironment
+            .Builder(jobMemory)
+            .withEnvironmentVariables(environmentVariables)
+            .build();
+
+        return new ResolvedJob(jobSpecification, jobEnvironment);
     }
 
     private Map<Cluster, String> queryForClustersAndCommands(
@@ -361,7 +428,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final JobRequest jobRequest
     ) throws GeniePreconditionException {
         Cluster cluster = null;
-        for (final ClusterLoadBalancer loadBalancer : this.clusterLoadBalancers) {
+        for (final ClusterLoadBalancer loadBalancer : this.clusterLoadBalancerImpls) {
             final String loadBalancerClass;
             if (loadBalancer instanceof TargetClassAware) {
                 final Class<?> targetClass = ((TargetClassAware) loadBalancer).getTargetClass();

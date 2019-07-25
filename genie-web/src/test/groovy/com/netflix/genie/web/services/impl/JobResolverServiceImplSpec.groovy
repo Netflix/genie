@@ -18,10 +18,10 @@
 package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Lists
-import com.google.common.collect.Maps
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dto.v4.Cluster
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
@@ -31,6 +31,7 @@ import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest
+import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.jobs.JobConstants
@@ -38,13 +39,17 @@ import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.web.data.services.ApplicationPersistenceService
 import com.netflix.genie.web.data.services.ClusterPersistenceService
 import com.netflix.genie.web.data.services.CommandPersistenceService
+import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.services.ClusterLoadBalancer
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
+import wiremock.com.google.common.collect.ImmutableMap
 
+import javax.annotation.Nullable
 import java.time.Instant
 
 /**
@@ -54,9 +59,21 @@ import java.time.Instant
  */
 class JobResolverServiceImplSpec extends Specification {
 
-    def "Can generate job specification"() {
+    def "Can resolve a job"() {
+        def cluster1Id = UUID.randomUUID().toString()
+        def cluster2Id = UUID.randomUUID().toString()
+        def cluster1 = createCluster(cluster1Id)
+        def cluster2 = createCluster(cluster2Id)
+        def clusters = Sets.newHashSet(cluster1, cluster2)
+
+        def commandId = UUID.randomUUID().toString()
+        def executableBinary = UUID.randomUUID().toString()
+        def executableArgument0 = UUID.randomUUID().toString()
+        def executableArgument1 = UUID.randomUUID().toString()
+        def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
+        def command = createCommand(commandId, executable)
+
         def jobId = UUID.randomUUID().toString()
-        def jobName = UUID.randomUUID().toString()
         def commandArgs = Lists.newArrayList(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -65,97 +82,27 @@ class JobResolverServiceImplSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
         )
-        def cluster1Id = UUID.randomUUID().toString()
-        def cluster2Id = UUID.randomUUID().toString()
-        def clusterTags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def commandId = UUID.randomUUID().toString()
-        def commandTags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def clusterCriteria = Lists.newArrayList(
-            new Criterion
-                .Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
-                .build(),
-            new Criterion
-                .Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .build()
-        )
-        def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
         def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
-        def jobRequest = new JobRequest(
-            null,
-            null,
-            commandArgs,
-            new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
-            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
-            null,
-            new AgentConfigRequest.Builder()
-                .build(),
-            new JobArchivalDataRequest.Builder()
-                .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
-                .build()
-        )
-        def cluster1 = new Cluster(
-            cluster1Id,
-            Instant.now(),
-            Instant.now(),
-            new ExecutionEnvironment(null, null, null),
-            new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
-            ).withTags(clusterTags).build()
-        )
-        def cluster2 = new Cluster(
-            cluster2Id,
-            Instant.now(),
-            Instant.now(),
-            new ExecutionEnvironment(null, null, null),
-            new ClusterMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
-            ).withTags(clusterTags).build()
-        )
 
-        def clusters = Sets.newHashSet(cluster1, cluster2)
-        def executableBinary = UUID.randomUUID().toString()
-        def executableArgument0 = UUID.randomUUID().toString()
-        def executableArgument1 = UUID.randomUUID().toString()
-        def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
-        def command = new Command(
-            commandId,
-            Instant.now(),
-            Instant.now(),
-            new ExecutionEnvironment(null, null, null),
-            new CommandMetadata.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE
-            ).withTags(commandTags).build(),
-            executable,
-            null,
-            100L
-        )
+        def expectedJobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
+        expectedJobCommandArgs.addAll(commandArgs)
+        Map<Cluster, String> clusterCommandMap = ImmutableMap.of(cluster1, commandId, cluster2, commandId)
+        def jobRequest = createJobRequest(commandArgs, requestedArchiveLocationPrefix, null)
+        def jobRequestNoArchivalData = createJobRequest(commandArgs, null, null)
+        def requestedMemory = 6_323
+        def savedJobRequest = createJobRequest(commandArgs, null, requestedMemory)
 
-        def jobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
-        jobCommandArgs.addAll(commandArgs)
-
-        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        Map<Cluster, String> clusterCommandMap = Maps.newHashMap()
-        clusterCommandMap.put(cluster1, commandId)
-        clusterCommandMap.put(cluster2, commandId)
         def clusterService = Mock(ClusterPersistenceService)
         def loadBalancer = Mock(ClusterLoadBalancer)
         def applicationService = Mock(ApplicationPersistenceService)
         def commandService = Mock(CommandPersistenceService)
+        def jobPersistenceService = Mock(JobPersistenceService)
+        def jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         def service = new JobResolverServiceImpl(
             applicationService,
             clusterService,
             commandService,
+            jobPersistenceService,
             Lists.newArrayList(loadBalancer),
             new SimpleMeterRegistry(),
             jobsProperties
@@ -164,13 +111,18 @@ class JobResolverServiceImplSpec extends Specification {
         when:
         def resolvedJob = service.resolveJob(jobId, jobRequest)
         def jobSpec = resolvedJob.getJobSpecification()
+        def jobEnvironment = resolvedJob.getJobEnvironment()
 
         then:
-        1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
+        0 * jobPersistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
+        1 * clusterService.findClustersAndCommandsForCriteria(
+            jobRequest.getCriteria().getClusterCriteria(),
+            jobRequest.getCriteria().getCommandCriterion()
+        ) >> clusterCommandMap
         1 * loadBalancer.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        jobSpec.getCommandArgs() == jobCommandArgs
+        jobSpec.getCommandArgs() == expectedJobCommandArgs
         jobSpec.getJob().getId() == jobId
         jobSpec.getCluster().getId() == cluster1Id
         jobSpec.getCommand().getId() == commandId
@@ -178,28 +130,26 @@ class JobResolverServiceImplSpec extends Specification {
         !jobSpec.isInteractive()
         jobSpec.getEnvironmentVariables().size() == 17
         jobSpec.getArchiveLocation() == Optional.of(requestedArchiveLocationPrefix + File.separator + jobId)
+        jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
+        jobEnvironment.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
+        jobEnvironment.getCpu() == 1
+        !jobEnvironment.getExt().isPresent()
 
         when:
-        def jobRequestNoArchivalData = new JobRequest(
-            null,
-            null,
-            commandArgs,
-            new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
-            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
-            null,
-            new AgentConfigRequest.Builder()
-                .build(),
-            null
-        )
         def resolvedJobNoArchivalData = service.resolveJob(jobId, jobRequestNoArchivalData)
         def jobSpecNoArchivalData = resolvedJobNoArchivalData.getJobSpecification()
+        def jobEnvironmentNoArchivalData = resolvedJobNoArchivalData.getJobEnvironment()
 
         then:
-        1 * clusterService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
+        0 * jobPersistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
+        1 * clusterService.findClustersAndCommandsForCriteria(
+            jobRequestNoArchivalData.getCriteria().getClusterCriteria(),
+            jobRequestNoArchivalData.getCriteria().getCommandCriterion()
+        ) >> clusterCommandMap
         1 * loadBalancer.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        jobSpecNoArchivalData.getCommandArgs() == jobCommandArgs
+        jobSpecNoArchivalData.getCommandArgs() == expectedJobCommandArgs
         jobSpecNoArchivalData.getJob().getId() == jobId
         jobSpecNoArchivalData.getCluster().getId() == cluster1Id
         jobSpecNoArchivalData.getCommand().getId() == commandId
@@ -207,6 +157,39 @@ class JobResolverServiceImplSpec extends Specification {
         !jobSpecNoArchivalData.isInteractive()
         jobSpecNoArchivalData.getEnvironmentVariables().size() == 17
         jobSpecNoArchivalData.getArchiveLocation() == Optional.empty()
+        jobEnvironmentNoArchivalData.getEnvironmentVariables() == jobSpecNoArchivalData.getEnvironmentVariables()
+        jobEnvironmentNoArchivalData.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
+        jobEnvironmentNoArchivalData.getCpu() == 1
+        !jobEnvironmentNoArchivalData.getExt().isPresent()
+
+        when: "We try to resolve a saved job"
+        def resolvedSavedJobData = service.resolveJob(jobId)
+        def jobSpecSavedData = resolvedSavedJobData.getJobSpecification()
+        def jobEnvironmentSavedData = resolvedSavedJobData.getJobEnvironment()
+
+        then: "the resolution is saved"
+        1 * jobPersistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
+        1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(savedJobRequest)
+        1 * clusterService.findClustersAndCommandsForCriteria(
+            savedJobRequest.getCriteria().getClusterCriteria(),
+            savedJobRequest.getCriteria().getCommandCriterion()
+        ) >> clusterCommandMap
+        1 * loadBalancer.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
+        1 * commandService.getCommand(commandId) >> command
+        1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
+        1 * jobPersistenceService.saveResolvedJob(jobId, _ as ResolvedJob)
+        jobSpecSavedData.getCommandArgs() == expectedJobCommandArgs
+        jobSpecSavedData.getJob().getId() == jobId
+        jobSpecSavedData.getCluster().getId() == cluster1Id
+        jobSpecSavedData.getCommand().getId() == commandId
+        jobSpecSavedData.getApplications().isEmpty()
+        !jobSpecSavedData.isInteractive()
+        jobSpecSavedData.getEnvironmentVariables().size() == 17
+        jobSpecSavedData.getArchiveLocation() == Optional.empty()
+        jobEnvironmentSavedData.getEnvironmentVariables() == jobSpecSavedData.getEnvironmentVariables()
+        jobEnvironmentSavedData.getMemory() == requestedMemory
+        jobEnvironmentSavedData.getCpu() == 1
+        !jobEnvironmentSavedData.getExt().isPresent()
     }
 
     def "Can convert tags to string"() {
@@ -214,6 +197,7 @@ class JobResolverServiceImplSpec extends Specification {
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),
+            Mock(JobPersistenceService),
             Lists.newArrayList(),
             Mock(MeterRegistry),
             JobsProperties.getJobsPropertiesDefaults()
@@ -241,6 +225,7 @@ class JobResolverServiceImplSpec extends Specification {
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),
+            Mock(JobPersistenceService),
             Lists.newArrayList(),
             Mock(MeterRegistry),
             jobsProperties
@@ -344,6 +329,7 @@ class JobResolverServiceImplSpec extends Specification {
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),
+            Mock(JobPersistenceService),
             Lists.newArrayList(),
             Mock(MeterRegistry),
             jobsProperties
@@ -424,6 +410,7 @@ class JobResolverServiceImplSpec extends Specification {
             Mock(ApplicationPersistenceService),
             Mock(ClusterPersistenceService),
             Mock(CommandPersistenceService),
+            Mock(JobPersistenceService),
             Lists.newArrayList(),
             Mock(MeterRegistry),
             jobsProperties
@@ -482,5 +469,75 @@ class JobResolverServiceImplSpec extends Specification {
         v3JobRequest.getClusterCriterias().size() == 2
         v3JobRequest.getClusterCriterias().get(0).getTags() == clusterCriteria.get(0).getTags()
         v3JobRequest.getClusterCriterias().get(1).getTags() == service.toV3Tags(clusterCriteria.get(1))
+    }
+
+    private static Cluster createCluster(String id) {
+        return new Cluster(
+            id,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+            ).withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+        )
+    }
+
+    private static Command createCommand(String id, List<String> executable) {
+        return new Command(
+            id,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.ACTIVE
+            )
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build(),
+            executable,
+            null,
+            100L
+        )
+    }
+
+    private static JobRequest createJobRequest(
+        List<String> commandArgs,
+        @Nullable String requestedArchiveLocationPrefix,
+        @Nullable Integer requestedMemory
+    ) {
+        def clusterCriteria = Lists.newArrayList(
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .build(),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+        )
+        def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        return new JobRequest(
+            null,
+            null,
+            commandArgs,
+            new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build(),
+            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+            requestedMemory == null
+                ? null
+                : new JobEnvironmentRequest.Builder().withRequestedJobMemory(requestedMemory).build(),
+            new AgentConfigRequest.Builder().build(),
+            requestedArchiveLocationPrefix == null
+                ? null
+                : new JobArchivalDataRequest.Builder()
+                .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
+                .build()
+        )
     }
 }

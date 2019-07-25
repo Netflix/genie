@@ -206,7 +206,7 @@ public class ServicesAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(JobKillService.class)
-    public JobKillService jobKillService(
+    public JobKillServiceImpl jobKillService(
         final JobKillServiceV3 jobKillServiceV3,
         final JobKillServiceV4 jobKillServiceV4,
         final JobPersistenceService jobPersistenceService
@@ -341,7 +341,7 @@ public class ServicesAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(AttachmentService.class)
-    public AttachmentService attachmentService(final JobsProperties jobsProperties) {
+    public FileSystemAttachmentService attachmentService(final JobsProperties jobsProperties) {
         return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments());
     }
 
@@ -367,7 +367,7 @@ public class ServicesAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(JobFileService.class)
-    public JobFileService jobFileService(@Qualifier("jobsDir") final Resource jobsDir) throws IOException {
+    public DiskJobFileServiceImpl jobFileService(@Qualifier("jobsDir") final Resource jobsDir) throws IOException {
         return new DiskJobFileServiceImpl(jobsDir);
     }
 
@@ -377,18 +377,20 @@ public class ServicesAutoConfiguration {
      * @param applicationPersistenceService The service to use to manipulate applications
      * @param clusterPersistenceService     The service to use to manipulate clusters
      * @param commandPersistenceService     The service to use to manipulate commands
-     * @param clusterLoadBalancers          The load balancer implementations to use
+     * @param jobPersistenceService         The job persistence service instance to use
+     * @param clusterLoadBalancerImpls      The load balancer implementations to use
      * @param registry                      The metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
      * @return A {@link JobResolverServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(JobResolverService.class)
-    public JobResolverService jobResolverService(
+    public JobResolverServiceImpl jobResolverService(
         final ApplicationPersistenceService applicationPersistenceService,
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
-        @NotEmpty final List<ClusterLoadBalancer> clusterLoadBalancers,
+        final JobPersistenceService jobPersistenceService,
+        @NotEmpty final List<ClusterLoadBalancer> clusterLoadBalancerImpls,
         final MeterRegistry registry,
         final JobsProperties jobsProperties
     ) {
@@ -396,7 +398,8 @@ public class ServicesAutoConfiguration {
             applicationPersistenceService,
             clusterPersistenceService,
             commandPersistenceService,
-            clusterLoadBalancers,
+            jobPersistenceService,
+            clusterLoadBalancerImpls,
             registry,
             jobsProperties
         );
@@ -454,7 +457,7 @@ public class ServicesAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(JobDirectoryServerService.class)
-    public JobDirectoryServerService jobDirectoryServerService(
+    public JobDirectoryServerServiceImpl jobDirectoryServerService(
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
         final JobFileService jobFileService,
