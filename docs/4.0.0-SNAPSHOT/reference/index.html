@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-07-18</span>
+<span id="revdate">2019-07-25</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -6194,7 +6194,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken by the loaded script to select a cluster among the one passed as input</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptLoadBalancer</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, clusterName, clusterId</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.clusters.loadBalancers.script.update.timer</code></p></td>
@@ -6376,7 +6376,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter for cluster load balancer algorithms invocations</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status, clusterName, clusterId, loadBalancerClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectApplications.timer</code></p></td>
@@ -6480,7 +6480,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-07-18 17:28:20 UTC
+Last updated 2019-07-25 22:12:12 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
