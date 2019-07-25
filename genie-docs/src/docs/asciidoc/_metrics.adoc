@@ -433,46 +433,52 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |DiskCleanupTask
 |-
 
-|genie.services.specification.clusterCommandQuery.timer
+|genie.services.jobResolver.clusterCommandQuery.timer
 |Time taken to query the database and find clusters and commands matching the supplied criteria.
 |nanoseconds
-|JobSpecificationServiceImpl
+|JobResolverServiceImpl
 |status, exceptionClass
 
-|genie.services.specification.loadBalancer.counter
+|genie.services.jobResolver.loadBalancer.counter
 |Counter for cluster load balancer algorithms invocations
 |count
-|JobSpecificationServiceImpl
+|JobResolverServiceImpl
 |class, status, clusterName, clusterId, loadBalancerClass
 
-|genie.services.specification.selectApplications.timer
+|genie.services.jobResolver.resolve.timer
+|Time taken to completely resolve the job
+|nanoseconds
+|JobResolverServiceImpl
+|status, exceptionClass, saved
+
+|genie.services.jobResolver.selectApplications.timer
 |Time taken to retrieve applications information for this task
 |nanoseconds
-|JobSpecificationServiceImpl
+|JobResolverServiceImpl
 |status, exceptionClass
 
-|genie.services.specification.selectCluster.timer
+|genie.services.jobResolver.selectCluster.timer
 |Time taken to select a cluster using the load balancing strategy
 |nanoseconds
-|JobSpecificationServiceImpl
+|JobResolverServiceImpl
 |status, exceptionClass
 
-|genie.services.specification.selectCluster.noneSelected.counter
+|genie.services.jobResolver.selectCluster.noneSelected.counter
 |Number of times the cluster load balancing terminated without selecting a cluster
 |count
-|JobSpecificationServiceImpl
+|JobResolverServiceImpl
 |-
 
-|genie.services.specification.selectCluster.noneFound.counter
+|genie.services.jobResolver.selectCluster.noneFound.counter
 |Number of times the criteria for cluster selection does not match any cluster
 |count
-|JobSpecificationServiceImpl
+|JobResolverServiceImpl
 |-
 
-|genie.services.specification.selectCommand.timer
+|genie.services.jobResolver.selectCommand.timer
 |Time taken to resolve a command based on criteria and cluster
 |nanoseconds
-|JobSpecificationServiceImpl
+|JobResolverServiceImpl
 |status, exceptionClass
 
 |genie.health.endpoint.timer
