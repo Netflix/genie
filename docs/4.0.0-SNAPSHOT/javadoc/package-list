@@ -53,6 +53,8 @@ com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 com.netflix.genie.web.agent.apis.rpc.v4.interceptors
 com.netflix.genie.web.agent.inspectors
 com.netflix.genie.web.agent.inspectors.impl
+com.netflix.genie.web.agent.launchers
+com.netflix.genie.web.agent.launchers.impl
 com.netflix.genie.web.agent.resources
 com.netflix.genie.web.agent.services
 com.netflix.genie.web.agent.services.impl
@@ -70,6 +72,7 @@ com.netflix.genie.web.data.repositories.jpa.specifications
 com.netflix.genie.web.data.services
 com.netflix.genie.web.data.services.jpa
 com.netflix.genie.web.data.utils
+com.netflix.genie.web.dtos
 com.netflix.genie.web.events
 com.netflix.genie.web.exceptions.checked
 com.netflix.genie.web.health

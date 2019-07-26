@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-07-25</span>
+<span id="revdate">2019-07-26</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -6365,52 +6365,59 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.clusterCommandQuery.timer</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.clusterCommandQuery.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to query the database and find clusters and commands matching the supplied criteria.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.loadBalancer.counter</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.loadBalancer.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter for cluster load balancer algorithms invocations</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status, clusterName, clusterId, loadBalancerClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectApplications.timer</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.resolve.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to completely resolve the job</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, saved</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.selectApplications.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to retrieve applications information for this task</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCluster.timer</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.selectCluster.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to select a cluster using the load balancing strategy</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCluster.noneSelected.counter</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.selectCluster.noneSelected.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the cluster load balancing terminated without selecting a cluster</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCluster.noneFound.counter</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.selectCluster.noneFound.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the criteria for cluster selection does not match any cluster</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCommand.timer</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.selectCommand.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to resolve a command based on criteria and cluster</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
@@ -6480,7 +6487,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-07-25 22:12:12 UTC
+Last updated 2019-07-26 19:53:16 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
