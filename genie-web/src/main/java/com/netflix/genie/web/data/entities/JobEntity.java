@@ -56,6 +56,7 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -460,6 +461,9 @@ public class JobEntity extends BaseEntity implements
         }
     )
     private Set<TagEntity> tags = new HashSet<>();
+
+    @Transient
+    private JobStatus notifiedJobStatus;
 
     /**
      * Default Constructor.
