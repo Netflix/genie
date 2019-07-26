@@ -59,6 +59,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-starter-aws")
+    compile("org.springframework.cloud:spring-cloud-starter-aws-messaging")
     compile("org.springframework.cloud:spring-cloud-starter-zookeeper")
     compile("org.springframework.integration:spring-integration-zookeeper")
     compile("org.springframework.retry:spring-retry")

@@ -17,12 +17,18 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.events;
 
+import com.amazonaws.services.sns.AmazonSNS;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserverImpl;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobNotificationMetricPublisher;
+import com.netflix.genie.web.events.SNSNotificationsPublisher;
+import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,6 +39,11 @@ import org.springframework.context.annotation.Configuration;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        SNSNotificationsProperties.class
+    }
+)
 public class NotificationsAutoConfiguration {
 
     /**
@@ -62,5 +73,29 @@ public class NotificationsAutoConfiguration {
         final MeterRegistry registry
     ) {
         return new JobNotificationMetricPublisher(registry);
+    }
+
+    /**
+     * Create a {@link SNSNotificationsPublisher} unless one exists in the context already.
+     *
+     * @param snsClient  the Amazon SNS client
+     * @param properties configuration properties
+     * @param registry   the metrics registry
+     * @return a {@link SNSNotificationsPublisher}
+     */
+    @Bean
+    @ConditionalOnProperty(value = SNSNotificationsProperties.ENABLED_PROPERTY, havingValue = "true")
+    @ConditionalOnMissingBean(SNSNotificationsPublisher.class)
+    public SNSNotificationsPublisher jobNotificationsSNSPublisher(
+        final SNSNotificationsProperties properties,
+        final MeterRegistry registry,
+        final AmazonSNS snsClient
+    ) {
+        return new SNSNotificationsPublisher(
+            snsClient,
+            properties,
+            registry,
+            GenieObjectMapper.getMapper()
+        );
     }
 }

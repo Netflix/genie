@@ -184,6 +184,21 @@ doesn't exist.
 |10240
 |no
 
+|genie.notifications.sns.enabled
+|Wether to enable SNS publishing of events
+|-
+|no
+
+|genie.notifications.sns.topicARN
+|The SNS topic to publish to
+|-
+|no
+
+|genie.notifications.sns.additionalEventKeys.<KEY>
+|Map of KEYs and corresponding values to be added to the SNS messages published
+|-
+|no
+
 |genie.jobs.users.creationEnabled
 |Whether Genie should attempt to create a system user in order to run the job as or not. Genie user must have sudo
 rights for this to work.

@@ -541,6 +541,12 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |UserMetricsTask
 |-
 
+|genie.notifications.sns.publish.counter
+|Count the number of notification published to SNS
+|count
+|SNSNotificationsPublisher
+|status
+
 |===
 
 (*) Source may add additional tags on a case-by-case basis
