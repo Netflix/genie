@@ -113,6 +113,16 @@ public final class MetricsConstants {
         public static final String LOAD_BALANCER_CLASS = "loadBalancerClass";
 
         /**
+         * Key to tag the origin/source state of a state transition.
+         */
+        public static final String FROM_STATE = "fromState";
+
+        /**
+         * Key to tag the destination/target state of a state transition.
+         */
+        public static final String TO_STATE = "toState";
+
+        /**
          * Utility class private constructor.
          */
         private TagKeys() {

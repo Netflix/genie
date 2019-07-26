@@ -19,6 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.events
 
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver
 import com.netflix.genie.web.events.GenieEventBus
+import com.netflix.genie.web.events.JobNotificationMetricPublisher
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 
@@ -41,5 +42,13 @@ class NotificationsAutoConfigurationSpec extends Specification {
 
         then:
         observer != null
+    }
+
+    def "jobNotificationMetricPublisher"() {
+        when:
+        JobNotificationMetricPublisher publisher = this.config.jobNotificationMetricPublisher(registry)
+
+        then:
+        publisher != null
     }
 }
