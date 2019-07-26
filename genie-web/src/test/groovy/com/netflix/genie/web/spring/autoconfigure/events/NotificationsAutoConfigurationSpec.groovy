@@ -17,9 +17,12 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.events
 
+import com.amazonaws.services.sns.AmazonSNS
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver
 import com.netflix.genie.web.events.GenieEventBus
 import com.netflix.genie.web.events.JobNotificationMetricPublisher
+import com.netflix.genie.web.events.SNSNotificationsPublisher
+import com.netflix.genie.web.properties.SNSNotificationsProperties
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 
@@ -47,6 +50,20 @@ class NotificationsAutoConfigurationSpec extends Specification {
     def "jobNotificationMetricPublisher"() {
         when:
         JobNotificationMetricPublisher publisher = this.config.jobNotificationMetricPublisher(registry)
+
+        then:
+        publisher != null
+    }
+
+    def "jobNotificationsSNSPublisher"() {
+        AmazonSNS snsClient = Mock(AmazonSNS)
+        SNSNotificationsProperties snsProperties = Mock(SNSNotificationsProperties)
+        when:
+        SNSNotificationsPublisher publisher = this.config.jobNotificationsSNSPublisher(
+            snsProperties,
+            registry,
+            snsClient
+        )
 
         then:
         publisher != null
