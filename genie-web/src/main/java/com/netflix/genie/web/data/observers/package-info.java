@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  */
 
 /**
- * Entity classes that represent the Genie data model/internal state.
+ * Entity observer classes that get notified about transformations applied to entities.
  *
  * @author tgianos
  * @since 3.0.0
