@@ -19,6 +19,7 @@ package com.netflix.genie.web.data.entities;
 
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.web.data.entities.listeners.JobEntityListener;
 import com.netflix.genie.web.data.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.data.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.data.entities.projections.JobClusterProjection;
@@ -44,6 +45,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -123,6 +125,12 @@ import java.util.Set;
     doNotUseGetters = true
 )
 @Entity
+@EntityListeners(
+    {
+        // Can't decouple through interface or abstract class or configuration, only concrete classes work.
+        JobEntityListener.class
+    }
+)
 @Table(name = "jobs")
 public class JobEntity extends BaseEntity implements
     JobProjection,
