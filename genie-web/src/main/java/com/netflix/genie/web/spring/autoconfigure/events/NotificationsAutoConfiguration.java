@@ -17,10 +17,11 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.events;
 
-
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserverImpl;
 import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.events.JobNotificationMetricPublisher;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,5 +47,20 @@ public class NotificationsAutoConfiguration {
         final GenieEventBus genieEventBus
     ) {
         return new PersistedJobStatusObserverImpl(genieEventBus);
+    }
+
+    /**
+     * Create a {@link JobNotificationMetricPublisher} which publishes metrics related to to job state changes
+     * notifications.
+     *
+     * @param registry the metrics registry
+     * @return a {@link JobNotificationMetricPublisher}
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobNotificationMetricPublisher.class)
+    public JobNotificationMetricPublisher jobNotificationMetricPublisher(
+        final MeterRegistry registry
+    ) {
+        return new JobNotificationMetricPublisher(registry);
     }
 }

@@ -127,6 +127,18 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |JobStateServiceImpl
 |-
 
+|genie.jobs.notifications.final-state.counter
+|Count the number of completed job notifications
+|count
+|JobNotificationMetricPublisher
+|jobFinalState
+
+|genie.jobs.notifications.state-transition.counter
+|Count the number of job transitions notifications
+|count
+|JobNotificationMetricPublisher
+|fromState, toState
+
 |genie.jobs.submit.localRunner.overall.timer
 |Time takend to submit a new job (create workspace and scripts, register in database and kick off)
 |nanoseconds
