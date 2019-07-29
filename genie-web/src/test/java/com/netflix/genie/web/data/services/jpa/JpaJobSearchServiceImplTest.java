@@ -36,12 +36,14 @@ import com.netflix.genie.web.data.entities.projections.UniqueIdProjection;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
@@ -302,4 +304,51 @@ public class JpaJobSearchServiceImplTest {
         );
     }
 
+    /**
+     * Make sure the right repository method is called.
+     */
+    @Test
+    public void canGetAllocatedMemoryOnHost() {
+        final String hostname = UUID.randomUUID().toString();
+        final long totalMemory = 213_382L;
+
+        Mockito
+            .when(this.jobRepository.getTotalMemoryUsedOnHost(hostname, JobStatus.getActiveStatuses()))
+            .thenReturn(totalMemory);
+
+        Assertions.assertThat(this.service.getAllocatedMemoryOnHost(hostname)).isEqualTo(totalMemory);
+    }
+
+    /**
+     * Make sure the right repository method is called.
+     */
+    @Test
+    public void canGetUsedMemoryOnHost() {
+        final String hostname = UUID.randomUUID().toString();
+        final long totalMemory = 213_328L;
+
+        Mockito
+            .when(this.jobRepository.getTotalMemoryUsedOnHost(
+                hostname,
+                EnumSet.of(JobStatus.RUNNING, JobStatus.CLAIMED, JobStatus.INIT))
+            )
+            .thenReturn(totalMemory);
+
+        Assertions.assertThat(this.service.getUsedMemoryOnHost(hostname)).isEqualTo(totalMemory);
+    }
+
+    /**
+     * Make sure the right repository method is called.
+     */
+    @Test
+    public void canGetCountActiveJobsOnHost() {
+        final String hostname = UUID.randomUUID().toString();
+        final long totalJobs = 32L;
+
+        Mockito
+            .when(this.jobRepository.countByAgentHostnameAndStatusIn(hostname, JobStatus.getActiveStatuses()))
+            .thenReturn(totalJobs);
+
+        Assertions.assertThat(this.service.getActiveJobCountOnHost(hostname)).isEqualTo(totalJobs);
+    }
 }

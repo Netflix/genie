@@ -54,6 +54,32 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Set<JobProjection> findByAgentHostnameAndStatusIn(String agentHostname, Set<JobStatus> statuses);
 
     /**
+     * Get the number of agent jobs on a given host with the given statuses.
+     *
+     * @param agentHostname The hostname of the agent
+     * @param statuses      The statuses the job should be in e.g. {@link JobStatus#getActiveStatuses()}
+     * @return The number of jobs in the given statuses on that node
+     */
+    long countByAgentHostnameAndStatusIn(String agentHostname, Set<JobStatus> statuses);
+
+    /**
+     * Given the hostname that agents are running on return the total memory their jobs are currently using.
+     *
+     * @param agentHostname The agent hostname
+     * @param statuses      The job statuses to filter by e.g. {@link JobStatus#getActiveStatuses()}
+     * @return The total memory used in MB
+     */
+    @Query(
+        "SELECT COALESCE(SUM(j.memoryUsed), 0)"
+            + " FROM JobEntity j"
+            + " WHERE j.agentHostname = :agentHostname AND j.status IN (:statuses)"
+    )
+    long getTotalMemoryUsedOnHost(
+        @Param("agentHostname") String agentHostname,
+        @Param("statuses") Set<JobStatus> statuses
+    );
+
+    /**
      * Find the jobs with one of the statuses entered.
      *
      * @param statuses The statuses to search

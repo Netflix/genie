@@ -31,6 +31,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.data.services.JobSearchService;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -682,5 +683,38 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
         final Set<String> jobs = this.service.getActiveDisconnectedAgentJobs();
         Assert.assertThat(jobs.size(), Matchers.is(1));
         Assert.assertThat(jobs, Matchers.contains("agentJob1"));
+    }
+
+    /**
+     * Make sure the amount of allocated memory for active jobs is correct.
+     */
+    @Test
+    public void canGetAllocatedMemoryOnHost() {
+        Assertions.assertThat(this.service.getAllocatedMemoryOnHost("a.netflix.com")).isEqualTo(2048L);
+        Assertions.assertThat(this.service.getAllocatedMemoryOnHost("b.netflix.com")).isEqualTo(2048L);
+        Assertions.assertThat(this.service.getAllocatedMemoryOnHost("agent.netflix.com")).isEqualTo(4096L);
+        Assertions.assertThat(this.service.getAllocatedMemoryOnHost(UUID.randomUUID().toString())).isEqualTo(0L);
+    }
+
+    /**
+     * Make sure the amount of used memory for running jobs is correct.
+     */
+    @Test
+    public void canGetUsedMemoryOnHost() {
+        Assertions.assertThat(this.service.getUsedMemoryOnHost("a.netflix.com")).isEqualTo(2048L);
+        Assertions.assertThat(this.service.getUsedMemoryOnHost("b.netflix.com")).isEqualTo(2048L);
+        Assertions.assertThat(this.service.getUsedMemoryOnHost("agent.netflix.com")).isEqualTo(4096L);
+        Assertions.assertThat(this.service.getUsedMemoryOnHost(UUID.randomUUID().toString())).isEqualTo(0L);
+    }
+
+    /**
+     * Make sure the amount of used memory for active jobs is correct.
+     */
+    @Test
+    public void canGetCountOfActiveJobsOnHost() {
+        Assertions.assertThat(this.service.getActiveJobCountOnHost("a.netflix.com")).isEqualTo(1L);
+        Assertions.assertThat(this.service.getActiveJobCountOnHost("b.netflix.com")).isEqualTo(1L);
+        Assertions.assertThat(this.service.getActiveJobCountOnHost("agent.netflix.com")).isEqualTo(2L);
+        Assertions.assertThat(this.service.getActiveJobCountOnHost(UUID.randomUUID().toString())).isEqualTo(0L);
     }
 }
