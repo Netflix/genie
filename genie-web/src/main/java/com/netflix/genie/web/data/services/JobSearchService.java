@@ -211,4 +211,34 @@ public interface JobSearchService {
      * @return a set of job ids
      */
     Set<String> getActiveDisconnectedAgentJobs();
+
+    /**
+     * Get the amount of memory currently allocated on the given host by Genie jobs that are currently active.
+     *
+     * @param hostname The hostname to get the memory for
+     * @return The amount of memory reserved in MB by all active jobs on the given host
+     * @see JobStatus#getActiveStatuses()
+     */
+    long getAllocatedMemoryOnHost(String hostname);
+
+    /**
+     * Get the amount of memory currently used on the given host by Genie jobs in any of the following states.
+     * <p>
+     * {@link JobStatus#CLAIMED}
+     * {@link JobStatus#INIT}
+     * {@link JobStatus#RUNNING}
+     *
+     * @param hostname The hostname to get the memory for
+     * @return The amount of memory being used in MB by all jobs
+     */
+    long getUsedMemoryOnHost(String hostname);
+
+    /**
+     * Get the number of active Genie jobs on a given host.
+     *
+     * @param hostname The host to get the count for
+     * @return The count of jobs in an active state on the given host
+     * @see JobStatus#getActiveStatuses()
+     */
+    long getActiveJobCountOnHost(String hostname);
 }

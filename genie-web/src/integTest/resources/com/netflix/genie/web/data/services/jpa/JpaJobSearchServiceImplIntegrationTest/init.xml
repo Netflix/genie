@@ -503,6 +503,7 @@
         command_criterion="3"
         requested_cpu="2"
         requested_memory="2048"
+        memory_used="2048"
         archiving_disabled="false"
         requested_timeout="608400"
         num_attachments="3"

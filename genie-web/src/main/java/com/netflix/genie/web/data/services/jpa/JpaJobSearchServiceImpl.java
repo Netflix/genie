@@ -71,6 +71,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,6 +87,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @Slf4j
 public class JpaJobSearchServiceImpl implements JobSearchService {
+
+    private static final EnumSet<JobStatus> USING_MEMORY_JOB_SET = EnumSet.of(
+        JobStatus.CLAIMED,
+        JobStatus.INIT,
+        JobStatus.RUNNING
+    );
 
     private final JpaJobRepository jobRepository;
     private final JpaClusterRepository clusterRepository;
@@ -434,6 +441,30 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             .stream()
             .map(UniqueIdProjection::getUniqueId)
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getAllocatedMemoryOnHost(final String hostname) {
+        return this.jobRepository.getTotalMemoryUsedOnHost(hostname, JobStatus.getActiveStatuses());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getUsedMemoryOnHost(final String hostname) {
+        return this.jobRepository.getTotalMemoryUsedOnHost(hostname, USING_MEMORY_JOB_SET);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getActiveJobCountOnHost(final String hostname) {
+        return this.jobRepository.countByAgentHostnameAndStatusIn(hostname, JobStatus.getActiveStatuses());
     }
 
     private <E extends BaseEntity> Optional<E> getEntityOrNull(
