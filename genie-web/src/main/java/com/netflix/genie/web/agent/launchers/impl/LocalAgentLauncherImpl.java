@@ -32,8 +32,6 @@ import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -45,18 +43,7 @@ import java.io.IOException;
  * @since 4.0.0
  */
 @Slf4j
-public class LocalAgentLauncherImpl implements AgentLauncher, HealthIndicator {
-
-    @VisibleForTesting
-    static final String NUMBER_RUNNING_JOBS_KEY = "numRunningJobs";
-    @VisibleForTesting
-    static final String ALLOCATED_MEMORY_KEY = "allocatedMemory";
-    @VisibleForTesting
-    static final String USED_MEMORY_KEY = "usedMemory";
-    @VisibleForTesting
-    static final String AVAILABLE_MEMORY = "availableMemory";
-    @VisibleForTesting
-    static final String AVAILABLE_MAX_JOB_CAPACITY = "availableMaxJobCapacity";
+public class LocalAgentLauncherImpl implements AgentLauncher {
 
     private static final String SETS_ID = "setsid";
     private static final String EXEC_COMMAND = "exec";
@@ -187,39 +174,6 @@ public class LocalAgentLauncherImpl implements AgentLauncher, HealthIndicator {
                 ioe
             );
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Health health() {
-        final long allocatedMemoryOnHost = this.jobSearchService.getAllocatedMemoryOnHost(this.hostname);
-        final long usedMemoryOnHost = this.jobSearchService.getUsedMemoryOnHost(this.hostname);
-
-        // Use allocated memory to make the host go OOS early enough that we don't throw as many exceptions on
-        // accepted jobs during launch
-        final long availableMemory = this.launcherProperties.getMaxTotalJobMemory() - allocatedMemoryOnHost;
-        final int maxJobMemory = this.launcherProperties.getMaxJobMemory();
-
-        final Health.Builder builder;
-
-        // If we can fit one more max job in we're still healthy
-        if (availableMemory >= maxJobMemory) {
-            builder = Health.up();
-        } else {
-            builder = Health.down();
-        }
-
-        return builder
-            .withDetail(NUMBER_RUNNING_JOBS_KEY, this.jobSearchService.getActiveJobCountOnHost(this.hostname))
-            .withDetail(ALLOCATED_MEMORY_KEY, allocatedMemoryOnHost)
-            .withDetail(AVAILABLE_MEMORY, availableMemory)
-            .withDetail(USED_MEMORY_KEY, usedMemoryOnHost)
-            .withDetail(
-                AVAILABLE_MAX_JOB_CAPACITY,
-                (availableMemory >= 0 && maxJobMemory > 0) ? (availableMemory / maxJobMemory) : 0)
-            .build();
     }
 
     // TODO: Likely need to handle user creation locally to match V3 behavior. Getting basics done first.
