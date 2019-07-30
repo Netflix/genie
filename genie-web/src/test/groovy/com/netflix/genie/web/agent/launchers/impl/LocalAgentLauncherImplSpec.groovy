@@ -27,10 +27,12 @@ import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties
 import com.netflix.genie.web.util.ExecutorFactory
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.ExecuteResultHandler
 import org.apache.commons.exec.Executor
 import org.apache.commons.lang3.SystemUtils
+import org.springframework.boot.actuate.health.Status
 import spock.lang.Specification
 
 /**
@@ -169,5 +171,74 @@ class LocalAgentLauncherImplSpec extends Specification {
             throw new IOException("Something broke")
         }
         thrown(AgentLaunchException)
+    }
+
+    def "Can report health"() {
+        def hostname = UUID.randomUUID().toString()
+        def genieHostInfo = Mock(GenieHostInfo) {
+            getHostname() >> hostname
+        }
+        def jobSearchService = Mock(JobSearchService)
+        def maxTotalJobMemory = 100_003L
+        def maxJobMemory = 10_000
+        def properties = Mock(LocalAgentLauncherProperties) {
+            getMaxTotalJobMemory() >> maxTotalJobMemory
+            getMaxJobMemory() >> maxJobMemory
+            getExecutable() >> ["java", "-jar", "/tmp/genie-agent.jar"]
+        }
+        def rpcPort = 8990
+        def executorFactory = Mock(ExecutorFactory)
+        def meterRegistry = new SimpleMeterRegistry()
+
+        def launcher = new LocalAgentLauncherImpl(
+            genieHostInfo,
+            jobSearchService,
+            properties,
+            rpcPort,
+            executorFactory,
+            meterRegistry
+        )
+
+        when: "Available memory is equal to one max job"
+        def health = launcher.health()
+
+        then: "The system reports healthy"
+        1 * jobSearchService.getAllocatedMemoryOnHost(hostname) >> maxTotalJobMemory - maxJobMemory
+        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobSearchService.getActiveJobCountOnHost(hostname) >> 335L
+        health.getStatus() == Status.UP
+        health.getDetails().get(LocalAgentLauncherImpl.NUMBER_RUNNING_JOBS_KEY) == 335L
+        health.getDetails().get(LocalAgentLauncherImpl.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory)
+        health.getDetails().get(LocalAgentLauncherImpl.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MAX_JOB_CAPACITY) == ((maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory)) / maxJobMemory).toInteger()
+
+        when: "Available memory is equal to more than one max job"
+        health = launcher.health()
+
+        then: "The system reports healthy"
+        1 * jobSearchService.getAllocatedMemoryOnHost(hostname) >> maxTotalJobMemory - maxJobMemory - 1
+        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobSearchService.getActiveJobCountOnHost(hostname) >> 337L
+        health.getStatus() == Status.UP
+        health.getDetails().get(LocalAgentLauncherImpl.NUMBER_RUNNING_JOBS_KEY) == 337L
+        health.getDetails().get(LocalAgentLauncherImpl.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory - 1
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory - 1)
+        health.getDetails().get(LocalAgentLauncherImpl.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MAX_JOB_CAPACITY) == ((maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory - 1)) / maxJobMemory).toInteger()
+
+        when: "Available memory is less than one max job"
+        health = launcher.health()
+
+        then: "The system reports down"
+        1 * jobSearchService.getAllocatedMemoryOnHost(hostname) >> maxTotalJobMemory - maxJobMemory + 1
+        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobSearchService.getActiveJobCountOnHost(hostname) >> 343L
+        health.getStatus() == Status.DOWN
+        health.getDetails().get(LocalAgentLauncherImpl.NUMBER_RUNNING_JOBS_KEY) == 343L
+        health.getDetails().get(LocalAgentLauncherImpl.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory + 1
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory + 1)
+        health.getDetails().get(LocalAgentLauncherImpl.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
+        health.getDetails().get(LocalAgentLauncherImpl.AVAILABLE_MAX_JOB_CAPACITY) == ((maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory + 1)) / maxJobMemory).toInteger()
     }
 }
