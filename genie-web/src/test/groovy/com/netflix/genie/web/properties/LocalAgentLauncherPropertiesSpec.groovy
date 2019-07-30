@@ -38,16 +38,24 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
 
         then:
         properties.getExecutable() == Lists.newArrayList("java", "-jar", "/tmp/genie-agent.jar")
+        properties.getMaxJobMemory() == 10_240
+        properties.getMaxTotalJobMemory() == 30_720L
     }
 
     def "Setters and getters work properly"() {
         def newExecutable = Lists.newArrayList("/etc/genie-agent.sh", "run")
+        def newMaxJobMemory = 30_000
+        def newMaxTotalJobMemory = 900_000L
         def properties = new LocalAgentLauncherProperties()
 
         when:
         properties.setExecutable(newExecutable)
+        properties.setMaxJobMemory(newMaxJobMemory)
+        properties.setMaxTotalJobMemory(newMaxTotalJobMemory)
 
         then:
         properties.getExecutable() == newExecutable
+        properties.getMaxJobMemory() == newMaxJobMemory
+        properties.getMaxTotalJobMemory() == newMaxTotalJobMemory
     }
 }

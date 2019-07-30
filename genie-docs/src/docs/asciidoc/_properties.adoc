@@ -48,6 +48,21 @@ no value is specified the bucket is assumed to be in the same region as the Geni
 |
 |yes
 
+|genie.agent.launcher.local.executable
+|The system command that the launcher should use to launch an agent process. Ordered list of arguments.
+|java -jar /tmp/genie-agent.jar
+|no
+
+|genie.agent.launcher.local.maxJobMemory
+|The maximum amount of memory, in megabytes, that a job can be allocated while using the local launcher
+|10240
+|no
+
+|genie.agent.launcher.local.maxTotalJobMemory
+|The total number of MB out of the system memory that Genie can use for running agents
+|30720
+|no
+
 |genie.aws.credentials.role
 |The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
 attempt to assume this role on the host Genie is running on
