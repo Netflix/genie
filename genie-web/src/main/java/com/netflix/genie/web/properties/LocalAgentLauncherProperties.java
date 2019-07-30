@@ -23,6 +23,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
@@ -47,6 +48,18 @@ public class LocalAgentLauncherProperties {
     /**
      * The command that should be run to execute the Genie agent. Required.
      */
-    @NotEmpty
+    @NotEmpty(message = "The agent executable cannot be empty or it will be impossible to launch an agent process")
     private List<@NotBlank String> executable = Lists.newArrayList("java", "-jar", "/tmp/genie-agent.jar");
+
+    /**
+     * Defaults to 10 GB (10,240 MB).
+     */
+    @Min(value = 1, message = "The minimum value is 1MB but the value should likely be much higher")
+    private int maxJobMemory = 10_240;
+
+    /**
+     * Default to 30 GB (30,720 MB).
+     */
+    @Min(value = 1L, message = "The minimum value is 1MB but the value should likely be set much higher")
+    private long maxTotalJobMemory = 30_720L;
 }
