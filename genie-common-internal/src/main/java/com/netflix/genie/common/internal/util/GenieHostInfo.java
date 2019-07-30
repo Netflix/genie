@@ -19,6 +19,7 @@ package com.netflix.genie.common.internal.util;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -27,18 +28,10 @@ import lombok.ToString;
  * @author tgianos
  * @since 4.0.0
  */
+@RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
 public class GenieHostInfo {
     private final String hostname;
-
-    /**
-     * Constructor.
-     *
-     * @param hostname The hostname of the node this Genie process is running on.
-     */
-    public GenieHostInfo(final String hostname) {
-        this.hostname = hostname;
-    }
 }
