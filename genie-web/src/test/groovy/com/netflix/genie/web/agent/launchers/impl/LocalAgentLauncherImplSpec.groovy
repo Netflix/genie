@@ -20,6 +20,8 @@ package com.netflix.genie.web.agent.launchers.impl
 import com.google.common.collect.Lists
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.util.GenieHostInfo
+import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties
@@ -39,6 +41,11 @@ import spock.lang.Specification
 class LocalAgentLauncherImplSpec extends Specification {
 
     def "Can Launch Agent"() {
+        def hostname = UUID.randomUUID().toString()
+        def genieHostInfo = Mock(GenieHostInfo) {
+            getHostname() >> hostname
+        }
+        def jobSearchService = Mock(JobSearchService)
         def executable = Lists.newArrayList("java", "-jar", "genie-agent.jar")
         def properties = Mock(LocalAgentLauncherProperties)
         def factory = Mock(ExecutorFactory)
@@ -46,12 +53,15 @@ class LocalAgentLauncherImplSpec extends Specification {
         def registry = Mock(MeterRegistry)
 
         def jobId = UUID.randomUUID().toString()
+        def jobMemory = 10_240
         def jobSpecification = Mock(JobSpecification) {
             getJob() >> Mock(JobSpecification.ExecutionResource) {
                 getId() >> jobId
             }
         }
-        def jobEnvironment = Mock(JobEnvironment)
+        def jobEnvironment = Mock(JobEnvironment) {
+            getMemory() >> jobMemory
+        }
         def resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment)
         def executor = Mock(Executor)
 
@@ -87,15 +97,25 @@ class LocalAgentLauncherImplSpec extends Specification {
         ]
 
         when:
-        def launcher = new LocalAgentLauncherImpl(properties, rpcPort, factory, registry)
+        def launcher = new LocalAgentLauncherImpl(
+            genieHostInfo,
+            jobSearchService,
+            properties,
+            rpcPort,
+            factory,
+            registry
+        )
 
         then:
         1 * properties.getExecutable() >> executable
 
-        when:
+        when: "A resolved job passes all checks"
         launcher.launchAgent(resolvedJob)
 
-        then:
+        then: "An agent is successfully launched"
+        1 * properties.getMaxJobMemory() >> jobMemory + 1
+        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> 0
+        1 * properties.getMaxTotalJobMemory() >> jobMemory + 1
         1 * factory.newInstance(true) >> executor
         1 * executor.execute(
             {
@@ -115,10 +135,35 @@ class LocalAgentLauncherImplSpec extends Specification {
             }
         )
 
-        when:
+        when: "The job requests more memory than the system is configured to allow for a max per job"
         launcher.launchAgent(resolvedJob)
 
-        then:
+        then: "An AgentLaunchException is thrown"
+        2 * properties.getMaxJobMemory() >> jobMemory - 1
+        0 * jobSearchService.getUsedMemoryOnHost(hostname)
+        0 * properties.getMaxTotalJobMemory()
+        0 * factory.newInstance(true)
+        0 * executor.execute(_ as CommandLine, _ as ExecuteResultHandler)
+        thrown(AgentLaunchException)
+
+        when: "Running the job would put the system over the max configured memory"
+        launcher.launchAgent(resolvedJob)
+
+        then: "An AgentLaunchException is thrown"
+        1 * properties.getMaxJobMemory() >> jobMemory + 1
+        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> jobMemory
+        2 * properties.getMaxTotalJobMemory() >> jobMemory
+        0 * factory.newInstance(true)
+        0 * executor.execute(_ as CommandLine, _ as ExecuteResultHandler)
+        thrown(AgentLaunchException)
+
+        when: "The command line can't be executed"
+        launcher.launchAgent(resolvedJob)
+
+        then: "An AgentLaunchException is thrown"
+        1 * properties.getMaxJobMemory() >> jobMemory + 1
+        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> 0
+        1 * properties.getMaxTotalJobMemory() >> jobMemory + 1
         1 * factory.newInstance(true) >> executor
         1 * executor.execute(_ as CommandLine, _ as ExecuteResultHandler) >> {
             throw new IOException("Something broke")

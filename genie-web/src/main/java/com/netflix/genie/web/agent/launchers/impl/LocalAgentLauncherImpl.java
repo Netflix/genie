@@ -18,7 +18,9 @@
 package com.netflix.genie.web.agent.launchers.impl;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
+import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
@@ -51,6 +53,11 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private static final String JOB_ID_OPTION = "--jobId";
     private static final String FULL_CLEANUP_OPTION = "--full-cleanup";
 
+    private static final Object MEMORY_CHECK_LOCK = new Object();
+
+    private final JobSearchService jobSearchService;
+    private final LocalAgentLauncherProperties launcherProperties;
+    private final String hostname;
     private final ExecutorFactory executorFactory;
     private final MeterRegistry registry;
     private final CommandLine commandTemplate;
@@ -58,22 +65,30 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     /**
      * Constructor.
      *
-     * @param localAgentProperties The properties from the configuration that control agent behavior
-     * @param agentRpcPort         The port the RPC service is listening on for the agent to connect to
-     * @param executorFactory      A {@link ExecutorFactory} to create {@link org.apache.commons.exec.Executor}
-     *                             instances
-     * @param registry             Metrics repository
+     * @param hostInfo           The {@link GenieHostInfo} instance
+     * @param jobSearchService   The {@link JobSearchService} used to get metrics about the jobs on this node
+     * @param launcherProperties The properties from the configuration that control agent behavior
+     * @param agentRpcPort       The port the RPC service is listening on for the agent to connect to
+     * @param executorFactory    A {@link ExecutorFactory} to create {@link org.apache.commons.exec.Executor}
+     *                           instances
+     * @param registry           Metrics repository
      */
     public LocalAgentLauncherImpl(
-        final LocalAgentLauncherProperties localAgentProperties,
+        final GenieHostInfo hostInfo,
+        final JobSearchService jobSearchService,
+        final LocalAgentLauncherProperties launcherProperties,
+        // TODO: Roll this into GenieHostInfo
         final int agentRpcPort,
         final ExecutorFactory executorFactory,
         final MeterRegistry registry
     ) {
+        this.hostname = hostInfo.getHostname();
+        this.jobSearchService = jobSearchService;
+        this.launcherProperties = launcherProperties;
         this.executorFactory = executorFactory;
         this.registry = registry;
 
-        final String[] agentExecutable = localAgentProperties.getExecutable().toArray(new String[0]);
+        final String[] agentExecutable = this.launcherProperties.getExecutable().toArray(new String[0]);
 
         if (SystemUtils.IS_OS_LINUX) {
             this.commandTemplate = new CommandLine(SETS_ID);
@@ -102,10 +117,43 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
      */
     @Override
     public void launchAgent(@Valid final ResolvedJob resolvedJob) throws AgentLaunchException {
+        // Check error conditions
+        final int jobMemory = resolvedJob.getJobEnvironment().getMemory();
+        final String jobId = resolvedJob.getJobSpecification().getJob().getId();
+
+        // Job was resolved with more memory allocated than the system was configured to allow
+        if (jobMemory > this.launcherProperties.getMaxJobMemory()) {
+            throw new AgentLaunchException(
+                "Unable to launch job as the requested job memory ("
+                    + jobMemory
+                    + "MB) exceeds the maximum allowed by the configuration of the system ("
+                    + this.launcherProperties.getMaxJobMemory()
+                    + "MB)"
+            );
+        }
+
+        // One at a time to ensure we don't overflow configured max
+        synchronized (MEMORY_CHECK_LOCK) {
+            final long usedMemoryOnHost = this.jobSearchService.getUsedMemoryOnHost(this.hostname);
+            final long expectedUsedMemoryOnHost = usedMemoryOnHost + jobMemory;
+            if (expectedUsedMemoryOnHost > this.launcherProperties.getMaxTotalJobMemory()) {
+                throw new AgentLaunchException(
+                    "Running job "
+                        + jobId
+                        + " with "
+                        + jobMemory
+                        + "MB of memory would cause there to be more memory used than the configured amount of "
+                        + this.launcherProperties.getMaxTotalJobMemory()
+                        + "MB. "
+                        + usedMemoryOnHost
+                        + "MB worth of jobs are currently running on this node."
+                );
+            }
+        }
+
         // TODO: What happens if the server crashes? Does the process live on? Make sure this is totally detached
         final Executor executor = this.executorFactory.newInstance(true);
         final CommandLine commandLine = new CommandLine(this.commandTemplate);
-        final String jobId = resolvedJob.getJobSpecification().getJob().getId();
 
         // Should now come after `--jobId`
         commandLine.addArgument(jobId);
