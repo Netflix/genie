@@ -17,10 +17,15 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.health;
 
+import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
+import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
 import com.netflix.genie.web.health.GenieMemoryHealthIndicator;
+import com.netflix.genie.web.health.LocalAgentLauncherHealthIndicator;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import com.netflix.genie.web.services.JobMetricsService;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -51,13 +56,30 @@ public class HealthAutoConfigurationTest {
      * Make sure expected beans are provided for health indicators.
      */
     @Test
-    public void bothHealthBeansCreatedIfNoOthersExist() {
+    public void healthBeansCreatedIfNoOthersExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(GenieMemoryHealthIndicator.class);
                 Assertions.assertThat(context).hasSingleBean(GenieAgentHealthIndicator.class);
+                Assertions.assertThat(context).doesNotHaveBean(LocalAgentLauncherHealthIndicator.class);
             }
         );
+    }
+
+    /**
+     * Make sure expected beans are provided for health indicators.
+     */
+    @Test
+    public void localAgentHealthIndicatorCreatedIfNecessaryBeansExist() {
+        this.contextRunner
+            .withUserConfiguration(LocalAgentLaunchMockConfiguration.class)
+            .run(
+                context -> {
+                    Assertions.assertThat(context).hasSingleBean(GenieMemoryHealthIndicator.class);
+                    Assertions.assertThat(context).hasSingleBean(GenieAgentHealthIndicator.class);
+                    Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherHealthIndicator.class);
+                }
+            );
     }
 
     /**
@@ -89,6 +111,32 @@ public class HealthAutoConfigurationTest {
         public AgentMetricsService agentMetricsService() {
             return new AgentMetricsService() {
             };
+        }
+    }
+
+    /**
+     * Mock configuration for local agent launch health beans.
+     */
+    @Configuration
+    static class LocalAgentLaunchMockConfiguration {
+        @Bean
+        public LocalAgentLauncherProperties localAgentLauncherProperties() {
+            return new LocalAgentLauncherProperties();
+        }
+
+        @Bean
+        public LocalAgentLauncherImpl localAgentLauncher() {
+            return Mockito.mock(LocalAgentLauncherImpl.class);
+        }
+
+        @Bean
+        public JobSearchService jobSearchService() {
+            return Mockito.mock(JobSearchService.class);
+        }
+
+        @Bean
+        public GenieHostInfo genieHostInfo() {
+            return Mockito.mock(GenieHostInfo.class);
         }
     }
 }
