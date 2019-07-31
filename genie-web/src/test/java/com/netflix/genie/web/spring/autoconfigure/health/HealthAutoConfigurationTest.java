@@ -33,7 +33,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Unit tests for {@link HealthAutoConfiguration}.
@@ -85,7 +84,6 @@ public class HealthAutoConfigurationTest {
     /**
      * Provide some junk beans if needed.
      */
-    @Configuration
     static class UserConfiguration {
         @Bean
         public JobMetricsService jobMetricsService() {
@@ -117,7 +115,6 @@ public class HealthAutoConfigurationTest {
     /**
      * Mock configuration for local agent launch health beans.
      */
-    @Configuration
     static class LocalAgentLaunchMockConfiguration {
         @Bean
         public LocalAgentLauncherProperties localAgentLauncherProperties() {
