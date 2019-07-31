@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-07-26</span>
+<span id="revdate">2019-07-31</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5069,6 +5069,24 @@ doesn&#8217;t exist.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to enable SNS publishing of events</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.topicARN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The SNS topic to publish to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.additionalEventKeys.&lt;KEY&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map of KEYs and corresponding values to be added to the SNS messages published</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.creationEnabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether Genie should attempt to create a system user in order to run the job as or not. Genie user must have sudo
 rights for this to work.</p></td>
@@ -6008,6 +6026,20 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.notifications.final-state.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count the number of completed job notifications</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobNotificationMetricPublisher</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>jobFinalState</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.notifications.state-transition.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count the number of job transitions notifications</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobNotificationMetricPublisher</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>fromState, toState</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.overall.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time takend to submit a new job (create workspace and scripts, register in database and kick off)</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
@@ -6476,6 +6508,13 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>UserMetricsTask</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.notifications.sns.publish.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count the number of notification published to SNS</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>SNSNotificationsPublisher</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status</code></p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -6487,7 +6526,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-07-26 19:53:16 UTC
+Last updated 2019-07-31 23:14:46 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">

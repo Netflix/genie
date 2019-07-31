@@ -64,9 +64,11 @@ com.netflix.genie.web.apis.rest.v3.hateoas.resources
 com.netflix.genie.web.aspects
 com.netflix.genie.web.data.entities
 com.netflix.genie.web.data.entities.aggregates
+com.netflix.genie.web.data.entities.listeners
 com.netflix.genie.web.data.entities.projections
 com.netflix.genie.web.data.entities.projections.v4
 com.netflix.genie.web.data.entities.v4
+com.netflix.genie.web.data.observers
 com.netflix.genie.web.data.repositories.jpa
 com.netflix.genie.web.data.repositories.jpa.specifications
 com.netflix.genie.web.data.services
