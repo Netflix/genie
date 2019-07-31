@@ -34,7 +34,7 @@ import java.nio.file.Paths;
 
 /**
  * Resource resolver for files local to an agent running a job that can be streamed to the server and served via API.
- * The URI for such resources is: agent://\<jobId\>/\<relativePath\>.
+ * The URI for such resources is: {@literal agent://<jobId>/<relativePath>}.
  *
  * @author mprimi
  * @since 4.0.0
