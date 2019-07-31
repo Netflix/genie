@@ -163,7 +163,7 @@ public interface JobPersistenceService {
      * <p>
      * The job record will be created with initial state of {@link JobStatus#RESERVED} meaning that the unique id
      * returned by this API has been reserved within Genie and no other job can use it. If
-     * {@link JobSubmission#getAttachments()} contains some attachments these attachments will be persisted to a
+     * {@link JobSubmission} contains some attachments these attachments will be persisted to a
      * configured storage system (i.e. local disk, S3, etc) and added to the set of dependencies for the job.
      * The underlying attachment storage system must be accessible by the agent process configured by the system. For
      * example if the server is set up to write attachments to local disk but the agent is not running locally but

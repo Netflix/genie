@@ -277,7 +277,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          * The command arguments to use in conjunction with the command executable selected for this job.
          *
          * @param commandArgs The command args. The maximum combined length of the command args plus one space between
-         *                    each argument must be <= 10,000 characters
+         *                    each argument must be less than or equal to 10,000 characters
          * @return The builder
          * @since 3.3.0
          */
