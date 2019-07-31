@@ -9,6 +9,10 @@ ext {
     snippetsDir = new File(project.buildDir, "generated-snippets")
 }
 
+configurations {
+    genieAgent
+}
+
 dependencies {
     /*******************************
      * Annotation Processors
@@ -101,6 +105,12 @@ dependencies {
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
     testCompile("org.springframework.restdocs:spring-restdocs-restassured")
     testCompile("io.grpc:grpc-testing")
+
+    /*******************************
+     * Agent Dependencies
+     *******************************/
+
+    genieAgent(project(path: ":genie-agent-app", configuration: "agentBootJar"))
 }
 
 license {
@@ -112,7 +122,9 @@ license {
 }
 
 integrationTest {
+    dependsOn project.findProject(":genie-agent-app").tasks.bootJar
     outputs.dir snippetsDir
+    systemProperty("genie.agent.launcher.local.executable", "java,-jar,${configurations.genieAgent.asPath}")
 }
 
 // This is needed cause some things like attributes for asciidoctor don't serialize project.version properly at runtime
