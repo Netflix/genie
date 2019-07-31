@@ -1,6 +1,10 @@
 apply plugin: "org.springframework.boot"
 //apply plugin: "application"
 
+configurations {
+    agentBootJar
+}
+
 license {
     exclude "*.yml"
     exclude "*.xml"
@@ -42,4 +46,9 @@ jar {
     manifest {
         attributes("Implementation-Version": genieVersion)
     }
+}
+
+// Used to provide convenient way to reference the actual executable jar between projects
+artifacts {
+    agentBootJar bootJar
 }
