@@ -31,7 +31,7 @@ class AgentFileResourceSpec extends Specification {
     Path path = Paths.get("foo/bar.txt")
 
     InputStream inputStream = Mock(InputStream)
-    URI uri = new URI(AgentFileProtocolResolver.URI_SCHEME, jobId, "/" + path, null)
+    URI uri = AgentFileProtocolResolver.createUri(jobId, "/" + path)
     long lastModTime = 1553793121 * 1000
 
     def "Construct for resource"() {

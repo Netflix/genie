@@ -41,7 +41,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     static final String JOB_ID = "123456"
     static final String relPath = "bar/foo.txt"
     static final URL BASE_URL = new URL("https", "genie.netflix.net", 8080, "/jobs/" + JOB_ID + "/output/" + relPath)
-    static final URI EXPECTED_V4_FILE_URI = new URI(AgentFileProtocolResolver.URI_SCHEME, JOB_ID, "/" + relPath, null);
+    static final URI EXPECTED_V4_FILE_URI = AgentFileProtocolResolver.createUri(JOB_ID, "/" + relPath)
 
     ResourceLoader resourceLoader
     JobPersistenceService jobPersistenceService

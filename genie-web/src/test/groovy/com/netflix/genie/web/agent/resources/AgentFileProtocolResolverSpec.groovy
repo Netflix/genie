@@ -21,6 +21,7 @@ import com.netflix.genie.web.agent.services.AgentFileStreamService
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -46,7 +47,7 @@ class AgentFileProtocolResolverSpec extends Specification {
         setup:
         String jobId = UUID.randomUUID().toString()
         Path relativePath = Paths.get("foo/bar.txt")
-        URI uri = new URI(AgentFileProtocolResolver.URI_SCHEME, jobId, "/" + relativePath, null)
+        URI uri = AgentFileProtocolResolver.createUri(jobId, "/" + relativePath)
 
         String location = uri.toString()
         when:
@@ -74,5 +75,24 @@ class AgentFileProtocolResolverSpec extends Specification {
 
         then:
         r == null
+    }
+
+    @Unroll
+    def "URI representation for job ID: #jobId path: #path"() {
+
+        when:
+        URI uri = AgentFileProtocolResolver.createUri(jobId, path)
+
+        then:
+        AgentFileProtocolResolver.getAgentResourceURIFilePath(uri) == path
+        AgentFileProtocolResolver.getAgentResourceURIFileJobId(uri) == jobId
+
+        where:
+        jobId                        | path
+        UUID.randomUUID().toString() | ""
+        UUID.randomUUID().toString() | "/bar"
+        UUID.randomUUID().toString() | "/bar/foo.txt"
+        UUID.randomUUID().toString() | "/foo.txt"
+        // "job_id_1.2.3.4"          | "foo" //BUG! Fails URI serialization due to illegal characters.
     }
 }
