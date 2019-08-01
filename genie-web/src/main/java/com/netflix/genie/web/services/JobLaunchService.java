@@ -17,8 +17,11 @@
  */
 package com.netflix.genie.web.services;
 
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nonnull;
@@ -43,10 +46,14 @@ public interface JobLaunchService {
      *
      * @param jobSubmission The payload of metadata and resources making up all the information needed to launch
      *                      a job
-     * @return The id of the job. Upon return the job will at least be in
-     * {@link com.netflix.genie.common.dto.JobStatus#ACCEPTED} state
-     * @throws AgentLaunchException If the system was unable to launch an agent to handle job execution
+     * @return The id of the job. Upon return the job will at least be in {@link JobStatus#ACCEPTED} state
+     * @throws AgentLaunchException     If the system was unable to launch an agent to handle job execution
+     * @throws IdAlreadyExistsException If the unique identifier for the job conflicts with an already existing job
+     * @throws SaveAttachmentException  When a job is submitted with attachments but there is an error saving them
      */
     @Nonnull
-    String launchJob(@Valid JobSubmission jobSubmission) throws AgentLaunchException;
+    String launchJob(@Valid JobSubmission jobSubmission) throws
+        AgentLaunchException,
+        IdAlreadyExistsException,
+        SaveAttachmentException;
 }

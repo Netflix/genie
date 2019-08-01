@@ -23,6 +23,8 @@ import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
 import com.netflix.genie.web.services.JobResolverService
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import spock.lang.Specification
@@ -77,7 +79,31 @@ class JobLaunchServiceImplSpec extends Specification {
         0 * jobResolverService.resolveJob(_ as String)
         0 * jobPersistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
-        thrown(AgentLaunchException)
+        thrown(IllegalStateException)
+
+        when:
+        service.launchJob(jobSubmission)
+
+        then:
+        1 * jobPersistenceService.saveJobSubmission(jobSubmission) >> {
+            throw new IdAlreadyExistsException("try again")
+        }
+        0 * jobResolverService.resolveJob(_ as String)
+        0 * jobPersistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        0 * agentLauncher.launchAgent(_ as ResolvedJob)
+        thrown(IdAlreadyExistsException)
+
+        when:
+        service.launchJob(jobSubmission)
+
+        then:
+        1 * jobPersistenceService.saveJobSubmission(jobSubmission) >> {
+            throw new SaveAttachmentException("hmm that's not good")
+        }
+        0 * jobResolverService.resolveJob(_ as String)
+        0 * jobPersistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
+        0 * agentLauncher.launchAgent(_ as ResolvedJob)
+        thrown(SaveAttachmentException)
 
         when:
         service.launchJob(jobSubmission)

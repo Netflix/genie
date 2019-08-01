@@ -24,6 +24,8 @@ import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -77,7 +79,9 @@ public class JobLaunchServiceImpl implements JobLaunchService {
      */
     @Override
     @Nonnull
-    public String launchJob(@Valid final JobSubmission jobSubmission) throws AgentLaunchException {
+    public String launchJob(
+        @Valid final JobSubmission jobSubmission
+    ) throws AgentLaunchException, IdAlreadyExistsException, SaveAttachmentException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -91,14 +95,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
              * 5. If the agent launch fails mark the job failed else return
              */
 
-            final String jobId;
-            try {
-                jobId = this.jobPersistenceService.saveJobSubmission(jobSubmission);
-            } catch (final Throwable t) {
-                // TODO: Really handle this error
-                log.error("TODO", t);
-                throw new AgentLaunchException(t);
-            }
+            final String jobId = this.jobPersistenceService.saveJobSubmission(jobSubmission);
 
             final ResolvedJob resolvedJob;
             try {
