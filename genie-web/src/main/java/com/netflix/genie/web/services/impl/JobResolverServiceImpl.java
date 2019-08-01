@@ -59,7 +59,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.File;
@@ -132,6 +131,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private final int defaultMemory;
     // TODO: Switch to path
     private final File defaultJobDirectory;
+    private final String defaultArchiveLocation;
 
     private final Counter noClusterSelectedCounter;
     private final Counter noClusterFoundCounter;
@@ -169,6 +169,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         } catch (final URISyntaxException e) {
             throw new IllegalArgumentException("Job directory location property is invalid: " + jobDirProperty);
         }
+        this.defaultArchiveLocation = jobsProperties.getLocations().getArchives();
 
         // Metrics
         this.registry = registry;
@@ -284,12 +285,18 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .getRequestedAgentConfig()
                 .getRequestedJobDirectoryLocation()
                 .orElse(this.defaultJobDirectory),
-            toArchiveLocation(
+            // TODO: Disable ability to disable archival for all jobs during internal V4 migration.
+            //       Will allow us to reach out to clients who may set this variable but still expect output after
+            //       job completion due to it being served off the node after completion in V3 but now it won't.
+            //       Put this back in once all use cases have been hunted down and users are sure of their expected
+            //       behavior
+            this.toArchiveLocation(
                 jobRequest
                     .getRequestedJobArchivalData()
                     .getRequestedArchiveLocationPrefix()
-                    .orElse(null),
-                id)
+                    .orElse(this.defaultArchiveLocation),
+                id
+            )
         );
 
         final JobEnvironment jobEnvironment = new JobEnvironment
@@ -629,15 +636,17 @@ public class JobResolverServiceImpl implements JobResolverService {
      * @return archive location for the job
      */
     private String toArchiveLocation(
-        @Nullable final String requestedArchiveLocationPrefix,
+        final String requestedArchiveLocationPrefix,
         final String jobId
     ) {
-        if (StringUtils.isBlank(requestedArchiveLocationPrefix)) {
-            return null;
-        } else if (requestedArchiveLocationPrefix.endsWith(File.separator)) {
-            return requestedArchiveLocationPrefix + jobId;
+        final String archivePrefix = StringUtils.isBlank(requestedArchiveLocationPrefix)
+            ? this.defaultArchiveLocation
+            : requestedArchiveLocationPrefix;
+
+        if (archivePrefix.endsWith(File.separator)) {
+            return archivePrefix + jobId;
         } else {
-            return requestedArchiveLocationPrefix + File.separator + jobId;
+            return archivePrefix + File.separator + jobId;
         }
     }
 
