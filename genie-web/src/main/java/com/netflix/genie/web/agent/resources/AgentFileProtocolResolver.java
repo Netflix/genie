@@ -25,6 +25,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -37,11 +38,10 @@ import java.nio.file.Paths;
  */
 @Slf4j
 public class AgentFileProtocolResolver implements ProtocolResolver {
-    /**
-     * The 'protocol' part of the URI used to identify file streamed from a live agent.
-     */
-    public static final String URI_SCHEME = "agent";
+
+    private static final String URI_SCHEME = "agent";
     private static final Path ROOT_PATH = Paths.get(".").toAbsolutePath().getRoot();
+
     private final AgentFileStreamService agentFileStreamService;
 
     /**
@@ -56,33 +56,56 @@ public class AgentFileProtocolResolver implements ProtocolResolver {
     }
 
     /**
+     * Create a URI for the given remote agent file.
+     *
+     * @param jobId the job id
+     * @param path  the path of the file within the job directory
+     * @return a {@link URI} representing the remote agent file
+     * @throws URISyntaxException if constructing the URI fails
+     */
+    public static URI createUri(final String jobId, final String path) throws URISyntaxException {
+        return new URI(AgentFileProtocolResolver.URI_SCHEME, jobId, path, null);
+    }
+
+    private static String getAgentResourceURIFileJobId(final URI agentUri) {
+        if (!URI_SCHEME.equals(agentUri.getScheme())) {
+            throw new IllegalArgumentException("Not a valid Agent resource URI: " + agentUri);
+        }
+        return agentUri.getHost();
+    }
+
+    private static String getAgentResourceURIFilePath(final URI agentUri) {
+        if (!URI_SCHEME.equals(agentUri.getScheme())) {
+            throw new IllegalArgumentException("Not a valid Agent resource URI: " + agentUri);
+        }
+        return agentUri.getPath();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public Resource resolve(final String location, final ResourceLoader resourceLoader) {
         log.debug("Attempting to resolve if {} is an Agent file resource or not", location);
         final URI uri;
+        final String jobId;
+        final Path relativePath;
+
         try {
             uri = URI.create(location);
+            jobId = getAgentResourceURIFileJobId(uri);
+            relativePath = ROOT_PATH.relativize(Paths.get(getAgentResourceURIFilePath(uri))).normalize();
         } catch (final IllegalArgumentException | NullPointerException e) {
             log.debug("{} is not a valid Agent resource (Error message: {}).", location, e.getMessage());
             return null;
         }
 
-        if (URI_SCHEME.equals(uri.getScheme())) {
-            log.info("{} is a valid agent resource.", location); //TODO log level
-            final String jobId = uri.getHost();
-            final Path relativePath = ROOT_PATH.relativize(Paths.get(uri.getPath())).normalize();
+        final AgentFileStreamService.AgentFileResource resourceOrNull =
+            agentFileStreamService.getResource(jobId, relativePath, uri).orElse(null);
 
-            final AgentFileStreamService.AgentFileResource resourceOrNull =
-                agentFileStreamService.getResource(jobId, relativePath, uri).orElse(null);
-
-            if (resourceOrNull != null) {
-                log.info("Returning resource: {}", resourceOrNull.getDescription()); //TODO log level
-                return resourceOrNull;
-            }
+        if (resourceOrNull != null) {
+            log.debug("Returning resource: {}", resourceOrNull.getDescription());
         }
-
-        return null;
+        return resourceOrNull;
     }
 }

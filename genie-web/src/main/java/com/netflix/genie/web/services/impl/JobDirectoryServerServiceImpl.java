@@ -237,7 +237,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
 
             final URI jobDirRoot;
             try {
-                jobDirRoot = new URI(AgentFileProtocolResolver.URI_SCHEME, jobId, SLASH, null);
+                jobDirRoot = AgentFileProtocolResolver.createUri(jobId, SLASH);
             } catch (final URISyntaxException e) {
                 log.error(e.getMessage(), e);
                 response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
