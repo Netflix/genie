@@ -156,7 +156,12 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecNoArchivalData.getApplications().isEmpty()
         !jobSpecNoArchivalData.isInteractive()
         jobSpecNoArchivalData.getEnvironmentVariables().size() == 17
-        jobSpecNoArchivalData.getArchiveLocation() == Optional.empty()
+        jobSpecNoArchivalData.getArchiveLocation() ==
+            Optional.of(
+                StringUtils.endsWith(jobsProperties.getLocations().getArchives(), File.separator)
+                    ? jobsProperties.getLocations().getArchives() + jobId
+                    : jobsProperties.getLocations().getArchives() + File.separator + jobId
+            )
         jobEnvironmentNoArchivalData.getEnvironmentVariables() == jobSpecNoArchivalData.getEnvironmentVariables()
         jobEnvironmentNoArchivalData.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
         jobEnvironmentNoArchivalData.getCpu() == 1
@@ -185,7 +190,12 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecSavedData.getApplications().isEmpty()
         !jobSpecSavedData.isInteractive()
         jobSpecSavedData.getEnvironmentVariables().size() == 17
-        jobSpecSavedData.getArchiveLocation() == Optional.empty()
+        jobSpecSavedData.getArchiveLocation() ==
+            Optional.of(
+                StringUtils.endsWith(jobsProperties.getLocations().getArchives(), File.separator)
+                    ? jobsProperties.getLocations().getArchives() + jobId
+                    : jobsProperties.getLocations().getArchives() + File.separator + jobId
+            )
         jobEnvironmentSavedData.getEnvironmentVariables() == jobSpecSavedData.getEnvironmentVariables()
         jobEnvironmentSavedData.getMemory() == requestedMemory
         jobEnvironmentSavedData.getCpu() == 1
