@@ -93,6 +93,42 @@ class AgentFileProtocolResolverSpec extends Specification {
         UUID.randomUUID().toString() | "/bar"
         UUID.randomUUID().toString() | "/bar/foo.txt"
         UUID.randomUUID().toString() | "/foo.txt"
-        // "job_id_1.2.3.4"          | "foo" //BUG! Fails URI serialization due to illegal characters.
+        "job_id_1.2.3.4"             | "/foo"
+        "job_id with spaces"         | "/foo"
+        "\$%*&></+="                 | "/foo"
+    }
+
+    @Unroll
+    def "URI representation: #path -> #expectedPath"() {
+
+        when:
+        URI uri = AgentFileProtocolResolver.createUri(jobId, path)
+
+        then:
+        AgentFileProtocolResolver.getAgentResourceURIFilePath(uri) == expectedPath
+        AgentFileProtocolResolver.getAgentResourceURIFileJobId(uri) == jobId
+
+        where:
+        jobId                        | path             | expectedPath
+        UUID.randomUUID().toString() | ""               | ""
+        UUID.randomUUID().toString() | "/bar"           | "/bar"
+        UUID.randomUUID().toString() | "bar"            | "/bar"
+        UUID.randomUUID().toString() | "//bar"           | "//bar"
+    }
+
+    def "URI errors"() {
+        setup:
+        URI uri = new URI("http://agent/path/to/file")
+
+        when:
+        AgentFileProtocolResolver.getAgentResourceURIFilePath(uri)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        AgentFileProtocolResolver.getAgentResourceURIFileJobId(uri)
+        then:
+        thrown(IllegalArgumentException)
     }
 }
