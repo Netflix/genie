@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.internal.services.impl
 
+import com.netflix.genie.common.internal.exceptions.JobArchiveException
 import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -40,44 +41,76 @@ class FileSystemJobArchiverImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
 
-    Path source
-    Path target
-
-    def setup() {
-        this.source = temporaryFolder.newFolder().toPath()
-        this.target = temporaryFolder.newFolder().toPath()
+    def "Can archive job directory"() {
+        def source = this.temporaryFolder.newFolder().toPath()
+        def target = this.temporaryFolder.newFolder().toPath()
 
         // create a directory structure
-        Files.write(this.source.resolve("stdout"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
-        Files.write(this.source.resolve("stderr"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
-        def genieDir = Files.createDirectory(this.source.resolve("genie"))
+        Files.write(source.resolve("stdout"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
+        Files.write(source.resolve("stderr"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
+        def genieDir = Files.createDirectory(source.resolve("genie"))
         Files.write(genieDir.resolve("env.sh"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
         def genieSubDir = Files.createDirectory(genieDir.resolve("subdir"))
         Files.write(genieSubDir.resolve("exit"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
-        def clusterDir = Files.createDirectory(this.source.resolve("cluster"))
+        def clusterDir = Files.createDirectory(source.resolve("cluster"))
         Files.write(
             clusterDir.resolve("clusterSetupFile.sh"),
             UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)
         )
-    }
 
-    def "Can archive job directory"() {
         def archiver = new FileSystemJobArchiverImpl()
-        def visitor = new DirectoryComparator(this.source, this.target)
+        def visitor = new DirectoryComparator(source, target)
 
         when: "We list the target directory"
-        Stream<Path> paths = Files.list(this.target)
+        Stream<Path> paths = Files.list(target)
 
         then: "It is empty"
         paths.count() == 0
 
         when: "We archive the source to the target and compare the directories"
-        archiver.archiveDirectory(this.source, this.target.toUri())
-        Files.walkFileTree(this.source, visitor)
+        archiver.archiveDirectory(source, target.toUri())
+        Files.walkFileTree(source, visitor)
         def result = visitor.isSame()
 
         then:
         result
+    }
+
+    def "Test error cases"() {
+        def archiver = new FileSystemJobArchiverImpl()
+
+        when: "source doesn't exist"
+        def sourceDoesNotExist = this.temporaryFolder.getRoot().toPath().resolve(UUID.randomUUID().toString())
+        archiver.archiveDirectory(sourceDoesNotExist, this.temporaryFolder.newFolder().toPath().toUri())
+
+        then: "An exception is thrown"
+        thrown(JobArchiveException)
+
+        when: "source isn't a directory"
+        def sourceIsFile = this.temporaryFolder.newFile().toPath()
+        archiver.archiveDirectory(sourceIsFile, this.temporaryFolder.newFolder().toPath().toUri())
+
+        then: "An exception is thrown"
+        thrown(JobArchiveException)
+
+        when: "Target exists but is a file"
+        archiver.archiveDirectory(
+            this.temporaryFolder.newFolder().toPath(),
+            this.temporaryFolder.newFile().toPath().toUri()
+        )
+
+        then: "An exception is thrown"
+        thrown(JobArchiveException)
+
+        when: "Target doesn't exist"
+        def target = this.temporaryFolder.getRoot().toPath().resolve(UUID.randomUUID().toString())
+        archiver.archiveDirectory(
+            this.temporaryFolder.newFolder().toPath(),
+            target.toUri()
+        )
+
+        then: "it is created"
+        Files.exists(target)
     }
 
     private static class DirectoryComparator extends SimpleFileVisitor<Path> {

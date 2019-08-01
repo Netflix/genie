@@ -83,7 +83,20 @@ public class FileSystemJobArchiverImpl implements JobArchiver {
         private final Path source;
         private final Path target;
 
-        JobDirectoryCopier(final Path source, final Path target) {
+        JobDirectoryCopier(final Path source, final Path target) throws IOException {
+            // If the source doesn't exist or isn't a directory throw an exception
+            if (!Files.exists(source) || !Files.isDirectory(source)) {
+                throw new IOException(source + " doesn't exist or isn't a directory. Unable to copy");
+            }
+            // If the target exists but isn't a directory throw an error
+            if (Files.exists(target) && !Files.isDirectory(target)) {
+                throw new IOException(target + " exists but isn't a directory");
+            }
+            // If the target doesn't exist try to create it
+            if (!Files.exists(target)) {
+                Files.createDirectories(target);
+            }
+
             this.source = source;
             this.target = target;
         }
