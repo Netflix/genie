@@ -20,12 +20,15 @@ package com.netflix.genie.web.agent.resources;
 
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.core.io.ProtocolResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -64,14 +67,19 @@ public class AgentFileProtocolResolver implements ProtocolResolver {
      * @throws URISyntaxException if constructing the URI fails
      */
     public static URI createUri(final String jobId, final String path) throws URISyntaxException {
-        return new URI(AgentFileProtocolResolver.URI_SCHEME, jobId, path, null);
+        final String encodedJobId = Base64.encodeBase64URLSafeString(jobId.getBytes(Charset.defaultCharset()));
+        return new URIBuilder()
+            .setScheme(URI_SCHEME)
+            .setHost(encodedJobId)
+            .setPath(path)
+            .build();
     }
 
     private static String getAgentResourceURIFileJobId(final URI agentUri) {
         if (!URI_SCHEME.equals(agentUri.getScheme())) {
             throw new IllegalArgumentException("Not a valid Agent resource URI: " + agentUri);
         }
-        return agentUri.getHost();
+        return new String(Base64.decodeBase64(agentUri.getHost()), Charset.defaultCharset());
     }
 
     private static String getAgentResourceURIFilePath(final URI agentUri) {
