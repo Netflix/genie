@@ -29,6 +29,7 @@ import com.netflix.genie.web.data.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.entities.projections.JobProjection;
 import com.netflix.genie.web.data.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.data.entities.projections.JobSearchProjection;
+import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
@@ -133,6 +134,7 @@ import java.util.Set;
 )
 @Table(name = "jobs")
 public class JobEntity extends BaseEntity implements
+    FinishedJobProjection,
     JobProjection,
     JobRequestProjection,
     JobMetadataProjection,

@@ -43,6 +43,7 @@ import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.TagEntity;
 import com.netflix.genie.web.data.entities.projections.JobStatusProjection;
+import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
@@ -74,6 +75,7 @@ import java.util.stream.Collectors;
  * @since 3.0.0
  */
 public class JpaJobPersistenceServiceImplTest {
+// TODO the use of a static converter makes this class hard to test. Switch to a non-static converter object.
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_1_NAME = "relativity";
@@ -960,4 +962,23 @@ public class JpaJobPersistenceServiceImplTest {
         }
         Assert.assertThat(this.jobPersistenceService.getJobStatus(id), Matchers.is(status));
     }
+
+    /**
+     * Test {@link JpaJobPersistenceServiceImpl#getFinishedJob(String)}.
+     *
+     * @throws GenieNotFoundException if the job doesn't exist
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testGetFinishedJobNonExisting() throws GenieNotFoundException {
+        final String id = UUID.randomUUID().toString();
+
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id, FinishedJobProjection.class))
+            .thenReturn(Optional.empty());
+
+        this.jobPersistenceService.getFinishedJob(id);
+    }
+
+    // TODO: JpaJobPersistenceServiceImpl#getFinishedJob(String) for job in non-final state
+    // TODO: JpaJobPersistenceServiceImpl#getFinishedJob(String) successfull
 }

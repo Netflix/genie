@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
+import com.netflix.genie.common.internal.dto.v4.FinishedJob;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
@@ -47,6 +48,7 @@ import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.CriterionEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.TagEntity;
+import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
@@ -280,6 +282,68 @@ public final class EntityDtoConverters {
             //       edges (REST API, RPC API) based on type of exceptions we should subclass GenieRuntimeException
             throw new GenieRuntimeException(gpe);
         }
+    }
+
+    /**
+     * Convert a given {@link FinishedJobProjection} to the equivalent {@link FinishedJob} DTO representation.
+     * @param finishedJobProjection the entity projection
+     * @return the DTO representation
+     */
+    public static FinishedJob toFinishedJobDto(final FinishedJobProjection finishedJobProjection) {
+        final FinishedJob.Builder builder = new FinishedJob.Builder(
+            finishedJobProjection.getUniqueId(),
+            finishedJobProjection.getName(),
+            finishedJobProjection.getUser(),
+            finishedJobProjection.getVersion(),
+            finishedJobProjection.getCreated(),
+            finishedJobProjection.getStatus(),
+            finishedJobProjection.getCommandArgs(),
+            toCriterionDto(finishedJobProjection.getCommandCriterion()),
+            finishedJobProjection.getClusterCriteria()
+                .stream()
+                .map(EntityDtoConverters::toCriterionDto)
+                .collect(Collectors.toList())
+        );
+
+        finishedJobProjection.getStarted().ifPresent(builder::withStarted);
+        finishedJobProjection.getFinished().ifPresent(builder::withFinished);
+        finishedJobProjection.getDescription().ifPresent(builder::withDescription);
+        finishedJobProjection.getGrouping().ifPresent(builder::withGrouping);
+        finishedJobProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
+        finishedJobProjection.getStatusMsg().ifPresent(builder::withStatusMessage);
+        finishedJobProjection.getRequestedMemory().ifPresent(builder::withRequestedMemory);
+        finishedJobProjection.getRequestApiClientHostname().ifPresent(builder::withRequestApiClientHostname);
+        finishedJobProjection.getRequestApiClientUserAgent().ifPresent(builder::withRequestApiClientUserAgent);
+        finishedJobProjection.getRequestAgentClientHostname().ifPresent(builder::withRequestAgentClientHostname);
+        finishedJobProjection.getRequestAgentClientVersion().ifPresent(builder::withRequestAgentClientVersion);
+        finishedJobProjection.getNumAttachments().ifPresent(builder::withNumAttachments);
+        finishedJobProjection.getExitCode().ifPresent(builder::withExitCode);
+        finishedJobProjection.getArchiveLocation().ifPresent(builder::withArchiveLocation);
+        finishedJobProjection.getMemoryUsed().ifPresent(builder::withMemoryUsed);
+
+        finishedJobProjection.getMetadata().ifPresent(
+            metadata ->
+                setJsonField(metadata, builder::withMetadata)
+        );
+
+        finishedJobProjection.getCommand().ifPresent(
+            commandEntity ->
+                builder.withCommand(toV4CommandDto(commandEntity))
+        );
+
+        finishedJobProjection.getCluster().ifPresent(
+            clusterEntity ->
+                builder.withCluster(toV4ClusterDto(clusterEntity))
+        );
+
+        builder.withApplications(
+            finishedJobProjection.getApplications()
+                .stream()
+                .map(EntityDtoConverters::toV4ApplicationDto)
+                .collect(Collectors.toList())
+        );
+
+        return builder.build();
     }
 
     /**
