@@ -39,6 +39,7 @@ import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.FinishedJob;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
@@ -731,6 +732,76 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             this.jobPersistenceService.getJobArchiveLocation(JOB_1_ID).orElseThrow(IllegalStateException::new),
             Matchers.is("s3://somebucket/genie/logs/1/")
         );
+    }
+
+    /**
+     * Test {@link JpaJobPersistenceServiceImpl#getFinishedJob(String)}.
+     *
+     * @throws GenieNotFoundException if the test works
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void canGetFinishedJobNonExistent() throws GenieNotFoundException {
+        this.jobPersistenceService.getFinishedJob(UUID.randomUUID().toString());
+        Assert.fail();
+    }
+
+    /**
+     * Test {@link JpaJobPersistenceServiceImpl#getFinishedJob(String)}.
+     *
+     * @throws GenieNotFoundException if the test is broken
+     */
+    @Test(expected = GenieInvalidStatusException.class)
+    public void canGetFinishedJobNotFinished() throws GenieNotFoundException {
+        this.jobPersistenceService.getFinishedJob(JOB_3_ID);
+        Assert.fail();
+    }
+
+    /**
+     * Test {@link JpaJobPersistenceServiceImpl#getFinishedJob(String)}.
+     *
+     * @throws GenieNotFoundException if the test is broken
+     */
+    @Test
+    public void canGetFinishedJob() throws GenieNotFoundException {
+        final FinishedJob finishedJob = this.jobPersistenceService.getFinishedJob(JOB_1_ID);
+        Assert.assertNotNull(finishedJob);
+
+        Assert.assertThat(finishedJob.getUniqueId(), Matchers.is(JOB_1_ID));
+        Assert.assertThat(finishedJob.getUser(), Matchers.is("tgianos"));
+        Assert.assertThat(finishedJob.getName(), Matchers.is("testSparkJob"));
+        Assert.assertThat(finishedJob.getVersion(), Matchers.is("2.4"));
+        Assert.assertNotNull(finishedJob.getCreated());
+        Assert.assertThat(finishedJob.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
+        Assert.assertThat(finishedJob.getCommandArgs().size(), Matchers.is(2));
+        Assert.assertNotNull(finishedJob.getCommandCriterion());
+        Assert.assertThat(finishedJob.getClusterCriteria().size(), Matchers.is(2));
+        Assert.assertFalse(finishedJob.getStarted().isPresent());
+        Assert.assertFalse(finishedJob.getFinished().isPresent());
+        Assert.assertFalse(finishedJob.getGrouping().isPresent());
+        Assert.assertFalse(finishedJob.getGroupingInstance().isPresent());
+        Assert.assertFalse(finishedJob.getStatusMessage().isPresent());
+        Assert.assertThat(finishedJob.getRequestedMemory().orElse(0), Matchers.is(1560));
+        Assert.assertFalse(finishedJob.getRequestApiClientHostname().isPresent());
+        Assert.assertFalse(finishedJob.getRequestApiClientUserAgent().isPresent());
+        Assert.assertFalse(finishedJob.getRequestAgentClientHostname().isPresent());
+        Assert.assertFalse(finishedJob.getRequestAgentClientVersion().isPresent());
+        Assert.assertThat(finishedJob.getNumAttachments().orElse(0), Matchers.is(2));
+        Assert.assertThat(finishedJob.getExitCode().orElse(-1), Matchers.is(0));
+        Assert.assertThat(finishedJob.getArchiveLocation().orElse(""), Matchers.is("s3://somebucket/genie/logs/1/"));
+        Assert.assertFalse(finishedJob.getMemoryUsed().isPresent());
+
+        final Command command = finishedJob.getCommand().orElse(null);
+        final Cluster cluster = finishedJob.getCluster().orElse(null);
+        final List<Application> applications = finishedJob.getApplications();
+
+        Assert.assertNotNull(command);
+        Assert.assertNotNull(cluster);
+        Assert.assertNotNull(applications);
+        Assert.assertThat(command.getMetadata().getName(), Matchers.is("spark"));
+        Assert.assertThat(cluster.getMetadata().getName(), Matchers.is("h2query"));
+        Assert.assertThat(applications.size(), Matchers.is(2));
+        Assert.assertThat(applications.get(0).getMetadata().getName(), Matchers.is("hadoop"));
+        Assert.assertThat(applications.get(1).getMetadata().getName(), Matchers.is("spark"));
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {

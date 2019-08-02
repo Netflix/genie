@@ -32,6 +32,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.FinishedJob;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
@@ -56,6 +57,7 @@ import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.projections.IdProjection;
 import com.netflix.genie.web.data.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.data.entities.projections.JobStatusProjection;
+import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
@@ -655,6 +657,19 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .findByUniqueId(id, JobArchiveLocationProjection.class)
             .map(JobArchiveLocationProjection::getArchiveLocation)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exits."));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public FinishedJob getFinishedJob(
+        @NotBlank(message = "Job id is missing and is required") final String id
+    ) throws GenieNotFoundException, GenieInvalidStatusException {
+        return this.jobRepository.findByUniqueId(id, FinishedJobProjection.class)
+            .map(EntityDtoConverters::toFinishedJobDto)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists."));
     }
 
     private void updateJobStatus(

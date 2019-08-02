@@ -24,10 +24,12 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ApplicationStatus
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dto.v4.FinishedJob
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest
 import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
@@ -45,9 +47,12 @@ import com.netflix.genie.web.data.entities.CriterionEntity
 import com.netflix.genie.web.data.entities.FileEntity
 import com.netflix.genie.web.data.entities.JobEntity
 import com.netflix.genie.web.data.entities.TagEntity
+import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection
 import spock.lang.Specification
 
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
 /**
@@ -773,5 +778,206 @@ class EntityDtoConvertersSpec extends Specification {
         1 * jobSpecificationProjection.getCommand() >> Optional.of(Mock(CommandEntity))
         1 * jobSpecificationProjection.getJobDirectoryLocation() >> Optional.empty()
         thrown(GenieRuntimeException)
+    }
+
+    def "Can convert FinishedJobProjection to FinishedJob DTO lacking all optional fields"() {
+
+        def created = Instant.now()
+
+        CriterionEntity criterion = Mock(CriterionEntity) {
+            getUniqueId() >> Optional.of("cId")
+            getName() >> Optional.of("cName")
+            getVersion() >> Optional.of("cVersion")
+            getStatus() >> Optional.of("cStatus")
+            getTags() >> Sets.newHashSet()
+        }
+
+        FinishedJobProjection p = Mock(FinishedJobProjection) {
+            getUniqueId() >> "id"
+            getName() >> "name"
+            getUser() >> "user"
+            getVersion() >> "version"
+            getCreated() >> created
+            getStatus() >> JobStatus.SUCCEEDED
+            getCommandArgs() >> ["foo", "bar"]
+            getCommandCriterion() >> criterion
+            getClusterCriteria() >> [criterion]
+            getStarted() >> Optional.empty()
+            getFinished() >> Optional.empty()
+            getDescription() >> Optional.empty()
+            getGrouping() >> Optional.empty()
+            getGroupingInstance() >> Optional.empty()
+            getStatusMsg() >> Optional.empty()
+            getRequestedMemory() >> Optional.empty()
+            getRequestApiClientHostname() >> Optional.empty()
+            getRequestApiClientUserAgent() >> Optional.empty()
+            getRequestAgentClientHostname() >> Optional.empty()
+            getRequestAgentClientVersion() >> Optional.empty()
+            getNumAttachments() >> Optional.empty()
+            getExitCode() >> Optional.empty()
+            getArchiveLocation() >> Optional.empty()
+            getMemoryUsed() >> Optional.empty()
+            getMetadata() >> Optional.empty()
+            getCommand() >> Optional.empty()
+            getCluster() >> Optional.empty()
+            getApplications() >> Lists.newArrayList()
+        }
+
+        when:
+        FinishedJob dto = EntityDtoConverters.toFinishedJobDto(p)
+
+        then:
+        dto.getUniqueId() == "id"
+        dto.getName() == "name"
+        dto.getUser() == "user"
+        dto.getVersion() == "version"
+        dto.getCreated() == created
+        dto.getStatus() == JobStatus.SUCCEEDED
+        dto.getCommandArgs() == ["foo", "bar"]
+        dto.getCommandCriterion() != null
+        !dto.getClusterCriteria().isEmpty()
+        !dto.getStarted().isPresent()
+        !dto.getFinished().isPresent()
+        !dto.getDescription().isPresent()
+        !dto.getGrouping().isPresent()
+        !dto.getGroupingInstance().isPresent()
+        !dto.getStatusMessage().isPresent()
+        !dto.getRequestedMemory().isPresent()
+        !dto.getRequestApiClientHostname().isPresent()
+        !dto.getRequestApiClientUserAgent().isPresent()
+        !dto.getRequestAgentClientHostname().isPresent()
+        !dto.getRequestAgentClientVersion().isPresent()
+        !dto.getNumAttachments().isPresent()
+        !dto.getExitCode().isPresent()
+        !dto.getArchiveLocation().isPresent()
+        !dto.getMemoryUsed().isPresent()
+        !dto.getMetadata().isPresent()
+        !dto.getCommand().isPresent()
+        !dto.getCluster().isPresent()
+        dto.getApplications().isEmpty()
+    }
+
+    def "Can convert FinishedJobProjection to FinishedJob DTO"() {
+
+        def created = Instant.now()
+        def started = created + 5
+        def finished = created + 60
+
+        CriterionEntity criterion = Mock(CriterionEntity) {
+            getUniqueId() >> Optional.of("cId")
+            getName() >> Optional.of("cName")
+            getVersion() >> Optional.of("cVersion")
+            getStatus() >> Optional.of("cStatus")
+            getTags() >> Sets.newHashSet()
+        }
+
+        CommandEntity commandEntity = Mock(CommandEntity) {
+            getUser() >> "command_user"
+            getUniqueId() >> "command_id"
+            getName() >> "command_name"
+            getVersion() >> "command_version"
+            getStatus() >> CommandStatus.ACTIVE
+            getExecutable() >> ["spark"]
+            getTags() >> []
+            getDescription() >> Optional.empty()
+            getMetadata() >> Optional.empty()
+            getSetupFile() >> Optional.empty()
+            getConfigs() >> []
+            getDependencies() >> []
+            getMemory() >> Optional.empty()
+            getCheckDelay() >> 100
+        }
+
+        ClusterEntity clusterEntity = Mock(ClusterEntity) {
+            getUser() >> "cluster_user"
+            getUniqueId() >> "cluster_id"
+            getName() >> "cluster_name"
+            getVersion() >> "cluster_version"
+            getTags() >> []
+            getDescription() >> Optional.empty()
+            getMetadata() >> Optional.empty()
+            getSetupFile() >> Optional.empty()
+            getConfigs() >> []
+            getDependencies() >> []
+            getStatus() >> ClusterStatus.UP
+        }
+
+        ApplicationEntity applicationEntity = Mock(ApplicationEntity) {
+            getUser() >> "app_user"
+            getUniqueId() >> "app_id"
+            getName() >> "app_name"
+            getVersion() >> "app_version"
+            getTags() >> []
+            getDescription() >> Optional.empty()
+            getMetadata() >> Optional.empty()
+            getSetupFile() >> Optional.empty()
+            getConfigs() >> []
+            getDependencies() >> []
+            getType() >> Optional.empty()
+        }
+
+        FinishedJobProjection p = Mock(FinishedJobProjection) {
+            getUniqueId() >> "id"
+            getName() >> "name"
+            getUser() >> "user"
+            getVersion() >> "version"
+            getCreated() >> created
+            getStatus() >> JobStatus.SUCCEEDED
+            getCommandArgs() >> ["foo", "bar"]
+            getCommandCriterion() >> criterion
+            getClusterCriteria() >> [criterion]
+            getStarted() >> Optional.of(started)
+            getFinished() >> Optional.of(finished)
+            getDescription() >> Optional.of("description")
+            getGrouping() >> Optional.of("group")
+            getGroupingInstance() >> Optional.of("group_instance")
+            getStatusMsg() >> Optional.of("status message")
+            getRequestedMemory() >> Optional.of(512)
+            getRequestApiClientHostname() >> Optional.of("api_client_host")
+            getRequestApiClientUserAgent() >> Optional.of("apl_client_user-agent")
+            getRequestAgentClientHostname() >> Optional.of("agent_client_host")
+            getRequestAgentClientVersion() >> Optional.of("agent_client_version")
+            getNumAttachments() >> Optional.of(3)
+            getExitCode() >> Optional.of(127)
+            getArchiveLocation() >> Optional.of("s3://bucket/prefix/job")
+            getMemoryUsed() >> Optional.of(1024)
+            getMetadata() >> Optional.of("{ \"foo\" : \"bar\" }")
+            getCommand() >> Optional.of(commandEntity)
+            getCluster() >> Optional.of(clusterEntity)
+            getApplications() >> Lists.newArrayList(applicationEntity)
+        }
+
+        when:
+        FinishedJob dto = EntityDtoConverters.toFinishedJobDto(p)
+
+        then:
+        dto.getUniqueId() == "id"
+        dto.getName() == "name"
+        dto.getUser() == "user"
+        dto.getVersion() == "version"
+        dto.getCreated() == created
+        dto.getStatus() == JobStatus.SUCCEEDED
+        dto.getCommandArgs() == ["foo", "bar"]
+        dto.getCommandCriterion() != null
+        dto.getClusterCriteria().size() == 1
+        dto.getStarted().isPresent()
+        dto.getFinished().isPresent()
+        dto.getDescription().isPresent()
+        dto.getGrouping().isPresent()
+        dto.getGroupingInstance().isPresent()
+        dto.getStatusMessage().isPresent()
+        dto.getRequestedMemory().isPresent()
+        dto.getRequestApiClientHostname().isPresent()
+        dto.getRequestApiClientUserAgent().isPresent()
+        dto.getRequestAgentClientHostname().isPresent()
+        dto.getRequestAgentClientVersion().isPresent()
+        dto.getNumAttachments().isPresent()
+        dto.getExitCode().isPresent()
+        dto.getArchiveLocation().isPresent()
+        dto.getMemoryUsed().isPresent()
+        dto.getMetadata().isPresent()
+        dto.getCommand().isPresent()
+        dto.getCluster().isPresent()
+        dto.getApplications().size() == 1
     }
 }

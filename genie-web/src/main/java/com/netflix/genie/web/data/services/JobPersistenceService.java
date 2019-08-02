@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
+import com.netflix.genie.common.internal.dto.v4.FinishedJob;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
@@ -299,4 +300,16 @@ public interface JobPersistenceService {
     Optional<String> getJobArchiveLocation(
         @NotBlank(message = "Job id is missing and is required") String id
     ) throws GenieNotFoundException;
+
+    /**
+     * Get a DTO representing a finished job.
+     *
+     * @param id The id of the job to retrieve
+     * @return the finished job
+     * @throws GenieNotFoundException      if no job with the given {@code id} exists
+     * @throws GenieInvalidStatusException if the current status of the job is not final
+     */
+    FinishedJob getFinishedJob(
+        @NotBlank(message = "Job id is missing and is required") String id
+    ) throws GenieNotFoundException, GenieInvalidStatusException;
 }
