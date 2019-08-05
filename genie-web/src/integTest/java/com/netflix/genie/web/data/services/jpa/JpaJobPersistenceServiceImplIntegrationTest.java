@@ -60,6 +60,7 @@ import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
@@ -746,9 +747,12 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             Matchers.is(DESCRIPTION)
         );
         Assert.assertThat(
-            savedJobRequest.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS.get(0))
+            savedJobRequest.getCommandArgsString().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(
+                COMMAND_ARGS.stream().map(arg -> '\'' + arg + '\'').collect(Collectors.joining(StringUtils.SPACE))
+            )
         );
+        Assert.assertThat(savedJobRequest.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(
             savedJobRequest.getGroup().orElseThrow(IllegalArgumentException::new),
             Matchers.is(GROUP)
@@ -799,9 +803,12 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             Matchers.is(DESCRIPTION)
         );
         Assert.assertThat(
-            savedJob.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS.get(0))
+            savedJob.getCommandArgsString().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(
+                COMMAND_ARGS.stream().map(arg -> '\'' + arg + '\'').collect(Collectors.joining(StringUtils.SPACE))
+            )
         );
+        Assert.assertThat(savedJob.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(savedJob.getTags(), Matchers.is(TAGS));
         Assert.assertThat(
             savedJob.getArchiveLocation().orElseThrow(IllegalArgumentException::new),

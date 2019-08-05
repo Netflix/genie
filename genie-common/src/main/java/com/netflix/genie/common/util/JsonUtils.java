@@ -22,9 +22,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringTokenizer;
+import org.apache.commons.text.matcher.StringMatcherFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Utility methods for interacting with JSON.
@@ -75,6 +81,47 @@ public final class JsonUtils {
             }
         } catch (final IOException ioe) {
             throw new GenieServerException("Failed to read JSON value", ioe);
+        }
+    }
+
+    /**
+     * Given a flat string of command line arguments this method will attempt to tokenize the string and split it for
+     * use in DTOs. The split will occur on whitespace (tab, space, new line, carriage return) while respecting
+     * single quotes to keep those elements together.
+     * <p>
+     * Example:
+     * {@code "/bin/bash -xc 'echo "hello" world!'"} results in {@code ["/bin/bash", "-xc", "echo "hello" world!"]}
+     *
+     * @param commandArgs The original string representation of the command arguments
+     * @return An ordered list of arguments
+     */
+    @Nonnull
+    public static List<String> splitArguments(final String commandArgs) {
+        final StringTokenizer tokenizer = new StringTokenizer(
+            commandArgs,
+            StringMatcherFactory.INSTANCE.splitMatcher(),
+            StringMatcherFactory.INSTANCE.singleQuoteMatcher()
+        );
+
+        return tokenizer.getTokenList();
+    }
+
+    /**
+     * Given an ordered list of command line arguments join them back together as a space delimited String where
+     * each argument is wrapped in {@literal '}.
+     *
+     * @param commandArgs The command arguments to join back together
+     * @return The command arguments joined together or {@literal null} if there weren't any arguments
+     */
+    @Nullable
+    public static String joinArguments(final List<String> commandArgs) {
+        if (commandArgs.isEmpty()) {
+            return null;
+        } else {
+            return commandArgs
+                .stream()
+                .map(argument -> '\'' + argument + '\'')
+                .collect(Collectors.joining(StringUtils.SPACE));
         }
     }
 }

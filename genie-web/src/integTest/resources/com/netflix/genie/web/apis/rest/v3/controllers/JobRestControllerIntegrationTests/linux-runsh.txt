@@ -121,7 +121,7 @@ source ${GENIE_JOB_DIR}/jobsetupfile
 env | sort > ${GENIE_JOB_DIR}/genie/logs/env.log
 
 # Kick off the command in background mode and wait for it using its pid
-/bin/bash -c 'echo hello world' > ${GENIE_JOB_DIR}/stdout 2> ${GENIE_JOB_DIR}/stderr &
+/bin/bash '-c' 'echo hello world' > ${GENIE_JOB_DIR}/stdout 2> ${GENIE_JOB_DIR}/stderr &
 export CHILDREN_PID=$!
 wait ${CHILDREN_PID}
 
