@@ -18,10 +18,15 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.netflix.genie.common.util.JsonUtils;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -61,10 +66,16 @@ public class Job extends CommonDTO {
     @NotNull
     @JsonSerialize(using = ToStringSerializer.class)
     private final Duration runtime;
-    @Size(max = 10_000, message = "The maximum number of characters for the command arguments is 10,000")
-    private final String commandArgs;
+    private final List<
+        @Size(
+            max = 10_000,
+            message = "The maximum number of characters for a single command argument is 10,000"
+        ) String> commandArgs;
     private final String grouping;
     private final String groupingInstance;
+
+    // Used to prevent serializing the List multiple times per get request
+    private final String commandArgsString;
 
     /**
      * Constructor used by the builder.
@@ -73,7 +84,8 @@ public class Job extends CommonDTO {
      */
     protected Job(@Valid final Builder builder) {
         super(builder);
-        this.commandArgs = builder.bCommandArgs;
+        this.commandArgs = ImmutableList.copyOf(builder.bCommandArgs);
+        this.commandArgsString = JsonUtils.joinArguments(this.commandArgs);
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
         this.started = builder.bStarted;
@@ -91,9 +103,22 @@ public class Job extends CommonDTO {
      * Get the arguments to be put on the command line along with the command executable.
      *
      * @return The command arguments
+     * @deprecated See {@link #getCommandArgsList()}
      */
-    public Optional<String> getCommandArgs() {
-        return Optional.ofNullable(this.commandArgs);
+    @JsonGetter("commandArgs")
+    @Deprecated
+    public Optional<String> getCommandArgsString() {
+        return Optional.ofNullable(this.commandArgsString);
+    }
+
+    /**
+     * Get the command arguments for this job as an immutable list.
+     *
+     * @return Any command args that were in the job request
+     */
+    @JsonIgnore
+    public List<String> getCommandArgs() {
+        return this.commandArgs;
     }
 
     /**
@@ -178,7 +203,7 @@ public class Job extends CommonDTO {
      */
     public static class Builder extends CommonDTO.Builder<Builder> {
 
-        private String bCommandArgs;
+        private final List<String> bCommandArgs = Lists.newArrayList();
         private JobStatus bStatus = JobStatus.INIT;
         private String bStatusMsg;
         private Instant bStarted;
@@ -225,7 +250,9 @@ public class Job extends CommonDTO {
             @Nullable final String commandArgs
         ) {
             super(name, user, version);
-            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
+            if (StringUtils.isNotBlank(commandArgs)) {
+                this.bCommandArgs.addAll(JsonUtils.splitArguments(commandArgs));
+            }
         }
 
         /**
@@ -241,7 +268,10 @@ public class Job extends CommonDTO {
          */
         @Deprecated
         public Builder withCommandArgs(@Nullable final String commandArgs) {
-            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
+            this.bCommandArgs.clear();
+            if (StringUtils.isNotBlank(commandArgs)) {
+                this.bCommandArgs.addAll(JsonUtils.splitArguments(commandArgs));
+            }
             return this;
         }
 
@@ -254,13 +284,9 @@ public class Job extends CommonDTO {
          * @since 3.3.0
          */
         public Builder withCommandArgs(@Nullable final List<String> commandArgs) {
+            this.bCommandArgs.clear();
             if (commandArgs != null) {
-                this.bCommandArgs = StringUtils.join(commandArgs, StringUtils.SPACE);
-                if (StringUtils.isBlank(this.bCommandArgs)) {
-                    this.bCommandArgs = null;
-                }
-            } else {
-                this.bCommandArgs = null;
+                this.bCommandArgs.addAll(commandArgs);
             }
             return this;
         }

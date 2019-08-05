@@ -18,10 +18,15 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.util.JsonUtils;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,8 +36,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,6 +48,7 @@ import java.util.Set;
  */
 @Getter
 @JsonDeserialize(builder = JobRequest.Builder.class)
+@SuppressWarnings("FinalClass")
 public class JobRequest extends ExecutionEnvironmentDTO {
 
     /**
@@ -54,8 +58,11 @@ public class JobRequest extends ExecutionEnvironmentDTO {
 
     private static final long serialVersionUID = 3163971970144435277L;
 
-    @Size(max = 10_000, message = "The maximum number of characters for the command arguments is 10,000")
-    private final String commandArgs;
+    private final List<
+        @Size(
+            max = 10_000,
+            message = "The maximum number of characters for a single command argument is 10,000"
+        ) String> commandArgs;
     @Valid
     @NotEmpty(message = "At least one cluster criteria is required")
     private final List<ClusterCriteria> clusterCriterias;
@@ -77,14 +84,18 @@ public class JobRequest extends ExecutionEnvironmentDTO {
     private final String grouping;
     private final String groupingInstance;
 
+    // Used to prevent serializing the List multiple times per get request
+    private final String commandArgsString;
+
     /**
      * Constructor used by the builder build() method.
      *
      * @param builder The builder to use
      */
-    JobRequest(@Valid final Builder builder) {
+    private JobRequest(@Valid final Builder builder) {
         super(builder);
-        this.commandArgs = builder.bCommandArgs;
+        this.commandArgs = ImmutableList.copyOf(builder.bCommandArgs);
+        this.commandArgsString = JsonUtils.joinArguments(this.commandArgs);
         this.clusterCriterias = ImmutableList.copyOf(builder.bClusterCriterias);
         this.commandCriteria = ImmutableSet.copyOf(builder.bCommandCriteria);
         this.group = builder.bGroup;
@@ -102,9 +113,22 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      * Get the arguments to be put on the command line along with the command executable.
      *
      * @return The command arguments
+     * @deprecated See {@link #getCommandArgs()}
      */
-    public Optional<String> getCommandArgs() {
-        return Optional.ofNullable(this.commandArgs);
+    @JsonGetter("commandArgs")
+    @Deprecated
+    public Optional<String> getCommandArgsString() {
+        return Optional.ofNullable(this.commandArgsString);
+    }
+
+    /**
+     * Get the command arguments for this job as an immutable list.
+     *
+     * @return Any command args that were in the job request
+     */
+    @JsonIgnore
+    public List<String> getCommandArgs() {
+        return this.commandArgs;
     }
 
     /**
@@ -180,10 +204,10 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      */
     public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
-        private final List<ClusterCriteria> bClusterCriterias = new ArrayList<>();
-        private final Set<String> bCommandCriteria = new HashSet<>();
-        private final List<String> bApplications = new ArrayList<>();
-        private String bCommandArgs;
+        private final List<ClusterCriteria> bClusterCriterias = Lists.newArrayList();
+        private final Set<String> bCommandCriteria = Sets.newHashSet();
+        private final List<String> bApplications = Lists.newArrayList();
+        private final List<String> bCommandArgs = Lists.newArrayList();
         private String bGroup;
         private boolean bDisableLogArchival;
         private String bEmail;
@@ -245,7 +269,9 @@ public class JobRequest extends ExecutionEnvironmentDTO {
             final Set<String> commandCriteria
         ) {
             super(name, user, version);
-            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
+            if (StringUtils.isNotBlank(commandArgs)) {
+                this.bCommandArgs.addAll(JsonUtils.splitArguments(commandArgs));
+            }
             this.bClusterCriterias.addAll(clusterCriterias);
             commandCriteria.forEach(
                 criteria -> {
@@ -269,7 +295,10 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          */
         @Deprecated
         public Builder withCommandArgs(@Nullable final String commandArgs) {
-            this.bCommandArgs = StringUtils.isBlank(commandArgs) ? null : commandArgs;
+            this.bCommandArgs.clear();
+            if (StringUtils.isNotBlank(commandArgs)) {
+                this.bCommandArgs.addAll(JsonUtils.splitArguments(commandArgs));
+            }
             return this;
         }
 
@@ -282,13 +311,9 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          * @since 3.3.0
          */
         public Builder withCommandArgs(@Nullable final List<String> commandArgs) {
+            this.bCommandArgs.clear();
             if (commandArgs != null) {
-                this.bCommandArgs = StringUtils.join(commandArgs, StringUtils.SPACE);
-                if (StringUtils.isBlank(this.bCommandArgs)) {
-                    this.bCommandArgs = null;
-                }
-            } else {
-                this.bCommandArgs = null;
+                this.bCommandArgs.addAll(commandArgs);
             }
             return this;
         }

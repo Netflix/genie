@@ -39,10 +39,10 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.util.GenieObjectMapper
-import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
 
 import java.time.Instant
+import java.util.stream.Collectors
 
 /**
  * Specifications for the {@link DtoConverters} class which handles converting between v3 and v4 DTOs for API
@@ -897,7 +897,8 @@ class DtoConvertersSpec extends Specification {
         v3JobRequest.getVersion() == version
         v3JobRequest.getTags() == tags
         v3JobRequest.getApplications() == applicationIds
-        v3JobRequest.getCommandArgs().orElse(UUID.randomUUID().toString()) == StringUtils.join(commandArgs, " ")
+        v3JobRequest.getCommandArgsString().orElse(UUID.randomUUID().toString()) ==
+            commandArgs.stream().map { it -> '\'' + it + '\'' }.collect(Collectors.joining(' '))
         !v3JobRequest.getMemory().isPresent()
         v3JobRequest.getTimeout().orElse(-1) == timeout
         v3JobRequest.getMetadata().orElse(null) == metadata
@@ -982,7 +983,7 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getMetadata().getVersion() == version
         v4JobRequest.getMetadata().getTags() == tags
         v4JobRequest.getCriteria().getApplicationIds() == applicationIds
-        v4JobRequest.getCommandArgs() == [StringUtils.join(commandArgs, StringUtils.SPACE)] as List
+        v4JobRequest.getCommandArgs() == commandArgs
         v4JobRequest.getRequestedJobEnvironment().getRequestedJobMemory().orElse(null) == memory
         v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().orElse(-1) == timeout
         v4JobRequest.getMetadata().getMetadata().orElse(null) == metadata

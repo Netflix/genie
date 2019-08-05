@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
 
 import java.time.Instant
+import java.util.stream.Collectors
 
 /**
  * Specifications for the JpaServiceUtils class.
@@ -512,7 +513,9 @@ class JpaServiceUtilsSpec extends Specification {
         request.getCreated().orElseGet(RandomSuppliers.INSTANT) == created
         request.getUpdated().orElseGet(RandomSuppliers.INSTANT) == updated
         request.getTags() == tags
-        request.getCommandArgs().orElseGet(RandomSuppliers.STRING) == StringUtils.join(commandArgs, StringUtils.SPACE)
+        request.getCommandArgsString().orElseGet(RandomSuppliers.STRING) ==
+            commandArgs.stream().map { it -> '\'' + it + '\'' }.collect(Collectors.joining(StringUtils.SPACE))
+        request.getCommandArgs() == commandArgs
 
         def criterias = request.getClusterCriterias()
         criterias.size() == 3

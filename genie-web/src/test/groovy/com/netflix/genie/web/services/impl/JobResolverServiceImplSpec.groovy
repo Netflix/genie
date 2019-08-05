@@ -51,6 +51,7 @@ import wiremock.com.google.common.collect.ImmutableMap
 
 import javax.annotation.Nullable
 import java.time.Instant
+import java.util.stream.Collectors
 
 /**
  * Specifications for the {@link JobResolverServiceImpl} class.
@@ -462,7 +463,9 @@ class JobResolverServiceImplSpec extends Specification {
         v3JobRequest.getVersion() == version
         v3JobRequest.getTags() == tags
         v3JobRequest.getApplications() == applicationIds
-        v3JobRequest.getCommandArgs().orElse(UUID.randomUUID().toString()) == StringUtils.join(commandArgs, " ")
+        v3JobRequest.getCommandArgsString().orElse(UUID.randomUUID().toString()) ==
+            commandArgs.stream().map { it -> '\'' + it + '\'' }.collect(Collectors.joining(StringUtils.SPACE))
+        v3JobRequest.getCommandArgs() == commandArgs
         !v3JobRequest.getMemory().isPresent()
         v3JobRequest.getTimeout().orElse(-1) == timeout
         v3JobRequest.getMetadata().orElse(null) == metadata
