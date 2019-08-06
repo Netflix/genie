@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-08-02</span>
+<span id="revdate">2019-08-06</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4908,6 +4908,24 @@ no value is specified the bucket is assumed to be in the same region as the Geni
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.executable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system command that the launcher should use to launch an agent process. Ordered list of arguments.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java -jar /tmp/genie-agent.jar</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.maxJobMemory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum amount of memory, in megabytes, that a job can be allocated while using the local launcher</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10240</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.maxTotalJobMemory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The total number of MB out of the system memory that Genie can use for running agents</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30720</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
 attempt to assume this role on the host Genie is running on</p></td>
@@ -6526,7 +6544,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-08-02 22:24:42 UTC
+Last updated 2019-08-06 20:41:49 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
