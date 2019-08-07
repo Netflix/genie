@@ -158,9 +158,9 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecNoArchivalData.getEnvironmentVariables().size() == 17
         jobSpecNoArchivalData.getArchiveLocation() ==
             Optional.of(
-                StringUtils.endsWith(jobsProperties.getLocations().getArchives(), File.separator)
-                    ? jobsProperties.getLocations().getArchives() + jobId
-                    : jobsProperties.getLocations().getArchives() + File.separator + jobId
+                StringUtils.endsWith(jobsProperties.getLocations().getArchives().toString(), File.separator)
+                    ? jobsProperties.getLocations().getArchives().toString() + jobId
+                    : jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
         jobEnvironmentNoArchivalData.getEnvironmentVariables() == jobSpecNoArchivalData.getEnvironmentVariables()
         jobEnvironmentNoArchivalData.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
@@ -192,9 +192,9 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecSavedData.getEnvironmentVariables().size() == 17
         jobSpecSavedData.getArchiveLocation() ==
             Optional.of(
-                StringUtils.endsWith(jobsProperties.getLocations().getArchives(), File.separator)
-                    ? jobsProperties.getLocations().getArchives() + jobId
-                    : jobsProperties.getLocations().getArchives() + File.separator + jobId
+                StringUtils.endsWith(jobsProperties.getLocations().getArchives().toString(), File.separator)
+                    ? jobsProperties.getLocations().getArchives().toString() + jobId
+                    : jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
         jobEnvironmentSavedData.getEnvironmentVariables() == jobSpecSavedData.getEnvironmentVariables()
         jobEnvironmentSavedData.getMemory() == requestedMemory

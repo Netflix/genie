@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2015 Netflix, Inc.
+#  Copyright 2019 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -17,33 +17,16 @@
 ##
 
 genie:
-  data:
-    service:
-      retry:
-        noOfRetries: 2
-        initialInterval: 10
-        maxInterval: 10
-  health:
-    maxCpuLoadPercent: 100
+  file:
+    cache:
+      location: file:///tmp/genie/cache
   jobs:
     clusters:
       load-balancers:
         script:
-          enabled: true
-
-# Start gRPC on a random available port to avoid port binding conflicts during
-# integration tests shutting down less than gracefully
-grpc:
-  server:
-    port: 0
-
-spring:
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-#  # Leaving this in for reference as it can be helpful for debugging
-#  jpa:
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
+          destination: file:///tmp/genie/loadbalancers/script/destination/
+          source: file:///tmp/genie/loadBalancers/script/source/loadBalance.js
+    locations:
+      archives: file:///tmp/genie/archives/
+      attachments: file:///tmp/genie/attachments/
+      jobs: file:///tmp/genie/jobs/

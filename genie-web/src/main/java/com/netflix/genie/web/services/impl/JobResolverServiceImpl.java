@@ -63,7 +63,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
@@ -163,13 +162,9 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.clusterLoadBalancerImpls = clusterLoadBalancerImpls;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
 
-        final String jobDirProperty = jobsProperties.getLocations().getJobs();
-        try {
-            this.defaultJobDirectory = Paths.get(new URI(jobDirProperty)).toFile();
-        } catch (final URISyntaxException e) {
-            throw new IllegalArgumentException("Job directory location property is invalid: " + jobDirProperty);
-        }
-        this.defaultArchiveLocation = jobsProperties.getLocations().getArchives();
+        final URI jobDirProperty = jobsProperties.getLocations().getJobs();
+        this.defaultJobDirectory = Paths.get(jobDirProperty).toFile();
+        this.defaultArchiveLocation = jobsProperties.getLocations().getArchives().toString();
 
         // Metrics
         this.registry = registry;

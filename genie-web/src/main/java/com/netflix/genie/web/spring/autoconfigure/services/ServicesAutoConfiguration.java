@@ -253,7 +253,7 @@ public class ServicesAutoConfiguration {
     ) throws GenieException {
         return new CacheGenieFileTransferService(
             fileTransferFactory,
-            fileCacheProperties.getLocation(),
+            fileCacheProperties.getLocation().toString(),
             localFileTransfer,
             registry
         );
@@ -342,7 +342,7 @@ public class ServicesAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(AttachmentService.class)
     public FileSystemAttachmentService attachmentService(final JobsProperties jobsProperties) {
-        return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments());
+        return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments().toString());
     }
 
     /**

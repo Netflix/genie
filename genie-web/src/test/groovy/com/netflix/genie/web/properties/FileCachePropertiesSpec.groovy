@@ -27,14 +27,16 @@ import spock.lang.Specification
 class FileCachePropertiesSpec extends Specification {
 
     def "Can get and set values"() {
+        def systemTmpDir = System.getProperty("java.io.tmpdir", "/tmp/")
+
         when:
         def properties = new FileCacheProperties()
 
         then:
-        properties.getLocation() == "file:///tmp/genie/cache"
+        properties.getLocation() == URI.create("file://" + systemTmpDir + "genie/cache")
 
         when:
-        def newLocation = "file:///tmp/" + UUID.randomUUID().toString()
+        def newLocation = URI.create("file:///tmp/" + UUID.randomUUID().toString())
         properties.setLocation(newLocation)
 
         then:

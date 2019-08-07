@@ -59,6 +59,7 @@ import org.mockito.MockitoAnnotations;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -77,7 +78,7 @@ public class JobCoordinatorServiceImplTest {
     private static final String JOB_1_NAME = "relativity";
     private static final String JOB_1_USER = "einstein";
     private static final String JOB_1_VERSION = "1.0";
-    private static final String BASE_ARCHIVE_LOCATION = "file://baselocation";
+    private static final URI BASE_ARCHIVE_LOCATION = URI.create("file:///baselocation");
     private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final int MEMORY = 1_512;
     private static final String KILL_REASON = "Killed by test";

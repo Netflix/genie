@@ -71,7 +71,7 @@ attempt to assume this role on the host Genie is running on
 
 |genie.file.cache.location
 |Where to store cached files on local disk
-|file:///tmp/genie/cache
+|file://${java.io.tmpdir}genie/cache
 |no
 
 |genie.grpc.server.services.job-file-sync.ackIntervalMilliseconds
@@ -117,7 +117,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |genie.jobs.clusters.load-balancers.script.destination
 |The location on disk where the script source file should be stored after it is downloaded from
 `genie.jobs.clusters.load-balancers.script.source`. The file will be given the same name.
-|file:///tmp/genie/loadbalancers/script/destination/
+|file://${java.io.tmpdir}genie/loadbalancers/script/destination/
 |no
 
 |genie.jobs.clusters.load-balancers.script.enabled
@@ -134,7 +134,7 @@ See also: `genie.jobs.clusters.load-balancers.script.destination`
 
 |genie.jobs.clusters.load-balancers.script.source
 |The location of the script the load balancer should load to evaluate which cluster to use for a job request
-|file:///tmp/genie/loadBalancers/script/source/loadBalance.js
+|file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js
 |no
 
 |genie.jobs.clusters.load-balancers.script.timeout
@@ -160,18 +160,18 @@ forces a timeout
 
 |genie.jobs.locations.archives
 |The default root location where job archives should be stored. Scheme should be included. Created if doesn't exist.
-|file:///tmp/genie/archives/
+|file://${java.io.tmpdir}genie/archives/
 |no
 
 |genie.jobs.locations.attachments
 |The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
 doesn't exist.
-|file:///tmp/genie/attachments/
+|file://${java.io.tmpdir}genie/attachments/
 |no
 
 |genie.jobs.locations.jobs
 |The default root location where job working directories will be placed. Created by system if doesn't exist.
-|file:///tmp/genie/jobs/
+|file://${java.io.tmpdir}genie/jobs/
 |no
 
 |genie.jobs.max.stdOutSize

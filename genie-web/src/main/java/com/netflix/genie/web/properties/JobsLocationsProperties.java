@@ -22,7 +22,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.net.URI;
 
 /**
  * Properties for various job related locations.
@@ -41,12 +42,14 @@ public class JobsLocationsProperties {
      */
     public static final String PROPERTY_PREFIX = "genie.jobs.locations";
 
-    @NotBlank(message = "Archives location is required")
-    private String archives = "file:///tmp/genie/archives/";
+    private static final String SYSTEM_TMP_DIR = System.getProperty("java.io.tmpdir", "/tmp/");
 
-    @NotBlank(message = "Attachments temporary location is required")
-    private String attachments = "file:///tmp/genie/attachments/";
+    @NotNull(message = "Archives storage location is required")
+    private URI archives = URI.create("file://" + SYSTEM_TMP_DIR + "genie/archives/");
 
-    @NotBlank(message = "Jobs dir is required")
-    private String jobs = "file:///tmp/genie/jobs/";
+    @NotNull(message = "Attachment storage location is required")
+    private URI attachments = URI.create("file://" + SYSTEM_TMP_DIR + "genie/attachments/");
+
+    @NotNull(message = "Default job working directory is required")
+    private URI jobs = URI.create("file://" + SYSTEM_TMP_DIR + "genie/jobs/");
 }
