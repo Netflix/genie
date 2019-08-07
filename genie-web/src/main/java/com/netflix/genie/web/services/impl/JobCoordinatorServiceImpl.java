@@ -173,7 +173,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             //       Put this back in once all use cases have been hunted down and users are sure of their expected
             //       behavior
 //            if (!jobRequest.isDisableLogArchival()) {
-            String archiveRoot = this.jobsProperties.getLocations().getArchives();
+            String archiveRoot = this.jobsProperties.getLocations().getArchives().toString();
             if (!archiveRoot.endsWith(JobConstants.FILE_PATH_DELIMITER)) {
                 archiveRoot += JobConstants.FILE_PATH_DELIMITER;
             }

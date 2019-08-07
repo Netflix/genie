@@ -49,11 +49,14 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -65,6 +68,12 @@ import java.util.UUID;
  * @since 3.0.0
  */
 public class ServicesAutoConfigurationTest {
+
+    /**
+     * Temporary folder for tests.
+     */
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private ServicesAutoConfiguration servicesAutoConfiguration;
 
@@ -144,11 +153,12 @@ public class ServicesAutoConfigurationTest {
      * Confirm we can get a GenieFileTransfer instance.
      *
      * @throws GenieException If there is any problem.
+     * @throws IOException    On error creating temporary folder
      */
     @Test
-    public void canGetCacheGenieFileTransferServiceBean() throws GenieException {
+    public void canGetCacheGenieFileTransferServiceBean() throws GenieException, IOException {
         final FileCacheProperties cacheProperties = Mockito.mock(FileCacheProperties.class);
-        Mockito.when(cacheProperties.getLocation()).thenReturn(".");
+        Mockito.when(cacheProperties.getLocation()).thenReturn(this.temporaryFolder.newFolder().toURI());
         Assert.assertNotNull(
             this.servicesAutoConfiguration.cacheGenieFileTransferService(
                 Mockito.mock(FileTransferFactory.class),

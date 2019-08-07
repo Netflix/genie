@@ -170,7 +170,7 @@ public class ApisAutoConfiguration {
         final ResourceLoader resourceLoader,
         final JobsProperties jobsProperties
     ) throws IOException {
-        final String jobsDirLocation = jobsProperties.getLocations().getJobs();
+        final String jobsDirLocation = jobsProperties.getLocations().getJobs().toString();
         final Resource tmpJobsDirResource = resourceLoader.getResource(jobsDirLocation);
         if (tmpJobsDirResource.exists() && !tmpJobsDirResource.getFile().isDirectory()) {
             throw new IllegalStateException(jobsDirLocation + " exists but isn't a directory. Unable to continue");

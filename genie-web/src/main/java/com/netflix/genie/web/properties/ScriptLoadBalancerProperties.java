@@ -23,7 +23,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.net.URI;
 
 /**
  * Properties related to the {@link com.netflix.genie.web.services.loadbalancers.script.ScriptLoadBalancer}
@@ -37,6 +38,7 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 public class ScriptLoadBalancerProperties {
+
     /**
      * The common prefix for all properties in this group.
      */
@@ -67,13 +69,15 @@ public class ScriptLoadBalancerProperties {
      */
     public static final String TIMEOUT_PROPERTY = PROPERTY_PREFIX + ".timeout";
 
+    private static final String SYSTEM_TMP_DIR = System.getProperty("java.io.tmpdir", "/tmp/");
+
     private boolean enabled;
     @Min(1L)
     private long refreshRate = 300_000L;
-    @NotEmpty
-    private String destination = "file:///tmp/genie/loadbalancers/script/destination/";
-    @NotEmpty
-    private String source = "file:///tmp/genie/loadBalancers/script/source/loadBalance.js";
+    @NotNull
+    private URI destination = URI.create("file://" + SYSTEM_TMP_DIR + "genie/loadbalancers/script/destination/");
+    @NotNull
+    private URI source = URI.create("file://" + SYSTEM_TMP_DIR + "genie/loadBalancers/script/source/loadBalance.js");
     @Min(1L)
     private long timeout = 5_000L;
 }

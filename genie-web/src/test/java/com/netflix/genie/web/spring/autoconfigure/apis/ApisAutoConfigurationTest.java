@@ -32,6 +32,7 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.UUID;
 
@@ -99,12 +100,12 @@ public class ApisAutoConfigurationTest {
     @Test
     public void cantGetJobsDirWhenJobsDirInvalid() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
-        final String jobsDirLocation = UUID.randomUUID().toString();
+        final URI jobsDirLocation = URI.create("file:/" + UUID.randomUUID().toString());
         final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getLocations().setJobs(jobsDirLocation);
 
         final Resource tmpResource = Mockito.mock(Resource.class);
-        Mockito.when(resourceLoader.getResource(jobsDirLocation)).thenReturn(tmpResource);
+        Mockito.when(resourceLoader.getResource(jobsDirLocation.toString())).thenReturn(tmpResource);
         Mockito.when(tmpResource.exists()).thenReturn(true);
 
         final File file = Mockito.mock(File.class);
@@ -150,12 +151,12 @@ public class ApisAutoConfigurationTest {
     @Test
     public void canGetJobsDir() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
-        final String jobsDirLocation = UUID.randomUUID().toString() + "/";
+        final URI jobsDirLocation = URI.create("file:///" + UUID.randomUUID().toString() + "/");
         final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getLocations().setJobs(jobsDirLocation);
 
         final Resource jobsDirResource = Mockito.mock(Resource.class);
-        Mockito.when(resourceLoader.getResource(jobsDirLocation)).thenReturn(jobsDirResource);
+        Mockito.when(resourceLoader.getResource(jobsDirLocation.toString())).thenReturn(jobsDirResource);
         Mockito.when(jobsDirResource.exists()).thenReturn(true);
 
         final File file = Mockito.mock(File.class);

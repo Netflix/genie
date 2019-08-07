@@ -29,7 +29,7 @@ cloud:
 genie:
   file:
     cache:
-      location: file:///tmp/genie/cache
+      location: file://${java.io.tmpdir}genie/cache
   grpc:
     server:
       enabled: false
@@ -42,19 +42,19 @@ genie:
     clusters:
       load-balancers:
         script:
-          destination: file:///tmp/genie/loadbalancers/script/destination/
+          destination: file://${java.io.tmpdir}genie/loadbalancers/script/destination/
           enabled: false
           refreshRate: 300000
-          source: file:///tmp/genie/loadBalancers/script/source/loadBalance.js
+          source: file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js
           timeout: 5000
     forwarding:
       enabled: true
       port: 8080
       scheme: http
     locations:
-      archives: file:///tmp/genie/archives/
-      attachments: file:///tmp/genie/attachments/
-      jobs: file:///tmp/genie/jobs/
+      archives: file://${java.io.tmpdir}genie/archives/
+      attachments: file://${java.io.tmpdir}genie/attachments/
+      jobs: file://${java.io.tmpdir}genie/jobs/
     max:
       stdOutSize: 8589934592
       stdErrSize: 8589934592

@@ -30,9 +30,6 @@ genie:
       load-balancers:
         script:
           enabled: true
-    locations:
-      archives: /archive/location
-      jobs: file:///tmp/genie/jobs/
 
 grpc:
   server:

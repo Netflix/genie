@@ -52,7 +52,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,7 +93,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     static final String STATUS_TAG_FAILED = "failed";
     static final String STATUS_TAG_NO_PREFERENCE = "no preference";
     private static final long DEFAULT_TIMEOUT_LENGTH = 5_000L;
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final String SLASH = "/";
     private static final String PERIOD = ".";
     private static final String CLUSTERS_BINDING = "clusters";
@@ -342,7 +341,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 final Compilable compilable = (Compilable) engine;
                 try (
                     InputStream fis = Files.newInputStream(scriptDestinationPath);
-                    InputStreamReader reader = new InputStreamReader(fis, UTF_8)
+                    InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8)
                 ) {
                     log.debug("Compiling {}", scriptFileSource);
                     this.script.set(compilable.compile(reader));

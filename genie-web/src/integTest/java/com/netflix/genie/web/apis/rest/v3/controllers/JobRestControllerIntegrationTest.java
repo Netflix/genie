@@ -69,9 +69,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -203,7 +201,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         super.setup();
 
         // Re-point archives
-        this.jobsLocationsProperties.setArchives(this.temporaryFolder.newFolder().toURI().toString());
+        this.jobsLocationsProperties.setArchives(this.temporaryFolder.newFolder().toURI());
 
         this.schedulerJobName = UUID.randomUUID().toString();
         this.schedulerRunId = UUID.randomUUID().toString();
@@ -358,8 +356,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         Assert.assertTrue(
             Files.exists(
                 Paths.get(
-                    new URI(this.fileCacheProperties.getLocation()).getPath(),
-                    UUID.nameUUIDFromBytes(clusterSetUpFilePath.getBytes(Charset.forName("UTF-8"))).toString()
+                    this.fileCacheProperties.getLocation().getPath(),
+                    UUID.nameUUIDFromBytes(clusterSetUpFilePath.getBytes(StandardCharsets.UTF_8)).toString()
                 )
             )
         );
@@ -911,7 +909,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         final String id,
         final boolean jobShouldBeArchived
     ) throws URISyntaxException {
-        final Path archiveDirectory = Paths.get(new URI(this.jobsLocationsProperties.getArchives())).resolve(id);
+        final Path archiveDirectory = Paths.get(this.jobsLocationsProperties.getArchives()).resolve(id);
         // TODO: This is flipped during V4 migration and should be changed back once clients are fixed
 //        if (jobShouldBeArchived) {
         Assert.assertTrue(Files.exists(archiveDirectory));

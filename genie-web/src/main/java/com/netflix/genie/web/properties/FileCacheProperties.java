@@ -19,11 +19,11 @@ package com.netflix.genie.web.properties;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.net.URI;
 
 /**
  * Properties related to the Genie file cache.
@@ -42,7 +42,8 @@ public class FileCacheProperties {
      */
     public static final String PROPERTY_PREFIX = "genie.file.cache";
 
-    @NotBlank
-    @URL
-    private String location = "file:///tmp/genie/cache";
+    private static final String SYSTEM_TMP_DIR = System.getProperty("java.io.tmpdir", "/tmp/");
+
+    @NotNull(message = "A file cache location is required")
+    private URI location = URI.create("file://" + SYSTEM_TMP_DIR + "genie/cache");
 }

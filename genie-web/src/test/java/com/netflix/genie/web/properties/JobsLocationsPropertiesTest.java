@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.web.properties;
 
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URI;
 import java.util.UUID;
 
 /**
@@ -32,6 +34,7 @@ import java.util.UUID;
  */
 public class JobsLocationsPropertiesTest {
 
+    private static final String SYSTEM_TMP_DIR = System.getProperty("java.io.tmpdir", "/tmp/");
     private JobsLocationsProperties properties;
 
     /**
@@ -47,9 +50,15 @@ public class JobsLocationsPropertiesTest {
      */
     @Test
     public void canConstruct() {
-        Assert.assertThat(this.properties.getArchives(), Matchers.is("file:///tmp/genie/archives/"));
-        Assert.assertThat(this.properties.getAttachments(), Matchers.is("file:///tmp/genie/attachments/"));
-        Assert.assertThat(this.properties.getJobs(), Matchers.is("file:///tmp/genie/jobs/"));
+        Assertions
+            .assertThat(this.properties.getArchives())
+            .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/archives/"));
+        Assertions
+            .assertThat(this.properties.getAttachments())
+            .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/attachments/"));
+        Assertions
+            .assertThat(this.properties.getJobs())
+            .isEqualTo(URI.create("file://" + SYSTEM_TMP_DIR + "genie/jobs/"));
     }
 
     /**
@@ -57,7 +66,7 @@ public class JobsLocationsPropertiesTest {
      */
     @Test
     public void canSetArchivesLocation() {
-        final String location = UUID.randomUUID().toString();
+        final URI location = URI.create("file:/" + UUID.randomUUID().toString());
         this.properties.setArchives(location);
         Assert.assertThat(this.properties.getArchives(), Matchers.is(location));
     }
@@ -67,7 +76,7 @@ public class JobsLocationsPropertiesTest {
      */
     @Test
     public void canSetAttachmentsLocation() {
-        final String location = UUID.randomUUID().toString();
+        final URI location = URI.create("file:/" + UUID.randomUUID().toString());
         this.properties.setAttachments(location);
         Assert.assertThat(this.properties.getAttachments(), Matchers.is(location));
     }
@@ -77,7 +86,7 @@ public class JobsLocationsPropertiesTest {
      */
     @Test
     public void canSetJobsLocation() {
-        final String location = UUID.randomUUID().toString();
+        final URI location = URI.create("file:/" + UUID.randomUUID().toString());
         this.properties.setJobs(location);
         Assert.assertThat(this.properties.getJobs(), Matchers.is(location));
     }
