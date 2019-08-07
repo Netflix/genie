@@ -13,6 +13,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.spring.autoconfigure.events.NotificationsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.health.HealthAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.jobs.JobsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.properties.converters.PropertyConvertersAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.services.ServicesAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.tasks.leader.LeaderAutoConfiguration,\
