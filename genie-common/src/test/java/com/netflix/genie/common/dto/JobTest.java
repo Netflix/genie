@@ -18,6 +18,8 @@
 package com.netflix.genie.common.dto;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,17 +42,7 @@ public class JobTest {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
-    private static final String COMMAND_ARG_1 = UUID.randomUUID().toString();
-    private static final String COMMAND_ARG_2 = UUID.randomUUID().toString() + ' ' + UUID.randomUUID().toString();
-    private static final String COMMAND_ARG_3 = UUID.randomUUID().toString();
-    private static final List<String> COMMAND_ARGS = com.google.common.collect.Lists.newArrayList(
-        COMMAND_ARG_1,
-        COMMAND_ARG_2,
-        COMMAND_ARG_3
-    );
-    private static final String COMMAND_ARGS_INPUT_STRING = COMMAND_ARG_1 + " '" + COMMAND_ARG_2 + "' " + COMMAND_ARG_3;
-    private static final String COMMAND_ARGS_EXPECTED
-        = '\'' + COMMAND_ARG_1 + "' '" + COMMAND_ARG_2 + "' '" + COMMAND_ARG_3 + '\'';
+    private static final List<String> COMMAND_ARGS = Lists.newArrayList(UUID.randomUUID().toString());
 
     /**
      * Test to make sure can build a valid Job using the builder.
@@ -58,15 +50,14 @@ public class JobTest {
     @Test
     @SuppressWarnings("deprecation")
     public void canBuildJobDeprecatedConstructor() {
-        final Job job = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS_INPUT_STRING).build();
+        final Job job = new Job.Builder(NAME, USER, VERSION, StringUtils.join(COMMAND_ARGS, StringUtils.SPACE)).build();
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(
-            job.getCommandArgsString().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS_EXPECTED)
+            job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
-        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());
@@ -93,8 +84,7 @@ public class JobTest {
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(job.getCommandArgsString(), Matchers.is(Optional.empty()));
-        Assert.assertTrue(job.getCommandArgs().isEmpty());
+        Assert.assertThat(job.getCommandArgs(), Matchers.is(Optional.empty()));
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());
@@ -120,7 +110,7 @@ public class JobTest {
     public void canBuildJobWithOptionalsDeprecated() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
 
-        builder.withCommandArgs(COMMAND_ARGS_EXPECTED);
+        builder.withCommandArgs(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
 
         final String archiveLocation = UUID.randomUUID().toString();
         builder.withArchiveLocation(archiveLocation);
@@ -172,10 +162,9 @@ public class JobTest {
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(
-            job.getCommandArgsString().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS_EXPECTED)
+            job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
-        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(
             job.getArchiveLocation().orElseThrow(IllegalArgumentException::new), Matchers.is(archiveLocation)
         );
@@ -260,10 +249,9 @@ public class JobTest {
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(
-            job.getCommandArgsString().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS_EXPECTED)
+            job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
-        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(
             job.getArchiveLocation().orElseThrow(IllegalArgumentException::new), Matchers.is(archiveLocation)
         );
@@ -313,8 +301,7 @@ public class JobTest {
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertFalse(job.getCommandArgsString().isPresent());
-        Assert.assertTrue(job.getCommandArgs().isEmpty());
+        Assert.assertFalse(job.getCommandArgs().isPresent());
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());
@@ -387,5 +374,37 @@ public class JobTest {
 
         Assert.assertEquals(job1.hashCode(), job2.hashCode());
         Assert.assertNotEquals(job1.hashCode(), job3.hashCode());
+    }
+
+    /**
+     * Test to prove a bug with command args splitting with trailing whitespace was corrected.
+     */
+    @Test
+    public void testCommandArgsEdgeCases() {
+        final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
+
+        String commandArgs = " blah ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(" blah ")
+        );
+        commandArgs = " blah    ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(" blah    ")
+        );
+        commandArgs = "  blah blah     blah\nblah\tblah \"blah\" blah  ";
+        builder.withCommandArgs(commandArgs);
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("  blah blah     blah\nblah\tblah \"blah\" blah  ")
+        );
+        builder.withCommandArgs(Lists.newArrayList("blah", "blah", "  blah", "\nblah", "\"blah\""));
+        Assert.assertThat(
+            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("blah blah   blah \nblah \"blah\"")
+        );
     }
 }

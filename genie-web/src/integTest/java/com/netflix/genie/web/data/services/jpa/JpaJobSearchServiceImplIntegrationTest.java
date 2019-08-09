@@ -32,7 +32,6 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.data.services.JobSearchService;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -518,10 +517,9 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
     public void canGetJobRequest() throws GenieException {
         final JobRequest job1Request = this.service.getJobRequest(JOB_1_ID);
         Assert.assertThat(
-            job1Request.getCommandArgsString().orElseThrow(IllegalArgumentException::new),
-            Matchers.is("'-f' 'query.q'")
+            job1Request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f query.q")
         );
-        Assert.assertThat(job1Request.getCommandArgs(), Matchers.is(Lists.newArrayList("-f", "query.q")));
         Assert.assertThat(
             job1Request.getClusterCriterias().size(),
             Matchers.is(2)
@@ -550,12 +548,12 @@ public class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBas
             Matchers.is(Sets.newHashSet("type:spark", "ver:1.6.0", "genie.name:spark"))
         );
         Assert.assertThat(
-            this.service.getJobRequest(JOB_2_ID).getCommandArgsString().orElseThrow(IllegalArgumentException::new),
-            Matchers.is("'-f' 'spark.jar'")
+            this.service.getJobRequest(JOB_2_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f spark.jar")
         );
         Assert.assertThat(
-            this.service.getJobRequest(JOB_3_ID).getCommandArgsString().orElseThrow(IllegalArgumentException::new),
-            Matchers.is("'-f' 'spark.jar'")
+            this.service.getJobRequest(JOB_3_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f spark.jar")
         );
 
         try {
