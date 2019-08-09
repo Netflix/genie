@@ -16,6 +16,7 @@ dependencies {
 
     implementation("com.google.guava:guava")
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.apache.commons:commons-text")
 
     /*******************************
      * Provided Dependencies
