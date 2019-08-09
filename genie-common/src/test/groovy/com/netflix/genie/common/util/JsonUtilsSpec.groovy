@@ -38,8 +38,6 @@ class JsonUtilsSpec extends Specification {
         "/bin/bash -xc 'echo \"hello\" world!'" | ["/bin/bash", "-xc", "echo \"hello\" world!"]
         "arg1   arg2\targ3\narg4\r'arg5' '''"   | ["arg1", "arg2", "arg3", "arg4", "arg5", "'"]
         "foo/bar --hello '\$world'"             | ["foo/bar", "--hello", "\$world"]
-        "foo/bar \" --hello\" \"\$world\""      | ["foo/bar", " --hello", "\$world"]
-        "foo/bar \"'hello'\""                   | ["foo/bar", "'hello'"]
     }
 
     @Unroll

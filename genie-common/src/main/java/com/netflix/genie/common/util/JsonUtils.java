@@ -100,7 +100,7 @@ public final class JsonUtils {
         final StringTokenizer tokenizer = new StringTokenizer(
             commandArgs,
             StringMatcherFactory.INSTANCE.splitMatcher(),
-            StringMatcherFactory.INSTANCE.quoteMatcher()
+            StringMatcherFactory.INSTANCE.singleQuoteMatcher()
         );
 
         return tokenizer.getTokenList();
