@@ -700,7 +700,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .getMetadata()
             .ifPresent(metadata -> EntityDtoConverters.setJsonField(metadata, jobEntity::setMetadata));
         JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), jobRequest, jobEntity);
-        jobEntity.setCommandArgs(jobRequest.getCommandArgs());
+        jobRequest.getCommandArgs().ifPresent(commandArgs -> jobEntity.setCommandArgs(Lists.newArrayList(commandArgs)));
         jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
         final FileEntity setupFile = jobRequest.getSetupFile().isPresent()
             ? this.createAndGetFileEntity(jobRequest.getSetupFile().get())

@@ -392,10 +392,12 @@ public final class DtoConverters {
 
         final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder = new JobArchivalDataRequest.Builder();
 
+        final List<String> commandArgs = Lists.newArrayList();
+        v3JobRequest.getCommandArgs().ifPresent(commandArgs::add);
         return new JobRequest(
             v3JobRequest.getId().orElse(null),
             resources,
-            v3JobRequest.getCommandArgs(),
+            commandArgs,
             metadataBuilder.build(),
             criteria,
             jobEnvironmentBuilder.build(),
