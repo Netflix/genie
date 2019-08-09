@@ -7,9 +7,7 @@ def genieVersion = project.version.toString()
 
 asciidoctor {
     inputs.dir new File(project.projectDir, "/src/docs/asciidoc")
-    attributes \
-            "revnumber": genieVersion,
-            "docinfo1": ""
+    attributes.putAll(["revnumber": genieVersion, "docinfo1": ""])
 }
 
 def apacheImageName = "genie-demo-apache"
