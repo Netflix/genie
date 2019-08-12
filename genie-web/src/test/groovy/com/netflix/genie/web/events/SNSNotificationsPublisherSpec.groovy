@@ -64,10 +64,10 @@ class SNSNotificationsPublisherSpec extends Specification {
         this.publisher.onApplicationEvent(event)
 
         then:
-        1 * event.getJobId() >> jobId
-        1 * event.getPreviousStatus() >> JobStatus.RUNNING
-        1 * event.getNewStatus() >> JobStatus.SUCCEEDED
         1 * snsProperties.isEnabled() >> false
+        0 * event.getJobId()
+        0 * event.getPreviousStatus()
+        0 * event.getNewStatus()
         0 * snsClient.publish(_, _)
         0 * registry.counter(_, _)
     }
@@ -81,8 +81,8 @@ class SNSNotificationsPublisherSpec extends Specification {
 
         then:
         1 * event.getJobId() >> jobId
-        1 * event.getPreviousStatus() >> JobStatus.RUNNING
-        1 * event.getNewStatus() >> JobStatus.SUCCEEDED
+        1 * event.getPreviousStatus() >> JobStatus.CLAIMED
+        1 * event.getNewStatus() >> JobStatus.INIT
         1 * snsProperties.isEnabled() >> true
         1 * snsProperties.getTopicARN() >> ""
         0 * snsClient.publish(_, _)
@@ -101,7 +101,7 @@ class SNSNotificationsPublisherSpec extends Specification {
         then:
         1 * event.getJobId() >> jobId
         1 * event.getPreviousStatus() >> prevState
-        1 * event.getNewStatus() >> JobStatus.SUCCEEDED
+        1 * event.getNewStatus() >> JobStatus.RUNNING
         1 * snsProperties.isEnabled() >> true
         1 * snsProperties.getTopicARN() >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
@@ -111,7 +111,7 @@ class SNSNotificationsPublisherSpec extends Specification {
                 return Mock(PublishResult)
         }
         1 * registry.counter(
-            SNSNotificationsPublisher.PUBLISH_METRIC_COUNTER_NAME,
+            "genie.notifications.sns.publish.JOB_STATUS_CHANGE.counter",
             MetricsUtils.newSuccessTagsSet()
         ) >> counter
         1 * counter.increment()
@@ -133,7 +133,7 @@ class SNSNotificationsPublisherSpec extends Specification {
         eventDetails != null
         eventDetails.get("job-id") == jobId
         eventDetails.get("from-state") == String.valueOf(prevState)
-        eventDetails.get("to-state") == JobStatus.SUCCEEDED.name()
+        eventDetails.get("to-state") == JobStatus.RUNNING.name()
 
         where:
         prevState      | _
@@ -153,14 +153,14 @@ class SNSNotificationsPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * event.getJobId() >> jobId
         1 * event.getPreviousStatus() >> JobStatus.INIT
-        1 * event.getNewStatus() >> JobStatus.SUCCEEDED
+        1 * event.getNewStatus() >> JobStatus.RUNNING
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
         1 * snsProperties.getTopicARN() >> topicARN
         1 * snsClient.publish(topicARN, _ as String) >> {
             throw e
         }
         1 * registry.counter(
-            SNSNotificationsPublisher.PUBLISH_METRIC_COUNTER_NAME,
+            "genie.notifications.sns.publish.JOB_STATUS_CHANGE.counter",
             MetricsUtils.newFailureTagsSetForException(e)
         ) >> counter
         1 * counter.increment()
