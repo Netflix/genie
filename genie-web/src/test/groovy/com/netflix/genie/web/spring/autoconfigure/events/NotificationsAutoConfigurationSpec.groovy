@@ -21,7 +21,7 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver
 import com.netflix.genie.web.events.GenieEventBus
 import com.netflix.genie.web.events.JobNotificationMetricPublisher
-import com.netflix.genie.web.events.SNSNotificationsPublisher
+import com.netflix.genie.web.events.JobStateChangeSNSPublisher
 import com.netflix.genie.web.properties.SNSNotificationsProperties
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
@@ -59,7 +59,7 @@ class NotificationsAutoConfigurationSpec extends Specification {
         AmazonSNS snsClient = Mock(AmazonSNS)
         SNSNotificationsProperties snsProperties = Mock(SNSNotificationsProperties)
         when:
-        SNSNotificationsPublisher publisher = this.config.jobNotificationsSNSPublisher(
+        JobStateChangeSNSPublisher publisher = this.config.jobNotificationsSNSPublisher(
             snsProperties,
             registry,
             snsClient

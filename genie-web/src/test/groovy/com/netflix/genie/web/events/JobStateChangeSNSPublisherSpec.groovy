@@ -31,8 +31,8 @@ import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class SNSNotificationsPublisherSpec extends Specification {
-    SNSNotificationsPublisher publisher
+class JobStateChangeSNSPublisherSpec extends Specification {
+    JobStateChangeSNSPublisher publisher
     AmazonSNS snsClient
     SNSNotificationsProperties snsProperties
     MeterRegistry registry
@@ -48,7 +48,7 @@ class SNSNotificationsPublisherSpec extends Specification {
         this.snsProperties = Mock(SNSNotificationsProperties)
         this.registry = Mock(MeterRegistry)
         this.mapper = GenieObjectMapper.getMapper()
-        this.publisher = new SNSNotificationsPublisher(snsClient, snsProperties, registry, mapper)
+        this.publisher = new JobStateChangeSNSPublisher(snsClient, snsProperties, registry, mapper)
         this.event = Mock(JobStateChangeEvent)
         this.extraKeysMap = Maps.newHashMap()
         this.jobId = UUID.randomUUID().toString()

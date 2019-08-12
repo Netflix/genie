@@ -23,7 +23,7 @@ import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserverImpl;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobNotificationMetricPublisher;
-import com.netflix.genie.web.events.SNSNotificationsPublisher;
+import com.netflix.genie.web.events.JobStateChangeSNSPublisher;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -76,22 +76,22 @@ public class NotificationsAutoConfiguration {
     }
 
     /**
-     * Create a {@link SNSNotificationsPublisher} unless one exists in the context already.
+     * Create a {@link JobStateChangeSNSPublisher} unless one exists in the context already.
      *
      * @param snsClient  the Amazon SNS client
      * @param properties configuration properties
      * @param registry   the metrics registry
-     * @return a {@link SNSNotificationsPublisher}
+     * @return a {@link JobStateChangeSNSPublisher}
      */
     @Bean
     @ConditionalOnProperty(value = SNSNotificationsProperties.ENABLED_PROPERTY, havingValue = "true")
-    @ConditionalOnMissingBean(SNSNotificationsPublisher.class)
-    public SNSNotificationsPublisher jobNotificationsSNSPublisher(
+    @ConditionalOnMissingBean(JobStateChangeSNSPublisher.class)
+    public JobStateChangeSNSPublisher jobNotificationsSNSPublisher(
         final SNSNotificationsProperties properties,
         final MeterRegistry registry,
         final AmazonSNS snsClient
     ) {
-        return new SNSNotificationsPublisher(
+        return new JobStateChangeSNSPublisher(
             snsClient,
             properties,
             registry,
