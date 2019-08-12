@@ -21,14 +21,12 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationListener;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -37,81 +35,46 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Publishes Amazon SNS notifications.
- * Currently, only job status changes trigger a notification.
+ * Abstract SNS publisher that adds fields common to all payloads, records metrics, etc.
  *
  * @author mprimi
  * @since 4.0.0
  */
 @Slf4j
-public class SNSNotificationsPublisher implements ApplicationListener<JobStateChangeEvent> {
-
+abstract class AbstractSNSPublisher {
     private static final String PUBLISH_METRIC_COUNTER_NAME_FORMAT = "genie.notifications.sns.publish.%s.counter";
-
-    // Top level keys
     private static final String EVENT_TYPE_KEY_NAME = "event-type";
     private static final String EVENT_ID_KEY_NAME = "event-id";
     private static final String EVENT_TIMESTAMP_KEY_NAME = "event-timestamp";
     private static final String EVENT_DETAILS_KEY_NAME = "event-details";
 
-    // Keys for JOB_STATUS_CHANGE
-    private static final String JOB_ID_KEY_NAME = "job-id";
-    private static final String FROM_STATE_KEY_NAME = "from-state";
-    private static final String TO_STATE_KEY_NAME = "to-state";
+    protected final SNSNotificationsProperties properties;
+    protected final MeterRegistry registry;
 
     private final AmazonSNS snsClient;
-    private final SNSNotificationsProperties properties;
-    private final MeterRegistry registry;
     private final ObjectMapper mapper;
 
     /**
      * Constructor.
      *
-     * @param snsClient  Amazon SNS client
-     * @param properties configuration properties
+     * @param properties SNS properties
      * @param registry   metrics registry
-     * @param mapper     object mapper
+     * @param snsClient  SNS client
+     * @param mapper     JSON object mapper
      */
-    public SNSNotificationsPublisher(
-        final AmazonSNS snsClient,
+    AbstractSNSPublisher(
         final SNSNotificationsProperties properties,
         final MeterRegistry registry,
+        final AmazonSNS snsClient,
         final ObjectMapper mapper
     ) {
-        this.snsClient = snsClient;
         this.properties = properties;
         this.registry = registry;
+        this.snsClient = snsClient;
         this.mapper = mapper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onApplicationEvent(final JobStateChangeEvent event) {
-        if (!this.properties.isEnabled()) {
-            // Publishing is disabled
-            return;
-        }
-
-        publishJobStateChangeEvent(event);
-    }
-
-    private void publishJobStateChangeEvent(final JobStateChangeEvent event) {
-        final String jobId = event.getJobId();
-        final JobStatus fromState = event.getPreviousStatus();
-        final JobStatus toState = event.getNewStatus();
-
-        final HashMap<String, Object> eventDetailsMap = Maps.newHashMap();
-
-        eventDetailsMap.put(JOB_ID_KEY_NAME, jobId);
-        eventDetailsMap.put(FROM_STATE_KEY_NAME, fromState != null ? fromState.name() : "null");
-        eventDetailsMap.put(TO_STATE_KEY_NAME, toState.name());
-
-        this.publishEvent(EventType.JOB_STATUS_CHANGE, eventDetailsMap);
-    }
-
-    private void publishEvent(final EventType eventType, final HashMap<String, Object> eventDetailsMap) {
+    protected void publishEvent(final EventType eventType, final HashMap<String, Object> eventDetailsMap) {
         final String topic = this.properties.getTopicARN();
 
         if (StringUtils.isBlank(topic)) {
@@ -155,7 +118,7 @@ public class SNSNotificationsPublisher implements ApplicationListener<JobStateCh
     /**
      * Types of event.
      */
-    private enum EventType {
+    protected enum EventType {
         JOB_STATUS_CHANGE,
     }
 }
