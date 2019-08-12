@@ -46,7 +46,7 @@ import java.util.UUID;
 @Slf4j
 public class SNSNotificationsPublisher implements ApplicationListener<JobStateChangeEvent> {
 
-    private static final String PUBLISH_METRIC_COUNTER_NAME = "genie.notifications.sns.publish.counter";
+    private static final String PUBLISH_METRIC_COUNTER_NAME_FORMAT = "genie.notifications.sns.publish.%s.counter";
 
     // Top level keys
     private static final String EVENT_TYPE_KEY_NAME = "event-type";
@@ -89,11 +89,20 @@ public class SNSNotificationsPublisher implements ApplicationListener<JobStateCh
      */
     @Override
     public void onApplicationEvent(final JobStateChangeEvent event) {
+        if (!this.properties.isEnabled()) {
+            // Publishing is disabled
+            return;
+        }
+
+        publishJobStateChangeEvent(event);
+    }
+
+    private void publishJobStateChangeEvent(final JobStateChangeEvent event) {
         final String jobId = event.getJobId();
         final JobStatus fromState = event.getPreviousStatus();
         final JobStatus toState = event.getNewStatus();
 
-        final HashMap<String, String> eventDetailsMap = Maps.newHashMap();
+        final HashMap<String, Object> eventDetailsMap = Maps.newHashMap();
 
         eventDetailsMap.put(JOB_ID_KEY_NAME, jobId);
         eventDetailsMap.put(FROM_STATE_KEY_NAME, fromState != null ? fromState.name() : "null");
@@ -102,12 +111,7 @@ public class SNSNotificationsPublisher implements ApplicationListener<JobStateCh
         this.publishEvent(EventType.JOB_STATUS_CHANGE, eventDetailsMap);
     }
 
-    private void publishEvent(final EventType eventType, final HashMap<String, String> eventDetailsMap) {
-        if (!this.properties.isEnabled()) {
-            // Publishing is disabled
-            return;
-        }
-
+    private void publishEvent(final EventType eventType, final HashMap<String, Object> eventDetailsMap) {
         final String topic = this.properties.getTopicARN();
 
         if (StringUtils.isBlank(topic)) {
@@ -136,12 +140,15 @@ public class SNSNotificationsPublisher implements ApplicationListener<JobStateCh
             final String serializedMessage = this.mapper.writeValueAsString(eventMap);
             // Send message
             this.snsClient.publish(topic, serializedMessage);
-            log.debug("Published SNS notification)");
+            log.debug("Published SNS notification (type: {})", eventType.name());
         } catch (JsonProcessingException | RuntimeException e) {
             metricTags = MetricsUtils.newFailureTagsSetForException(e);
             log.error("Failed to publish SNS notification", e);
         } finally {
-            registry.counter(PUBLISH_METRIC_COUNTER_NAME, metricTags).increment();
+            registry.counter(
+                String.format(PUBLISH_METRIC_COUNTER_NAME_FORMAT, eventType.name()),
+                metricTags
+            ).increment();
         }
     }
 
