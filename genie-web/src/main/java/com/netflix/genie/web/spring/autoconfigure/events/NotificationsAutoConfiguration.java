@@ -21,7 +21,9 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserverImpl;
+import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.events.JobFinishedSNSPublisher;
 import com.netflix.genie.web.events.JobNotificationMetricPublisher;
 import com.netflix.genie.web.events.JobStateChangeSNSPublisher;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
@@ -94,6 +96,33 @@ public class NotificationsAutoConfiguration {
         return new JobStateChangeSNSPublisher(
             snsClient,
             properties,
+            registry,
+            GenieObjectMapper.getMapper()
+        );
+    }
+
+    /**
+     * Create a {@link JobFinishedSNSPublisher} unless one exists in the context already.
+     *
+     * @param properties            configuration properties
+     * @param registry              the metrics registry
+     * @param snsClient             the Amazon SNS client
+     * @param jobPersistenceService the job persistence service
+     * @return a {@link JobFinishedSNSPublisher}
+     */
+    @Bean
+    @ConditionalOnProperty(value = SNSNotificationsProperties.ENABLED_PROPERTY, havingValue = "true")
+    @ConditionalOnMissingBean(JobFinishedSNSPublisher.class)
+    public JobFinishedSNSPublisher jobFinishedSNSPublisher(
+        final SNSNotificationsProperties properties,
+        final MeterRegistry registry,
+        final AmazonSNS snsClient,
+        final JobPersistenceService jobPersistenceService
+    ) {
+        return new JobFinishedSNSPublisher(
+            snsClient,
+            properties,
+            jobPersistenceService,
             registry,
             GenieObjectMapper.getMapper()
         );
