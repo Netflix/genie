@@ -120,5 +120,6 @@ abstract class AbstractSNSPublisher {
      */
     protected enum EventType {
         JOB_STATUS_CHANGE,
+        JOB_FINISHED,
     }
 }
