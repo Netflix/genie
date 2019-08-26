@@ -39,9 +39,9 @@ public class JobStateChangeSNSPublisher
     extends AbstractSNSPublisher
     implements ApplicationListener<JobStateChangeEvent> {
 
-    private static final String JOB_ID_KEY_NAME = "job-id";
-    private static final String FROM_STATE_KEY_NAME = "from-state";
-    private static final String TO_STATE_KEY_NAME = "to-state";
+    private static final String JOB_ID_KEY_NAME = "jobId";
+    private static final String FROM_STATE_KEY_NAME = "fromState";
+    private static final String TO_STATE_KEY_NAME = "toState";
 
     /**
      * Constructor.
