@@ -46,44 +46,45 @@ public class JobFinishedSNSPublisher
     extends AbstractSNSPublisher
     implements ApplicationListener<JobStateChangeEvent> {
 
-    private static final String JOB_ID_KEY_NAME = "job-id";
-    private static final String JOB_VERSION_KEY_NAME = "job-version";
-    private static final String JOB_NAME_KEY_NAME = "job-name";
-    private static final String JOB_USER_KEY_NAME = "job-user";
-    private static final String JOB_DESCRIPTION_KEY_NAME = "job-description";
-    private static final String JOB_METADATA_KEY_NAME = "job-metadata";
-    private static final String JOB_TAGS_KEY_NAME = "job-tags";
-    private static final String JOB_CREATED_KEY_NAME = "job-created";
-    private static final String JOB_STATUS_KEY_NAME = "job-status";
-    private static final String JOB_COMMAND_CRITERION_KEY_NAME = "job-command-criterion";
-    private static final String JOB_CLUSTER_CRITERIA_KEY_NAME = "job-cluster-criteria";
-    private static final String JOB_STARTED_KEY_NAME = "job-started";
-    private static final String JOB_GROUPING_KEY_NAME = "job-grouping";
-    private static final String JOB_FINISHED_KEY_NAME = "job-finished";
-    private static final String JOB_AGENT_VERSION_KEY_NAME = "job-agent-version";
-    private static final String JOB_GROUPING_INSTANCE_KEY_NAME = "job-grouping-instance";
-    private static final String JOB_STATUS_MESSAGE_KEY_NAME = "job-status-message";
-    private static final String JOB_API_CLIENT_HOSTNAME_KEY_NAME = "job-api-client-hostname";
-    private static final String JOB_REQUESTED_MEMORY_KEY_NAME = "job-requested-memory";
-    private static final String JOB_AGENT_HOSTNAME_KEY_NAME = "job-agent-hostname";
-    private static final String JOB_API_CLIENT_USER_AGENT_KEY_NAME = "job-api-client-user-agent";
-    private static final String JOB_EXIT_CODE_KEY_NAME = "job-exit-code";
-    private static final String JOB_NUM_ATTACHMENTS_KEY_NAME = "job-num-attachments";
-    private static final String JOB_ARCHIVE_LOCATION_KEY_NAME = "job-archive-location";
-    private static final String JOB_USED_MEMORY_KEY_NAME = "job-used-memory";
-    private static final String COMMAND_ID_KEY_NAME = "command-id";
-    private static final String COMMAND_NAME_KEY_NAME = "command-name";
-    private static final String COMMAND_VERSION_KEY_NAME = "command-version";
-    private static final String COMMAND_DESCRIPTION_KEY_NAME = "command-description";
-    private static final String COMMAND_CREATED_KEY_NAME = "command-created";
-    private static final String COMMAND_UPDATED_KEY_NAME = "command-updated";
-    private static final String COMMAND_EXECUTABLE_KEY_NAME = "command-executable";
-    private static final String CLUSTER_ID_KEY_NAME = "cluster-id";
-    private static final String CLUSTER_NAME_KEY_NAME = "cluster-name";
-    private static final String CLUSTER_VERSION_KEY_NAME = "cluster-version";
-    private static final String CLUSTER_DESCRIPTION_KEY_NAME = "cluster-description";
-    private static final String CLUSTER_CREATED_KEY_NAME = "cluster-created";
-    private static final String CLUSTER_UPDATED_KEY_NAME = "cluster-updated";
+    private static final char COLON = ':';
+    private static final String JOB_ID_KEY_NAME = "jobId";
+    private static final String JOB_VERSION_KEY_NAME = "jobVersion";
+    private static final String JOB_NAME_KEY_NAME = "jobName";
+    private static final String JOB_USER_KEY_NAME = "jobUser";
+    private static final String JOB_DESCRIPTION_KEY_NAME = "jobDescription";
+    private static final String JOB_METADATA_KEY_NAME = "jobMetadata";
+    private static final String JOB_TAGS_KEY_NAME = "jobTags";
+    private static final String JOB_CREATED_KEY_NAME = "jobCreated";
+    private static final String JOB_STATUS_KEY_NAME = "jobStatus";
+    private static final String JOB_COMMAND_CRITERION_KEY_NAME = "jobCommandCriterion";
+    private static final String JOB_CLUSTER_CRITERIA_KEY_NAME = "jobClusterCriteria";
+    private static final String JOB_STARTED_KEY_NAME = "jobStarted";
+    private static final String JOB_GROUPING_KEY_NAME = "jobGrouping";
+    private static final String JOB_FINISHED_KEY_NAME = "jobFinished";
+    private static final String JOB_AGENT_VERSION_KEY_NAME = "jobAgentVersion";
+    private static final String JOB_GROUPING_INSTANCE_KEY_NAME = "jobGroupingInstance";
+    private static final String JOB_STATUS_MESSAGE_KEY_NAME = "jobStatusMessage";
+    private static final String JOB_API_CLIENT_HOSTNAME_KEY_NAME = "jobApiClientHostname";
+    private static final String JOB_REQUESTED_MEMORY_KEY_NAME = "jobRequestedMemory";
+    private static final String JOB_AGENT_HOSTNAME_KEY_NAME = "jobAgentHostname";
+    private static final String JOB_API_CLIENT_USER_AGENT_KEY_NAME = "jobApiClientUserAgent";
+    private static final String JOB_EXIT_CODE_KEY_NAME = "jobExitCode";
+    private static final String JOB_NUM_ATTACHMENTS_KEY_NAME = "jobNumAttachments";
+    private static final String JOB_ARCHIVE_LOCATION_KEY_NAME = "jobArchiveLocation";
+    private static final String JOB_USED_MEMORY_KEY_NAME = "jobUsedMemory";
+    private static final String COMMAND_ID_KEY_NAME = "commandId";
+    private static final String COMMAND_NAME_KEY_NAME = "commandName";
+    private static final String COMMAND_VERSION_KEY_NAME = "commandVersion";
+    private static final String COMMAND_DESCRIPTION_KEY_NAME = "commandDescription";
+    private static final String COMMAND_CREATED_KEY_NAME = "commandCreated";
+    private static final String COMMAND_UPDATED_KEY_NAME = "commandUpdated";
+    private static final String COMMAND_EXECUTABLE_KEY_NAME = "commandExecutable";
+    private static final String CLUSTER_ID_KEY_NAME = "clusterId";
+    private static final String CLUSTER_NAME_KEY_NAME = "clusterName";
+    private static final String CLUSTER_VERSION_KEY_NAME = "clusterVersion";
+    private static final String CLUSTER_DESCRIPTION_KEY_NAME = "clusterDescription";
+    private static final String CLUSTER_CREATED_KEY_NAME = "clusterCreated";
+    private static final String CLUSTER_UPDATED_KEY_NAME = "clusterUpdated";
     private static final String APPLICATIONS_KEY_NAME = "applications";
 
     private final JobPersistenceService jobPersistenceService;
@@ -204,7 +205,7 @@ public class JobFinishedSNSPublisher
             APPLICATIONS_KEY_NAME,
             job.getApplications().stream().map(
                 application ->
-                    application.getId() + application.getMetadata().getVersion()
+                    application.getId() + COLON + application.getMetadata().getVersion()
             ).collect(Collectors.toList())
         );
 

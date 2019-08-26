@@ -142,8 +142,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
         1 * snsClient.publish(topicARN, _ as String) >> {
             args ->
-                println args[1]
-                Map<String, Object> eventDetails = mapper.readValue(args[1] as String, Map.class).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME)
+                Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
                 Assert.that(eventDetails.entrySet().size() == 39)
                 Assert.that(eventDetails.entrySet().stream().filter({entry -> entry.getValue() == null}).count() == 29)
         }
@@ -229,8 +228,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
         1 * snsClient.publish(topicARN, _ as String) >> {
             args ->
-                println args[1]
-                Map<String, Object> eventDetails = mapper.readValue(args[1] as String, Map.class).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME)
+                Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
                 Assert.that(eventDetails.entrySet().size() == 39)
                 Assert.that(eventDetails.entrySet().stream().filter({entry -> entry.getValue() == null}).count() == 0)
         }

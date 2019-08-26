@@ -126,14 +126,14 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         parsedMessage.size() == 6
         parsedMessage.get("foo") as String == "bar"
         parsedMessage.get("bar") as String == "foo"
-        parsedMessage.get("event-type") as String ==  "JOB_STATUS_CHANGE"
-        parsedMessage.get("event-id") != null
-        parsedMessage.get("event-timestamp") != null
-        Map<String, String> eventDetails = parsedMessage.get("event-details") as Map<String, String>
+        parsedMessage.get("eventType") as String == "JOB_STATUS_CHANGE"
+        parsedMessage.get("eventId") != null
+        parsedMessage.get("eventTimestamp") != null
+        Map<String, String> eventDetails = parsedMessage.get("eventDetails") as Map<String, String>
         eventDetails != null
-        eventDetails.get("job-id") == jobId
-        eventDetails.get("from-state") == String.valueOf(prevState)
-        eventDetails.get("to-state") == JobStatus.RUNNING.name()
+        eventDetails.get("jobId") == jobId
+        eventDetails.get("fromState") == String.valueOf(prevState)
+        eventDetails.get("toState") == JobStatus.RUNNING.name()
 
         where:
         prevState      | _
@@ -164,7 +164,5 @@ class JobStateChangeSNSPublisherSpec extends Specification {
             MetricsUtils.newFailureTagsSetForException(e)
         ) >> counter
         1 * counter.increment()
-
     }
-
 }

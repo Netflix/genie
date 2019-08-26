@@ -43,10 +43,10 @@ import java.util.UUID;
 @Slf4j
 abstract class AbstractSNSPublisher {
     private static final String PUBLISH_METRIC_COUNTER_NAME_FORMAT = "genie.notifications.sns.publish.%s.counter";
-    private static final String EVENT_TYPE_KEY_NAME = "event-type";
-    private static final String EVENT_ID_KEY_NAME = "event-id";
-    private static final String EVENT_TIMESTAMP_KEY_NAME = "event-timestamp";
-    private static final String EVENT_DETAILS_KEY_NAME = "event-details";
+    private static final String EVENT_TYPE_KEY_NAME = "eventType";
+    private static final String EVENT_ID_KEY_NAME = "eventId";
+    private static final String EVENT_TIMESTAMP_KEY_NAME = "eventTimestamp";
+    private static final String EVENT_DETAILS_KEY_NAME = "eventDetails";
 
     protected final SNSNotificationsProperties properties;
     protected final MeterRegistry registry;
