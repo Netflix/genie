@@ -90,6 +90,10 @@ atlassian-ide-plugin.xml
 /private
 */private
 
+# Visual Studio Code specific files/directories #
+#################################################
+*/bin
+
 # Temp Directory#
 ######################################
 temp/*
