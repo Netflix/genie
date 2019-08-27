@@ -21,10 +21,13 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,7 +45,8 @@ import java.util.UUID;
  */
 @Slf4j
 abstract class AbstractSNSPublisher {
-    private static final String PUBLISH_METRIC_COUNTER_NAME_FORMAT = "genie.notifications.sns.publish.%s.counter";
+    private static final String PUBLISH_METRIC_COUNTER_NAME_FORMAT = "genie.notifications.sns.publish.counter";
+    private static final String EVENT_TYPE_METRIC_TAG_NAME = "type";
     private static final String EVENT_TYPE_KEY_NAME = "type";
     private static final String EVENT_ID_KEY_NAME = "id";
     private static final String EVENT_TIMESTAMP_KEY_NAME = "timestamp";
@@ -97,7 +101,7 @@ abstract class AbstractSNSPublisher {
         // Add event details
         eventMap.put(EVENT_DETAILS_KEY_NAME, eventDetailsMap);
 
-        Set<Tag> metricTags = MetricsUtils.newSuccessTagsSet();
+        final Set<Tag> metricTags = Sets.newHashSet(eventType.getTypeTag());
 
         try {
             // Serialize message
@@ -105,12 +109,13 @@ abstract class AbstractSNSPublisher {
             // Send message
             this.snsClient.publish(topic, serializedMessage);
             log.debug("Published SNS notification (type: {})", eventType.name());
+            metricTags.addAll(MetricsUtils.newSuccessTagsSet());
         } catch (JsonProcessingException | RuntimeException e) {
-            metricTags = MetricsUtils.newFailureTagsSetForException(e);
+            metricTags.addAll(MetricsUtils.newFailureTagsSetForException(e));
             log.error("Failed to publish SNS notification", e);
         } finally {
-            registry.counter(
-                String.format(PUBLISH_METRIC_COUNTER_NAME_FORMAT, eventType.name()),
+            this.registry.counter(
+                PUBLISH_METRIC_COUNTER_NAME_FORMAT,
                 metricTags
             ).increment();
         }
@@ -119,8 +124,11 @@ abstract class AbstractSNSPublisher {
     /**
      * Types of event.
      */
+    @Getter(AccessLevel.PROTECTED)
     protected enum EventType {
         JOB_STATUS_CHANGE,
-        JOB_FINISHED,
+        JOB_FINISHED;
+
+        private final Tag typeTag = Tag.of(EVENT_TYPE_METRIC_TAG_NAME, this.name());
     }
 }
