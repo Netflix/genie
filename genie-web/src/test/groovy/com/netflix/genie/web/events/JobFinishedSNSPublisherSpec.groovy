@@ -42,7 +42,6 @@ import spock.lang.Specification
 
 import java.time.Instant
 
-
 class JobFinishedSNSPublisherSpec extends Specification {
     Map<String, String> extraKeysMap
     String jobId
@@ -112,7 +111,6 @@ class JobFinishedSNSPublisherSpec extends Specification {
     }
 
     def "Publish event for job with none of the optional fields"() {
-
         Criterion criterion = new Criterion.Builder().withName("foo").build()
 
         def empty = Optional.empty()
@@ -143,15 +141,14 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsClient.publish(topicARN, _ as String) >> {
             args ->
                 Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
-                Assert.that(eventDetails.entrySet().size() == 39)
-                Assert.that(eventDetails.entrySet().stream().filter({entry -> entry.getValue() == null}).count() == 29)
+                Assert.that(eventDetails.entrySet().size() == 46)
+                Assert.that(eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 35)
         }
         1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter
         1 * counter.increment()
     }
 
     def "Publish event for job with all of the optional fields"() {
-
         Criterion criterion = new Criterion.Builder().withName("foo").build()
         JsonNode jobMetadata = mapper.readTree("{\"foo\": \"foo\"}")
         ApplicationMetadata applicationMetadata = Mock(ApplicationMetadata) {
@@ -229,8 +226,8 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsClient.publish(topicARN, _ as String) >> {
             args ->
                 Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
-                Assert.that(eventDetails.entrySet().size() == 39)
-                Assert.that(eventDetails.entrySet().stream().filter({entry -> entry.getValue() == null}).count() == 0)
+                Assert.that(eventDetails.entrySet().size() == 46)
+                Assert.that(eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 0)
         }
         1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter
         1 * counter.increment()
