@@ -94,6 +94,8 @@ class JobStateChangeSNSPublisherSpec extends Specification {
         setup:
         this.extraKeysMap.putAll([foo: "bar", bar: "foo"])
         String message = null
+        def tags = MetricsUtils.newSuccessTagsSet()
+        tags.add(AbstractSNSPublisher.EventType.JOB_STATUS_CHANGE.getTypeTag())
 
         when:
         this.publisher.onApplicationEvent(event)
@@ -111,8 +113,8 @@ class JobStateChangeSNSPublisherSpec extends Specification {
                 return Mock(PublishResult)
         }
         1 * registry.counter(
-            "genie.notifications.sns.publish.JOB_STATUS_CHANGE.counter",
-            MetricsUtils.newSuccessTagsSet()
+            "genie.notifications.sns.publish.counter",
+            tags
         ) >> counter
         1 * counter.increment()
 
@@ -144,10 +146,11 @@ class JobStateChangeSNSPublisherSpec extends Specification {
     def "Publish event exception"() {
         setup:
         Exception e = new AuthorizationErrorException("...")
+        def tags = MetricsUtils.newFailureTagsSetForException(e)
+        tags.add(AbstractSNSPublisher.EventType.JOB_STATUS_CHANGE.getTypeTag())
 
         when:
         this.publisher.onApplicationEvent(event)
-        print(MetricsUtils.newFailureTagsSetForException(e))
 
         then:
         1 * snsProperties.isEnabled() >> true
@@ -160,8 +163,8 @@ class JobStateChangeSNSPublisherSpec extends Specification {
             throw e
         }
         1 * registry.counter(
-            "genie.notifications.sns.publish.JOB_STATUS_CHANGE.counter",
-            MetricsUtils.newFailureTagsSetForException(e)
+            "genie.notifications.sns.publish.counter",
+            tags
         ) >> counter
         1 * counter.increment()
     }

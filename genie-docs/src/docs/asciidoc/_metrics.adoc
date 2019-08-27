@@ -1,13 +1,11 @@
 == Metrics
 
-The following is an extensive list of metrics (counters, timers, gauges, ...)
-published organically by Genie, in addition to metrics published by Spring, JVM
-and system metrics and statistics.
+The following is an extensive list of metrics (counters, timers, gauges, ...) published organically by Genie, in addition to metrics published by Spring, JVM and system metrics and statistics.
 
-Metrics are collected using http://micrometer.io/[Micrometer] which allows system admins to plugin a variety of backend
-collection systems (Atlas, Datadog, Graphite, Ganglia, etc). See http://micrometer.io/[website] for more details. Genie
-ships with no backend system compiled in. It will have to be added if one is desired otherwise metrics are just
-published within the local JVM and available on the Actuator `/metrics` endpoint.
+Metrics are collected using http://micrometer.io/[Micrometer] which allows system admins to plugin a variety of backend collection systems (Atlas, Datadog, Graphite, Ganglia, etc).
+See http://micrometer.io/[website] for more details.
+Genie ships with no backend system compiled in.
+It will have to be added if one is desired otherwise metrics are just published within the local JVM and available on the Actuator `/metrics` endpoint.
 
 [cols=">1m,<10,^1,^1m,^1m",options="header"]
 |===
@@ -361,6 +359,12 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |JobMonitoringCoordinator
 |-
 
+|genie.notifications.sns.publish.counter
+|Count the number of notification published to SNS
+|count
+|AbstractSNSPublisher
+|status, type
+
 |genie.tasks.clusterChecker.unhealtyHosts.gauge
 |Number of Genie nodes that the leader has currently marked unhealthy
 |Current amount
@@ -540,12 +544,6 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |count
 |UserMetricsTask
 |-
-
-|genie.notifications.sns.publish.<event-type>.counter
-|Count the number of notification published to SNS for the given event type
-|count
-|SNSNotificationsPublisher
-|status
 
 |===
 

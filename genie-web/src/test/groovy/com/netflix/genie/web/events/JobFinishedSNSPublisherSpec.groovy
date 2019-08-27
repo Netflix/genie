@@ -146,7 +146,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
                 Assert.that(eventDetails.entrySet().size() == 39)
                 Assert.that(eventDetails.entrySet().stream().filter({entry -> entry.getValue() == null}).count() == 29)
         }
-        1 * registry.counter("genie.notifications.sns.publish.JOB_FINISHED.counter", _) >> counter
+        1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter
         1 * counter.increment()
     }
 
@@ -232,7 +232,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
                 Assert.that(eventDetails.entrySet().size() == 39)
                 Assert.that(eventDetails.entrySet().stream().filter({entry -> entry.getValue() == null}).count() == 0)
         }
-        1 * registry.counter("genie.notifications.sns.publish.JOB_FINISHED.counter", _) >> counter
+        1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter
         1 * counter.increment()
     }
 }
