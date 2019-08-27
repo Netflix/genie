@@ -43,10 +43,10 @@ import java.util.UUID;
 @Slf4j
 abstract class AbstractSNSPublisher {
     private static final String PUBLISH_METRIC_COUNTER_NAME_FORMAT = "genie.notifications.sns.publish.%s.counter";
-    private static final String EVENT_TYPE_KEY_NAME = "eventType";
-    private static final String EVENT_ID_KEY_NAME = "eventId";
-    private static final String EVENT_TIMESTAMP_KEY_NAME = "eventTimestamp";
-    private static final String EVENT_DETAILS_KEY_NAME = "eventDetails";
+    private static final String EVENT_TYPE_KEY_NAME = "type";
+    private static final String EVENT_ID_KEY_NAME = "id";
+    private static final String EVENT_TIMESTAMP_KEY_NAME = "timestamp";
+    private static final String EVENT_DETAILS_KEY_NAME = "details";
 
     protected final SNSNotificationsProperties properties;
     protected final MeterRegistry registry;
@@ -91,7 +91,8 @@ abstract class AbstractSNSPublisher {
         // Add event type, timestamp, event id
         eventMap.put(EVENT_TYPE_KEY_NAME, eventType.name());
         eventMap.put(EVENT_ID_KEY_NAME, UUID.randomUUID().toString());
-        eventMap.put(EVENT_TIMESTAMP_KEY_NAME, Instant.now());
+        final Instant timestamp = Instant.now();
+        eventMap.put(EVENT_TIMESTAMP_KEY_NAME, timestamp.toEpochMilli());
 
         // Add event details
         eventMap.put(EVENT_DETAILS_KEY_NAME, eventDetailsMap);
