@@ -54,13 +54,16 @@ public class JobFinishedSNSPublisher
     private static final String JOB_DESCRIPTION_KEY_NAME = "jobDescription";
     private static final String JOB_METADATA_KEY_NAME = "jobMetadata";
     private static final String JOB_TAGS_KEY_NAME = "jobTags";
-    private static final String JOB_CREATED_KEY_NAME = "jobCreated";
+    private static final String JOB_CREATED_TIMESTAMP_KEY_NAME = "jobCreatedTimestamp";
+    private static final String JOB_CREATED_ISO_TIMESTAMP_KEY_NAME = "jobCreatedIsoTimestamp";
     private static final String JOB_STATUS_KEY_NAME = "jobStatus";
     private static final String JOB_COMMAND_CRITERION_KEY_NAME = "jobCommandCriterion";
     private static final String JOB_CLUSTER_CRITERIA_KEY_NAME = "jobClusterCriteria";
-    private static final String JOB_STARTED_KEY_NAME = "jobStarted";
+    private static final String JOB_STARTED_TIMESTAMP_KEY_NAME = "jobStartedTimestamp";
+    private static final String JOB_STARTED_ISO_TIMESTAMP_KEY_NAME = "jobStartedIsoTimestamp";
     private static final String JOB_GROUPING_KEY_NAME = "jobGrouping";
-    private static final String JOB_FINISHED_KEY_NAME = "jobFinished";
+    private static final String JOB_FINISHED_TIMESTAMP_KEY_NAME = "jobFinishedTimestamp";
+    private static final String JOB_FINISHED_ISO_TIMESTAMP_KEY_NAME = "jobFinishedIsoTimestamp";
     private static final String JOB_AGENT_VERSION_KEY_NAME = "jobAgentVersion";
     private static final String JOB_GROUPING_INSTANCE_KEY_NAME = "jobGroupingInstance";
     private static final String JOB_STATUS_MESSAGE_KEY_NAME = "jobStatusMessage";
@@ -76,15 +79,19 @@ public class JobFinishedSNSPublisher
     private static final String COMMAND_NAME_KEY_NAME = "commandName";
     private static final String COMMAND_VERSION_KEY_NAME = "commandVersion";
     private static final String COMMAND_DESCRIPTION_KEY_NAME = "commandDescription";
-    private static final String COMMAND_CREATED_KEY_NAME = "commandCreated";
-    private static final String COMMAND_UPDATED_KEY_NAME = "commandUpdated";
+    private static final String COMMAND_CREATED_TIMESTAMP_KEY_NAME = "commandCreatedTimestamp";
+    private static final String COMMAND_CREATED_ISO_TIMESTAMP_KEY_NAME = "commandCreatedIsoTimestamp";
+    private static final String COMMAND_UPDATED_TIMESTAMP_KEY_NAME = "commandUpdatedTimestamp";
+    private static final String COMMAND_UPDATED_ISO_TIMESTAMP_KEY_NAME = "commandUpdatedIsoTimestamp";
     private static final String COMMAND_EXECUTABLE_KEY_NAME = "commandExecutable";
     private static final String CLUSTER_ID_KEY_NAME = "clusterId";
     private static final String CLUSTER_NAME_KEY_NAME = "clusterName";
     private static final String CLUSTER_VERSION_KEY_NAME = "clusterVersion";
     private static final String CLUSTER_DESCRIPTION_KEY_NAME = "clusterDescription";
-    private static final String CLUSTER_CREATED_KEY_NAME = "clusterCreated";
-    private static final String CLUSTER_UPDATED_KEY_NAME = "clusterUpdated";
+    private static final String CLUSTER_CREATED_TIMESTAMP_KEY_NAME = "clusterCreatedTimestamp";
+    private static final String CLUSTER_CREATED_ISO_TIMESTAMP_KEY_NAME = "clusterCreatedIsoTimestamp";
+    private static final String CLUSTER_UPDATED_TIMESTAMP_KEY_NAME = "clusterUpdatedTimestamp";
+    private static final String CLUSTER_UPDATED_ISO_TIMESTAMP_KEY_NAME = "clusterUpdatedIsoTimestamp";
     private static final String APPLICATIONS_KEY_NAME = "applications";
 
     private final JobPersistenceService jobPersistenceService;
@@ -146,12 +153,25 @@ public class JobFinishedSNSPublisher
         eventDetailsMap.put(JOB_DESCRIPTION_KEY_NAME, job.getDescription().orElse(null));
         eventDetailsMap.put(JOB_METADATA_KEY_NAME, job.getMetadata().orElse(null));
         eventDetailsMap.put(JOB_TAGS_KEY_NAME, job.getTags());
-        eventDetailsMap.put(JOB_CREATED_KEY_NAME, job.getCreated());
+        eventDetailsMap.put(JOB_CREATED_TIMESTAMP_KEY_NAME, job.getCreated().toEpochMilli());
+        eventDetailsMap.put(JOB_CREATED_ISO_TIMESTAMP_KEY_NAME, job.getCreated());
         eventDetailsMap.put(JOB_STATUS_KEY_NAME, job.getStatus());
         eventDetailsMap.put(JOB_COMMAND_CRITERION_KEY_NAME, job.getCommandCriterion());
         eventDetailsMap.put(JOB_CLUSTER_CRITERIA_KEY_NAME, job.getClusterCriteria());
-        eventDetailsMap.put(JOB_STARTED_KEY_NAME, job.getStarted().orElse(null));
-        eventDetailsMap.put(JOB_FINISHED_KEY_NAME, job.getFinished().orElse(null));
+        eventDetailsMap.put(
+            JOB_STARTED_TIMESTAMP_KEY_NAME,
+            job.getStarted().isPresent()
+                ? job.getStarted().get().toEpochMilli()
+                : null
+        );
+        eventDetailsMap.put(JOB_STARTED_ISO_TIMESTAMP_KEY_NAME, job.getStarted().orElse(null));
+        eventDetailsMap.put(
+            JOB_FINISHED_TIMESTAMP_KEY_NAME,
+            job.getFinished().isPresent()
+                ? job.getFinished().get().toEpochMilli()
+                : null
+        );
+        eventDetailsMap.put(JOB_FINISHED_ISO_TIMESTAMP_KEY_NAME, job.getFinished().orElse(null));
         eventDetailsMap.put(JOB_GROUPING_KEY_NAME, job.getGrouping().orElse(null));
         eventDetailsMap.put(JOB_GROUPING_INSTANCE_KEY_NAME, job.getGroupingInstance().orElse(null));
         eventDetailsMap.put(JOB_STATUS_MESSAGE_KEY_NAME, job.getStatusMessage().orElse(null));
@@ -171,16 +191,20 @@ public class JobFinishedSNSPublisher
             eventDetailsMap.put(COMMAND_NAME_KEY_NAME, command.getMetadata().getName());
             eventDetailsMap.put(COMMAND_VERSION_KEY_NAME, command.getMetadata().getVersion());
             eventDetailsMap.put(COMMAND_DESCRIPTION_KEY_NAME, command.getMetadata().getDescription().orElse(null));
-            eventDetailsMap.put(COMMAND_CREATED_KEY_NAME, command.getCreated());
-            eventDetailsMap.put(COMMAND_UPDATED_KEY_NAME, command.getUpdated());
+            eventDetailsMap.put(COMMAND_CREATED_TIMESTAMP_KEY_NAME, command.getCreated().toEpochMilli());
+            eventDetailsMap.put(COMMAND_CREATED_ISO_TIMESTAMP_KEY_NAME, command.getCreated());
+            eventDetailsMap.put(COMMAND_UPDATED_TIMESTAMP_KEY_NAME, command.getUpdated().toEpochMilli());
+            eventDetailsMap.put(COMMAND_UPDATED_ISO_TIMESTAMP_KEY_NAME, command.getUpdated());
             eventDetailsMap.put(COMMAND_EXECUTABLE_KEY_NAME, command.getExecutable());
         } else {
             eventDetailsMap.put(COMMAND_ID_KEY_NAME, null);
             eventDetailsMap.put(COMMAND_NAME_KEY_NAME, null);
             eventDetailsMap.put(COMMAND_VERSION_KEY_NAME, null);
             eventDetailsMap.put(COMMAND_DESCRIPTION_KEY_NAME, null);
-            eventDetailsMap.put(COMMAND_CREATED_KEY_NAME, null);
-            eventDetailsMap.put(COMMAND_UPDATED_KEY_NAME, null);
+            eventDetailsMap.put(COMMAND_CREATED_TIMESTAMP_KEY_NAME, null);
+            eventDetailsMap.put(COMMAND_CREATED_ISO_TIMESTAMP_KEY_NAME, null);
+            eventDetailsMap.put(COMMAND_UPDATED_TIMESTAMP_KEY_NAME, null);
+            eventDetailsMap.put(COMMAND_UPDATED_ISO_TIMESTAMP_KEY_NAME, null);
             eventDetailsMap.put(COMMAND_EXECUTABLE_KEY_NAME, null);
         }
 
@@ -190,15 +214,19 @@ public class JobFinishedSNSPublisher
             eventDetailsMap.put(CLUSTER_NAME_KEY_NAME, cluster.getMetadata().getName());
             eventDetailsMap.put(CLUSTER_VERSION_KEY_NAME, cluster.getMetadata().getVersion());
             eventDetailsMap.put(CLUSTER_DESCRIPTION_KEY_NAME, cluster.getMetadata().getDescription().orElse(null));
-            eventDetailsMap.put(CLUSTER_CREATED_KEY_NAME, cluster.getCreated());
-            eventDetailsMap.put(CLUSTER_UPDATED_KEY_NAME, cluster.getUpdated());
+            eventDetailsMap.put(CLUSTER_CREATED_TIMESTAMP_KEY_NAME, cluster.getCreated().toEpochMilli());
+            eventDetailsMap.put(CLUSTER_CREATED_ISO_TIMESTAMP_KEY_NAME, cluster.getCreated());
+            eventDetailsMap.put(CLUSTER_UPDATED_TIMESTAMP_KEY_NAME, cluster.getUpdated().toEpochMilli());
+            eventDetailsMap.put(CLUSTER_UPDATED_ISO_TIMESTAMP_KEY_NAME, cluster.getUpdated());
         } else {
             eventDetailsMap.put(CLUSTER_ID_KEY_NAME, null);
             eventDetailsMap.put(CLUSTER_NAME_KEY_NAME, null);
             eventDetailsMap.put(CLUSTER_VERSION_KEY_NAME, null);
             eventDetailsMap.put(CLUSTER_DESCRIPTION_KEY_NAME, null);
-            eventDetailsMap.put(CLUSTER_CREATED_KEY_NAME, null);
-            eventDetailsMap.put(CLUSTER_UPDATED_KEY_NAME, null);
+            eventDetailsMap.put(CLUSTER_CREATED_TIMESTAMP_KEY_NAME, null);
+            eventDetailsMap.put(CLUSTER_CREATED_ISO_TIMESTAMP_KEY_NAME, null);
+            eventDetailsMap.put(CLUSTER_UPDATED_TIMESTAMP_KEY_NAME, null);
+            eventDetailsMap.put(CLUSTER_UPDATED_ISO_TIMESTAMP_KEY_NAME, null);
         }
 
         eventDetailsMap.put(

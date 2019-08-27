@@ -125,12 +125,15 @@ class JobStateChangeSNSPublisherSpec extends Specification {
             Map.class
         )
 
-        parsedMessage.size() == 6
+        parsedMessage.size() == 7
         parsedMessage.get("foo") as String == "bar"
         parsedMessage.get("bar") as String == "foo"
         parsedMessage.get("type") as String == "JOB_STATUS_CHANGE"
         parsedMessage.get("id") != null
         parsedMessage.get("timestamp") != null
+        parsedMessage.get("timestamp") instanceof Long
+        parsedMessage.get("isoTimestamp") != null
+        parsedMessage.get("isoTimestamp") instanceof String
         Map<String, String> eventDetails = parsedMessage.get("details") as Map<String, String>
         eventDetails != null
         eventDetails.get("jobId") == jobId

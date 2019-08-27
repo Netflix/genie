@@ -50,6 +50,7 @@ abstract class AbstractSNSPublisher {
     private static final String EVENT_TYPE_KEY_NAME = "type";
     private static final String EVENT_ID_KEY_NAME = "id";
     private static final String EVENT_TIMESTAMP_KEY_NAME = "timestamp";
+    private static final String EVENT_ISO_TIMESTAMP_KEY_NAME = "isoTimestamp";
     private static final String EVENT_DETAILS_KEY_NAME = "details";
 
     protected final SNSNotificationsProperties properties;
@@ -97,6 +98,7 @@ abstract class AbstractSNSPublisher {
         eventMap.put(EVENT_ID_KEY_NAME, UUID.randomUUID().toString());
         final Instant timestamp = Instant.now();
         eventMap.put(EVENT_TIMESTAMP_KEY_NAME, timestamp.toEpochMilli());
+        eventMap.put(EVENT_ISO_TIMESTAMP_KEY_NAME, timestamp);
 
         // Add event details
         eventMap.put(EVENT_DETAILS_KEY_NAME, eventDetailsMap);
