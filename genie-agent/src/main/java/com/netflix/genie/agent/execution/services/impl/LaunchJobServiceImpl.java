@@ -130,6 +130,7 @@ class LaunchJobServiceImpl implements LaunchJobService {
         }
 
         processBuilder.command(expandedCommandLine);
+        processBuilder.directory(jobDirectory);
 
         if (interactive) {
             processBuilder.inheritIO();
