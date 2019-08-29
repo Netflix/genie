@@ -281,6 +281,10 @@ configure(javaProjects) {
                 }
             }
 
+            if (System.env."TRAVIS" == "true") {
+                systemProperty "spring.profiles.include", "travisci"
+            }
+
             reports.html.setDestination(new File("${reporting.baseDir}/test/${task.name}"))
             jacocoTestReport.getExecutionData().plus(files("$buildDir/jacoco/${task.name}.exec"))
     }
