@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-08-27</span>
+<span id="revdate">2019-08-30</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4935,7 +4935,7 @@ attempt to assume this role on the host Genie is running on</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.file.cache.location</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Where to store cached files on local disk</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/cache" class="bare">file:///tmp/genie/cache</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/cache" class="bare">file://${java.io.tmpdir}genie/cache</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -4989,7 +4989,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.destination</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
 <code>genie.jobs.clusters.load-balancers.script.source</code>. The file will be given the same name.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/loadbalancers/script/destination/" class="bare">file://${java.io.tmpdir}genie/loadbalancers/script/destination/</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5009,7 +5009,7 @@ See also: <code>genie.jobs.clusters.load-balancers.script.destination</code></p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js" class="bare">file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5040,20 +5040,20 @@ forces a timeout</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.archives</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job archives should be stored. Scheme should be included. Created if doesn&#8217;t exist.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/archives/" class="bare">file:///tmp/genie/archives/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/archives/" class="bare">file://${java.io.tmpdir}genie/archives/</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.attachments</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
 doesn&#8217;t exist.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/attachments/" class="bare">file:///tmp/genie/attachments/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/attachments/" class="bare">file://${java.io.tmpdir}genie/attachments/</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.jobs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job working directories will be placed. Created by system if doesn&#8217;t exist.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/jobs/" class="bare">file:///tmp/genie/jobs/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/jobs/" class="bare">file://${java.io.tmpdir}genie/jobs/</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -6539,7 +6539,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-08-27 20:21:34 UTC
+Last updated 2019-08-30 03:38:37 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">

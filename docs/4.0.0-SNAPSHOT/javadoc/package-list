@@ -82,6 +82,7 @@ com.netflix.genie.web.jobs
 com.netflix.genie.web.jobs.workflow
 com.netflix.genie.web.jobs.workflow.impl
 com.netflix.genie.web.properties
+com.netflix.genie.web.properties.converters
 com.netflix.genie.web.resources.writers
 com.netflix.genie.web.services
 com.netflix.genie.web.services.impl
@@ -100,6 +101,7 @@ com.netflix.genie.web.spring.autoconfigure.data
 com.netflix.genie.web.spring.autoconfigure.events
 com.netflix.genie.web.spring.autoconfigure.health
 com.netflix.genie.web.spring.autoconfigure.jobs
+com.netflix.genie.web.spring.autoconfigure.properties.converters
 com.netflix.genie.web.spring.autoconfigure.services
 com.netflix.genie.web.spring.autoconfigure.tasks
 com.netflix.genie.web.spring.autoconfigure.tasks.leader
