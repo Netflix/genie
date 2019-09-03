@@ -73,7 +73,7 @@ public class JobServiceProtoConverter {
      * @return The request that should be sent to the server for a new Job Specification given the parameters
      * @throws GenieConversionException if conversion fails
      */
-    public ReserveJobIdRequest toProtoReserveJobIdRequest(
+    public ReserveJobIdRequest toReserveJobIdRequestProto(
         final AgentJobRequest jobRequest,
         final AgentClientMetadata agentClientMetadata
     ) throws GenieConversionException {
@@ -92,7 +92,7 @@ public class JobServiceProtoConverter {
      * @param id The job id to generate the request for
      * @return The request instance
      */
-    public JobSpecificationRequest toProtoJobSpecificationRequest(final String id) {
+    public JobSpecificationRequest toJobSpecificationRequestProto(final String id) {
         return JobSpecificationRequest.newBuilder().setId(id).build();
     }
 
@@ -103,7 +103,7 @@ public class JobServiceProtoConverter {
      * @return The job request
      * @throws GenieConversionException if conversion fails
      */
-    public JobRequest toJobRequestDTO(final ReserveJobIdRequest request) throws GenieConversionException {
+    public JobRequest toJobRequestDto(final ReserveJobIdRequest request) throws GenieConversionException {
         return this.toJobRequestDto(
             request.getMetadata(),
             request.getCriteria(),
@@ -119,7 +119,7 @@ public class JobServiceProtoConverter {
      * @return The request that should be sent to the server for a new Job Specification given the parameters
      * @throws GenieConversionException if conversion fails
      */
-    public DryRunJobSpecificationRequest toProtoDryRunJobSpecificationRequest(
+    public DryRunJobSpecificationRequest toDryRunJobSpecificationRequestProto(
         final AgentJobRequest jobRequest
     ) throws GenieConversionException {
         final DryRunJobSpecificationRequest.Builder builder = DryRunJobSpecificationRequest.newBuilder();
@@ -138,9 +138,7 @@ public class JobServiceProtoConverter {
      * @return The job request
      * @throws GenieConversionException if conversion fails
      */
-    public JobRequest toJobRequestDTO(
-        final DryRunJobSpecificationRequest request
-    ) throws GenieConversionException {
+    public JobRequest toJobRequestDto(final DryRunJobSpecificationRequest request) throws GenieConversionException {
         return toJobRequestDto(
             request.getMetadata(),
             request.getCriteria(),
@@ -155,7 +153,7 @@ public class JobServiceProtoConverter {
      * @param agentMetadata The metadata to convert
      * @return The immutable DTO representation
      */
-    public AgentClientMetadata toAgentClientMetadataDTO(final AgentMetadata agentMetadata) {
+    public AgentClientMetadata toAgentClientMetadataDto(final AgentMetadata agentMetadata) {
         return new AgentClientMetadata(
             agentMetadata.getAgentHostname(),
             agentMetadata.getAgentVersion(),
@@ -169,7 +167,7 @@ public class JobServiceProtoConverter {
      * @param jobSpecification The job specification to serialize
      * @return The response instance
      */
-    public JobSpecificationResponse toProtoJobSpecificationResponse(final JobSpecification jobSpecification) {
+    public JobSpecificationResponse toJobSpecificationResponseProto(final JobSpecification jobSpecification) {
         return JobSpecificationResponse
             .newBuilder()
             .setSpecification(this.toJobSpecificationProto(jobSpecification))
@@ -182,18 +180,18 @@ public class JobServiceProtoConverter {
      * @param protoSpec The protobuf specification message
      * @return A job specification DTO
      */
-    public JobSpecification toJobSpecificationDTO(
+    public JobSpecification toJobSpecificationDto(
         final com.netflix.genie.proto.JobSpecification protoSpec
     ) {
         return new JobSpecification(
             protoSpec.getCommandArgsList(),
-            toExecutionResourceDTO(protoSpec.getJob()),
-            toExecutionResourceDTO(protoSpec.getCluster()),
-            toExecutionResourceDTO(protoSpec.getCommand()),
+            toExecutionResourceDto(protoSpec.getJob()),
+            toExecutionResourceDto(protoSpec.getCluster()),
+            toExecutionResourceDto(protoSpec.getCommand()),
             protoSpec
                 .getApplicationsList()
                 .stream()
-                .map(this::toExecutionResourceDTO)
+                .map(this::toExecutionResourceDto)
                 .collect(Collectors.toList()),
             protoSpec.getEnvironmentVariablesMap(),
             protoSpec.getIsInteractive(),
@@ -239,7 +237,7 @@ public class JobServiceProtoConverter {
      * @param agentClientMetadata agent metadata
      * @return a ClaimJobRequest
      */
-    public ClaimJobRequest toProtoClaimJobRequest(
+    public ClaimJobRequest toClaimJobRequestProto(
         final String jobId,
         final AgentClientMetadata agentClientMetadata
     ) {
@@ -260,7 +258,7 @@ public class JobServiceProtoConverter {
      * @param message          an optional message to record with the state change
      * @return a ChangeJobStatusRequest
      */
-    public ChangeJobStatusRequest toProtoChangeJobStatusRequest(
+    public ChangeJobStatusRequest toChangeJobStatusRequestProto(
         final @NotBlank String jobId,
         final JobStatus currentJobStatus,
         final JobStatus newJobStatus,
@@ -281,7 +279,7 @@ public class JobServiceProtoConverter {
      * @return a {@link HandshakeRequest}
      * @throws GenieConversionException if the inputs are invalid
      */
-    public HandshakeRequest toHandshakeRequest(
+    public HandshakeRequest toHandshakeRequestProto(
         final AgentClientMetadata agentClientMetadata
     ) throws GenieConversionException {
         return HandshakeRequest.newBuilder()
@@ -328,7 +326,7 @@ public class JobServiceProtoConverter {
         return builder.build();
     }
 
-    private JobSpecification.ExecutionResource toExecutionResourceDTO(final ExecutionResource protoResource) {
+    private JobSpecification.ExecutionResource toExecutionResourceDto(final ExecutionResource protoResource) {
         return new JobSpecification.ExecutionResource(
             protoResource.getId(),
             new ExecutionEnvironment(
@@ -353,7 +351,7 @@ public class JobServiceProtoConverter {
         return builder.build();
     }
 
-    private Criterion toCriterionDTO(
+    private Criterion toCriterionDto(
         final com.netflix.genie.proto.Criterion protoCriterion
     ) throws GenieConversionException {
         try {
@@ -479,12 +477,12 @@ public class JobServiceProtoConverter {
                 = protoExecutionResourceCriteria.getClusterCriteriaList();
             final List<Criterion> clusterCriteria = Lists.newArrayListWithExpectedSize(protoCriteria.size());
             for (final com.netflix.genie.proto.Criterion protoCriterion : protoCriteria) {
-                clusterCriteria.add(toCriterionDTO(protoCriterion));
+                clusterCriteria.add(toCriterionDto(protoCriterion));
             }
 
             final ExecutionResourceCriteria executionResourceCriteria = new ExecutionResourceCriteria(
                 clusterCriteria,
-                toCriterionDTO(protoExecutionResourceCriteria.getCommandCriterion()),
+                toCriterionDto(protoExecutionResourceCriteria.getCommandCriterion()),
                 protoExecutionResourceCriteria.getRequestedApplicationIdOverridesList()
             );
 

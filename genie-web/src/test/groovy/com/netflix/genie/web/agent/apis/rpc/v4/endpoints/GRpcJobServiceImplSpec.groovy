@@ -87,7 +87,7 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.handshake(request, handshakeResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(agentMetadata) >> agentClientMetadata
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(agentMetadata) >> agentClientMetadata
         1 * agentJobService.handshake(agentClientMetadata)
         1 * handshakeResponseObserver.onNext(_ as HandshakeResponse) >> {
             args -> responseCapture = args[0]
@@ -111,7 +111,7 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.handshake(request, handshakeResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(agentMetadata) >> agentClientMetadata
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(agentMetadata) >> agentClientMetadata
         1 * agentJobService.handshake(agentClientMetadata) >> { throw e }
         1 * errorMessageComposer.toProtoHandshakeResponse(e) >> response
         1 * handshakeResponseObserver.onNext(_ as HandshakeResponse) >> {
@@ -130,8 +130,8 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.reserveJobId(request, reserveJobIdResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
-        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> agentClientMetadata
+        1 * jobServiceProtoConverter.toJobRequestDto(request) >> jobRequest
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
         1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> id
         1 * reserveJobIdResponseObserver.onNext(expectedResponse)
         1 * reserveJobIdResponseObserver.onCompleted()
@@ -148,8 +148,8 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.reserveJobId(request, reserveJobIdResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
-        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> agentClientMetadata
+        1 * jobServiceProtoConverter.toJobRequestDto(request) >> jobRequest
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
         1 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata) >> {
             throw e
         }
@@ -168,7 +168,7 @@ class GRpcJobServiceImplSpec extends Specification {
 
         then:
         1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
-        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> specificationResponse
+        1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> specificationResponse
         1 * jobSpecificationResponseObserver.onNext(specificationResponse)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
@@ -184,7 +184,7 @@ class GRpcJobServiceImplSpec extends Specification {
 
         then:
         1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
-        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> response
+        1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
@@ -214,7 +214,7 @@ class GRpcJobServiceImplSpec extends Specification {
 
         then:
         1 * agentJobService.getJobSpecification(id) >> jobSpecification
-        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> response
+        1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
@@ -244,9 +244,9 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.resolveJobSpecificationDryRun(request, jobSpecificationResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
+        1 * jobServiceProtoConverter.toJobRequestDto(request) >> jobRequest
         1 * agentJobService.dryRunJobSpecificationResolution(jobRequest) >> jobSpecification
-        1 * jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification) >> response
+        1 * jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
         1 * jobSpecificationResponseObserver.onCompleted()
     }
@@ -261,7 +261,7 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.resolveJobSpecificationDryRun(request, jobSpecificationResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toJobRequestDTO(request) >> jobRequest
+        1 * jobServiceProtoConverter.toJobRequestDto(request) >> jobRequest
         1 * agentJobService.dryRunJobSpecificationResolution(jobRequest) >> { throw exception }
         1 * errorMessageComposer.toProtoJobSpecificationResponse(exception) >> response
         1 * jobSpecificationResponseObserver.onNext(response)
@@ -277,7 +277,7 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.claimJob(request, claimJobResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> clientMetadata
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> clientMetadata
         1 * agentJobService.claimJob(id, clientMetadata)
         1 * claimJobResponseObserver.onNext(_ as ClaimJobResponse) >> {
             args ->
@@ -301,7 +301,7 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.claimJob(request, claimJobResponseObserver)
 
         then:
-        1 * jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata()) >> clientMetadata
+        1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> clientMetadata
         1 * agentJobService.claimJob(id, clientMetadata) >> { throw exception }
         1 * errorMessageComposer.toProtoClaimJobResponse(exception) >> response
         1 * claimJobResponseObserver.onNext(response)
