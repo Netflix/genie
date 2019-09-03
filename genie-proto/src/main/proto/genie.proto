@@ -99,11 +99,11 @@ message HandshakeRequest {
 
 message HandshakeResponse {
     enum Type {
-      UNKNOWN = 0;
-      ALLOWED = 1;
-      REJECTED = 2;
-      SERVER_ERROR = 3;
-      INVALID_REQUEST = 4;
+        UNKNOWN = 0;
+        ALLOWED = 1;
+        REJECTED = 2;
+        SERVER_ERROR = 3;
+        INVALID_REQUEST = 4;
     }
     Type type = 1;
     string message = 2;
