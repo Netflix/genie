@@ -83,7 +83,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
     ) {
         try {
             final AgentClientMetadata agentMetadata =
-                jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+                jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
 
             agentJobService.handshake(agentMetadata);
 
@@ -113,9 +113,9 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final StreamObserver<ReserveJobIdResponse> responseObserver
     ) {
         try {
-            final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDTO(request);
+            final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDto(request);
             final AgentClientMetadata agentClientMetadata
-                = jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+                = jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
             final String jobId = this.agentJobService.reserveJobId(jobRequest, agentClientMetadata);
             responseObserver.onNext(
                 ReserveJobIdResponse.newBuilder()
@@ -144,7 +144,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         try {
             final String id = request.getId();
             final JobSpecification jobSpec = this.agentJobService.resolveJobSpecification(id);
-            responseObserver.onNext(jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpec));
+            responseObserver.onNext(jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpec));
         } catch (final Exception e) {
             log.error(e.getMessage(), e);
             responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
@@ -167,7 +167,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         try {
             final String id = request.getId();
             final JobSpecification jobSpecification = this.agentJobService.getJobSpecification(id);
-            responseObserver.onNext(jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
+            responseObserver.onNext(jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification));
         } catch (final Exception e) {
             log.error(e.getMessage(), e);
             responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
@@ -189,9 +189,9 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
         try {
-            final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDTO(request);
+            final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDto(request);
             final JobSpecification jobSpecification = this.agentJobService.dryRunJobSpecificationResolution(jobRequest);
-            responseObserver.onNext(jobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
+            responseObserver.onNext(jobServiceProtoConverter.toJobSpecificationResponseProto(jobSpecification));
         } catch (final Exception e) {
             log.error("Error resolving job specification for request " + request, e);
             responseObserver.onNext(protoErrorComposer.toProtoJobSpecificationResponse(e));
@@ -213,7 +213,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         try {
             final String id = request.getId();
             final AgentClientMetadata clientMetadata
-                = jobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+                = jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());
             this.agentJobService.claimJob(id, clientMetadata);
             responseObserver.onNext(ClaimJobResponse.newBuilder().setSuccessful(true).build());
         } catch (final Exception e) {

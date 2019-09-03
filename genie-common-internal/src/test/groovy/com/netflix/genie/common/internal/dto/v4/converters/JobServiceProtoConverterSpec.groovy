@@ -216,23 +216,23 @@ class JobServiceProtoConverterSpec extends Specification {
         def reserveJobIdRequest = createReserveJobIdRequest()
 
         when:
-        def reserveJobIdRequest1 = converter.toProtoReserveJobIdRequest(jobRequest, agentClientMetadata)
-        def jobRequest1 = converter.toJobRequestDTO(reserveJobIdRequest1)
+        def reserveJobIdRequest1 = converter.toReserveJobIdRequestProto(jobRequest, agentClientMetadata)
+        def jobRequest1 = converter.toJobRequestDto(reserveJobIdRequest1)
 
         then:
         jobRequest1 == jobRequest
 
 
         when:
-        def jobRequest2 = converter.toJobRequestDTO(reserveJobIdRequest)
+        def jobRequest2 = converter.toJobRequestDto(reserveJobIdRequest)
 
         then:
         jobRequest2 == jobRequest
 
         when:
         def jobRequest3 = createJobRequest(id, null)
-        def reserveJobIdRequest3 = converter.toProtoReserveJobIdRequest(jobRequest3, agentClientMetadata)
-        def jobRequest4 = converter.toJobRequestDTO(reserveJobIdRequest3)
+        def reserveJobIdRequest3 = converter.toReserveJobIdRequestProto(jobRequest3, agentClientMetadata)
+        def jobRequest4 = converter.toJobRequestDto(reserveJobIdRequest3)
 
         then:
         jobRequest4 == jobRequest3
@@ -243,23 +243,23 @@ class JobServiceProtoConverterSpec extends Specification {
         def dryRunJobSpecificationRequest = createDryRunJobSpecificationRequest()
 
         when:
-        def dryRunJobSpecificationRequest1 = converter.toProtoDryRunJobSpecificationRequest(jobRequest)
-        def jobRequest1 = converter.toJobRequestDTO(dryRunJobSpecificationRequest1)
+        def dryRunJobSpecificationRequest1 = converter.toDryRunJobSpecificationRequestProto(jobRequest)
+        def jobRequest1 = converter.toJobRequestDto(dryRunJobSpecificationRequest1)
 
         then:
         jobRequest1 == jobRequest
 
 
         when:
-        def jobRequest2 = converter.toJobRequestDTO(dryRunJobSpecificationRequest)
+        def jobRequest2 = converter.toJobRequestDto(dryRunJobSpecificationRequest)
 
         then:
         jobRequest2 == jobRequest
 
         when:
         def jobRequest3 = createJobRequest(id, null)
-        def dryRunJobSpecificationRequest3 = converter.toProtoDryRunJobSpecificationRequest(jobRequest3)
-        def jobRequest4 = converter.toJobRequestDTO(dryRunJobSpecificationRequest3)
+        def dryRunJobSpecificationRequest3 = converter.toDryRunJobSpecificationRequestProto(jobRequest3)
+        def jobRequest4 = converter.toJobRequestDto(dryRunJobSpecificationRequest3)
 
         then:
         jobRequest3 == jobRequest4
@@ -268,7 +268,7 @@ class JobServiceProtoConverterSpec extends Specification {
 
     def "Can create a JobSpecificationRequest"() {
         when:
-        def request = converter.toProtoJobSpecificationRequest(id)
+        def request = converter.toJobSpecificationRequestProto(id)
 
         then:
         request.getId() == id
@@ -279,7 +279,7 @@ class JobServiceProtoConverterSpec extends Specification {
         def agentClientMetadata = createAgentClientMetadata()
 
         when:
-        def agentClientMetadata1 = converter.toAgentClientMetadataDTO(agentMetadata)
+        def agentClientMetadata1 = converter.toAgentClientMetadataDto(agentMetadata)
 
         then:
         agentClientMetadata1 == agentClientMetadata
@@ -311,7 +311,7 @@ class JobServiceProtoConverterSpec extends Specification {
 
         when:
         def specProto = converter.toJobSpecificationProto(originalSpecification)
-        def convertedSpecification = converter.toJobSpecificationDTO(specProto)
+        def convertedSpecification = converter.toJobSpecificationDto(specProto)
 
         then:
         originalSpecification == convertedSpecification
@@ -322,8 +322,8 @@ class JobServiceProtoConverterSpec extends Specification {
         def jobSpecificationResponse = createJobSpecificationResponse()
 
         when:
-        def jobSpecificationResponse2 = converter.toProtoJobSpecificationResponse(jobSpecification)
-        def jobSpecification2 = converter.toJobSpecificationDTO(jobSpecificationResponse2.getSpecification())
+        def jobSpecificationResponse2 = converter.toJobSpecificationResponseProto(jobSpecification)
+        def jobSpecification2 = converter.toJobSpecificationDto(jobSpecificationResponse2.getSpecification())
 
         then:
         jobSpecificationResponse2.hasSpecification()
@@ -331,7 +331,7 @@ class JobServiceProtoConverterSpec extends Specification {
         jobSpecification2 == jobSpecification
 
         when:
-        def jobSpecification3 = converter.toJobSpecificationDTO(jobSpecificationResponse.getSpecification())
+        def jobSpecification3 = converter.toJobSpecificationDto(jobSpecificationResponse.getSpecification())
 
         then:
         jobSpecification3 == jobSpecification
@@ -341,8 +341,8 @@ class JobServiceProtoConverterSpec extends Specification {
         def agentClientMetadata = createAgentClientMetadata()
 
         when:
-        def request = converter.toProtoClaimJobRequest(id, agentClientMetadata)
-        def agentClientMetadata2 = converter.toAgentClientMetadataDTO(request.getAgentMetadata())
+        def request = converter.toClaimJobRequestProto(id, agentClientMetadata)
+        def agentClientMetadata2 = converter.toAgentClientMetadataDto(request.getAgentMetadata())
 
         then:
         request.getId() == id
@@ -355,23 +355,23 @@ class JobServiceProtoConverterSpec extends Specification {
         def agentClientMetadata = createAgentClientMetadata()
 
         when:
-        def reserveJobIdRequest = converter.toProtoReserveJobIdRequest(jobRequest, agentClientMetadata)
-        def jobRequest1 = converter.toJobRequestDTO(reserveJobIdRequest)
+        def reserveJobIdRequest = converter.toReserveJobIdRequestProto(jobRequest, agentClientMetadata)
+        def jobRequest1 = converter.toJobRequestDto(reserveJobIdRequest)
 
         then:
         jobRequest1 == jobRequest
 
         when:
-        def resolveSpecDryRunRequest = converter.toProtoDryRunJobSpecificationRequest(jobRequest)
-        def jobRequest2 = converter.toJobRequestDTO(resolveSpecDryRunRequest)
+        def resolveSpecDryRunRequest = converter.toDryRunJobSpecificationRequestProto(jobRequest)
+        def jobRequest2 = converter.toJobRequestDto(resolveSpecDryRunRequest)
 
         then:
         jobRequest2 == jobRequest
 
         when:
         def jobRequest3 = createJobRequest(id, null)
-        def reserveJobIdRequest3 = converter.toProtoReserveJobIdRequest(jobRequest3, agentClientMetadata)
-        def jobRequest4 = converter.toJobRequestDTO(reserveJobIdRequest3)
+        def reserveJobIdRequest3 = converter.toReserveJobIdRequestProto(jobRequest3, agentClientMetadata)
+        def jobRequest4 = converter.toJobRequestDto(reserveJobIdRequest3)
 
         then:
         jobRequest4 == jobRequest3
@@ -383,7 +383,7 @@ class JobServiceProtoConverterSpec extends Specification {
         def message = "..."
 
         when:
-        def changeJobStatusRequest = converter.toProtoChangeJobStatusRequest(
+        def changeJobStatusRequest = converter.toChangeJobStatusRequestProto(
             id,
             currentStatus,
             newStatus,
@@ -401,7 +401,7 @@ class JobServiceProtoConverterSpec extends Specification {
         AgentClientMetadata agentClientMetadata = createAgentClientMetadata()
 
         when:
-        HandshakeRequest handshakeRequest = converter.toHandshakeRequest(agentClientMetadata)
+        HandshakeRequest handshakeRequest = converter.toHandshakeRequestProto(agentClientMetadata)
 
         then:
         AgentMetadata agentMetadata = handshakeRequest.getAgentMetadata()

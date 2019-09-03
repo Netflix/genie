@@ -91,7 +91,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
     ) throws HandshakeException {
         final HandshakeRequest request;
         try {
-            request = jobServiceProtoConverter.toHandshakeRequest(agentClientMetadata);
+            request = jobServiceProtoConverter.toHandshakeRequestProto(agentClientMetadata);
         } catch (final GenieConversionException e) {
             throw new HandshakeException("Failed to construct request from parameters", e);
         }
@@ -127,7 +127,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
     ) throws JobReservationException, JobIdUnavailableException {
         final ReserveJobIdRequest request;
         try {
-            request = jobServiceProtoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata);
+            request = jobServiceProtoConverter.toReserveJobIdRequestProto(agentJobRequest, agentClientMetadata);
         } catch (final GenieConversionException e) {
             throw new JobReservationException("Failed to construct request from parameters", e);
         }
@@ -160,7 +160,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
         @NotBlank final String id
     ) throws JobSpecificationResolutionException {
 
-        final JobSpecificationRequest request = jobServiceProtoConverter.toProtoJobSpecificationRequest(id);
+        final JobSpecificationRequest request = jobServiceProtoConverter.toJobSpecificationRequestProto(id);
 
         final JobSpecificationResponse response = handleResponseFuture(client.resolveJobSpecification(request));
 
@@ -173,7 +173,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
     @Override
     public JobSpecification getJobSpecification(@NotBlank final String id) throws JobSpecificationResolutionException {
 
-        final JobSpecificationRequest request = jobServiceProtoConverter.toProtoJobSpecificationRequest(id);
+        final JobSpecificationRequest request = jobServiceProtoConverter.toJobSpecificationRequestProto(id);
 
         final JobSpecificationResponse response = handleResponseFuture(this.client.getJobSpecification(request));
 
@@ -190,7 +190,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
 
         final DryRunJobSpecificationRequest request;
         try {
-            request = jobServiceProtoConverter.toProtoDryRunJobSpecificationRequest(jobRequest);
+            request = jobServiceProtoConverter.toDryRunJobSpecificationRequestProto(jobRequest);
         } catch (final GenieConversionException e) {
             throw new JobSpecificationResolutionException("Failed to construct request from parameters", e);
         }
@@ -210,7 +210,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
         @Valid final AgentClientMetadata agentClientMetadata
     ) throws JobReservationException {
 
-        final ClaimJobRequest request = jobServiceProtoConverter.toProtoClaimJobRequest(jobId, agentClientMetadata);
+        final ClaimJobRequest request = jobServiceProtoConverter.toClaimJobRequestProto(jobId, agentClientMetadata);
 
         final ClaimJobResponse response = handleResponseFuture(this.client.claimJob(request));
 
@@ -227,7 +227,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
         @Nullable final String message
     ) throws ChangeJobStatusException {
 
-        final ChangeJobStatusRequest request = this.jobServiceProtoConverter.toProtoChangeJobStatusRequest(
+        final ChangeJobStatusRequest request = this.jobServiceProtoConverter.toChangeJobStatusRequestProto(
             jobId,
             currentJobStatus,
             newJobStatus,
@@ -259,7 +259,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
                 throw new GenieRuntimeException("Unexpected server response " + response.toString());
         }
 
-        return jobServiceProtoConverter.toJobSpecificationDTO(response.getSpecification());
+        return jobServiceProtoConverter.toJobSpecificationDto(response.getSpecification());
     }
 
     private void throwForClaimJobError(final ClaimJobError error) throws JobReservationException {

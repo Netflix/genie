@@ -87,7 +87,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.handshake(agentClientMetadata)
 
         then:
-        1 * protoConverter.toHandshakeRequest(agentClientMetadata) >> request
+        1 * protoConverter.toHandshakeRequestProto(agentClientMetadata) >> request
     }
 
     def "Handshake -- rejected"() {
@@ -102,7 +102,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.handshake(agentClientMetadata)
 
         then:
-        1 * protoConverter.toHandshakeRequest(agentClientMetadata) >> request
+        1 * protoConverter.toHandshakeRequestProto(agentClientMetadata) >> request
         thrown(HandshakeException)
     }
 
@@ -119,7 +119,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.handshake(agentClientMetadata)
 
         then:
-        1 * protoConverter.toHandshakeRequest(agentClientMetadata) >> request
+        1 * protoConverter.toHandshakeRequestProto(agentClientMetadata) >> request
         Exception e = thrown(GenieRuntimeException)
         e.getMessage().contains(error.name())
 
@@ -141,7 +141,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         String reservedId = service.reserveJobId(agentJobRequest, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata) >> request
+        1 * protoConverter.toReserveJobIdRequestProto(agentJobRequest, agentClientMetadata) >> request
 
         expect:
         reservedId == id
@@ -162,7 +162,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.reserveJobId(agentJobRequest, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata) >> request
+        1 * protoConverter.toReserveJobIdRequestProto(agentJobRequest, agentClientMetadata) >> request
         thrown(expectedException)
 
         where:
@@ -183,7 +183,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.reserveJobId(agentJobRequest, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata) >> request
+        1 * protoConverter.toReserveJobIdRequestProto(agentJobRequest, agentClientMetadata) >> request
 
         thrown(GenieRuntimeException)
     }
@@ -198,7 +198,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.reserveJobId(agentJobRequest, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoReserveJobIdRequest(agentJobRequest, agentClientMetadata) >> { throw exception }
+        1 * protoConverter.toReserveJobIdRequestProto(agentJobRequest, agentClientMetadata) >> { throw exception }
 
         thrown(JobReservationException)
     }
@@ -213,8 +213,8 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         JobSpecification resolvedJobSpecification = service.resolveJobSpecification(id)
 
         then:
-        1 * protoConverter.toProtoJobSpecificationRequest(id) >> request
-        1 * protoConverter.toJobSpecificationDTO(jobSpecificationProto) >> jobSpecification
+        1 * protoConverter.toJobSpecificationRequestProto(id) >> request
+        1 * protoConverter.toJobSpecificationDto(jobSpecificationProto) >> jobSpecification
 
         expect:
         resolvedJobSpecification == jobSpecification
@@ -235,7 +235,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.resolveJobSpecification(id)
 
         then:
-        1 * protoConverter.toProtoJobSpecificationRequest(id) >> request
+        1 * protoConverter.toJobSpecificationRequestProto(id) >> request
 
         thrown(expectedException)
 
@@ -257,7 +257,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.resolveJobSpecification(id)
 
         then:
-        1 * protoConverter.toProtoJobSpecificationRequest(id) >> request
+        1 * protoConverter.toJobSpecificationRequestProto(id) >> request
 
         thrown(GenieRuntimeException)
     }
@@ -272,8 +272,8 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         JobSpecification resolvedJobSpecification = service.getJobSpecification(id)
 
         then:
-        1 * protoConverter.toProtoJobSpecificationRequest(id) >> request
-        1 * protoConverter.toJobSpecificationDTO(jobSpecificationProto) >> jobSpecification
+        1 * protoConverter.toJobSpecificationRequestProto(id) >> request
+        1 * protoConverter.toJobSpecificationDto(jobSpecificationProto) >> jobSpecification
 
         expect:
         resolvedJobSpecification == jobSpecification
@@ -294,7 +294,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.getJobSpecification(id)
 
         then:
-        1 * protoConverter.toProtoJobSpecificationRequest(id) >> request
+        1 * protoConverter.toJobSpecificationRequestProto(id) >> request
 
         thrown(expectedException)
 
@@ -316,7 +316,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.getJobSpecification(id)
 
         then:
-        1 * protoConverter.toProtoJobSpecificationRequest(id) >> request
+        1 * protoConverter.toJobSpecificationRequestProto(id) >> request
 
         thrown(GenieRuntimeException)
     }
@@ -332,8 +332,8 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         JobSpecification resolvedJobSpecification = service.resolveJobSpecificationDryRun(agentJobRequest)
 
         then:
-        1 * protoConverter.toProtoDryRunJobSpecificationRequest(agentJobRequest) >> request
-        1 * protoConverter.toJobSpecificationDTO(jobSpecificationProto) >> jobSpecification
+        1 * protoConverter.toDryRunJobSpecificationRequestProto(agentJobRequest) >> request
+        1 * protoConverter.toJobSpecificationDto(jobSpecificationProto) >> jobSpecification
 
         expect:
         resolvedJobSpecification == jobSpecification
@@ -349,7 +349,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.resolveJobSpecificationDryRun(agentJobRequest)
 
         then:
-        1 * protoConverter.toProtoDryRunJobSpecificationRequest(agentJobRequest) >> { throw exception }
+        1 * protoConverter.toDryRunJobSpecificationRequestProto(agentJobRequest) >> { throw exception }
 
         thrown(JobSpecificationResolutionException)
     }
@@ -370,7 +370,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.resolveJobSpecificationDryRun(agentJobRequest)
 
         then:
-        1 * protoConverter.toProtoDryRunJobSpecificationRequest(agentJobRequest) >> request
+        1 * protoConverter.toDryRunJobSpecificationRequestProto(agentJobRequest) >> request
 
         thrown(expectedException)
 
@@ -392,7 +392,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.resolveJobSpecificationDryRun(agentJobRequest)
 
         then:
-        1 * protoConverter.toProtoDryRunJobSpecificationRequest(agentJobRequest) >> request
+        1 * protoConverter.toDryRunJobSpecificationRequestProto(agentJobRequest) >> request
 
         thrown(GenieRuntimeException)
     }
@@ -406,7 +406,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.claimJob(id, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoClaimJobRequest(id, agentClientMetadata) >> request
+        1 * protoConverter.toClaimJobRequestProto(id, agentClientMetadata) >> request
     }
 
     @Unroll
@@ -425,7 +425,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.claimJob(id, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoClaimJobRequest(id, agentClientMetadata) >> request
+        1 * protoConverter.toClaimJobRequestProto(id, agentClientMetadata) >> request
 
         thrown(expectedException)
 
@@ -447,7 +447,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.claimJob(id, agentClientMetadata)
 
         then:
-        1 * protoConverter.toProtoClaimJobRequest(id, agentClientMetadata) >> request
+        1 * protoConverter.toClaimJobRequestProto(id, agentClientMetadata) >> request
 
         thrown(GenieRuntimeException)
     }
@@ -462,7 +462,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.changeJobStatus(id, currentStatus, newStatus, null)
 
         then:
-        1 * protoConverter.toProtoChangeJobStatusRequest(id, currentStatus, newStatus, _ as String) >> request
+        1 * protoConverter.toChangeJobStatusRequestProto(id, currentStatus, newStatus, _ as String) >> request
     }
 
     @Unroll
@@ -484,7 +484,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.changeJobStatus(id, currentStatus, newStatus, message)
 
         then:
-        1 * protoConverter.toProtoChangeJobStatusRequest(id, currentStatus, newStatus, message) >> request
+        1 * protoConverter.toChangeJobStatusRequestProto(id, currentStatus, newStatus, message) >> request
 
         thrown(expectedException)
 
@@ -507,7 +507,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         service.changeJobStatus(id, currentStatus, newStatus, message)
 
         then:
-        1 * protoConverter.toProtoChangeJobStatusRequest(id, currentStatus, newStatus, message) >> request
+        1 * protoConverter.toChangeJobStatusRequestProto(id, currentStatus, newStatus, message) >> request
 
         thrown(GenieRuntimeException)
     }
