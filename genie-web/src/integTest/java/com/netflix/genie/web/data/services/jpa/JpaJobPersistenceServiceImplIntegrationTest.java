@@ -578,6 +578,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .findByUniqueId(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
+        Assertions.assertThat(preClaimedJob.isApi()).isTrue();
         Assert.assertThat(preClaimedJob.getStatus(), Matchers.is(JobStatus.RESOLVED));
         Assert.assertTrue(preClaimedJob.isResolved());
         Assert.assertFalse(preClaimedJob.isClaimed());
@@ -621,7 +622,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final String jobId = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(
                 this.createJobRequest(null, UUID.randomUUID().toString()),
-                this.createJobRequestMetadata(true, NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+                this.createJobRequestMetadata(false, NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
             ).build()
         );
 
@@ -667,6 +668,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .findByUniqueId(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
+        Assertions.assertThat(jobEntity.isApi()).isFalse();
         Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.INIT));
         Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(initStatusMessage)));
         Assert.assertFalse(jobEntity.getStarted().isPresent());
