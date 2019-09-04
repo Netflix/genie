@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -937,6 +938,29 @@ public class JobEntityTest extends EntityTestBase {
             this.jobEntity.getRequestedArchiveLocationPrefix().get(),
             Matchers.is(requestedArchiveLocationPrefix)
         );
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetTimeoutUsed() {
+        Assertions.assertThat(this.jobEntity.getTimeoutUsed()).isEmpty();
+        this.jobEntity.setTimeoutUsed(null);
+        Assertions.assertThat(this.jobEntity.getTimeoutUsed()).isEmpty();
+        final int timeoutUsed = 324_323;
+        this.jobEntity.setTimeoutUsed(timeoutUsed);
+        Assertions.assertThat(this.jobEntity.getTimeoutUsed().orElse(timeoutUsed - 1)).isEqualTo(timeoutUsed);
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetApi() {
+        Assertions.assertThat(this.jobEntity.isApi()).isTrue();
+        this.jobEntity.setApi(false);
+        Assertions.assertThat(this.jobEntity.isApi()).isFalse();
     }
 
     /**
