@@ -74,7 +74,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * A row in jobs table.
+ * A row in the jobs table.
  *
  * @author amsharma
  * @author tgianos
@@ -121,7 +121,9 @@ import java.util.Set;
         "resolved",
         "claimed",
         "v4",
-        "requestedArchiveLocationPrefix"
+        "requestedArchiveLocationPrefix",
+        "timeoutUsed",
+        "api"
     },
     doNotUseGetters = true
 )
@@ -351,6 +353,14 @@ public class JobEntity extends BaseEntity implements
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "requested_agent_environment_ext", updatable = false, columnDefinition = "TEXT DEFAULT NULL")
     private String requestedAgentEnvironmentExt;
+
+    @Basic
+    @Column(name = "timeout_used")
+    private Integer timeoutUsed;
+
+    @Basic(optional = false)
+    @Column(name = "api", nullable = false)
+    private boolean api = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cluster_id")
@@ -1005,6 +1015,24 @@ public class JobEntity extends BaseEntity implements
         if (clusterCriteria != null) {
             this.clusterCriteria.addAll(clusterCriteria);
         }
+    }
+
+    /**
+     * Get the final resolved timeout duration if there was one for this job.
+     *
+     * @return The timeout value wrapped in an {@link Optional}
+     */
+    public Optional<Integer> getTimeoutUsed() {
+        return Optional.ofNullable(this.timeoutUsed);
+    }
+
+    /**
+     * Set the final resolved timeout duration for this job.
+     *
+     * @param timeoutUsed The timeout value (in seconds) after which this job should be killed by the system
+     */
+    public void setTimeoutUsed(@Nullable final Integer timeoutUsed) {
+        this.timeoutUsed = timeoutUsed;
     }
 
     /**
