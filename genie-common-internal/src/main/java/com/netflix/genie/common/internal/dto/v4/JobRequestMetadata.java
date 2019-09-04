@@ -60,8 +60,8 @@ public class JobRequestMetadata {
     ) {
         this.apiClientMetadata = apiClientMetadata;
         this.agentClientMetadata = agentClientMetadata;
-        this.numAttachments = numAttachments >= 0 ? numAttachments : 0;
-        this.totalSizeOfAttachments = totalSizeOfAttachments >= 0L ? totalSizeOfAttachments : 0L;
+        this.numAttachments = Math.max(numAttachments, 0);
+        this.totalSizeOfAttachments = Math.max(totalSizeOfAttachments, 0L);
     }
 
     /**
