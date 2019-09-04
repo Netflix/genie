@@ -45,19 +45,32 @@ public class JobRequestMetadata {
     private final long totalSizeOfAttachments;
 
     /**
-     * Constructor.
+     * Constructor. One of {@literal apiClientMetadata} or {@literal agentClientMetadata} is required. Both cannot be
+     * present.
      *
      * @param apiClientMetadata      The metadata about the client if this request was received via API
      * @param agentClientMetadata    The metadata about the client if this request was received from the Agent
      * @param numAttachments         The number of attachments that came with this job request
      * @param totalSizeOfAttachments The total size of the attachments that came with this job request
+     * @throws IllegalArgumentException If both {@literal apiClientMetadata} and {@literal agentClientMetadata} are
+     *                                  missing or both are present
      */
     public JobRequestMetadata(
         @Nullable final ApiClientMetadata apiClientMetadata,
         @Nullable final AgentClientMetadata agentClientMetadata,
         final int numAttachments,
         final long totalSizeOfAttachments
-    ) {
+    ) throws IllegalArgumentException {
+        if (apiClientMetadata == null && agentClientMetadata == null) {
+            throw new IllegalArgumentException(
+                "Both apiClientMetadata and agentClientMetadata are missing. One is required."
+            );
+        }
+        if (apiClientMetadata != null && agentClientMetadata != null) {
+            throw new IllegalArgumentException(
+                "Both apiClientMetadata and agentClientMetadata are present. Only one should be present"
+            );
+        }
         this.apiClientMetadata = apiClientMetadata;
         this.agentClientMetadata = agentClientMetadata;
         this.numAttachments = Math.max(numAttachments, 0);

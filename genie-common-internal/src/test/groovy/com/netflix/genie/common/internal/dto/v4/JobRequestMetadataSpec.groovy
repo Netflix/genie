@@ -35,31 +35,43 @@ class JobRequestMetadataSpec extends Specification {
         JobRequestMetadata jobRequestMetadata
 
         when:
-        jobRequestMetadata = new JobRequestMetadata(null, null, -1, -5L)
+        new JobRequestMetadata(null, null, -1, -5L)
 
         then:
-        !jobRequestMetadata.getApiClientMetadata().isPresent()
+        thrown(IllegalArgumentException)
+
+        when:
+        new JobRequestMetadata(apiClientMetadata, agentClientMetadata, -1, -5L)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        jobRequestMetadata = new JobRequestMetadata(apiClientMetadata, null, -1, -5L)
+
+        then:
+        jobRequestMetadata.getApiClientMetadata().orElse(null) == apiClientMetadata
         !jobRequestMetadata.getAgentClientMetadata().isPresent()
         jobRequestMetadata.getNumAttachments() == 0
         jobRequestMetadata.getTotalSizeOfAttachments() == 0
 
         when:
         jobRequestMetadata = new JobRequestMetadata(
-            apiClientMetadata,
+            null,
             agentClientMetadata,
             numAttachments,
             totalSizeOfAttachments
         )
 
         then:
-        jobRequestMetadata.getApiClientMetadata().orElse(null) == apiClientMetadata
+        !jobRequestMetadata.getApiClientMetadata().isPresent()
         jobRequestMetadata.getAgentClientMetadata().orElse(null) == agentClientMetadata
         jobRequestMetadata.getNumAttachments() == numAttachments
         jobRequestMetadata.getTotalSizeOfAttachments() == totalSizeOfAttachments
     }
 
     def "Test equals"() {
-        def base = createJobRequestMetadata()
+        def base = createJobRequestMetadata(true)
         Object comparable
 
         when:
@@ -75,7 +87,7 @@ class JobRequestMetadataSpec extends Specification {
         base != comparable
 
         when:
-        comparable = createJobRequestMetadata()
+        comparable = createJobRequestMetadata(false)
 
         then:
         base != comparable
@@ -87,12 +99,11 @@ class JobRequestMetadataSpec extends Specification {
         base != comparable
 
         when:
-        def apiClientMetadata = Mock(ApiClientMetadata)
         def agentClientMetadata = Mock(AgentClientMetadata)
         def numAttachments = RandomSuppliers.INT.get()
         def sizeAttachments = RandomSuppliers.LONG.get()
-        base = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
-        comparable = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+        base = new JobRequestMetadata(null, agentClientMetadata, numAttachments, sizeAttachments)
+        comparable = new JobRequestMetadata(null, agentClientMetadata, numAttachments, sizeAttachments)
 
         then:
         base == comparable
@@ -103,26 +114,25 @@ class JobRequestMetadataSpec extends Specification {
         JobRequestMetadata two
 
         when:
-        one = createJobRequestMetadata()
+        one = createJobRequestMetadata(true)
         two = one
 
         then:
         one.hashCode() == two.hashCode()
 
         when:
-        one = createJobRequestMetadata()
-        two = createJobRequestMetadata()
+        one = createJobRequestMetadata(true)
+        two = createJobRequestMetadata(false)
 
         then:
         one.hashCode() != two.hashCode()
 
         when:
         def apiClientMetadata = Mock(ApiClientMetadata)
-        def agentClientMetadata = Mock(AgentClientMetadata)
         def numAttachments = RandomSuppliers.INT.get()
         def sizeAttachments = RandomSuppliers.LONG.get()
-        one = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
-        two = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+        one = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
+        two = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
 
         then:
         one.hashCode() == two.hashCode()
@@ -133,37 +143,45 @@ class JobRequestMetadataSpec extends Specification {
         JobRequestMetadata two
 
         when:
-        one = createJobRequestMetadata()
+        one = createJobRequestMetadata(true)
         two = one
 
         then:
         one.toString() == two.toString()
 
         when:
-        one = createJobRequestMetadata()
-        two = createJobRequestMetadata()
+        one = createJobRequestMetadata(true)
+        two = createJobRequestMetadata(false)
 
         then:
         one.toString() != two.toString()
 
         when:
         def apiClientMetadata = Mock(ApiClientMetadata)
-        def agentClientMetadata = Mock(AgentClientMetadata)
         def numAttachments = RandomSuppliers.INT.get()
         def sizeAttachments = RandomSuppliers.LONG.get()
-        one = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
-        two = new JobRequestMetadata(apiClientMetadata, agentClientMetadata, numAttachments, sizeAttachments)
+        one = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
+        two = new JobRequestMetadata(apiClientMetadata, null, numAttachments, sizeAttachments)
 
         then:
         one.toString() == two.toString()
     }
 
-    JobRequestMetadata createJobRequestMetadata() {
-        return new JobRequestMetadata(
-            Mock(ApiClientMetadata),
-            Mock(AgentClientMetadata),
-            RandomSuppliers.INT.get(),
-            RandomSuppliers.LONG.get()
-        )
+    JobRequestMetadata createJobRequestMetadata(boolean api) {
+        if (api) {
+            return new JobRequestMetadata(
+                Mock(ApiClientMetadata),
+                null,
+                RandomSuppliers.INT.get(),
+                RandomSuppliers.LONG.get()
+            )
+        } else {
+            return new JobRequestMetadata(
+                null,
+                Mock(AgentClientMetadata),
+                RandomSuppliers.INT.get(),
+                RandomSuppliers.LONG.get()
+            )
+        }
     }
 }

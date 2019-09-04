@@ -365,6 +365,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final JobRequest jobRequest2 = this.createJobRequest(JOB_3_ID, UUID.randomUUID().toString());
         final JobRequest jobRequest3 = this.createJobRequest(job3Id, null);
         final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata(
+            true,
             NUM_ATTACHMENTS,
             TOTAL_SIZE_ATTACHMENTS
         );
@@ -423,6 +424,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             totalAttachmentSize += Files.size(attachment);
         }
         final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata(
+            true,
             numAttachments,
             totalAttachmentSize
         );
@@ -488,7 +490,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final String jobId = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(
                 this.createJobRequest(null, UUID.randomUUID().toString()),
-                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+                this.createJobRequestMetadata(false, NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
             ).build()
         );
 
@@ -515,7 +517,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final String jobId2 = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(
                 this.createJobRequest(null, null),
-                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+                this.createJobRequestMetadata(false, NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
             ).build()
         );
 
@@ -553,7 +555,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final String jobId = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(
                 this.createJobRequest(null, UUID.randomUUID().toString()),
-                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+                this.createJobRequestMetadata(true, NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
             ).build()
         );
 
@@ -619,7 +621,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final String jobId = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(
                 this.createJobRequest(null, UUID.randomUUID().toString()),
-                this.createJobRequestMetadata(NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
+                this.createJobRequestMetadata(true, NUM_ATTACHMENTS, TOTAL_SIZE_ATTACHMENTS)
             ).build()
         );
 
@@ -1120,25 +1122,39 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         );
     }
 
-    private JobRequestMetadata createJobRequestMetadata(final int numAttachments, final long totalAttachmentSize) {
-        final String agentVersion = UUID.randomUUID().toString();
-        final int agentPid = RandomSuppliers.INT.get();
-        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
-            UUID.randomUUID().toString(),
-            agentVersion,
-            agentPid
-        );
+    private JobRequestMetadata createJobRequestMetadata(
+        final boolean api,
+        final int numAttachments,
+        final long totalAttachmentSize
+    ) {
+        if (!api) {
+            final String agentVersion = UUID.randomUUID().toString();
+            final int agentPid = RandomSuppliers.INT.get();
+            final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
+                UUID.randomUUID().toString(),
+                agentVersion,
+                agentPid
+            );
 
-        final ApiClientMetadata apiClientMetadata = new ApiClientMetadata(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        );
-        return new JobRequestMetadata(
-            apiClientMetadata,
-            agentClientMetadata,
-            numAttachments,
-            totalAttachmentSize
-        );
+            return new JobRequestMetadata(
+                null,
+                agentClientMetadata,
+                numAttachments,
+                totalAttachmentSize
+            );
+        } else {
+            final ApiClientMetadata apiClientMetadata = new ApiClientMetadata(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+            );
+
+            return new JobRequestMetadata(
+                apiClientMetadata,
+                null,
+                numAttachments,
+                totalAttachmentSize
+            );
+        }
     }
 
     private JobSpecification createJobSpecification(
