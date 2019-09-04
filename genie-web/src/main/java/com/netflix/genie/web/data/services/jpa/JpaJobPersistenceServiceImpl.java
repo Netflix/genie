@@ -88,6 +88,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -248,7 +249,9 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         this.updateJobStatus(jobEntity, JobStatus.RUNNING, "Job is Running.");
         jobEntity.setProcessId(processId);
         jobEntity.setCheckDelay(checkDelay);
-        jobEntity.setTimeout(timeout);
+        jobEntity
+            .getStarted()
+            .ifPresent(started -> jobEntity.setTimeoutUsed(this.toTimeoutUsed(started, timeout)));
     }
 
     /**
@@ -788,7 +791,9 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setAgentHostname(jobExecution.getHostName());
         jobExecution.getProcessId().ifPresent(jobEntity::setProcessId);
         jobExecution.getCheckDelay().ifPresent(jobEntity::setCheckDelay);
-        jobExecution.getTimeout().ifPresent(jobEntity::setTimeout);
+        if (job.getStarted().isPresent() && jobExecution.getTimeout().isPresent()) {
+            jobEntity.setTimeoutUsed(this.toTimeoutUsed(job.getStarted().get(), jobExecution.getTimeout().get()));
+        }
         jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
 
         // Flag to signal to rest of system that this job is V3. Temporary until everything moved to v4
@@ -948,5 +953,9 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         job.setCluster(cluster);
         job.setCommand(command);
         job.setApplications(applications);
+    }
+
+    private int toTimeoutUsed(final Instant started, final Instant timeout) {
+        return (int) started.until(timeout, ChronoUnit.SECONDS);
     }
 }

@@ -47,6 +47,7 @@ import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -247,7 +248,11 @@ public final class JpaServiceUtils {
 
         jobExecutionProjection.getProcessId().ifPresent(builder::withProcessId);
         jobExecutionProjection.getCheckDelay().ifPresent(builder::withCheckDelay);
-        jobExecutionProjection.getTimeout().ifPresent(builder::withTimeout);
+        // Calculate the timeout as it used to be represented pre-timeoutUsed
+        if (jobExecutionProjection.getStarted().isPresent() && jobExecutionProjection.getTimeoutUsed().isPresent()) {
+            final Instant started = jobExecutionProjection.getStarted().get();
+            builder.withTimeout(started.plusSeconds(jobExecutionProjection.getTimeoutUsed().get()));
+        }
         jobExecutionProjection.getExitCode().ifPresent(builder::withExitCode);
         jobExecutionProjection.getMemoryUsed().ifPresent(builder::withMemory);
 

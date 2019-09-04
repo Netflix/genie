@@ -29,6 +29,13 @@ import java.util.Optional;
 public interface JobExecutionProjection extends AuditProjection, AgentHostnameProjection {
 
     /**
+     * Get when the job was started.
+     *
+     * @return The start date
+     */
+    Optional<Instant> getStarted();
+
+    /**
      * Get the unique identifier of this job execution.
      *
      * @return The unique id
@@ -64,9 +71,9 @@ public interface JobExecutionProjection extends AuditProjection, AgentHostnamePr
     Optional<Integer> getMemoryUsed();
 
     /**
-     * Get the date this job will be killed due to exceeding its set timeout duration.
+     * Get the final resolved timeout duration (in seconds) if there was one for this job.
      *
-     * @return The timeout date
+     * @return The timeout value wrapped in an {@link Optional}
      */
-    Optional<Instant> getTimeout();
+    Optional<Integer> getTimeoutUsed();
 }

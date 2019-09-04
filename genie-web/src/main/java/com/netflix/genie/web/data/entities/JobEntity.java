@@ -114,7 +114,6 @@ import java.util.Set;
         "checkDelay",
         "exitCode",
         "memoryUsed",
-        "timeout",
         "archiveLocation",
         "requestedJobDirectoryLocation",
         "jobDirectoryLocation",
@@ -305,10 +304,6 @@ public class JobEntity extends BaseEntity implements
     @Basic
     @Column(name = "memory_used")
     private Integer memoryUsed;
-
-    @Basic
-    @Column(name = "timeout")
-    private Instant timeout;
 
     @Basic
     @Column(name = "archive_location", length = 1024)
@@ -868,17 +863,17 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<Instant> getTimeout() {
-        return Optional.ofNullable(this.timeout);
+    public Optional<Integer> getTimeoutUsed() {
+        return Optional.ofNullable(this.timeoutUsed);
     }
 
     /**
-     * Set the date this job will be killed due to exceeding its set timeout duration.
+     * Set the final resolved timeout duration for this job.
      *
-     * @param timeout The new timeout
+     * @param timeoutUsed The timeout value (in seconds) after which this job should be killed by the system
      */
-    public void setTimeout(@Nullable final Instant timeout) {
-        this.timeout = timeout;
+    public void setTimeoutUsed(@Nullable final Integer timeoutUsed) {
+        this.timeoutUsed = timeoutUsed;
     }
 
     /**
@@ -1015,24 +1010,6 @@ public class JobEntity extends BaseEntity implements
         if (clusterCriteria != null) {
             this.clusterCriteria.addAll(clusterCriteria);
         }
-    }
-
-    /**
-     * Get the final resolved timeout duration if there was one for this job.
-     *
-     * @return The timeout value wrapped in an {@link Optional}
-     */
-    public Optional<Integer> getTimeoutUsed() {
-        return Optional.ofNullable(this.timeoutUsed);
-    }
-
-    /**
-     * Set the final resolved timeout duration for this job.
-     *
-     * @param timeoutUsed The timeout value (in seconds) after which this job should be killed by the system
-     */
-    public void setTimeoutUsed(@Nullable final Integer timeoutUsed) {
-        this.timeoutUsed = timeoutUsed;
     }
 
     /**
