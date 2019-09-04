@@ -50,6 +50,7 @@ class JobRequestMetadataSpec extends Specification {
         jobRequestMetadata = new JobRequestMetadata(apiClientMetadata, null, -1, -5L)
 
         then:
+        jobRequestMetadata.isApi()
         jobRequestMetadata.getApiClientMetadata().orElse(null) == apiClientMetadata
         !jobRequestMetadata.getAgentClientMetadata().isPresent()
         jobRequestMetadata.getNumAttachments() == 0
@@ -64,6 +65,7 @@ class JobRequestMetadataSpec extends Specification {
         )
 
         then:
+        !jobRequestMetadata.isApi()
         !jobRequestMetadata.getApiClientMetadata().isPresent()
         jobRequestMetadata.getAgentClientMetadata().orElse(null) == agentClientMetadata
         jobRequestMetadata.getNumAttachments() == numAttachments

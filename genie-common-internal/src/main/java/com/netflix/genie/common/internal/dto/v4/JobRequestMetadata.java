@@ -37,6 +37,7 @@ import java.util.Optional;
 @SuppressWarnings("checkstyle:finalclass")
 public class JobRequestMetadata {
 
+    private final boolean api;
     private final ApiClientMetadata apiClientMetadata;
     private final AgentClientMetadata agentClientMetadata;
     @Min(0)
@@ -71,6 +72,7 @@ public class JobRequestMetadata {
                 "Both apiClientMetadata and agentClientMetadata are present. Only one should be present"
             );
         }
+        this.api = apiClientMetadata != null;
         this.apiClientMetadata = apiClientMetadata;
         this.agentClientMetadata = agentClientMetadata;
         this.numAttachments = Math.max(numAttachments, 0);
