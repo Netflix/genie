@@ -42,6 +42,7 @@ import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.TagEntity;
+import com.netflix.genie.web.data.entities.projections.JobApiProjection;
 import com.netflix.genie.web.data.entities.projections.JobStatusProjection;
 import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
@@ -985,5 +986,20 @@ public class JpaJobPersistenceServiceImplTest {
     }
 
     // TODO: JpaJobPersistenceServiceImpl#getFinishedJob(String) for job in non-final state
-    // TODO: JpaJobPersistenceServiceImpl#getFinishedJob(String) successfull
+    // TODO: JpaJobPersistenceServiceImpl#getFinishedJob(String) successful
+
+    /**
+     * Make sure when a job can't be found when {@link JpaJobPersistenceServiceImpl#isApiJob(String)} is called that
+     * the expected exception is thrown.
+     *
+     * @throws GenieNotFoundException When the job can't be found with the given id
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testIsApiJobNoJob() throws GenieNotFoundException {
+        final String id = UUID.randomUUID().toString();
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id, JobApiProjection.class))
+            .thenReturn(Optional.empty());
+        this.jobPersistenceService.isApiJob(id);
+    }
 }

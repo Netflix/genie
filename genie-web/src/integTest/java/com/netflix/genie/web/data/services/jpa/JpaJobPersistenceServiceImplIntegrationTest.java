@@ -809,6 +809,19 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         Assert.assertThat(applications.get(1).getMetadata().getName(), Matchers.is("spark"));
     }
 
+    /**
+     * Make sure the {@link JpaJobPersistenceServiceImpl#isApiJob(String)} API behaves as expected against existing
+     * data.
+     *
+     * @throws GenieNotFoundException If a job with the given ID doesn't exist
+     */
+    @Test
+    public void canDetermineIfIsApiJob() throws GenieNotFoundException {
+        Assertions.assertThat(this.jobPersistenceService.isApiJob(JOB_1_ID)).isFalse();
+        Assertions.assertThat(this.jobPersistenceService.isApiJob(JOB_2_ID)).isTrue();
+        Assertions.assertThat(this.jobPersistenceService.isApiJob(JOB_3_ID)).isTrue();
+    }
+
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
         Assert.assertThat(
             savedJobRequest.getId().orElseThrow(IllegalArgumentException::new),

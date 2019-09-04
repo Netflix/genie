@@ -419,6 +419,7 @@
         requested_id="true"
         job_directory_location="/tmp/genie/jobs/1"
         resolved="true"
+        api="false"
     />
     <job_requested_applications
         job_id="1"
@@ -510,6 +511,7 @@
         requested_id="true"
         job_directory_location="/tmp/genie/jobs/2"
         resolved="true"
+        api="true"
     />
     <job_command_arguments
         job_id="2"
@@ -591,6 +593,7 @@
         requested_id="true"
         job_directory_location="/tmp/genie/jobs/3"
         resolved="true"
+        api="true"
     />
     <job_command_arguments
         job_id="3"
