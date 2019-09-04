@@ -151,7 +151,7 @@ public class AgentJobServiceImpl implements AgentJobService {
         final JobRequest jobRequest = this.jobPersistenceService
             .getJobRequest(id)
             .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
-        final ResolvedJob resolvedJob = this.jobResolverService.resolveJob(id, jobRequest);
+        final ResolvedJob resolvedJob = this.jobResolverService.resolveJob(id, jobRequest, false);
         this.jobPersistenceService.saveResolvedJob(id, resolvedJob);
         return resolvedJob.getJobSpecification();
     }
@@ -177,7 +177,8 @@ public class AgentJobServiceImpl implements AgentJobService {
     public JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest) {
         return this.jobResolverService.resolveJob(
             jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()),
-            jobRequest
+            jobRequest,
+            false
         ).getJobSpecification();
     }
 

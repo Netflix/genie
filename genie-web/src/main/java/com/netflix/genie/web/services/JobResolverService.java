@@ -54,8 +54,9 @@ public interface JobResolverService {
      *
      * @param id         The id of the job
      * @param jobRequest The job request containing all details a user wants to have for their job
+     * @param apiJob     {@literal true} if this job was submitted via the REST API. {@literal false} otherwise.
      * @return The completely resolved job information within a {@link ResolvedJob} instance
      */
     @Nonnull
-    ResolvedJob resolveJob(String id, @Valid JobRequest jobRequest);
+    ResolvedJob resolveJob(String id, @Valid JobRequest jobRequest, boolean apiJob);
 }

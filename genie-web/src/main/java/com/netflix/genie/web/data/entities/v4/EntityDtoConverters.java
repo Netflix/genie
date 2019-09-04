@@ -476,7 +476,7 @@ public final class EntityDtoConverters {
             jobSpecificationProjection.isInteractive(),
             jobDirectoryLocation,
             archiveLocation,
-            null
+            jobSpecificationProjection.getTimeoutUsed().orElse(null)
         );
     }
 

@@ -87,17 +87,17 @@ class JobResolverServiceImplSpec extends Specification {
         def expectedJobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
         expectedJobCommandArgs.addAll(commandArgs)
         Map<Cluster, String> clusterCommandMap = ImmutableMap.of(cluster1, commandId, cluster2, commandId)
-        def jobRequest = createJobRequest(commandArgs, requestedArchiveLocationPrefix, null)
-        def jobRequestNoArchivalData = createJobRequest(commandArgs, null, null)
+        def jobRequest = createJobRequest(commandArgs, requestedArchiveLocationPrefix, null, null)
+        def jobRequestNoArchivalData = createJobRequest(commandArgs, null, null, 5_002)
         def requestedMemory = 6_323
-        def savedJobRequest = createJobRequest(commandArgs, null, requestedMemory)
+        def savedJobRequest = createJobRequest(commandArgs, null, requestedMemory, null)
 
         def clusterService = Mock(ClusterPersistenceService)
         def loadBalancer = Mock(ClusterLoadBalancer)
         def applicationService = Mock(ApplicationPersistenceService)
         def commandService = Mock(CommandPersistenceService)
         def jobPersistenceService = Mock(JobPersistenceService)
-        def jobsProperties = JobsProperties.getJobsPropertiesDefaults();
+        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobResolverServiceImpl(
             applicationService,
             clusterService,
@@ -109,7 +109,7 @@ class JobResolverServiceImplSpec extends Specification {
         )
 
         when:
-        def resolvedJob = service.resolveJob(jobId, jobRequest)
+        def resolvedJob = service.resolveJob(jobId, jobRequest, true)
         def jobSpec = resolvedJob.getJobSpecification()
         def jobEnvironment = resolvedJob.getJobEnvironment()
 
@@ -134,9 +134,10 @@ class JobResolverServiceImplSpec extends Specification {
         jobEnvironment.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
         jobEnvironment.getCpu() == 1
         !jobEnvironment.getExt().isPresent()
+        jobSpec.getTimeout().orElse(null) == com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION
 
         when:
-        def resolvedJobNoArchivalData = service.resolveJob(jobId, jobRequestNoArchivalData)
+        def resolvedJobNoArchivalData = service.resolveJob(jobId, jobRequestNoArchivalData, true)
         def jobSpecNoArchivalData = resolvedJobNoArchivalData.getJobSpecification()
         def jobEnvironmentNoArchivalData = resolvedJobNoArchivalData.getJobEnvironment()
 
@@ -166,6 +167,7 @@ class JobResolverServiceImplSpec extends Specification {
         jobEnvironmentNoArchivalData.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
         jobEnvironmentNoArchivalData.getCpu() == 1
         !jobEnvironmentNoArchivalData.getExt().isPresent()
+        jobSpecNoArchivalData.getTimeout().orElse(null) == 5_002
 
         when: "We try to resolve a saved job"
         def resolvedSavedJobData = service.resolveJob(jobId)
@@ -174,6 +176,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "the resolution is saved"
         1 * jobPersistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
+        1 * jobPersistenceService.isApiJob(jobId) >> false
         1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(savedJobRequest)
         1 * clusterService.findClustersAndCommandsForCriteria(
             savedJobRequest.getCriteria().getClusterCriteria(),
@@ -200,6 +203,7 @@ class JobResolverServiceImplSpec extends Specification {
         jobEnvironmentSavedData.getMemory() == requestedMemory
         jobEnvironmentSavedData.getCpu() == 1
         !jobEnvironmentSavedData.getExt().isPresent()
+        !jobSpecSavedData.getTimeout().isPresent()
     }
 
     def "Can convert tags to string"() {
@@ -520,7 +524,8 @@ class JobResolverServiceImplSpec extends Specification {
     private static JobRequest createJobRequest(
         List<String> commandArgs,
         @Nullable String requestedArchiveLocationPrefix,
-        @Nullable Integer requestedMemory
+        @Nullable Integer requestedMemory,
+        @Nullable Integer requestedTimeout
     ) {
         def clusterCriteria = Lists.newArrayList(
             new Criterion
@@ -542,7 +547,9 @@ class JobResolverServiceImplSpec extends Specification {
             requestedMemory == null
                 ? null
                 : new JobEnvironmentRequest.Builder().withRequestedJobMemory(requestedMemory).build(),
-            new AgentConfigRequest.Builder().build(),
+            requestedTimeout == null
+                ? null
+                : new AgentConfigRequest.Builder().withTimeoutRequested(requestedTimeout).build(),
             requestedArchiveLocationPrefix == null
                 ? null
                 : new JobArchivalDataRequest.Builder()

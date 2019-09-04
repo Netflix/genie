@@ -195,7 +195,10 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .getJobRequest(id)
                 .orElseThrow(() -> new GenieJobNotFoundException("No job with id " + id + " exists."));
 
-            final ResolvedJob resolvedJob = this.resolve(id, jobRequest);
+            // Possible improvement to combine this query with a few others to save DB trips but for now...
+            final boolean apiJob = this.jobPersistenceService.isApiJob(id);
+
+            final ResolvedJob resolvedJob = this.resolve(id, jobRequest, apiJob);
             this.jobPersistenceService.saveResolvedJob(id, resolvedJob);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
@@ -220,7 +223,11 @@ public class JobResolverServiceImpl implements JobResolverService {
      */
     @Override
     @Nonnull
-    public ResolvedJob resolveJob(final String id, @Valid final JobRequest jobRequest) {
+    public ResolvedJob resolveJob(
+        final String id,
+        @Valid final JobRequest jobRequest,
+        final boolean apiJob
+    ) {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet(NOT_SAVED_TAG);
         try {
@@ -230,7 +237,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 jobRequest
             );
 
-            final ResolvedJob resolvedJob = this.resolve(id, jobRequest);
+            final ResolvedJob resolvedJob = this.resolve(id, jobRequest, apiJob);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
         } catch (final Throwable t) {
@@ -243,7 +250,11 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private ResolvedJob resolve(final String id, final JobRequest jobRequest) throws GenieException {
+    private ResolvedJob resolve(
+        final String id,
+        final JobRequest jobRequest,
+        final boolean apiJob
+    ) throws GenieException {
         final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
             jobRequest.getCriteria().getClusterCriteria(),
             jobRequest.getCriteria().getCommandCriterion()
@@ -267,6 +278,16 @@ public class JobResolverServiceImpl implements JobResolverService {
 
         final Map<String, String> environmentVariables
             = this.generateEnvironmentVariables(id, jobRequest, cluster, command, jobMemory);
+
+        final Integer timeout;
+        if (jobRequest.getRequestedAgentConfig().getTimeoutRequested().isPresent()) {
+            timeout = jobRequest.getRequestedAgentConfig().getTimeoutRequested().get();
+        } else if (apiJob) {
+            // For backwards V3 compatibility
+            timeout = com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION;
+        } else {
+            timeout = null;
+        }
 
         final JobSpecification jobSpecification = new JobSpecification(
             commandArgs,
@@ -292,7 +313,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     .orElse(this.defaultArchiveLocation),
                 id
             ),
-            null
+            timeout
         );
 
         final JobEnvironment jobEnvironment = new JobEnvironment
