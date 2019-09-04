@@ -773,6 +773,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobMetadata.getTotalSizeOfAttachments().ifPresent(jobEntity::setTotalSizeOfAttachments);
         jobMetadata.getStdErrSize().ifPresent(jobEntity::setStdErrSize);
         jobMetadata.getStdOutSize().ifPresent(jobEntity::setStdOutSize);
+        // For V3 (which this method supports) it's always API
+        jobEntity.setApi(true);
 
         // Fields a user cares about (job dto)
 
@@ -903,6 +905,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final JobEntity jobEntity,
         final JobRequestMetadata jobRequestMetadata
     ) {
+        jobEntity.setApi(jobRequestMetadata.isApi());
         jobEntity.setNumAttachments(jobRequestMetadata.getNumAttachments());
         jobEntity.setTotalSizeOfAttachments(jobRequestMetadata.getTotalSizeOfAttachments());
         jobRequestMetadata.getApiClientMetadata().ifPresent(
