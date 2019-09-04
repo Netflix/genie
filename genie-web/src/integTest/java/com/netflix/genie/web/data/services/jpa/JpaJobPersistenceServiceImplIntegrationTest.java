@@ -501,7 +501,9 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final JobSpecification jobSpecification = this.createJobSpecification(
             jobId,
-            jobRequest, UUID.randomUUID().toString()
+            jobRequest,
+            UUID.randomUUID().toString(),
+            null
         );
 
         final ResolvedJob resolvedJob = new ResolvedJob(
@@ -526,7 +528,12 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .getJobRequest(jobId2)
             .orElseThrow(IllegalArgumentException::new);
 
-        final JobSpecification jobSpecification2 = this.createJobSpecification(jobId2, jobRequest2, null);
+        final JobSpecification jobSpecification2 = this.createJobSpecification(
+            jobId2,
+            jobRequest2,
+            null,
+            10_358
+        );
 
         final ResolvedJob resolvedJob1 = new ResolvedJob(
             jobSpecification2,
@@ -567,7 +574,9 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final JobSpecification jobSpecification = this.createJobSpecification(
             jobId,
             jobRequest,
-            UUID.randomUUID().toString());
+            UUID.randomUUID().toString(),
+            null
+        );
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
@@ -634,7 +643,9 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final JobSpecification jobSpecification = this.createJobSpecification(
             jobId,
             jobRequest,
-            UUID.randomUUID().toString());
+            UUID.randomUUID().toString(),
+            null
+        );
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
@@ -1176,7 +1187,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     private JobSpecification createJobSpecification(
         final String jobId,
         final JobRequest jobRequest,
-        @Nullable final String archiveLocation
+        @Nullable final String archiveLocation,
+        @Nullable final Integer timeout
     ) throws GenieException {
         final String clusterId = "cluster1";
         final String commandId = "command1";
@@ -1228,7 +1240,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             jobRequest.getRequestedAgentConfig().isInteractive(),
             jobDirectoryLocation,
             ARCHIVE_LOCATION,
-            null
+            timeout
         );
     }
 }

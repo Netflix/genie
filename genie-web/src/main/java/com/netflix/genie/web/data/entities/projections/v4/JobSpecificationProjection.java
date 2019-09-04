@@ -116,4 +116,11 @@ public interface JobSpecificationProjection extends UniqueIdProjection, JobArchi
      * @return True if the job specification has been resolved
      */
     boolean isResolved();
+
+    /**
+     * Get the final resolved timeout duration (in seconds) if there was one for this job.
+     *
+     * @return The timeout value wrapped in an {@link Optional}
+     */
+    Optional<Integer> getTimeoutUsed();
 }

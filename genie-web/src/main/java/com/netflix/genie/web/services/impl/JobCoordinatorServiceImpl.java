@@ -193,7 +193,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             try {
                 jobSpecification = this.jobResolverService.resolveJob(
                     jobId,
-                    DtoConverters.toV4JobRequest(jobRequest)
+                    DtoConverters.toV4JobRequest(jobRequest),
+                    true
                 ).getJobSpecification();
             } catch (final RuntimeException re) {
                 //TODO: Here for now as we figure out what to do with exceptions for JobResolverServiceImpl

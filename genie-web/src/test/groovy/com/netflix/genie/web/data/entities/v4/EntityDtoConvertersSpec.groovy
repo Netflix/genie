@@ -649,6 +649,7 @@ class EntityDtoConvertersSpec extends Specification {
             1 * getSetupFile() >> Optional.ofNullable(new FileEntity(application1SetupFile))
         }
         def applications = Lists.newArrayList(application0Entity, application1Entity)
+        def timeout = 242_383
 
         def jobSpecificationProjection = Mock(JobSpecificationProjection)
 
@@ -699,6 +700,7 @@ class EntityDtoConvertersSpec extends Specification {
             .toSet()
         1 * jobSpecificationProjection.getSetupFile() >> Optional.ofNullable(jobSetupFile)
         1 * jobSpecificationProjection.getEnvironmentVariables() >> environmentVariables
+        1 * jobSpecificationProjection.getTimeoutUsed() >> Optional.ofNullable(timeout)
         jobSpecification.isInteractive()
         jobSpecification.getCommandArgs() == executable + commandArgs
         jobSpecification.getEnvironmentVariables() == environmentVariables
@@ -745,6 +747,7 @@ class EntityDtoConvertersSpec extends Specification {
                 )
             )
         )
+        jobSpecification.getTimeout().orElse(null) == timeout
     }
 
     def "Invalid Job Specification throws exceptions"() {

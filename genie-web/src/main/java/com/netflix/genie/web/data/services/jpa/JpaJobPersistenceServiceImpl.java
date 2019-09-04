@@ -458,6 +458,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             entity.setEnvironmentVariables(jobSpecification.getEnvironmentVariables());
             entity.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
             jobSpecification.getArchiveLocation().ifPresent(entity::setArchiveLocation);
+            jobSpecification.getTimeout().ifPresent(entity::setTimeoutUsed);
 
             final JobEnvironment jobEnvironment = resolvedJob.getJobEnvironment();
             entity.setMemoryUsed(jobEnvironment.getMemory());
