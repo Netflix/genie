@@ -312,4 +312,13 @@ public interface JobPersistenceService {
     FinishedJob getFinishedJob(
         @NotBlank(message = "Job id is missing and is required") String id
     ) throws GenieNotFoundException, GenieInvalidStatusException;
+
+    /**
+     * Get whether the job with the given ID was submitted via the REST API or other mechanism.
+     *
+     * @param id The id of the job. Not blank.
+     * @return {@literal true} if the job was submitted via the API. {@literal false} otherwise
+     * @throws GenieNotFoundException If no job with {@literal id} exists
+     */
+    boolean isApiJob(@NotBlank(message = "Job id is missing and is required") String id) throws GenieNotFoundException;
 }

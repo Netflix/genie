@@ -20,6 +20,7 @@ package com.netflix.genie.web.data.entities;
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.entities.listeners.JobEntityListener;
+import com.netflix.genie.web.data.entities.projections.JobApiProjection;
 import com.netflix.genie.web.data.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.data.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.data.entities.projections.JobClusterProjection;
@@ -147,7 +148,8 @@ public class JobEntity extends BaseEntity implements
     V4JobRequestProjection,
     JobSpecificationProjection,
     JobArchiveLocationProjection,
-    IsV4JobProjection {
+    IsV4JobProjection,
+    JobApiProjection {
 
     private static final long serialVersionUID = 2849367731657512224L;
 

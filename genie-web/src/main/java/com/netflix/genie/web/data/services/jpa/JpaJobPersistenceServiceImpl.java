@@ -55,6 +55,7 @@ import com.netflix.genie.web.data.entities.CriterionEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.projections.IdProjection;
+import com.netflix.genie.web.data.entities.projections.JobApiProjection;
 import com.netflix.genie.web.data.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.data.entities.projections.JobStatusProjection;
 import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
@@ -673,6 +674,20 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return this.jobRepository.findByUniqueId(id, FinishedJobProjection.class)
             .map(EntityDtoConverters::toFinishedJobDto)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists."));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isApiJob(
+        @NotBlank(message = "Job id is missing and is required") final String id
+    ) throws GenieNotFoundException {
+        return this.jobRepository
+            .findByUniqueId(id, JobApiProjection.class)
+            .map(JobApiProjection::isApi)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists"));
     }
 
     private void updateJobStatus(
