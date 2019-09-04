@@ -21,6 +21,7 @@ import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import com.netflix.genie.agent.execution.services.JobProcessManager;
+import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
@@ -111,5 +112,20 @@ public class ServicesAutoConfiguration {
     @ConditionalOnMissingBean(JobProcessManager.class)
     public JobProcessManager jobProcessManager() {
         return new JobProcessManagerImpl();
+    }
+
+    /**
+     * Provide a lazy {@link JobSetupService} bean if one hasn't already been defined.
+     *
+     * @param downloadService the download service
+     * @return A {@link JobSetupServiceImpl} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(JobSetupService.class)
+    public JobSetupService jobSetupService(
+        final DownloadService downloadService
+    ) {
+        return new JobSetupServiceImpl(downloadService);
     }
 }
