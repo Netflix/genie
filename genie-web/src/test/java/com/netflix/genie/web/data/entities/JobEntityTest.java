@@ -402,17 +402,6 @@ public class JobEntityTest extends EntityTestBase {
     }
 
     /**
-     * Make sure setting timeout works.
-     */
-    @Test
-    public void canSetTimeout() {
-        Assert.assertFalse(this.jobEntity.getTimeout().isPresent());
-        final Instant timeout = Instant.now();
-        this.jobEntity.setTimeout(timeout);
-        Assert.assertThat(this.jobEntity.getTimeout().orElseGet(RandomSuppliers.INSTANT), Matchers.is(timeout));
-    }
-
-    /**
      * Make sure setting memory used works.
      */
     @Test

@@ -332,8 +332,10 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setCheckDelay(checkDelay)
         def exitCode = 2084390
         entity.setExitCode(exitCode)
-        def timeout = Instant.now()
-        entity.setTimeout(timeout)
+        def started = Instant.now()
+        def timeout = started.plusSeconds(50L)
+        entity.setStarted(started)
+        entity.setTimeoutUsed(50)
         def memory = 10_265
         entity.setMemoryUsed(memory)
 

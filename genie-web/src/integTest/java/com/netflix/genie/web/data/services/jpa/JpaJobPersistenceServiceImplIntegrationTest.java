@@ -86,6 +86,7 @@ import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -154,19 +155,19 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     private static final long STD_ERR_SIZE = 98025245L;
     private static final long STD_OUT_SIZE = 78723423L;
 
-    // Job Execution fields
-    private static final String HOSTNAME = UUID.randomUUID().toString();
-    private static final int PROCESS_ID = 3203;
-    private static final long CHECK_DELAY = 8728L;
-    private static final Instant TIMEOUT = Instant.now();
-    private static final int MEMORY = 2048;
-
     // Job fields
     private static final String ARCHIVE_LOCATION = UUID.randomUUID().toString();
     private static final Instant FINISHED = Instant.now();
     private static final Instant STARTED = Instant.now();
     private static final JobStatus STATUS = JobStatus.RUNNING;
     private static final String STATUS_MSG = UUID.randomUUID().toString();
+
+    // Job Execution fields
+    private static final String HOSTNAME = UUID.randomUUID().toString();
+    private static final int PROCESS_ID = 3203;
+    private static final long CHECK_DELAY = 8728L;
+    private static final Instant TIMEOUT = STARTED.plus(50L, ChronoUnit.SECONDS);
+    private static final int MEMORY = 2048;
 
     /**
      * Creates a temporary folder to use for these tests that is cleaned up after tests are run.

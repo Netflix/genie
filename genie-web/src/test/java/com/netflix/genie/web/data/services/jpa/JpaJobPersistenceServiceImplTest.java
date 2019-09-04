@@ -62,6 +62,7 @@ import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -504,12 +505,16 @@ public class JpaJobPersistenceServiceImplTest {
         final String id = UUID.randomUUID().toString();
         final int processId = 28042;
         final long checkDelay = 280234L;
-        final Instant timeout = Instant.now();
+        final Instant started = Instant.now();
+        final Instant timeout = Instant.now().plus(50L, ChronoUnit.MINUTES);
+        final int timeoutUsed = (int) started.until(timeout, ChronoUnit.SECONDS);
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT);
         Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.of(jobEntity));
+        Mockito.when(jobEntity.getStarted()).thenReturn(Optional.of(started));
+
         this.jobPersistenceService.setJobRunningInformation(id, processId, checkDelay, timeout);
-        Mockito.verify(jobEntity, Mockito.times(1)).setTimeout(timeout);
+        Mockito.verify(jobEntity, Mockito.times(1)).setTimeoutUsed(timeoutUsed);
         Mockito.verify(jobEntity, Mockito.times(1)).setProcessId(processId);
         Mockito.verify(jobEntity, Mockito.times(1)).setCheckDelay(checkDelay);
     }
