@@ -25,8 +25,8 @@ import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.JobProcessManager;
+import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -171,7 +171,7 @@ public class StateMachineActionsAutoConfiguration {
      * Provide a lazy {@link SetUpJobAction} bean.
      *
      * @param executionContext      The job execution context to use
-     * @param downloadService       The download service to use
+     * @param jobSetupService       The job setup service to use
      * @param agentJobService       The agent job service to use
      * @param agentHeartBeatService The agent heart beat service to use
      * @param agentJobKillService   The agent job kill service to use
@@ -183,7 +183,7 @@ public class StateMachineActionsAutoConfiguration {
     @Lazy
     public SetUpJobAction setUpJobAction(
         final ExecutionContext executionContext,
-        final DownloadService downloadService,
+        final JobSetupService jobSetupService,
         final AgentJobService agentJobService,
         final AgentHeartBeatService agentHeartBeatService,
         final AgentJobKillService agentJobKillService,
@@ -192,7 +192,7 @@ public class StateMachineActionsAutoConfiguration {
     ) {
         return new SetUpJobAction(
             executionContext,
-            downloadService,
+            jobSetupService,
             agentJobService,
             agentHeartBeatService,
             agentJobKillService,

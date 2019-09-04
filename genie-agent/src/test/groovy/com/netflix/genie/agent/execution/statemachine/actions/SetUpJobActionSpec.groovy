@@ -28,6 +28,7 @@ import com.netflix.genie.agent.execution.services.AgentHeartBeatService
 import com.netflix.genie.agent.execution.services.AgentJobKillService
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.services.DownloadService
+import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.utils.EnvUtils
 import com.netflix.genie.agent.utils.PathUtils
@@ -42,19 +43,13 @@ import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Paths
 
 class SetUpJobActionSpec extends Specification {
-    @Rule
-    TemporaryFolder temporaryFolder
 
     ExecutionContext executionContext
 
-    Set<URI> manifestUris
-    File dummyFile
-
-    DownloadService.Manifest manifest
-    DownloadService.Manifest.Builder manifestBuilder
-    DownloadService downloadService
+    JobSetupService jobSetupService
     AgentJobService agentJobService
     AgentHeartBeatService heartbeatService
     AgentJobKillService killService
@@ -62,609 +57,119 @@ class SetUpJobActionSpec extends Specification {
     ArgumentDelegates.CleanupArguments cleanupArguments
     SetUpJobAction action
 
-    JobSpecification spec
     String jobId
-    List<JobSpecification.ExecutionResource> apps
-    JobSpecification.ExecutionResource app1
-    JobSpecification.ExecutionResource app2
-    JobSpecification.ExecutionResource cluster
-    JobSpecification.ExecutionResource command
+    JobSpecification spec
     JobSpecification.ExecutionResource job
 
-    File app1Dir
-    ExecutionEnvironment app1Env
-    Optional<String> app1Setup
-    Set<String> app1Configs
-    Set<String> app1Deps
-
-    File app2Dir
-    ExecutionEnvironment app2Env
-    Optional<String> app2Setup
-    Set<String> app2Configs
-    Set<String> app2Deps
-
-    File clusterDir
-    ExecutionEnvironment clusterEnv
-    Optional<String> clusterSetup
-    Set<String> clusterConfigs
-    Set<String> clusterDeps
-
-    File commandDir
-    ExecutionEnvironment commandEnv
-    Optional<String> commandSetup
-    Set<String> commandConfigs
-    Set<String> commandDeps
-
     File jobDir
-    ExecutionEnvironment jobEnv
-    Optional<String> jobSetup = Optional.empty()
-    Set<String> jobConfigs = []
-    Set<String> jobDeps = []
-
-    Map<String, String> jobServerEnvMap
+    List<File> setupFiles
+    Map<String, String> envMap
+    CleanupStrategy cleanupStrategy
 
     void setup() {
 
-        this.dummyFile = temporaryFolder.newFile()
-
+        this.jobId = UUID.randomUUID().toString()
         this.executionContext = Mock(ExecutionContext)
+        this.spec = Mock(JobSpecification)
+        this.job = Mock(JobSpecification.ExecutionResource)
 
-        this.manifestUris = Sets.newHashSet()
-
-        this.manifest = Mock(DownloadService.Manifest) {
-        }
-
-        this.manifestBuilder = Mock(DownloadService.Manifest.Builder) {
-            _ * build() >> manifest
-        }
-        this.downloadService = Mock(DownloadService) {
-            _ * newManifestBuilder() >> manifestBuilder
-        }
+        this.jobDir = Paths.get("/tmp/genie/jobs/" + jobId).toFile()
+        this.setupFiles = []
+        this.envMap = [:]
+        this.cleanupStrategy = CleanupStrategy.FULL_CLEANUP
 
         this.agentJobService = Mock(AgentJobService)
+        this.jobSetupService = Mock(JobSetupService)
         this.heartbeatService = Mock(AgentHeartBeatService)
         this.killService = Mock(AgentJobKillService)
         this.fileStreamService = Mock(AgentFileStreamService)
         this.cleanupArguments = Mock(ArgumentDelegates.CleanupArguments)
 
-        this.jobId = UUID.randomUUID().toString()
-        this.jobDir = new File(temporaryFolder.getRoot(), jobId)
-        this.jobSetup = Optional.empty()
-        this.jobConfigs = []
-        this.jobDeps = []
-        this.jobEnv = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> { return jobSetup }
-            _ * getConfigs() >> { return jobConfigs }
-            _ * getDependencies() >> { return jobDeps }
-        }
-        this.job = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> { return jobId }
-            _ * getExecutionEnvironment() >> { return jobEnv }
-        }
-
-        def app1Id = UUID.randomUUID().toString()
-        this.app1Setup = Optional.empty()
-        this.app1Configs = []
-        this.app1Deps = []
-        this.app1Env = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> { return app1Setup }
-            _ * getConfigs() >> { return app1Configs }
-            _ * getDependencies() >> { return app1Deps }
-        }
-        this.app1 = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> { return app1Id }
-            _ * getExecutionEnvironment() >> { return app1Env }
-        }
-        this.app1Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app1.getId()).toFile()
-
-        def app2Id = UUID.randomUUID().toString()
-        this.app2Setup = Optional.empty()
-        this.app2Configs = []
-        this.app2Deps = []
-        this.app2Env = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> { return app2Setup }
-            _ * getConfigs() >> { return app2Configs }
-            _ * getDependencies() >> { return app2Deps }
-        }
-        this.app2 = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> { return app2Id }
-            _ * getExecutionEnvironment() >> { return app2Env }
-        }
-        this.app2Dir = PathUtils.jobApplicationDirectoryPath(jobDir, app2.getId()).toFile()
-
-        this.apps = [
-            app1,
-            app2
-        ]
-
-        def clusterId = UUID.randomUUID().toString()
-        this.clusterSetup = Optional.empty()
-        this.clusterConfigs = []
-        this.clusterDeps = []
-        this.clusterEnv = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> { return clusterSetup }
-            _ * getConfigs() >> { return clusterConfigs }
-            _ * getDependencies() >> { return clusterDeps }
-        }
-        this.cluster = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> { return clusterId }
-            _ * getExecutionEnvironment() >> { return clusterEnv }
-        }
-        this.clusterDir = PathUtils.jobClusterDirectoryPath(jobDir, cluster.getId()).toFile()
-
-        def commandId = UUID.randomUUID().toString()
-        this.commandSetup = Optional.empty()
-        this.commandConfigs = []
-        this.commandDeps = []
-        this.commandEnv = Mock(ExecutionEnvironment) {
-            _ * getSetupFile() >> { return commandSetup }
-            _ * getConfigs() >> { return commandConfigs }
-            _ * getDependencies() >> { return commandDeps }
-        }
-        this.command = Mock(JobSpecification.ExecutionResource) {
-            _ * getId() >> { return commandId }
-            _ * getExecutionEnvironment() >> { return commandEnv }
-        }
-
-        this.commandDir = PathUtils.jobCommandDirectoryPath(jobDir, command.getId()).toFile()
-
-        this.jobServerEnvMap = [:]
-
-        this.spec = Mock(JobSpecification) {
-            _ * getApplications() >> apps
-            _ * getCluster() >> cluster
-            _ * getCommand() >> command
-            _ * getJob() >> job
-            _ * getJobDirectoryLocation() >> temporaryFolder.getRoot()
-            _ * getEnvironmentVariables() >> jobServerEnvMap
-        }
-
-        this.action = new SetUpJobAction(executionContext, downloadService, agentJobService, heartbeatService, killService, fileStreamService, cleanupArguments)
+        this.action = new SetUpJobAction(executionContext, jobSetupService, agentJobService, heartbeatService, killService, fileStreamService, cleanupArguments)
     }
 
     void cleanup() {
-        File file = new File("created-by-setup-file.txt")
-        if (file.exists()) {
-            file.delete()
-        }
     }
 
-    def "Execute w/o dependencies and environment"() {
+    def "Successful action execution and cleanup"() {
         setup:
-        Map<String, String> envMap
 
         when:
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
         1 * executionContext.getJobSpecification() >> Optional.of(spec)
+        1 * spec.getJob() >> job
+        1 * job.getId() >> jobId
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
+        1 * jobSetupService.createJobDirectory(spec) >> jobDir
+        1 * executionContext.setJobDirectory(jobDir)
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
-        1 * executionContext.setJobDirectory(jobDir)
         1 * fileStreamService.start(jobId, jobDir.toPath())
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-        1 * executionContext.setJobEnvironment(_ as Map<String, String>) >> { args ->
-            envMap = (Map<String, String>) args.getAt(0)
-        }
-
-        expect:
+        1 * jobSetupService.downloadJobResources(spec, jobDir) >> setupFiles
+        1 * jobSetupService.setupJobEnvironment(jobDir, spec, setupFiles) >> envMap
+        1 * executionContext.setJobEnvironment(envMap)
         event == Events.SETUP_JOB_COMPLETE
-        envMap != null
-        envMap.get(JobConstants.GENIE_JOB_DIR_ENV_VAR) == jobDir.toString()
-        envMap.get(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.APPLICATION_PATH_VAR
-        envMap.get(JobConstants.GENIE_COMMAND_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.COMMAND_PATH_VAR + "/" + command.getId()
-        envMap.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
-
-        for (File entityDir : [app1Dir, app2Dir, clusterDir, commandDir]) {
-            assert entityDir.exists()
-            def confDir = new File(entityDir, JobConstants.CONFIG_FILE_PATH_PREFIX)
-            assert confDir.exists()
-            assert confDir.list().size() == 0
-            def depsDir = new File(entityDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX)
-            assert depsDir.exists()
-            assert depsDir.list().size() == 0
-        }
-    }
-
-    def "Execute w/ dependencies and environment"() {
-        setup:
-        Map<String, String> envMap
-        jobServerEnvMap.put("SERVER_VARIABLE_KEY", "SERVER VARIABLE VALUE")
-        def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
-        jobSetup = Optional.of(setupFileUri.toString())
-        app1Setup = Optional.of(setupFileUri.toString())
-        app2Setup = Optional.of(setupFileUri.toString())
-        commandSetup = Optional.of(setupFileUri.toString())
-        clusterSetup = Optional.of(setupFileUri.toString())
-        def dependencyUri = URI.create("s3://my-bucket/my-org/my-job/dependency.tar.gz")
-        jobDeps.add(dependencyUri.toString())
-        app1Deps.add(dependencyUri.toString())
-        app2Deps.add(dependencyUri.toString())
-        commandDeps.add(dependencyUri.toString())
-        clusterDeps.add(dependencyUri.toString())
-        def configUri = URI.create("s3://my-bucket/my-org/my-job/cfg.xml")
-        jobConfigs.add(configUri.toString())
-        app1Configs.add(configUri.toString())
-        app2Configs.add(configUri.toString())
-        commandConfigs.add(configUri.toString())
-        clusterConfigs.add(configUri.toString())
-        dummyFile.write(
-            "echo Hello World\n"
-                + "export SETUP_VARIABLE_KEY='SETUP VARIABLE VALUE'\n"
-                + "touch created-by-setup-file.txt\n"
-                + "export TRICKY_VARIABLE=\"'foo\nbar\ny'all'\"\n"
-        )
 
         when:
-        def event = action.executeStateAction(executionContext)
+        action.executeStateActionCleanup(executionContext)
 
         then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
-        1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
-        1 * executionContext.setJobDirectory(jobDir)
-        1 * fileStreamService.start(jobId, jobDir.toPath())
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-        1 * executionContext.setJobEnvironment(_ as Map<String, String>) >> { args ->
-            envMap = (Map<String, String>) args.getAt(0)
-        }
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, app1Dir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, app2Dir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, commandDir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, clusterDir)
-        5 * manifest.getTargetLocation(setupFileUri) >> dummyFile
-        1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, jobDir)
-        1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(app1Dir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
-        1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(app2Dir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
-        1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(commandDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
-        1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(clusterDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
-        0 * manifest.getTargetLocation(dependencyUri)
-        1 * manifestBuilder.addFileWithTargetDirectory(configUri, jobDir)
-        1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(app1Dir, JobConstants.CONFIG_FILE_PATH_PREFIX))
-        1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(app2Dir, JobConstants.CONFIG_FILE_PATH_PREFIX))
-        1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(commandDir, JobConstants.CONFIG_FILE_PATH_PREFIX))
-        1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(clusterDir, JobConstants.CONFIG_FILE_PATH_PREFIX))
-        0 * manifest.getTargetLocation(configUri)
-
-        expect:
-        event == Events.SETUP_JOB_COMPLETE
-        jobDir.exists()
-        app1Dir.exists()
-        app2Dir.exists()
-        clusterDir.exists()
-        commandDir.exists()
-        envMap != null
-        envMap.get(JobConstants.GENIE_JOB_DIR_ENV_VAR) == jobDir.toString()
-        envMap.get(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.APPLICATION_PATH_VAR
-        envMap.get(JobConstants.GENIE_COMMAND_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.COMMAND_PATH_VAR + "/" + command.getId()
-        envMap.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
-        envMap.get("SERVER_VARIABLE_KEY") == "SERVER VARIABLE VALUE"
-        envMap.get("SETUP_VARIABLE_KEY") == "SETUP VARIABLE VALUE"
-        envMap.get("TRICKY_VARIABLE") == "'foo\nbar\ny'all'"
-        new File("created-by-setup-file.txt").exists()
-        PathUtils.composePath(
-            PathUtils.jobGenieDirectoryPath(jobDir),
-            JobConstants.LOGS_PATH_VAR,
-            JobConstants.GENIE_AGENT_ENV_SCRIPT_LOG_FILE_NAME
-        ).toFile().getText(StandardCharsets.UTF_8.toString()).count("Hello World") == 5
-    }
-
-    def "Change job status exception"() {
-        Exception exception = new ChangeJobStatusException("...")
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> {
-            throw exception
-        }
-        def e = thrown(RuntimeException)
-        e.getCause() == exception
-    }
-
-    def "Existing job directory"() {
-        setup:
-        temporaryFolder.newFolder(jobId)
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-    }
-
-    def "SetUp file lookup error"() {
-        setup:
-        def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
-        jobSetup = Optional.of(setupFileUri.toString())
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
-        1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
-        1 * executionContext.setJobDirectory(jobDir)
-        1 * fileStreamService.start(jobId, jobDir.toPath())
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifest.getTargetLocation(setupFileUri) >> null
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-    }
-
-    def "Malformed dependency URI"() {
-        setup:
-        jobSetup = Optional.of("://")
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
-        1 * executionContext.setJobDirectory(jobDir)
-        1 * fileStreamService.start(jobId, jobDir.toPath())
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-        e.getCause().getCause().getClass() == URISyntaxException
-    }
-
-    def "Download exception"() {
-        setup:
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
-        1 * executionContext.setJobDirectory(jobDir)
-        1 * fileStreamService.start(jobId, jobDir.toPath())
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest) >> { throw new DownloadException("") }
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-        e.getCause().getCause().getClass() == DownloadException
-    }
-
-    def "Setup script error"() {
-        setup:
-        def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
-        jobSetup = Optional.of(setupFileUri.toString())
-        dummyFile.write("exit 1\n")
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
-        1 * executionContext.setJobDirectory(jobDir)
-        1 * fileStreamService.start(jobId, jobDir.toPath())
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifest.getTargetLocation(setupFileUri) >> dummyFile
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-    }
-
-    def "Environment file parse error"() {
-        setup:
-        def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
-        jobSetup = Optional.of(setupFileUri.toString())
-
-        def envFile = PathUtils.composePath(
-            PathUtils.jobGenieDirectoryPath(jobDir),
-            JobConstants.GENIE_AGENT_ENV_SCRIPT_OUTPUT_FILE_NAME
-        ).toFile()
-
-        dummyFile.write("echo \"syntax error!\" >> " + envFile.getAbsolutePath() + "\n")
-
-        when:
-        action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getClaimedJobId() >> Optional.of(jobId)
-        1 * executionContext.getJobSpecification() >> Optional.of(spec)
-        1 * heartbeatService.start(jobId)
-        1 * killService.start(jobId)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
-        1 * executionContext.setJobDirectory(jobDir)
-        1 * fileStreamService.start(jobId, jobDir.toPath())
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifest.getTargetLocation(setupFileUri) >> dummyFile
-        def e = thrown(RuntimeException)
-        e.getCause().getClass() == SetUpJobException
-        e.getCause().getCause().getClass() == EnvUtils.ParseException
-    }
-
-    def "Skip cleanup"() {
-        setup:
-        File[] dependencies = [
-            jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
-            jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
-            jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
-        ].collect { new File(temporaryFolder.getRoot(), it) }
-
-        File[] otherFiles = [
-            jobId + "/run",
-            jobId + "/genie/logs/genie.log",
-            jobId + "/genie/logs/env.log",
-            jobId + "/genie/genie.done",
-            jobId + "/stdout",
-            jobId + "/stderr"
-        ].collect { new File(temporaryFolder.getRoot(), it) }
-
-        def allFiles = dependencies + otherFiles as File[]
-
-        allFiles.each {
-            file ->
-                println "Creating dir " + file.getParentFile().getAbsolutePath()
-                Files.createDirectories(file.getParentFile().toPath())
-                println "Creating file " + file.getAbsolutePath()
-                Files.createFile(file.toPath())
-        }
-
-        when:
-        action.cleanup()
-
-        then:
-        1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.NO_CLEANUP
-        1 * executionContext.getJobDirectory() >> Optional.of(new File(temporaryFolder.getRoot(), jobId))
-
-        allFiles.each {
-                // Check all directories not deleted, even the empty dependencies one
-            file -> assert file.exists()
-        }
-
+        1 * executionContext.getJobDirectory() >> Optional.of(jobDir)
+        1 * cleanupArguments.getCleanupStrategy() >> cleanupStrategy
+        1 * jobSetupService.cleanupJobDirectory(jobDir.toPath(), cleanupStrategy)
         1 * killService.stop()
         1 * heartbeatService.stop()
+        1 * fileStreamService.stop()
     }
 
-    def "Full cleanup"() {
+    def "Exception handling"() {
         setup:
-        File[] dependencies = [
-            jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
-            jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
-            jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
-        ].collect { new File(temporaryFolder.getRoot(), it) }
-
-        File[] otherFiles = [
-            jobId + "/run",
-            jobId + "/genie/logs/genie.log",
-            jobId + "/genie/logs/env.log",
-            jobId + "/genie/genie.done",
-            jobId + "/stdout",
-            jobId + "/stderr"
-        ].collect { new File(temporaryFolder.getRoot(), it) }
-
-        def allFiles = dependencies + otherFiles as File[]
-
-        allFiles.each {
-            file ->
-                println "Creating dir " + file.getParentFile().getAbsolutePath()
-                Files.createDirectories(file.getParentFile().toPath())
-                println "Creating file " + file.getAbsolutePath()
-                Files.createFile(file.toPath())
-        }
-
-        File jobDirectory = new File(temporaryFolder.getRoot(), jobId)
+        Exception setupException = new SetUpJobException("...")
+        Exception changeJobStatusException = new ChangeJobStatusException("...")
+        Exception ioException = new IOException("...")
+        Exception e
 
         when:
-        action.cleanup()
+        action.executeStateAction(executionContext)
 
         then:
-        1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.FULL_CLEANUP
-        1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
-
-        !jobDirectory.exists()
-
-        1 * killService.stop()
-        1 * heartbeatService.stop()
-    }
-
-    def "Dependencies cleanup"() {
-        setup:
-        File[] dependencies = [
-            jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
-            jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
-            jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
-        ].collect { new File(temporaryFolder.getRoot(), it) }
-
-        File[] otherFiles = [
-            jobId + "/run",
-            jobId + "/genie/logs/genie.log",
-            jobId + "/genie/logs/env.log",
-            jobId + "/genie/applications/presto0180/config/presto.cfg",
-            jobId + "/genie/applications/presto0180/setup.sh",
-            jobId + "/genie/command/presto0180/config/presto-wrapper-config.py",
-            jobId + "/genie/command/presto0180/setup.sh",
-            jobId + "/genie/cluster/presto-v005/config/presto-v005.cfg",
-            jobId + "/genie/genie.done",
-            jobId + "/stdout",
-            jobId + "/stderr",
-            jobId + "/script.presto",
-            "dependencies/foo.txt"
-        ].collect { new File(temporaryFolder.getRoot(), it) }
-
-        def allFiles = dependencies + otherFiles as File[]
-
-        allFiles.each {
-            file ->
-                println "Creating dir " + file.getParentFile().getAbsolutePath()
-                Files.createDirectories(file.getParentFile().toPath())
-                println "Creating file " + file.getAbsolutePath()
-                Files.createFile(file.toPath())
-        }
+        1 * executionContext.getJobSpecification() >> Optional.of(spec)
+        1 * spec.getJob() >> job
+        1 * job.getId() >> jobId
+        1 * heartbeatService.start(jobId)
+        1 * killService.start(jobId)
+        1 * jobSetupService.createJobDirectory(spec) >> {throw setupException}
+        e = thrown(RuntimeException)
+        e.getCause() == setupException
 
         when:
-        action.cleanup()
+        action.executeStateAction(executionContext)
 
         then:
-        1 * cleanupArguments.getCleanupStrategy() >> CleanupStrategy.DEPENDENCIES_CLEANUP
-        1 * executionContext.getJobDirectory() >> Optional.of(new File(temporaryFolder.getRoot(), jobId))
+        1 * executionContext.getJobSpecification() >> Optional.of(spec)
+        1 * spec.getJob() >> job
+        1 * job.getId() >> jobId
+        1 * heartbeatService.start(jobId)
+        1 * killService.start(jobId)
+        1 * jobSetupService.createJobDirectory(spec) >> jobDir
+        1 * executionContext.setJobDirectory(jobDir)
+        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> {throw changeJobStatusException}
+        e = thrown(RuntimeException)
+        e.getCause() == changeJobStatusException
 
-        dependencies.each {
-                // Check all dependencies deleted
-            file -> assert !file.exists()
-        }
+        when:
+        action.executeStateActionCleanup(executionContext)
 
-        otherFiles.each {
-                // Check all other files not deleted
-            file -> assert file.exists()
-        }
-
-        allFiles.each {
-                // Check all directories not deleted, even the empty dependencies one
-            file -> assert file.getParentFile().exists()
-        }
-
+        then:
+        1 * executionContext.getJobDirectory() >> Optional.of(jobDir)
+        1 * cleanupArguments.getCleanupStrategy() >> cleanupStrategy
+        1 * jobSetupService.cleanupJobDirectory(jobDir.toPath(), cleanupStrategy) >> { throw ioException}
         1 * killService.stop()
         1 * heartbeatService.stop()
+        1 * fileStreamService.stop()
     }
 
     def "Pre and post action validation"() {
@@ -684,6 +189,6 @@ class SetUpJobActionSpec extends Specification {
         then:
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.INIT)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnv)
+        1 * executionContext.getJobEnvironment() >> Optional.of(envMap)
     }
 }
