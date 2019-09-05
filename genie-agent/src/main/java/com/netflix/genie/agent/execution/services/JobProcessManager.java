@@ -27,12 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Service that launches the job process.
+ * Singleton to manage the subprocess for the actual user job this Agent instance is managing.
  *
  * @author mprimi
+ * @author tgianos
  * @since 4.0.0
  */
-public interface LaunchJobService extends ApplicationListener<KillService.KillEvent> {
+public interface JobProcessManager extends ApplicationListener<KillService.KillEvent> {
 
     /**
      * Launch the job process (unless launch was aborted by previous a {@code kill} call).

@@ -20,7 +20,7 @@ package com.netflix.genie.agent.execution.statemachine.actions
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.agent.execution.services.LaunchJobService
+import com.netflix.genie.agent.execution.services.JobProcessManager
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
 import spock.lang.Specification
@@ -32,13 +32,13 @@ class MonitorJobActionSpec extends Specification {
     MonitorJobAction action
     Process process
     AgentJobService agentJobService
-    LaunchJobService launchJobService
+    JobProcessManager launchJobService
 
     void setup() {
         this.id = UUID.randomUUID().toString()
         this.executionContext = Mock(ExecutionContext)
         this.agentJobService = Mock(AgentJobService)
-        this.launchJobService = Mock(LaunchJobService)
+        this.launchJobService = Mock(JobProcessManager)
         this.process = Mock(Process)
         this.action = new MonitorJobAction(executionContext, agentJobService, launchJobService)
     }

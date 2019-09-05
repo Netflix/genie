@@ -23,7 +23,7 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.agent.execution.services.LaunchJobService;
+import com.netflix.genie.agent.execution.services.JobProcessManager;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
@@ -43,16 +43,16 @@ import java.util.Map;
 @Slf4j
 class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
-    private final LaunchJobService launchJobService;
+    private final JobProcessManager jobProcessManager;
     private final AgentJobService agentJobService;
 
     LaunchJobAction(
         final ExecutionContext executionContext,
-        final LaunchJobService launchJobService,
+        final JobProcessManager jobProcessManager,
         final AgentJobService agentJobService
     ) {
         super(executionContext);
-        this.launchJobService = launchJobService;
+        this.jobProcessManager = jobProcessManager;
         this.agentJobService = agentJobService;
     }
 
@@ -72,7 +72,6 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
     protected Events executeStateAction(final ExecutionContext executionContext) {
         UserConsole.getLogger().info("Launching job...");
 
-
         final JobSpecification jobSpec = executionContext.getJobSpecification().get();
         final File jobDirectory = executionContext.getJobDirectory().get();
         final Map<String, String> jobEnvironment = executionContext.getJobEnvironment().get();
@@ -80,7 +79,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         final boolean interactive = jobSpec.isInteractive();
 
         try {
-            launchJobService.launchProcess(
+            this.jobProcessManager.launchProcess(
                 jobDirectory,
                 jobEnvironment,
                 jobCommandLine,

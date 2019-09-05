@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.agent.execution.services.LaunchJobService
+import com.netflix.genie.agent.execution.services.JobProcessManager
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
@@ -33,7 +33,7 @@ class LaunchJobActionSpec extends Specification {
     JobSpecification jobSpec
     Map<String, String> jobEnvironment
     LaunchJobAction action
-    LaunchJobService launchJobService
+    JobProcessManager launchJobService
     AgentJobService agentJobService
     Process process
     File jobDirectory
@@ -48,7 +48,7 @@ class LaunchJobActionSpec extends Specification {
         this.jobEnvironment = Mock(Map)
         this.jobCommandLine = Mock(List)
         this.interactive = true
-        this.launchJobService = Mock(LaunchJobService)
+        this.launchJobService = Mock(JobProcessManager)
         this.agentJobService = Mock(AgentJobService)
         this.process = Mock(Process)
         this.action = new LaunchJobAction(executionContext, launchJobService, agentJobService)

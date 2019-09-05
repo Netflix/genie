@@ -22,7 +22,7 @@ import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.agent.execution.services.LaunchJobService;
+import com.netflix.genie.agent.execution.services.JobProcessManager;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
@@ -38,16 +38,16 @@ import lombok.extern.slf4j.Slf4j;
 class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob {
 
     private final AgentJobService agentJobService;
-    private final LaunchJobService launchJobService;
+    private final JobProcessManager jobProcessManager;
 
     MonitorJobAction(
         final ExecutionContext executionContext,
         final AgentJobService agentJobService,
-        final LaunchJobService launchJobService
+        final JobProcessManager jobProcessManager
     ) {
         super(executionContext);
         this.agentJobService = agentJobService;
-        this.launchJobService = launchJobService;
+        this.jobProcessManager = jobProcessManager;
     }
 
     @Override
@@ -66,7 +66,7 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
 
         final JobStatus finalJobStatus;
         try {
-            finalJobStatus = launchJobService.waitFor();
+            finalJobStatus = jobProcessManager.waitFor();
         } catch (final InterruptedException e) {
             throw new RuntimeException("Interrupted while waiting for job process completion", e);
         }

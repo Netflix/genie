@@ -26,7 +26,7 @@ import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
-import com.netflix.genie.agent.execution.services.LaunchJobService;
+import com.netflix.genie.agent.execution.services.JobProcessManager;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -106,37 +106,37 @@ public class StateMachineActionsAutoConfiguration {
     /**
      * Provide a lazy {@link LaunchJobAction} bean.
      *
-     * @param executionContext The job execution context to use
-     * @param launchJobService The launch job service to use
-     * @param agentJobService  The agent job service to use
+     * @param executionContext  The job execution context to use
+     * @param jobProcessManager The launch job service to use
+     * @param agentJobService   The agent job service to use
      * @return A {@link LaunchJobAction} instance
      */
     @Bean
     @Lazy
     public LaunchJobAction launchJobAction(
         final ExecutionContext executionContext,
-        final LaunchJobService launchJobService,
+        final JobProcessManager jobProcessManager,
         final AgentJobService agentJobService
     ) {
-        return new LaunchJobAction(executionContext, launchJobService, agentJobService);
+        return new LaunchJobAction(executionContext, jobProcessManager, agentJobService);
     }
 
     /**
      * Provide a lazy {@link MonitorJobAction} bean.
      *
-     * @param executionContext The job execution context to use
-     * @param launchJobService The launch job service to use
-     * @param agentJobService  The agent job service to use
+     * @param executionContext  The job execution context to use
+     * @param jobProcessManager The launch job service to use
+     * @param agentJobService   The agent job service to use
      * @return A {@link MonitorJobAction} instance
      */
     @Bean
     @Lazy
     public MonitorJobAction monitorJobAction(
         final ExecutionContext executionContext,
-        final LaunchJobService launchJobService,
+        final JobProcessManager jobProcessManager,
         final AgentJobService agentJobService
     ) {
-        return new MonitorJobAction(executionContext, agentJobService, launchJobService);
+        return new MonitorJobAction(executionContext, agentJobService, jobProcessManager);
     }
 
     /**
