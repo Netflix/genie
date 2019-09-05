@@ -321,6 +321,13 @@ public final class EntityDtoConverters {
         finishedJobProjection.getArchiveLocation().ifPresent(builder::withArchiveLocation);
         finishedJobProjection.getMemoryUsed().ifPresent(builder::withMemoryUsed);
 
+        builder.withTags(
+            finishedJobProjection.getTags()
+                .stream()
+                .map(TagEntity::getTag)
+                .collect(Collectors.toSet())
+        );
+
         finishedJobProjection.getMetadata().ifPresent(
             metadata ->
                 setJsonField(metadata, builder::withMetadata)

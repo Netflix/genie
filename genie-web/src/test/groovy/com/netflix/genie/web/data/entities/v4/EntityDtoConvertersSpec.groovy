@@ -821,6 +821,7 @@ class EntityDtoConvertersSpec extends Specification {
             getCommand() >> Optional.empty()
             getCluster() >> Optional.empty()
             getApplications() >> Lists.newArrayList()
+            getTags() >> Sets.newHashSet()
         }
 
         when:
@@ -855,6 +856,7 @@ class EntityDtoConvertersSpec extends Specification {
         !dto.getCommand().isPresent()
         !dto.getCluster().isPresent()
         dto.getApplications().isEmpty()
+        dto.getTags().isEmpty()
     }
 
     def "Can convert FinishedJobProjection to FinishedJob DTO"() {
@@ -916,6 +918,14 @@ class EntityDtoConvertersSpec extends Specification {
             getType() >> Optional.empty()
         }
 
+        TagEntity jobTag1 = Mock(TagEntity) {
+            getTag() >> "tag1"
+        }
+
+        TagEntity jobTag2 = Mock(TagEntity) {
+            getTag() >> "tag2"
+        }
+
         FinishedJobProjection p = Mock(FinishedJobProjection) {
             getUniqueId() >> "id"
             getName() >> "name"
@@ -945,6 +955,7 @@ class EntityDtoConvertersSpec extends Specification {
             getCommand() >> Optional.of(commandEntity)
             getCluster() >> Optional.of(clusterEntity)
             getApplications() >> Lists.newArrayList(applicationEntity)
+            getTags() >> Sets.newHashSet(jobTag1, jobTag2)
         }
 
         when:
@@ -979,5 +990,7 @@ class EntityDtoConvertersSpec extends Specification {
         dto.getCommand().isPresent()
         dto.getCluster().isPresent()
         dto.getApplications().size() == 1
+        dto.getTags().size() == 2
+        dto.getTags() == Sets.newHashSet(["tag1", "tag2"])
     }
 }
