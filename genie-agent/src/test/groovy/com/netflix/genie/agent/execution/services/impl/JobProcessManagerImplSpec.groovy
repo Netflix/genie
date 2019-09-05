@@ -18,8 +18,8 @@
 package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
+import com.netflix.genie.agent.execution.services.JobProcessManager
 import com.netflix.genie.agent.execution.services.KillService
-import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatus
 import org.junit.Rule
@@ -29,7 +29,7 @@ import spock.lang.Specification
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-class LaunchJobServiceImplSpec extends Specification {
+class JobProcessManagerImplSpec extends Specification {
 
     @Rule
     TemporaryFolder temporaryFolder
@@ -51,12 +51,12 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "LaunchProcess interactive"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
         File expectedFile = new File(temporaryFolder.getRoot(), UUID.randomUUID().toString())
         envMap.put("PATH", System.getenv("PATH") + ":/foo")
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["touch", expectedFile.getAbsolutePath()],
@@ -67,7 +67,7 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.SUCCEEDED
@@ -79,11 +79,11 @@ class LaunchJobServiceImplSpec extends Specification {
     def "LaunchProcess noninteractive with variable expansion"() {
         setup:
         String helloWorld = "Hello World!"
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
         envMap.put("ECHO_COMMAND", "echo")
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["\${ECHO_COMMAND}", helloWorld],
@@ -94,7 +94,7 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.SUCCEEDED
@@ -108,10 +108,10 @@ class LaunchJobServiceImplSpec extends Specification {
         String uuid = UUID.randomUUID().toString()
         envMap.put("GENIE_UUID", uuid)
         String expectedString = "GENIE_UUID=" + uuid
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["env"],
@@ -122,7 +122,7 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.SUCCEEDED
@@ -134,10 +134,10 @@ class LaunchJobServiceImplSpec extends Specification {
     def "LaunchProcess command error"() {
         setup:
         File nonExistentFile = new File(temporaryFolder.getRoot(), UUID.randomUUID().toString())
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["rm", nonExistentFile.absolutePath],
@@ -148,7 +148,7 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.FAILED
@@ -160,10 +160,10 @@ class LaunchJobServiceImplSpec extends Specification {
     def "LaunchProcess missing executable"() {
         setup:
         String uuid = UUID.randomUUID().toString()
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             [uuid],
@@ -175,10 +175,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "LaunchProcess missing environment variable"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["\$COMMAND"],
@@ -191,10 +191,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Job directory null"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             null,
             envMap,
             ["echo"],
@@ -207,10 +207,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Job directory not a directory"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.newFile("foo"),
             envMap,
             ["echo"],
@@ -223,10 +223,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Job folder not existing"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             new File(temporaryFolder.getRoot(), "foo"),
             envMap,
             ["echo"],
@@ -239,10 +239,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Environment null"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             null,
             ["echo"],
@@ -254,10 +254,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Args not set"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             null,
@@ -269,10 +269,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Args empty"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             [],
@@ -285,10 +285,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Kill running process"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["sleep", "60"],
@@ -299,13 +299,13 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        service.kill()
+        manager.kill()
 
         then:
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.KILLED
@@ -315,10 +315,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Kill running process via event"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["sleep", "60"],
@@ -329,13 +329,13 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        service.onApplicationEvent(new KillService.KillEvent(KillService.KillSource.API_KILL_REQUEST))
+        manager.onApplicationEvent(new KillService.KillEvent(KillService.KillSource.API_KILL_REQUEST))
 
         then:
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.KILLED
@@ -345,10 +345,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Kill completed process"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["echo", "foo"],
@@ -359,13 +359,13 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        service.kill()
+        manager.kill()
 
         then:
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.KILLED
@@ -375,16 +375,16 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Skip process launch"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.kill()
+        manager.kill()
 
         then:
         noExceptionThrown()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["echo", "foo"],
@@ -395,7 +395,7 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = service.waitFor()
+        JobStatus status = manager.waitFor()
 
         then:
         status == JobStatus.KILLED
@@ -405,10 +405,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "Double launch"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["echo", "foo"],
@@ -419,7 +419,7 @@ class LaunchJobServiceImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        service.launchProcess(
+        manager.launchProcess(
             temporaryFolder.getRoot(),
             envMap,
             ["echo", "foo"],
@@ -432,10 +432,10 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "No launch"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl()
+        JobProcessManager manager = new JobProcessManagerImpl()
 
         when:
-        service.waitFor()
+        manager.waitFor()
 
         then:
         thrown(IllegalStateException)

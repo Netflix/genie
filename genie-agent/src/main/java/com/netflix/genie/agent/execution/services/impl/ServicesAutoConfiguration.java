@@ -20,8 +20,8 @@ package com.netflix.genie.agent.execution.services.impl;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
+import com.netflix.genie.agent.execution.services.JobProcessManager;
 import com.netflix.genie.agent.execution.services.KillService;
-import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
 import com.netflix.genie.common.internal.configs.AwsAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
@@ -102,14 +102,14 @@ public class ServicesAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link LaunchJobService} bean if one hasn't already been defined.
+     * Provide a lazy {@link JobProcessManager} bean if one hasn't already been defined.
      *
-     * @return A {@link LaunchJobServiceImpl} instance
+     * @return A {@link JobProcessManagerImpl} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(LaunchJobService.class)
-    public LaunchJobService launchJobService() {
-        return new LaunchJobServiceImpl();
+    @ConditionalOnMissingBean(JobProcessManager.class)
+    public JobProcessManager jobProcessManager() {
+        return new JobProcessManagerImpl();
     }
 }
