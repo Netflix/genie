@@ -26,6 +26,7 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,7 +95,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
                 executionContext.getClaimedJobId().get(),
                 JobStatus.INIT,
                 JobStatus.RUNNING,
-                "Job process launched"
+                JobStatusMessages.JOB_RUNNING
             );
             executionContext.setCurrentJobStatus(JobStatus.RUNNING);
         } catch (final ChangeJobStatusException e) {

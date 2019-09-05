@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
@@ -68,7 +69,7 @@ class HandleErrorAction extends BaseStateAction implements StateAction.HandleErr
                     claimedJobId.get(),
                     executionContext.getCurrentJobStatus().get(),
                     JobStatus.FAILED,
-                    "Setting failed status due to execution error"
+                    JobStatusMessages.JOB_FAILED
                 );
                 executionContext.setCurrentJobStatus(JobStatus.FAILED);
                 executionContext.setFinalJobStatus(JobStatus.FAILED);

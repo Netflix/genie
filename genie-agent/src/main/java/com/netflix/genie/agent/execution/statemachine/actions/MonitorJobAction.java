@@ -25,6 +25,7 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -72,12 +73,30 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
 
         log.info("Job process completed with final status {}", finalJobStatus);
 
+        // TODO: Likely want to clean this up as it only contains a few cases.
+        //       This doesn't handle if it's killed due to timeout, log file lengths exceeded, etc
+        final String finalStatusMessage;
+        switch (finalJobStatus) {
+            case SUCCEEDED:
+                finalStatusMessage = JobStatusMessages.JOB_FINISHED_SUCCESSFULLY;
+                break;
+            case FAILED:
+                finalStatusMessage = JobStatusMessages.JOB_FAILED;
+                break;
+            case KILLED:
+                finalStatusMessage = JobStatusMessages.JOB_KILLED_BY_USER;
+                break;
+            default:
+                finalStatusMessage = "Job process completed with final status " + finalJobStatus;
+                break;
+        }
+
         try {
             this.agentJobService.changeJobStatus(
                 executionContext.getClaimedJobId().get(),
                 JobStatus.RUNNING,
                 finalJobStatus,
-                "Job process completed with final status " + finalJobStatus
+                finalStatusMessage
             );
             executionContext.setCurrentJobStatus(finalJobStatus);
             executionContext.setFinalJobStatus(finalJobStatus);

@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -72,7 +73,7 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
                     claimedJobId.get(),
                     executionContext.getCurrentJobStatus().get(),
                     JobStatus.KILLED,
-                    "Job aborted before process launch"
+                    JobStatusMessages.USER_REQUESTED_JOB_BE_KILLED_DURING_INITIALIZATION
                 );
                 executionContext.setCurrentJobStatus(JobStatus.KILLED);
                 executionContext.setFinalJobStatus(JobStatus.KILLED);
