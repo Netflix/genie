@@ -36,6 +36,7 @@ import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
@@ -121,7 +122,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
                 claimedJobId,
                 JobStatus.CLAIMED,
                 JobStatus.INIT,
-                "Setting up job"
+                JobStatusMessages.JOB_INITIALIZING
             );
             executionContext.setCurrentJobStatus(JobStatus.INIT);
         } catch (final ChangeJobStatusException e) {

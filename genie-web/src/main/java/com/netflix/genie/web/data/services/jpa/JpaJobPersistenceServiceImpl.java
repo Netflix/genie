@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -247,7 +248,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists. Unable to update"));
 
-        this.updateJobStatus(jobEntity, JobStatus.RUNNING, "Job is Running.");
+        this.updateJobStatus(jobEntity, JobStatus.RUNNING, JobStatusMessages.JOB_RUNNING);
         jobEntity.setProcessId(processId);
         jobEntity.setCheckDelay(checkDelay);
         jobEntity

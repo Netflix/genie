@@ -27,6 +27,16 @@ public final class JobStatusMessages {
     //TODO this class could go away and we could fold this into JobStatus
 
     /**
+     * The message for when the agent is preparing to launch the job.
+     */
+    public static final String JOB_INITIALIZING = "Preparing to launch job";
+
+    /**
+     * The status message while a job is actively running.
+     */
+    public static final String JOB_RUNNING = "Job is Running.";
+
+    /**
      * Job killed because maximum stdout length was exceeded.
      */
     public static final String JOB_EXCEEDED_STDOUT_LENGTH = "Std out length exceeded.";
