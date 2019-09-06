@@ -3,6 +3,7 @@ syntax = "proto3";
 package com.netflix.genie.proto;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option java_multiple_files = true;
 option java_package = "com.netflix.genie.proto";
@@ -85,6 +86,7 @@ message ExecutionResourceCriteria {
 message AgentConfig {
     bool is_interactive = 1;
     string job_directory_location = 2;
+    google.protobuf.Int32Value timeout = 3; // Requested timeout in seconds
 }
 
 message JobArchivalData {
