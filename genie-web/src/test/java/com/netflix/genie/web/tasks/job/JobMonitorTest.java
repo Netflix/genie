@@ -257,6 +257,7 @@ public class JobMonitorTest {
 
     /**
      * Make sure that a timed out process sends event.
+     *
      * @throws Exception in case of error
      */
     @Test

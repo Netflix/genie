@@ -26,7 +26,6 @@ import spock.lang.Specification
  * Specifications for the Metrics Utility class.
  *
  * @author mprimi
- * @author tgianos
  */
 class MetricsUtilsSpec extends Specification {
     Tag fooBarTag = Tag.of("foo", "bar")
@@ -51,7 +50,7 @@ class MetricsUtilsSpec extends Specification {
         when:
         MetricsUtils.addSuccessTags(emptyTags)
         then:
-        emptyTags == ImmutableSet.of(
+        emptyTags == Sets.newHashSet(
             Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
     }

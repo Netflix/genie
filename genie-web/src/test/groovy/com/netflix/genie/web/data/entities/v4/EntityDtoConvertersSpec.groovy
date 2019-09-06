@@ -52,7 +52,6 @@ import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjec
 import spock.lang.Specification
 
 import java.time.Instant
-import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
 /**

@@ -152,16 +152,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         return Events.SETUP_JOB_COMPLETE;
     }
 
-    private void relocateAgentLogFile(final File jobDirectory) {
-        final Path destinationPath = PathUtils.jobAgentLogFilePath(jobDirectory);
-        log.info("Relocating agent log file to: {}", destinationPath);
-        try {
-            UserConsole.relocateLogFile(destinationPath);
-        } catch (IOException e) {
-            log.error("Failed to relocate agent log file", e);
-        }
-    }
-
     @Override
     protected void executePostActionValidation() {
         assertCurrentJobStatusEqual(JobStatus.INIT);
@@ -183,6 +173,16 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         killService.stop();
         heartbeatService.stop();
         fileManifestService.stop();
+    }
+
+    private void relocateAgentLogFile(final File jobDirectory) {
+        final Path destinationPath = PathUtils.jobAgentLogFilePath(jobDirectory);
+        log.info("Relocating agent log file to: {}", destinationPath);
+        try {
+            UserConsole.relocateLogFile(destinationPath);
+        } catch (IOException e) {
+            log.error("Failed to relocate agent log file", e);
+        }
     }
 
     private File setupJobDirectory(

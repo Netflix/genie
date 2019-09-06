@@ -224,10 +224,10 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     def "Resolve job specification -- handle error #errorType"() {
         this.jobSpecificationResponse = JobSpecificationResponse.newBuilder()
             .setError(
-            JobSpecificationError.newBuilder()
-                .setType(errorType)
-                .setMessage("error message")
-        )
+                JobSpecificationError.newBuilder()
+                    .setType(errorType)
+                    .setMessage("error message")
+            )
             .build()
         JobSpecificationRequest request = JobSpecificationRequest.getDefaultInstance()
 
@@ -283,10 +283,10 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     def "Get job specification -- handle error #errorType"() {
         this.jobSpecificationResponse = JobSpecificationResponse.newBuilder()
             .setError(
-            JobSpecificationError.newBuilder()
-                .setType(errorType)
-                .setMessage("error message")
-        )
+                JobSpecificationError.newBuilder()
+                    .setType(errorType)
+                    .setMessage("error message")
+            )
             .build()
         JobSpecificationRequest request = JobSpecificationRequest.getDefaultInstance()
 
@@ -358,10 +358,10 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     def "Resolve job specification dry run -- handle error #errorType"() {
         this.jobSpecificationResponse = JobSpecificationResponse.newBuilder()
             .setError(
-            JobSpecificationError.newBuilder()
-                .setType(errorType)
-                .setMessage("error message")
-        )
+                JobSpecificationError.newBuilder()
+                    .setType(errorType)
+                    .setMessage("error message")
+            )
             .build()
         DryRunJobSpecificationRequest request = DryRunJobSpecificationRequest.getDefaultInstance()
         AgentJobRequest agentJobRequest = Mock()
@@ -413,10 +413,10 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     def "Claim job -- handle error #errorType"() {
         this.claimJobResponse = ClaimJobResponse.newBuilder()
             .setError(
-            ClaimJobError.newBuilder()
-                .setType(errorType)
-                .setMessage("error message")
-        )
+                ClaimJobError.newBuilder()
+                    .setType(errorType)
+                    .setMessage("error message")
+            )
             .build()
         AgentClientMetadata agentClientMetadata = Mock()
         ClaimJobRequest request = ClaimJobRequest.getDefaultInstance()
@@ -470,10 +470,10 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         this.changeJobStatusResponse = ChangeJobStatusResponse.newBuilder()
             .setSuccessful(false)
             .setError(
-            ChangeJobStatusError.newBuilder()
-                .setType(errorType)
-                .setMessage("error message")
-        )
+                ChangeJobStatusError.newBuilder()
+                    .setType(errorType)
+                    .setMessage("error message")
+            )
             .build()
         JobStatus currentStatus = JobStatus.INIT
         JobStatus newStatus = JobStatus.RUNNING

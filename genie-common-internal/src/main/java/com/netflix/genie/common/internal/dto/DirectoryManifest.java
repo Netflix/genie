@@ -275,7 +275,8 @@ public class DirectoryManifest {
      */
     public static class Factory {
 
-        private static final Filter ACCEPT_ALL_FILTER = new DirectoryManifest.Filter() { };
+        private static final Filter ACCEPT_ALL_FILTER = new DirectoryManifest.Filter() {
+        };
         private final Filter filter;
 
         /**

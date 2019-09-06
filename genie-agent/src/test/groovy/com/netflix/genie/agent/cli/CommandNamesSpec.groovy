@@ -37,8 +37,8 @@ class CommandNamesSpec extends Specification {
         return CommandNames.getCommandNamesFields()
             .stream()
             .map { field ->
-            [field.getName(), (String) field.get(null)] as String[]
-        }
-        .collect(Collectors.toList())
+                [field.getName(), (String) field.get(null)] as String[]
+            }
+            .collect(Collectors.toList())
     }
 }

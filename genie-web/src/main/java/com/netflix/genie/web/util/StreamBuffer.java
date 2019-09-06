@@ -168,6 +168,15 @@ public class StreamBuffer {
          * {@inheritDoc}
          */
         @Override
+        public int read() {
+            // Overriding other read() methods and hoping nobody is referring to this one directly.
+            throw new NotImplementedException("Not implemented");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public int read(final byte[] b, final int off, final int len) throws IOException {
 
             if (off < 0 || len < 0 || len > b.length - off) {
@@ -183,15 +192,6 @@ public class StreamBuffer {
             }
 
             return bytesRead;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int read() {
-            // Overriding other read() methods and hoping nobody is referring to this one directly.
-            throw new NotImplementedException("Not implemented");
         }
     }
 

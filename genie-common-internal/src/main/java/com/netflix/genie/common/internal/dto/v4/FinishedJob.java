@@ -110,6 +110,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job start timestamp, if present
      */
     public Optional<Instant> getStarted() {
@@ -118,6 +119,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job completion timestamp, if present
      */
     public Optional<Instant> getFinished() {
@@ -126,6 +128,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job grouping, if present
      */
     public Optional<String> getGrouping() {
@@ -134,6 +137,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job grouping instance, if present
      */
     public Optional<String> getGroupingInstance() {
@@ -142,6 +146,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job final status message, if present
      */
     public Optional<String> getStatusMessage() {
@@ -150,6 +155,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job requested memory, if present
      */
     public Optional<Integer> getRequestedMemory() {
@@ -158,6 +164,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the requesting client hostname, if present
      */
     public Optional<String> getRequestApiClientHostname() {
@@ -166,6 +173,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the requesting client user-agent, if present
      */
     public Optional<String> getRequestApiClientUserAgent() {
@@ -174,6 +182,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the executing agent hostname, if present
      */
     public Optional<String> getRequestAgentClientHostname() {
@@ -182,6 +191,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the executing agent version, if present
      */
     public Optional<String> getRequestAgentClientVersion() {
@@ -190,6 +200,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the number of job attachments, if present
      */
     public Optional<Integer> getNumAttachments() {
@@ -198,6 +209,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job process exit code, if present
      */
     public Optional<Integer> getExitCode() {
@@ -206,6 +218,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job outputs archive location, if present
      */
     public Optional<String> getArchiveLocation() {
@@ -214,6 +227,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job used memory, if present
      */
     public Optional<Integer> getMemoryUsed() {
@@ -222,6 +236,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job resolved command, if present
      */
     public Optional<Command> getCommand() {
@@ -230,6 +245,7 @@ public class FinishedJob extends CommonMetadata {
 
     /**
      * Getter for optional field.
+     *
      * @return the job resolved cluster, if present
      */
     public Optional<Cluster> getCluster() {
@@ -268,15 +284,15 @@ public class FinishedJob extends CommonMetadata {
         /**
          * Constructor with required fields.
          *
-         * @param uniqueId job id
-         * @param name job name
-         * @param user job user
-         * @param version job version
-         * @param created job creation timestamp
-         * @param status job status
-         * @param commandArgs job command arguments
+         * @param uniqueId         job id
+         * @param name             job name
+         * @param user             job user
+         * @param version          job version
+         * @param created          job creation timestamp
+         * @param status           job status
+         * @param commandArgs      job command arguments
          * @param commandCriterion job command criterion
-         * @param clusterCriteria job cluster criteria
+         * @param clusterCriteria  job cluster criteria
          */
         public Builder(
             final String uniqueId,

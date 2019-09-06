@@ -522,14 +522,6 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<Integer> getRequestedMemory() {
-        return Optional.ofNullable(this.requestedMemory);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<Integer> getRequestedTimeout() {
         return Optional.ofNullable(this.requestedTimeout);
     }
@@ -563,6 +555,47 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
+    public Optional<String> getStatusMsg() {
+        return Optional.ofNullable(this.statusMsg);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<Instant> getStarted() {
+        return Optional.ofNullable(this.started);
+    }
+
+    /**
+     * Set the start time for the job.
+     *
+     * @param started The started time.
+     */
+    public void setStarted(@Nullable final Instant started) {
+        this.started = started;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<Instant> getFinished() {
+        return Optional.ofNullable(this.finished);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<Integer> getRequestedMemory() {
+        return Optional.ofNullable(this.requestedMemory);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<String> getRequestApiClientHostname() {
         return Optional.ofNullable(this.requestApiClientHostname);
     }
@@ -581,6 +614,107 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<Integer> getNumAttachments() {
         return Optional.ofNullable(this.numAttachments);
+    }
+
+    /**
+     * Get the hostname of the agent that requested this job be run if there was one.
+     *
+     * @return The hostname wrapped in an {@link Optional}
+     */
+    public Optional<String> getRequestAgentClientHostname() {
+        return Optional.ofNullable(this.requestAgentClientHostname);
+    }
+
+    /**
+     * Get the version of the agent that requested this job be run if there was one.
+     *
+     * @return The version wrapped in an {@link Optional}
+     */
+    public Optional<String> getRequestAgentClientVersion() {
+        return Optional.ofNullable(this.requestAgentClientVersion);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<Integer> getExitCode() {
+        return Optional.ofNullable(this.exitCode);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getArchiveLocation() {
+        return Optional.ofNullable(this.archiveLocation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<Integer> getMemoryUsed() {
+        return Optional.ofNullable(this.memoryUsed);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<ClusterEntity> getCluster() {
+        return Optional.ofNullable(this.cluster);
+    }
+
+    /**
+     * Set the cluster this job ran on.
+     *
+     * @param cluster The cluster this job ran on
+     */
+    public void setCluster(@Nullable final ClusterEntity cluster) {
+        if (this.cluster != null) {
+            this.clusterName = null;
+        }
+
+        this.cluster = cluster;
+
+        if (this.cluster != null) {
+            this.clusterName = cluster.getName();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<CommandEntity> getCommand() {
+        return Optional.ofNullable(this.command);
+    }
+
+    /**
+     * Set the command used to run this job.
+     *
+     * @param command The command
+     */
+    public void setCommand(@Nullable final CommandEntity command) {
+        if (this.command != null) {
+            this.commandName = null;
+        }
+
+        this.command = command;
+
+        if (this.command != null) {
+            this.commandName = command.getName();
+        }
+    }
+
+    /**
+     * Set the finishTime for the job.
+     *
+     * @param finished The finished time.
+     */
+    public void setFinished(@Nullable final Instant finished) {
+        this.finished = finished;
     }
 
     /**
@@ -626,24 +760,6 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the hostname of the agent that requested this job be run if there was one.
-     *
-     * @return The hostname wrapped in an {@link Optional}
-     */
-    public Optional<String> getRequestAgentClientHostname() {
-        return Optional.ofNullable(this.requestAgentClientHostname);
-    }
-
-    /**
-     * Get the version of the agent that requested this job be run if there was one.
-     *
-     * @return The version wrapped in an {@link Optional}
-     */
-    public Optional<String> getRequestAgentClientVersion() {
-        return Optional.ofNullable(this.requestAgentClientVersion);
-    }
-
-    /**
      * Get the PID of the agent that requested this job be run if there was one.
      *
      * @return The PID wrapped in an {@link Optional}
@@ -682,48 +798,6 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getStatusMsg() {
-        return Optional.ofNullable(this.statusMsg);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<Instant> getStarted() {
-        return Optional.ofNullable(this.started);
-    }
-
-    /**
-     * Set the start time for the job.
-     *
-     * @param started The started time.
-     */
-    public void setStarted(@Nullable final Instant started) {
-        this.started = started;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<Instant> getFinished() {
-        return Optional.ofNullable(this.finished);
-    }
-
-    /**
-     * Set the finishTime for the job.
-     *
-     * @param finished The finished time.
-     */
-    public void setFinished(@Nullable final Instant finished) {
-        this.finished = finished;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<String> getClusterName() {
         return Optional.ofNullable(this.clusterName);
     }
@@ -734,14 +808,6 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getCommandName() {
         return Optional.ofNullable(this.commandName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<String> getArchiveLocation() {
-        return Optional.ofNullable(this.archiveLocation);
     }
 
     /**
@@ -786,22 +852,6 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<Long> getCheckDelay() {
         return Optional.ofNullable(this.checkDelay);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<Integer> getExitCode() {
-        return Optional.ofNullable(this.exitCode);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<Integer> getMemoryUsed() {
-        return Optional.ofNullable(this.memoryUsed);
     }
 
     /**
@@ -931,56 +981,6 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getJobDirectoryLocation() {
         return Optional.ofNullable(this.jobDirectoryLocation);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<ClusterEntity> getCluster() {
-        return Optional.ofNullable(this.cluster);
-    }
-
-    /**
-     * Set the cluster this job ran on.
-     *
-     * @param cluster The cluster this job ran on
-     */
-    public void setCluster(@Nullable final ClusterEntity cluster) {
-        if (this.cluster != null) {
-            this.clusterName = null;
-        }
-
-        this.cluster = cluster;
-
-        if (this.cluster != null) {
-            this.clusterName = cluster.getName();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<CommandEntity> getCommand() {
-        return Optional.ofNullable(this.command);
-    }
-
-    /**
-     * Set the command used to run this job.
-     *
-     * @param command The command
-     */
-    public void setCommand(@Nullable final CommandEntity command) {
-        if (this.command != null) {
-            this.commandName = null;
-        }
-
-        this.command = command;
-
-        if (this.command != null) {
-            this.commandName = command.getName();
-        }
     }
 
     /**

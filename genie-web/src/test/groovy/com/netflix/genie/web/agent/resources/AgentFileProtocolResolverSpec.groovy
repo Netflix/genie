@@ -109,11 +109,11 @@ class AgentFileProtocolResolverSpec extends Specification {
         AgentFileProtocolResolver.getAgentResourceURIFileJobId(uri) == jobId
 
         where:
-        jobId                        | path             | expectedPath
-        UUID.randomUUID().toString() | ""               | ""
-        UUID.randomUUID().toString() | "/bar"           | "/bar"
-        UUID.randomUUID().toString() | "bar"            | "/bar"
-        UUID.randomUUID().toString() | "//bar"           | "//bar"
+        jobId                        | path    | expectedPath
+        UUID.randomUUID().toString() | ""      | ""
+        UUID.randomUUID().toString() | "/bar"  | "/bar"
+        UUID.randomUUID().toString() | "bar"   | "/bar"
+        UUID.randomUUID().toString() | "//bar" | "//bar"
     }
 
     def "URI errors"() {

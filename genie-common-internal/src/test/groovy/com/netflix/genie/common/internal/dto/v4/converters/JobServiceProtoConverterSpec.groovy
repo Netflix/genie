@@ -610,33 +610,33 @@ class JobServiceProtoConverterSpec extends Specification {
     com.netflix.genie.proto.ExecutionResourceCriteria createExecutionResourceCriteriaProto() {
         return com.netflix.genie.proto.ExecutionResourceCriteria.newBuilder()
             .addAllClusterCriteria(
-            Lists.newArrayList(
-                com.netflix.genie.proto.Criterion
-                    .newBuilder()
-                    .setId(clusterCriterion0Id)
-                    .setName(clusterCriterion0Name)
-                    .setVersion(clusterCriterion0Version)
-                    .setStatus(clusterCriterion0Status)
-                    .addAllTags(clusterCriterion0Tags)
-                    .build(),
-                com.netflix.genie.proto.Criterion
-                    .newBuilder()
-                    .setId(clusterCriterion1Id)
-                    .setName(clusterCriterion1Name)
-                    .setVersion(clusterCriterion1Version)
-                    .setStatus(clusterCriterion1Status)
-                    .addAllTags(clusterCriterion1Tags)
-                    .build(),
-                com.netflix.genie.proto.Criterion
-                    .newBuilder()
-                    .setId(clusterCriterion2Id)
-                    .setName(clusterCriterion2Name)
-                    .setVersion(clusterCriterion2Version)
-                    .setStatus(clusterCriterion2Status)
-                    .addAllTags(clusterCriterion2Tags)
-                    .build()
-            )
-        ).setCommandCriterion(
+                Lists.newArrayList(
+                    com.netflix.genie.proto.Criterion
+                        .newBuilder()
+                        .setId(clusterCriterion0Id)
+                        .setName(clusterCriterion0Name)
+                        .setVersion(clusterCriterion0Version)
+                        .setStatus(clusterCriterion0Status)
+                        .addAllTags(clusterCriterion0Tags)
+                        .build(),
+                    com.netflix.genie.proto.Criterion
+                        .newBuilder()
+                        .setId(clusterCriterion1Id)
+                        .setName(clusterCriterion1Name)
+                        .setVersion(clusterCriterion1Version)
+                        .setStatus(clusterCriterion1Status)
+                        .addAllTags(clusterCriterion1Tags)
+                        .build(),
+                    com.netflix.genie.proto.Criterion
+                        .newBuilder()
+                        .setId(clusterCriterion2Id)
+                        .setName(clusterCriterion2Name)
+                        .setVersion(clusterCriterion2Version)
+                        .setStatus(clusterCriterion2Status)
+                        .addAllTags(clusterCriterion2Tags)
+                        .build()
+                )
+            ).setCommandCriterion(
             com.netflix.genie.proto.Criterion
                 .newBuilder()
                 .setId(commandCriterionId)

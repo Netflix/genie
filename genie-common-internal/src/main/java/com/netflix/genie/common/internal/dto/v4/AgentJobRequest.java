@@ -100,10 +100,14 @@ public interface AgentJobRequest extends CommonRequest {
         public Builder(
             @JsonProperty(value = "metadata", required = true) final JobMetadata metadata,
             @JsonProperty(value = "criteria", required = true) final ExecutionResourceCriteria criteria,
-            @JsonProperty(value = "requestedAgentConfig", required = true)
-            final AgentConfigRequest requestedAgentConfig,
-            @JsonProperty(value = "requestedJobArchivalData", required = true)
-            final JobArchivalDataRequest requestedJobArchivalData
+            @JsonProperty(
+                value = "requestedAgentConfig",
+                required = true
+            ) final AgentConfigRequest requestedAgentConfig,
+            @JsonProperty(
+                value = "requestedJobArchivalData",
+                required = true
+            ) final JobArchivalDataRequest requestedJobArchivalData
         ) {
             super();
             this.bMetadata = metadata;
