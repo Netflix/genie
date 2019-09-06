@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.CommandService;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
@@ -34,7 +33,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -132,21 +130,16 @@ public class CommandClient {
         final List<String> statusList,
         final List<String> tagList
     ) throws IOException, GenieClientException {
-        final List<Command> commandList = new ArrayList<>();
-        final JsonNode jNode = commandService.getCommands(
-            name,
-            user,
-            statusList,
-            tagList
-        ).execute().body()
-            .get("_embedded");
-        if (jNode != null) {
-            for (final JsonNode objNode : jNode.get("commandList")) {
-                final Command command = GenieClientUtils.treeToValue(objNode, Command.class);
-                commandList.add(command);
-            }
-        }
-        return commandList;
+        return GenieClientUtils.parseSearchResultsResponse(
+            this.commandService.getCommands(
+                name,
+                user,
+                statusList,
+                tagList
+            ).execute(),
+            "commandList",
+            Command.class
+        );
     }
 
     /**
@@ -230,7 +223,7 @@ public class CommandClient {
         commandService.updateCommand(commandId, command).execute();
     }
 
-    /****************** Methods to manipulate configs for a command   *********************/
+    //****************** Methods to manipulate configs for a command   *********************/
 
     /**
      * Method to get all the configs for a command.
@@ -309,7 +302,7 @@ public class CommandClient {
         commandService.removeAllConfigsForCommand(commandId).execute();
     }
 
-    /****************** Methods to manipulate dependencies for a command   *********************/
+    //****************** Methods to manipulate dependencies for a command   *********************/
 
     /**
      * Method to get all the dependency files for an command.
@@ -389,7 +382,7 @@ public class CommandClient {
         commandService.removeAllDependenciesForCommand(commandId).execute();
     }
 
-    /****************** Methods to manipulate applications for a command   *********************/
+    //****************** Methods to manipulate applications for a command   *********************/
 
     /**
      * Method to get all the applications for a command.
@@ -508,7 +501,7 @@ public class CommandClient {
         commandService.removeAllApplicationsForCommand(commandId).execute();
     }
 
-    /****************** Methods to manipulate tags for a command   *********************/
+    //****************** Methods to manipulate tags for a command   *********************/
 
     /**
      * Method to get all the tags for a command.

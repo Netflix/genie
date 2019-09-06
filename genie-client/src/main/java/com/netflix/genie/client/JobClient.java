@@ -18,6 +18,7 @@
 package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
@@ -37,6 +38,7 @@ import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
@@ -247,8 +249,7 @@ public class JobClient {
         final Long minFinished,
         final Long maxFinished
     ) throws IOException, GenieClientException {
-
-        final JsonNode jnode = this.jobService.getJobs(
+        return this.getJobs(
             id,
             name,
             user,
@@ -264,16 +265,7 @@ public class JobClient {
             maxFinished,
             null,
             null
-        ).execute().body()
-            .get("_embedded")
-            .get("jobSearchResultList");
-
-        final List<JobSearchResult> jobList = new ArrayList<>();
-        for (final JsonNode objNode : jnode) {
-            final JobSearchResult jobSearchResult = GenieClientUtils.treeToValue(objNode, JobSearchResult.class);
-            jobList.add(jobSearchResult);
-        }
-        return jobList;
+        );
     }
 
     /**
@@ -315,33 +307,27 @@ public class JobClient {
         @Nullable final String grouping,
         @Nullable final String groupingInstance
     ) throws IOException, GenieClientException {
-
-        final JsonNode jnode = this.jobService.getJobs(
-            id,
-            name,
-            user,
-            statuses,
-            tags,
-            clusterName,
-            clusterId,
-            commandName,
-            commandId,
-            minStarted,
-            maxStarted,
-            minFinished,
-            maxFinished,
-            grouping,
-            groupingInstance
-        ).execute().body()
-            .get("_embedded")
-            .get("jobSearchResultList");
-
-        final List<JobSearchResult> jobList = new ArrayList<>();
-        for (final JsonNode objNode : jnode) {
-            final JobSearchResult jobSearchResult = GenieClientUtils.treeToValue(objNode, JobSearchResult.class);
-            jobList.add(jobSearchResult);
-        }
-        return jobList;
+        return GenieClientUtils.parseSearchResultsResponse(
+            this.jobService.getJobs(
+                id,
+                name,
+                user,
+                statuses,
+                tags,
+                clusterName,
+                clusterId,
+                commandName,
+                commandId,
+                minStarted,
+                maxStarted,
+                minFinished,
+                maxFinished,
+                grouping,
+                groupingInstance
+            ).execute(),
+            "jobSearchResultList",
+            JobSearchResult.class
+        );
     }
 
     /**
@@ -465,28 +451,31 @@ public class JobClient {
      * Method to fetch the stdout of a job from Genie.
      *
      * @param jobId The id of the job whose output is desired.
-     * @return An inputstream to the output contents.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @return An input stream to the output contents.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
-    public InputStream getJobStdout(
-        final String jobId
-    ) throws IOException, GenieClientException {
+    public InputStream getJobStdout(final String jobId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
+        // TODO: Why Not? -- TJG 9/6/2019
         if (!this.getJobStatus(jobId).equals(JobStatus.SUCCEEDED)) {
             throw new GenieClientException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
         }
-        return jobService.getJobStdout(jobId).execute().body().byteStream();
+        final ResponseBody body = this.jobService.getJobStdout(jobId).execute().body();
+        if (body == null) {
+            throw new GenieClientException("No data for job std out returned");
+        }
+        return body.byteStream();
     }
 
     /**
      * Method to fetch the stderr of a job from Genie.
      *
      * @param jobId The id of the job whose stderr is desired.
-     * @return An inputstream to the stderr contents.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @return An input stream to the stderr contents.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
     public InputStream getJobStderr(
@@ -495,7 +484,11 @@ public class JobClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
-        return jobService.getJobStderr(jobId).execute().body().byteStream();
+        final ResponseBody body = this.jobService.getJobStderr(jobId).execute().body();
+        if (body == null) {
+            throw new GenieClientException("No data for job std out returned");
+        }
+        return body.byteStream();
     }
 
     /**
@@ -512,9 +505,16 @@ public class JobClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
-        final JsonNode jsonNode = jobService.getJobStatus(jobId).execute().body();
+        final JsonNode jsonNode = this.jobService.getJobStatus(jobId).execute().body();
+        if (jsonNode == null || jsonNode.getNodeType() != JsonNodeType.OBJECT) {
+            throw new GenieClientException("Unknown response from server: " + jsonNode);
+        }
         try {
-            return JobStatus.parse(jsonNode.get(STATUS).asText());
+            final JsonNode statusNode = jsonNode.get(STATUS);
+            if (statusNode == null || statusNode.getNodeType() != JsonNodeType.STRING) {
+                throw new GenieClientException("Unknown response format for status: " + statusNode);
+            }
+            return JobStatus.parse(statusNode.asText());
         } catch (GeniePreconditionException ge) {
             throw new GenieClientException(ge.getMessage());
         }

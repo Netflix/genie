@@ -35,4 +35,5 @@ dependencies {
 
     testCompile("org.springframework.boot:spring-boot-starter-jetty")
     testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
+    testCompile("com.squareup.okhttp3:mockwebserver")
 }
