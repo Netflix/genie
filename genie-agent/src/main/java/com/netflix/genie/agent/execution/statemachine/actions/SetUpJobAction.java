@@ -105,6 +105,12 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             final File jobDirectory;
             jobDirectory = this.jobSetupService.createJobDirectory(jobSpecification);
             executionContext.setJobDirectory(jobDirectory);
+            
+            // Move the agent log file inside the job folder
+            relocateAgentLogFile(jobDirectory);
+
+            // Start manifest service, allowing server to browse and request files.
+            this.agentFileStreamService.start(claimedJobId, jobDirectory.toPath());
 
             // Set status to INIT
             this.agentJobService.changeJobStatus(
@@ -114,12 +120,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
                 JobStatusMessages.JOB_INITIALIZING
             );
             executionContext.setCurrentJobStatus(JobStatus.INIT);
-
-            // Move the agent log file inside the job folder
-            relocateAgentLogFile(jobDirectory);
-
-            // Start manifest service, allowing server to browse and request files.
-            this.agentFileStreamService.start(claimedJobId, jobDirectory.toPath());
 
             // Download dependencies, configurations, etc.
             final List<File> setupFiles = this.jobSetupService.downloadJobResources(jobSpecification, jobDirectory);
