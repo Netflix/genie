@@ -127,6 +127,9 @@ public class StateMachineActionsAutoConfiguration {
      * @param executionContext  The job execution context to use
      * @param jobProcessManager The launch job service to use
      * @param agentJobService   The agent job service to use
+     * @param jobSetupService   The job setup service
+     * @param jobArchiveService The job archive service
+     * @param cleanupArguments  The cleanup arguments group
      * @return A {@link MonitorJobAction} instance
      */
     @Bean
@@ -134,9 +137,19 @@ public class StateMachineActionsAutoConfiguration {
     public MonitorJobAction monitorJobAction(
         final ExecutionContext executionContext,
         final JobProcessManager jobProcessManager,
-        final AgentJobService agentJobService
+        final AgentJobService agentJobService,
+        final JobSetupService jobSetupService,
+        final JobArchiveService jobArchiveService,
+        final ArgumentDelegates.CleanupArguments cleanupArguments
     ) {
-        return new MonitorJobAction(executionContext, agentJobService, jobProcessManager);
+        return new MonitorJobAction(
+            executionContext,
+            agentJobService,
+            jobProcessManager,
+            jobSetupService,
+            jobArchiveService,
+            cleanupArguments
+        );
     }
 
     /**
@@ -176,7 +189,6 @@ public class StateMachineActionsAutoConfiguration {
      * @param agentHeartBeatService The agent heart beat service to use
      * @param agentJobKillService   The agent job kill service to use
      * @param fileStreamService     The agent file stream service to use
-     * @param cleanupArguments      The cleanup arguments to use
      * @return A {@link SetUpJobAction} instance
      */
     @Bean
@@ -187,8 +199,7 @@ public class StateMachineActionsAutoConfiguration {
         final AgentJobService agentJobService,
         final AgentHeartBeatService agentHeartBeatService,
         final AgentJobKillService agentJobKillService,
-        final AgentFileStreamService fileStreamService,
-        final ArgumentDelegates.CleanupArguments cleanupArguments
+        final AgentFileStreamService fileStreamService
     ) {
         return new SetUpJobAction(
             executionContext,
@@ -196,24 +207,21 @@ public class StateMachineActionsAutoConfiguration {
             agentJobService,
             agentHeartBeatService,
             agentJobKillService,
-            fileStreamService,
-            cleanupArguments
+            fileStreamService
         );
     }
 
     /**
      * Provide a {@link ShutdownAction} bean.
      *
-     * @param executionContext  The job execution context to use
-     * @param jobArchiveService Archival service to use
+     * @param executionContext The job execution context to use
      * @return A {@link ShutdownAction} instance
      */
     @Bean
     @Lazy
     public ShutdownAction shutdownAction(
-        final ExecutionContext executionContext,
-        final JobArchiveService jobArchiveService
+        final ExecutionContext executionContext
     ) {
-        return new ShutdownAction(executionContext, jobArchiveService);
+        return new ShutdownAction(executionContext);
     }
 }

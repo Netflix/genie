@@ -18,7 +18,6 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
-import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
@@ -40,7 +39,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Action performed when in state SETUP_JOB.
@@ -56,7 +54,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     private final AgentHeartBeatService heartbeatService;
     private final AgentJobKillService killService;
     private final AgentFileStreamService agentFileStreamService;
-    private final ArgumentDelegates.CleanupArguments cleanupArguments;
 
     SetUpJobAction(
         final ExecutionContext executionContext,
@@ -64,8 +61,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         final AgentJobService agentJobService,
         final AgentHeartBeatService heartbeatService,
         final AgentJobKillService killService,
-        final AgentFileStreamService fileStreamService,
-        final ArgumentDelegates.CleanupArguments cleanupArguments
+        final AgentFileStreamService fileStreamService
     ) {
         super(executionContext);
         this.jobSetupService = jobSetupService;
@@ -73,7 +69,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         this.heartbeatService = heartbeatService;
         this.killService = killService;
         this.agentFileStreamService = fileStreamService;
-        this.cleanupArguments = cleanupArguments;
     }
 
     @Override
@@ -150,19 +145,6 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
     @Override
     protected void executeStateActionCleanup(final ExecutionContext executionContext) {
-        final Optional<File> jobDirectory = executionContext.getJobDirectory();
-
-        if (jobDirectory.isPresent()) {
-            try {
-                this.jobSetupService.cleanupJobDirectory(
-                    jobDirectory.get().toPath(),
-                    cleanupArguments.getCleanupStrategy()
-                );
-            } catch (final IOException e) {
-                log.warn("Exception while performing job directory cleanup", e);
-            }
-        }
-
         // Stop services started during setup
         killService.stop();
         heartbeatService.stop();
