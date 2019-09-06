@@ -170,6 +170,17 @@ class SetUpJobActionSpec extends Specification {
         1 * killService.stop()
         1 * heartbeatService.stop()
         1 * fileStreamService.stop()
+
+        when:
+        action.executeStateActionCleanup(executionContext)
+
+        then:
+        1 * executionContext.getJobDirectory() >> Optional.empty()
+        0 * cleanupArguments.getCleanupStrategy() >> cleanupStrategy
+        0 * jobSetupService.cleanupJobDirectory(jobDir.toPath(), cleanupStrategy) >> { throw ioException}
+        1 * killService.stop()
+        1 * heartbeatService.stop()
+        1 * fileStreamService.stop()
     }
 
     def "Pre and post action validation"() {
