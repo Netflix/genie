@@ -20,6 +20,7 @@ package com.netflix.genie.common.internal.dto.v4.converters
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
+import com.google.protobuf.Int32Value
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
@@ -76,6 +77,7 @@ class JobServiceProtoConverterSpec extends Specification {
         UUID.randomUUID().toString()
     )
     def jobDirectoryLocation = "/tmp"
+    def timeout = 23_382
 
     def configs = Sets.newHashSet(
         UUID.randomUUID().toString(),
@@ -409,6 +411,43 @@ class JobServiceProtoConverterSpec extends Specification {
         agentMetadata.getAgentPid() == agentPid
     }
 
+    def "Can convert AgentConfigRequest DTO to AgentConfig Proto and vice versa"() {
+        def agentConfigRequestWithOptionals = new AgentConfigRequest.Builder()
+            .withInteractive(interactive)
+            .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+            .withTimeoutRequested(timeout)
+            .build()
+
+        def agentConfigRequestWithoutOptionals = new AgentConfigRequest.Builder()
+            .withInteractive(false)
+            .build()
+
+        when:
+        def protoWithOptionals = converter.toAgentConfigProto(agentConfigRequestWithOptionals)
+
+        then:
+        protoWithOptionals.getIsInteractive()
+        protoWithOptionals.getJobDirectoryLocation() == jobDirectoryLocation
+        protoWithOptionals.hasTimeout()
+        protoWithOptionals.getTimeout().getValue() == timeout
+
+        when:
+        def protoWithoutOptionals = converter.toAgentConfigProto(agentConfigRequestWithoutOptionals)
+
+        then:
+        !protoWithoutOptionals.getIsInteractive()
+        protoWithoutOptionals.getJobDirectoryLocation() == ""
+        !protoWithoutOptionals.hasTimeout()
+
+        when:
+        def dtoWithOptionals = converter.toAgentConfigRequestDto(protoWithOptionals)
+        def dtoWithoutOptionals = converter.toAgentConfigRequestDto(protoWithoutOptionals)
+
+        then:
+        agentConfigRequestWithOptionals == dtoWithOptionals
+        agentConfigRequestWithoutOptionals == dtoWithoutOptionals
+    }
+
     AgentJobRequest createJobRequest(String id, String archiveLocationPrefix) {
         def jobMetadata = new JobMetadata.Builder(name, user, version)
             .withDescription(description)
@@ -432,6 +471,7 @@ class JobServiceProtoConverterSpec extends Specification {
         def agentConfigRequest = new AgentConfigRequest.Builder()
             .withInteractive(interactive)
             .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+            .withTimeoutRequested(timeout)
             .build()
 
         def jobArchivalDataRequest = new JobArchivalDataRequest.Builder()
@@ -654,6 +694,7 @@ class JobServiceProtoConverterSpec extends Specification {
             .newBuilder()
             .setIsInteractive(interactive)
             .setJobDirectoryLocation(jobDirectoryLocation)
+            .setTimeout(Int32Value.of(timeout))
             .build()
     }
 

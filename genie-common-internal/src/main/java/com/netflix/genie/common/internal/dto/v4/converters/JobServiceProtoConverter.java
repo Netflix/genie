@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.protobuf.Int32Value;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
@@ -275,6 +276,7 @@ public class JobServiceProtoConverter {
                     : null
             )
             .withInteractive(protoAgentConfig.getIsInteractive())
+            .withTimeoutRequested(protoAgentConfig.hasTimeout() ? protoAgentConfig.getTimeout().getValue() : null)
             .build();
     }
 
@@ -290,6 +292,9 @@ public class JobServiceProtoConverter {
             location -> builder.setJobDirectoryLocation(location.getAbsolutePath())
         );
         builder.setIsInteractive(agentConfigRequest.isInteractive());
+        agentConfigRequest
+            .getTimeoutRequested()
+            .ifPresent(requestedTimeout -> builder.setTimeout(Int32Value.of(requestedTimeout)));
         return builder.build();
     }
 
