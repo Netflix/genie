@@ -396,10 +396,10 @@ class JobServiceProtoConverterSpec extends Specification {
     }
 
     def "Can convert AgentClientMetadata to HandshakeRequest"() {
-        AgentClientMetadata agentClientMetatada = createAgentClientMetadata()
+        AgentClientMetadata agentClientMetadata = createAgentClientMetadata()
 
         when:
-        HandshakeRequest handshakeRequest = converter.toHandshakeRequest(agentClientMetatada)
+        HandshakeRequest handshakeRequest = converter.toHandshakeRequest(agentClientMetadata)
 
         then:
         AgentMetadata agentMetadata = handshakeRequest.getAgentMetadata()
