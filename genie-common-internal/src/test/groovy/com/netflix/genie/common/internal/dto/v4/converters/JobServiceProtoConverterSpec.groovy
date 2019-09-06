@@ -309,8 +309,8 @@ class JobServiceProtoConverterSpec extends Specification {
         )
 
         when:
-        def specResponseProto = converter.toProtoJobSpecificationResponse(originalSpecification)
-        def convertedSpecification = converter.toJobSpecificationDTO(specResponseProto.getSpecification())
+        def specProto = converter.toJobSpecificationProto(originalSpecification)
+        def convertedSpecification = converter.toJobSpecificationDTO(specProto)
 
         then:
         originalSpecification == convertedSpecification
