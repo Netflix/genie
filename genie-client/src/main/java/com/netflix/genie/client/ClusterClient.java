@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ClusterService;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
@@ -33,7 +32,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -139,23 +137,17 @@ public class ClusterClient {
         final Long minUpdateTime,
         final Long maxUpdateTime
     ) throws IOException, GenieClientException {
-
-        final List<Cluster> clusterList = new ArrayList<>();
-        final JsonNode jnode = clusterService.getClusters(
-            name,
-            statusList,
-            tagList,
-            minUpdateTime,
-            maxUpdateTime
-        ).execute().body()
-            .get("_embedded");
-        if (jnode != null) {
-            for (final JsonNode objNode : jnode.get("clusterList")) {
-                final Cluster cluster = GenieClientUtils.treeToValue(objNode, Cluster.class);
-                clusterList.add(cluster);
-            }
-        }
-        return clusterList;
+        return GenieClientUtils.parseSearchResultsResponse(
+            this.clusterService.getClusters(
+                name,
+                statusList,
+                tagList,
+                minUpdateTime,
+                maxUpdateTime
+            ).execute(),
+            "clusterList",
+            Cluster.class
+        );
     }
 
     /**
@@ -239,7 +231,7 @@ public class ClusterClient {
         clusterService.updateCluster(clusterId, cluster).execute();
     }
 
-    /****************** Methods to manipulate configs for a cluster   *********************/
+    //****************** Methods to manipulate configs for a cluster   *********************/
 
     /**
      * Method to get all the configs for a cluster.
@@ -318,7 +310,7 @@ public class ClusterClient {
         clusterService.removeAllConfigsForCluster(clusterId).execute();
     }
 
-    /****************** Methods to manipulate dependencies for a cluster   *********************/
+    //****************** Methods to manipulate dependencies for a cluster   *********************/
 
     /**
      * Method to get all the dependency files for an cluster.
@@ -398,7 +390,7 @@ public class ClusterClient {
         clusterService.removeAllDependenciesForCluster(clusterId).execute();
     }
 
-    /****************** Methods to manipulate commands for a cluster   *********************/
+    //****************** Methods to manipulate commands for a cluster   *********************/
 
     /**
      * Method to get all the commands for a cluster.
@@ -500,7 +492,7 @@ public class ClusterClient {
         clusterService.removeAllCommandsForCluster(clusterId).execute();
     }
 
-    /****************** Methods to manipulate tags for a cluster   *********************/
+    //****************** Methods to manipulate tags for a cluster   *********************/
 
     /**
      * Method to get all the tags for a cluster.

@@ -105,7 +105,10 @@ configure(javaProjects) {
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.springtestdbunit:spring-test-dbunit:1.3.0")
             dependency("com.github.spotbugs:spotbugs-annotations:3.1.12")
-            dependency("com.squareup.okhttp3:okhttp:3.11.0")
+            dependencySet(group: "com.squareup.okhttp3", version: "3.11.0") {
+                entry "okhttp"
+                entry "mockwebserver"
+            }
             dependencySet(group: "com.squareup.retrofit2", version: "2.6.1") {
                 entry "retrofit"
                 entry "converter-jackson"

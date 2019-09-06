@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ApplicationService;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
@@ -33,7 +32,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -132,22 +130,17 @@ public class ApplicationClient {
         final List<String> tagList,
         final String type
     ) throws IOException {
-        final List<Application> applicationList = new ArrayList<>();
-        final JsonNode jNode = this.applicationService.getApplications(
-            name,
-            user,
-            statusList,
-            tagList,
-            type
-        ).execute().body()
-            .get("_embedded");
-        if (jNode != null) {
-            for (final JsonNode objNode : jNode.get("applicationList")) {
-                final Application application = GenieClientUtils.treeToValue(objNode, Application.class);
-                applicationList.add(application);
-            }
-        }
-        return applicationList;
+        return GenieClientUtils.parseSearchResultsResponse(
+            this.applicationService.getApplications(
+                name,
+                user,
+                statusList,
+                tagList,
+                type
+            ).execute(),
+            "applicationList",
+            Application.class
+        );
     }
 
     /**
@@ -327,7 +320,7 @@ public class ApplicationClient {
         applicationService.removeAllConfigsForApplication(applicationId).execute();
     }
 
-    /****************** Methods to manipulate dependencies for a application   *********************/
+    //****************** Methods to manipulate dependencies for a application   *********************/
 
     /**
      * Method to get all the dependency files for an application.
@@ -407,7 +400,7 @@ public class ApplicationClient {
         applicationService.removeAllDependenciesForApplication(applicationId).execute();
     }
 
-    /****************** Methods to manipulate tags for a application   *********************/
+    //**************** Methods to manipulate tags for a application   *********************/
 
     /**
      * Method to get all the tags for a application.

@@ -18,6 +18,8 @@
 package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.Lists;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.interceptors.ResponseMappingInterceptor;
@@ -25,12 +27,14 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -123,5 +127,51 @@ final class GenieClientUtils {
      */
     static String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf(SLASH) + 1);
+    }
+
+    /**
+     * Given a response from a Genie search API parse the results from the list.
+     *
+     * @param response        The response JSON from the server
+     * @param searchResultKey The JSON key the search result list is expected to exist under
+     * @param clazz           The expected response type to bind to
+     * @param <T>             The type of POJO to bind to
+     * @return A {@link List} of {@literal T} or empty if no results
+     * @throws IOException          On error reading the body
+     * @throws GenieClientException On unsuccessful query
+     */
+    static <T> List<T> parseSearchResultsResponse(
+        final Response<JsonNode> response,
+        final String searchResultKey,
+        final Class<T> clazz
+    ) throws IOException {
+        if (!response.isSuccessful()) {
+            throw new GenieClientException(
+                "Search failed due to "
+                    + (response.errorBody() == null ? response.message() : response.errorBody().toString())
+            );
+        }
+
+        // Request returned some 2xx
+        final JsonNode body = response.body();
+        if (body == null || body.getNodeType() != JsonNodeType.OBJECT) {
+            return Lists.newArrayList();
+        }
+        final JsonNode embedded = body.get("_embedded");
+        if (embedded == null || embedded.getNodeType() != JsonNodeType.OBJECT) {
+            // Kind of an invalid response? Could return error or just swallow?
+            return Lists.newArrayList();
+        }
+        final JsonNode searchResultsJson = embedded.get(searchResultKey);
+        if (searchResultsJson == null || searchResultsJson.getNodeType() != JsonNodeType.ARRAY) {
+            return Lists.newArrayList();
+        }
+
+        final List<T> searchList = new ArrayList<>();
+        for (final JsonNode searchResultJson : searchResultsJson) {
+            final T searchResult = GenieClientUtils.treeToValue(searchResultJson, clazz);
+            searchList.add(searchResult);
+        }
+        return searchList;
     }
 }
