@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -47,7 +47,7 @@ public class AgentAutoConfiguration {
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentMetadata.class)
-    public AgentMetadata agentMetadata() {
+    public AgentMetadataImpl agentMetadata() {
         return new AgentMetadataImpl();
     }
 
@@ -63,17 +63,34 @@ public class AgentAutoConfiguration {
     }
 
     /**
-     * Get a lazy task executor bean which may be shared by different components if one isn't already defined.
+     * Get a lazy {@link AsyncTaskExecutor} bean which may be shared by different components if one isn't already
+     * defined.
      *
-     * @return A task executor
+     * @return A {@link ThreadPoolTaskExecutor} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = TaskExecutor.class)
-    public TaskExecutor sharedAgentTaskExecutor() {
+    @ConditionalOnMissingBean(name = "sharedAgentTaskExecutor", value = AsyncTaskExecutor.class)
+    public AsyncTaskExecutor sharedAgentTaskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.initialize();
+        executor.setCorePoolSize(5);
+        executor.setThreadNamePrefix("agent-task-executor-");
         return executor;
+    }
+
+    /**
+     * Provide a lazy {@link TaskScheduler} to be used by the Agent process if one isn't already defined.
+     *
+     * @return A {@link ThreadPoolTaskScheduler} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(name = "sharedAgentTaskScheduler")
+    public TaskScheduler sharedAgentTaskScheduler() {
+        final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5); // Big enough?
+        scheduler.setThreadNamePrefix("agent-task-scheduler-");
+        return scheduler;
     }
 
     /**
@@ -84,8 +101,8 @@ public class AgentAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(name = "heartBeatServiceTaskExecutor", value = TaskScheduler.class)
-    public TaskScheduler heartBeatServiceTaskExecutor() {
+    @ConditionalOnMissingBean(name = "heartBeatServiceTaskScheduler")
+    public TaskScheduler heartBeatServiceTaskScheduler() {
         final ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.setPoolSize(1);
         taskScheduler.initialize();

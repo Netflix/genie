@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -99,15 +98,18 @@ public class GRpcServicesAutoConfigurationIntegrationTest {
             return Mockito.mock(KillService.class);
         }
 
-        @Bean
-        @Qualifier("sharedAgentTaskExecutor")
+        @Bean(name = "sharedAgentTaskExecutor")
         TaskExecutor taskExecutor() {
             return Mockito.mock(TaskExecutor.class);
         }
 
-        @Bean
-        @Qualifier("heartBeatServiceTaskExecutor")
-        TaskScheduler taskScheduler() {
+        @Bean(name = "sharedAgentTaskScheduler")
+        TaskScheduler sharedAgentTaskScheduler() {
+            return Mockito.mock(TaskScheduler.class);
+        }
+
+        @Bean(name = "heartBeatServiceTaskScheduler")
+        TaskScheduler heartBeatServiceTaskScheduler() {
             return Mockito.mock(TaskScheduler.class);
         }
 
