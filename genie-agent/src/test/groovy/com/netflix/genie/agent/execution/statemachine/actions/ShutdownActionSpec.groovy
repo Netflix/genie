@@ -30,92 +30,23 @@ class ShutdownActionSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
     ExecutionContext executionContext
-    JobArchiveService archivalService
     ShutdownAction action
-    JobSpecification jobSpecification
-    File jobDir
-    URI sampleS3URI = new URI("s3://test-bucket/genie/job/test123")
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.archivalService = Mock(JobArchiveService)
-        this.jobSpecification = Mock(JobSpecification)
-        this.jobDir = temporaryFolder.newFolder("job")
-        this.action = new ShutdownAction(executionContext, archivalService)
+        this.action = new ShutdownAction(executionContext)
     }
 
     void cleanup() {
     }
 
-    def "Archive if archival location is provided"() {
+    def "Execute action successfully"() {
         def event
 
         when:
         event = action.executeStateAction(executionContext)
 
         then:
-        2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
-        2 * jobSpecification.getArchiveLocation() >> Optional.of(sampleS3URI.toString())
-        2 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * archivalService.archiveDirectory(jobDir.toPath(), sampleS3URI)
-        event == Events.SHUTDOWN_COMPLETE
-
-    }
-
-    def "Don't archive if archival location is not provided"() {
-        def event
-
-        when:
-        event = action.executeStateAction(executionContext)
-
-        then:
-        2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
-        1 * jobSpecification.getArchiveLocation() >> Optional.empty()
-        0 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        0 * archivalService.archiveDirectory(_, _)
-        event == Events.SHUTDOWN_COMPLETE
-    }
-
-    def "Don't archive if archival location is not empty"() {
-        def event
-        when:
-        event = action.executeStateAction(executionContext)
-
-        then: "Skip archival for a empty archiveDirectory location"
-        2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
-        2 * jobSpecification.getArchiveLocation() >> Optional.of("")
-        0 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        0 * archivalService.archiveDirectory(_, _)
-        event == Events.SHUTDOWN_COMPLETE
-    }
-
-    def "Swallow archival exception"() {
-        def event
-
-        when:
-        event = action.executeStateAction(executionContext)
-
-        then:
-        2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
-        2 * jobSpecification.getArchiveLocation() >> Optional.of(sampleS3URI.toString())
-        2 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * archivalService.archiveDirectory(jobDir.toPath(), sampleS3URI) >> {
-            throw new JobArchiveException("error")
-        }
-        event == Events.SHUTDOWN_COMPLETE
-    }
-
-    def "Swallow bad archival URI exception"() {
-        def event
-
-        when:
-        event = action.executeStateAction(executionContext)
-
-        then:
-        2 * executionContext.getJobSpecification() >> Optional.of(jobSpecification)
-        2 * jobSpecification.getArchiveLocation() >> Optional.of("invalid URI")
-        2 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        0 * archivalService.archiveDirectory(jobDir.toPath(), sampleS3URI)
         event == Events.SHUTDOWN_COMPLETE
     }
 

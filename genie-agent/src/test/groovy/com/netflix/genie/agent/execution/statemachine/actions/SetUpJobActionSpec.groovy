@@ -85,7 +85,7 @@ class SetUpJobActionSpec extends Specification {
         this.fileStreamService = Mock(AgentFileStreamService)
         this.cleanupArguments = Mock(ArgumentDelegates.CleanupArguments)
 
-        this.action = new SetUpJobAction(executionContext, jobSetupService, agentJobService, heartbeatService, killService, fileStreamService, cleanupArguments)
+        this.action = new SetUpJobAction(executionContext, jobSetupService, agentJobService, heartbeatService, killService, fileStreamService)
     }
 
     void cleanup() {
@@ -117,9 +117,6 @@ class SetUpJobActionSpec extends Specification {
         action.executeStateActionCleanup(executionContext)
 
         then:
-        1 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * cleanupArguments.getCleanupStrategy() >> cleanupStrategy
-        1 * jobSetupService.cleanupJobDirectory(jobDir.toPath(), cleanupStrategy)
         1 * killService.stop()
         1 * heartbeatService.stop()
         1 * fileStreamService.stop()
@@ -159,28 +156,6 @@ class SetUpJobActionSpec extends Specification {
         1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> {throw changeJobStatusException}
         e = thrown(RuntimeException)
         e.getCause() == changeJobStatusException
-
-        when:
-        action.executeStateActionCleanup(executionContext)
-
-        then:
-        1 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * cleanupArguments.getCleanupStrategy() >> cleanupStrategy
-        1 * jobSetupService.cleanupJobDirectory(jobDir.toPath(), cleanupStrategy) >> { throw ioException}
-        1 * killService.stop()
-        1 * heartbeatService.stop()
-        1 * fileStreamService.stop()
-
-        when:
-        action.executeStateActionCleanup(executionContext)
-
-        then:
-        1 * executionContext.getJobDirectory() >> Optional.empty()
-        0 * cleanupArguments.getCleanupStrategy() >> cleanupStrategy
-        0 * jobSetupService.cleanupJobDirectory(jobDir.toPath(), cleanupStrategy) >> { throw ioException}
-        1 * killService.stop()
-        1 * heartbeatService.stop()
-        1 * fileStreamService.stop()
     }
 
     def "Pre and post action validation"() {

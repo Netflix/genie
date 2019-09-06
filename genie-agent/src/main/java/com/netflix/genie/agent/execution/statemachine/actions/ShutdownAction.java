@@ -21,15 +21,7 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.Events;
-import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.common.internal.exceptions.JobArchiveException;
-import com.netflix.genie.common.internal.services.JobArchiveService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Action performed when in state SHUTDOWN.
@@ -40,14 +32,10 @@ import java.net.URISyntaxException;
 @Slf4j
 class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
 
-    private final JobArchiveService jobArchiveService;
-
     ShutdownAction(
-        final ExecutionContext executionContext,
-        final JobArchiveService jobArchiveService
+        final ExecutionContext executionContext
     ) {
         super(executionContext);
-        this.jobArchiveService = jobArchiveService;
     }
 
     @Override
@@ -60,27 +48,6 @@ class ShutdownAction extends BaseStateAction implements StateAction.Shutdown {
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         UserConsole.getLogger().info("Shutting down...");
-
-        if (executionContext.getJobSpecification().isPresent()) {
-            final JobSpecification jobSpecification = executionContext.getJobSpecification().get();
-            if (jobSpecification.getArchiveLocation().isPresent()) {
-                final String archiveLocation = jobSpecification.getArchiveLocation().get();
-                if (StringUtils.isNotBlank(archiveLocation)
-                    && executionContext.getJobDirectory().isPresent()) {
-                    final File jobDirectory = executionContext.getJobDirectory().get();
-                    try {
-                        log.info("Attempting to archive job folder to: " + archiveLocation);
-                        this.jobArchiveService.archiveDirectory(
-                            jobDirectory.toPath(),
-                            new URI(archiveLocation)
-                        );
-                        log.info("Job folder archived to: " + archiveLocation);
-                    } catch (JobArchiveException | URISyntaxException e) {
-                        log.error("Error archiving job folder", e);
-                    }
-                }
-            }
-        }
 
         return Events.SHUTDOWN_COMPLETE;
     }
