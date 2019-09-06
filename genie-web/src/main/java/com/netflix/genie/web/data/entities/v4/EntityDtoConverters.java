@@ -475,7 +475,8 @@ public final class EntityDtoConverters {
             jobSpecificationProjection.getEnvironmentVariables(),
             jobSpecificationProjection.isInteractive(),
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            null
         );
     }
 

@@ -163,6 +163,7 @@ message JobSpecification {
     bool is_interactive = 7;
     string job_directory_location = 8;
     string archive_location = 9;
+    google.protobuf.Int32Value timeout = 10; // Optional number of seconds from start when the job should timeout
 }
 
 message JobSpecificationError {

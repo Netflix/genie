@@ -305,6 +305,7 @@ class JobServiceProtoConverterSpec extends Specification {
             null,
             false,
             new File("/tmp/jobs"),
+            null,
             null
         )
 
@@ -328,7 +329,6 @@ class JobServiceProtoConverterSpec extends Specification {
         jobSpecificationResponse2.hasSpecification()
         !jobSpecificationResponse2.hasError()
         jobSpecification2 == jobSpecification
-
 
         when:
         def jobSpecification3 = converter.toJobSpecificationDTO(jobSpecificationResponse.getSpecification())
@@ -566,7 +566,8 @@ class JobServiceProtoConverterSpec extends Specification {
             environmentVariables,
             interactive,
             new File(jobDirectoryLocation),
-            archiveLocation
+            archiveLocation,
+            timeout
         )
     }
 
@@ -622,6 +623,7 @@ class JobServiceProtoConverterSpec extends Specification {
             .setCommand(command)
             .addAllApplications(Lists.newArrayList(application0, application1))
             .setArchiveLocation(archiveLocation)
+            .setTimeout(Int32Value.of(timeout))
             .build()
 
         return JobSpecificationResponse.newBuilder().setSpecification(jobSpecification).build()

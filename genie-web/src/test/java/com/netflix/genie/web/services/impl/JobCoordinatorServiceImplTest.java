@@ -261,7 +261,8 @@ public class JobCoordinatorServiceImplTest {
             null,
             false,
             new File("/tmp/genie/jobs/" + JOB_1_ID),
-            archiveLocation
+            archiveLocation,
+            null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
         final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
@@ -391,7 +392,8 @@ public class JobCoordinatorServiceImplTest {
             null,
             false,
             new File("/tmp/genie/jobs/" + JOB_1_ID),
-            archiveLocation
+            archiveLocation,
+            null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
         final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
@@ -494,7 +496,8 @@ public class JobCoordinatorServiceImplTest {
             null,
             false,
             new File("/tmp/genie/jobs/" + JOB_1_ID),
-            archiveLocation
+            archiveLocation,
+            null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
         final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
@@ -616,7 +619,8 @@ public class JobCoordinatorServiceImplTest {
             null,
             false,
             new File("/tmp/genie/jobs/" + JOB_1_ID),
-            archiveLocation
+            archiveLocation,
+            null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
         final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
@@ -720,7 +724,8 @@ public class JobCoordinatorServiceImplTest {
             null,
             false,
             new File("/tmp/genie/jobs/" + JOB_1_ID),
-            archiveLocation
+            archiveLocation,
+            null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
         final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
@@ -842,7 +847,8 @@ public class JobCoordinatorServiceImplTest {
             null,
             false,
             new File("/tmp/genie/jobs/" + JOB_1_ID),
-            archiveLocation
+            archiveLocation,
+            null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
         final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);

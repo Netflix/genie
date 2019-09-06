@@ -1195,7 +1195,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             environmentVariables,
             jobRequest.getRequestedAgentConfig().isInteractive(),
             jobDirectoryLocation,
-            ARCHIVE_LOCATION
+            ARCHIVE_LOCATION,
+            null
         );
     }
 }

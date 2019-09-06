@@ -291,7 +291,8 @@ public class JobResolverServiceImpl implements JobResolverService {
                     .getRequestedArchiveLocationPrefix()
                     .orElse(this.defaultArchiveLocation),
                 id
-            )
+            ),
+            null
         );
 
         final JobEnvironment jobEnvironment = new JobEnvironment
