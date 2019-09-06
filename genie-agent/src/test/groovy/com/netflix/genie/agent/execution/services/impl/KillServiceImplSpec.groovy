@@ -15,8 +15,9 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.execution.services
+package com.netflix.genie.agent.execution.services.impl
 
+import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.services.impl.KillServiceImpl
 import org.springframework.context.ApplicationEventPublisher
 import spock.lang.Specification
