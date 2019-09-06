@@ -54,7 +54,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     private final AgentJobService agentJobService;
     private final AgentHeartBeatService heartbeatService;
     private final AgentJobKillService killService;
-    private final AgentFileStreamService fileManifestService;
+    private final AgentFileStreamService agentFileStreamService;
     private final ArgumentDelegates.CleanupArguments cleanupArguments;
 
     SetUpJobAction(
@@ -71,7 +71,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         this.agentJobService = agentJobService;
         this.heartbeatService = heartbeatService;
         this.killService = killService;
-        this.fileManifestService = fileStreamService;
+        this.agentFileStreamService = fileStreamService;
         this.cleanupArguments = cleanupArguments;
     }
 
@@ -119,7 +119,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             relocateAgentLogFile(jobDirectory);
 
             // Start manifest service, allowing server to browse and request files.
-            this.fileManifestService.start(claimedJobId, jobDirectory.toPath());
+            this.agentFileStreamService.start(claimedJobId, jobDirectory.toPath());
 
             // Download dependencies, configurations, etc.
             final List<File> setupFiles = this.jobSetupService.downloadJobResources(jobSpecification, jobDirectory);
@@ -160,7 +160,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         // Stop services started during setup
         killService.stop();
         heartbeatService.stop();
-        fileManifestService.stop();
+        agentFileStreamService.stop();
     }
 
     private void relocateAgentLogFile(final File jobDirectory) {
