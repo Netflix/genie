@@ -198,7 +198,8 @@ public class JobServiceProtoConverter {
             protoSpec.getEnvironmentVariablesMap(),
             protoSpec.getIsInteractive(),
             new File(protoSpec.getJobDirectoryLocation()),
-            StringUtils.isBlank(protoSpec.getArchiveLocation()) ? null : protoSpec.getArchiveLocation()
+            StringUtils.isBlank(protoSpec.getArchiveLocation()) ? null : protoSpec.getArchiveLocation(),
+            protoSpec.hasTimeout() ? protoSpec.getTimeout().getValue() : null
         );
     }
 
@@ -227,6 +228,7 @@ public class JobServiceProtoConverter {
         builder.setIsInteractive(jobSpecification.isInteractive());
         builder.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
         jobSpecification.getArchiveLocation().ifPresent(builder::setArchiveLocation);
+        jobSpecification.getTimeout().ifPresent(timeout -> builder.setTimeout(Int32Value.of(timeout)));
         return builder.build();
     }
 

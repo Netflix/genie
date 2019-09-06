@@ -53,6 +53,7 @@ public class JobSpecification {
     private final boolean interactive;
     private final File jobDirectoryLocation;
     private final String archiveLocation;
+    private final Integer timeout;
 
     /**
      * Constructor.
@@ -66,6 +67,8 @@ public class JobSpecification {
      * @param interactive          Whether the job is interactive or not
      * @param jobDirectoryLocation Location on disk where the job directory will be created
      * @param archiveLocation      Location where job folder is archived by the agent when job finishes. Optional
+     * @param timeout              The number of seconds after a job starts that it should be killed due to timeout.
+     *                             Optional
      */
     @JsonCreator
     public JobSpecification(
@@ -77,7 +80,8 @@ public class JobSpecification {
         @JsonProperty("environmentVariables") @Nullable final Map<String, String> environmentVariables,
         @JsonProperty(value = "interactive", required = true) final boolean interactive,
         @JsonProperty(value = "jobDirectoryLocation", required = true) final File jobDirectoryLocation,
-        @JsonProperty(value = "archiveLocation") @Nullable final String archiveLocation
+        @JsonProperty(value = "archiveLocation") @Nullable final String archiveLocation,
+        @JsonProperty(value = "timeout") @Nullable final Integer timeout
     ) {
         this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(
             commandArgs
@@ -95,6 +99,7 @@ public class JobSpecification {
         this.interactive = interactive;
         this.jobDirectoryLocation = jobDirectoryLocation;
         this.archiveLocation = archiveLocation;
+        this.timeout = timeout;
     }
 
     /**
@@ -132,6 +137,17 @@ public class JobSpecification {
      */
     public Optional<String> getArchiveLocation() {
         return Optional.ofNullable(this.archiveLocation);
+    }
+
+    /**
+     * Get the job timeout.
+     *
+     * @return The number of seconds after a job launch that this job should be killed by the agent due to timeout.
+     * Wrapped in {@link Optional} as it's not required. {@link Optional#empty()} means there is no timeout and the job
+     * can run indefinitely.
+     */
+    public Optional<Integer> getTimeout() {
+        return Optional.ofNullable(this.timeout);
     }
 
     /**

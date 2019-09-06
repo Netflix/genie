@@ -39,7 +39,7 @@ class JobSpecificationSpec extends Specification {
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
 
         when:
-        def jobSpecification = new JobSpecification(null, job, cluster, command, null, null, true, null, null)
+        def jobSpecification = new JobSpecification(null, job, cluster, command, null, null, true, null, null, null)
 
         then:
         jobSpecification.getCommandArgs().isEmpty()
@@ -50,6 +50,7 @@ class JobSpecificationSpec extends Specification {
         jobSpecification.getEnvironmentVariables().isEmpty()
         jobSpecification.isInteractive()
         jobSpecification.getJobDirectoryLocation() == null
+        !jobSpecification.getTimeout().isPresent()
     }
 
     def "Can construct new job specification with optionals"() {
@@ -71,6 +72,7 @@ class JobSpecificationSpec extends Specification {
         )
         def jobDirectoryLocation = new File(".")
         def archiveLocation = UUID.randomUUID().toString()
+        def timeout = 213_309
 
         when:
         def jobSpecification = new JobSpecification(
@@ -82,7 +84,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             false,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
 
         then:
@@ -95,6 +98,7 @@ class JobSpecificationSpec extends Specification {
         !jobSpecification.isInteractive()
         jobSpecification.getJobDirectoryLocation() == jobDirectoryLocation
         jobSpecification.getArchiveLocation() == Optional.of(archiveLocation)
+        jobSpecification.getTimeout() == Optional.of(timeout)
     }
 
     def "Can construct new job specification with empty optionals"() {
@@ -118,6 +122,7 @@ class JobSpecificationSpec extends Specification {
         )
         def jobDirectoryLocation = new File(".")
         def archiveLocation = null
+        def timeout = null
 
         when:
         def jobSpecification = new JobSpecification(
@@ -129,7 +134,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             false,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
 
         then:
@@ -142,6 +148,7 @@ class JobSpecificationSpec extends Specification {
         !jobSpecification.isInteractive()
         jobSpecification.getJobDirectoryLocation() == jobDirectoryLocation
         jobSpecification.getArchiveLocation() == Optional.empty()
+        jobSpecification.getTimeout() == Optional.empty()
     }
 
     def "Can construct execution resource without optionals"() {
@@ -211,6 +218,7 @@ class JobSpecificationSpec extends Specification {
         def interactive = true
         def jobDirectoryLocation = new File(UUID.randomUUID().toString())
         def archiveLocation = UUID.randomUUID().toString()
+        def timeout = 232_281
 
         base = new JobSpecification(
             Lists.newArrayList(commandArg),
@@ -221,7 +229,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             interactive,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
         comparable = new JobSpecification(
             Lists.newArrayList(commandArg),
@@ -232,7 +241,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             interactive,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
 
         then:
@@ -267,6 +277,8 @@ class JobSpecificationSpec extends Specification {
         def interactive = true
         def jobDirectoryLocation = new File(UUID.randomUUID().toString())
         def archiveLocation = UUID.randomUUID().toString()
+        def timeout = 2_233
+
         one = new JobSpecification(
             Lists.newArrayList(commandArg),
             job,
@@ -276,7 +288,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             interactive,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
         two = new JobSpecification(
             Lists.newArrayList(commandArg),
@@ -287,7 +300,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             interactive,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
 
         then:
@@ -322,6 +336,8 @@ class JobSpecificationSpec extends Specification {
         def interactive = true
         def jobDirectoryLocation = new File(UUID.randomUUID().toString())
         def archiveLocation = UUID.randomUUID().toString()
+        def timeout = 38_382
+
         one = new JobSpecification(
             Lists.newArrayList(commandArg),
             job,
@@ -331,7 +347,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             interactive,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
         two = new JobSpecification(
             Lists.newArrayList(commandArg),
@@ -342,7 +359,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             interactive,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
 
         then:
@@ -368,6 +386,7 @@ class JobSpecificationSpec extends Specification {
         )
         def jobDirectoryLocation = new File(".")
         def archiveLocation = UUID.randomUUID().toString()
+        def timeout = 238_834_324
 
         return new JobSpecification(
             commandArgs,
@@ -378,7 +397,8 @@ class JobSpecificationSpec extends Specification {
             environmentVariables,
             false,
             jobDirectoryLocation,
-            archiveLocation
+            archiveLocation,
+            timeout
         )
     }
 }
