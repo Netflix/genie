@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.agent.services;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
@@ -26,7 +27,6 @@ import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentMetricsServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
-import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobResolverService;
@@ -48,10 +48,10 @@ public class AgentServicesAutoConfiguration {
     /**
      * Get a {@link AgentJobService} instance if there isn't already one.
      *
-     * @param jobPersistenceService   The persistence service to use
-     * @param jobResolverService The specification service to use
-     * @param agentFilterService      The agent filter service to use
-     * @param meterRegistry           The metrics registry to use
+     * @param jobPersistenceService The persistence service to use
+     * @param jobResolverService    The specification service to use
+     * @param agentFilterService    The agent filter service to use
+     * @param meterRegistry         The metrics registry to use
      * @return An {@link AgentJobServiceImpl} instance.
      */
     @Bean

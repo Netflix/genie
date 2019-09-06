@@ -70,7 +70,7 @@ public class CommonServicesAutoConfiguration {
     /**
      * Provide a default {@link JobArchiveService} if no override is defined.
      *
-     * @param jobArchivers                The ordered available {@link JobArchiver} implementations in the system
+     * @param jobArchivers             The ordered available {@link JobArchiver} implementations in the system
      * @param directoryManifestFactory the job directory manifest factory
      * @return A {@link JobArchiveServiceImpl} instance
      */

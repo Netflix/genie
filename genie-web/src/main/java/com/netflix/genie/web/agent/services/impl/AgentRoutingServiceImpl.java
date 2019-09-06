@@ -19,8 +19,8 @@
 package com.netflix.genie.web.agent.services.impl;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 

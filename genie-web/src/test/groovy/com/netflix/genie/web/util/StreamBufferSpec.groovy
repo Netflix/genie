@@ -20,7 +20,6 @@ package com.netflix.genie.web.util
 
 import com.google.protobuf.ByteString
 import org.apache.commons.lang3.NotImplementedException
-import org.junit.Assert
 import spock.lang.Specification
 import spock.lang.Timeout
 

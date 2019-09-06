@@ -37,7 +37,6 @@ import org.apache.commons.lang3.StringUtils
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.env.Environment
-import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import spock.lang.Shared

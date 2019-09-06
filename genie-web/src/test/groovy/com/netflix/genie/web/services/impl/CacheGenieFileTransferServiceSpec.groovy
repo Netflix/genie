@@ -28,7 +28,6 @@ import spock.lang.Unroll
  * Unit tests for CacheGenieFileTransferService.
  *
  * @author amajumdar
- * @since 7/26/16.
  */
 @Unroll
 class CacheGenieFileTransferServiceSpec extends Specification {

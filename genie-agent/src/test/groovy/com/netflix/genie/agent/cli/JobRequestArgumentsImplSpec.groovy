@@ -26,8 +26,6 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-import java.nio.file.Paths
-
 class JobRequestArgumentsImplSpec extends Specification {
 
     @Rule

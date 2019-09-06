@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers;
 
-import com.netflix.genie.web.properties.GRpcServerProperties;
 import com.netflix.genie.web.agent.apis.rpc.servers.GRpcServerManager;
+import com.netflix.genie.web.properties.GRpcServerProperties;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerInterceptor;

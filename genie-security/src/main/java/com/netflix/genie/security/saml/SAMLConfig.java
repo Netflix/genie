@@ -751,14 +751,14 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
             .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
         http
             .antMatcher("/**")
-                .authorizeRequests()
-                    .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
-                    .antMatchers("/api/**").permitAll()
-                    .antMatchers("/error").permitAll()
-                    .antMatchers("/saml/**").permitAll()
-                    .anyRequest().authenticated()
+            .authorizeRequests()
+            .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
+            .antMatchers("/api/**").permitAll()
+            .antMatchers("/error").permitAll()
+            .antMatchers("/saml/**").permitAll()
+            .anyRequest().authenticated()
             .and()
-                .x509().authenticationUserDetailsService(this.x509UserDetailsService);
+            .x509().authenticationUserDetailsService(this.x509UserDetailsService);
         http
             .logout()
             .logoutSuccessUrl("/");

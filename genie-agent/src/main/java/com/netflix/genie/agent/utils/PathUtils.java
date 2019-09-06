@@ -213,6 +213,7 @@ public final class PathUtils {
 
     /**
      * Compose the path to the agent log file for a job (after it has been relocated inside the job directory).
+     *
      * @param jobDirectory the job directory
      * @return a Path
      */

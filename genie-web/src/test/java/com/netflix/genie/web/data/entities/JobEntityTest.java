@@ -262,9 +262,9 @@ public class JobEntityTest extends EntityTestBase {
         Assert.assertEquals(JobStatus.RUNNING, localJobEntity.getNotifiedJobStatus());
     }
 
-        /**
-         * Test the setter and the getter for tags.
-         */
+    /**
+     * Test the setter and the getter for tags.
+     */
     @Test
     public void testSetGetTags() {
         Assert.assertNotNull(this.jobEntity.getTags());

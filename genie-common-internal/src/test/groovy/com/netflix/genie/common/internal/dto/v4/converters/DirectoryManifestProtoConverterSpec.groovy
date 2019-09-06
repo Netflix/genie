@@ -65,7 +65,7 @@ class DirectoryManifestProtoConverterSpec extends Specification {
         this.converter.manifestToProtoMessage("...", manifest)
 
         then:
-        1 * objectMapper.writeValueAsString(manifest) >> {throw exception}
+        1 * objectMapper.writeValueAsString(manifest) >> { throw exception }
         Exception e = thrown(GenieConversionException)
         e.getCause() == exception
     }
@@ -78,7 +78,7 @@ class DirectoryManifestProtoConverterSpec extends Specification {
         this.converter.toManifest(AgentManifestMessage.getDefaultInstance())
 
         then:
-        1 * objectMapper.readValue(_, DirectoryManifest.class) >> {throw exception}
+        1 * objectMapper.readValue(_, DirectoryManifest.class) >> { throw exception }
         Exception e = thrown(GenieConversionException)
         e.getCause() == exception
     }

@@ -24,7 +24,12 @@ import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService
-import com.netflix.genie.proto.*
+import com.netflix.genie.proto.AgentFileMessage
+import com.netflix.genie.proto.AgentManifestMessage
+import com.netflix.genie.proto.FileStreamServiceGrpc
+import com.netflix.genie.proto.ServerAckMessage
+import com.netflix.genie.proto.ServerControlMessage
+import com.netflix.genie.proto.ServerFileRequestMessage
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
 import org.assertj.core.util.Lists
@@ -266,13 +271,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         observer.onNext(
             ServerControlMessage.newBuilder()
                 .setServerFileRequest(
-                ServerFileRequestMessage.newBuilder()
-                    .setRelativePath("file.txt")
-                    .setStreamId(UUID.randomUUID().toString())
-                    .setStartOffset(0)
-                    .setEndOffset(0)
-                    .build()
-            )
+                    ServerFileRequestMessage.newBuilder()
+                        .setRelativePath("file.txt")
+                        .setStreamId(UUID.randomUUID().toString())
+                        .setStartOffset(0)
+                        .setEndOffset(0)
+                        .build()
+                )
                 .build()
         )
 
@@ -285,13 +290,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         observer.onNext(
             ServerControlMessage.newBuilder()
                 .setServerFileRequest(
-                ServerFileRequestMessage.newBuilder()
-                    .setRelativePath("no-such-file.txt")
-                    .setStreamId(UUID.randomUUID().toString())
-                    .setStartOffset(0)
-                    .setEndOffset(1000)
-                    .build()
-            )
+                    ServerFileRequestMessage.newBuilder()
+                        .setRelativePath("no-such-file.txt")
+                        .setStreamId(UUID.randomUUID().toString())
+                        .setStartOffset(0)
+                        .setEndOffset(1000)
+                        .build()
+                )
                 .build()
         )
 
@@ -304,13 +309,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         observer.onNext(
             ServerControlMessage.newBuilder()
                 .setServerFileRequest(
-                ServerFileRequestMessage.newBuilder()
-                    .setRelativePath("small-file.txt")
-                    .setStreamId(UUID.randomUUID().toString())
-                    .setStartOffset(0)
-                    .setEndOffset(10)
-                    .build()
-            )
+                    ServerFileRequestMessage.newBuilder()
+                        .setRelativePath("small-file.txt")
+                        .setStreamId(UUID.randomUUID().toString())
+                        .setStartOffset(0)
+                        .setEndOffset(10)
+                        .build()
+                )
                 .build()
         )
 
@@ -334,13 +339,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
             observer.onNext(
                 ServerControlMessage.newBuilder()
                     .setServerFileRequest(
-                    ServerFileRequestMessage.newBuilder()
-                        .setRelativePath("small-file.txt")
-                        .setStreamId(UUID.randomUUID().toString())
-                        .setStartOffset(0)
-                        .setEndOffset(10)
-                        .build()
-                )
+                        ServerFileRequestMessage.newBuilder()
+                            .setRelativePath("small-file.txt")
+                            .setStreamId(UUID.randomUUID().toString())
+                            .setStartOffset(0)
+                            .setEndOffset(10)
+                            .build()
+                    )
                     .build()
             )
         }
@@ -354,13 +359,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         observer.onNext(
             ServerControlMessage.newBuilder()
                 .setServerFileRequest(
-                ServerFileRequestMessage.newBuilder()
-                    .setRelativePath("small-file.txt")
-                    .setStreamId(UUID.randomUUID().toString())
-                    .setStartOffset(0)
-                    .setEndOffset(20)
-                    .build()
-            )
+                    ServerFileRequestMessage.newBuilder()
+                        .setRelativePath("small-file.txt")
+                        .setStreamId(UUID.randomUUID().toString())
+                        .setStartOffset(0)
+                        .setEndOffset(20)
+                        .build()
+                )
                 .build()
         )
 
@@ -383,13 +388,13 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         observer.onNext(
             ServerControlMessage.newBuilder()
                 .setServerFileRequest(
-                ServerFileRequestMessage.newBuilder()
-                    .setRelativePath("small-file.txt")
-                    .setStreamId(UUID.randomUUID().toString())
-                    .setStartOffset(0)
-                    .setEndOffset(20)
-                    .build()
-            )
+                    ServerFileRequestMessage.newBuilder()
+                        .setRelativePath("small-file.txt")
+                        .setStreamId(UUID.randomUUID().toString())
+                        .setStartOffset(0)
+                        .setEndOffset(20)
+                        .build()
+                )
                 .build()
         )
 

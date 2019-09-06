@@ -19,9 +19,9 @@
 package com.netflix.genie.web.agent.services.impl;
 
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
-import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
+import com.netflix.genie.web.agent.services.AgentFilterService;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
