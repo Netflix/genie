@@ -172,7 +172,7 @@ public class JobServiceProtoConverter {
     public JobSpecificationResponse toProtoJobSpecificationResponse(final JobSpecification jobSpecification) {
         return JobSpecificationResponse
             .newBuilder()
-            .setSpecification(toJobSpecificationProto(jobSpecification))
+            .setSpecification(this.toJobSpecificationProto(jobSpecification))
             .build();
     }
 
@@ -200,6 +200,34 @@ public class JobServiceProtoConverter {
             new File(protoSpec.getJobDirectoryLocation()),
             StringUtils.isBlank(protoSpec.getArchiveLocation()) ? null : protoSpec.getArchiveLocation()
         );
+    }
+
+    /**
+     * Convert a Job Specification DTO to a protobuf message representation.
+     *
+     * @param jobSpecification The {@link JobSpecification} to convert
+     * @return A {@link com.netflix.genie.proto.JobSpecification} instance
+     */
+    public com.netflix.genie.proto.JobSpecification toJobSpecificationProto(final JobSpecification jobSpecification) {
+        final com.netflix.genie.proto.JobSpecification.Builder builder
+            = com.netflix.genie.proto.JobSpecification.newBuilder();
+
+        builder.addAllCommandArgs(jobSpecification.getCommandArgs());
+        builder.setJob(toExecutionResourceProto(jobSpecification.getJob()));
+        builder.setCluster(toExecutionResourceProto(jobSpecification.getCluster()));
+        builder.setCommand(toExecutionResourceProto(jobSpecification.getCommand()));
+        builder.addAllApplications(
+            jobSpecification
+                .getApplications()
+                .stream()
+                .map(this::toExecutionResourceProto)
+                .collect(Collectors.toList())
+        );
+        builder.putAllEnvironmentVariables(jobSpecification.getEnvironmentVariables());
+        builder.setIsInteractive(jobSpecification.isInteractive());
+        builder.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
+        jobSpecification.getArchiveLocation().ifPresent(builder::setArchiveLocation);
+        return builder.build();
     }
 
     /**
@@ -295,30 +323,6 @@ public class JobServiceProtoConverter {
         agentConfigRequest
             .getTimeoutRequested()
             .ifPresent(requestedTimeout -> builder.setTimeout(Int32Value.of(requestedTimeout)));
-        return builder.build();
-    }
-
-    private com.netflix.genie.proto.JobSpecification toJobSpecificationProto(
-        final JobSpecification jobSpecification
-    ) {
-        final com.netflix.genie.proto.JobSpecification.Builder builder
-            = com.netflix.genie.proto.JobSpecification.newBuilder();
-
-        builder.addAllCommandArgs(jobSpecification.getCommandArgs());
-        builder.setJob(toExecutionResourceProto(jobSpecification.getJob()));
-        builder.setCluster(toExecutionResourceProto(jobSpecification.getCluster()));
-        builder.setCommand(toExecutionResourceProto(jobSpecification.getCommand()));
-        builder.addAllApplications(
-            jobSpecification
-                .getApplications()
-                .stream()
-                .map(this::toExecutionResourceProto)
-                .collect(Collectors.toList())
-        );
-        builder.putAllEnvironmentVariables(jobSpecification.getEnvironmentVariables());
-        builder.setIsInteractive(jobSpecification.isInteractive());
-        builder.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
-        jobSpecification.getArchiveLocation().ifPresent(builder::setArchiveLocation);
         return builder.build();
     }
 
