@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Action performed when in state SETUP_JOB.
@@ -105,7 +106,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             final File jobDirectory;
             jobDirectory = this.jobSetupService.createJobDirectory(jobSpecification);
             executionContext.setJobDirectory(jobDirectory);
-            
+
             // Move the agent log file inside the job folder
             relocateAgentLogFile(jobDirectory);
 
@@ -149,12 +150,17 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
     @Override
     protected void executeStateActionCleanup(final ExecutionContext executionContext) {
-        final File jobDirectory = executionContext.getJobDirectory().get();
+        final Optional<File> jobDirectory = executionContext.getJobDirectory();
 
-        try {
-            this.jobSetupService.cleanupJobDirectory(jobDirectory.toPath(), cleanupArguments.getCleanupStrategy());
-        } catch (final IOException e) {
-            log.warn("Exception while performing job directory cleanup", e);
+        if (jobDirectory.isPresent()) {
+            try {
+                this.jobSetupService.cleanupJobDirectory(
+                    jobDirectory.get().toPath(),
+                    cleanupArguments.getCleanupStrategy()
+                );
+            } catch (final IOException e) {
+                log.warn("Exception while performing job directory cleanup", e);
+            }
         }
 
         // Stop services started during setup
