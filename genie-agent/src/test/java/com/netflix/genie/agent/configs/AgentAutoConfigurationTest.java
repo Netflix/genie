@@ -17,10 +17,15 @@
  */
 package com.netflix.genie.agent.configs;
 
-import org.junit.Assert;
-import org.junit.Before;
+import com.netflix.genie.agent.AgentMetadataImpl;
+import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * Tests for {@link AgentAutoConfiguration}.
@@ -28,26 +33,40 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author standon
  * @since 4.0.0
  */
-// TODO: Make this use the spring context runner
 public class AgentAutoConfigurationTest {
-
-    private AgentAutoConfiguration config;
-
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
-        this.config = new AgentAutoConfiguration();
-    }
+    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+        .withConfiguration(
+            AutoConfigurations.of(
+                AgentAutoConfiguration.class
+            )
+        );
 
     /**
-     * Make sure the executor bean is of the right type.
+     * Make sure all the expected beans exist.
      */
     @Test
-    public void canGetTaskExecutor() {
-        Assert.assertTrue(
-            this.config.sharedAgentTaskExecutor() instanceof ThreadPoolTaskExecutor
+    public void expectedBeansExist() {
+        this.contextRunner.run(
+            context -> {
+                Assertions.assertThat(context).hasSingleBean(AgentMetadataImpl.class);
+                Assertions.assertThat(context).hasSingleBean(FileLockFactory.class);
+                Assertions.assertThat(context).hasSingleBean(AsyncTaskExecutor.class);
+                Assertions.assertThat(context).hasBean("sharedAgentTaskExecutor");
+                Assertions
+                    .assertThat(context)
+                    .getBean("sharedAgentTaskExecutor")
+                    .isOfAnyClassIn(ThreadPoolTaskExecutor.class);
+                Assertions.assertThat(context).hasBean("sharedAgentTaskScheduler");
+                Assertions
+                    .assertThat(context)
+                    .getBean("sharedAgentTaskScheduler")
+                    .isOfAnyClassIn(ThreadPoolTaskScheduler.class);
+                Assertions.assertThat(context).hasBean("heartBeatServiceTaskScheduler");
+                Assertions
+                    .assertThat(context)
+                    .getBean("heartBeatServiceTaskScheduler")
+                    .isOfAnyClassIn(ThreadPoolTaskScheduler.class);
+            }
         );
     }
 }

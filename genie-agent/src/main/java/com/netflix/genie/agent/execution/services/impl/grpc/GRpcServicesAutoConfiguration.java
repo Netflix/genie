@@ -58,7 +58,7 @@ public class GRpcServicesAutoConfiguration {
     @ConditionalOnMissingBean(AgentHeartBeatService.class)
     public AgentHeartBeatService agentHeartBeatService(
         final HeartBeatServiceGrpc.HeartBeatServiceStub heartBeatServiceStub,
-        @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler
+        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler
     ) {
         return new GrpcAgentHeartBeatServiceImpl(heartBeatServiceStub, taskScheduler);
     }
@@ -113,7 +113,7 @@ public class GRpcServicesAutoConfiguration {
     @ConditionalOnMissingBean(AgentFileStreamService.class)
     public AgentFileStreamService agentFileStreamService(
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
-        @Qualifier("heartBeatServiceTaskExecutor") final TaskScheduler taskScheduler,
+        @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler,
         final JobDirectoryManifestProtoConverter jobDirectoryManifestProtoConverter,
         final JobDirectoryManifestService jobDirectoryManifestService
     ) {
