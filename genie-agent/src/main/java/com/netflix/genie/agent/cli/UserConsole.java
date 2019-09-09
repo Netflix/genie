@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli;
 
 import org.apache.commons.lang3.StringUtils;

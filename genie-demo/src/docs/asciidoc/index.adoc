@@ -92,7 +92,6 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 | `http://localhost:50070`
 | `http://localhost:50071`
 
-
 | DataNode
 | `http://localhost:50075`
 | `http://localhost:50076`

@@ -22,5 +22,4 @@
  * @author mprimi
  * @since 4.0.0
  */
-
 package com.netflix.genie.agent.utils;

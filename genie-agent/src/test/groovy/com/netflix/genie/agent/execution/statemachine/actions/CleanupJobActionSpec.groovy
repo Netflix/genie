@@ -145,7 +145,6 @@ class CleanupJobActionSpec extends Specification {
         thrown(RuntimeException)
     }
 
-
     def "Pre and post action validation"() {
         when:
         action.executePreActionValidation()

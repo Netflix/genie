@@ -592,6 +592,15 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
+     * Set the finishTime for the job.
+     *
+     * @param finished The finished time.
+     */
+    public void setFinished(@Nullable final Instant finished) {
+        this.finished = finished;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -716,15 +725,6 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Set the finishTime for the job.
-     *
-     * @param finished The finished time.
-     */
-    public void setFinished(@Nullable final Instant finished) {
-        this.finished = finished;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -738,6 +738,15 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<Long> getStdOutSize() {
         return Optional.ofNullable(this.stdOutSize);
+    }
+
+    /**
+     * Set the total size in bytes of the std out file for this job.
+     *
+     * @param stdOutSize The size. Null empties database field
+     */
+    public void setStdOutSize(@Nullable final Long stdOutSize) {
+        this.stdOutSize = stdOutSize;
     }
 
     /**
@@ -755,15 +764,6 @@ public class JobEntity extends BaseEntity implements
      */
     public void setStdErrSize(@Nullable final Long stdErrSize) {
         this.stdErrSize = stdErrSize;
-    }
-
-    /**
-     * Set the total size in bytes of the std out file for this job.
-     *
-     * @param stdOutSize The size. Null empties database field
-     */
-    public void setStdOutSize(@Nullable final Long stdOutSize) {
-        this.stdOutSize = stdOutSize;
     }
 
     /**

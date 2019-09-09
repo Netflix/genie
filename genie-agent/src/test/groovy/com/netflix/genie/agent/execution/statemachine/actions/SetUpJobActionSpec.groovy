@@ -21,28 +21,17 @@ import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
-import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
 import com.netflix.genie.agent.execution.services.AgentFileStreamService
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService
 import com.netflix.genie.agent.execution.services.AgentJobKillService
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.agent.utils.EnvUtils
-import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.common.internal.jobs.JobConstants
-import org.assertj.core.util.Sets
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.nio.file.Paths
 
 class SetUpJobActionSpec extends Specification {
@@ -138,7 +127,7 @@ class SetUpJobActionSpec extends Specification {
         1 * job.getId() >> jobId
         1 * heartbeatService.start(jobId)
         1 * killService.start(jobId)
-        1 * jobSetupService.createJobDirectory(spec) >> {throw setupException}
+        1 * jobSetupService.createJobDirectory(spec) >> { throw setupException }
         e = thrown(RuntimeException)
         e.getCause() == setupException
 
@@ -153,7 +142,9 @@ class SetUpJobActionSpec extends Specification {
         1 * killService.start(jobId)
         1 * jobSetupService.createJobDirectory(spec) >> jobDir
         1 * executionContext.setJobDirectory(jobDir)
-        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> {throw changeJobStatusException}
+        1 * agentJobService.changeJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, _ as String) >> {
+            throw changeJobStatusException
+        }
         e = thrown(RuntimeException)
         e.getCause() == changeJobStatusException
     }

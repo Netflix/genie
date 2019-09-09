@@ -48,7 +48,6 @@ public class ClusterMetadata extends CommonMetadata {
         this.status = builder.bStatus;
     }
 
-
     /**
      * A builder to create cluster user metadata instances.
      *

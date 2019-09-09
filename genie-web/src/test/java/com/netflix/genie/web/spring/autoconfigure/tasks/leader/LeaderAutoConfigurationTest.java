@@ -159,7 +159,6 @@ public class LeaderAutoConfigurationTest {
             );
     }
 
-
     /**
      * Configuration for beans that are dependencies of the auto configured beans in {@link TasksAutoConfiguration}.
      *

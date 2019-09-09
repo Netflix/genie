@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.properties;
 
 import com.netflix.genie.web.agent.services.AgentFilterService;

@@ -45,7 +45,6 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
     private ListenableFuture<JobKillRegistrationResponse> jobKillFuture;
     private boolean started;
 
-
     /**
      * Constructor.
      *

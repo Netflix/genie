@@ -265,7 +265,6 @@ public class JpaJobPersistenceServiceImplTest {
             .withCommandArgs(JOB_1_COMMAND_ARGS)
             .build();
 
-
         final JobExecution execution = new JobExecution.Builder(UUID.randomUUID().toString()).build();
 
         Mockito
@@ -734,7 +733,6 @@ public class JpaJobPersistenceServiceImplTest {
         this.jobPersistenceService.getJobSpecification(UUID.randomUUID().toString());
     }
 
-
     /**
      * If a job isn't resolved empty {@link Optional} returned.
      */
@@ -761,7 +759,6 @@ public class JpaJobPersistenceServiceImplTest {
 
         this.jobPersistenceService.isV4(UUID.randomUUID().toString());
     }
-
 
     /**
      * If v4 is false in db then return false.

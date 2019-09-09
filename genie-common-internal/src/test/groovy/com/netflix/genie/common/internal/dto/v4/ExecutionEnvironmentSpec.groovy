@@ -57,7 +57,6 @@ class ExecutionEnvironmentSpec extends Specification {
         environment.getConfigs().isEmpty()
         environment.getDependencies().isEmpty()
 
-
         when:
         environment = new ExecutionEnvironment(configs, dependencies, setupFile)
         configs.add(UUID.randomUUID().toString())

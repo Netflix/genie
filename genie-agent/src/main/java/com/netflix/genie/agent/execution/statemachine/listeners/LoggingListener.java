@@ -203,7 +203,6 @@ public class LoggingListener implements JobExecutionListener {
         );
     }
 
-
     private String getStateNameString(@Nullable final State<States, Events> state) {
         return state != null ? state.getId().toString() : "(null)";
     }

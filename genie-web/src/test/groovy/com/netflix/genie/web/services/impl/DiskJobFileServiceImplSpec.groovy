@@ -92,7 +92,6 @@ class DiskJobFileServiceImplSpec extends Specification {
         def file3StartByte = 10_003L
         def file3Length = (long) (file3StartByte + file3ContentsAsBytes.length)
 
-
         when:
         this.diskLogService.createJobDirectory(jobId)
 

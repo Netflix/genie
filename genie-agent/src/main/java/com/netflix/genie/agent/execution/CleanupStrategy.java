@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution;
 
 /**
@@ -25,7 +24,6 @@ package com.netflix.genie.agent.execution;
  * @since 4.0.0
  */
 public enum CleanupStrategy {
-
 
     /**
      * Skip cleanup completely.

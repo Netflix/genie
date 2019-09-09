@@ -548,7 +548,6 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
             .body(USER_PATH, Matchers.is(USER));
 
-
         final String newUser = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + newUser + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
@@ -642,7 +641,6 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         final String version1 = UUID.randomUUID().toString();
         final String version2 = UUID.randomUUID().toString();
         final String version3 = UUID.randomUUID().toString();
-
 
         this.createConfigResource(
             new Application

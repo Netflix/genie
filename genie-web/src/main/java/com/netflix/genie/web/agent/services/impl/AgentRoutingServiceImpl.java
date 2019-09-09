@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.agent.services.impl;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;

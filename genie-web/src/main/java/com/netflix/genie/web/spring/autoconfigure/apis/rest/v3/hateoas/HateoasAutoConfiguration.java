@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas;
 
-
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;

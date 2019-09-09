@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.agent.resources
 
 import org.springframework.beans.BeansException

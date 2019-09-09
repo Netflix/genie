@@ -146,7 +146,6 @@ public class JobKickoffTask extends GenieBaseTask {
                 + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
             command.add(runScript);
 
-
             // Cannot convert to executor because it does not provide an api to get process id.
             final ProcessBuilder pb = new ProcessBuilder(command)
                 .directory(jobExecEnv.getJobWorkingDir())

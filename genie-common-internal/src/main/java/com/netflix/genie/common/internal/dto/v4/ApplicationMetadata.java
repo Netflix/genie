@@ -64,7 +64,6 @@ public class ApplicationMetadata extends CommonMetadata {
         return Optional.ofNullable(this.type);
     }
 
-
     /**
      * A builder to create application user metadata instances.
      *

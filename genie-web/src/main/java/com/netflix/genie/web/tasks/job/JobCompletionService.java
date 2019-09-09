@@ -370,7 +370,6 @@ public class JobCompletionService {
         }
     }
 
-
     /**
      * Delete application, cluster, command dependencies from the job working directory to save space.
      *

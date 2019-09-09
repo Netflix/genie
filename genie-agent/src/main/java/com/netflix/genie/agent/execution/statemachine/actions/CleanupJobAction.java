@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.cli.UserConsole;
@@ -60,7 +59,6 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         UserConsole.getLogger().info("Cleaning up job...");
-
 
         // If execution was aborted sometimes before the job was launched, the server is due for a job status update.
         final Optional<String> claimedJobId = executionContext.getClaimedJobId();

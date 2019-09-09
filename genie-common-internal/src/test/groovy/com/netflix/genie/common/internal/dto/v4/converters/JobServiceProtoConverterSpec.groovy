@@ -222,7 +222,6 @@ class JobServiceProtoConverterSpec extends Specification {
         then:
         jobRequest1 == jobRequest
 
-
         when:
         def jobRequest2 = converter.toJobRequestDto(reserveJobIdRequest)
 
@@ -248,7 +247,6 @@ class JobServiceProtoConverterSpec extends Specification {
 
         then:
         jobRequest1 == jobRequest
-
 
         when:
         def jobRequest2 = converter.toJobRequestDto(dryRunJobSpecificationRequest)
@@ -348,7 +346,6 @@ class JobServiceProtoConverterSpec extends Specification {
         request.getId() == id
         agentClientMetadata == agentClientMetadata2
     }
-
 
     def "Can convert JobRequest to ReserveJobIdRequest with null id"() {
         def jobRequest = createJobRequest(null, requestedArchiveLocationPrefix)

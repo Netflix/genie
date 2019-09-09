@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.data.services.jpa
 
-
 import com.netflix.genie.web.data.entities.TagEntity
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository
 import org.springframework.dao.DuplicateKeyException

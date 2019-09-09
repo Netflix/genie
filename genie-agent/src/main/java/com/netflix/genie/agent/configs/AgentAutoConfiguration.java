@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.configs;
 
 import com.netflix.genie.agent.AgentMetadata;

@@ -123,7 +123,6 @@ class GRpcAgentJobServiceImplSpec extends Specification {
         Exception e = thrown(GenieRuntimeException)
         e.getMessage().contains(error.name())
 
-
         where:
         error                                  | _
         HandshakeResponse.Type.UNKNOWN         | _

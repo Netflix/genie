@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.util;
 
 import com.google.protobuf.ByteString;

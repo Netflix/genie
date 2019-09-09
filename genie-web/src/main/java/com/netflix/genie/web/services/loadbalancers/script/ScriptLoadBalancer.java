@@ -186,7 +186,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
             tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND));
             return null; // Should throw
 
-
         } catch (final Exception e) {
             tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED));
             tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName()));
@@ -256,7 +255,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         private final Environment environment;
         private final MeterRegistry registry;
         private final GenieFileTransferService fileTransferService;
-
 
         protected Loader(
             final TaskScheduler taskScheduler,

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.internal.util;
 
 import org.springframework.scheduling.Trigger;

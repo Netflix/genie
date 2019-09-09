@@ -84,7 +84,6 @@ public class NodeAutoConfigurationTest {
             );
     }
 
-
     /**
      * Configuration for beans that are dependencies of the auto configured beans in {@link TasksAutoConfiguration}.
      *
@@ -112,7 +111,6 @@ public class NodeAutoConfigurationTest {
         public JobSearchService jobSearchService() {
             return Mockito.mock(JobSearchService.class);
         }
-
 
         /**
          * Mocked bean.

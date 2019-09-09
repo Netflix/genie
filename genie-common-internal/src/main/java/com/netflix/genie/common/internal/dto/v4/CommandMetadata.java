@@ -48,7 +48,6 @@ public class CommandMetadata extends CommonMetadata {
         this.status = builder.bStatus;
     }
 
-
     /**
      * A builder to create command user metadata instances.
      *

@@ -29,7 +29,6 @@ class ResolveJobSpecCommandArgumentsSpec extends Specification {
     ArgumentDelegates.JobRequestArguments jobArguments
     MainCommandArguments mainCommandArguments
 
-
     void setup() {
         serverArguments = new ServerArgumentsImpl()
         mainCommandArguments = Mock(MainCommandArguments)

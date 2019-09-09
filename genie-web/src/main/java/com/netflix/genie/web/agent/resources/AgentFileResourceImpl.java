@@ -84,7 +84,6 @@ public final class AgentFileResourceImpl implements AgentFileStreamService.Agent
         );
     }
 
-
     /**
      * Factory method to create a resource for a remote file.
      *

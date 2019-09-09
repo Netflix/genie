@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.data.repositories.jpa;
 
 import com.netflix.genie.web.data.entities.AgentConnectionEntity;

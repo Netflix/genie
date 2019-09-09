@@ -232,7 +232,6 @@ public class JpaJobSearchServiceImplTest {
         );
     }
 
-
     /**
      * Make sure that user resources summaries are returned correctly.
      */
@@ -263,7 +262,6 @@ public class JpaJobSearchServiceImplTest {
             this.service.getUserResourcesSummaries()
         );
     }
-
 
     /**
      * Make sure that user disconnected agent ids are returned correctly when there is no active job.

@@ -246,7 +246,6 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
 
             this.handleRequest(baseUri, relativePath, request, response, manifest.get(), jobDirRoot);
 
-
         } else if (jobStatus.isActive()) {
             // Active V3 job
 

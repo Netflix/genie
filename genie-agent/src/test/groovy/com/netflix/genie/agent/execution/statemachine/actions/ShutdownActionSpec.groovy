@@ -19,9 +19,6 @@ package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.common.internal.exceptions.JobArchiveException
-import com.netflix.genie.common.internal.services.JobArchiveService
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -49,7 +46,6 @@ class ShutdownActionSpec extends Specification {
         then:
         event == Events.SHUTDOWN_COMPLETE
     }
-
 
     def "Pre and post action validation"() {
         when:

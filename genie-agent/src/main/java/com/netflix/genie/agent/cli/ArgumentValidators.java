@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli;
 
 import com.amazonaws.services.s3.AmazonS3URI;

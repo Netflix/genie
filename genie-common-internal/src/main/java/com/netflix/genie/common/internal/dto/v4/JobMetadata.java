@@ -96,7 +96,6 @@ public class JobMetadata extends CommonMetadata {
         return Optional.ofNullable(this.groupingInstance);
     }
 
-
     /**
      * A builder to create job user metadata instances.
      *

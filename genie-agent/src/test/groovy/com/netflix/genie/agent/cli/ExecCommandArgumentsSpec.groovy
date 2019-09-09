@@ -32,7 +32,6 @@ class ExecCommandArgumentsSpec extends Specification {
     ArgumentDelegates.CleanupArguments cleanupArguments
     MainCommandArguments mainCommandArguments
 
-
     void setup() {
         serverArguments = new ServerArgumentsImpl()
         cacheArguments = new CacheArgumentsImpl()

@@ -63,7 +63,6 @@ class CacheArgumentsImplSpec extends Specification {
         thrown(ParameterException)
     }
 
-
     class TestOptions {
         @ParametersDelegate
         private ArgumentDelegates.CacheArguments cacheArguments = new CacheArgumentsImpl()

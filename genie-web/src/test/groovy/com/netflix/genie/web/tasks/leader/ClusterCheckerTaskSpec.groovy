@@ -57,7 +57,6 @@ class ClusterCheckerTaskSpec extends Specification {
             _ * getLostThreshold() >> 3
         }
 
-
         this.jobSearchService = Mock(JobSearchService.class)
         this.jobPersistenceService = Mock(JobPersistenceService.class)
         this.restTemplate = Mock(RestTemplate.class)

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.DownloadException;

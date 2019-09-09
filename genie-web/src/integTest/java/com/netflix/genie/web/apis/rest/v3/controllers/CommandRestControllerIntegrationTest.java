@@ -559,7 +559,6 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
             .body(NAME_PATH, Matchers.is(NAME));
 
-
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
