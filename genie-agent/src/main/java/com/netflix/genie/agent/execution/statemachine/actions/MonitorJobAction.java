@@ -22,11 +22,11 @@ import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
+import com.netflix.genie.agent.execution.process.JobProcessResult;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
@@ -86,32 +86,15 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
     protected Events executeStateAction(final ExecutionContext executionContext) {
         UserConsole.getLogger().info("Monitoring job...");
 
-        final JobStatus finalJobStatus;
+        final JobProcessResult jobProcessResult;
         try {
-            finalJobStatus = jobProcessManager.waitFor();
+            jobProcessResult = this.jobProcessManager.waitFor();
         } catch (final InterruptedException e) {
             throw new RuntimeException("Interrupted while waiting for job process completion", e);
         }
 
+        final JobStatus finalJobStatus = jobProcessResult.getFinalStatus();
         log.info("Job process completed with final status {}", finalJobStatus);
-
-        // TODO: Likely want to clean this up as it only contains a few cases.
-        //       This doesn't handle if it's killed due to timeout, log file lengths exceeded, etc
-        final String finalStatusMessage;
-        switch (finalJobStatus) {
-            case SUCCEEDED:
-                finalStatusMessage = JobStatusMessages.JOB_FINISHED_SUCCESSFULLY;
-                break;
-            case FAILED:
-                finalStatusMessage = JobStatusMessages.JOB_FAILED;
-                break;
-            case KILLED:
-                finalStatusMessage = JobStatusMessages.JOB_KILLED_BY_USER;
-                break;
-            default:
-                finalStatusMessage = "Job process completed with final status " + finalJobStatus;
-                break;
-        }
 
         final File jobDirectory = executionContext.getJobDirectory().get();
         final JobSpecification jobSpecification = executionContext.getJobSpecification().get();
@@ -128,7 +111,7 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
                 executionContext.getClaimedJobId().get(),
                 JobStatus.RUNNING,
                 finalJobStatus,
-                finalStatusMessage
+                jobProcessResult.getFinalStatusMessage()
             );
             executionContext.setCurrentJobStatus(finalJobStatus);
             executionContext.setFinalJobStatus(finalJobStatus);

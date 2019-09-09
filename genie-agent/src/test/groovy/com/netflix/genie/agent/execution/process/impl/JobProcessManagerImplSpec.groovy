@@ -19,9 +19,11 @@ package com.netflix.genie.agent.execution.process.impl
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.process.JobProcessManager
+import com.netflix.genie.agent.execution.process.JobProcessResult
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.dto.JobStatusMessages
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -67,10 +69,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        JobProcessResult result = manager.waitFor()
 
         then:
-        status == JobStatus.SUCCEEDED
+        result.getFinalStatus() == JobStatus.SUCCEEDED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         expectedFile.exists()
         !stdErr.exists()
         !stdOut.exists()
@@ -94,10 +99,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        JobProcessResult result = manager.waitFor()
 
         then:
-        status == JobStatus.SUCCEEDED
+        result.getFinalStatus() == JobStatus.SUCCEEDED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         stdErr.exists()
         stdOut.exists()
         stdOut.getText(StandardCharsets.UTF_8.toString()).contains(helloWorld)
@@ -122,10 +130,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        JobProcessResult result = manager.waitFor()
 
         then:
-        status == JobStatus.SUCCEEDED
+        result.getFinalStatus() == JobStatus.SUCCEEDED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         stdErr.exists()
         stdOut.exists()
         stdOut.getText(StandardCharsets.UTF_8.toString()).contains(expectedString)
@@ -148,10 +159,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        JobProcessResult result = manager.waitFor()
 
         then:
-        status == JobStatus.FAILED
+        result.getFinalStatus() == JobStatus.FAILED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FAILED
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         stdErr.exists()
         stdOut.exists()
         stdErr.getText(StandardCharsets.UTF_8.toString()).contains("No such file or directory")
@@ -305,10 +319,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        JobProcessResult result = manager.waitFor()
 
         then:
-        status == JobStatus.KILLED
+        result.getFinalStatus() == JobStatus.KILLED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         !stdErr.exists()
         !stdOut.exists()
     }
@@ -335,10 +352,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        JobProcessResult result = manager.waitFor()
 
         then:
-        status == JobStatus.KILLED
+        result.getFinalStatus() == JobStatus.KILLED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         !stdErr.exists()
         !stdOut.exists()
     }
@@ -365,10 +385,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        def result = manager.waitFor()
 
         then:
-        status == JobStatus.KILLED
+        result.getFinalStatus() == JobStatus.KILLED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         !stdErr.exists()
         !stdOut.exists()
     }
@@ -395,10 +418,13 @@ class JobProcessManagerImplSpec extends Specification {
         noExceptionThrown()
 
         when:
-        JobStatus status = manager.waitFor()
+        def result = manager.waitFor()
 
         then:
-        status == JobStatus.KILLED
+        result.getFinalStatus() == JobStatus.KILLED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
         !stdErr.exists()
         !stdOut.exists()
     }

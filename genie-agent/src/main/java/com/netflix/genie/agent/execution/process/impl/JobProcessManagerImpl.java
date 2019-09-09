@@ -20,10 +20,12 @@ package com.netflix.genie.agent.execution.process.impl;
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
+import com.netflix.genie.agent.execution.process.JobProcessResult;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,6 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class JobProcessManagerImpl implements JobProcessManager {
 
+    private static final int SUCCESS_EXIT_CODE = 0;
     private final AtomicBoolean launched = new AtomicBoolean(false);
     private final AtomicReference<Process> processReference = new AtomicReference<>();
     private final AtomicBoolean killed = new AtomicBoolean(false);
@@ -168,7 +171,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
      * {@inheritDoc}
      */
     @Override
-    public JobStatus waitFor() throws InterruptedException {
+    public JobProcessResult waitFor() throws InterruptedException {
 
         if (!launched.get()) {
             throw new IllegalStateException("Process not launched");
@@ -195,11 +198,14 @@ public class JobProcessManagerImpl implements JobProcessManager {
         }
 
         if (killed.get()) {
-            return JobStatus.KILLED;
-        } else if (exitCode == 0) {
-            return JobStatus.SUCCEEDED;
+            return new JobProcessResult.Builder(JobStatus.KILLED, JobStatusMessages.JOB_KILLED_BY_USER).build();
+        } else if (exitCode == SUCCESS_EXIT_CODE) {
+            return new JobProcessResult.Builder(
+                JobStatus.SUCCEEDED,
+                JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+            ).build();
         } else {
-            return JobStatus.FAILED;
+            return new JobProcessResult.Builder(JobStatus.FAILED, JobStatusMessages.JOB_FAILED).build();
         }
     }
 

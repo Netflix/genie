@@ -19,7 +19,6 @@ package com.netflix.genie.agent.execution.process;
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.KillService;
-import com.netflix.genie.common.dto.JobStatus;
 import org.springframework.context.ApplicationListener;
 
 import java.io.File;
@@ -65,5 +64,5 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
      * @throws IllegalStateException if the process was not launched
      * @throws InterruptedException  if the calling thread is interrupted while waiting
      */
-    JobStatus waitFor() throws InterruptedException;
+    JobProcessResult waitFor() throws InterruptedException;
 }
