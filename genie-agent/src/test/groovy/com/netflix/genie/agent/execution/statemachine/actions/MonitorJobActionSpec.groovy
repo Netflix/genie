@@ -22,10 +22,12 @@ import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.process.JobProcessManager
+import com.netflix.genie.agent.execution.process.JobProcessResult
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
@@ -38,7 +40,7 @@ class MonitorJobActionSpec extends Specification {
     MonitorJobAction action
     Process process
     AgentJobService agentJobService
-    JobProcessManager launchJobService
+    JobProcessManager jobProcessManager
     JobSetupService jobSetupService
     JobArchiveService jobArchiveService
     ArgumentDelegates.CleanupArguments cleanupArguments
@@ -51,7 +53,7 @@ class MonitorJobActionSpec extends Specification {
         this.id = UUID.randomUUID().toString()
         this.executionContext = Mock(ExecutionContext)
         this.agentJobService = Mock(AgentJobService)
-        this.launchJobService = Mock(JobProcessManager)
+        this.jobProcessManager = Mock(JobProcessManager)
         this.jobSetupService = Mock(JobSetupService)
         this.jobArchiveService = Mock(JobArchiveService)
         this.process = Mock(Process)
@@ -63,7 +65,7 @@ class MonitorJobActionSpec extends Specification {
         this.action = new MonitorJobAction(
             executionContext,
             agentJobService,
-            launchJobService,
+            jobProcessManager,
             jobSetupService,
             jobArchiveService,
             cleanupArguments
@@ -76,7 +78,7 @@ class MonitorJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * launchJobService.waitFor() >> expectedJobStatus
+        1 * jobProcessManager.waitFor() >> new JobProcessResult.Builder(finalStatus, finalStatusMessage).build()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
@@ -84,29 +86,30 @@ class MonitorJobActionSpec extends Specification {
         1 * jobSetupService.cleanupJobDirectory(jobDirectory.toPath(), cleanupStrategy)
         1 * jobSpec.getArchiveLocation() >> Optional.of(archiveLocation)
         1 * jobArchiveService.archiveDirectory(jobDirectory.toPath(), new URI(archiveLocation))
-        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, expectedJobStatus, _ as String)
-        1 * executionContext.setCurrentJobStatus(expectedJobStatus)
-        1 * executionContext.setFinalJobStatus(expectedJobStatus)
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, finalStatus, finalStatusMessage)
+        1 * executionContext.setCurrentJobStatus(finalStatus)
+        1 * executionContext.setFinalJobStatus(finalStatus)
 
         expect:
         event == Events.MONITOR_JOB_COMPLETE
 
         where:
-        _ | expectedJobStatus
-        _ | JobStatus.SUCCEEDED
-        _ | JobStatus.FAILED
-        _ | JobStatus.KILLED
+        finalStatus         | finalStatusMessage
+        JobStatus.SUCCEEDED | JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+        JobStatus.FAILED    | JobStatusMessages.JOB_FAILED
+        JobStatus.KILLED    | JobStatusMessages.JOB_KILLED_BY_USER
     }
 
     def "Cleanup and archival errors"() {
         setup:
         def finalJobStatus = JobStatus.SUCCEEDED
+        def finalJobStatusMessage = JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
 
         when:
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * launchJobService.waitFor() >> finalJobStatus
+        1 * jobProcessManager.waitFor() >> new JobProcessResult.Builder(finalJobStatus, finalJobStatusMessage).build()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
@@ -118,7 +121,7 @@ class MonitorJobActionSpec extends Specification {
         1 * jobArchiveService.archiveDirectory(jobDirectory.toPath(), new URI(archiveLocation)) >> {
             throw new JobArchiveException("...")
         }
-        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, finalJobStatus, _ as String)
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, finalJobStatus, finalJobStatusMessage)
         1 * executionContext.setCurrentJobStatus(finalJobStatus)
         1 * executionContext.setFinalJobStatus(finalJobStatus)
 
@@ -134,20 +137,22 @@ class MonitorJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        1 * launchJobService.waitFor() >> { throw exception }
+        1 * jobProcessManager.waitFor() >> { throw exception }
         Exception e = thrown(RuntimeException)
         e.getCause() == exception
     }
 
     def "Change job status exception"() {
         JobStatus expectedJobStatus = JobStatus.SUCCEEDED
+        String expectedJobStatusMessage = JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+        JobProcessResult result = new JobProcessResult.Builder(expectedJobStatus, expectedJobStatusMessage).build()
         Exception exception = new ChangeJobStatusException("...")
 
         when:
         action.executeStateAction(executionContext)
 
         then:
-        1 * launchJobService.waitFor() >> expectedJobStatus
+        1 * jobProcessManager.waitFor() >> result
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
@@ -155,7 +160,7 @@ class MonitorJobActionSpec extends Specification {
         1 * jobSetupService.cleanupJobDirectory(jobDirectory.toPath(), cleanupStrategy)
         1 * jobSpec.getArchiveLocation() >> Optional.empty()
         0 * jobArchiveService.archiveDirectory(_, _)
-        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, expectedJobStatus, _ as String) >> {
+        1 * agentJobService.changeJobStatus(id, JobStatus.RUNNING, expectedJobStatus, expectedJobStatusMessage) >> {
             throw exception
         }
         Exception e = thrown(RuntimeException)
