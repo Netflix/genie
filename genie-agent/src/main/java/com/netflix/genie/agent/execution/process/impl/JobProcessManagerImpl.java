@@ -15,11 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.execution.services.impl;
+package com.netflix.genie.agent.execution.process.impl;
 
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
-import com.netflix.genie.agent.execution.services.JobProcessManager;
+import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 4.0.0
  */
 @Slf4j
-class JobProcessManagerImpl implements JobProcessManager {
+public class JobProcessManagerImpl implements JobProcessManager {
 
     private final AtomicBoolean launched = new AtomicBoolean(false);
     private final AtomicReference<Process> processReference = new AtomicReference<>();
@@ -247,4 +247,3 @@ class JobProcessManagerImpl implements JobProcessManager {
         return pid;
     }
 }
-

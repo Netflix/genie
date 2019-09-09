@@ -15,10 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.execution.services.impl
+package com.netflix.genie.agent.execution.process.impl
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
-import com.netflix.genie.agent.execution.services.JobProcessManager
+import com.netflix.genie.agent.execution.process.JobProcessManager
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatus
