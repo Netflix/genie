@@ -17,12 +17,12 @@
  */
 
 /**
- * Spring configuration classes for the Genie Agent.
+ * Classes related to configuring the Agent as a Spring Boot application.
  *
  * @author tgianos
  * @since 4.0.0
  */
 @ParametersAreNonnullByDefault
-package com.netflix.genie.agent.configs;
+package com.netflix.genie.agent.spring;
 
 import javax.annotation.ParametersAreNonnullByDefault;

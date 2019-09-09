@@ -19,14 +19,14 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.collect.Sets;
-import com.netflix.genie.agent.configs.AgentAutoConfiguration;
-import com.netflix.genie.agent.configs.ProcessAutoConfiguration;
 import com.netflix.genie.agent.execution.ExecutionAutoConfiguration;
 import com.netflix.genie.agent.execution.services.impl.ServicesAutoConfiguration;
 import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration;
 import com.netflix.genie.agent.execution.statemachine.StateMachineAutoConfiguration;
 import com.netflix.genie.agent.execution.statemachine.actions.StateMachineActionsAutoConfiguration;
 import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
+import com.netflix.genie.agent.spring.autoconfigure.AgentAutoConfiguration;
+import com.netflix.genie.agent.spring.autoconfigure.ProcessAutoConfiguration;
 import com.netflix.genie.common.internal.configs.CommonServicesAutoConfiguration;
 import com.netflix.genie.common.internal.configs.ProtoConvertersAutoConfiguration;
 import org.junit.Assert;
