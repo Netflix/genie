@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs;
+package com.netflix.genie.agent.spring.autoconfigure;
 
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.AgentMetadataImpl;

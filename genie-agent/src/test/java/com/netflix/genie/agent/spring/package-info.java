@@ -23,6 +23,6 @@
  * @since 4.0.0
  */
 @ParametersAreNonnullByDefault
-package com.netflix.genie.agent.configs;
+package com.netflix.genie.agent.spring;
 
 import javax.annotation.ParametersAreNonnullByDefault;

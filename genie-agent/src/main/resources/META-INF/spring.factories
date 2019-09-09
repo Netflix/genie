@@ -1,13 +1,13 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.agent.cli.CliAutoConfiguration,\
   com.netflix.genie.agent.cli.JCommanderAutoConfiguration,\
-  com.netflix.genie.agent.configs.AgentAutoConfiguration,\
-  com.netflix.genie.agent.configs.ProcessAutoConfiguration,\
   com.netflix.genie.agent.execution.ExecutionAutoConfiguration,\
   com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration,\
   com.netflix.genie.agent.execution.services.impl.ServicesAutoConfiguration,\
   com.netflix.genie.agent.execution.statemachine.StateMachineAutoConfiguration,\
   com.netflix.genie.agent.execution.statemachine.actions.StateMachineActionsAutoConfiguration,\
-  com.netflix.genie.agent.rpc.GRpcAutoConfiguration
+  com.netflix.genie.agent.rpc.GRpcAutoConfiguration,\
+  com.netflix.genie.agent.spring.autoconfigure.AgentAutoConfiguration,\
+  com.netflix.genie.agent.spring.autoconfigure.ProcessAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\
-  com.netflix.genie.agent.configs.processors.GenieDefaultPropertiesPostProcessor
+  com.netflix.genie.agent.spring.processors.GenieDefaultPropertiesPostProcessor

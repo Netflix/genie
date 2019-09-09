@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs.processors;
+package com.netflix.genie.agent.spring.processors;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;

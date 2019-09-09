@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.configs.processors;
+package com.netflix.genie.agent.spring.processors;
 
 import com.netflix.genie.common.internal.util.PropertySourceUtils;
 import org.springframework.boot.SpringApplication;
