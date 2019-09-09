@@ -20,7 +20,6 @@ package com.netflix.genie.agent.execution.services.impl;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.FetchingCacheService;
-import com.netflix.genie.agent.execution.services.JobProcessManager;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
@@ -100,18 +99,6 @@ public class ServicesAutoConfiguration {
     @ConditionalOnMissingBean(KillService.class)
     public KillService killService(final ApplicationEventPublisher applicationEventPublisher) {
         return new KillServiceImpl(applicationEventPublisher);
-    }
-
-    /**
-     * Provide a lazy {@link JobProcessManager} bean if one hasn't already been defined.
-     *
-     * @return A {@link JobProcessManagerImpl} instance
-     */
-    @Bean
-    @Lazy
-    @ConditionalOnMissingBean(JobProcessManager.class)
-    public JobProcessManager jobProcessManager() {
-        return new JobProcessManagerImpl();
     }
 
     /**

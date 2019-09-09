@@ -21,8 +21,8 @@ import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
+import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.agent.execution.services.JobProcessManager;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
@@ -139,6 +139,11 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
         return Events.MONITOR_JOB_COMPLETE;
     }
 
+    @Override
+    protected void executePostActionValidation() {
+        assertFinalJobStatusPresentAndValid();
+    }
+
     private void archiveJobDirectory(
         final File jobDirectory,
         final JobSpecification jobSpecification
@@ -172,10 +177,5 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
         } catch (final IOException e) {
             log.warn("Exception while performing job directory cleanup", e);
         }
-    }
-
-    @Override
-    protected void executePostActionValidation() {
-        assertFinalJobStatusPresentAndValid();
     }
 }

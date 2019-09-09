@@ -22,7 +22,7 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.agent.execution.services.JobProcessManager;
+import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
