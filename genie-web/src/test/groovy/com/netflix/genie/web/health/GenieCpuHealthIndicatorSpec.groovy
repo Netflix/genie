@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.health
 
-
 import com.netflix.genie.web.properties.HealthProperties
 import com.sun.management.OperatingSystemMXBean
 import io.micrometer.core.instrument.DistributionSummary

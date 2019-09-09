@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli;
 
 import com.google.common.collect.Lists;

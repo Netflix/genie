@@ -44,7 +44,6 @@ class GrpcAgentHeartBeatServiceImplSpec extends Specification {
     StreamObserver<AgentHeartBeat> currentRequestObserver
     final List<AgentHeartBeat> heartbeatsReceived = Lists.newArrayList()
 
-
     void setup() {
         this.jobId = UUID.randomUUID().toString()
         this.taskScheduler = Mock(TaskScheduler)

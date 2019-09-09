@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.utils;
 
 import com.netflix.genie.common.internal.jobs.JobConstants;
@@ -65,7 +64,6 @@ public final class PathUtils {
     ) {
         return composePath(baseDirectory.toFile(), children);
     }
-
 
     /**
      * Compose the path to the applications directory inside a job directory.

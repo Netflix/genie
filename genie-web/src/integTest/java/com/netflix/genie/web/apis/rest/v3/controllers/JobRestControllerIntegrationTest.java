@@ -1201,7 +1201,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .withDisableLogArchival(true)
             .build();
 
-
         final String jobId = this.getIdFromLocation(
             RestAssured
                 .given(this.getRequestSpecification())

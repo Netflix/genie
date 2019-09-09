@@ -227,7 +227,6 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         1 * responseObserver2.onCompleted()
     }
 
-
     def "Accept anonymous agents"() {
         setup:
         String jobId = ""

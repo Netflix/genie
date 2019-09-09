@@ -27,8 +27,8 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
-#        useLocalSessionState: true
-#        useLocalTransactionState: true
+        # useLocalSessionState: true
+        # useLocalTransactionState: true
         rewriteBatchedStatements: true
         cacheResultSetMetadata: true
         cacheServerConfiguration: true

@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.events
 
-
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener

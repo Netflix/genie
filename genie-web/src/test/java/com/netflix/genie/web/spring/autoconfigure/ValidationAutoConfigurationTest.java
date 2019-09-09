@@ -26,7 +26,6 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 
 import javax.validation.Validator;
 
-
 /**
  * Tests for the bean validation configuration.
  *

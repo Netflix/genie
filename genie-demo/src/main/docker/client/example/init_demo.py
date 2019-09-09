@@ -24,11 +24,9 @@ logging.basicConfig(level=logging.WARNING)
 
 LOGGER = logging.getLogger(__name__)
 
-
 def load_yaml(yaml_file):
     with open(yaml_file) as _file:
         return yaml.load(_file)
-
 
 genie_conf = GenieConf()
 genie_conf.genie.url = "http://genie:8080"

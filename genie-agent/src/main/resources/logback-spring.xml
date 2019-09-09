@@ -9,17 +9,17 @@
 -->
 <configuration debug="false">
 
-  <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-  <property name="LOG_FILE" value="/tmp/genie-agent-${PID}.log"/>
-  <include resource="genie-agent-file-appender.xml" />
+    <property name="LOG_FILE" value="/tmp/genie-agent-${PID}.log"/>
+    <include resource="genie-agent-file-appender.xml"/>
 
-  <property name="CONSOLE_FILTER_LOGGER_NAME" value="genie-agent"/>
-  <include resource="genie-agent-console-appender.xml" />
+    <property name="CONSOLE_FILTER_LOGGER_NAME" value="genie-agent"/>
+    <include resource="genie-agent-console-appender.xml"/>
 
-  <root level="INFO">
-    <appender-ref ref="CONSOLE" />
-    <appender-ref ref="FILE" />
-  </root>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
 
 </configuration>

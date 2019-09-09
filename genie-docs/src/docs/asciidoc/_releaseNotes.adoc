@@ -184,7 +184,6 @@ Switched to http://micrometer.io/[Micrometer]
 |===
 |Old Name |New Name |Reason
 
-
 |genie.jobs.coordination.clusterCommandQuery.timer
 |genie.services.specification.clusterCommandQuery.timer
 |Functionality moved to new service

@@ -63,7 +63,6 @@ class JobArchiveServiceImplSpec extends Specification {
         when:
         service.archiveDirectory(jobDirectory, target)
 
-
         then:
         1 * directoryManifestFactory.getDirectoryManifest(jobDirectory, true) >> originalManifest
         Files.exists(manifestPath)

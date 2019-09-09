@@ -155,7 +155,6 @@ public class JobRestControllerTest {
 
     }
 
-
     /**
      * Make sure won't forward job kill request if it's already been forwarded.
      *

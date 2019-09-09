@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;

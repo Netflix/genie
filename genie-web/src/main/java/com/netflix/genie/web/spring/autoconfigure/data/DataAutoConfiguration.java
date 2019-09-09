@@ -224,7 +224,6 @@ public class DataAutoConfiguration {
         return new JpaJobSearchServiceImpl(jobRepository, clusterRepository, commandRepository);
     }
 
-
     /**
      * A JPA implementation of the {@link AgentConnectionPersistenceService} interface.
      *

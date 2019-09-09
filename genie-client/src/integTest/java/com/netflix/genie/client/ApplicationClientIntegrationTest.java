@@ -463,7 +463,6 @@ public class ApplicationClientIntegrationTest extends GenieClientIntegrationTest
         final Command command1 = constructCommandDTO(null);
         final Command command2 = constructCommandDTO(null);
 
-
         commandClient.createCommand(command1);
         commandClient.createCommand(command2);
 

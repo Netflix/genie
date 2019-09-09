@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services;
 
 import javax.validation.constraints.NotBlank;

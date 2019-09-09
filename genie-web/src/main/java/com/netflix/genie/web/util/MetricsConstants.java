@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.util;
 
-
 /**
  * Used to store constants related to metric names.
  *

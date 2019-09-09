@@ -217,7 +217,6 @@ public class FetchingCacheServiceImplTest {
         //Wait for both threads to try to lock
         lockAquisitionAttempted.await();
 
-
         //Either one thread would have tried a download or would try shortly.
         //So, either one thread is waiting on a download or will try to download.
         //Regardless since both threads have atleast tried to lock once,
@@ -718,7 +717,6 @@ public class FetchingCacheServiceImplTest {
             cacheService.getCacheResourceVersionLockFile(resourceCacheId, lastModifiedTimeStamp).exists()
         );
     }
-
 
     private void assertResourceDownloaded(
         final FetchingCacheServiceImpl cacheService,

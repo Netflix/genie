@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.util
 
 import com.google.protobuf.ByteString
@@ -138,7 +137,6 @@ class StreamBufferSpec extends Specification {
 
         then:
         thrown(IndexOutOfBoundsException)
-
 
         when:
         inputStream.read(b, 0, -1)

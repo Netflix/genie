@@ -84,7 +84,6 @@ public class ApplicationTask extends GenieBaseTask {
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
             log.info("Starting Application Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
 
-
             for (final Application application : jobExecEnv.getApplications()) {
                 final long applicationStart = System.nanoTime();
                 final Set<Tag> applicationTags = Sets.newHashSet();

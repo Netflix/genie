@@ -48,7 +48,6 @@ class AgentJobServiceImplSpec extends Specification {
     public static final String version = "1.2.3"
     public static final String hostname = "127.0.0.1"
 
-
     JobPersistenceService jobPersistenceService
     JobResolverService jobSpecificationService
     AgentFilterService agentFilterService
@@ -152,7 +151,6 @@ class AgentJobServiceImplSpec extends Specification {
         }
         1 * counter.increment()
     }
-
 
     def "Can reserve job id"() {
         def jobRequest = Mock(JobRequest)

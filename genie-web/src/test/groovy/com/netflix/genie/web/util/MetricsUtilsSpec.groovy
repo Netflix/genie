@@ -55,7 +55,6 @@ class MetricsUtilsSpec extends Specification {
         )
     }
 
-
     def "Can get a new success tags set"() {
         when:
         def finalTags = MetricsUtils.newSuccessTagsSet()

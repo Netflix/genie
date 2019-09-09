@@ -30,7 +30,6 @@ class InfoCommandSpec extends Specification {
     ConfigurableEnvironment env
     Map<String, Object> map = ["Foo": "foo", "Bar": new Object(), "Baz": null]
 
-
     void setup() {
         args = Mock()
         ctx = Mock()

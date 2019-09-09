@@ -113,7 +113,6 @@ public class ClusterClientIntegrationTest extends GenieClientIntegrationTestBase
 
         final Set<String> cluster2Tags = Sets.newHashSet("bar", "pi");
 
-
         final Cluster cluster1 = new Cluster.Builder("cluster1name", "cluster1user", "1.0", ClusterStatus.UP)
             .withId(cluster1Id)
             .withTags(cluster1Tags)
@@ -453,7 +452,6 @@ public class ClusterClientIntegrationTest extends GenieClientIntegrationTestBase
             .build();
 
         commandClient.createCommand(bar);
-
 
         final Command pi = new Command.Builder(
             "name",

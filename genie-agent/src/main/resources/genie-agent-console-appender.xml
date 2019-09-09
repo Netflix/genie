@@ -6,17 +6,17 @@
 -->
 
 <included>
-  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <target>System.err</target>
-    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-      <evaluator>
-        <expression>return "${CONSOLE_FILTER_LOGGER_NAME}".equals(logger);</expression>
-      </evaluator>
-      <OnMismatch>DENY</OnMismatch>
-      <OnMatch>NEUTRAL</OnMatch>
-    </filter>
-    <encoder>
-      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-    </encoder>
-  </appender>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return "${CONSOLE_FILTER_LOGGER_NAME}".equals(logger);</expression>
+            </evaluator>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>NEUTRAL</OnMatch>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
 </included>

@@ -80,7 +80,6 @@ class UserConsoleSpec extends Specification {
         1 * environment.getProperty(UserConsole.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> "classpath:not-a-banner.txt"
     }
 
-
     def "PrintBanner"() {
         setup:
         Environment environment = Mock(Environment)

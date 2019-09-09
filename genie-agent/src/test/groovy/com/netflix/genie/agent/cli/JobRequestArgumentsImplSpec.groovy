@@ -86,7 +86,6 @@ class JobRequestArgumentsImplSpec extends Specification {
         File dep2 = temporaryFolder.newFile("dep2.jar")
         File setup = temporaryFolder.newFile("setup.sh")
 
-
         when:
         jCommander.parse(
             "--jobDirectoryLocation", "/foo/bar",
@@ -166,7 +165,6 @@ class JobRequestArgumentsImplSpec extends Specification {
         then:
         thrown(ParameterException)
     }
-
 
     def "Non S3 url throws ParameterException"() {
 

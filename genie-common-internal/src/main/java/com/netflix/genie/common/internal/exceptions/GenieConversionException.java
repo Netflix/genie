@@ -15,9 +15,7 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.internal.exceptions;
-
 
 /**
  * Failure to convert objects into wire format or vice versa.

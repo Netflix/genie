@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.dtos
 
-
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata
 import org.springframework.core.io.Resource

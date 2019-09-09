@@ -210,7 +210,6 @@ class JobRequestSpec extends Specification {
         jobRequest.getResources() != null
         jobRequest.requestedJobArchivalData == requestedJobArchivalData
 
-
         when: "Empty command args are supplied they're ignored"
         jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig, requestedJobArchivalData)
             .withCommandArgs(Lists.newArrayList(" ", "\n"))

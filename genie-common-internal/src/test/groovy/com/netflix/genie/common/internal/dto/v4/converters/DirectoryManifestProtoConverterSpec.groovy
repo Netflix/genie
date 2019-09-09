@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.common.internal.dto.v4.converters
 
 import com.fasterxml.jackson.core.JsonProcessingException

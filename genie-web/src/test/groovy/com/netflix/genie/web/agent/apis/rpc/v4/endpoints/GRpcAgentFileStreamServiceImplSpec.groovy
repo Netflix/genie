@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.google.protobuf.ByteString
@@ -67,7 +66,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         )
         this.serverControlObserver = Mock(StreamObserver)
         this.serverTransmitObserver = Mock(StreamObserver)
-
 
         this.jobId = UUID.randomUUID().toString()
         this.manifestMessage = AgentManifestMessage.newBuilder().setJobId(jobId).build()
@@ -321,7 +319,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         then:
         noExceptionThrown()
 
-
         when: "Agent initiates stream"
         s = service.transmit(serverTransmitObserver)
 
@@ -344,7 +341,6 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         noExceptionThrown()
-
 
         when: "Agent initiates stream"
         s = service.transmit(serverTransmitObserver)

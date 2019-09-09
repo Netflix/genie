@@ -316,7 +316,6 @@ public class GRpcAgentFileStreamServiceImpl
         }
     }
 
-
     private static class ControlStreamObserver implements StreamObserver<AgentManifestMessage> {
         private final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService;
         private final StreamObserver<ServerControlMessage> responseObserver;
@@ -378,7 +377,6 @@ public class GRpcAgentFileStreamServiceImpl
         private final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService;
         private final StreamObserver<ServerAckMessage> responseObserver;
         private final AtomicReference<String> streamId = new AtomicReference<>();
-
 
         FileTransferStreamObserver(
             final GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService,

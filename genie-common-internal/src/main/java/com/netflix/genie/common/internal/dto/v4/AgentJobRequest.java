@@ -65,7 +65,6 @@ public interface AgentJobRequest extends CommonRequest {
      */
     AgentConfigRequest getRequestedAgentConfig();
 
-
     /**
      * Get the requested job archival agent configuration parameters.
      *

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
@@ -72,7 +71,6 @@ class DownloadCommand implements AgentCommand {
             downloadCommandArguments.getDestinationDirectory()
         );
 
-
         final DownloadService.Manifest.Builder manifestBuilder = downloadService.newManifestBuilder();
 
         for (final URI uri : uris) {
@@ -115,7 +113,6 @@ class DownloadCommand implements AgentCommand {
         )
         @Getter
         private File destinationDirectory;
-
 
         DownloadCommandArguments(
             final ArgumentDelegates.CacheArguments cacheArguments

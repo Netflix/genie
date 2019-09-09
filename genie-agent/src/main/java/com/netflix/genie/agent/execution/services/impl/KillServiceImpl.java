@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.execution.services.impl;
 
 import com.netflix.genie.agent.cli.UserConsole;

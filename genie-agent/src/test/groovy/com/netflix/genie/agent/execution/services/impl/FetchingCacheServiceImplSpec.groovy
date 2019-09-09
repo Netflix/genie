@@ -137,7 +137,6 @@ class FetchingCacheServiceImplSpec extends Specification {
         targetFile.exists()
         targetFile.getText(StandardCharsets.UTF_8.toString()) == fileContents
 
-
         when:
         cache.get(uri, targetFile2)
 

@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
@@ -105,7 +104,6 @@ class HeartBeatCommand implements AgentCommand {
         HeartBeatCommandArguments(final ArgumentDelegates.ServerArguments serverArguments) {
             this.serverArguments = serverArguments;
         }
-
 
         @Override
         public Class<? extends AgentCommand> getConsumerClass() {

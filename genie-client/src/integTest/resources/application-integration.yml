@@ -25,7 +25,7 @@ genie:
 spring:
   autoconfigure:
     exclude:
-    - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: validate

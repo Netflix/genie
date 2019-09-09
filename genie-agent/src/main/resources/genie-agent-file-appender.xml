@@ -6,10 +6,10 @@
 -->
 
 <included>
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
-    </encoder>
-    <file>${LOG_FILE}</file>
-  </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <file>${LOG_FILE}</file>
+    </appender>
 </included>

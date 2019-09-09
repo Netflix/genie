@@ -418,7 +418,6 @@ class JobResolverServiceImplSpec extends Specification {
         def setupFile = UUID.randomUUID().toString()
         def timeout = 10835
 
-
         def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         def service = new JobResolverServiceImpl(
             Mock(ApplicationPersistenceService),

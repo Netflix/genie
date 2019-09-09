@@ -85,7 +85,6 @@ public class ServicesAutoConfigurationTest {
         this.servicesAutoConfiguration = new ServicesAutoConfiguration();
     }
 
-
     /**
      * Can get jobs properties bean.
      */
@@ -137,7 +136,6 @@ public class ServicesAutoConfigurationTest {
             )
         );
     }
-
 
     /**
      * Confirm we can get a GenieFileTransfer instance.

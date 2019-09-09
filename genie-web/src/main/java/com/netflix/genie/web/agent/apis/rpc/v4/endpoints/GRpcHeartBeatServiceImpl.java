@@ -15,7 +15,6 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.google.common.collect.Maps;

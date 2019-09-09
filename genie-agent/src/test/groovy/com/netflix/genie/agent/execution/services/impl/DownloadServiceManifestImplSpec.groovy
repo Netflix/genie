@@ -126,7 +126,6 @@ class DownloadServiceManifestImplSpec extends Specification {
         f2 == file2
     }
 
-
     def "targetDirectories is immutable"() {
         setup:
         DownloadService.Manifest manifest = new DownloadServiceImpl().newManifestBuilder().build()

@@ -164,7 +164,6 @@ public class CriteriaResolutionRepositoryImpl implements CriteriaResolutionRepos
         return query.toString();
     }
 
-
     /**
      * Enumeration of the types of criteria and default values that can be supplied to the cluster and command
      * resolution methods.

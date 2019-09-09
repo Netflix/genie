@@ -199,7 +199,6 @@ public final class EntityDtoConverters {
             .getMetadata()
             .ifPresent(metadata -> setJsonField(metadata, jobMetadataBuilder::withMetadata));
 
-
         // Rebuild the execution resource criteria
         final ImmutableList.Builder<Criterion> clusterCriteria = ImmutableList.builder();
         for (final CriterionEntity criterionEntity : jobRequestProjection.getClusterCriteria()) {

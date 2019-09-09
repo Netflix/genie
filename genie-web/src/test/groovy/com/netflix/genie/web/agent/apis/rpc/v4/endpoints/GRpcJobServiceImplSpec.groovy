@@ -173,7 +173,6 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * jobSpecificationResponseObserver.onCompleted()
     }
 
-
     def "Resolve job specification -- successful"() {
         JobSpecificationRequest request = JobSpecificationRequest.newBuilder().setId(id).build()
         JobSpecification jobSpecification = Mock(JobSpecification)
@@ -295,7 +294,6 @@ class GRpcJobServiceImplSpec extends Specification {
         AgentClientMetadata clientMetadata = Mock(AgentClientMetadata)
         Exception exception = new GenieJobAlreadyClaimedException()
         ClaimJobResponse response = ClaimJobResponse.newBuilder().build()
-
 
         when:
         gRpcJobService.claimJob(request, claimJobResponseObserver)

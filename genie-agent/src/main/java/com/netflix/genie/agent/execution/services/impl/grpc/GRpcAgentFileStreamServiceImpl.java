@@ -79,7 +79,6 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     private AtomicBoolean started = new AtomicBoolean();
     private ScheduledFuture<?> scheduledTask;
 
-
     GRpcAgentFileStreamServiceImpl(
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         final TaskScheduler taskScheduler,
