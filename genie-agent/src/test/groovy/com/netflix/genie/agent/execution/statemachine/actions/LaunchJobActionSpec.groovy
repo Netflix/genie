@@ -35,7 +35,6 @@ class LaunchJobActionSpec extends Specification {
     LaunchJobAction action
     JobProcessManager jobProcessManager
     AgentJobService agentJobService
-    Process process
     File jobDirectory
     List<String> jobCommandLine
     boolean interactive
@@ -50,7 +49,6 @@ class LaunchJobActionSpec extends Specification {
         this.interactive = true
         this.jobProcessManager = Mock(JobProcessManager)
         this.agentJobService = Mock(AgentJobService)
-        this.process = Mock(Process)
         this.action = new LaunchJobAction(executionContext, jobProcessManager, agentJobService)
     }
 
@@ -69,29 +67,6 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(10)
         1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive, 10)
-        1 * executionContext.getClaimedJobId() >> Optional.of(id)
-        1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
-        1 * executionContext.setCurrentJobStatus(JobStatus.RUNNING)
-
-        expect:
-        event == Events.LAUNCH_JOB_COMPLETE
-    }
-
-    def "Successful with actual process"() {
-        setup:
-        process = new ProcessBuilder().command("echo").start()
-
-        when:
-        def event = action.executeStateAction(executionContext)
-
-        then:
-        1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
-        1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
-        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
-        1 * jobSpec.getCommandArgs() >> jobCommandLine
-        1 * jobSpec.isInteractive() >> interactive
-        1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive, null)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.RUNNING)
