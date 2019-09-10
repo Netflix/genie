@@ -21,6 +21,7 @@ import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.KillService;
 import org.springframework.context.ApplicationListener;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -41,21 +42,26 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
      * @param environmentVariables additional environment variables (to merge on top of inherited environment)
      * @param commandLine          command-line executable and arguments
      * @param interactive          launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
+     * @param timeout              The optional number of seconds this job is allowed to run before the system will
+     *                             kill it
      * @throws JobLaunchException if the job process failed to launch
      */
     void launchProcess(
         File jobDirectory,
         Map<String, String> environmentVariables,
         List<String> commandLine,
-        boolean interactive
+        boolean interactive,
+        @Nullable Integer timeout
     ) throws JobLaunchException;
 
     /**
      * Terminate job process execution (if still running) or prevent it from launching (if not launched yet).
      * Optionally sends SIGINT to the process (unnecessary under certain circumstances. For example,
      * CTRL-C in a terminal session, is already received by the job process, issuing a second one is unneeded).
+     *
+     * @param source The {@link KillService.KillSource} value representing where this kill request is coming from
      */
-    void kill();
+    void kill(KillService.KillSource source);
 
     /**
      * Wait indefinitely for the job process to terminate.
