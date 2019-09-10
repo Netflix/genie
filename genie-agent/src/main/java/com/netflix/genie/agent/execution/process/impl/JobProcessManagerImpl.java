@@ -244,22 +244,23 @@ public class JobProcessManagerImpl implements JobProcessManager {
             switch (source) {
                 case TIMEOUT:
                     return new JobProcessResult
-                        .Builder(JobStatus.KILLED, JobStatusMessages.JOB_EXCEEDED_TIMEOUT)
+                        .Builder(JobStatus.KILLED, JobStatusMessages.JOB_EXCEEDED_TIMEOUT, exitCode)
                         .build();
                 case API_KILL_REQUEST:
                 case SYSTEM_SIGNAL:
                 default:
                     return new JobProcessResult
-                        .Builder(JobStatus.KILLED, JobStatusMessages.JOB_KILLED_BY_USER)
+                        .Builder(JobStatus.KILLED, JobStatusMessages.JOB_KILLED_BY_USER, exitCode)
                         .build();
             }
         } else if (exitCode == SUCCESS_EXIT_CODE) {
             return new JobProcessResult.Builder(
                 JobStatus.SUCCEEDED,
-                JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+                JobStatusMessages.JOB_FINISHED_SUCCESSFULLY,
+                exitCode
             ).build();
         } else {
-            return new JobProcessResult.Builder(JobStatus.FAILED, JobStatusMessages.JOB_FAILED).build();
+            return new JobProcessResult.Builder(JobStatus.FAILED, JobStatusMessages.JOB_FAILED, exitCode).build();
         }
     }
 

@@ -38,12 +38,14 @@ public class JobProcessResult {
     private final String finalStatusMessage;
     private final long stdOutSize;
     private final long stdErrSize;
+    private final int exitCode;
 
     private JobProcessResult(final Builder builder) {
         this.finalStatus = builder.bFinalStatus;
         this.finalStatusMessage = builder.bFinalStatusMessage;
         this.stdOutSize = builder.bStdOutSize;
         this.stdErrSize = builder.bStdErrSize;
+        this.exitCode = builder.bExitCode;
     }
 
     /**
@@ -55,6 +57,7 @@ public class JobProcessResult {
     public static class Builder {
         private final JobStatus bFinalStatus;
         private final String bFinalStatusMessage;
+        private final int bExitCode;
         private long bStdOutSize;
         private long bStdErrSize;
 
@@ -64,9 +67,14 @@ public class JobProcessResult {
          * @param finalStatus        The final {@link JobStatus} for the job. {@link JobStatus#isFinished()} must return
          *                           true
          * @param finalStatusMessage The final human readable message for the job status
+         * @param exitCode           The process exit code
          * @throws IllegalArgumentException When {@literal finalStatus} is not a final status
          */
-        public Builder(final JobStatus finalStatus, final String finalStatusMessage) throws IllegalArgumentException {
+        public Builder(
+            final JobStatus finalStatus,
+            final String finalStatusMessage,
+            final int exitCode
+        ) throws IllegalArgumentException {
             if (!finalStatus.isFinished()) {
                 throw new IllegalArgumentException(
                     "finalStatus must be one of the final states: "
@@ -77,6 +85,7 @@ public class JobProcessResult {
             }
             this.bFinalStatus = finalStatus;
             this.bFinalStatusMessage = finalStatusMessage;
+            this.bExitCode = exitCode;
         }
 
         /**

@@ -87,6 +87,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 0
         expectedFile.exists()
         !this.stdErr.exists()
         !this.stdOut.exists()
@@ -117,6 +118,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 0
         this.stdErr.exists()
         this.stdOut.exists()
         this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(helloWorld)
@@ -148,6 +150,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 0
         this.stdErr.exists()
         this.stdOut.exists()
         this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(expectedString)
@@ -177,6 +180,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_FAILED
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 1
         this.stdErr.exists()
         this.stdOut.exists()
         this.stdErr.getText(StandardCharsets.UTF_8.toString()).contains("No such file or directory")
@@ -334,6 +338,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 143
         !this.stdErr.exists()
         !this.stdOut.exists()
         1 * future.cancel(true)
@@ -367,6 +372,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 143
         !this.stdErr.exists()
         !this.stdOut.exists()
     }
@@ -402,6 +408,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 143
         !this.stdErr.exists()
         !this.stdOut.exists()
     }
@@ -434,6 +441,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 0
         !this.stdErr.exists()
         !this.stdOut.exists()
     }
@@ -503,6 +511,7 @@ class JobProcessManagerImplSpec extends Specification {
         result.getFinalStatusMessage() == JobStatusMessages.JOB_EXCEEDED_TIMEOUT
         result.getStdOutSize() == 0L
         result.getStdErrSize() == 0L
+        result.getExitCode() == 143
         !this.stdErr.exists()
         !this.stdOut.exists()
 

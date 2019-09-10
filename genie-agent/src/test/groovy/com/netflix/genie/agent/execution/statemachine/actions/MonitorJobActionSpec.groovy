@@ -78,7 +78,7 @@ class MonitorJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * jobProcessManager.waitFor() >> new JobProcessResult.Builder(finalStatus, finalStatusMessage).build()
+        1 * jobProcessManager.waitFor() >> new JobProcessResult.Builder(finalStatus, finalStatusMessage, 0).build()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
@@ -109,7 +109,7 @@ class MonitorJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * jobProcessManager.waitFor() >> new JobProcessResult.Builder(finalJobStatus, finalJobStatusMessage).build()
+        1 * jobProcessManager.waitFor() >> new JobProcessResult.Builder(finalJobStatus, finalJobStatusMessage, 0).build()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
@@ -145,7 +145,7 @@ class MonitorJobActionSpec extends Specification {
     def "Change job status exception"() {
         JobStatus expectedJobStatus = JobStatus.SUCCEEDED
         String expectedJobStatusMessage = JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
-        JobProcessResult result = new JobProcessResult.Builder(expectedJobStatus, expectedJobStatusMessage).build()
+        JobProcessResult result = new JobProcessResult.Builder(expectedJobStatus, expectedJobStatusMessage, 0).build()
         Exception exception = new ChangeJobStatusException("...")
 
         when:
