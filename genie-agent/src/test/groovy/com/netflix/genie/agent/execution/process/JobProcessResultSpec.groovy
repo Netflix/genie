@@ -30,9 +30,9 @@ import spock.lang.Unroll
 class JobProcessResultSpec extends Specification {
 
     @Unroll
-    def "can create with #finalStatus, #finalStatusMessage, #stdOutSize, #stdErrSize"() {
+    def "can create with #finalStatus, #finalStatusMessage, #stdOutSize, #stdErrSize, #exitCode"() {
         when:
-        def builder = new JobProcessResult.Builder(finalStatus, finalStatusMessage)
+        def builder = new JobProcessResult.Builder(finalStatus, finalStatusMessage, exitCode)
         if (stdOutSize != null) {
             builder.withStdOutSize(stdOutSize)
         }
@@ -46,18 +46,19 @@ class JobProcessResultSpec extends Specification {
         result.getFinalStatusMessage() == finalStatusMessage
         result.getStdOutSize() == expectedStdOutSize
         result.getStdErrSize() == expectedStdErrSize
+        result.getExitCode() == exitCode
 
         where:
-        finalStatus         | finalStatusMessage                          | stdOutSize | expectedStdOutSize | stdErrSize | expectedStdErrSize
-        JobStatus.SUCCEEDED | JobStatusMessages.JOB_FINISHED_SUCCESSFULLY | -1L        | 0L                 | 10L        | 10L
-        JobStatus.FAILED    | JobStatusMessages.JOB_FAILED                | 1L         | 1L                 | -45L       | 0L
-        JobStatus.KILLED    | JobStatusMessages.JOB_KILLED_BY_USER        | null       | 0L                 | null       | 0L
-        JobStatus.INVALID   | "I was bad"                                 | null       | 0L                 | null       | 0L
+        finalStatus         | finalStatusMessage                          | stdOutSize | expectedStdOutSize | stdErrSize | expectedStdErrSize | exitCode
+        JobStatus.SUCCEEDED | JobStatusMessages.JOB_FINISHED_SUCCESSFULLY | -1L        | 0L                 | 10L        | 10L                | 0
+        JobStatus.FAILED    | JobStatusMessages.JOB_FAILED                | 1L         | 1L                 | -45L       | 0L                 | 1
+        JobStatus.KILLED    | JobStatusMessages.JOB_KILLED_BY_USER        | null       | 0L                 | null       | 0L                 | -1
+        JobStatus.INVALID   | "I was bad"                                 | null       | 0L                 | null       | 0L                 | 283
     }
 
     def "Preconditions throw expected exceptions"() {
         when:
-        new JobProcessResult.Builder(JobStatus.RUNNING, "This will fail")
+        new JobProcessResult.Builder(JobStatus.RUNNING, "This will fail", 1)
 
         then:
         thrown(IllegalArgumentException)
