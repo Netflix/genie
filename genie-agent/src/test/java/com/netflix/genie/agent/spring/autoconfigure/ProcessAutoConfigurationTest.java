@@ -33,7 +33,10 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 public class ProcessAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
-            AutoConfigurations.of(ProcessAutoConfiguration.class)
+            AutoConfigurations.of(
+                AgentAutoConfiguration.class,
+                ProcessAutoConfiguration.class
+            )
         );
 
     /**

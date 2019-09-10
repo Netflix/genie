@@ -28,15 +28,19 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.TaskScheduler;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -53,6 +57,19 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicBoolean launched = new AtomicBoolean(false);
     private final AtomicReference<Process> processReference = new AtomicReference<>();
     private final AtomicBoolean killed = new AtomicBoolean(false);
+    private final AtomicReference<KillService.KillSource> killSource = new AtomicReference<>();
+    private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
+
+    private final TaskScheduler taskScheduler;
+
+    /**
+     * Constructor.
+     *
+     * @param taskScheduler The {@link TaskScheduler} instance to use to run scheduled asynchronous tasks
+     */
+    public JobProcessManagerImpl(final TaskScheduler taskScheduler) {
+        this.taskScheduler = taskScheduler;
+    }
 
     /**
      * {@inheritDoc}
@@ -62,10 +79,10 @@ public class JobProcessManagerImpl implements JobProcessManager {
         final File jobDirectory,
         final Map<String, String> environmentVariablesMap,
         final List<String> commandLine,
-        final boolean interactive
+        final boolean interactive,
+        @Nullable final Integer timeout
     ) throws JobLaunchException {
-
-        if (!launched.compareAndSet(false, true)) {
+        if (!this.launched.compareAndSet(false, true)) {
             throw new IllegalStateException("Job already launched");
         }
 
@@ -140,16 +157,24 @@ public class JobProcessManagerImpl implements JobProcessManager {
             processBuilder.redirectOutput(PathUtils.jobStdOutPath(jobDirectory).toFile());
         }
 
-        if (killed.get()) {
+        if (this.killed.get()) {
             log.info("Job aborted, skipping launch");
         } else {
             log.info("Launching job");
             try {
-                processReference.set(processBuilder.start());
+                this.processReference.set(processBuilder.start());
+                if (timeout != null) {
+                    // NOTE: There is a chance of a SLIGHT delay here between the process launch and the timeout
+                    final Instant timeoutInstant = Instant.now().plusSeconds(timeout);
+                    this.timeoutKillThread.set(
+                        this.taskScheduler.schedule(new TimeoutKiller(this), timeoutInstant)
+                    );
+                    log.info("Scheduled timeout kill to occur {} second(s) from now at {}", timeout, timeoutInstant);
+                }
             } catch (final IOException | SecurityException e) {
                 throw new JobLaunchException("Failed to launch job: ", e);
             }
-            log.info("Process launched (pid: {})", getPid(processReference.get()));
+            log.info("Process launched (pid: {})", this.getPid(this.processReference.get()));
         }
     }
 
@@ -157,11 +182,17 @@ public class JobProcessManagerImpl implements JobProcessManager {
      * {@inheritDoc}
      */
     @Override
-    public void kill() {
-        killed.set(true);
+    public void kill(final KillService.KillSource source) {
+        // TODO: These may need to be done atomically as a tandem
+        if (!this.killed.compareAndSet(false, true)) {
+            // this job was already killed by something else
+            return;
+        }
+        this.killSource.set(source);
 
-        final Process process = processReference.get();
+        final Process process = this.processReference.get();
 
+        // TODO: This probably isn't enough. We need retries with a force at the end
         if (process != null) {
             process.destroy();
         }
@@ -172,12 +203,11 @@ public class JobProcessManagerImpl implements JobProcessManager {
      */
     @Override
     public JobProcessResult waitFor() throws InterruptedException {
-
-        if (!launched.get()) {
+        if (!this.launched.get()) {
             throw new IllegalStateException("Process not launched");
         }
 
-        final Process process = processReference.get();
+        final Process process = this.processReference.get();
 
         int exitCode = 0;
         if (process != null) {
@@ -197,8 +227,32 @@ public class JobProcessManagerImpl implements JobProcessManager {
             // Do nothing.
         }
 
-        if (killed.get()) {
-            return new JobProcessResult.Builder(JobStatus.KILLED, JobStatusMessages.JOB_KILLED_BY_USER).build();
+        // If for whatever reason the timeout thread is currently running or if it is scheduled to be run, cancel it
+        final ScheduledFuture timeoutThreadFuture = this.timeoutKillThread.get();
+        if (timeoutThreadFuture != null) {
+            timeoutThreadFuture.cancel(true);
+        }
+
+        // TODO: This doesn't seem quite right to me and is confirmed by an existing test. If the job completes
+        //       successfully but then the system calls kill before this method then the final job status will be
+        //       killed instead of successful. We should discuss this - TJG 9/9/2019
+        if (this.killed.get()) {
+            final KillService.KillSource source = this.killSource.get() != null
+                ? this.killSource.get()
+                : KillService.KillSource.API_KILL_REQUEST;
+
+            switch (source) {
+                case TIMEOUT:
+                    return new JobProcessResult
+                        .Builder(JobStatus.KILLED, JobStatusMessages.JOB_EXCEEDED_TIMEOUT)
+                        .build();
+                case API_KILL_REQUEST:
+                case SYSTEM_SIGNAL:
+                default:
+                    return new JobProcessResult
+                        .Builder(JobStatus.KILLED, JobStatusMessages.JOB_KILLED_BY_USER)
+                        .build();
+            }
         } else if (exitCode == SUCCESS_EXIT_CODE) {
             return new JobProcessResult.Builder(
                 JobStatus.SUCCEEDED,
@@ -214,8 +268,9 @@ public class JobProcessManagerImpl implements JobProcessManager {
      */
     @Override
     public void onApplicationEvent(final KillService.KillEvent event) {
-        log.info("Stopping state machine due to kill event (source: {})", event.getKillSource());
-        this.kill();
+        final KillService.KillSource source = event.getKillSource();
+        log.info("Stopping state machine due to kill event (source: {})", source);
+        this.kill(source);
     }
 
     private List<String> expandCommandLineVariables(
@@ -251,5 +306,31 @@ public class JobProcessManagerImpl implements JobProcessManager {
             log.warn("Failed to determine job process PID");
         }
         return pid;
+    }
+
+    /**
+     * This class is meant to be run in a thread that wakes up after some period of time and initiates a kill of the
+     * job process due to the job timing out.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    @Slf4j
+    private static class TimeoutKiller implements Runnable {
+        private final JobProcessManager jobProcessManager;
+
+        TimeoutKiller(final JobProcessManager jobProcessManager) {
+            this.jobProcessManager = jobProcessManager;
+        }
+
+        /**
+         * When this thread is run it is expected that the timeout duration has been reached so the run merely
+         * sends a kill signal to the manager.
+         */
+        @Override
+        public void run() {
+            log.info("Timeout for job reached at {}. Sending kill signal to terminate job.", Instant.now());
+            this.jobProcessManager.kill(KillService.KillSource.TIMEOUT);
+        }
     }
 }

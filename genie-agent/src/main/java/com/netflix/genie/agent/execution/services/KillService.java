@@ -48,6 +48,10 @@ public interface KillService {
          * A request to the server, forwarded to the agent.
          */
         API_KILL_REQUEST,
+        /**
+         * The job has exceeded its max execution duration.
+         */
+        TIMEOUT,
     }
 
     /**
@@ -60,9 +64,7 @@ public interface KillService {
          *
          * @param killSource the source of the kill
          */
-        public KillEvent(
-            final KillSource killSource
-        ) {
+        public KillEvent(final KillSource killSource) {
             super(killSource);
         }
 

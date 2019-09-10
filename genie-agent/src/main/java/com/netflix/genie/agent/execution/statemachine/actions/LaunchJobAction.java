@@ -21,8 +21,8 @@ import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
-import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
@@ -82,7 +82,8 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
                 jobDirectory,
                 jobEnvironment,
                 jobCommandLine,
-                interactive
+                interactive,
+                jobSpec.getTimeout().orElse(null)
             );
         } catch (final JobLaunchException e) {
             throw new RuntimeException("Failed to launch job", e);
