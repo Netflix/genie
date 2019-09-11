@@ -1,10 +1,10 @@
 com.netflix.genie
 com.netflix.genie.agent
 com.netflix.genie.agent.cli
-com.netflix.genie.agent.configs
-com.netflix.genie.agent.configs.processors
 com.netflix.genie.agent.execution
 com.netflix.genie.agent.execution.exceptions
+com.netflix.genie.agent.execution.process
+com.netflix.genie.agent.execution.process.impl
 com.netflix.genie.agent.execution.services
 com.netflix.genie.agent.execution.services.impl
 com.netflix.genie.agent.execution.services.impl.grpc
@@ -12,6 +12,8 @@ com.netflix.genie.agent.execution.statemachine
 com.netflix.genie.agent.execution.statemachine.actions
 com.netflix.genie.agent.execution.statemachine.listeners
 com.netflix.genie.agent.rpc
+com.netflix.genie.agent.spring.autoconfigure
+com.netflix.genie.agent.spring.processors
 com.netflix.genie.agent.utils
 com.netflix.genie.agent.utils.locks
 com.netflix.genie.agent.utils.locks.impl
