@@ -29,6 +29,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
@@ -90,18 +91,16 @@ public class ClusterRestController {
      * Constructor.
      *
      * @param clusterPersistenceService The cluster configuration service to use.
-     * @param clusterResourceAssembler  The assembler to use to convert clusters to cluster HAL resources
-     * @param commandResourceAssembler  The assembler to use to convert commands to command HAL resources
+     * @param resourceAssemblers        The encapsulation of all available V3 resource assemblers
      */
     @Autowired
     public ClusterRestController(
         final ClusterPersistenceService clusterPersistenceService,
-        final ClusterResourceAssembler clusterResourceAssembler,
-        final CommandResourceAssembler commandResourceAssembler
+        final ResourceAssemblers resourceAssemblers
     ) {
         this.clusterPersistenceService = clusterPersistenceService;
-        this.clusterResourceAssembler = clusterResourceAssembler;
-        this.commandResourceAssembler = commandResourceAssembler;
+        this.clusterResourceAssembler = resourceAssemblers.getClusterResourceAssembler();
+        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
     }
 
     /**

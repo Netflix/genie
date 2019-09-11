@@ -40,6 +40,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResource
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
@@ -154,24 +155,17 @@ public class JobRestController {
     /**
      * Constructor.
      *
-     * @param jobCoordinatorService            The job coordinator service to use.
-     * @param jobSearchService                 The search service to use
-     * @param attachmentService                The attachment service to use to save attachments.
-     * @param applicationResourceAssembler     Assemble application resources out of applications
-     * @param clusterResourceAssembler         Assemble cluster resources out of applications
-     * @param commandResourceAssembler         Assemble cluster resources out of applications
-     * @param jobResourceAssembler             Assemble job resources out of jobs
-     * @param jobRequestResourceAssembler      Assemble job request resources out of job requests
-     * @param jobExecutionResourceAssembler    Assemble job execution resources out of job executions
-     * @param jobMetadataResourceAssembler     Assemble job metadata resources out of job metadata DTO
-     * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
-     * @param genieHostInfo                    Information about the host that the Genie process is running on
-     * @param restTemplate                     The rest template for http requests
-     * @param jobDirectoryServerService        The service to handle serving back job directory resources
-     * @param jobsProperties                   All the properties associated with jobs
-     * @param registry                         The metrics registry to use
-     * @param jobPersistenceService            Job persistence service
-     * @param agentRoutingService              Agent routing service
+     * @param jobCoordinatorService     The job coordinator service to use.
+     * @param jobSearchService          The search service to use
+     * @param attachmentService         The attachment service to use to save attachments.
+     * @param resourceAssemblers        The encapsulation of all the V3 resource assemblers
+     * @param genieHostInfo             Information about the host that the Genie process is running on
+     * @param restTemplate              The rest template for http requests
+     * @param jobDirectoryServerService The service to handle serving back job directory resources
+     * @param jobsProperties            All the properties associated with jobs
+     * @param registry                  The metrics registry to use
+     * @param jobPersistenceService     Job persistence service
+     * @param agentRoutingService       Agent routing service
      */
     @Autowired
     @SuppressWarnings("checkstyle:parameternumber")
@@ -179,14 +173,7 @@ public class JobRestController {
         final JobCoordinatorService jobCoordinatorService,
         final JobSearchService jobSearchService,
         final AttachmentService attachmentService,
-        final ApplicationResourceAssembler applicationResourceAssembler,
-        final ClusterResourceAssembler clusterResourceAssembler,
-        final CommandResourceAssembler commandResourceAssembler,
-        final JobResourceAssembler jobResourceAssembler,
-        final JobRequestResourceAssembler jobRequestResourceAssembler,
-        final JobExecutionResourceAssembler jobExecutionResourceAssembler,
-        final JobMetadataResourceAssembler jobMetadataResourceAssembler,
-        final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
+        final ResourceAssemblers resourceAssemblers,
         final GenieHostInfo genieHostInfo,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final JobDirectoryServerService jobDirectoryServerService,
@@ -198,14 +185,14 @@ public class JobRestController {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;
         this.attachmentService = attachmentService;
-        this.applicationResourceAssembler = applicationResourceAssembler;
-        this.clusterResourceAssembler = clusterResourceAssembler;
-        this.commandResourceAssembler = commandResourceAssembler;
-        this.jobResourceAssembler = jobResourceAssembler;
-        this.jobRequestResourceAssembler = jobRequestResourceAssembler;
-        this.jobExecutionResourceAssembler = jobExecutionResourceAssembler;
-        this.jobMetadataResourceAssembler = jobMetadataResourceAssembler;
-        this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
+        this.applicationResourceAssembler = resourceAssemblers.getApplicationResourceAssembler();
+        this.clusterResourceAssembler = resourceAssemblers.getClusterResourceAssembler();
+        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
+        this.jobResourceAssembler = resourceAssemblers.getJobResourceAssembler();
+        this.jobRequestResourceAssembler = resourceAssemblers.getJobRequestResourceAssembler();
+        this.jobExecutionResourceAssembler = resourceAssemblers.getJobExecutionResourceAssembler();
+        this.jobMetadataResourceAssembler = resourceAssemblers.getJobMetadataResourceAssembler();
+        this.jobSearchResultResourceAssembler = resourceAssemblers.getJobSearchResultResourceAssembler();
         this.hostname = genieHostInfo.getHostname();
         this.restTemplate = restTemplate;
         this.jobDirectoryServerService = jobDirectoryServerService;

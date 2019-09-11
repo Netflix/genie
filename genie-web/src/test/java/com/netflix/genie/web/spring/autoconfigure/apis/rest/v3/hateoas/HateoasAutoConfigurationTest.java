@@ -25,6 +25,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResource
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -62,6 +63,7 @@ public class HateoasAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(JobResourceAssembler.class);
                 Assertions.assertThat(context).hasSingleBean(JobSearchResultResourceAssembler.class);
                 Assertions.assertThat(context).hasSingleBean(RootResourceAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(ResourceAssemblers.class);
             }
         );
     }
