@@ -4870,34 +4870,20 @@ Whereas static properties values are bound during application startup and do not
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].roleARN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">For the bucket with name <code>bucketName</code> the ARN of the role to assume to read/write to that bucket. If a bucket is used
-that isn&#8217;t listed in this map the default credentials configured will be used</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].region</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS region the bucket with <code>bucketName</code> is in. Clients to talk to this bucket will be created in this region. If
-no value is specified the bucket is assumed to be in the same region as the Genie process.</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If set to <code>true</code>, enables the built-in agent filter service. The filter behavior is controlled by other active <code>genie.agent.filter.*</code> properties.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.minimum</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum version an agent needs to be (e.g., <code>1.2.3</code>) in order to communicate with this server. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.blacklist</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A regex matched against agent version (e.g., <code>1\.2\..*</code>), matching agents are rejected. The filter needs to be enabled for this to take effect.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.blacklist</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A regex matched against agent version (e.g., <code>1\.2\..*</code>), matching agents are rejected. The filter needs to be enabled for this to take effect.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.filter.version.minimum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum version an agent needs to be (e.g., <code>1.2.3</code>) in order to communicate with this server. The filter needs to be enabled for this to take effect.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
@@ -4929,6 +4915,20 @@ no value is specified the bucket is assumed to be in the same region as the Geni
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
 attempt to assume this role on the host Genie is running on</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].roleARN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For the bucket with name <code>bucketName</code> the ARN of the role to assume to read/write to that bucket. If a bucket is used
+that isn&#8217;t listed in this map the default credentials configured will be used</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.s3.buckets.[bucketName].region</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS region the bucket with <code>bucketName</code> is in. Clients to talk to this bucket will be created in this region. If
+no value is specified the bucket is assumed to be in the same region as the Genie process.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -4980,6 +4980,24 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.count</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true. This limit applies to users that don&#8217;t have an override set via <code>genie.jobs.users.active-limit.overrides.&lt;user-name&gt;</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables the per-user active job limit. The number of jobs is controlled by the <code>genie.jobs.users.active-limit.count</code> property.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.overrides.&lt;user-name&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
@@ -5020,6 +5038,25 @@ forces a timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.factor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.max-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most
+cases is specified as part of the <code>Command</code> entity for a particular job.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.min-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum time between checks for job completion in milliseconds. Must be greater than zero.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to attempt to forward kill and get output requests for jobs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
@@ -5057,14 +5094,14 @@ doesn&#8217;t exist.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdOutSize</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard output file can grow to before Genie will kill the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdErrSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard error file can grow to before Genie will kill the job</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8589934592</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdErrSize</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard error file can grow to before Genie will kill the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdOutSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard output file can grow to before Genie will kill the job</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8589934592</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -5087,22 +5124,16 @@ doesn&#8217;t exist.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to enable SNS publishing of events</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submission.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether new job submission is enabled (<code>true</code>) or disabled (<code>false</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.topicARN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The SNS topic to publish to</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.additionalEventKeys.&lt;KEY&gt;</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Map of KEYs and corresponding values to be added to the SNS messages published</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submission.disabledMessage</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A message to return to the users when new job submission is disabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Job submission is currently disabled. Please try again later.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.creationEnabled</p></td>
@@ -5119,42 +5150,6 @@ to work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Enables the per-user active job limit. The number of jobs is controlled by the <code>genie.jobs.users.active-limit.count</code> property.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.count</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true. This limit applies to users that don&#8217;t have an override set via <code>genie.jobs.users.active-limit.overrides.&lt;user-name&gt;</code>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.active-limit.overrides.&lt;user-name&gt;</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless <code>genie.jobs.users.active-limit.enabled</code> is set to true.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.min-interval</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum time between checks for job completion in milliseconds. Must be greater than zero.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.max-interval</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most cases is specified as part of the <code>Command</code> entity for a particular job.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.completion-check-back-off.factor</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.leader.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
 determined by Zookeeper or other mechanism via Spring</p></td>
@@ -5168,15 +5163,33 @@ determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password for the e-mail server</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.user</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The user to log into the e-mail server with</p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.password</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The password for the e-mail server</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to enable SNS publishing of events</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.topicARN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The SNS topic to publish to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.notifications.sns.additionalEventKeys.&lt;KEY&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map of KEYs and corresponding values to be added to the SNS messages published</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5207,6 +5220,12 @@ determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.s3.noOfRetries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of times to retry requests to S3 before failure</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.s3filetransfer.strictUrlCheckEnabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to strictly check an S3 URL for illegal characters before attempting to use it</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5400,6 +5419,12 @@ See: <code>genie.tasks.database-cleanup.expression</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The cron expression for how often to run the database cleanup task</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.maxDeletedPerTransaction</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of job records (across multiple tables) to delete from the database
  in a single transaction. Genie will loop and perform multiple transactions until
@@ -5415,21 +5440,9 @@ See: <code>genie.tasks.database-cleanup.expression</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.expression</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The cron expression for how often to run the database cleanup task</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.retention</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to retain jobs in the database</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">90</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipJobsCleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Jobs table when performing database cleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5441,6 +5454,12 @@ See: <code>genie.tasks.database-cleanup.expression</code></p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipFilesCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Files table when performing database cleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipJobsCleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Jobs table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -5498,12 +5517,6 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.leader.path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie leadership election of a given cluster</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/leader/</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.s3filetransfer.strictUrlCheckEnabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to strictly check an S3 URL for illegal characters before attempting to use it</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 </tbody>
@@ -6539,7 +6552,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-09-10 23:47:34 UTC
+Last updated 2019-09-11 20:08:50 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
