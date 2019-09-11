@@ -32,6 +32,8 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResource
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -67,6 +69,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -80,7 +83,7 @@ import java.util.UUID;
  */
 public class JobRestControllerTest {
 
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
+    private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
     //Mocked variables
     private JobSearchService jobSearchService;
@@ -110,18 +113,12 @@ public class JobRestControllerTest {
         final Counter counter = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
 
+
         this.controller = new JobRestController(
             Mockito.mock(JobCoordinatorService.class),
             this.jobSearchService,
             Mockito.mock(AttachmentService.class),
-            Mockito.mock(ApplicationResourceAssembler.class),
-            Mockito.mock(ClusterResourceAssembler.class),
-            Mockito.mock(CommandResourceAssembler.class),
-            Mockito.mock(JobResourceAssembler.class),
-            Mockito.mock(JobRequestResourceAssembler.class),
-            Mockito.mock(JobExecutionResourceAssembler.class),
-            Mockito.mock(JobMetadataResourceAssembler.class),
-            Mockito.mock(JobSearchResultResourceAssembler.class),
+            this.createMockResourceAssembler(),
             new GenieHostInfo(this.hostname),
             this.restTemplate,
             this.jobDirectoryServerService,
@@ -834,14 +831,7 @@ public class JobRestControllerTest {
             Mockito.mock(JobCoordinatorService.class),
             this.jobSearchService,
             Mockito.mock(AttachmentService.class),
-            Mockito.mock(ApplicationResourceAssembler.class),
-            Mockito.mock(ClusterResourceAssembler.class),
-            Mockito.mock(CommandResourceAssembler.class),
-            Mockito.mock(JobResourceAssembler.class),
-            Mockito.mock(JobRequestResourceAssembler.class),
-            Mockito.mock(JobExecutionResourceAssembler.class),
-            Mockito.mock(JobMetadataResourceAssembler.class),
-            Mockito.mock(JobSearchResultResourceAssembler.class),
+            this.createMockResourceAssembler(),
             new GenieHostInfo(this.hostname),
             template,
             this.jobDirectoryServerService,
@@ -865,5 +855,19 @@ public class JobRestControllerTest {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
+    }
+
+    private ResourceAssemblers createMockResourceAssembler() {
+        return new ResourceAssemblers(
+            Mockito.mock(ApplicationResourceAssembler.class),
+            Mockito.mock(ClusterResourceAssembler.class),
+            Mockito.mock(CommandResourceAssembler.class),
+            Mockito.mock(JobExecutionResourceAssembler.class),
+            Mockito.mock(JobMetadataResourceAssembler.class),
+            Mockito.mock(JobRequestResourceAssembler.class),
+            Mockito.mock(JobResourceAssembler.class),
+            Mockito.mock(JobSearchResultResourceAssembler.class),
+            Mockito.mock(RootResourceAssembler.class)
+        );
     }
 }

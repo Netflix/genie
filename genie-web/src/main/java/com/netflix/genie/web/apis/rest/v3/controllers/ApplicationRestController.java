@@ -29,6 +29,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
@@ -88,18 +89,16 @@ public class ApplicationRestController {
      * Constructor.
      *
      * @param applicationPersistenceService The application configuration service to use.
-     * @param applicationResourceAssembler  The assembler used to create Application resources.
-     * @param commandResourceAssembler      The assembler used to create Command resources.
+     * @param resourceAssemblers            The encapsulation of all the available V3 resource assemblers
      */
     @Autowired
     public ApplicationRestController(
         final ApplicationPersistenceService applicationPersistenceService,
-        final ApplicationResourceAssembler applicationResourceAssembler,
-        final CommandResourceAssembler commandResourceAssembler
+        final ResourceAssemblers resourceAssemblers
     ) {
         this.applicationPersistenceService = applicationPersistenceService;
-        this.applicationResourceAssembler = applicationResourceAssembler;
-        this.commandResourceAssembler = commandResourceAssembler;
+        this.applicationResourceAssembler = resourceAssemblers.getApplicationResourceAssembler();
+        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
     }
 
     /**

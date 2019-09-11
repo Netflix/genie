@@ -30,6 +30,7 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
@@ -92,22 +93,18 @@ public class CommandRestController {
     /**
      * Constructor.
      *
-     * @param commandPersistenceService    The command configuration service to use.
-     * @param commandResourceAssembler     The assembler to use to convert commands to command HAL resources
-     * @param applicationResourceAssembler The assembler to use to convert applications to application HAL resources
-     * @param clusterResourceAssembler     The assembler to use to convert clusters to cluster HAL resources
+     * @param commandPersistenceService The command configuration service to use.
+     * @param resourceAssemblers        The encapsulation of all available V3 resource assemblers
      */
     @Autowired
     public CommandRestController(
         final CommandPersistenceService commandPersistenceService,
-        final CommandResourceAssembler commandResourceAssembler,
-        final ApplicationResourceAssembler applicationResourceAssembler,
-        final ClusterResourceAssembler clusterResourceAssembler
+        final ResourceAssemblers resourceAssemblers
     ) {
         this.commandPersistenceService = commandPersistenceService;
-        this.commandResourceAssembler = commandResourceAssembler;
-        this.applicationResourceAssembler = applicationResourceAssembler;
-        this.clusterResourceAssembler = clusterResourceAssembler;
+        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
+        this.applicationResourceAssembler = resourceAssemblers.getApplicationResourceAssembler();
+        this.clusterResourceAssembler = resourceAssemblers.getClusterResourceAssembler();
     }
 
     /**

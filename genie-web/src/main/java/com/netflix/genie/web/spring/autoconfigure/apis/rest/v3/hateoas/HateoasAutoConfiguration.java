@@ -25,6 +25,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResource
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -133,8 +134,48 @@ public class HateoasAutoConfiguration {
      * @return A {@link RootResourceAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(RootResourceAssembler.class)
     public RootResourceAssembler rootResourceAssembler() {
         return new RootResourceAssembler();
+    }
+
+    /**
+     * An encapsulation of all the V3 resource assemblers.
+     *
+     * @param applicationResourceAssembler     The application assembler
+     * @param clusterResourceAssembler         The cluster assembler
+     * @param commandResourceAssembler         The command assembler
+     * @param jobExecutionResourceAssembler    The job execution assembler
+     * @param jobMetadataResourceAssembler     The job metadata assembler
+     * @param jobRequestResourceAssembler      The job request assembler
+     * @param jobResourceAssembler             The job assembler
+     * @param jobSearchResultResourceAssembler The job search result assembler
+     * @param rootResourceAssembler            The root assembler
+     * @return A {@link ResourceAssemblers} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(ResourceAssemblers.class)
+    public ResourceAssemblers resourceAssemblers(
+        final ApplicationResourceAssembler applicationResourceAssembler,
+        final ClusterResourceAssembler clusterResourceAssembler,
+        final CommandResourceAssembler commandResourceAssembler,
+        final JobExecutionResourceAssembler jobExecutionResourceAssembler,
+        final JobMetadataResourceAssembler jobMetadataResourceAssembler,
+        final JobRequestResourceAssembler jobRequestResourceAssembler,
+        final JobResourceAssembler jobResourceAssembler,
+        final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
+        final RootResourceAssembler rootResourceAssembler
+    ) {
+        return new ResourceAssemblers(
+            applicationResourceAssembler,
+            clusterResourceAssembler,
+            commandResourceAssembler,
+            jobExecutionResourceAssembler,
+            jobMetadataResourceAssembler,
+            jobRequestResourceAssembler,
+            jobResourceAssembler,
+            jobSearchResultResourceAssembler,
+            rootResourceAssembler
+        );
     }
 }
