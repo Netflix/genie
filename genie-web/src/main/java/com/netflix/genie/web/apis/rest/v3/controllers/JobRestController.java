@@ -19,6 +19,7 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
@@ -28,6 +29,7 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
@@ -61,6 +63,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -124,6 +127,13 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v3/jobs")
 @Slf4j
 public class JobRestController {
+    @VisibleForTesting
+    static final String JOB_SUBMISSION_ENABLED_PROPERTY_KEY = "genie.jobs.submission.enabled";
+    @VisibleForTesting
+    static final String JOB_SUBMISSION_DISABLED_MESSAGE_KEY = "genie.jobs.submission.disabledMessage";
+    @VisibleForTesting
+    static final String JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+        = "Job submission is currently disabled. Please try again later.";
     private static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
     private static final String NAME_HEADER_COOKIE = "cookie";
@@ -147,6 +157,7 @@ public class JobRestController {
     private final JobsProperties jobsProperties;
     private final AgentRoutingService agentRoutingService;
     private final JobPersistenceService jobPersistenceService;
+    private final Environment environment;
 
     // Metrics
     private final Counter submitJobWithoutAttachmentsRate;
@@ -166,6 +177,7 @@ public class JobRestController {
      * @param registry                  The metrics registry to use
      * @param jobPersistenceService     Job persistence service
      * @param agentRoutingService       Agent routing service
+     * @param environment               The application environment to pull dynamic properties from
      */
     @Autowired
     @SuppressWarnings("checkstyle:parameternumber")
@@ -180,7 +192,8 @@ public class JobRestController {
         final JobsProperties jobsProperties,
         final MeterRegistry registry,
         final JobPersistenceService jobPersistenceService,
-        final AgentRoutingService agentRoutingService
+        final AgentRoutingService agentRoutingService,
+        final Environment environment
     ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;
@@ -199,6 +212,7 @@ public class JobRestController {
         this.jobsProperties = jobsProperties;
         this.agentRoutingService = agentRoutingService;
         this.jobPersistenceService = jobPersistenceService;
+        this.environment = environment;
 
         // Set up the metrics
         this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
@@ -264,6 +278,19 @@ public class JobRestController {
         @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
+        // TODO: This is quick and dirty and we may want to handle it better overall for the system going forward
+        //       e.g. should it be in an filter that we can do for more APIs?
+        //            should value be cached rather than checking every time?
+        if (!this.environment.getProperty(JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean.class, true)) {
+            // Job Submission is disabled
+            throw new GenieServerUnavailableException(
+                this.environment.getProperty(
+                    JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+                    JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+                )
+            );
+        }
+
         // get client's host from the context
         final String localClientHost;
         if (StringUtils.isNotBlank(clientHost)) {

@@ -18,9 +18,11 @@
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -47,11 +49,13 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -93,6 +97,7 @@ public class JobRestControllerTest {
     private RestTemplate restTemplate;
     private JobDirectoryServerService jobDirectoryServerService;
     private JobsProperties jobsProperties;
+    private Environment environment;
 
     private JobRestController controller;
 
@@ -108,6 +113,7 @@ public class JobRestControllerTest {
         this.restTemplate = Mockito.mock(RestTemplate.class);
         this.jobDirectoryServerService = Mockito.mock(JobDirectoryServerService.class);
         this.jobsProperties = JobsProperties.getJobsPropertiesDefaults();
+        this.environment = Mockito.mock(Environment.class);
 
         final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         final Counter counter = Mockito.mock(Counter.class);
@@ -125,7 +131,8 @@ public class JobRestControllerTest {
             this.jobsProperties,
             registry,
             this.jobPersistenceService,
-            this.agentRoutingService
+            this.agentRoutingService,
+            this.environment
         );
     }
 
@@ -838,7 +845,8 @@ public class JobRestControllerTest {
             this.jobsProperties,
             registry,
             this.jobPersistenceService,
-            this.agentRoutingService
+            this.agentRoutingService,
+            this.environment
         );
         jobController.getJobOutput(jobId, forwardedFrom, request, response);
 
@@ -855,6 +863,40 @@ public class JobRestControllerTest {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
+    }
+
+    /**
+     * Make sure when job submission is disabled it won't run the job and will return the proper error message.
+     *
+     * @throws GenieException On unexpected exception
+     */
+    @Test
+    public void whenJobSubmissionIsDisabledItThrowsCorrectError() throws GenieException {
+        final String errorMessage = UUID.randomUUID().toString();
+        try {
+            Mockito.when(
+                this.environment.getProperty(
+                    JobRestController.JOB_SUBMISSION_ENABLED_PROPERTY_KEY,
+                    Boolean.class,
+                    true
+                )
+            ).thenReturn(false);
+            Mockito.when(
+                this.environment.getProperty(
+                    JobRestController.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+                    JobRestController.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+                )
+            ).thenReturn(errorMessage);
+            this.controller.submitJob(
+                Mockito.mock(JobRequest.class),
+                null,
+                null,
+                Mockito.mock(HttpServletRequest.class)
+            );
+            Assert.fail("Expected exception not thrown");
+        } catch (final GenieServerUnavailableException e) {
+            Assertions.assertThat(e.getMessage()).isEqualTo(errorMessage);
+        }
     }
 
     private ResourceAssemblers createMockResourceAssembler() {
