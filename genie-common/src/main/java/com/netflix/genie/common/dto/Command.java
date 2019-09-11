@@ -49,7 +49,7 @@ public class Command extends ExecutionEnvironmentDTO {
     @NotNull(message = "A valid command status is required")
     private final CommandStatus status;
     @NotEmpty(message = "An executable is required")
-    @Size(max = 255, message = "Executable path can't be longer than 255 characters")
+    @Size(max = 1024, message = "Executable path can't be longer than 1024 characters")
     private final String executable;
     @Min(
         value = 1,
