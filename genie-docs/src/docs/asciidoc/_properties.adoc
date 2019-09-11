@@ -256,6 +256,16 @@ to work.
 |1.2
 |no
 
+|genie.jobs.submission.enabled
+|Whether new job submission is enabled (`true`) or disabled (`false`)
+|true
+|yes
+
+|genie.jobs.submission.disabledMessage
+|A message to return to the users when new job submission is disabled
+|Job submission is currently disabled. Please try again later.
+|yes
+
 |genie.leader.enabled
 |Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
 determined by Zookeeper or other mechanism via Spring
