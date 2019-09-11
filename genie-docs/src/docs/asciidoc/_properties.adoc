@@ -16,30 +16,18 @@ Whereas static properties values are bound during application startup and do not
 |===
 |Property |Description |Default Value |Dynamic
 
-|genie.aws.s3.buckets.[bucketName].roleARN
-|For the bucket with name `bucketName` the ARN of the role to assume to read/write to that bucket. If a bucket is used
-that isn't listed in this map the default credentials configured will be used
-|
-|no
-
-|genie.aws.s3.buckets.[bucketName].region
-|The AWS region the bucket with `bucketName` is in. Clients to talk to this bucket will be created in this region. If
-no value is specified the bucket is assumed to be in the same region as the Genie process.
-|
-|no
-
 |genie.agent.filter.enabled
 |If set to `true`, enables the built-in agent filter service. The filter behavior is controlled by other active `genie.agent.filter.*` properties.
 |
 |no
 
-|genie.agent.filter.version.minimum
-|The minimum version an agent needs to be (e.g., `1.2.3`) in order to communicate with this server. The filter needs to be enabled for this to take effect.
+|genie.agent.filter.version.blacklist
+|A regex matched against agent version (e.g., `1\.2\..*`), matching agents are rejected. The filter needs to be enabled for this to take effect.
 |
 |yes
 
-|genie.agent.filter.version.blacklist
-|A regex matched against agent version (e.g., `1\.2\..*`), matching agents are rejected. The filter needs to be enabled for this to take effect.
+|genie.agent.filter.version.minimum
+|The minimum version an agent needs to be (e.g., `1.2.3`) in order to communicate with this server. The filter needs to be enabled for this to take effect.
 |
 |yes
 
@@ -66,6 +54,18 @@ no value is specified the bucket is assumed to be in the same region as the Geni
 |genie.aws.credentials.role
 |The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
 attempt to assume this role on the host Genie is running on
+|
+|no
+
+|genie.aws.s3.buckets.[bucketName].roleARN
+|For the bucket with name `bucketName` the ARN of the role to assume to read/write to that bucket. If a bucket is used
+that isn't listed in this map the default credentials configured will be used
+|
+|no
+
+|genie.aws.s3.buckets.[bucketName].region
+|The AWS region the bucket with `bucketName` is in. Clients to talk to this bucket will be created in this region. If
+no value is specified the bucket is assumed to be in the same region as the Genie process.
 |
 |no
 
@@ -109,6 +109,21 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |10000
 |no
 
+|genie.jobs.active-limit.count
+|The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true. This limit applies to users that don't have an override set via `genie.jobs.users.active-limit.overrides.<user-name>`.
+|100
+|no
+
+|genie.jobs.active-limit.enabled
+|Enables the per-user active job limit. The number of jobs is controlled by the `genie.jobs.users.active-limit.count` property.
+|false
+|no
+
+|genie.jobs.active-limit.overrides.<user-name>
+|The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true.
+|-
+|yes
+
 |genie.jobs.cleanup.deleteDependencies
 |Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion
 |true
@@ -143,6 +158,22 @@ forces a timeout
 |5000
 |no
 
+|genie.jobs.completion-check-back-off.factor
+|Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.
+|1.2
+|no
+
+|genie.jobs.completion-check-back-off.max-interval
+|The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most
+cases is specified as part of the `Command` entity for a particular job.
+|10000
+|no
+
+|genie.jobs.completion-check-back-off.min-interval
+|The minimum time between checks for job completion in milliseconds. Must be greater than zero.
+|100
+|no
+
 |genie.jobs.forwarding.enabled
 |Whether or not to attempt to forward kill and get output requests for jobs
 |true
@@ -174,13 +205,13 @@ doesn't exist.
 |file://${java.io.tmpdir}genie/jobs/
 |no
 
-|genie.jobs.max.stdOutSize
-|The maximum number of bytes the job standard output file can grow to before Genie will kill the job
+|genie.jobs.max.stdErrSize
+|The maximum number of bytes the job standard error file can grow to before Genie will kill the job
 |8589934592
 |no
 
-|genie.jobs.max.stdErrSize
-|The maximum number of bytes the job standard error file can grow to before Genie will kill the job
+|genie.jobs.max.stdOutSize
+|The maximum number of bytes the job standard output file can grow to before Genie will kill the job
 |8589934592
 |no
 
@@ -199,20 +230,15 @@ doesn't exist.
 |10240
 |no
 
-|genie.notifications.sns.enabled
-|Wether to enable SNS publishing of events
-|-
-|no
+|genie.jobs.submission.enabled
+|Whether new job submission is enabled (`true`) or disabled (`false`)
+|true
+|yes
 
-|genie.notifications.sns.topicARN
-|The SNS topic to publish to
-|-
-|no
-
-|genie.notifications.sns.additionalEventKeys.<KEY>
-|Map of KEYs and corresponding values to be added to the SNS messages published
-|-
-|no
+|genie.jobs.submission.disabledMessage
+|A message to return to the users when new job submission is disabled
+|Job submission is currently disabled. Please try again later.
+|yes
 
 |genie.jobs.users.creationEnabled
 |Whether Genie should attempt to create a system user in order to run the job as or not. Genie user must have sudo
@@ -226,46 +252,6 @@ to work.
 |false
 |no
 
-|genie.jobs.active-limit.enabled
-|Enables the per-user active job limit. The number of jobs is controlled by the `genie.jobs.users.active-limit.count` property.
-|false
-|no
-
-|genie.jobs.active-limit.count
-|The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true. This limit applies to users that don't have an override set via `genie.jobs.users.active-limit.overrides.<user-name>`.
-|100
-|no
-
-|genie.jobs.active-limit.overrides.<user-name>
-|The maximum number of active jobs that user 'user-name' is allowed to have. This is property is ignored unless `genie.jobs.users.active-limit.enabled` is set to true.
-|-
-|yes
-
-|genie.jobs.completion-check-back-off.min-interval
-|The minimum time between checks for job completion in milliseconds. Must be greater than zero.
-|100
-|no
-
-|genie.jobs.completion-check-back-off.max-interval
-|The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most cases is specified as part of the `Command` entity for a particular job.
-|10000
-|no
-
-|genie.jobs.completion-check-back-off.factor
-|Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.
-|1.2
-|no
-
-|genie.jobs.submission.enabled
-|Whether new job submission is enabled (`true`) or disabled (`false`)
-|true
-|yes
-
-|genie.jobs.submission.disabledMessage
-|A message to return to the users when new job submission is disabled
-|Job submission is currently disabled. Please try again later.
-|yes
-
 |genie.leader.enabled
 |Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
 determined by Zookeeper or other mechanism via Spring
@@ -277,14 +263,29 @@ determined by Zookeeper or other mechanism via Spring
 |no-reply-genie@geniehost.com
 |no
 
+|genie.mail.password
+|The password for the e-mail server
+|
+|no
+
 |genie.mail.user
 |The user to log into the e-mail server with
 |
 |no
 
-|genie.mail.password
-|The password for the e-mail server
-|
+|genie.notifications.sns.enabled
+|Wether to enable SNS publishing of events
+|-
+|no
+
+|genie.notifications.sns.topicARN
+|The SNS topic to publish to
+|-
+|no
+
+|genie.notifications.sns.additionalEventKeys.<KEY>
+|Map of KEYs and corresponding values to be added to the SNS messages published
+|-
 |no
 
 |genie.redis.enabled
@@ -310,6 +311,11 @@ determined by Zookeeper or other mechanism via Spring
 |genie.retry.s3.noOfRetries
 |The number of times to retry requests to S3 before failure
 |5
+|no
+
+|genie.s3filetransfer.strictUrlCheckEnabled
+|Whether to strictly check an S3 URL for illegal characters before attempting to use it
+|false
 |no
 
 |genie.security.oauth2.enabled
@@ -471,6 +477,11 @@ See: `genie.tasks.database-cleanup.expression`
 |true
 |no
 
+|genie.tasks.database-cleanup.expression
+|The cron expression for how often to run the database cleanup task
+|0 0 0 * * *
+|no
+
 |genie.tasks.database-cleanup.maxDeletedPerTransaction
 |The number of job records (across multiple tables) to delete from the database
  in a single transaction. Genie will loop and perform multiple transactions until
@@ -484,19 +495,9 @@ See: `genie.tasks.database-cleanup.expression`
 |1000
 |no
 
-|genie.tasks.database-cleanup.expression
-|The cron expression for how often to run the database cleanup task
-|0 0 0 * * *
-|no
-
 |genie.tasks.database-cleanup.retention
 |The number of days to retain jobs in the database
 |90
-|no
-
-|genie.tasks.database-cleanup.skipJobsCleanup
-|Skip the Jobs table when performing database cleanup
-|false
 |no
 
 |genie.tasks.database-cleanup.skipClustersCleanup
@@ -506,6 +507,11 @@ See: `genie.tasks.database-cleanup.expression`
 
 |genie.tasks.database-cleanup.skipFilesCleanup
 |Skip the Files table when performing database cleanup
+|false
+|no
+
+|genie.tasks.database-cleanup.skipJobsCleanup
+|Skip the Jobs table when performing database cleanup
 |false
 |no
 
@@ -554,11 +560,6 @@ to the number of CPU cores x 2 + 1
 |genie.zookeeper.leader.path
 |The namespace to use for Genie leadership election of a given cluster
 |/genie/leader/
-|no
-
-|genie.s3filetransfer.strictUrlCheckEnabled
-|Whether to strictly check an S3 URL for illegal characters before attempting to use it
-|false
 |no
 
 |===
