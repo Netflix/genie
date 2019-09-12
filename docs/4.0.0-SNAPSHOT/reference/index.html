@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-09-11</span>
+<span id="revdate">2019-09-12</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -804,14 +804,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_wrap_up_4">6.4.2. Wrap Up</a></li>
 </ul>
 </li>
-<li><a href="#_security">6.5. Security</a>
-<ul class="sectlevel3">
-<li><a href="#_architecture">6.5.1. Architecture</a></li>
-<li><a href="#_rest_api_security">6.5.2. REST API Security</a></li>
-<li><a href="#_ui_security">6.5.3. UI Security</a></li>
-<li><a href="#_wrap_up_5">6.5.4. Wrap Up</a></li>
-</ul>
-</li>
+<li><a href="#_security">6.5. Security</a></li>
 </ul>
 </li>
 <li><a href="#_features_5">7. Features</a>
@@ -820,7 +813,7 @@ b.conum * { color: inherit !important; }
 <ul class="sectlevel3">
 <li><a href="#_randomizedclusterloadbalancerimpl">7.1.1. RandomizedClusterLoadBalancerImpl</a></li>
 <li><a href="#_scriptloadbalancer">7.1.2. ScriptLoadBalancer</a></li>
-<li><a href="#_wrap_up_6">7.1.3. Wrap Up</a></li>
+<li><a href="#_wrap_up_5">7.1.3. Wrap Up</a></li>
 </ul>
 </li>
 </ul>
@@ -828,7 +821,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_installation">8. Installation</a>
 <ul class="sectlevel2">
 <li><a href="#_standalone_jar">8.1. Standalone Jar</a></li>
-<li><a href="#_tomcat_deployment">8.2. Tomcat Deployment</a></li>
+<li><a href="#_servlet_container_deployment">8.2. Servlet Container Deployment</a></li>
 <li><a href="#_configuration_3">8.3. Configuration</a>
 <ul class="sectlevel3">
 <li><a href="#_profiles">8.3.1. Profiles</a></li>
@@ -836,7 +829,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_local_directories">8.3.3. Local Directories</a></li>
 </ul>
 </li>
-<li><a href="#_wrap_up_7">8.4. Wrap Up</a></li>
+<li><a href="#_wrap_up_6">8.4. Wrap Up</a></li>
 </ul>
 </li>
 <li><a href="#_properties">9. Properties</a>
@@ -1408,14 +1401,14 @@ drop them yourself if they&#8217;re no longer needed.
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot to 2.1.6.RELEASE</p>
+<p>Upgrade Spring Boot to 2.1.8.RELEASE</p>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Greenwich.SR2 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Greenwich.SR3 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR2/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR3/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1708,7 +1701,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -4163,87 +4156,23 @@ should only serve as a template or example.</p>
 <div class="sect2">
 <h3 id="_security"><a class="anchor" href="#_security"></a><a class="link" href="#_security">6.5. Security</a></h3>
 <div class="paragraph">
-<p>A long requested feature for Genie has been adding authentication and authorization support for the UI and particularly
-the REST APIs. Genie 3 development allowed the time and resources to finally implement a solution. Genie security is
-built on top of <a href="https://projects.spring.io/spring-security/">Spring Security</a> which allows the specific security
-solution to be plugged in based on user requirements.</p>
-</div>
-<div class="sect3">
-<h4 id="_architecture"><a class="anchor" href="#_architecture"></a><a class="link" href="#_architecture">6.5.1. Architecture</a></h4>
-<div class="paragraph">
-<p>Out of the box Genie supports securing the REST APIs via OAuth2 and/or x509 certificates and the UI via SAML. Below is
-an image of how this security architecture works within Netflix.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<a class="image" href="https://netflix.github.io/genie/images/3.0.0/security.png"><img src="https://netflix.github.io/genie/images/3.0.0/security.png" alt="Genie Security Architecture"></a>
-</div>
-<div class="title">Figure 2. Genie Security Architecture</div>
+<p>In version Genie 3.x there existed a
+<a href="https://github.com/Netflix/genie/tree/3.3.x/genie-web/src/main/java/com/netflix/genie/web/security">security module</a>
+built on top of <a href="https://projects.spring.io/spring-security/">Spring Security</a>. This module contained a lot of
+custom code to make security work in the Netflix security environment at the time. It attempted to abstract this into
+reusable components but still was pretty specific.</p>
 </div>
 <div class="paragraph">
-<p>At a high level you can see that the requests are passed through several security filter chains before they arrive at
-the Genie application code. Based on the URL being accessed different filter chains will be triggered. If the request
-can be authenticated and authorized the security configuration is stored within the Spring Security Context which can
-then be accessed via Genie code if necessary.</p>
-</div>
-<div class="paragraph">
-<p>All the security can be enabled or disabled as desired by system administrators. You can find the various properties
-under <code>genie.security.*</code> in the <a href="#_properties">Properties</a> section. Spring specific properties are also involved but the enabling
-and disabling is done via the <code>genie.security</code> properties.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_rest_api_security"><a class="anchor" href="#_rest_api_security"></a><a class="link" href="#_rest_api_security">6.5.2. REST API Security</a></h4>
-<div class="paragraph">
-<p>The REST APIs described in the <a href="https://netflix.github.io/genie/releases/4.0.0-SNAPSHOT/rest/">REST documentation</a> can be
-secured via OAuth2 and/or x509 out of the box. Both these mechanisms secure everything under <code>/api/*</code> to require a user
-be authenticated to access them. All <code>job</code> and read (e.g. GET) APIs are available to any authenticated user when
-security is enabled. If security is enabled users will need to be granted an <code>admin</code> role in order to use the
-configuration APIs for <code>applications</code>, <code>commands</code> and <code>clusters</code>. By configuration APIs we mean anything that will
-modify the state of these resources like the POST, PUT, PATCH, DELETE APIs.</p>
-</div>
-<div class="sect4">
-<h5 id="_x509"><a class="anchor" href="#_x509"></a><a class="link" href="#_x509">6.5.2.1. x509</a></h5>
-<div class="paragraph">
-<p>If x509 is enabled it will be checked first (before the OAuth2 filter chain if that is enabled) and if a valid
-certificate is present in the request the user will be authenticated and granted the pertinent role.</p>
-</div>
-<div class="paragraph">
-<p>For this to work out of the box the certicates must be formatted so that the <code>principle</code> field contains a colon
-separated string of format <code>{user}:{role1,role2&#8230;&#8203;}</code>. This is how Genie will determine the user and roles that user
-will be granted within the system.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_oauth2"><a class="anchor" href="#_oauth2"></a><a class="link" href="#_oauth2">6.5.2.2. OAuth2</a></h5>
-<div class="paragraph">
-<p><a href="https://oauth.net/2/">OAuth2</a> security is implemented via the
-<a href="https://projects.spring.io/spring-security-oauth/">Spring Security OAuth</a> project. You can read documentation there but
-out of the box support has been extended to include Ping Federate as a provider. This is used within Netflix and there
-are two ways you can have Genie validate tokens. One is if the Bearer token is merely and identifier you can have
-Genie call the Ping Federate server to validate the Bearer token is valid. The other is to configure Ping Federate to
-generated <a href="https://jwt.io/">JWT</a> tokens and all validation can be done within the Genie node. This is the preferrable
-option as you save processing time and unnecessary IO.</p>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_ui_security"><a class="anchor" href="#_ui_security"></a><a class="link" href="#_ui_security">6.5.3. UI Security</a></h4>
-<div class="paragraph">
-<p>The UI and other endpoints can be secured using SAML via <a href="https://projects.spring.io/spring-security-saml/">Spring SAML</a>.
-You can configure Genie where to look in the SAML assertion to parse out user and role information. If only SAML
-security is turned on users won&#8217;t need to authenticate in order to access the APIs. If SAML and one of the REST API
-security methods is enabled and configured if a user authenticates to the UI via SAML they will also be able to access
-the REST APIs within the same HTTP session without aquiring a token or passing a certificate.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_wrap_up_5"><a class="anchor" href="#_wrap_up_5"></a><a class="link" href="#_wrap_up_5">6.5.4. Wrap Up</a></h4>
-<div class="paragraph">
-<p>This section is meant to provide a high level overview of how Genie supports authentication and authorization out of
-the box if configured properly. Security is a very large topic and to truly understand how this works reading into
-the various libraries and technologies mentioned in this section is recommended.</p>
-</div>
+<p><a href="https://medium.com/netflix-techblog/netflix-oss-and-spring-boot-coming-full-circle-4855947713a0">Spring at Netflix</a> has
+evolved since that time into the primary Java runtime platform. As part of this process our core runtime teams have
+produced security modules built on Spring Security which provide paved path integration with Netflix security
+security mechanism. Genie has been using this paved path since the 4.x line has started releasing candidates. As such
+we&#8217;ve made the decision to remove the <code>genie-security</code> module as it is a burden to support and likely isn&#8217;t very
+useful out of the box for most use cases. The recommendation if security is desired is to take the <code>genie-web</code> project
+and build it into your own project in conjunction with some Spring Security implementations that work for your
+environment. This is how we ship Genie internally. If you want to reference how this might look have a look
+at the <a href="https://github.com/Netflix/genie/tree/v4.0.0-rc.31/genie-security">4.0.0-rc.31</a> code which is the last candidate
+release to contain our old <code>genie-security</code> code.</p>
 </div>
 </div>
 </div>
@@ -4483,7 +4412,7 @@ this situation.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wrap_up_6"><a class="anchor" href="#_wrap_up_6"></a><a class="link" href="#_wrap_up_6">7.1.3. Wrap Up</a></h4>
+<h4 id="_wrap_up_5"><a class="anchor" href="#_wrap_up_5"></a><a class="link" href="#_wrap_up_5">7.1.3. Wrap Up</a></h4>
 <div class="paragraph">
 <p>This section went over the cluster load balancing feature of Genie. This interface provides an extension point for
 administrators of Genie to tweak Genie&#8217;s runtime behavior to suit their needs.</p>
@@ -4551,27 +4480,16 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tomcat_deployment"><a class="anchor" href="#_tomcat_deployment"></a><a class="link" href="#_tomcat_deployment">8.2. Tomcat Deployment</a></h3>
+<h3 id="_servlet_container_deployment"><a class="anchor" href="#_servlet_container_deployment"></a><a class="link" href="#_servlet_container_deployment">8.2. Servlet Container Deployment</a></h3>
 <div class="paragraph">
-<p>The WAR deployment requires the
-<a href="http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-war/4.0.0-SNAPSHOT/">WAR file</a>
-be placed in an existing Tomcat or servlet
-container. At Netflix we use this method as we have existing tuning of Tomcat and a lot of infrastructure in place
-for monitoring of the Tomcat process. We deploy to Tomcat 8.x and rename the WAR file to ROOT.war so that the
-application context root is <code>/</code>.</p>
-</div>
-<div class="paragraph">
-<p>The benefits of deploying to Tomcat are you have more access to the internals of the application and can change
-property files directly or add classpath items to either the Tomcat classpath or in the actual Genie lib directory.</p>
-</div>
-<div class="paragraph">
-<p>The drawback is that you now also have to tune and configure Tomcat or your chosen servlet container in addition to
-Genie and it may be more overhead than you&#8217;re comfortable with.</p>
+<p>If you want to deploy to an existing Servlet container deployment you can re-package the <code>genie-web</code> jar inside a WAR.
+You can see the <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/howto-traditional-deployment.html#howto-create-a-deployable-war-file">Spring Boot</a>
+docs for an example of how to do this.</p>
 </div>
 </div>
 <div class="sect2">
@@ -4579,7 +4497,7 @@ Genie and it may be more overhead than you&#8217;re comfortable with.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/">Spring Boot</a>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/">Spring Boot</a>
 docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -4587,7 +4505,7 @@ docs as they will go in depth on how to configure the various Spring components 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+<a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
 default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
 will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
 profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
@@ -4826,7 +4744,7 @@ instead of the default one.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_wrap_up_7"><a class="anchor" href="#_wrap_up_7"></a><a class="link" href="#_wrap_up_7">8.4. Wrap Up</a></h3>
+<h3 id="_wrap_up_6"><a class="anchor" href="#_wrap_up_6"></a><a class="link" href="#_wrap_up_6">8.4. Wrap Up</a></h3>
 <div class="paragraph">
 <p>This section contains the basic setup instructions for Genie. There are other components that can be added to the
 system like Redis, Zookeeper and Security systems that are somewhat outside the scope of an initial setup. You can see
@@ -4841,8 +4759,8 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR2/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
+and the <a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR3/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -5229,132 +5147,6 @@ determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable oauth2 based security or not for REST APIs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether Ping Federate is being used as the OAuth2 server and Genie should assume default configuration for its tokens</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.jwt.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to assume that the bearer tokens coming with API requests are <a href="https://jwt.io/">JWT</a> tokens or not</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.jwt.keyValue</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The public key used to verify the JWT signature</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether SAML security should be turned on to protect access to the user interface</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.user</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The key in the SAML assertion to get the user name from</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.groups.name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The key in the SAML assertion to get group information for the user from</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.groups.admin</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The group a user needs to be a member of in order to be granted an admin role</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.idp.serviceProviderMetadataUrl</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The URL where metadata for Genie service SAML configuration can be pulled from</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the keystore file on the classpath for SAML assertions</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.password</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The password for opening the keystore</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.defaultKey.name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the default key to use for signing the SAML request</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.defaultKey.password</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The password to open the default key</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.contextPath</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The context path for Genie</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">/</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.includeServerPortInRequestURL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to include the port of the load balancer in the redirect request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.scheme</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The scheme the load balancer Genie cluster is run behind uses (http or https). Used for SAML post back</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.serverName</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Root context for the Genie load balancer e.g. genie.prod.com</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.serverPort</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The port the load balancer is listening on. Used for SAML post back</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.sp.entityId</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The id that Genie is identified by in the identity provider</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.sp.entityBaseURL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Where the SAML assertion should be posted back to. e.g. <a href="https://genie.prod.com" class="bare">https://genie.prod.com</a></p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.x509.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable x509 certificate security on the REST APIs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.swagger.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable <a href="http://swagger.io/">Swagger</a> to be bootstrapped into the Genie service so that the endpoint
 /swagger-ui.html shows API documentation generated by the swagger specification</p></td>
@@ -5525,7 +5317,7 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">9.1.2. Spring Properties</a></h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -5551,31 +5343,6 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default base path for the Spring Actuator[<a href="https://docs.spring.io/spring-boot/docs/current/actuator-api/html/" class="bare">https://docs.spring.io/spring-boot/docs/current/actuator-api/html/</a>]
 management endpoints. Switched from default <code>/actuator</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/admin</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">security.oauth2.client.client-id</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The id of the OAuth2 client</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">security.oauth2.client.client-secret</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The secret for the oauth2 client</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">security.oauth2.resource.filter-order</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The order the OAuth2 resource filter is places within the spring security chain</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">security.oauth2.resource.id</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Id of the resource server</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">security.oauth2.resource.token-info-uri</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URI where to get token information from</p></td>
-<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.application.name</p></td>
@@ -5712,7 +5479,7 @@ returned</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
 </tr>
@@ -6309,48 +6076,6 @@ for multiple errors.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, type</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.security.oauth2.pingFederate.authentication.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to process JWT token and obtain OAuth2 authentication</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>PingFederateJWTTokenServices</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.security.oauth2.pingFederate.authentication.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to process authentication token and obtain OAuth2 for an API request</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>PingFederateRemoteTokenServices</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.security.oauth2.pingFederate.tokenValidation.error.rate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of token validation errors from the backend</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>PingFederateRemoteTokenServices</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.security.oauth2.pingFederate.api.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>PingFederateRemoteTokenServices</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.security.oauth2.pingFederate.jwt.validation.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to validate a JWT token claim</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>PingFederateValidator</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.security.saml.parse.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to load or create user details based on SAML parameters</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>SAMLUserDetailsServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.agentJob.handshake.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter for calls to the 'handshake' protocol of the Genie Agent Job Service</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -6552,7 +6277,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-09-11 20:08:50 UTC
+Last updated 2019-09-12 19:27:25 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">

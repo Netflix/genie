@@ -40,13 +40,6 @@ com.netflix.genie.common.internal.services
 com.netflix.genie.common.internal.services.impl
 com.netflix.genie.common.internal.util
 com.netflix.genie.common.util
-com.netflix.genie.security
-com.netflix.genie.security.configs
-com.netflix.genie.security.configs.processors
-com.netflix.genie.security.oauth2
-com.netflix.genie.security.oauth2.pingfederate
-com.netflix.genie.security.saml
-com.netflix.genie.security.x509
 com.netflix.genie.test.suppliers
 com.netflix.genie.test.web.configs
 com.netflix.genie.ui.controllers
