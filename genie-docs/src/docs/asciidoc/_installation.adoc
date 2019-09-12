@@ -38,25 +38,11 @@ For more details see the
 http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/#boot-features-external-config[Spring Boot]
 documentation on external configuration.
 
-=== Tomcat Deployment
+=== Servlet Container Deployment
 
-The WAR deployment requires the
-ifeval::[{isSnapshot} == true]
-http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-war/{revnumber}/[WAR file]
-endif::[]
-ifeval::[{isSnapshot} == false]
-https://bintray.com/netflixoss/maven/download_file?file_path=com%2Fnetflix%2Fgenie%2Fgenie-war%2F{revnumber}%2Fgenie-war-{revnumber}.war[WAR file]
-endif::[]
-be placed in an existing Tomcat or servlet
-container. At Netflix we use this method as we have existing tuning of Tomcat and a lot of infrastructure in place
-for monitoring of the Tomcat process. We deploy to Tomcat 8.x and rename the WAR file to ROOT.war so that the
-application context root is `/`.
-
-The benefits of deploying to Tomcat are you have more access to the internals of the application and can change
-property files directly or add classpath items to either the Tomcat classpath or in the actual Genie lib directory.
-
-The drawback is that you now also have to tune and configure Tomcat or your chosen servlet container in addition to
-Genie and it may be more overhead than you're comfortable with.
+If you want to deploy to an existing Servlet container deployment you can re-package the `genie-web` jar inside a WAR.
+You can see the https://docs.spring.io/spring-boot/docs/current/reference/html/howto-traditional-deployment.html#howto-create-a-deployable-war-file[Spring Boot]
+docs for an example of how to do this.
 
 === Configuration
 

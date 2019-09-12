@@ -502,5 +502,4 @@ task dockerBuildAllImages(group: "Docker", description: "Container task for all 
     dependsOn ":genie-app:dockerBuildAppImage"
     dependsOn ":genie-demo:dockerBuildApacheImage"
     dependsOn ":genie-demo:dockerBuildClientImage"
-    dependsOn ":genie-war:dockerBuildWarImage"
 }
