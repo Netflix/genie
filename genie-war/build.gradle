@@ -7,7 +7,6 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
-    compile(project(":genie-security"))
     compile(project(":genie-web"))
     compile(project(":genie-ui"))
 
