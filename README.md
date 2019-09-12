@@ -41,19 +41,10 @@ Successful builds will also generate a docker image which is published to Docker
 
 [![App Image](https://img.shields.io/docker/pulls/netflixoss/genie-app.svg)](https://hub.docker.com/r/netflixoss/genie-app/)
 
-This is the image for the Spring Boot all in one jar. You can use `docker pull netflixoss/genie-app:{version}` to test 
-the one you want.
+This is the image for the sample Spring Boot all in one jar. You can use `docker pull netflixoss/genie-app:{version}` 
+to test the one you want.
  
 You can run via `docker run -t --rm -p 8080:8080 netflixoss/genie-app:{version}`
-
-### WAR Image
-
-[![WAR Image](https://img.shields.io/docker/pulls/netflixoss/genie-war.svg)](https://hub.docker.com/r/netflixoss/genie-war/)
-
-This is the image that has Genie deployed as a WAR file within Tomcat. You can use 
-`docker pull netflixoss/genie-war:{version}` to test the one you want.
-
-You can run via `docker run -t --rm -p 8080:8080 netflixoss/genie-war:{version}`
 
 ## Python Client
 
