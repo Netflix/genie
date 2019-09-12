@@ -1,65 +1,18 @@
 === Security
 
-A long requested feature for Genie has been adding authentication and authorization support for the UI and particularly
-the REST APIs. Genie 3 development allowed the time and resources to finally implement a solution. Genie security is
-built on top of https://projects.spring.io/spring-security/[Spring Security] which allows the specific security
-solution to be plugged in based on user requirements.
+In version Genie 3.x there existed a
+https://github.com/Netflix/genie/tree/3.3.x/genie-web/src/main/java/com/netflix/genie/web/security[security module]
+built on top of https://projects.spring.io/spring-security/[Spring Security]. This module contained a lot of
+custom code to make security work in the Netflix security environment at the time. It attempted to abstract this into
+reusable components but still was pretty specific.
 
-==== Architecture
-
-Out of the box Genie supports securing the REST APIs via OAuth2 and/or x509 certificates and the UI via SAML. Below is
-an image of how this security architecture works within Netflix.
-
-.Genie Security Architecture
-image::security.png[Genie Security Architecture, link="{imagesdir}/security.png"]
-
-At a high level you can see that the requests are passed through several security filter chains before they arrive at
-the Genie application code. Based on the URL being accessed different filter chains will be triggered. If the request
-can be authenticated and authorized the security configuration is stored within the Spring Security Context which can
-then be accessed via Genie code if necessary.
-
-All the security can be enabled or disabled as desired by system administrators. You can find the various properties
-under `genie.security.*` in the <<Properties>> section. Spring specific properties are also involved but the enabling
-and disabling is done via the `genie.security` properties.
-
-==== REST API Security
-
-The REST APIs described in the https://netflix.github.io/genie/releases/{revnumber}/rest/[REST documentation] can be
-secured via OAuth2 and/or x509 out of the box. Both these mechanisms secure everything under `/api/*` to require a user
-be authenticated to access them. All `job` and read (e.g. GET) APIs are available to any authenticated user when
-security is enabled. If security is enabled users will need to be granted an `admin` role in order to use the
-configuration APIs for `applications`, `commands` and `clusters`. By configuration APIs we mean anything that will
-modify the state of these resources like the POST, PUT, PATCH, DELETE APIs.
-
-===== x509
-
-If x509 is enabled it will be checked first (before the OAuth2 filter chain if that is enabled) and if a valid
-certificate is present in the request the user will be authenticated and granted the pertinent role.
-
-For this to work out of the box the certicates must be formatted so that the `principle` field contains a colon
-separated string of format `{user}:{role1,role2...}`. This is how Genie will determine the user and roles that user
-will be granted within the system.
-
-===== OAuth2
-
-https://oauth.net/2/[OAuth2] security is implemented via the
-https://projects.spring.io/spring-security-oauth/[Spring Security OAuth] project. You can read documentation there but
-out of the box support has been extended to include Ping Federate as a provider. This is used within Netflix and there
-are two ways you can have Genie validate tokens. One is if the Bearer token is merely and identifier you can have
-Genie call the Ping Federate server to validate the Bearer token is valid. The other is to configure Ping Federate to
-generated https://jwt.io/[JWT] tokens and all validation can be done within the Genie node. This is the preferrable
-option as you save processing time and unnecessary IO.
-
-==== UI Security
-
-The UI and other endpoints can be secured using SAML via https://projects.spring.io/spring-security-saml/[Spring SAML].
-You can configure Genie where to look in the SAML assertion to parse out user and role information. If only SAML
-security is turned on users won't need to authenticate in order to access the APIs. If SAML and one of the REST API
-security methods is enabled and configured if a user authenticates to the UI via SAML they will also be able to access
-the REST APIs within the same HTTP session without aquiring a token or passing a certificate.
-
-==== Wrap Up
-
-This section is meant to provide a high level overview of how Genie supports authentication and authorization out of
-the box if configured properly. Security is a very large topic and to truly understand how this works reading into
-the various libraries and technologies mentioned in this section is recommended.
+https://medium.com/netflix-techblog/netflix-oss-and-spring-boot-coming-full-circle-4855947713a0[Spring at Netflix] has
+evolved since that time into the primary Java runtime platform. As part of this process our core runtime teams have
+produced security modules built on Spring Security which provide paved path integration with Netflix security
+security mechanism. Genie has been using this paved path since the 4.x line has started releasing candidates. As such
+we've made the decision to remove the `genie-security` module as it is a burden to support and likely isn't very
+useful out of the box for most use cases. The recommendation if security is desired is to take the `genie-web` project
+and build it into your own project in conjunction with some Spring Security implementations that work for your
+environment. This is how we ship Genie internally. If you want to reference how this might look have a look
+at the https://github.com/Netflix/genie/tree/v4.0.0-rc.31/genie-security[4.0.0-rc.31] code which is the last candidate
+release to contain our old `genie-security` code.

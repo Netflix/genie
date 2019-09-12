@@ -343,42 +343,6 @@ for multiple errors.
 |AbstractSNSPublisher
 |status, type
 
-|genie.security.oauth2.pingFederate.authentication.timer
-|Time taken to process JWT token and obtain OAuth2 authentication
-|nanoseconds
-|PingFederateJWTTokenServices
-|-
-
-|genie.security.oauth2.pingFederate.authentication.timer
-|Time taken to process authentication token and obtain OAuth2 for an API request
-|nanoseconds
-|PingFederateRemoteTokenServices
-|-
-
-|genie.security.oauth2.pingFederate.tokenValidation.error.rate
-|Counts the number of token validation errors from the backend
-|nanoseconds
-|PingFederateRemoteTokenServices
-|status
-
-|genie.security.oauth2.pingFederate.api.timer
-|?
-|nanoseconds
-|PingFederateRemoteTokenServices
-|-
-
-|genie.security.oauth2.pingFederate.jwt.validation.timer
-|Time taken to validate a JWT token claim
-|nanoseconds
-|PingFederateValidator
-|-
-
-|genie.security.saml.parse.timer
-|Time taken to load or create user details based on SAML parameters
-|nanoseconds
-|SAMLUserDetailsServiceImpl
-|-
-
 |genie.services.agentJob.handshake.counter
 |Counter for calls to the 'handshake' protocol of the Genie Agent Job Service
 |count
