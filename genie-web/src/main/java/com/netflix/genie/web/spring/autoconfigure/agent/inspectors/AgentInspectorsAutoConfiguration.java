@@ -20,6 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure.agent.inspectors;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.impl.BlacklistedVersionAgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.impl.MinimumVersionAgentMetadataInspector;
+import com.netflix.genie.web.agent.inspectors.impl.RejectAllJobsAgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.impl.WhitelistedVersionAgentMetadataInspector;
 import com.netflix.genie.web.properties.AgentFilterProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * Auto-configuration for the default implementations of {@link AgentMetadataInspector}s.
@@ -91,5 +93,20 @@ public class AgentInspectorsAutoConfiguration {
         final AgentFilterProperties agentFilterProperties
     ) {
         return new MinimumVersionAgentMetadataInspector(agentFilterProperties);
+    }
+
+
+    /**
+     * A {@link AgentMetadataInspector} that may reject all agents based on system properties.
+     *
+     * @param environment the environment
+     * @return a {@link AgentMetadataInspector}
+     */
+    @Bean
+    @ConditionalOnMissingBean(RejectAllJobsAgentMetadataInspector.class)
+    public RejectAllJobsAgentMetadataInspector rejectAllJobsAgentMetadataInspector(
+        final Environment environment
+    ) {
+        return new RejectAllJobsAgentMetadataInspector(environment);
     }
 }

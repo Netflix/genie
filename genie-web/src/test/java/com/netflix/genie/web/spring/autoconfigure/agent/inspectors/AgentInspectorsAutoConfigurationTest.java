@@ -20,6 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure.agent.inspectors;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.impl.BlacklistedVersionAgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.impl.MinimumVersionAgentMetadataInspector;
+import com.netflix.genie.web.agent.inspectors.impl.RejectAllJobsAgentMetadataInspector;
 import com.netflix.genie.web.agent.inspectors.impl.WhitelistedVersionAgentMetadataInspector;
 import com.netflix.genie.web.properties.AgentFilterProperties;
 import org.assertj.core.api.Assertions;
@@ -55,10 +56,11 @@ public class AgentInspectorsAutoConfigurationTest {
             .run(
                 (context) -> {
                     Assertions.assertThat(context).hasSingleBean(AgentFilterProperties.class);
-                    Assertions.assertThat(context).getBeans(AgentMetadataInspector.class).hasSize(3);
+                    Assertions.assertThat(context).getBeans(AgentMetadataInspector.class).hasSize(4);
                     Assertions.assertThat(context).hasSingleBean(WhitelistedVersionAgentMetadataInspector.class);
                     Assertions.assertThat(context).hasSingleBean(BlacklistedVersionAgentMetadataInspector.class);
                     Assertions.assertThat(context).hasSingleBean(MinimumVersionAgentMetadataInspector.class);
+                    Assertions.assertThat(context).hasSingleBean(RejectAllJobsAgentMetadataInspector.class);
                 }
             );
     }
