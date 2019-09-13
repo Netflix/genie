@@ -328,11 +328,6 @@ public final class JobConstants {
     public static final String CHILDREN_PID_ENV_VAR = "CHILDREN_PID";
 
     /**
-     * Empty byte array.
-     */
-    public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
-
-    /**
      * An object the encapsulates the kill handling logic to be added to the for each job.
      */
     public static final String JOB_FAILURE_AND_KILL_HANDLER_LOGIC = new StringBuilder()
