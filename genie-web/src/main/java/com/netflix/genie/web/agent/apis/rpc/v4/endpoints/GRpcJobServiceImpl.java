@@ -18,10 +18,12 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobRequest;
@@ -37,6 +39,7 @@ import com.netflix.genie.proto.ReserveJobIdResponse;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 
 /**
  * Extension of {@link JobServiceGrpc.JobServiceImplBase} to provide
@@ -50,6 +53,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
     private final AgentJobService agentJobService;
     private final JobServiceProtoConverter jobServiceProtoConverter;
     private final JobServiceProtoErrorComposer protoErrorComposer;
+    private final Environment environment;
 
     // TODO: Metrics which I believe can be captured by an interceptor
 
@@ -59,15 +63,18 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
      * @param agentJobService          The implementation of the {@link AgentJobService} to use
      * @param jobServiceProtoConverter DTO/Proto converter
      * @param protoErrorComposer       proto error message composer
+     * @param environment              The application environment to pull properties from
      */
     public GRpcJobServiceImpl(
         final AgentJobService agentJobService,
         final JobServiceProtoConverter jobServiceProtoConverter,
-        final JobServiceProtoErrorComposer protoErrorComposer
+        final JobServiceProtoErrorComposer protoErrorComposer,
+        final Environment environment
     ) {
         this.agentJobService = agentJobService;
         this.jobServiceProtoConverter = jobServiceProtoConverter;
         this.protoErrorComposer = protoErrorComposer;
+        this.environment = environment;
     }
 
     /**
@@ -113,6 +120,21 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final StreamObserver<ReserveJobIdResponse> responseObserver
     ) {
         try {
+            // TODO: This is quick and dirty and we may want to handle it better overall for the system going forward
+            //       e.g. should it be in an filter that we can do for more APIs?
+            //            should value be cached rather than checking every time?
+            // TODO: While this currently shares code with JobRestController I couldn't find a good place to put it
+            //       that was shared and I suspect they'll diverge or change so I'm going to leave it for now
+            //       - TJG 9/13/2019
+            if (!this.environment.getProperty(JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean.class, true)) {
+                // Job Submission is disabled
+                throw new GenieServerUnavailableException(
+                    this.environment.getProperty(
+                        JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+                        JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+                    )
+                );
+            }
             final JobRequest jobRequest = jobServiceProtoConverter.toJobRequestDto(request);
             final AgentClientMetadata agentClientMetadata
                 = jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata());

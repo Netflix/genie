@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -132,6 +133,7 @@ public class AgentRpcEndpointsAutoConfiguration {
      * @param agentJobService          The {@link AgentJobService} instance to use
      * @param jobServiceProtoConverter The {@link JobServiceProtoConverter} instance to use
      * @param protoErrorComposer       The {@link JobServiceProtoErrorComposer} instance to use
+     * @param environment              The Spring application environment
      * @return A {@link GRpcJobServiceImpl} instance
      */
     @Bean
@@ -139,9 +141,10 @@ public class AgentRpcEndpointsAutoConfiguration {
     public GRpcJobServiceImpl gRpcJobService(
         final AgentJobService agentJobService,
         final JobServiceProtoConverter jobServiceProtoConverter,
-        final JobServiceProtoErrorComposer protoErrorComposer
+        final JobServiceProtoErrorComposer protoErrorComposer,
+        final Environment environment
     ) {
-        return new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, protoErrorComposer);
+        return new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, protoErrorComposer, environment);
     }
 
     /**

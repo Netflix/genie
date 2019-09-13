@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GeniePreconditionException
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
@@ -27,6 +28,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
+import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.ChangeJobStatusRequest
 import com.netflix.genie.proto.ChangeJobStatusResponse
@@ -42,6 +44,7 @@ import com.netflix.genie.proto.ReserveJobIdResponse
 import com.netflix.genie.web.agent.services.AgentJobService
 import io.grpc.stub.StreamObserver
 import org.apache.commons.lang3.StringUtils
+import org.springframework.core.env.Environment
 import spock.lang.Specification
 
 /**
@@ -61,13 +64,20 @@ class GRpcJobServiceImplSpec extends Specification {
     StreamObserver<ClaimJobResponse> claimJobResponseObserver
     StreamObserver<ChangeJobStatusResponse> changeJobStatusResponseObserver
     JobServiceProtoConverter jobServiceProtoConverter
+    Environment environment
 
     def setup() {
         this.id = UUID.randomUUID().toString()
         this.errorMessageComposer = Mock(JobServiceProtoErrorComposer)
         this.jobServiceProtoConverter = Mock(JobServiceProtoConverter)
         this.agentJobService = Mock(AgentJobService)
-        this.gRpcJobService = new GRpcJobServiceImpl(agentJobService, jobServiceProtoConverter, errorMessageComposer)
+        this.environment = Mock(Environment)
+        this.gRpcJobService = new GRpcJobServiceImpl(
+            this.agentJobService,
+            this.jobServiceProtoConverter,
+            this.errorMessageComposer,
+            this.environment
+        )
         this.handshakeResponseObserver = Mock(StreamObserver)
         this.reserveJobIdResponseObserver = Mock(StreamObserver)
         this.jobSpecificationResponseObserver = Mock(StreamObserver)
@@ -130,6 +140,11 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.reserveJobId(request, reserveJobIdResponseObserver)
 
         then:
+        1 * this.environment.getProperty(JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean, true) >> true
+        0 * this.environment.getProperty(
+            JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+            JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+        )
         1 * jobServiceProtoConverter.toJobRequestDto(request) >> jobRequest
         1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
         1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> id
@@ -148,12 +163,41 @@ class GRpcJobServiceImplSpec extends Specification {
         gRpcJobService.reserveJobId(request, reserveJobIdResponseObserver)
 
         then:
+        1 * this.environment.getProperty(JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean, true) >> true
+        0 * this.environment.getProperty(
+            JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+            JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+        )
         1 * jobServiceProtoConverter.toJobRequestDto(request) >> jobRequest
         1 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
         1 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata) >> {
             throw e
         }
         1 * errorMessageComposer.toProtoReserveJobIdResponse(e) >> errorResponse
+        1 * reserveJobIdResponseObserver.onNext(errorResponse)
+        1 * reserveJobIdResponseObserver.onCompleted()
+    }
+
+    def "Reserve job id -- jobs disabled"() {
+        ReserveJobIdRequest request = ReserveJobIdRequest.newBuilder().build()
+        JobRequest jobRequest = Mock(JobRequest)
+        AgentClientMetadata agentClientMetadata = Mock(AgentClientMetadata)
+        ReserveJobIdResponse errorResponse = ReserveJobIdResponse.newBuilder().build()
+        def errorMessage = "Jobs are currently disabled."
+
+        when:
+        this.gRpcJobService.reserveJobId(request, reserveJobIdResponseObserver)
+
+        then:
+        1 * this.environment.getProperty(JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean, true) >> false
+        1 * this.environment.getProperty(
+            JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+            JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+        ) >> errorMessage
+        0 * jobServiceProtoConverter.toJobRequestDto(request) >> jobRequest
+        0 * jobServiceProtoConverter.toAgentClientMetadataDto(request.getAgentMetadata()) >> agentClientMetadata
+        0 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata)
+        1 * errorMessageComposer.toProtoReserveJobIdResponse(_ as GenieServerUnavailableException) >> errorResponse
         1 * reserveJobIdResponseObserver.onNext(errorResponse)
         1 * reserveJobIdResponseObserver.onCompleted()
     }

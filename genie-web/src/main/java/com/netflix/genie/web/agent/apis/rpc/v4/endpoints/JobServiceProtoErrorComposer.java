@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.internal.exceptions.GenieConversionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
@@ -56,6 +57,7 @@ public class JobServiceProtoErrorComposer {
         ImmutableMap.<Class<? extends Exception>, ReserveJobIdError.Type>builder()
             .put(GenieConversionException.class, ReserveJobIdError.Type.INVALID_REQUEST)
             .put(GenieIdAlreadyExistsException.class, ReserveJobIdError.Type.ID_NOT_AVAILABLE)
+            .put(GenieServerUnavailableException.class, ReserveJobIdError.Type.SERVER_ERROR)
             .build();
 
     private static final Map<Class<? extends Exception>, JobSpecificationError.Type> JOB_SPECIFICATION_ERROR_MAP =

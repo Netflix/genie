@@ -18,6 +18,7 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException
@@ -65,11 +66,12 @@ class JobServiceProtoErrorComposerSpec extends Specification {
         response.getError().getMessage().contains(MESSAGE)
 
         where:
-        exception                                  | expectedErrorType
-        new GenieConversionException(MESSAGE)      | ReserveJobIdError.Type.INVALID_REQUEST
-        new GenieIdAlreadyExistsException(MESSAGE) | ReserveJobIdError.Type.ID_NOT_AVAILABLE
-        new IOException(MESSAGE)                   | ReserveJobIdError.Type.UNKNOWN
-        new RuntimeException(MESSAGE)              | ReserveJobIdError.Type.UNKNOWN
+        exception                                    | expectedErrorType
+        new GenieConversionException(MESSAGE)        | ReserveJobIdError.Type.INVALID_REQUEST
+        new GenieIdAlreadyExistsException(MESSAGE)   | ReserveJobIdError.Type.ID_NOT_AVAILABLE
+        new IOException(MESSAGE)                     | ReserveJobIdError.Type.UNKNOWN
+        new RuntimeException(MESSAGE)                | ReserveJobIdError.Type.UNKNOWN
+        new GenieServerUnavailableException(MESSAGE) | ReserveJobIdError.Type.SERVER_ERROR
     }
 
     @Unroll
