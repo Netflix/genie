@@ -24,6 +24,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
@@ -876,15 +877,15 @@ public class JobRestControllerTest {
         try {
             Mockito.when(
                 this.environment.getProperty(
-                    JobRestController.JOB_SUBMISSION_ENABLED_PROPERTY_KEY,
+                    JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY,
                     Boolean.class,
                     true
                 )
             ).thenReturn(false);
             Mockito.when(
                 this.environment.getProperty(
-                    JobRestController.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
-                    JobRestController.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+                    JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+                    JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
                 )
             ).thenReturn(errorMessage);
             this.controller.submitJob(

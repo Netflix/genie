@@ -397,6 +397,22 @@ public final class JobConstants {
         .toString();
 
     /**
+     * The property name to check whether new job submissions should be allowed.
+     */
+    public static final String JOB_SUBMISSION_ENABLED_PROPERTY_KEY = "genie.jobs.submission.enabled";
+
+    /**
+     * The property name to check for the message to send back to the request user if jobs are currently disabled.
+     */
+    public static final String JOB_SUBMISSION_DISABLED_MESSAGE_KEY = "genie.jobs.submission.disabledMessage";
+
+    /**
+     * The default message to send back to users when the jobs are disabled if there was none other set.
+     */
+    public static final String JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+        = "Job submission is currently disabled. Please try again later.";
+
+    /**
      * Protected constructor for utility class.
      */
     protected JobConstants() {

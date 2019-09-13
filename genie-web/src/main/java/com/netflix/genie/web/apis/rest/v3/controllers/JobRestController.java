@@ -19,7 +19,6 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
@@ -127,13 +126,6 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v3/jobs")
 @Slf4j
 public class JobRestController {
-    @VisibleForTesting
-    static final String JOB_SUBMISSION_ENABLED_PROPERTY_KEY = "genie.jobs.submission.enabled";
-    @VisibleForTesting
-    static final String JOB_SUBMISSION_DISABLED_MESSAGE_KEY = "genie.jobs.submission.disabledMessage";
-    @VisibleForTesting
-    static final String JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
-        = "Job submission is currently disabled. Please try again later.";
     private static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
     private static final String NAME_HEADER_COOKIE = "cookie";
@@ -281,12 +273,12 @@ public class JobRestController {
         // TODO: This is quick and dirty and we may want to handle it better overall for the system going forward
         //       e.g. should it be in an filter that we can do for more APIs?
         //            should value be cached rather than checking every time?
-        if (!this.environment.getProperty(JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean.class, true)) {
+        if (!this.environment.getProperty(JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY, Boolean.class, true)) {
             // Job Submission is disabled
             throw new GenieServerUnavailableException(
                 this.environment.getProperty(
-                    JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
-                    JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+                    JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+                    JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
                 )
             );
         }
