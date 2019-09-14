@@ -57,13 +57,26 @@ public final class UserConsole {
      * This system property is set by Spring.
      */
     private static final String PID_SYSTEM_PROPERTY_NAME = "PID";
+    /**
+     * The name of the environment variable that can be supplied to have the temporary log file at a non standard
+     * location.
+     */
+    private static final String TEMPORARY_LOG_FILE_ENV_VAR_NAME = "GENIE_AGENT_TEMPORARY_LOG_FILE";
 
     /**
      * Stores the current location of the log file.
      * The logfile starts in a temporary location but may move inside the job folder during execution.
+     *
+     * Note that this value does not set the location of the log, it just tries to guess it.
+     * The file location is determined by the logback configuration.
      */
     private static final AtomicReference<Path> CURRENT_LOG_FILE_PATH = new AtomicReference<>(
-        Paths.get(String.format(LOG_FILE_PATH, System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???")))
+        Paths.get(
+            System.getenv().getOrDefault(
+                TEMPORARY_LOG_FILE_ENV_VAR_NAME,
+                String.format(LOG_FILE_PATH, System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???"))
+            )
+        )
     );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CONSOLE_LOGGER_NAME);
