@@ -11,7 +11,7 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <property name="LOG_FILE" value="/tmp/genie-agent-${PID}.log"/>
+    <property name="LOG_FILE" value="${GENIE_AGENT_TEMPORARY_LOG_FILE:-/tmp/genie-agent-${PID}.log}"/>
     <include resource="genie-agent-file-appender.xml"/>
 
     <property name="CONSOLE_FILTER_LOGGER_NAME" value="genie-agent"/>
