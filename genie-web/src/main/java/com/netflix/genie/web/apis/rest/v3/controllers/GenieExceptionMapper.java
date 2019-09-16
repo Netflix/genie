@@ -20,6 +20,13 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.util.MetricsConstants;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -80,6 +87,30 @@ public class GenieExceptionMapper {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
         return new ResponseEntity<>(e.getLocalizedMessage(), status);
+    }
+
+    /**
+     * Handle Genie runtime exceptions.
+     *
+     * @param e The Genie exception to handle
+     * @return A {@link ResponseEntity} with the exception mapped to a {@link HttpStatus}
+     */
+    @ExceptionHandler(GenieRuntimeException.class)
+    public ResponseEntity<Object> handleGenieRuntimeException(final GenieRuntimeException e) {
+        this.countException(e);
+        if (
+            e instanceof GenieApplicationNotFoundException
+            || e instanceof GenieCommandNotFoundException
+            || e instanceof GenieClusterNotFoundException
+            || e instanceof GenieJobNotFoundException
+            || e instanceof GenieJobSpecificationNotFoundException
+        ) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } else if (e instanceof GenieIdAlreadyExistsException) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } else {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
