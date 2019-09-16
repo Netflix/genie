@@ -27,14 +27,13 @@ import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -69,32 +68,28 @@ public class GenieExceptionMapper {
     /**
      * Handle Genie Exceptions.
      *
-     * @param response The HTTP response
-     * @param e        The exception to handle
-     * @throws IOException on error in sending error
+     * @param e The exception to handle
+     * @return An {@link ResponseEntity} instance
      */
     @ExceptionHandler(GenieException.class)
-    public void handleGenieException(
-        final HttpServletResponse response,
-        final GenieException e
-    ) throws IOException {
+    public ResponseEntity<Object> handleGenieException(final GenieException e) {
         this.countException(e);
         log.error(e.getLocalizedMessage(), e);
-        response.sendError(e.getErrorCode(), e.getLocalizedMessage());
+        HttpStatus status = HttpStatus.resolve(e.getErrorCode());
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return new ResponseEntity<>(e.getLocalizedMessage(), status);
     }
 
     /**
      * Handle constraint violation exceptions.
      *
-     * @param response The HTTP response
-     * @param cve      The exception to handle
-     * @throws IOException on error in sending error
+     * @param cve The exception to handle
+     * @return A {@link ResponseEntity} instance
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public void handleConstraintViolation(
-        final HttpServletResponse response,
-        final ConstraintViolationException cve
-    ) throws IOException {
+    public ResponseEntity<Object> handleConstraintViolation(final ConstraintViolationException cve) {
         final StringBuilder builder = new StringBuilder();
         if (cve.getConstraintViolations() != null) {
             for (final ConstraintViolation<?> cv : cve.getConstraintViolations()) {
@@ -106,25 +101,21 @@ public class GenieExceptionMapper {
         }
         this.countException(cve);
         log.error(cve.getLocalizedMessage(), cve);
-        response.sendError(HttpStatus.PRECONDITION_FAILED.value(), builder.toString());
+        return new ResponseEntity<>(builder.toString(), HttpStatus.PRECONDITION_FAILED);
     }
 
     /**
      * Handle MethodArgumentNotValid  exceptions.
      *
-     * @param response The HTTP response
-     * @param e        The exception to handle
-     * @throws IOException on error in sending error
+     * @param e The exception to handle
+     * @return A {@link ResponseEntity} instance
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public void handleMethodArgumentNotValidException(
-        final HttpServletResponse response,
-        final MethodArgumentNotValidException e
-    ) throws IOException {
+    public ResponseEntity<Object> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         this.countException(e);
         final String errorMessage = e.getMessage();
         log.error(errorMessage, e);
-        response.sendError(HttpStatus.PRECONDITION_FAILED.value(), errorMessage);
+        return new ResponseEntity<>(errorMessage, HttpStatus.PRECONDITION_FAILED);
     }
 
     private void countException(final Exception e) {
