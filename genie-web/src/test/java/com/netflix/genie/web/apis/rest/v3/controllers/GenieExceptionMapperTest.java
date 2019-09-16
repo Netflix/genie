@@ -32,17 +32,17 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
-import java.io.IOException;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -57,7 +57,6 @@ import java.util.UUID;
  */
 public class GenieExceptionMapperTest {
 
-    private HttpServletResponse response;
     private GenieExceptionMapper mapper;
     private MeterRegistry registry;
     private Counter counter;
@@ -67,7 +66,6 @@ public class GenieExceptionMapperTest {
      */
     @Before
     public void setup() {
-        this.response = Mockito.mock(HttpServletResponse.class);
         this.registry = Mockito.mock(MeterRegistry.class);
         this.counter = Mockito.mock(Counter.class);
         Mockito
@@ -83,11 +81,9 @@ public class GenieExceptionMapperTest {
 
     /**
      * Test Genie Exceptions.
-     *
-     * @throws IOException on error
      */
     @Test
-    public void canHandleGenieExceptions() throws IOException {
+    public void canHandleGenieExceptions() {
         final List<GenieException> exceptions = Arrays.asList(
             new GenieBadRequestException("bad"),
             new GenieConflictException("conflict"),
@@ -100,7 +96,11 @@ public class GenieExceptionMapperTest {
         );
 
         for (final GenieException exception : exceptions) {
-            this.mapper.handleGenieException(this.response, exception);
+            final ResponseEntity<Object> response = this.mapper.handleGenieException(exception);
+            final HttpStatus expectedStatus = HttpStatus.resolve(exception.getErrorCode()) != null
+                ? HttpStatus.resolve(exception.getErrorCode())
+                : HttpStatus.INTERNAL_SERVER_ERROR;
+            Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(expectedStatus);
             Mockito
                 .verify(this.registry, Mockito.times(1))
                 .counter(
@@ -118,16 +118,12 @@ public class GenieExceptionMapperTest {
 
     /**
      * Test constraint violation exceptions.
-     *
-     * @throws IOException on error
      */
     @Test
-    public void canHandleConstraintViolationExceptions() throws IOException {
+    public void canHandleConstraintViolationExceptions() {
         final ConstraintViolationException exception = new ConstraintViolationException("cve", null);
-        this.mapper.handleConstraintViolation(this.response, exception);
-        Mockito
-            .verify(this.response, Mockito.times(1))
-            .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
+        final ResponseEntity<Object> response = this.mapper.handleConstraintViolation(exception);
+        Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
         Mockito
             .verify(this.registry, Mockito.times(1))
             .counter(
@@ -143,12 +139,10 @@ public class GenieExceptionMapperTest {
 
     /**
      * Test method argument not valid exceptions.
-     *
-     * @throws IOException on error
      */
     @Test
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "It's needed for the test")
-    public void canHandleMethodArgumentNotValidExceptions() throws IOException {
+    public void canHandleMethodArgumentNotValidExceptions() {
         // Method is a final class so can't mock it. Just use the current method.
         final Method method = new Object() {
         }.getClass().getEnclosingMethod();
@@ -166,10 +160,8 @@ public class GenieExceptionMapperTest {
             bindingResult
         );
 
-        this.mapper.handleMethodArgumentNotValidException(this.response, exception);
-        Mockito
-            .verify(this.response, Mockito.times(1))
-            .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
+        final ResponseEntity<Object> response = this.mapper.handleMethodArgumentNotValidException(exception);
+        Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
         Mockito
             .verify(this.registry, Mockito.times(1))
             .counter(
