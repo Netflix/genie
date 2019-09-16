@@ -18,6 +18,7 @@
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
@@ -27,6 +28,13 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.util.MetricsConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
@@ -47,6 +55,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -173,5 +182,26 @@ public class GenieExceptionMapperTest {
         Mockito
             .verify(this.counter, Mockito.times(1))
             .increment();
+    }
+
+    /**
+     * Make sure the Runtime exceptions map to the expected error code.
+     */
+    @Test
+    public void canHandleGenieRuntimeExceptions() {
+        final Map<GenieRuntimeException, HttpStatus> exceptions = Maps.newHashMap();
+
+        exceptions.put(new GenieApplicationNotFoundException(), HttpStatus.NOT_FOUND);
+        exceptions.put(new GenieClusterNotFoundException(), HttpStatus.NOT_FOUND);
+        exceptions.put(new GenieCommandNotFoundException(), HttpStatus.NOT_FOUND);
+        exceptions.put(new GenieJobNotFoundException(), HttpStatus.NOT_FOUND);
+        exceptions.put(new GenieJobSpecificationNotFoundException(), HttpStatus.NOT_FOUND);
+        exceptions.put(new GenieIdAlreadyExistsException(), HttpStatus.CONFLICT);
+        exceptions.put(new GenieRuntimeException(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        for (final Map.Entry<GenieRuntimeException, HttpStatus> exception : exceptions.entrySet()) {
+            final ResponseEntity<Object> response = this.mapper.handleGenieRuntimeException(exception.getKey());
+            Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(exception.getValue());
+        }
     }
 }
