@@ -745,6 +745,14 @@ final class Snippets {
                 .description("The executable to run on the Genie node when this command is used. e.g. /usr/bin/hadoop")
                 .type(JsonFieldType.STRING),
             PayloadDocumentation
+                .fieldWithPath("executableAndArguments")
+                .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "executableAndArguments"))
+                .description(
+                    "The executable and arguments to run on the Genie node when this command is used."
+                        + " e.g. /usr/bin/hadoop"
+                )
+                .type(JsonFieldType.ARRAY),
+            PayloadDocumentation
                 .fieldWithPath("checkDelay")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "checkDelay"))
                 .description(
