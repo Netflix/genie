@@ -63,6 +63,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
     private static final String USER = "genie";
     private static final String VERSION = "1.0.0";
     private static final String EXECUTABLE = "/apps/hive/bin/hive";
+    private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("/apps/hive/bin/hive");
     private static final long CHECK_DELAY = 10000L;
     private static final String DESCRIPTION = "Hive command v" + VERSION;
     private static final int MEMORY = 1024;
@@ -77,6 +78,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
     private static final Set<String> TAGS = Sets.newHashSet(TAG_1, TAG_2);
 
     private static final String EXECUTABLE_PATH = "executable";
+    private static final String EXECUTABLE_AND_ARGS_PATH = "executableAndArguments";
     private static final String CHECK_DELAY_PATH = "checkDelay";
     private static final String MEMORY_PATH = "memory";
     private static final String COMMANDS_LIST_PATH = EMBEDDED_PATH + ".commandList";
@@ -229,6 +231,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body(VERSION_PATH, Matchers.is(VERSION))
             .body(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString()))
             .body(EXECUTABLE_PATH, Matchers.is(EXECUTABLE))
+            .body(EXECUTABLE_AND_ARGS_PATH, Matchers.is(EXECUTABLE_AND_ARGS))
             .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
             .body(DESCRIPTION_PATH, Matchers.is(DESCRIPTION))
             .body(MEMORY_PATH, Matchers.is(MEMORY))
@@ -489,7 +492,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             createdCommand.getUser(),
             createdCommand.getVersion(),
             CommandStatus.INACTIVE,
-            createdCommand.getExecutable(),
+            createdCommand.getExecutableAndArguments(),
             createdCommand.getCheckDelay()
         )
             .withId(createdCommand.getId().orElseThrow(IllegalArgumentException::new))

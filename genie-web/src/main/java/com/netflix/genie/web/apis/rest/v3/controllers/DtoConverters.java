@@ -259,7 +259,7 @@ public final class DtoConverters {
         v3Command.getMetadata().ifPresent(metadataBuilder::withMetadata);
         v3Command.getDescription().ifPresent(metadataBuilder::withDescription);
 
-        final List<String> executable = Lists.newArrayList(StringUtils.split(v3Command.getExecutable(), ' '));
+        final List<String> executable = v3Command.getExecutableAndArguments();
         final CommandRequest.Builder builder = new CommandRequest
             .Builder(metadataBuilder.build(), executable)
             .withCheckDelay(v3Command.getCheckDelay());
@@ -306,7 +306,7 @@ public final class DtoConverters {
             v3Command.getUpdated().orElse(Instant.now()),
             resources,
             metadataBuilder.build(),
-            Lists.newArrayList(StringUtils.split(v3Command.getExecutable())),
+            v3Command.getExecutableAndArguments(),
             v3Command.getMemory().orElse(null),
             v3Command.getCheckDelay()
         );
