@@ -40,7 +40,8 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
      *
      * @param jobDirectory         Job directory
      * @param environmentVariables additional environment variables (to merge on top of inherited environment)
-     * @param commandLine          command-line executable and arguments
+     * @param commandArguments     command-line executable and its fixed arguments arguments
+     * @param jobArguments         job-specific arguments
      * @param interactive          launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
      * @param timeout              The optional number of seconds this job is allowed to run before the system will
      *                             kill it
@@ -49,7 +50,8 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
     void launchProcess(
         File jobDirectory,
         Map<String, String> environmentVariables,
-        List<String> commandLine,
+        List<String> commandArguments,
+        List<String> jobArguments,
         boolean interactive,
         @Nullable Integer timeout
     ) throws JobLaunchException;

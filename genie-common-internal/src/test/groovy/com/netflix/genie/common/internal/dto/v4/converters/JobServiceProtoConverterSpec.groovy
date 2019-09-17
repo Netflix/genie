@@ -71,8 +71,11 @@ class JobServiceProtoConverterSpec extends Specification {
     def interactive = true
     def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
     def archiveLocation = UUID.randomUUID().toString()
-    def commandArgs = Lists.newArrayList(
+    def executableArgs = Lists.newArrayList(
         UUID.randomUUID().toString(),
+        UUID.randomUUID().toString()
+    )
+    def jobArgs = Lists.newArrayList(
         UUID.randomUUID().toString(),
         UUID.randomUUID().toString()
     )
@@ -287,6 +290,7 @@ class JobServiceProtoConverterSpec extends Specification {
         setup:
         def originalSpecification = new JobSpecification(
             ["echo"].asList(),
+            [].asList(),
             new JobSpecification.ExecutionResource(
                 "my-job",
                 new ExecutionEnvironment(null, null, null)
@@ -477,7 +481,7 @@ class JobServiceProtoConverterSpec extends Specification {
 
         return new AgentJobRequest.Builder(jobMetadata, executionResourceCriteria, agentConfigRequest, jobArchivalDataRequest)
             .withRequestedId(id)
-            .withCommandArgs(commandArgs)
+            .withCommandArgs(executableArgs)
             .withResources(new ExecutionEnvironment(configs, dependencies, setupFile))
             .build()
     }
@@ -529,7 +533,8 @@ class JobServiceProtoConverterSpec extends Specification {
 
     JobSpecification createJobSpecification() {
         return new JobSpecification(
-            commandArgs,
+            executableArgs,
+            jobArgs,
             new JobSpecification.ExecutionResource(
                 id,
                 new ExecutionEnvironment(configs, dependencies, setupFile)
@@ -614,7 +619,10 @@ class JobServiceProtoConverterSpec extends Specification {
             .setIsInteractive(interactive)
             .setJobDirectoryLocation(jobDirectoryLocation)
             .putAllEnvironmentVariables(environmentVariables)
-            .addAllCommandArgs(commandArgs)
+            .addAllExecutableAndArgs(executableArgs)
+            .addAllJobArgs(jobArgs)
+            .addAllCommandArgs(executableArgs)
+            .addAllCommandArgs(jobArgs)
             .setJob(job)
             .setCluster(cluster)
             .setCommand(command)
@@ -642,7 +650,7 @@ class JobServiceProtoConverterSpec extends Specification {
             .setSetupFile(setupFile)
             .addAllConfigs(configs)
             .addAllDependencies(dependencies)
-            .addAllCommandArgs(commandArgs)
+            .addAllCommandArgs(executableArgs)
             .build()
     }
 

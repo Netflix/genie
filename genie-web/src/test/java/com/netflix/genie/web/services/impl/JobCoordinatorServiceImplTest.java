@@ -242,6 +242,7 @@ public class JobCoordinatorServiceImplTest {
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
+            null,
             new JobSpecification.ExecutionResource(
                 jobRequest.getId().orElseThrow(IllegalArgumentException::new),
                 new ExecutionEnvironment(null, null, null)
@@ -375,6 +376,7 @@ public class JobCoordinatorServiceImplTest {
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
+            null,
             new JobSpecification.ExecutionResource(
                 jobRequest.getId().orElseThrow(IllegalArgumentException::new),
                 new ExecutionEnvironment(null, null, null)
@@ -480,6 +482,7 @@ public class JobCoordinatorServiceImplTest {
         final String archiveLocation = UUID.randomUUID().toString();
 
         final JobSpecification jobSpecification = new JobSpecification(
+            null,
             null,
             new JobSpecification.ExecutionResource(
                 jobRequest.getId().orElseThrow(IllegalArgumentException::new),
@@ -606,6 +609,7 @@ public class JobCoordinatorServiceImplTest {
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
+            null,
             new JobSpecification.ExecutionResource(
                 jobRequest.getId().orElseThrow(IllegalArgumentException::new),
                 new ExecutionEnvironment(null, null, null)
@@ -712,6 +716,7 @@ public class JobCoordinatorServiceImplTest {
         final String archiveLocation = UUID.randomUUID().toString();
 
         final JobSpecification jobSpecification = new JobSpecification(
+            null,
             null,
             new JobSpecification.ExecutionResource(
                 jobRequest.getId().orElseThrow(IllegalArgumentException::new),
@@ -837,6 +842,7 @@ public class JobCoordinatorServiceImplTest {
         final String archiveLocation = UUID.randomUUID().toString();
 
         final JobSpecification jobSpecification = new JobSpecification(
+            null,
             null,
             new JobSpecification.ExecutionResource(
                 jobRequest.getId().orElseThrow(IllegalArgumentException::new),

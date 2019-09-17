@@ -154,7 +154,7 @@ message ExecutionResource {
 }
 
 message JobSpecification {
-    repeated string command_args = 1;
+    repeated string command_args = 1; // Deprecated by fields 11 & 12. Populated for backward compatibility.
     ExecutionResource job = 2;
     ExecutionResource cluster = 3;
     ExecutionResource command = 4;
@@ -164,6 +164,8 @@ message JobSpecification {
     string job_directory_location = 8;
     string archive_location = 9;
     google.protobuf.Int32Value timeout = 10; // Optional number of seconds from start when the job should timeout
+    repeated string executable_and_args = 11;
+    repeated string job_args = 12;
 }
 
 message JobSpecificationError {

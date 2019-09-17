@@ -36,7 +36,8 @@ class LaunchJobActionSpec extends Specification {
     JobProcessManager jobProcessManager
     AgentJobService agentJobService
     File jobDirectory
-    List<String> jobCommandLine
+    List<String> commandArgs
+    List<String> jobArgs
     boolean interactive
 
     void setup() {
@@ -45,7 +46,8 @@ class LaunchJobActionSpec extends Specification {
         this.jobSpec = Mock(JobSpecification)
         this.jobDirectory = Mock(File)
         this.jobEnvironment = Mock(Map)
-        this.jobCommandLine = Mock(List)
+        this.commandArgs = Mock(List)
+        this.jobArgs = Mock(List)
         this.interactive = true
         this.jobProcessManager = Mock(JobProcessManager)
         this.agentJobService = Mock(AgentJobService)
@@ -63,10 +65,11 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
-        1 * jobSpec.getCommandArgs() >> jobCommandLine
+        1 * jobSpec.getExecutableArgs() >> commandArgs
+        1 * jobSpec.getJobArgs() >> jobArgs
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(10)
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive, 10)
+        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, 10)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.RUNNING)
@@ -85,10 +88,11 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
-        1 * jobSpec.getCommandArgs() >> jobCommandLine
+        1 * jobSpec.getExecutableArgs() >> commandArgs
+        1 * jobSpec.getJobArgs() >> jobArgs
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive, null) >> {
+        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null) >> {
             throw exception
         }
         def e = thrown(RuntimeException)
@@ -105,10 +109,11 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
         1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
-        1 * jobSpec.getCommandArgs() >> jobCommandLine
+        1 * jobSpec.getExecutableArgs() >> commandArgs
+        1 * jobSpec.getJobArgs() >> jobArgs
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, jobCommandLine, interactive, null)
+        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null)
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String) >> { throw exception }
         0 * executionContext.setCurrentJobStatus(_)

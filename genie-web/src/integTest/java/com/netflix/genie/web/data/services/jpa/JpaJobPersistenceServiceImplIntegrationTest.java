@@ -1209,11 +1209,9 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final File jobDirectoryLocation = new File("/tmp/genie/jobs/" + jobId);
 
-        final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
-        commandArgs.addAll(jobRequest.getCommandArgs());
-
         return new JobSpecification(
-            commandArgs,
+            command.getExecutable(),
+            jobRequest.getCommandArgs(),
             new JobSpecification.ExecutionResource(
                 jobId,
                 jobRequest.getResources()

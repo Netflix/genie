@@ -172,7 +172,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         1 * jobRequestConverter.agentJobRequestArgsToDTO(jobArgs) >> jobRequest
         1 * service.resolveJobSpecificationDryRun(jobRequest) >> spec
         1 * commandArgs.isPrintRequestDisabled() >> false
-        1 * spec.getCommandArgs() >> { throw new IOException("") }
+        1 * spec.getExecutableArgs() >> { throw new IOException("") }
         def e = thrown(RuntimeException)
         e.getCause() instanceof JsonProcessingException
     }

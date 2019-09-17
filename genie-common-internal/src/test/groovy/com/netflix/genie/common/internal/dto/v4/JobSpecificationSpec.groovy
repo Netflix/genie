@@ -39,10 +39,11 @@ class JobSpecificationSpec extends Specification {
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
 
         when:
-        def jobSpecification = new JobSpecification(null, job, cluster, command, null, null, true, null, null, null)
+        def jobSpecification = new JobSpecification(null, null, job, cluster, command, null, null, true, null, null, null)
 
         then:
-        jobSpecification.getCommandArgs().isEmpty()
+        jobSpecification.getExecutableArgs().isEmpty()
+        jobSpecification.getJobArgs().isEmpty()
         jobSpecification.getJob() == job
         jobSpecification.getCluster() == cluster
         jobSpecification.getCommand() == command
@@ -60,6 +61,7 @@ class JobSpecificationSpec extends Specification {
         def applicationId = UUID.randomUUID().toString()
 
         def commandArgs = Lists.newArrayList("one", "two", "three")
+        def jobArgs = Lists.newArrayList("X", "Y", "Z")
         def job = new JobSpecification.ExecutionResource(jobId, new ExecutionEnvironment(null, null, null))
         def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
@@ -77,6 +79,7 @@ class JobSpecificationSpec extends Specification {
         when:
         def jobSpecification = new JobSpecification(
             commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -89,7 +92,8 @@ class JobSpecificationSpec extends Specification {
         )
 
         then:
-        jobSpecification.getCommandArgs() == commandArgs
+        jobSpecification.getExecutableArgs() == commandArgs
+        jobSpecification.getJobArgs() == jobArgs
         jobSpecification.getJob() == job
         jobSpecification.getCluster() == cluster
         jobSpecification.getCommand() == command
@@ -107,9 +111,8 @@ class JobSpecificationSpec extends Specification {
         def commandId = UUID.randomUUID().toString()
         def applicationId = UUID.randomUUID().toString()
 
-        def commandArgs = Lists.newArrayList("one", "two", "three")
-        def emptyCommandArgs = Lists.newArrayList(commandArgs)
-        emptyCommandArgs.add("\n\n")
+        def commandArgs = Lists.newArrayList("one", "", "three")
+        def jobArgs = Lists.newArrayList("X", "", "Z")
         def job = new JobSpecification.ExecutionResource(jobId, new ExecutionEnvironment(null, null, null))
         def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
@@ -126,7 +129,8 @@ class JobSpecificationSpec extends Specification {
 
         when:
         def jobSpecification = new JobSpecification(
-            emptyCommandArgs,
+            commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -139,7 +143,8 @@ class JobSpecificationSpec extends Specification {
         )
 
         then:
-        jobSpecification.getCommandArgs() == commandArgs
+        jobSpecification.getExecutableArgs() == commandArgs
+        jobSpecification.getJobArgs() == jobArgs
         jobSpecification.getJob() == job
         jobSpecification.getCluster() == cluster
         jobSpecification.getCommand() == command
@@ -209,7 +214,8 @@ class JobSpecificationSpec extends Specification {
         base != comparable
 
         when:
-        def commandArg = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString())
+        def jobArgs = Lists.newArrayList()
         def job = Mock(JobSpecification.ExecutionResource)
         def cluster = Mock(JobSpecification.ExecutionResource)
         def command = Mock(JobSpecification.ExecutionResource)
@@ -221,7 +227,8 @@ class JobSpecificationSpec extends Specification {
         def timeout = 232_281
 
         base = new JobSpecification(
-            Lists.newArrayList(commandArg),
+            commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -233,7 +240,8 @@ class JobSpecificationSpec extends Specification {
             timeout
         )
         comparable = new JobSpecification(
-            Lists.newArrayList(commandArg),
+            commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -268,7 +276,8 @@ class JobSpecificationSpec extends Specification {
         one.hashCode() != two.hashCode()
 
         when:
-        def commandArg = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString())
+        def jobArgs = Lists.newArrayList()
         def job = Mock(JobSpecification.ExecutionResource)
         def cluster = Mock(JobSpecification.ExecutionResource)
         def command = Mock(JobSpecification.ExecutionResource)
@@ -280,7 +289,8 @@ class JobSpecificationSpec extends Specification {
         def timeout = 2_233
 
         one = new JobSpecification(
-            Lists.newArrayList(commandArg),
+            commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -292,7 +302,8 @@ class JobSpecificationSpec extends Specification {
             timeout
         )
         two = new JobSpecification(
-            Lists.newArrayList(commandArg),
+            commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -327,7 +338,8 @@ class JobSpecificationSpec extends Specification {
         one.toString() != two.toString()
 
         when:
-        def commandArg = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString())
+        def jobArgs = Lists.newArrayList()
         def job = Mock(JobSpecification.ExecutionResource)
         def cluster = Mock(JobSpecification.ExecutionResource)
         def command = Mock(JobSpecification.ExecutionResource)
@@ -339,7 +351,8 @@ class JobSpecificationSpec extends Specification {
         def timeout = 38_382
 
         one = new JobSpecification(
-            Lists.newArrayList(commandArg),
+            commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -351,7 +364,8 @@ class JobSpecificationSpec extends Specification {
             timeout
         )
         two = new JobSpecification(
-            Lists.newArrayList(commandArg),
+            commandArgs,
+            jobArgs,
             job,
             cluster,
             command,
@@ -374,6 +388,7 @@ class JobSpecificationSpec extends Specification {
         def applicationId = UUID.randomUUID().toString()
 
         def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def jobArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def job = new JobSpecification.ExecutionResource(jobId, new ExecutionEnvironment(null, null, null))
         def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
@@ -390,6 +405,7 @@ class JobSpecificationSpec extends Specification {
 
         return new JobSpecification(
             commandArgs,
+            jobArgs,
             job,
             cluster,
             command,

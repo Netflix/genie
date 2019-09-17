@@ -184,7 +184,8 @@ public class JobServiceProtoConverter {
         final com.netflix.genie.proto.JobSpecification protoSpec
     ) {
         return new JobSpecification(
-            protoSpec.getCommandArgsList(),
+            protoSpec.getExecutableAndArgsList(),
+            protoSpec.getJobArgsList(),
             toExecutionResourceDto(protoSpec.getJob()),
             toExecutionResourceDto(protoSpec.getCluster()),
             toExecutionResourceDto(protoSpec.getCommand()),
@@ -211,7 +212,11 @@ public class JobServiceProtoConverter {
         final com.netflix.genie.proto.JobSpecification.Builder builder
             = com.netflix.genie.proto.JobSpecification.newBuilder();
 
-        builder.addAllCommandArgs(jobSpecification.getCommandArgs());
+        builder.addAllExecutableAndArgs(jobSpecification.getExecutableArgs());
+        builder.addAllJobArgs(jobSpecification.getJobArgs());
+        // Keep populating commandArgs for backward compatibility
+        builder.addAllCommandArgs(jobSpecification.getExecutableArgs());
+        builder.addAllCommandArgs(jobSpecification.getJobArgs());
         builder.setJob(toExecutionResourceProto(jobSpecification.getJob()));
         builder.setCluster(toExecutionResourceProto(jobSpecification.getCluster()));
         builder.setCommand(toExecutionResourceProto(jobSpecification.getCommand()));

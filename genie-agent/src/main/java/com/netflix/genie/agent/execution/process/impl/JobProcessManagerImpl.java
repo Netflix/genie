@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.process.impl;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
@@ -78,7 +79,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
     public void launchProcess(
         final File jobDirectory,
         final Map<String, String> environmentVariablesMap,
-        final List<String> commandLine,
+        final List<String> commandArguments,
+        final List<String> jobArguments,
         final boolean interactive,
         @Nullable final Integer timeout
     ) throws JobLaunchException {
@@ -125,11 +127,14 @@ public class JobProcessManagerImpl implements JobProcessManager {
         });
 
         // Validate arguments
-        if (commandLine == null) {
+        if (commandArguments == null) {
             throw new JobLaunchException("Job command-line arguments is null");
-        } else if (commandLine.isEmpty()) {
+        } else if (commandArguments.isEmpty()) {
             throw new JobLaunchException("Job command-line arguments are empty");
         }
+
+        final List<String> commandLine = Lists.newArrayList(commandArguments);
+        commandLine.addAll(jobArguments);
 
         // Configure arguments
         log.info("Job command-line: {}", Arrays.toString(commandLine.toArray()));
