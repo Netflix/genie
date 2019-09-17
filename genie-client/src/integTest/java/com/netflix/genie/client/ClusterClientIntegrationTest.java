@@ -429,12 +429,14 @@ public class ClusterClientIntegrationTest extends GenieClientIntegrationTestBase
     @Test
     public void testClusterCommandsMethods() throws Exception {
 
+        final List<String> executableAndArgs = Lists.newArrayList("exec");
+
         final Command foo = new Command.Builder(
             "name",
             "user",
             "version",
             CommandStatus.ACTIVE,
-            "exec",
+            executableAndArgs,
             5
         ).withId("foo")
             .build();
@@ -446,7 +448,7 @@ public class ClusterClientIntegrationTest extends GenieClientIntegrationTestBase
             "user",
             "version",
             CommandStatus.ACTIVE,
-            "exec",
+            executableAndArgs,
             5
         ).withId("bar")
             .build();
@@ -458,7 +460,7 @@ public class ClusterClientIntegrationTest extends GenieClientIntegrationTestBase
             "user",
             "version",
             CommandStatus.ACTIVE,
-            "exec",
+            executableAndArgs,
             5
         ).withId("pi")
             .build();

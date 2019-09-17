@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.web.apis.rest.v3.hateoas.resources;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -37,7 +39,7 @@ public class CommandResourceTest {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
-    private static final String EXECUTABLE = UUID.randomUUID().toString();
+    private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList(UUID.randomUUID().toString());
     private static final long CHECK_DELAY = 1380L;
 
     private Command command;
@@ -48,7 +50,7 @@ public class CommandResourceTest {
     @Before
     public void setup() {
         this.command = new Command
-            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
             .withId(ID)
             .build();
     }

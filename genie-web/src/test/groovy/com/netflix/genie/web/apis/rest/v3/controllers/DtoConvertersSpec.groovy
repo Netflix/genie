@@ -533,7 +533,7 @@ class DtoConvertersSpec extends Specification {
         )
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
-        def executable = binary + ' ' + defaultBinaryArgument + ' '
+        def executableAndArgs = Lists.newArrayList(binary, defaultBinaryArgument)
         def memory = 128_347
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
@@ -557,7 +557,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            executable,
+            executableAndArgs,
             checkDelay
         )
             .withId(id)
@@ -595,7 +595,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            executable,
+            executableAndArgs,
             checkDelay
         ).build()
         commandRequest = DtoConverters.toV4CommandRequest(v3Command)
@@ -633,7 +633,7 @@ class DtoConvertersSpec extends Specification {
         )
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
-        def executable = Lists.newArrayList(binary, defaultBinaryArgument)
+        def executableAndArgs = Lists.newArrayList(binary, defaultBinaryArgument)
         def memory = 128_347
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
@@ -659,7 +659,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            binary + ' ' + defaultBinaryArgument,
+            executableAndArgs,
             checkDelay
         )
             .withId(id)
@@ -681,7 +681,7 @@ class DtoConvertersSpec extends Specification {
         v4Command.getUpdated() == updated
         v4Command.getCheckDelay() == checkDelay
         v4Command.getMemory().orElse(null) == memory
-        v4Command.getExecutable() == executable
+        v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
         v4Command.getMetadata().getVersion() == version
@@ -701,7 +701,7 @@ class DtoConvertersSpec extends Specification {
             user,
             version,
             status,
-            binary + ' ' + defaultBinaryArgument,
+            executableAndArgs,
             checkDelay
         )
             .withId(id)
@@ -714,7 +714,7 @@ class DtoConvertersSpec extends Specification {
         v4Command.getUpdated() != null
         v4Command.getCheckDelay() == checkDelay
         !v4Command.getMemory().isPresent()
-        v4Command.getExecutable() == executable
+        v4Command.getExecutable() == executableAndArgs
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
         v4Command.getMetadata().getVersion() == version

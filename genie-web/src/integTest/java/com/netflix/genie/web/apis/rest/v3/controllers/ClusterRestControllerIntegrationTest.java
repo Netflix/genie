@@ -70,6 +70,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
     private static final String CLUSTERS_ID_LIST_PATH = CLUSTERS_LIST_PATH + ".id";
     private static final String CLUSTER_COMMANDS_LINK_PATH = "_links.commands.href";
     private static final String CLUSTERS_COMMANDS_LINK_PATH = CLUSTERS_LIST_PATH + "._links.commands.href";
+    private static final  List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("bash");
 
     /**
      * {@inheritDoc}
@@ -799,16 +800,18 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
+        final List<String> executableAndArgs = Lists.newArrayList("exec");
+
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 1000L)
                 .withId(commandId1)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 2000L)
                 .withId(commandId2)
                 .build(),
             null
@@ -863,7 +866,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         final String commandId3 = UUID.randomUUID().toString();
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.INACTIVE, placeholder, 1000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.INACTIVE, executableAndArgs, 1000L)
                 .withId(commandId3)
                 .build(),
             null
@@ -952,14 +955,14 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         final String commandId2 = UUID.randomUUID().toString();
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 4000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 4000L)
                 .withId(commandId1)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 5000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 5000L)
                 .withId(commandId2)
                 .build(),
             null
@@ -1037,14 +1040,14 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         final String commandId2 = UUID.randomUUID().toString();
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 7000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 7000L)
                 .withId(commandId1)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 8000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 8000L)
                 .withId(commandId2)
                 .build(),
             null
@@ -1101,21 +1104,21 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
         final String commandId3 = UUID.randomUUID().toString();
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 1000L)
                 .withId(commandId1)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 2000L)
                 .withId(commandId2)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 3000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 3000L)
                 .withId(commandId3)
                 .build(),
             null
