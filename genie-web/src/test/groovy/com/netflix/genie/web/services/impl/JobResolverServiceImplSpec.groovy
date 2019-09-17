@@ -71,6 +71,7 @@ class JobResolverServiceImplSpec extends Specification {
         def executableArgument0 = UUID.randomUUID().toString()
         def executableArgument1 = UUID.randomUUID().toString()
         def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
+        def arguments = Lists.newArrayList(UUID.randomUUID().toString())
         def command = createCommand(commandId, executable)
 
         def jobId = UUID.randomUUID().toString()
@@ -84,13 +85,14 @@ class JobResolverServiceImplSpec extends Specification {
         )
         def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
 
-        def expectedJobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
-        expectedJobCommandArgs.addAll(commandArgs)
+        def expectedCommandArgs = executable
+        def expectedJobArgs = arguments
+
         Map<Cluster, String> clusterCommandMap = ImmutableMap.of(cluster1, commandId, cluster2, commandId)
-        def jobRequest = createJobRequest(commandArgs, requestedArchiveLocationPrefix, null, null)
-        def jobRequestNoArchivalData = createJobRequest(commandArgs, null, null, 5_002)
+        def jobRequest = createJobRequest(arguments, requestedArchiveLocationPrefix, null, null)
+        def jobRequestNoArchivalData = createJobRequest(arguments, null, null, 5_002)
         def requestedMemory = 6_323
-        def savedJobRequest = createJobRequest(commandArgs, null, requestedMemory, null)
+        def savedJobRequest = createJobRequest(arguments, null, requestedMemory, null)
 
         def clusterService = Mock(ClusterPersistenceService)
         def loadBalancer = Mock(ClusterLoadBalancer)
@@ -122,7 +124,8 @@ class JobResolverServiceImplSpec extends Specification {
         1 * loadBalancer.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        jobSpec.getCommandArgs() == expectedJobCommandArgs
+        jobSpec.getExecutableArgs() == expectedCommandArgs
+        jobSpec.getJobArgs() == expectedJobArgs
         jobSpec.getJob().getId() == jobId
         jobSpec.getCluster().getId() == cluster1Id
         jobSpec.getCommand().getId() == commandId
@@ -150,7 +153,8 @@ class JobResolverServiceImplSpec extends Specification {
         1 * loadBalancer.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        jobSpecNoArchivalData.getCommandArgs() == expectedJobCommandArgs
+        jobSpecNoArchivalData.getExecutableArgs() == expectedCommandArgs
+        jobSpecNoArchivalData.getJobArgs() == expectedJobArgs
         jobSpecNoArchivalData.getJob().getId() == jobId
         jobSpecNoArchivalData.getCluster().getId() == cluster1Id
         jobSpecNoArchivalData.getCommand().getId() == commandId
@@ -186,7 +190,8 @@ class JobResolverServiceImplSpec extends Specification {
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
         1 * jobPersistenceService.saveResolvedJob(jobId, _ as ResolvedJob)
-        jobSpecSavedData.getCommandArgs() == expectedJobCommandArgs
+        jobSpecSavedData.getExecutableArgs() == expectedCommandArgs
+        jobSpecSavedData.getJobArgs() == expectedJobArgs
         jobSpecSavedData.getJob().getId() == jobId
         jobSpecSavedData.getCluster().getId() == cluster1Id
         jobSpecSavedData.getCommand().getId() == commandId

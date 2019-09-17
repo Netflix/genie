@@ -268,9 +268,6 @@ public class JobResolverServiceImpl implements JobResolverService {
             );
         }
 
-        final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
-        commandArgs.addAll(jobRequest.getCommandArgs());
-
         final int jobMemory = this.resolveJobMemory(jobRequest, command);
 
         final Map<String, String> environmentVariables
@@ -287,7 +284,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
 
         final JobSpecification jobSpecification = new JobSpecification(
-            commandArgs,
+            command.getExecutable(),
+            jobRequest.getCommandArgs(),
             new JobSpecification.ExecutionResource(id, jobRequest.getResources()),
             new JobSpecification.ExecutionResource(cluster.getId(), cluster.getResources()),
             new JobSpecification.ExecutionResource(command.getId(), command.getResources()),

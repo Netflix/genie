@@ -24,14 +24,12 @@ import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * This DTO represents all the information needed to execute a job by the Genie Agent.
@@ -44,7 +42,8 @@ import java.util.stream.Collectors;
 @ToString(doNotUseGetters = true)
 public class JobSpecification {
 
-    private final ImmutableList<String> commandArgs;
+    private final ImmutableList<String> executableArgs;
+    private final ImmutableList<String> jobArgs;
     private final ExecutionResource job;
     private final ExecutionResource cluster;
     private final ExecutionResource command;
@@ -58,7 +57,8 @@ public class JobSpecification {
     /**
      * Constructor.
      *
-     * @param commandArgs          Any command arguments for the job. Optional. Any blanks will be removed
+     * @param executableArgs       Executable and its fixed argument provided by the Command
+     * @param jobArgs              Job arguments provided by the user for this job
      * @param job                  The execution resources for a specific job
      * @param cluster              The execution resources for a specific cluster used for a job
      * @param command              The execution resources for a specific command used for a job
@@ -72,7 +72,8 @@ public class JobSpecification {
      */
     @JsonCreator
     public JobSpecification(
-        @JsonProperty("commandArgs") @Nullable final List<String> commandArgs,
+        @JsonProperty("executableArgs") @Nullable final List<String> executableArgs,
+        @JsonProperty("jobArgs") @Nullable final List<String> jobArgs,
         @JsonProperty(value = "job", required = true) final ExecutionResource job,
         @JsonProperty(value = "cluster", required = true) final ExecutionResource cluster,
         @JsonProperty(value = "command", required = true) final ExecutionResource command,
@@ -83,12 +84,9 @@ public class JobSpecification {
         @JsonProperty(value = "archiveLocation") @Nullable final String archiveLocation,
         @JsonProperty(value = "timeout") @Nullable final Integer timeout
     ) {
-        this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(
-            commandArgs
-                .stream()
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.toList())
-        );
+
+        this.executableArgs = executableArgs == null ? ImmutableList.of() : ImmutableList.copyOf(executableArgs);
+        this.jobArgs = jobArgs == null ? ImmutableList.of() : ImmutableList.copyOf(jobArgs);
         this.job = job;
         this.cluster = cluster;
         this.command = command;
@@ -103,12 +101,21 @@ public class JobSpecification {
     }
 
     /**
-     * Returns an unmodifiable list of the command args for this job specification.
+     * Returns an unmodifiable list of executable and arguments provided by the Command resolved to.
      *
-     * @return A view of the list of command args that will throw exception if modifications are attempted
+     * @return A list of executable and arguments that will throw exception if modifications are attempted
      */
-    public List<String> getCommandArgs() {
-        return this.commandArgs;
+    public List<String> getExecutableArgs() {
+        return executableArgs;
+    }
+
+    /**
+     * Returns an unmodifiable list of arguments provided by the user for this job.
+     *
+     * @return A list of arguments that will throw exception if modifications are attempted
+     */
+    public List<String> getJobArgs() {
+        return jobArgs;
     }
 
     /**

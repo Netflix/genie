@@ -30,7 +30,6 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,14 +73,14 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         final JobSpecification jobSpec = executionContext.getJobSpecification().get();
         final File jobDirectory = executionContext.getJobDirectory().get();
         final Map<String, String> jobEnvironment = executionContext.getJobEnvironment().get();
-        final List<String> jobCommandLine = jobSpec.getCommandArgs();
         final boolean interactive = jobSpec.isInteractive();
 
         try {
             this.jobProcessManager.launchProcess(
                 jobDirectory,
                 jobEnvironment,
-                jobCommandLine,
+                jobSpec.getExecutableArgs(),
+                jobSpec.getJobArgs(),
                 interactive,
                 jobSpec.getTimeout().orElse(null)
             );

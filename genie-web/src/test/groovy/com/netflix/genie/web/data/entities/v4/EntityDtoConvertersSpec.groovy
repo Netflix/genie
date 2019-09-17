@@ -581,7 +581,7 @@ class EntityDtoConvertersSpec extends Specification {
             UUID.randomUUID().toString()
         )
         def jobDirectoryLocation = UUID.randomUUID().toString()
-        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def jobArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def interactive = true
         def jobConfigs = Sets.newHashSet(UUID.randomUUID().toString())
         def jobDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
@@ -606,7 +606,7 @@ class EntityDtoConvertersSpec extends Specification {
         def commandConfigs = Sets.newHashSet(UUID.randomUUID().toString())
         def commandDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def commandSetupFile = UUID.randomUUID().toString()
-        def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def executableArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def commandEntity = Mock(CommandEntity) {
             1 * getUniqueId() >> commandId
             1 * getConfigs() >> commandConfigs
@@ -616,7 +616,7 @@ class EntityDtoConvertersSpec extends Specification {
                 .collect({ dependency -> new FileEntity(dependency) })
                 .toSet()
             1 * getSetupFile() >> Optional.ofNullable(new FileEntity(commandSetupFile))
-            1 * getExecutable() >> executable
+            1 * getExecutable() >> executableArgs
         }
 
         def application0Id = UUID.randomUUID().toString()
@@ -690,7 +690,7 @@ class EntityDtoConvertersSpec extends Specification {
         1 * jobSpecificationProjection.getArchiveLocation() >> Optional.of(UUID.randomUUID().toString())
         1 * jobSpecificationProjection.getJobDirectoryLocation() >> Optional.of(jobDirectoryLocation)
         1 * jobSpecificationProjection.getApplications() >> applications
-        1 * jobSpecificationProjection.getCommandArgs() >> commandArgs
+        1 * jobSpecificationProjection.getCommandArgs() >> jobArgs
         1 * jobSpecificationProjection.isInteractive() >> interactive
         1 * jobSpecificationProjection.getConfigs() >> jobConfigs
             .collect({ config -> new FileEntity(config) })
@@ -702,7 +702,8 @@ class EntityDtoConvertersSpec extends Specification {
         1 * jobSpecificationProjection.getEnvironmentVariables() >> environmentVariables
         1 * jobSpecificationProjection.getTimeoutUsed() >> Optional.ofNullable(timeout)
         jobSpecification.isInteractive()
-        jobSpecification.getCommandArgs() == executable + commandArgs
+        jobSpecification.getExecutableArgs() == executableArgs
+        jobSpecification.getJobArgs() == jobArgs
         jobSpecification.getEnvironmentVariables() == environmentVariables
         jobSpecification.getJobDirectoryLocation() == new File(jobDirectoryLocation)
         jobSpecification.getJob() == new JobSpecification.ExecutionResource(

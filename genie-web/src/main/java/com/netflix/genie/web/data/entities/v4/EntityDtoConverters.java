@@ -20,7 +20,6 @@ package com.netflix.genie.web.data.entities.v4;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
@@ -462,11 +461,9 @@ public final class EntityDtoConverters {
             )
             .collect(Collectors.toList());
 
-        final List<String> commandArgs = Lists.newArrayList(commandEntity.getExecutable());
-        commandArgs.addAll(jobSpecificationProjection.getCommandArgs());
-
         return new JobSpecification(
-            commandArgs,
+            commandEntity.getExecutable(),
+            jobSpecificationProjection.getCommandArgs(),
             job,
             cluster,
             command,

@@ -70,7 +70,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["touch", expectedFile.getAbsolutePath()],
+            ["touch"],
+            [expectedFile.getAbsolutePath()],
             true,
             null
         )
@@ -101,7 +102,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["\${ECHO_COMMAND}", helloWorld],
+            ["\${ECHO_COMMAND}"],
+            [helloWorld],
             false,
             null
         )
@@ -134,6 +136,7 @@ class JobProcessManagerImplSpec extends Specification {
             this.temporaryFolder.getRoot(),
             this.envMap,
             ["env"],
+            [],
             false,
             null
         )
@@ -163,7 +166,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["rm", nonExistentFile.absolutePath],
+            ["rm"],
+            [nonExistentFile.absolutePath],
             false,
             null
         )
@@ -194,6 +198,7 @@ class JobProcessManagerImplSpec extends Specification {
             this.temporaryFolder.getRoot(),
             this.envMap,
             [uuid],
+            [],
             false,
             null
         )
@@ -209,6 +214,7 @@ class JobProcessManagerImplSpec extends Specification {
             this.temporaryFolder.getRoot(),
             this.envMap,
             ["\$COMMAND"],
+            [],
             false,
             null
         )
@@ -224,6 +230,7 @@ class JobProcessManagerImplSpec extends Specification {
             null,
             this.envMap,
             ["echo"],
+            [],
             false,
             null
         )
@@ -239,6 +246,7 @@ class JobProcessManagerImplSpec extends Specification {
             this.temporaryFolder.newFile("foo"),
             this.envMap,
             ["echo"],
+            [],
             false,
             null
         )
@@ -254,6 +262,7 @@ class JobProcessManagerImplSpec extends Specification {
             new File(this.temporaryFolder.getRoot(), "foo"),
             this.envMap,
             ["echo"],
+            [],
             false,
             null
         )
@@ -269,6 +278,7 @@ class JobProcessManagerImplSpec extends Specification {
             this.temporaryFolder.getRoot(),
             null,
             ["echo"],
+            [],
             false,
             null
         )
@@ -284,6 +294,7 @@ class JobProcessManagerImplSpec extends Specification {
             this.temporaryFolder.getRoot(),
             this.envMap,
             null,
+            null,
             false,
             null
         )
@@ -298,6 +309,7 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
+            [],
             [],
             false,
             null
@@ -315,7 +327,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["sleep", "60"],
+            ["sleep"],
+            ["60"],
             true,
             59
         )
@@ -349,7 +362,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["sleep", "60"],
+            ["sleep"],
+            ["60"],
             true,
             null
         )
@@ -385,7 +399,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["echo", "foo"],
+            ["echo"],
+            ["foo"],
             true,
             null
         )
@@ -425,7 +440,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["echo", "foo"],
+            ["echo"],
+            ["foo"],
             true,
             10
         )
@@ -452,7 +468,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["echo", "foo"],
+            ["echo"],
+            ["foo"],
             true,
             null
         )
@@ -465,7 +482,8 @@ class JobProcessManagerImplSpec extends Specification {
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["echo", "foo"],
+            ["echo"],
+            ["foo"],
             true,
             null
         )
@@ -496,7 +514,8 @@ class JobProcessManagerImplSpec extends Specification {
         realManager.launchProcess(
             this.temporaryFolder.getRoot(),
             this.envMap,
-            ["sleep", "60"],
+            ["sleep"],
+            ["60"],
             true,
             1
         )
