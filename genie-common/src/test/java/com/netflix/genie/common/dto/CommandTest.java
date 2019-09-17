@@ -214,7 +214,7 @@ public class CommandTest {
     @Test
     public void canUseHashCode() {
         final Command.Builder builder
-            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withDependencies(null);

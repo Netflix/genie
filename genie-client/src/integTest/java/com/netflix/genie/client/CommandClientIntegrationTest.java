@@ -116,12 +116,14 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
         final Set<String> command1Tags = Sets.newHashSet("foo", "pi");
         final Set<String> command2Tags = Sets.newHashSet("bar", "pi");
 
+        final List<String> executableAndArgs = Lists.newArrayList("exec");
+
         final Command command1 = new Command.Builder(
             "command1name",
             "command1user",
             "1.0",
             CommandStatus.ACTIVE,
-            "exec",
+            executableAndArgs,
             1000
         )
             .withId(command1Id)
@@ -134,7 +136,7 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
                 "command2user",
                 "2.0",
                 CommandStatus.INACTIVE,
-                "exec",
+                executableAndArgs,
                 1000
             )
                 .withId(command2Id)
@@ -261,8 +263,10 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
         final Command command2 = commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(command2.getName(), command1.getName());
 
+        final List<String> executableAndArgs = Lists.newArrayList("exec");
+
         final Command command3 = new
-            Command.Builder("newname", "newuser", "new version", CommandStatus.ACTIVE, "exec", 1000)
+            Command.Builder("newname", "newuser", "new version", CommandStatus.ACTIVE, executableAndArgs, 1000)
             .withId(command1.getId().orElseThrow(IllegalArgumentException::new))
             .build();
 
@@ -273,6 +277,7 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
         Assert.assertEquals("newname", command4.getName());
         Assert.assertEquals("newuser", command4.getUser());
         Assert.assertEquals("new version", command4.getVersion());
+        Assert.assertEquals(executableAndArgs, command4.getExecutableAndArguments());
         Assert.assertEquals(CommandStatus.ACTIVE, command4.getStatus());
         Assert.assertFalse(command4.getSetupFile().isPresent());
         Assert.assertFalse(command4.getDescription().isPresent());
@@ -290,8 +295,9 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
 
         final Set<String> initialTags = Sets.newHashSet("foo", "bar");
         final Set<String> configList = Sets.newHashSet("config1", "configs2");
+        final List<String> executable = Lists.newArrayList("exec");
 
-        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
             .withId("command1")
             .withDescription("client Test")
             .withSetupFile("path to set up file")
@@ -346,8 +352,9 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
     public void testCommandConfigsMethods() throws Exception {
 
         final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
+        final List<String> executable = Lists.newArrayList("exec");
 
-        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
             .withId("command1")
             .withDescription("client Test")
             .withSetupFile("path to set up file")
@@ -394,8 +401,9 @@ public class CommandClientIntegrationTest extends GenieClientIntegrationTestBase
     public void testCommandDependenciesMethods() throws Exception {
 
         final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
+        final List<String> executable = Lists.newArrayList("exec");
 
-        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executable, 1000)
             .withId("command1")
             .withDescription("client Test")
             .withSetupFile("path to set up file")

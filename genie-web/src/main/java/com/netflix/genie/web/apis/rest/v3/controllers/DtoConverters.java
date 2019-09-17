@@ -39,7 +39,6 @@ import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
@@ -320,7 +319,7 @@ public final class DtoConverters {
             commandMetadata.getUser(),
             commandMetadata.getVersion(),
             commandMetadata.getStatus(),
-            StringUtils.join(v4Command.getExecutable(), ' '),
+            v4Command.getExecutable(),
             v4Command.getCheckDelay()
         )
             .withId(v4Command.getId())

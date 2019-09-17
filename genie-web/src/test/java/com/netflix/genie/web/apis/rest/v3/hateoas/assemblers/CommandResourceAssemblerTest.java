@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
@@ -26,6 +27,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -40,7 +42,7 @@ public class CommandResourceAssemblerTest {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
-    private static final String EXECUTABLE = UUID.randomUUID().toString();
+    private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList(UUID.randomUUID().toString());
     private static final long CHECK_DELAY = 1000L;
 
     private Command command;
@@ -51,7 +53,7 @@ public class CommandResourceAssemblerTest {
      */
     @Before
     public void setup() {
-        this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+        this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
             .withId(ID)
             .build();
         this.assembler = new CommandResourceAssembler();

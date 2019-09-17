@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.client;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.GenieTestApp;
 import com.netflix.genie.common.dto.Application;
@@ -32,6 +33,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -107,8 +109,9 @@ public abstract class GenieClientIntegrationTestBase {
         final Set<String> tags = Sets.newHashSet("foo", "bar");
         final Set<String> configList = Sets.newHashSet("config1", "configs2");
         final Set<String> dependenciesList = Sets.newHashSet("command-dep1", "command-dep2");
+        final List<String> executableAndArgs = Lists.newArrayList("exec");
 
-        return new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
+        return new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, executableAndArgs, 1000)
             .withId(commandId)
             .withDescription("client Test")
             .withSetupFile("path to set up file")

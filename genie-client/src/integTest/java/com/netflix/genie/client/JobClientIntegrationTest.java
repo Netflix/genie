@@ -800,6 +800,7 @@ public class JobClientIntegrationTest extends GenieClientIntegrationTestBase {
     private void createClusterAndCommandForTest() throws Exception {
 
         final Set<String> tags = Sets.newHashSet("laptop");
+        final List<String> executableAndArgs = Lists.newArrayList("bash");
 
         final Cluster cluster = new Cluster.Builder(
             CLUSTER_NAME,
@@ -819,7 +820,7 @@ public class JobClientIntegrationTest extends GenieClientIntegrationTestBase {
             "user",
             "version",
             CommandStatus.ACTIVE,
-            "bash",
+            executableAndArgs,
             1000
         )
             .withTags(tags).build();

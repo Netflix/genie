@@ -148,6 +148,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final String CMD1_USER = "genie";
     private static final String CMD1_VERSION = "1.0";
     private static final String CMD1_EXECUTABLE = "/bin/bash";
+    private static final ArrayList<String> CMD1_EXECUTABLE_AND_ARGS = Lists.newArrayList(CMD1_EXECUTABLE);
     private static final String CMD1_TAGS
         = BASH_COMMAND_TAG + ","
         + "genie.id:" + CMD1_ID + ","
@@ -823,7 +824,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body(NAME_PATH, Matchers.is(CMD1_NAME))
             .body(USER_PATH, Matchers.is(CMD1_USER))
             .body(VERSION_PATH, Matchers.is(CMD1_VERSION))
-            .body("executable", Matchers.is(CMD1_EXECUTABLE));
+            .body("executable", Matchers.is(CMD1_EXECUTABLE))
+            .body("executableAndArguments", Matchers.equalTo(CMD1_EXECUTABLE_AND_ARGS));
     }
 
     private void checkJobApplications(final int documentationId, final String id) {
@@ -1737,7 +1739,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             CMD1_USER,
             CMD1_VERSION,
             CommandStatus.ACTIVE,
-            CMD1_EXECUTABLE,
+            CMD1_EXECUTABLE_AND_ARGS,
             CHECK_DELAY
         )
             .withId(CMD1_ID)

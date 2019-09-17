@@ -69,6 +69,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
     private static final String APPLICATIONS_ID_LIST_PATH = APPLICATIONS_LIST_PATH + ".id";
     private static final String APPLICATION_COMMANDS_LINK_PATH = "_links.commands.href";
     private static final String APPLICATIONS_COMMANDS_LINK_PATH = APPLICATIONS_LIST_PATH + "._links.commands.href";
+    private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("bash");
 
     /**
      * {@inheritDoc}
@@ -956,21 +957,21 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
         final String command3Id = UUID.randomUUID().toString();
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, 1000L)
                 .withId(command1Id)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.INACTIVE, placeholder, 1100L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.INACTIVE, EXECUTABLE_AND_ARGS, 1100L)
                 .withId(command2Id)
                 .build(),
             null
         );
         this.createConfigResource(
             new Command
-                .Builder(placeholder, placeholder, placeholder, CommandStatus.DEPRECATED, placeholder, 1200L)
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.DEPRECATED, EXECUTABLE_AND_ARGS, 1200L)
                 .withId(command3Id)
                 .build(),
             null
