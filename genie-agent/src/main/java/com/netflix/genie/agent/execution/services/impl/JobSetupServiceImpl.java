@@ -151,6 +151,78 @@ class JobSetupServiceImpl implements JobSetupService {
         return setupFiles;
     }
 
+    public Map<String, String> setupJobEnvironment(
+        final File jobDirectory,
+        final JobSpecification jobSpecification,
+        final List<File> setupFiles
+    ) throws SetUpJobException {
+
+        // Create additional environment variables
+        final Map<String, String> extraEnvironmentVariables =
+            createAdditionalEnvironmentMap(jobDirectory, jobSpecification);
+
+        // Source set up files and collect resulting environment variables into a file
+        final File jobEnvironmentFile = createJobEnvironmentFile(
+            jobDirectory,
+            setupFiles,
+            jobSpecification.getEnvironmentVariables(),
+            extraEnvironmentVariables
+        );
+
+        // Collect environment variables into a map
+        return createJobEnvironmentMap(jobEnvironmentFile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void cleanupJobDirectory(
+        final Path jobDirectoryPath,
+        final CleanupStrategy cleanupStrategy
+    ) throws IOException {
+
+        switch (cleanupStrategy) {
+            case NO_CLEANUP:
+                log.info("Skipping cleanup of job directory: {}", jobDirectoryPath);
+                break;
+
+            case FULL_CLEANUP:
+                log.info("Wiping job directory: {}", jobDirectoryPath);
+                FileSystemUtils.deleteRecursively(jobDirectoryPath);
+                break;
+
+            case DEPENDENCIES_CLEANUP:
+                final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
+                    (Pattern[]) Lists.newArrayList(
+                        PathUtils.jobClusterDirectoryPath(jobDirectoryPath.toFile(), ".*"),
+                        PathUtils.jobCommandDirectoryPath(jobDirectoryPath.toFile(), ".*"),
+                        PathUtils.jobApplicationDirectoryPath(jobDirectoryPath.toFile(), ".*")
+                    )
+                        .stream()
+                        .map(PathUtils::jobEntityDependenciesPath)
+                        .map(Path::toString)
+                        .map(pathString -> pathString + "/.*")
+                        .map(Pattern::compile)
+                        .toArray(Pattern[]::new)
+                );
+                Files.walk(jobDirectoryPath)
+                    .filter(path -> cleanupWhitelist.accept(path.toAbsolutePath().toString()))
+                    .forEach(path -> {
+                        try {
+                            log.debug("Deleting {}", path);
+                            FileSystemUtils.deleteRecursively(path);
+                        } catch (final IOException e) {
+                            log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
+                        }
+                    });
+                break;
+
+            default:
+                throw new RuntimeException("Unknown cleanup strategy: " + cleanupStrategy.name());
+        }
+    }
+
     private DownloadService.Manifest createDownloadManifest(
         final File jobDirectory,
         final JobSpecification jobSpec,
@@ -296,28 +368,6 @@ class JobSetupServiceImpl implements JobSetupService {
         }
     }
 
-    public Map<String, String> setupJobEnvironment(
-        final File jobDirectory,
-        final JobSpecification jobSpecification,
-        final List<File> setupFiles
-    ) throws SetUpJobException {
-
-        // Create additional environment variables
-        final Map<String, String> extraEnvironmentVariables =
-            createAdditionalEnvironmentMap(jobDirectory, jobSpecification);
-
-        // Source set up files and collect resulting environment variables into a file
-        final File jobEnvironmentFile = createJobEnvironmentFile(
-            jobDirectory,
-            setupFiles,
-            jobSpecification.getEnvironmentVariables(),
-            extraEnvironmentVariables
-        );
-
-        // Collect environment variables into a map
-        return createJobEnvironmentMap(jobEnvironmentFile);
-    }
-
     private Map<String, String> createAdditionalEnvironmentMap(
         final File jobDirectory,
         final JobSpecification jobSpec
@@ -443,55 +493,5 @@ class JobSetupServiceImpl implements JobSetupService {
         );
 
         return Collections.unmodifiableMap(env);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void cleanupJobDirectory(
-        final Path jobDirectoryPath,
-        final CleanupStrategy cleanupStrategy
-    ) throws IOException {
-
-        switch (cleanupStrategy) {
-            case NO_CLEANUP:
-                log.info("Skipping cleanup of job directory: {}", jobDirectoryPath);
-                break;
-
-            case FULL_CLEANUP:
-                log.info("Wiping job directory: {}", jobDirectoryPath);
-                FileSystemUtils.deleteRecursively(jobDirectoryPath);
-                break;
-
-            case DEPENDENCIES_CLEANUP:
-                final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
-                    (Pattern[]) Lists.newArrayList(
-                        PathUtils.jobClusterDirectoryPath(jobDirectoryPath.toFile(), ".*"),
-                        PathUtils.jobCommandDirectoryPath(jobDirectoryPath.toFile(), ".*"),
-                        PathUtils.jobApplicationDirectoryPath(jobDirectoryPath.toFile(), ".*")
-                    )
-                        .stream()
-                        .map(PathUtils::jobEntityDependenciesPath)
-                        .map(Path::toString)
-                        .map(pathString -> pathString + "/.*")
-                        .map(Pattern::compile)
-                        .toArray(Pattern[]::new)
-                );
-                Files.walk(jobDirectoryPath)
-                    .filter(path -> cleanupWhitelist.accept(path.toAbsolutePath().toString()))
-                    .forEach(path -> {
-                        try {
-                            log.debug("Deleting {}", path);
-                            FileSystemUtils.deleteRecursively(path);
-                        } catch (final IOException e) {
-                            log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
-                        }
-                    });
-                break;
-
-            default:
-                throw new RuntimeException("Unknown cleanup strategy: " + cleanupStrategy.name());
-        }
     }
 }
