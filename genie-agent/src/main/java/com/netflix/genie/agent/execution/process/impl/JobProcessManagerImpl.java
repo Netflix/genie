@@ -136,22 +136,28 @@ public class JobProcessManagerImpl implements JobProcessManager {
         final List<String> commandLine = Lists.newArrayList(commandArguments);
         commandLine.addAll(jobArguments);
 
-        // Configure arguments
-        log.info("Job command-line: {}", Arrays.toString(commandLine.toArray()));
+        log.info(
+            "Job command-line: {} arguments: {}",
+            Arrays.toString(commandArguments.toArray()),
+            Arrays.toString(jobArguments.toArray())
+        );
 
-        final List<String> expandedCommandLine;
+        // Configure arguments
+        final List<String> expandedCommandArguments;
         try {
-            expandedCommandLine = expandCommandLineVariables(
-                commandLine,
+            expandedCommandArguments = expandCommandLineVariables(
+                commandArguments,
                 Collections.unmodifiableMap(currentEnvironmentVariables)
             );
         } catch (final EnvUtils.VariableSubstitutionException e) {
-            throw new JobLaunchException("Job command-line arguments variables could not be expanded");
+            throw new JobLaunchException("Command executable and arguments variables could not be expanded");
         }
 
-        if (!commandLine.equals(expandedCommandLine)) {
-            log.info("Job command-line with variables expanded: {}", Arrays.toString(expandedCommandLine.toArray()));
-        }
+        final List<String> expandedCommandLine = Lists.newArrayList();
+        expandedCommandLine.addAll(expandedCommandArguments);
+        expandedCommandLine.addAll(jobArguments);
+
+        log.info("Command-line after expansion: {}", expandedCommandLine);
 
         processBuilder.command(expandedCommandLine);
 

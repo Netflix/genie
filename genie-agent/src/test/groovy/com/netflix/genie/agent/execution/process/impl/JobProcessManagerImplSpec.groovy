@@ -94,7 +94,7 @@ class JobProcessManagerImplSpec extends Specification {
         !this.stdOut.exists()
     }
 
-    def "LaunchProcess noninteractive with variable expansion"() {
+    def "LaunchProcess noninteractive with executable variable expansion"() {
         String helloWorld = "Hello World!"
         this.envMap.put("ECHO_COMMAND", "echo")
 
@@ -124,6 +124,38 @@ class JobProcessManagerImplSpec extends Specification {
         this.stdErr.exists()
         this.stdOut.exists()
         this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(helloWorld)
+    }
+
+    def "LaunchProcess noninteractive without job arguments variable expansion"() {
+        final String envVarName = "MY_VARIABLE";
+        this.envMap.put(envVarName, "If this value shows, then the variable was substituted by its value")
+
+        when:
+        this.manager.launchProcess(
+            this.temporaryFolder.getRoot(),
+            this.envMap,
+            ["echo"],
+            ["\$" + envVarName], // Variable should NOT get expanded/evaluated
+            false,
+            null
+        )
+
+        then:
+        noExceptionThrown()
+        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
+
+        when:
+        def result = this.manager.waitFor()
+
+        then:
+        result.getFinalStatus() == JobStatus.SUCCEEDED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
+        result.getExitCode() == 0
+        this.stdErr.exists()
+        this.stdOut.exists()
+        this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains("\$" + envVarName)
     }
 
     def "LaunchProcess noninteractive and check environment env"() {
