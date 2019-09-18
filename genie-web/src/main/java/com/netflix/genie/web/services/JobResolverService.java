@@ -19,7 +19,7 @@ package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import org.springframework.validation.annotation.Validated;
 
@@ -44,10 +44,11 @@ public interface JobResolverService {
      * @param id The id of the job to resolve. The job must exist and its status must return {@literal true} from
      *           {@link JobStatus#isResolvable()}
      * @return A {@link ResolvedJob} instance containing all the concrete information needed to execute the job
-     * @throws GenieJobNotFoundException When there is no job with {@literal id} in the system
+     * @throws GenieJobResolutionException When there is an issue resolving the job based on the information provided
+     *                                     by the user in conjunction with the configuration available in the system
      */
     @Nonnull
-    ResolvedJob resolveJob(String id) throws GenieJobNotFoundException; // TODO: Fix exception type thrown
+    ResolvedJob resolveJob(String id) throws GenieJobResolutionException;
 
     /**
      * Given a job request resolve all the details needed to run a job. This API is stateless and saves nothing.
@@ -56,7 +57,9 @@ public interface JobResolverService {
      * @param jobRequest The job request containing all details a user wants to have for their job
      * @param apiJob     {@literal true} if this job was submitted via the REST API. {@literal false} otherwise.
      * @return The completely resolved job information within a {@link ResolvedJob} instance
+     * @throws GenieJobResolutionException When there is an issue resolving the job based on the information provided
+     *                                     by the user in conjunction with the configuration available in the system
      */
     @Nonnull
-    ResolvedJob resolveJob(String id, @Valid JobRequest jobRequest, boolean apiJob);
+    ResolvedJob resolveJob(String id, @Valid JobRequest jobRequest, boolean apiJob) throws GenieJobResolutionException;
 }

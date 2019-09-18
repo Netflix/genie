@@ -22,8 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.dto.v4.Application;
@@ -35,8 +33,8 @@ import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
@@ -180,8 +178,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     @Override
     @Nonnull
     @Transactional
-    // TODO: Finalize exceptions thrown in here
-    public ResolvedJob resolveJob(final String id) throws GenieJobNotFoundException {
+    public ResolvedJob resolveJob(final String id) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet(SAVED_TAG);
         try {
@@ -202,15 +199,12 @@ public class JobResolverServiceImpl implements JobResolverService {
             this.jobPersistenceService.saveResolvedJob(id, resolvedJob);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
-        } catch (final GenieJobNotFoundException e) {
+        } catch (final GenieJobResolutionException e) {
             MetricsUtils.addFailureTagsWithException(tags, e);
             throw e;
-        } catch (final GenieNotFoundException e) {
-            MetricsUtils.addFailureTagsWithException(tags, e);
-            throw new GenieRuntimeException(e);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new RuntimeException(t);
+            throw new GenieJobResolutionException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_JOB_TIMER, tags)
@@ -227,7 +221,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id,
         @Valid final JobRequest jobRequest,
         final boolean apiJob
-    ) {
+    ) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet(NOT_SAVED_TAG);
         try {
@@ -240,9 +234,12 @@ public class JobResolverServiceImpl implements JobResolverService {
             final ResolvedJob resolvedJob = this.resolve(id, jobRequest, apiJob);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
+        } catch (final GenieJobResolutionException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw e;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw new RuntimeException(t);
+            throw new GenieJobResolutionException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_JOB_TIMER, tags)
@@ -254,7 +251,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id,
         final JobRequest jobRequest,
         final boolean apiJob
-    ) throws GenieException {
+    ) throws GenieJobResolutionException {
         final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
             jobRequest.getCriteria().getClusterCriteria(),
             jobRequest.getCriteria().getCommandCriterion()
@@ -327,7 +324,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private Map<Cluster, String> queryForClustersAndCommands(
         final List<Criterion> clusterCriteria,
         final Criterion commandCriterion
-    ) throws GenieException {
+    ) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -337,7 +334,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             return clustersAndCommands;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw t;
+            throw new GenieJobResolutionException(t);
         } finally {
             this.registry
                 .timer(CLUSTER_COMMAND_QUERY_TIMER_NAME, tags)
@@ -349,7 +346,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id,
         final JobRequest jobRequest,
         final Set<Cluster> clusters
-    ) throws GenieException {
+    ) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> timerTags = Sets.newHashSet();
         final Set<Tag> counterTags = Sets.newHashSet();
@@ -374,7 +371,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             return cluster;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(timerTags, t);
-            throw t;
+            throw new GenieJobResolutionException(t);
         } finally {
             this.registry
                 .timer(SELECT_CLUSTER_TIMER_NAME, timerTags)
@@ -386,7 +383,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private Command getCommand(
         final String commandId,
         final String jobId
-    ) throws GenieException {
+    ) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -397,7 +394,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             return command;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw t;
+            throw new GenieJobResolutionException(t);
         } finally {
             this.registry
                 .timer(SELECT_COMMAND_TIMER_NAME, tags)
@@ -409,7 +406,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final String id,
         final JobRequest jobRequest,
         final Command command
-    ) throws GenieException {
+    ) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -437,7 +434,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             return applications;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw t;
+            throw new GenieJobResolutionException(t);
         } finally {
             this.registry
                 .timer(SELECT_APPLICATIONS_TIMER_NAME, tags)
