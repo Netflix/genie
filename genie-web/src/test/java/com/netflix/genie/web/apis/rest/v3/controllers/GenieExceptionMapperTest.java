@@ -39,6 +39,8 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExis
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.util.MetricsConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
@@ -220,6 +222,9 @@ public class GenieExceptionMapperTest {
         exceptions.put(new JobArchiveException(), HttpStatus.INTERNAL_SERVER_ERROR);
         exceptions.put(new GenieConversionException(), HttpStatus.INTERNAL_SERVER_ERROR);
         exceptions.put(new GenieCheckedException(), HttpStatus.INTERNAL_SERVER_ERROR);
+        exceptions.put(new IdAlreadyExistsException(), HttpStatus.CONFLICT);
+        exceptions.put(new JobArchiveException(), HttpStatus.INTERNAL_SERVER_ERROR);
+        exceptions.put(new SaveAttachmentException(), HttpStatus.INTERNAL_SERVER_ERROR);
 
         for (final Map.Entry<GenieCheckedException, HttpStatus> exception : exceptions.entrySet()) {
             final ResponseEntity<Object> response = this.mapper.handleGenieCheckedException(exception.getKey());
