@@ -28,7 +28,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.util.GenieObjectMapper;

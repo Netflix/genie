@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.internal.services;
 
-import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 
 import java.net.URI;
 import java.nio.file.Path;

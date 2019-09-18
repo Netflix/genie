@@ -15,33 +15,47 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.common.internal.exceptions;
+package com.netflix.genie.common.internal.exceptions.checked;
 
 /**
- * Failure to convert objects into wire format or vice versa.
+ * Exception thrown in case there is a problem with archiving files.
  *
- * @author mprimi
+ * @author standon
  * @since 4.0.0
  */
-public class GenieConversionException extends Exception {
+public class JobArchiveException extends GenieCheckedException {
+    /**
+     * Constructor.
+     */
+    public JobArchiveException() {
+        super();
+    }
 
     /**
      * Constructor with message.
      *
-     * @param message message
+     * @param message a message
      */
-    public GenieConversionException(final String message) {
+    public JobArchiveException(final String message) {
         super(message);
     }
 
     /**
      * Constructor with message and cause.
      *
-     * @param message message
-     * @param cause   cause
+     * @param message a message
+     * @param cause   a cause
      */
-    public GenieConversionException(final String message, final Throwable cause) {
+    public JobArchiveException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param cause The root cause of this exception
+     */
+    public JobArchiveException(final Throwable cause) {
+        super(cause);
+    }
 }
