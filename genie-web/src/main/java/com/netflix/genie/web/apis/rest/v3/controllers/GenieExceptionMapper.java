@@ -100,10 +100,10 @@ public class GenieExceptionMapper {
         this.countException(e);
         if (
             e instanceof GenieApplicationNotFoundException
-            || e instanceof GenieCommandNotFoundException
-            || e instanceof GenieClusterNotFoundException
-            || e instanceof GenieJobNotFoundException
-            || e instanceof GenieJobSpecificationNotFoundException
+                || e instanceof GenieCommandNotFoundException
+                || e instanceof GenieClusterNotFoundException
+                || e instanceof GenieJobNotFoundException
+                || e instanceof GenieJobSpecificationNotFoundException
         ) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } else if (e instanceof GenieIdAlreadyExistsException) {

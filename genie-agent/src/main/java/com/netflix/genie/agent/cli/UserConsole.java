@@ -66,7 +66,7 @@ public final class UserConsole {
     /**
      * Stores the current location of the log file.
      * The logfile starts in a temporary location but may move inside the job folder during execution.
-     *
+     * <p>
      * Note that this value does not set the location of the log, it just tries to guess it.
      * The file location is determined by the logback configuration.
      */
