@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,45 +18,59 @@
 package com.netflix.genie.common.internal.exceptions.unchecked
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
- * Specifications for the {@link GenieClusterNotFoundException} class.
+ * Common specifications for all the classes which extend {@link GenieRuntimeException}.
  *
  * @author tgianos
  */
-class GenieClusterNotFoundExceptionSpec extends Specification {
+class GenieUncheckedExceptionsSpec extends Specification {
 
-    def "Can construct"() {
+    @Unroll
+    def "Can construct #exceptionClass"() {
         String message = UUID.randomUUID().toString()
         Throwable cause = new Exception()
-        GenieClusterNotFoundException exception
+        def exception
 
         when:
-        exception = new GenieClusterNotFoundException()
+        exception = exceptionClass.newInstance()
 
         then:
         exception.getMessage() == null
         exception.getCause() == null
 
         when:
-        exception = new GenieClusterNotFoundException(message)
+        exception = exceptionClass.newInstance(message)
 
         then:
         exception.getMessage() == message
         exception.getCause() == null
 
         when:
-        exception = new GenieClusterNotFoundException(message, cause)
+        exception = exceptionClass.newInstance(message, cause)
 
         then:
         exception.getMessage() == message
         exception.getCause() == cause
 
         when:
-        exception = new GenieClusterNotFoundException(cause)
+        exception = exceptionClass.newInstance(cause)
 
         then:
         exception.getMessage() == cause.toString()
         exception.getCause() == cause
+
+        where:
+        exceptionClass                         | _
+        GenieAgentRejectedException            | _
+        GenieApplicationNotFoundException      | _
+        GenieClusterNotFoundException          | _
+        GenieCommandNotFoundException          | _
+        GenieIdAlreadyExistsException          | _
+        GenieInvalidStatusException            | _
+        GenieJobAlreadyClaimedException        | _
+        GenieJobSpecificationNotFoundException | _
+        GenieRuntimeException                  | _
     }
 }
