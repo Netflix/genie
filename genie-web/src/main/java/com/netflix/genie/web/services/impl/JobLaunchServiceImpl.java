@@ -19,6 +19,7 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
@@ -81,7 +82,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
     @Nonnull
     public String launchJob(
         @Valid final JobSubmission jobSubmission
-    ) throws AgentLaunchException, IdAlreadyExistsException, SaveAttachmentException {
+    ) throws AgentLaunchException, GenieJobResolutionException, IdAlreadyExistsException, SaveAttachmentException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -101,9 +102,14 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             try {
                 resolvedJob = this.jobResolverService.resolveJob(jobId);
             } catch (final Throwable t) {
-                // TODO: Clean this up. Mark job as failed?
-                //       Probably should do that in a global catch
-                throw new AgentLaunchException(t);
+                MetricsUtils.addFailureTagsWithException(tags, t);
+                this.jobPersistenceService.updateJobStatus(
+                    jobId,
+                    JobStatus.RESERVED,
+                    JobStatus.FAILED,
+                    t.getMessage()
+                );
+                throw t; // Caught below for metrics gathering
             }
 
             // Job state should be RESOLVED now. Mark it ACCEPTED to avoid race condition with agent starting up
