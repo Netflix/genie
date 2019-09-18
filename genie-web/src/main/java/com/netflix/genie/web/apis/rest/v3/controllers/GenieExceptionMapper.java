@@ -20,6 +20,8 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -108,6 +110,23 @@ public class GenieExceptionMapper {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } else if (e instanceof GenieIdAlreadyExistsException) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } else {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Handle {@link GenieCheckedException} instances.
+     *
+     * @param e The exception to map
+     * @return A {@link ResponseEntity} with the exception mapped to a {@link HttpStatus}
+     */
+    @ExceptionHandler(GenieCheckedException.class)
+    public ResponseEntity<Object> handleGenieCheckedException(final GenieCheckedException e) {
+        this.countException(e);
+        if (e instanceof GenieJobResolutionException) {
+            // Mapped to Precondition failed to maintain existing contract with V3
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
         } else {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
