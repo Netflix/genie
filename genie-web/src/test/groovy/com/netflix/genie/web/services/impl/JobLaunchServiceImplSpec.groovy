@@ -18,6 +18,7 @@
 package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.web.agent.launchers.AgentLauncher
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.JobSubmission
@@ -111,11 +112,12 @@ class JobLaunchServiceImplSpec extends Specification {
         then:
         1 * jobPersistenceService.saveJobSubmission(jobSubmission) >> jobId
         1 * jobResolverService.resolveJob(jobId) >> {
-            throw new IllegalArgumentException("fail")
+            throw new GenieJobResolutionException("fail")
         }
+        1 * jobPersistenceService.updateJobStatus(jobId, JobStatus.RESERVED, JobStatus.FAILED, _ as String)
         0 * jobPersistenceService.updateJobStatus(jobId, JobStatus.RESOLVED, JobStatus.ACCEPTED, _ as String)
         0 * agentLauncher.launchAgent(_ as ResolvedJob)
-        thrown(AgentLaunchException)
+        thrown(GenieJobResolutionException)
 
         when:
         service.launchJob(jobSubmission)
