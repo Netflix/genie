@@ -28,6 +28,10 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
+import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -201,6 +205,24 @@ public class GenieExceptionMapperTest {
 
         for (final Map.Entry<GenieRuntimeException, HttpStatus> exception : exceptions.entrySet()) {
             final ResponseEntity<Object> response = this.mapper.handleGenieRuntimeException(exception.getKey());
+            Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(exception.getValue());
+        }
+    }
+
+    /**
+     * Make sure the Runtime exceptions map to the expected error code.
+     */
+    @Test
+    public void canHandleGenieCheckedExceptions() {
+        final Map<GenieCheckedException, HttpStatus> exceptions = Maps.newHashMap();
+
+        exceptions.put(new GenieJobResolutionException(), HttpStatus.PRECONDITION_FAILED);
+        exceptions.put(new JobArchiveException(), HttpStatus.INTERNAL_SERVER_ERROR);
+        exceptions.put(new GenieConversionException(), HttpStatus.INTERNAL_SERVER_ERROR);
+        exceptions.put(new GenieCheckedException(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        for (final Map.Entry<GenieCheckedException, HttpStatus> exception : exceptions.entrySet()) {
+            final ResponseEntity<Object> response = this.mapper.handleGenieCheckedException(exception.getKey());
             Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(exception.getValue());
         }
     }
