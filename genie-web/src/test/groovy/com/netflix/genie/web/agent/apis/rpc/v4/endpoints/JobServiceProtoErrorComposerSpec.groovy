@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException
 import com.netflix.genie.common.internal.exceptions.GenieConversionException
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
@@ -80,19 +81,25 @@ class JobServiceProtoErrorComposerSpec extends Specification {
         then:
         response.hasError()
         response.getError().getType() == expectedErrorType
-        response.getError().getMessage().contains(exception.class.getCanonicalName())
         response.getError().getMessage().contains(MESSAGE)
 
         where:
-        exception                                           | expectedErrorType
-        new GenieJobNotFoundException(MESSAGE)              | JobSpecificationError.Type.NO_JOB_FOUND
-        new GenieClusterNotFoundException(MESSAGE)          | JobSpecificationError.Type.NO_CLUSTER_FOUND
-        new GenieCommandNotFoundException(MESSAGE)          | JobSpecificationError.Type.NO_COMMAND_FOUND
-        new GenieApplicationNotFoundException(MESSAGE)      | JobSpecificationError.Type.NO_APPLICATION_FOUND
-        new GenieJobSpecificationNotFoundException(MESSAGE) | JobSpecificationError.Type.NO_SPECIFICATION_FOUND
-        new ConstraintViolationException(MESSAGE, cvs)      | JobSpecificationError.Type.INVALID_REQUEST
-        new IOException(MESSAGE)                            | JobSpecificationError.Type.UNKNOWN
-        new RuntimeException(MESSAGE)                       | JobSpecificationError.Type.UNKNOWN
+        exception                                                                                     | expectedErrorType
+        new GenieJobNotFoundException(MESSAGE)                                                        | JobSpecificationError.Type.NO_JOB_FOUND
+        new GenieClusterNotFoundException(MESSAGE)                                                    | JobSpecificationError.Type.NO_CLUSTER_FOUND
+        new GenieCommandNotFoundException(MESSAGE)                                                    | JobSpecificationError.Type.NO_COMMAND_FOUND
+        new GenieApplicationNotFoundException(MESSAGE)                                                | JobSpecificationError.Type.NO_APPLICATION_FOUND
+        new GenieJobSpecificationNotFoundException(MESSAGE)                                           | JobSpecificationError.Type.NO_SPECIFICATION_FOUND
+        new ConstraintViolationException(MESSAGE, cvs)                                                | JobSpecificationError.Type.INVALID_REQUEST
+        new IOException(MESSAGE)                                                                      | JobSpecificationError.Type.UNKNOWN
+        new RuntimeException(MESSAGE)                                                                 | JobSpecificationError.Type.UNKNOWN
+        new GenieJobResolutionException(MESSAGE, new GenieJobNotFoundException(MESSAGE))              | JobSpecificationError.Type.NO_JOB_FOUND
+        new GenieJobResolutionException(MESSAGE, new GenieClusterNotFoundException(MESSAGE))          | JobSpecificationError.Type.NO_CLUSTER_FOUND
+        new GenieJobResolutionException(MESSAGE, new GenieCommandNotFoundException(MESSAGE))          | JobSpecificationError.Type.NO_COMMAND_FOUND
+        new GenieJobResolutionException(MESSAGE, new GenieApplicationNotFoundException(MESSAGE))      | JobSpecificationError.Type.NO_APPLICATION_FOUND
+        new GenieJobResolutionException(MESSAGE, new GenieJobSpecificationNotFoundException(MESSAGE)) | JobSpecificationError.Type.NO_SPECIFICATION_FOUND
+        new GenieJobResolutionException(MESSAGE)                                                      | JobSpecificationError.Type.UNKNOWN
+        new GenieJobResolutionException(new Throwable(MESSAGE))                                       | JobSpecificationError.Type.UNKNOWN
     }
 
     @Unroll

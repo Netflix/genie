@@ -36,6 +36,8 @@ import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
@@ -156,10 +158,11 @@ public class JobCoordinatorServiceImplTest {
     /**
      * Test the coordinate job method.
      *
-     * @throws GenieException If there is any problem
+     * @throws GenieCheckedException If there is any problem
+     * @throws GenieException        If there is any problem
      */
     @Test(expected = GeniePreconditionException.class)
-    public void cantCoordinateJobIfJobSpecificationResolutionFails() throws GenieException {
+    public void cantCoordinateJobIfJobSpecificationResolutionFails() throws GenieException, GenieCheckedException {
 
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -178,7 +181,7 @@ public class JobCoordinatorServiceImplTest {
                     Mockito.eq(true)
                 )
             )
-            .thenThrow(new RuntimeException());
+            .thenThrow(new GenieJobResolutionException());
 
         Mockito.verifyNoMoreInteractions(this.setJobEnvironmentTimer);
 
@@ -200,10 +203,11 @@ public class JobCoordinatorServiceImplTest {
     /**
      * Test the coordinate job method.
      *
-     * @throws GenieException If there is any problem
+     * @throws GenieCheckedException If there is any problem
+     * @throws GenieException        If there is any problem
      */
     @Test
-    public void canCoordinateJob() throws GenieException {
+    public void canCoordinateJob() throws GenieException, GenieCheckedException {
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -331,10 +335,11 @@ public class JobCoordinatorServiceImplTest {
     /**
      * Test the coordinate job method.
      *
-     * @throws GenieException If there is any problem
+     * @throws GenieCheckedException If there is any problem
+     * @throws GenieException        If there is any problem
      */
     @Test(expected = GeniePreconditionException.class)
-    public void cantCoordinateJobIfTooMuchMemoryRequested() throws GenieException {
+    public void cantCoordinateJobIfTooMuchMemoryRequested() throws GenieException, GenieCheckedException {
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -437,10 +442,11 @@ public class JobCoordinatorServiceImplTest {
     /**
      * Test the coordinate job method.
      *
-     * @throws GenieException If there is any problem
+     * @throws GenieCheckedException If there is any problem
+     * @throws GenieException        If there is any problem
      */
     @Test(expected = GenieServerUnavailableException.class)
-    public void cantCoordinateJobIfNotEnoughMemoryAvailable() throws GenieException {
+    public void cantCoordinateJobIfNotEnoughMemoryAvailable() throws GenieException, GenieCheckedException {
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -557,10 +563,11 @@ public class JobCoordinatorServiceImplTest {
      * Test the coordinate job method allows a job through if the job user limit is exceeded but the limit itself is
      * disabled.
      *
-     * @throws GenieException If there is any problem
+     * @throws GenieCheckedException If there is any problem
+     * @throws GenieException        If there is any problem
      */
     @Test
-    public void canCoordinateIfJobUserJobLimitIsDisabled() throws GenieException {
+    public void canCoordinateIfJobUserJobLimitIsDisabled() throws GenieException, GenieCheckedException {
         final int userActiveJobsLimit = 5;
         this.jobsProperties.getActiveLimit().setEnabled(false);
         this.jobsProperties.getActiveLimit().setCount(userActiveJobsLimit);
@@ -663,10 +670,11 @@ public class JobCoordinatorServiceImplTest {
     /**
      * Test the coordinate job method reject to accept a job if the user has reached the limit of allowed active jobs.
      *
-     * @throws GenieException If there is any problem
+     * @throws GenieCheckedException If there is any problem
+     * @throws GenieException        If there is any problem
      */
     @Test(expected = GenieUserLimitExceededException.class)
-    public void cantCoordinateJobUserJobLimitIsExceeded() throws GenieException {
+    public void cantCoordinateJobUserJobLimitIsExceeded() throws GenieException, GenieCheckedException {
         final int userActiveJobsLimit = 5;
         this.jobsProperties.getActiveLimit().setEnabled(true);
         this.jobsProperties.getActiveLimit().setCount(userActiveJobsLimit);
@@ -791,10 +799,11 @@ public class JobCoordinatorServiceImplTest {
     /**
      * Test the coordinate job method.
      *
-     * @throws GenieException If there is any problem
+     * @throws GenieCheckedException If there is any problem
+     * @throws GenieException        If there is any problem
      */
     @Test(expected = GenieServerException.class)
-    public void cantCoordinateJobIfTaskDoesntLaunch() throws GenieException {
+    public void cantCoordinateJobIfTaskDoesntLaunch() throws GenieException, GenieCheckedException {
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),

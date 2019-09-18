@@ -21,10 +21,8 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
@@ -72,16 +70,10 @@ public interface AgentJobService {
      *
      * @param id The id of the job to resolve the specification for. Must already have a reserved an id in the database
      * @return The job specification if one could be resolved
-     * @throws GenieJobNotFoundException         If the job has not yet had its ID reserved and/or can't be found
-     * @throws GenieClusterNotFoundException     When the cluster specified in the job specification doesn't actually
-     *                                           exist
-     * @throws GenieCommandNotFoundException     When the command specified in the job specification doesn't actually
-     *                                           exist
-     * @throws GenieApplicationNotFoundException When an application specified in the job specification doesn't
-     *                                           actually exist
-     * @throws ConstraintViolationException      If the arguments fail validation
+     * @throws GenieJobResolutionException  On error resolving the job given the input parameters and system state
+     * @throws ConstraintViolationException If the arguments fail validation
      */
-    JobSpecification resolveJobSpecification(@NotBlank String id);
+    JobSpecification resolveJobSpecification(@NotBlank String id) throws GenieJobResolutionException;
 
     /**
      * Get a job specification if has been resolved.
@@ -100,9 +92,10 @@ public interface AgentJobService {
      *
      * @param jobRequest The job request containing all the metadata needed to resolve a job specification
      * @return The job specification that would have been resolved for the given input
+     * @throws GenieJobResolutionException  On error resolving the job given the input parameters and system state
      * @throws ConstraintViolationException If the arguments fail validation
      */
-    JobSpecification dryRunJobSpecificationResolution(@Valid JobRequest jobRequest);
+    JobSpecification dryRunJobSpecificationResolution(@Valid JobRequest jobRequest) throws GenieJobResolutionException;
 
     /**
      * Set a job identified by {@code id} to be owned by the agent identified by {@code agentClientMetadata}. The

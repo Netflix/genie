@@ -34,6 +34,7 @@ import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
@@ -196,9 +197,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     DtoConverters.toV4JobRequest(jobRequest),
                     true
                 ).getJobSpecification();
-            } catch (final RuntimeException re) {
-                //TODO: Here for now as we figure out what to do with exceptions for JobResolverServiceImpl
-                throw new GeniePreconditionException(re.getMessage(), re);
+            } catch (final GenieJobResolutionException e) {
+                // Remap to existing contract
+                throw new GeniePreconditionException(e.getMessage(), e);
             }
             final Cluster cluster = this.clusterPersistenceService.getCluster(jobSpecification.getCluster().getId());
             final Command command = this.commandPersistenceService.getCommand(jobSpecification.getCommand().getId());

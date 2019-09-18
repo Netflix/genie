@@ -23,6 +23,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
@@ -147,7 +148,9 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification resolveJobSpecification(@NotBlank final String id) {
+    public JobSpecification resolveJobSpecification(
+        @NotBlank final String id
+    ) throws GenieJobResolutionException {
         final JobRequest jobRequest = this.jobPersistenceService
             .getJobRequest(id)
             .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
@@ -174,7 +177,9 @@ public class AgentJobServiceImpl implements AgentJobService {
      */
     @Override
     @Transactional(readOnly = true)
-    public JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest) {
+    public JobSpecification dryRunJobSpecificationResolution(
+        @Valid final JobRequest jobRequest
+    ) throws GenieJobResolutionException {
         return this.jobResolverService.resolveJob(
             jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()),
             jobRequest,

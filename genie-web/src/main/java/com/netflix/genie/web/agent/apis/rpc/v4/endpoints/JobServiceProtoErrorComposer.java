@@ -20,6 +20,7 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.exceptions.GenieConversionException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
@@ -131,10 +132,20 @@ public class JobServiceProtoErrorComposer {
      * @return The response
      */
     JobSpecificationResponse toProtoJobSpecificationResponse(final Exception e) {
-        return JobSpecificationResponse.newBuilder()
-            .setError(JobSpecificationError.newBuilder()
-                .setMessage(getMessage(e))
-                .setType(getErrorType(e, JOB_SPECIFICATION_ERROR_MAP, JobSpecificationError.Type.UNKNOWN))
+        // Job resolution errors are wrapped in GenieJobResolutionException so try to get the root cause
+        final Exception cause;
+        if (e instanceof GenieJobResolutionException && e.getCause() != null && e.getCause() instanceof Exception) {
+            cause = (Exception) e.getCause();
+        } else {
+            cause = e;
+        }
+        return JobSpecificationResponse
+            .newBuilder()
+            .setError(
+                JobSpecificationError
+                    .newBuilder()
+                    .setMessage(getMessage(cause))
+                    .setType(getErrorType(cause, JOB_SPECIFICATION_ERROR_MAP, JobSpecificationError.Type.UNKNOWN))
             )
             .build();
     }
