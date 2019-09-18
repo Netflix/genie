@@ -29,6 +29,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExis
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.util.MetricsConstants;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -127,6 +128,8 @@ public class GenieExceptionMapper {
         if (e instanceof GenieJobResolutionException) {
             // Mapped to Precondition failed to maintain existing contract with V3
             return new ResponseEntity<>(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
+        } else if (e instanceof IdAlreadyExistsException) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         } else {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
