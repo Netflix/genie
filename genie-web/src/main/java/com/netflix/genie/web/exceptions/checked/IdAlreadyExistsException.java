@@ -17,13 +17,22 @@
  */
 package com.netflix.genie.web.exceptions.checked;
 
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+
 /**
  * Exception thrown when an resource is attempting to be saved with a unique ID that already exists in the system.
  *
  * @author tgianos
  * @since 4.0.0
  */
-public class IdAlreadyExistsException extends Exception {
+public class IdAlreadyExistsException extends GenieCheckedException {
+    /**
+     * Constructor.
+     */
+    public IdAlreadyExistsException() {
+        super();
+    }
+
     /**
      * Constructor.
      *

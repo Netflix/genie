@@ -17,13 +17,21 @@
  */
 package com.netflix.genie.web.exceptions.checked;
 
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+
 /**
  * An exception for when the server can't launch an agent for whatever reason.
  *
  * @author tgianos
  * @since 4.0.0
  */
-public class AgentLaunchException extends Exception {
+public class AgentLaunchException extends GenieCheckedException {
+    /**
+     * Constructor.
+     */
+    public AgentLaunchException() {
+        super();
+    }
 
     /**
      * Constructor.

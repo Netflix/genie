@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.exceptions.checked;
 
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+
 /**
  * Exception thrown when the system tries to save a user attachment to an underlying data store and it fails for
  * some reason.
@@ -24,7 +26,14 @@ package com.netflix.genie.web.exceptions.checked;
  * @author tgianos
  * @since 4.0.0
  */
-public class SaveAttachmentException extends Exception {
+public class SaveAttachmentException extends GenieCheckedException {
+    /**
+     * Constructor.
+     */
+    public SaveAttachmentException() {
+        super();
+    }
+
     /**
      * Constructor.
      *
