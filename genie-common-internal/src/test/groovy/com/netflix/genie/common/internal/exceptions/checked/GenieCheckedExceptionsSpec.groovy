@@ -65,6 +65,8 @@ class GenieCheckedExceptionsSpec extends Specification {
         where:
         exceptionClass              | _
         GenieCheckedException       | _
+        GenieConversionException    | _
         GenieJobResolutionException | _
+        JobArchiveException         | _
     }
 }

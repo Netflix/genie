@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
-import com.netflix.genie.common.internal.exceptions.GenieConversionException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import com.netflix.genie.proto.AgentFileMessage;

@@ -20,7 +20,7 @@ package com.netflix.genie.common.internal.dto.v4.converters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
-import com.netflix.genie.common.internal.exceptions.GenieConversionException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.proto.AgentManifestMessage;
 import org.springframework.validation.annotation.Validated;
 

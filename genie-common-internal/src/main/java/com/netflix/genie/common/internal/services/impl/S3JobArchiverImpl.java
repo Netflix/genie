@@ -21,7 +21,7 @@ import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
-import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;

@@ -28,7 +28,7 @@ import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

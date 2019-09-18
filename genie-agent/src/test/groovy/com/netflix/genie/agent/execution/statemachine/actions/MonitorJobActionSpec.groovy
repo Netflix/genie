@@ -29,7 +29,7 @@ import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.common.internal.exceptions.JobArchiveException
+import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
 import spock.lang.Specification
 import spock.lang.Unroll

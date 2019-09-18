@@ -19,7 +19,7 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.internal.exceptions.GenieConversionException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;

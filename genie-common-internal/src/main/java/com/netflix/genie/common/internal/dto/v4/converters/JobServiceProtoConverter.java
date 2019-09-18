@@ -34,7 +34,7 @@ import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.common.internal.exceptions.GenieConversionException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.proto.AgentConfig;
 import com.netflix.genie.proto.AgentMetadata;

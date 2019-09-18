@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.internal.services.impl;
 
-import com.netflix.genie.common.internal.exceptions.JobArchiveException;
+import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;
 
