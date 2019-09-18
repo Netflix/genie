@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,48 +15,56 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.common.internal.exceptions.unchecked
+package com.netflix.genie.common.internal.exceptions.checked
+
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
- * Specifications for the {@link GenieCommandNotFoundException} class.
+ * Common specifications for all the classes which extend {@link GenieCheckedException}.
  *
  * @author tgianos
  */
-class GenieCommandNotFoundExceptionSpec extends Specification {
+class GenieCheckedExceptionsSpec extends Specification {
 
-    def "Can construct"() {
+    @Unroll
+    def "Can construct #exceptionClass"() {
         String message = UUID.randomUUID().toString()
         Throwable cause = new Exception()
-        GenieCommandNotFoundException exception
+        def exception
 
         when:
-        exception = new GenieCommandNotFoundException()
+        exception = exceptionClass.newInstance()
 
         then:
         exception.getMessage() == null
         exception.getCause() == null
 
         when:
-        exception = new GenieCommandNotFoundException(message)
+        exception = exceptionClass.newInstance(message)
 
         then:
         exception.getMessage() == message
         exception.getCause() == null
 
         when:
-        exception = new GenieCommandNotFoundException(message, cause)
+        exception = exceptionClass.newInstance(message, cause)
 
         then:
         exception.getMessage() == message
         exception.getCause() == cause
 
         when:
-        exception = new GenieCommandNotFoundException(cause)
+        exception = exceptionClass.newInstance(cause)
 
         then:
         exception.getMessage() == cause.toString()
         exception.getCause() == cause
+
+        where:
+        exceptionClass              | _
+        GenieCheckedException       | _
+        GenieJobResolutionException | _
     }
 }
