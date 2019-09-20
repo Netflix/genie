@@ -19,7 +19,6 @@ package com.netflix.genie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * Reusable Spring Boot test application.
@@ -28,7 +27,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @since 4.0.0
  */
 @SpringBootApplication
-@EnableAspectJAutoProxy
 public class GenieTestApp {
 
     /**
