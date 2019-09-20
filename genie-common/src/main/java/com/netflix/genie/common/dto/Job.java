@@ -199,9 +199,9 @@ public class Job extends CommonDTO {
          */
         @JsonCreator
         public Builder(
-            @JsonProperty("name") final String name,
-            @JsonProperty("user") final String user,
-            @JsonProperty("version") final String version
+            @JsonProperty(value = "name", required = true) final String name,
+            @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version
         ) {
             super(name, user, version);
         }

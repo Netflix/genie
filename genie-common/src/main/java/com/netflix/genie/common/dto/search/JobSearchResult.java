@@ -70,10 +70,10 @@ public class JobSearchResult extends BaseSearchResult {
      */
     @JsonCreator
     public JobSearchResult(
-        @JsonProperty("id") @NotBlank final String id,
-        @JsonProperty("name") @NotBlank final String name,
-        @JsonProperty("user") @NotBlank final String user,
-        @JsonProperty("status") @NotNull final JobStatus status,
+        @JsonProperty(value = "id", required = true) @NotBlank final String id,
+        @JsonProperty(value = "name", required = true) @NotBlank final String name,
+        @JsonProperty(value = "user", required = true) @NotBlank final String user,
+        @JsonProperty(value = "status", required = true) @NotNull final JobStatus status,
         @JsonProperty("started") @Nullable final Instant started,
         @JsonProperty("finished") @Nullable final Instant finished,
         @JsonProperty("clusterName") @Nullable final String clusterName,

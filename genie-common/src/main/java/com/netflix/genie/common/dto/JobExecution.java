@@ -151,7 +151,7 @@ public class JobExecution extends BaseDTO {
          * @param hostName The hostname where the job is running
          */
         public Builder(
-            @JsonProperty("hostName") final String hostName
+            @JsonProperty(value = "hostName", required = true) final String hostName
         ) {
             super();
             this.bHostName = hostName;

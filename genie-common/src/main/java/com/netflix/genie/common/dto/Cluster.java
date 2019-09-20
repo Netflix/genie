@@ -67,10 +67,10 @@ public class Cluster extends ExecutionEnvironmentDTO {
          * @param status  The status of the Cluster
          */
         public Builder(
-            @JsonProperty("name") final String name,
-            @JsonProperty("user") final String user,
-            @JsonProperty("version") final String version,
-            @JsonProperty("status") final ClusterStatus status
+            @JsonProperty(value = "name", required = true) final String name,
+            @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version,
+            @JsonProperty(value = "status", required = true) final ClusterStatus status
         ) {
             super(name, user, version);
             this.bStatus = status;

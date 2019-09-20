@@ -171,11 +171,11 @@ public class Command extends ExecutionEnvironmentDTO {
          */
         @JsonCreator
         Builder(
-            @JsonProperty("name") final String name,
-            @JsonProperty("user") final String user,
-            @JsonProperty("version") final String version,
-            @JsonProperty("status") final CommandStatus status,
-            @JsonProperty("checkDelay") final long checkDelay
+            @JsonProperty(value = "name", required = true) final String name,
+            @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version,
+            @JsonProperty(value = "status", required = true) final CommandStatus status,
+            @JsonProperty(value = "checkDelay", required = true) final long checkDelay
         ) {
             super(name, user, version);
             this.bStatus = status;
