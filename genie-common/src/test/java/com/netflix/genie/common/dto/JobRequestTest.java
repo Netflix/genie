@@ -489,4 +489,49 @@ public class JobRequestTest {
             Matchers.is("blah blah   blah \nblah \"blah\"")
         );
     }
+
+    /**
+     * Test edge cases of building a job request with two overlapping fields: the legacy commandArgs (String) and the
+     * new commandArguments (List of String).
+     */
+    @Test
+    public void testCommandArgsConstructorEdgeCases() {
+
+        final Object[][] testCases = {
+            {null, null, null},
+            {"", null, null},
+            {null, Lists.newArrayList(), null},
+            {"foo bar", null, "foo bar"},
+            {null, Lists.newArrayList("foo", "bar"), "foo bar"},
+            {"...", Lists.newArrayList("foo", "bar"), "foo bar"},
+        };
+
+        for (final Object[] testCase : testCases) {
+            final String commandArgs = (String) testCase[0];
+            final List<String> commandArguments = (List<String>) testCase[1];
+            final String expectedCommandArgs = (String) testCase[2];
+
+            final JobRequest jobRequest = new JobRequest.Builder(
+                "NAME",
+                "USER",
+                "VERSION",
+                Lists.newArrayList(),
+                Sets.newHashSet(),
+                commandArgs,
+                commandArguments
+            ).build();
+
+            final String message = String.format(
+                "Unexpected result when constructing JobRequest with commandArgs: %s and commandArguments: %s",
+                commandArgs,
+                commandArguments
+            );
+
+            Assert.assertThat(
+                message,
+                jobRequest.getCommandArgs().orElse(null),
+                Matchers.is(expectedCommandArgs)
+            );
+        }
+    }
 }
