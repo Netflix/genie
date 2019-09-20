@@ -51,7 +51,7 @@ public class ClusterCriteria implements Serializable {
      */
     @JsonCreator
     public ClusterCriteria(
-        @JsonProperty("tags") final Set<String> tags
+        @JsonProperty(value = "tags", required = true) final Set<String> tags
     ) {
         final ImmutableSet.Builder<String> builder = ImmutableSet.builder();
         tags.forEach(

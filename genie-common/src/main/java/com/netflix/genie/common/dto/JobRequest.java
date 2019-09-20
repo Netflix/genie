@@ -205,11 +205,11 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          */
         @JsonCreator
         public Builder(
-            @JsonProperty("name") final String name,
-            @JsonProperty("user") final String user,
-            @JsonProperty("version") final String version,
-            @JsonProperty("clusterCriterias") final List<ClusterCriteria> clusterCriterias,
-            @JsonProperty("commandCriteria") final Set<String> commandCriteria
+            @JsonProperty(value = "name", required = true) final String name,
+            @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version,
+            @JsonProperty(value = "clusterCriterias", required = true) final List<ClusterCriteria> clusterCriterias,
+            @JsonProperty(value = "commandCriteria", required = true) final Set<String> commandCriteria
         ) {
             super(name, user, version);
             this.bClusterCriterias.addAll(clusterCriterias);

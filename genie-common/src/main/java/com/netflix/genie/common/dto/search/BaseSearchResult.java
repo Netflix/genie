@@ -52,9 +52,9 @@ public class BaseSearchResult implements Serializable {
      */
     @JsonCreator
     BaseSearchResult(
-        @NotBlank @JsonProperty("id") final String id,
-        @NotBlank @JsonProperty("name") final String name,
-        @NotBlank @JsonProperty("user") final String user
+        @NotBlank @JsonProperty(value = "id", required = true) final String id,
+        @NotBlank @JsonProperty(value = "name", required = true) final String name,
+        @NotBlank @JsonProperty(value = "user", required = true) final String user
     ) {
         this.id = id;
         this.name = name;
