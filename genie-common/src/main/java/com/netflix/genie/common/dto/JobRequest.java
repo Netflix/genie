@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -203,7 +204,6 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          * @param commandCriteria  The list of command criteria for the Job
          * @since 3.3.0
          */
-        @JsonCreator
         public Builder(
             @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty(value = "user", required = true) final String user,
@@ -220,6 +220,40 @@ public class JobRequest extends ExecutionEnvironmentDTO {
                     }
                 }
             );
+        }
+
+        /**
+         * Constructor which has required fields plus two optional ways of passing arguments.
+         *
+         * @param name             The name to use for the Job
+         * @param user             The user to use for the Job
+         * @param version          The version to use for the Job
+         * @param clusterCriterias The list of cluster criteria for the Job
+         * @param commandCriteria  The list of command criteria for the Job
+         * @since 4.0.0
+         */
+        @JsonCreator
+        Builder(
+            @JsonProperty(value = "name", required = true) final String name,
+            @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version,
+            @JsonProperty(value = "clusterCriterias", required = true) final List<ClusterCriteria> clusterCriterias,
+            @JsonProperty(value = "commandCriteria", required = true) final Set<String> commandCriteria,
+            @JsonProperty(value = "commandArgs") @Nullable final String commandArgs,
+            @JsonProperty(value = "commandArguments") @Nullable final List<String> commandArguments
+        ) {
+            this(name, user, version, clusterCriterias, commandCriteria);
+            if (commandArgs == null && commandArguments == null) {
+                // Neither fields are set.
+                this.withCommandArgs(Lists.newArrayList());
+            } else if (commandArguments != null && !commandArguments.isEmpty()) {
+                this.withCommandArgs(commandArguments);
+            } else if (commandArgs != null && !commandArgs.isEmpty()) {
+                this.withCommandArgs(commandArgs);
+            } else {
+                // Either is present but both are empty
+                this.withCommandArgs(Lists.newArrayList());
+            }
         }
 
         /**
