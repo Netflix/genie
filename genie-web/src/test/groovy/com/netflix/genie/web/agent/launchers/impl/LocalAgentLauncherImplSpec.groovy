@@ -20,8 +20,9 @@ package com.netflix.genie.web.agent.launchers.impl
 import com.google.common.collect.Lists
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.data.services.JobSearchService
+import com.netflix.genie.web.dtos.GenieWebHostInfo
+import com.netflix.genie.web.dtos.GenieWebRpcInfo
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties
@@ -42,14 +43,17 @@ class LocalAgentLauncherImplSpec extends Specification {
 
     def "Can Launch Agent"() {
         def hostname = UUID.randomUUID().toString()
-        def genieHostInfo = Mock(GenieHostInfo) {
+        def rpcPort = 9090
+        def genieHostInfo = Mock(GenieWebHostInfo) {
             getHostname() >> hostname
+        }
+        def genieRpcInfo = Mock(GenieWebRpcInfo) {
+            getRpcPort() >> rpcPort
         }
         def jobSearchService = Mock(JobSearchService)
         def executable = Lists.newArrayList("java", "-jar", "genie-agent.jar")
         def properties = Mock(LocalAgentLauncherProperties)
         def factory = Mock(ExecutorFactory)
-        def rpcPort = 9090
         def registry = Mock(MeterRegistry)
 
         def jobId = UUID.randomUUID().toString()
@@ -72,10 +76,10 @@ class LocalAgentLauncherImplSpec extends Specification {
             "genie-agent.jar",
             "exec",
             "--serverHost",
-            "localhost",
+            "127.0.0.1",
             "--serverPort",
             Integer.toString(rpcPort),
-            "--full-cleanup",
+            "--no-cleanup",
             "--api-job",
             "--jobId",
             jobId
@@ -87,10 +91,10 @@ class LocalAgentLauncherImplSpec extends Specification {
             "genie-agent.jar",
             "exec",
             "--serverHost",
-            "localhost",
+            "127.0.0.1",
             "--serverPort",
             Integer.toString(rpcPort),
-            "--full-cleanup",
+            "--no-cleanup",
             "--api-job",
             "--jobId",
             jobId
@@ -99,9 +103,9 @@ class LocalAgentLauncherImplSpec extends Specification {
         when:
         def launcher = new LocalAgentLauncherImpl(
             genieHostInfo,
+            genieRpcInfo,
             jobSearchService,
             properties,
-            rpcPort,
             factory,
             registry
         )

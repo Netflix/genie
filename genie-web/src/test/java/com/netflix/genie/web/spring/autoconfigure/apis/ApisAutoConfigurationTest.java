@@ -31,9 +31,7 @@ import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.util.UUID;
 
 /**
@@ -60,17 +58,6 @@ public class ApisAutoConfigurationTest {
     @Test
     public void canGetResourceLoader() {
         Assert.assertTrue(this.apisAutoConfiguration.resourceLoader() instanceof DefaultResourceLoader);
-    }
-
-    /**
-     * Make sure we get the correct host.
-     *
-     * @throws UnknownHostException When the host can't be calculated
-     */
-    @Test
-    public void canGetGenieHostInfo() throws UnknownHostException {
-        final String expectedHostname = InetAddress.getLocalHost().getCanonicalHostName();
-        Assert.assertThat(this.apisAutoConfiguration.genieHostInfo().getHostname(), Matchers.is(expectedHostname));
     }
 
     /**

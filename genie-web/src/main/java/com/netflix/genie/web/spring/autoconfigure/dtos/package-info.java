@@ -15,30 +15,14 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.dtos;
-
-import com.netflix.genie.common.internal.util.GenieHostInfo;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
- * Extension of {@link GenieHostInfo} which adds metadata specific to the web server.
+ * Autoconfigurations for any singletons from the {@literal dtos} package.
  *
  * @author tgianos
  * @since 4.0.0
  */
-@Getter
-@EqualsAndHashCode(doNotUseGetters = true, callSuper = true)
-@ToString(doNotUseGetters = true, callSuper = true)
-public class GenieWebHostInfo extends GenieHostInfo {
+@ParametersAreNonnullByDefault
+package com.netflix.genie.web.spring.autoconfigure.dtos;
 
-    /**
-     * Constructor.
-     *
-     * @param hostname The hostname of this Genie web instance
-     */
-    public GenieWebHostInfo(final String hostname) {
-        super(hostname);
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

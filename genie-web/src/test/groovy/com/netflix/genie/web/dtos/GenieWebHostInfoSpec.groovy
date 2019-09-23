@@ -28,18 +28,16 @@ class GenieWebHostInfoSpec extends Specification {
 
     def "can create and execute POJO methods"() {
         def hostname = UUID.randomUUID().toString()
-        def rpcPort = 33_352
 
         when:
-        def info = new GenieWebHostInfo(hostname, rpcPort)
+        def info = new GenieWebHostInfo(hostname)
 
         then:
         info.getHostname() == hostname
-        info.getRpcPort() == rpcPort
 
         when:
-        def info2 = new GenieWebHostInfo(hostname, rpcPort)
-        def info3 = new GenieWebHostInfo(hostname + UUID.randomUUID().toString(), rpcPort + 1)
+        def info2 = new GenieWebHostInfo(hostname)
+        def info3 = new GenieWebHostInfo(hostname + UUID.randomUUID().toString())
 
         then:
         info == info2

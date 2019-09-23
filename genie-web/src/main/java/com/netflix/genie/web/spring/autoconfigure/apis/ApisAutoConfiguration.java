@@ -17,18 +17,14 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.apis;
 
-import com.amazonaws.util.EC2MetadataUtils;
-import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.RetryProperties;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.cloud.aws.context.support.env.AwsCloudEnvironmentCheckUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -42,8 +38,6 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -73,34 +67,6 @@ public class ApisAutoConfiguration {
     @ConditionalOnMissingBean(ResourceLoader.class)
     public ResourceLoader resourceLoader() {
         return new DefaultResourceLoader();
-    }
-
-    /**
-     * Get the {@link GenieHostInfo} for this application. This is the default fallback implementation if no other bean
-     * instance of this type has been created.
-     *
-     * @return The hostname calculated from {@link InetAddress}
-     * @throws UnknownHostException  When the host can't be calculated
-     * @throws IllegalStateException When an instance can't be created
-     * @see InetAddress#getCanonicalHostName()
-     */
-    @Bean
-    @ConditionalOnMissingBean(GenieHostInfo.class)
-    public GenieHostInfo genieHostInfo() throws UnknownHostException {
-        if (AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment()) {
-            final String ec2Ipv4Address = EC2MetadataUtils.getPrivateIpAddress();
-            if (StringUtils.isNotBlank(ec2Ipv4Address)) {
-                return new GenieHostInfo(ec2Ipv4Address);
-            }
-        }
-
-        // Fallback if not on AWS
-        final String hostname = InetAddress.getLocalHost().getCanonicalHostName();
-        if (StringUtils.isNotBlank(hostname)) {
-            return new GenieHostInfo(hostname);
-        } else {
-            throw new IllegalStateException("Unable to create a Genie Host Info instance");
-        }
     }
 
     /**

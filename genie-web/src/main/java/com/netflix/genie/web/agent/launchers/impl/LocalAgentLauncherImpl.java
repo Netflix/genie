@@ -18,9 +18,10 @@
 package com.netflix.genie.web.agent.launchers.impl;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.dtos.GenieWebHostInfo;
+import com.netflix.genie.web.dtos.GenieWebRpcInfo;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
@@ -48,11 +49,12 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     private static final String SETS_ID = "setsid";
     private static final String EXEC_COMMAND = "exec";
     private static final String SERVER_HOST_OPTION = "--serverHost";
-    private static final String SERVER_HOST_VALUE = "localhost";
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private static final String SERVER_HOST_VALUE = "127.0.0.1";
     private static final String SERVER_PORT_OPTION = "--serverPort";
     private static final String API_JOB_OPTION = "--api-job";
     private static final String JOB_ID_OPTION = "--jobId";
-    private static final String FULL_CLEANUP_OPTION = "--full-cleanup";
+    private static final String FULL_CLEANUP_OPTION = "--no-cleanup";
 
     private static final Object MEMORY_CHECK_LOCK = new Object();
 
@@ -66,20 +68,19 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     /**
      * Constructor.
      *
-     * @param hostInfo           The {@link GenieHostInfo} instance
+     * @param hostInfo           The {@link GenieWebHostInfo} instance
+     * @param rpcInfo            The {@link GenieWebRpcInfo} instance
      * @param jobSearchService   The {@link JobSearchService} used to get metrics about the jobs on this node
      * @param launcherProperties The properties from the configuration that control agent behavior
-     * @param agentRpcPort       The port the RPC service is listening on for the agent to connect to
      * @param executorFactory    A {@link ExecutorFactory} to create {@link org.apache.commons.exec.Executor}
      *                           instances
      * @param registry           Metrics repository
      */
     public LocalAgentLauncherImpl(
-        final GenieHostInfo hostInfo,
+        final GenieWebHostInfo hostInfo,
+        final GenieWebRpcInfo rpcInfo,
         final JobSearchService jobSearchService,
         final LocalAgentLauncherProperties launcherProperties,
-        // TODO: Roll this into GenieHostInfo
-        final int agentRpcPort,
         final ExecutorFactory executorFactory,
         final MeterRegistry registry
     ) {
@@ -107,7 +108,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
         this.commandTemplate.addArgument(SERVER_HOST_OPTION);
         this.commandTemplate.addArgument(SERVER_HOST_VALUE);
         this.commandTemplate.addArgument(SERVER_PORT_OPTION);
-        this.commandTemplate.addArgument(Integer.toString(agentRpcPort));
+        this.commandTemplate.addArgument(Integer.toString(rpcInfo.getRpcPort()));
         this.commandTemplate.addArgument(FULL_CLEANUP_OPTION);
         this.commandTemplate.addArgument(API_JOB_OPTION);
         this.commandTemplate.addArgument(JOB_ID_OPTION);

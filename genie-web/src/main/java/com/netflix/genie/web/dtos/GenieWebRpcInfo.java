@@ -17,28 +17,26 @@
  */
 package com.netflix.genie.web.dtos;
 
-import com.netflix.genie.common.internal.util.GenieHostInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 /**
- * Extension of {@link GenieHostInfo} which adds metadata specific to the web server.
+ * Container class for RPC related properties.
  *
  * @author tgianos
  * @since 4.0.0
  */
+@RequiredArgsConstructor
 @Getter
-@EqualsAndHashCode(doNotUseGetters = true, callSuper = true)
-@ToString(doNotUseGetters = true, callSuper = true)
-public class GenieWebHostInfo extends GenieHostInfo {
-
-    /**
-     * Constructor.
-     *
-     * @param hostname The hostname of this Genie web instance
-     */
-    public GenieWebHostInfo(final String hostname) {
-        super(hostname);
-    }
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+public class GenieWebRpcInfo {
+    @Min(value = 1, message = "The minimum value for the RPC port is 1")
+    @Max(value = 65_535, message = "The maximum value for the RPC port is 65,535")
+    private final int rpcPort;
 }
