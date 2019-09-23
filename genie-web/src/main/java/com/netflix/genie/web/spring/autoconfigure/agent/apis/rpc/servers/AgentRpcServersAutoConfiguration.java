@@ -32,7 +32,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Set;
 
@@ -55,14 +54,6 @@ import java.util.Set;
 )
 @Slf4j
 public class AgentRpcServersAutoConfiguration {
-
-    /**
-     * Log that gRPC server is enabled.
-     */
-    @PostConstruct
-    public void postConstruct() {
-        log.info("gRPC server configuration is ENABLED");
-    }
 
     /**
      * Create a {@link Server} if one isn't already present in the context.
