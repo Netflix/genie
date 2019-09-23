@@ -20,7 +20,6 @@ package com.netflix.genie.web.agent.apis.rpc.servers;
 import io.grpc.Server;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,18 +38,11 @@ public class GRpcServerManager implements AutoCloseable {
      * Constructor.
      *
      * @param server The {@link Server} instance to manage
+     * @throws IllegalStateException If the server can't be started
      */
-    public GRpcServerManager(final Server server) {
+    public GRpcServerManager(final Server server) throws IllegalStateException {
         this.server = server;
-
-        try {
-            this.server.start();
-            log.info("Successfully started gRPC server on port {}", this.server.getPort());
-        } catch (final IllegalStateException ise) {
-            log.info("Server already started on port {}", this.server.getPort());
-        } catch (final IOException ioe) {
-            throw new IllegalStateException("Unable to start gRPC server on port " + this.server.getPort(), ioe);
-        }
+        GRpcServerUtils.startServer(this.server);
     }
 
     /**
