@@ -22,6 +22,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
@@ -49,6 +50,7 @@ import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
+import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
@@ -61,6 +63,7 @@ import com.netflix.genie.web.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.web.services.impl.JobDirectoryServerServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceImpl;
 import com.netflix.genie.web.services.impl.JobKillServiceV3;
+import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
@@ -519,5 +522,25 @@ public class ServicesAutoConfiguration {
     @Order
     public RandomizedClusterLoadBalancerImpl randomizedClusterLoadBalancer() {
         return new RandomizedClusterLoadBalancerImpl();
+    }
+
+    /**
+     * Provide a {@link JobLaunchService} implementation if one isn't available.
+     *
+     * @param jobPersistenceService The {@link JobPersistenceService} implementation to use
+     * @param jobResolverService    The {@link JobResolverService} implementation to use
+     * @param agentLauncher         The {@link AgentLauncher} implementation to use
+     * @param registry              The metrics registry to use
+     * @return A {@link JobLaunchServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobLaunchService.class)
+    public JobLaunchServiceImpl jobLaunchService(
+        final JobPersistenceService jobPersistenceService,
+        final JobResolverService jobResolverService,
+        final AgentLauncher agentLauncher,
+        final MeterRegistry registry
+    ) {
+        return new JobLaunchServiceImpl(jobPersistenceService, jobResolverService, agentLauncher, registry);
     }
 }
