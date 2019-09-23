@@ -56,7 +56,7 @@ public class AgentServicesAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(AgentJobService.class)
-    public AgentJobService agentJobService(
+    public AgentJobServiceImpl agentJobService(
         final JobPersistenceService jobPersistenceService,
         final JobResolverService jobResolverService,
         final AgentFilterService agentFilterService,
@@ -79,7 +79,7 @@ public class AgentServicesAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(AgentRoutingService.class)
-    public AgentRoutingService agentRoutingService(
+    public AgentRoutingServiceImpl agentRoutingService(
         final AgentConnectionPersistenceService agentConnectionPersistenceService,
         final GenieHostInfo genieHostInfo
     ) {
