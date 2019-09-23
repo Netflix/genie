@@ -19,6 +19,7 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.apis.rest.v3.controllers.ApplicationRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.ClusterRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.CommandRestController;
@@ -90,7 +91,7 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
                         .submitJob(null, null, null, null)
                 ).withRel(JOBS_LINK)
             );
-        } catch (final GenieException ge) {
+        } catch (final GenieException | GenieCheckedException ge) {
             // If we can't convert it we might as well force a server exception
             throw new RuntimeException(ge);
         }

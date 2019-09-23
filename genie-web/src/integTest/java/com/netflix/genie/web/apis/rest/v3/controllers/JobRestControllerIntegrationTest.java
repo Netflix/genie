@@ -31,12 +31,12 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
-import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
-import com.netflix.genie.web.properties.FileCacheProperties;
+import com.netflix.genie.web.dtos.GenieWebHostInfo;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -45,14 +45,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -64,11 +62,14 @@ import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -88,6 +89,11 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
+@TestPropertySource(
+    properties = {
+        JobRestController.AGENT_JOB_EXECUTION_KEY + "=false"
+    }
+)
 public class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobRestControllerIntegrationTest.class);
@@ -149,18 +155,10 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final String CMD1_VERSION = "1.0";
     private static final String CMD1_EXECUTABLE = "/bin/bash";
     private static final ArrayList<String> CMD1_EXECUTABLE_AND_ARGS = Lists.newArrayList(CMD1_EXECUTABLE);
-    private static final String CMD1_TAGS
-        = BASH_COMMAND_TAG + ","
-        + "genie.id:" + CMD1_ID + ","
-        + "genie.name:" + CMD1_NAME;
     private static final String CLUSTER1_ID = "cluster1";
     private static final String CLUSTER1_NAME = "Local laptop";
     private static final String CLUSTER1_USER = "genie";
     private static final String CLUSTER1_VERSION = "1.0";
-    private static final String CLUSTER1_TAGS
-        = "genie.id:" + CLUSTER1_ID + ","
-        + "genie.name:" + CLUSTER1_NAME + ","
-        + LOCALHOST_CLUSTER_TAG;
     private static final String JOB_TAG_1 = "aTag";
     private static final String JOB_TAG_2 = "zTag";
     private static final Set<String> JOB_TAGS = Sets.newHashSet(JOB_TAG_1, JOB_TAG_2);
@@ -170,28 +168,20 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     // related to charset headers
     private static final String GB18030_TXT = "GB18030.txt";
 
-    /**
-     * A temporary directory to use that will be cleaned up automatically at the end of testing.
-     */
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
     private ResourceLoader resourceLoader;
     private JsonNode metadata;
     private String schedulerJobName;
     private String schedulerRunId;
-
-    @Autowired
-    private GenieHostInfo genieHostInfo;
-
-    @Autowired
-    private Resource jobDirResource;
-
-    @Autowired
-    private FileCacheProperties fileCacheProperties;
+    private boolean agentExecution;
 
     @Autowired
     private JobsLocationsProperties jobsLocationsProperties;
+
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    private GenieWebHostInfo genieHostInfo;
 
     /**
      * {@inheritDoc}
@@ -200,9 +190,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Override
     public void setup() throws Exception {
         super.setup();
-
-        // Re-point archives
-        this.jobsLocationsProperties.setArchives(this.temporaryFolder.newFolder().toURI());
 
         this.schedulerJobName = UUID.randomUUID().toString();
         this.schedulerRunId = UUID.randomUUID().toString();
@@ -224,6 +211,11 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         this.createAllClusters();
         this.createAllCommands();
         this.linkAllEntities();
+        this.agentExecution = this.environment.getProperty(
+            JobRestController.AGENT_JOB_EXECUTION_KEY,
+            Boolean.class,
+            false
+        );
     }
 
     /**
@@ -246,7 +238,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     }
 
     /**
-     * Test to make sure command args are limitted to 10,000 characters.
+     * Test to make sure command args are limited to 10,000 characters.
      *
      * @throws Exception On error
      */
@@ -259,7 +251,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(LOCALHOST_CLUSTER_TAG))),
             Sets.newHashSet(BASH_COMMAND_TAG)
         )
-            .withCommandArgs(StringUtils.leftPad("bad", 10_001))
+            .withCommandArgs(StringUtils.leftPad("bad", 10_001, 'a'))
             .build();
 
         RestAssured
@@ -275,28 +267,24 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
     private void submitAndCheckJob(final int documentationId, final boolean archiveJob) throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "echo hello world");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        }
 
         final String clusterTag = LOCALHOST_CLUSTER_TAG;
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
             new ClusterCriteria(Sets.newHashSet(clusterTag))
         );
 
-        final String setUpFile = this.resourceLoader
-            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile")
-            .getFile()
-            .getAbsolutePath();
+        final String setUpFile = this.getResourceURI(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile");
 
-        final String configFile1 = this.resourceLoader
-            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "config1")
-            .getFile()
-            .getAbsolutePath();
+        final String configFile1 = this.getResourceURI(BASE_DIR + "job" + FILE_DELIMITER + "config1");
         final Set<String> configs = Sets.newHashSet(configFile1);
 
-        final String depFile1 = this.resourceLoader
-            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1")
-            .getFile()
-            .getAbsolutePath();
+        final String depFile1 = this.getResourceURI(BASE_DIR + "job" + FILE_DELIMITER + "dep1");
         final Set<String> dependencies = Sets.newHashSet(depFile1);
 
         final String commandTag = BASH_COMMAND_TAG;
@@ -349,19 +337,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
 
-        // Check if the cluster setup file is cached
-        final String clusterSetUpFilePath = this.resourceLoader
-            .getResource(BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile")
-            .getFile()
-            .getAbsolutePath();
-        Assert.assertTrue(
-            Files.exists(
-                Paths.get(
-                    this.fileCacheProperties.getLocation().getPath(),
-                    UUID.nameUUIDFromBytes(clusterSetUpFilePath.getBytes(StandardCharsets.UTF_8)).toString()
-                )
-            )
-        );
         // Test for conflicts
         this.testForConflicts(id, commandArgs, clusterCriteriaList, commandCriteria);
     }
@@ -507,7 +482,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body(STATUS_MESSAGE_PATH, Matchers.is(JOB_STATUS_MSG))
             .body(STARTED_PATH, Matchers.not(Instant.EPOCH))
             .body(FINISHED_PATH, Matchers.notNullValue())
-            // TODO: Flipped during V4 migration to always be on to replecate expected behavior of V3 until clients
+            // TODO: Flipped during V4 migration to always be on to replicate expected behavior of V3 until clients
             //       can be migrated
 //            .body(ARCHIVE_LOCATION_PATH, archiveJob ? Matchers.notNullValue() : Matchers.isEmptyOrNullString())
             .body(ARCHIVE_LOCATION_PATH, Matchers.notNullValue())
@@ -562,7 +537,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             Snippets.OUTPUT_DIRECTORY_FIELDS
         );
 
-        RestAssured
+        final ValidatableResponse outputDirJsonResponse = RestAssured
             .given(this.getRequestSpecification())
             .filter(jsonResultFilter)
             .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -571,15 +546,28 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .get(JOBS_API + "/{id}/output/{filePath}", id, "")
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .body("parent", Matchers.isEmptyOrNullString())
-            .body("directories[0].name", Matchers.is("genie/"))
-            .body("files[0].name", Matchers.is("config1"))
-            .body("files[1].name", Matchers.is("dep1"))
-            .body("files[2].name", Matchers.is("jobsetupfile"))
-            .body("files[3].name", Matchers.is("run"))
-            .body("files[4].name", Matchers.is("stderr"))
-            .body("files[5].name", Matchers.is("stdout"));
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE));
+
+        if (this.agentExecution) {
+            outputDirJsonResponse
+                .body("parent", Matchers.isEmptyOrNullString())
+                .body("directories[0].name", Matchers.is("genie/"))
+                .body("files[0].name", Matchers.is("config1"))
+                .body("files[1].name", Matchers.is("dep1"))
+                .body("files[2].name", Matchers.is("jobsetupfile"))
+                .body("files[3].name", Matchers.is("stderr"))
+                .body("files[4].name", Matchers.is("stdout"));
+        } else {
+            outputDirJsonResponse
+                .body("parent", Matchers.isEmptyOrNullString())
+                .body("directories[0].name", Matchers.is("genie/"))
+                .body("files[0].name", Matchers.is("config1"))
+                .body("files[1].name", Matchers.is("dep1"))
+                .body("files[2].name", Matchers.is("jobsetupfile"))
+                .body("files[3].name", Matchers.is("run"))
+                .body("files[4].name", Matchers.is("stderr"))
+                .body("files[5].name", Matchers.is("stdout"));
+        }
 
         // Check getting a directory as HTML
         final RestDocumentationFilter htmlResultFilter = RestAssuredRestDocumentation.document(
@@ -636,27 +624,21 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             ) // Response Headers
         );
 
-        // check that the generated run file is correct
-        final String runShFileName = SystemUtils.IS_OS_LINUX ? "linux-runsh.txt" : "non-linux-runsh.txt";
-
-        final String runShFile = this.resourceLoader
-            .getResource(BASE_DIR + runShFileName)
-            .getFile()
-            .getAbsolutePath();
-        final String runFileContents = new String(Files.readAllBytes(Paths.get(runShFile)), StandardCharsets.UTF_8);
-
-        final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + id;
-        final String expectedRunScriptContent = this.getExpectedRunContents(runFileContents, jobWorkingDir, id);
+        final String setupFile = this.getResourceURI(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile");
+        final String setupFileContents = new String(
+            Files.readAllBytes(Paths.get(new URI(setupFile))),
+            StandardCharsets.UTF_8
+        );
 
         RestAssured
             .given(this.getRequestSpecification())
             .filter(fileResultFilter)
             .when()
             .port(this.port)
-            .get(JOBS_API + "/{id}/output/{filePath}", id, "run")
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "jobsetupfile")
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .body(Matchers.is(expectedRunScriptContent));
+            .body(Matchers.is(setupFileContents));
     }
 
     private void checkJobRequest(
@@ -727,7 +709,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             Snippets.JOB_EXECUTION_LINKS // Links
         );
 
-        RestAssured
+        final ValidatableResponse validatableResponse = RestAssured
             .given(this.getRequestSpecification())
             .filter(getResultFilter)
             .when()
@@ -738,11 +720,22 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
             .body(ID_PATH, Matchers.is(id))
             .body(CREATED_PATH, Matchers.notNullValue())
-            .body(UPDATED_PATH, Matchers.notNullValue())
-            .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()))
-            .body(PROCESS_ID_PATH, Matchers.notNullValue())
-            .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
-            .body(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE));
+            .body(UPDATED_PATH, Matchers.notNullValue());
+
+        // TODO: Fix the difference here
+        if (this.agentExecution) {
+            validatableResponse
+                .body(HOST_NAME_PATH, Matchers.notNullValue())
+                .body(PROCESS_ID_PATH, Matchers.notNullValue())
+                .body(CHECK_DELAY_PATH, Matchers.nullValue())
+                .body(EXIT_CODE_PATH, Matchers.nullValue());
+        } else {
+            validatableResponse
+                .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()))
+                .body(PROCESS_ID_PATH, Matchers.notNullValue())
+                .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
+                .body(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE));
+        }
     }
 
     private void checkJobMetadata(final int documentationId, final String id) {
@@ -754,7 +747,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             Snippets.JOB_METADATA_LINKS // Links
         );
 
-        RestAssured
+        final ValidatableResponse validatableResponse = RestAssured
             .given(this.getRequestSpecification())
             .filter(getResultFilter)
             .when()
@@ -769,9 +762,18 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body(CLIENT_HOST_PATH, Matchers.notNullValue())
             .body(USER_AGENT_PATH, Matchers.notNullValue())
             .body(NUM_ATTACHMENTS_PATH, Matchers.notNullValue())
-            .body(TOTAL_SIZE_ATTACHMENTS_PATH, Matchers.notNullValue())
-            .body(STD_OUT_SIZE_PATH, Matchers.notNullValue())
-            .body(STD_ERR_SIZE_PATH, Matchers.notNullValue());
+            .body(TOTAL_SIZE_ATTACHMENTS_PATH, Matchers.notNullValue());
+
+        // TODO: Fix this difference
+        if (this.agentExecution) {
+            validatableResponse
+                .body(STD_OUT_SIZE_PATH, Matchers.nullValue())
+                .body(STD_ERR_SIZE_PATH, Matchers.nullValue());
+        } else {
+            validatableResponse
+                .body(STD_OUT_SIZE_PATH, Matchers.notNullValue())
+                .body(STD_ERR_SIZE_PATH, Matchers.notNullValue());
+        }
     }
 
     private void checkJobCluster(final int documentationId, final String id) {
@@ -941,16 +943,19 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
      */
     @Test
     public void canSubmitJobWithAttachments() throws Exception {
-        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "echo hello world");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        }
 
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
             new ClusterCriteria(Sets.newHashSet(LOCALHOST_CLUSTER_TAG))
         );
 
-        final String setUpFile = this.resourceLoader
-            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile")
-            .getFile()
-            .getAbsolutePath();
+        final String setUpFile = this.getResourceURI(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile");
 
         final File attachment1File = this.resourceLoader
             .getResource(BASE_DIR + "job/query.sql")
@@ -1004,7 +1009,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodMissingCluster() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "echo hello world");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        }
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet("undefined");
@@ -1036,7 +1046,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
-        Assert.assertThat(this.getStatus(jobId), Matchers.is("{\"status\":\"FAILED\"}"));
+        Assert.assertThat(this.getStatus(jobId), Matchers.is(JobStatus.FAILED));
     }
 
     /**
@@ -1047,7 +1057,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodInvalidClusterCriteria() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "echo hello world");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        }
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(" ", "", null)));
@@ -1094,7 +1109,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodInvalidCommandCriteria() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "echo hello world");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        }
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("ok")));
@@ -1141,7 +1161,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodMissingCommand() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "echo hello world");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        }
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1173,7 +1198,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
-        Assert.assertThat(this.getStatus(jobId), Matchers.is("{\"status\":\"FAILED\"}"));
+        Assert.assertThat(this.getStatus(jobId), Matchers.is(JobStatus.FAILED));
     }
 
     /**
@@ -1184,7 +1209,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodKill() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'sleep 60'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "sleep 60");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'sleep 60'");
+        }
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1221,7 +1251,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         this.waitForRunning(jobId);
 
         // Make sure we can get output for a running job
-        RestAssured
+        final ValidatableResponse outputResponse = RestAssured
             .given(this.getRequestSpecification())
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -1231,10 +1261,18 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .body("parent", Matchers.isEmptyOrNullString())
-            .body("directories[0].name", Matchers.is("genie/"))
-            .body("files[0].name", Matchers.is("run"))
-            .body("files[1].name", Matchers.is("stderr"))
-            .body("files[2].name", Matchers.is("stdout"));
+            .body("directories[0].name", Matchers.is("genie/"));
+
+        if (this.agentExecution) {
+            outputResponse
+                .body("files[0].name", Matchers.is("stderr"))
+                .body("files[1].name", Matchers.is("stdout"));
+        } else {
+            outputResponse
+                .body("files[0].name", Matchers.is("run"))
+                .body("files[1].name", Matchers.is("stderr"))
+                .body("files[2].name", Matchers.is("stdout"));
+        }
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1296,7 +1334,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodKillOnTimeout() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'sleep 60'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1304,17 +1341,23 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         clusterCriteriaList.add(clusterCriteria);
 
         final Set<String> commandCriteria = Sets.newHashSet(BASH_COMMAND_TAG);
-        final JobRequest jobRequest = new JobRequest.Builder(
+        final JobRequest.Builder builder = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
             clusterCriteriaList,
             commandCriteria
         )
-            .withCommandArgs(commandArgs)
             .withTimeout(5)
-            .withDisableLogArchival(true)
-            .build();
+            .withDisableLogArchival(true);
+
+        if (this.agentExecution) {
+            builder.withCommandArgs(Lists.newArrayList("-c", "sleep 60"));
+        } else {
+            builder.withCommandArgs("-c 'sleep 60'");
+        }
+
+        final JobRequest jobRequest = builder.build();
 
         final String id = this.getIdFromLocation(
             RestAssured
@@ -1343,7 +1386,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
             .body(ID_PATH, Matchers.is(id))
             .body(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString()))
-            .body(STATUS_MESSAGE_PATH, Matchers.is("Job exceeded timeout."));
+            .body(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_EXCEEDED_TIMEOUT));
     }
 
     /**
@@ -1354,7 +1397,12 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodFailure() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'exit 1'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "exit 1");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'exit 1'");
+        }
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1390,7 +1438,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
         this.waitForDone(id);
 
-        Assert.assertEquals(this.getStatus(id), "{\"status\":\"FAILED\"}");
+        Assert.assertEquals(this.getStatus(id), JobStatus.FAILED);
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1413,7 +1461,13 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testResponseContentType() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello'");
+        final List<String> commandArgs;
+        if (this.agentExecution) {
+            commandArgs = Lists.newArrayList("-c", "echo hello");
+        } else {
+            commandArgs = Lists.newArrayList("-c", "'echo hello'");
+        }
+        final String utf8 = "UTF-8";
 
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
@@ -1442,35 +1496,67 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
         this.waitForDone(jobId);
 
-        RestAssured
-            .given(this.getRequestSpecification())
-            .when()
-            .port(this.port)
-            .get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log")
-            .then()
-            .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("UTF-8"));
+        if (this.agentExecution) {
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/" + jobId + "/output/genie/logs/agent.log")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+                .contentType(Matchers.containsString(utf8));
 
-        RestAssured
-            .given(this.getRequestSpecification())
-            .when()
-            .port(this.port)
-            .get(JOBS_API + "/" + jobId + "/output/genie/logs/genie.log")
-            .then()
-            .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("UTF-8"));
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/" + jobId + "/output/genie/logs/env-setup.log")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+                .contentType(Matchers.containsString(utf8));
 
-        RestAssured
-            .given(this.getRequestSpecification())
-            .when()
-            .port(this.port)
-            .get(JOBS_API + "/" + jobId + "/output/genie/genie.done")
-            .then()
-            .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("UTF-8"));
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/" + jobId + "/output/genie/env.sh")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+                .contentType(Matchers.containsString(utf8));
+        } else {
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+                .contentType(Matchers.containsString(utf8));
+
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/" + jobId + "/output/genie/logs/genie.log")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+                .contentType(Matchers.containsString(utf8));
+
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/" + jobId + "/output/genie/genie.done")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+                .contentType(Matchers.containsString(utf8));
+        }
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1481,7 +1567,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("UTF-8"));
+            .contentType(Matchers.containsString(utf8));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1492,7 +1578,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("UTF-8"));
+            .contentType(Matchers.containsString(utf8));
 
         // Verify the file is served as UTF-8 even if it's not
         RestAssured
@@ -1504,42 +1590,25 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("UTF-8"));
+            .contentType(Matchers.containsString(utf8));
     }
 
-    private String getExpectedRunContents(
-        final String runFileContents,
-        final String jobWorkingDir,
-        final String jobId
-    ) {
-        return runFileContents
-            .replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER", jobWorkingDir)
-            .replace("JOB_ID_PLACEHOLDER", jobId)
-            .replace("COMMAND_ID_PLACEHOLDER", CMD1_ID)
-            .replace("COMMAND_NAME_PLACEHOLDER", CMD1_NAME)
-            .replace("COMMAND_TAGS_PLACEHOLDER", CMD1_TAGS)
-            .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
-            .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
-            .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
-            .replace("JOB_TAGS_PLACEHOLDER", JOB_TAG_1 + "," + JOB_TAG_2)
-            .replace("JOB_GROUPING_PLACEHOLDER", JOB_GROUPING)
-            .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE);
-    }
-
-    private String getStatus(final String jobId) {
-        return RestAssured
+    private JobStatus getStatus(final String jobId) throws IOException {
+        final String statusString = RestAssured
             .given(this.getRequestSpecification())
             .when()
             .port(this.port)
             .get(JOBS_API + "/{id}/status", jobId)
             .asString();
+
+        return JobStatus.valueOf(GenieObjectMapper.getMapper().readTree(statusString).get("status").textValue());
     }
 
     private void waitForDone(final String jobId) throws Exception {
         int counter = 0;
         while (true) {
-            final String statusString = this.getStatus(jobId);
-            if (statusString.contains("INIT") || statusString.contains("RUNNING")) {
+            final JobStatus status = this.getStatus(jobId);
+            if (status.isActive()) {
                 LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
                 Thread.sleep(SLEEP_TIME);
                 counter++;
@@ -1552,8 +1621,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private void waitForRunning(final String jobId) throws Exception {
         int counter = 0;
         while (true) {
-            final String statusString = this.getStatus(jobId);
-            if (statusString.contains("INIT")) {
+            final JobStatus status = this.getStatus(jobId);
+            if (status != JobStatus.RUNNING && !status.isFinished()) {
                 LOG.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
                 Thread.sleep(SLEEP_TIME);
                 counter++;
@@ -1592,39 +1661,14 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     }
 
     private void createAnApplication(final String id, final String appName) throws Exception {
-        final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "setupfile"
-        ).getFile().getAbsolutePath();
+        final String setUpFile = this.getResourceURI(BASE_DIR + id + FILE_DELIMITER + "setupfile");
 
-        final String depFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "dep1"
-        ).getFile().getAbsolutePath();
-        final String depFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "dep2"
-        ).getFile().getAbsolutePath();
+        final String depFile1 = this.getResourceURI(BASE_DIR + id + FILE_DELIMITER + "dep1");
+        final String depFile2 = this.getResourceURI(BASE_DIR + id + FILE_DELIMITER + "dep2");
         final Set<String> app1Dependencies = Sets.newHashSet(depFile1, depFile2);
 
-        final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "config1"
-        ).getFile().getAbsolutePath();
-        final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "config2"
-        ).getFile().getAbsolutePath();
+        final String configFile1 = this.getResourceURI(BASE_DIR + id + FILE_DELIMITER + "config1");
+        final String configFile2 = this.getResourceURI(BASE_DIR + id + FILE_DELIMITER + "config2");
         final Set<String> app1Configs = Sets.newHashSet(configFile1, configFile2);
 
         final Application app = new Application.Builder(
@@ -1651,30 +1695,14 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     }
 
     private void createAllClusters() throws Exception {
-        final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "setupfile"
-        ).getFile().getAbsolutePath();
+        final String setUpFile = this.getResourceURI(BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "setupfile");
 
-        final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config1"
-        ).getFile().getAbsolutePath();
-        final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config2"
-        ).getFile().getAbsolutePath();
+        final String configFile1 = this.getResourceURI(BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config1");
+        final String configFile2 = this.getResourceURI(BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config2");
         final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
 
-        final String depFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep1"
-        ).getFile().getAbsolutePath();
-        final String depFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep2"
-        ).getFile().getAbsolutePath();
+        final String depFile1 = this.getResourceURI(BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "dep1");
+        final String depFile2 = this.getResourceURI(BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "dep2");
         final Set<String> clusterDependencies = Sets.newHashSet(depFile1, depFile2);
         final Set<String> tags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
 
@@ -1704,32 +1732,14 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     }
 
     private void createAllCommands() throws Exception {
-        final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile"
-        ).getFile().getAbsolutePath();
+        final String setUpFile = this.getResourceURI(BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile");
 
-        final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config1"
-        ).getFile().getAbsolutePath();
-        final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2"
-        ).getFile().getAbsolutePath();
-        final String configFile3 = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + GB18030_TXT
-        ).getFile().getAbsolutePath();
+        final String configFile1 = this.getResourceURI(BASE_DIR + CMD1_ID + FILE_DELIMITER + "config1");
+        final String configFile2 = this.getResourceURI(BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2");
+        final String configFile3 = this.getResourceURI(BASE_DIR + CMD1_ID + FILE_DELIMITER + GB18030_TXT);
         final Set<String> configs = Sets.newHashSet(configFile1, configFile2, configFile3);
-        final String depFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep1"
-        ).getFile().getAbsolutePath();
-        final String depFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep2"
-        ).getFile().getAbsolutePath();
+        final String depFile1 = this.getResourceURI(BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "dep1");
+        final String depFile2 = this.getResourceURI(BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "dep2");
         final Set<String> commandDependencies = Sets.newHashSet(depFile1, depFile2);
 
         final Set<String> tags = Sets.newHashSet(BASH_COMMAND_TAG);
@@ -1759,5 +1769,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.CREATED.value()))
             .header(HttpHeaders.LOCATION, Matchers.notNullValue());
+    }
+
+    private String getResourceURI(final String location) throws IOException {
+        return this.resourceLoader.getResource(location).getURI().toString();
     }
 }

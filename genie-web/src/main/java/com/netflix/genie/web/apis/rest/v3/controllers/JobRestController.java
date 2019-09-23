@@ -19,6 +19,7 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
@@ -29,6 +30,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
+import com.netflix.genie.common.internal.dto.v4.ApiClientMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
@@ -52,10 +56,12 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobSearchResultResource;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
+import com.netflix.genie.web.services.JobLaunchService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -106,6 +112,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.List;
@@ -126,15 +133,23 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v3/jobs")
 @Slf4j
 public class JobRestController {
+    /**
+     * Name of key to get whether to use the agent for job execution or not.
+     * <p>
+     * TODO: Totally temporary way to switch agent execution on or off.
+     */
+    @VisibleForTesting
+    static final String AGENT_JOB_EXECUTION_KEY = "genie.jobs.execution.agent";
+
     private static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
     private static final String NAME_HEADER_COOKIE = "cookie";
     private static final String JOB_API_BASE_PATH = "/api/v3/jobs/";
     private static final String COMMA = ",";
 
-    private final JobCoordinatorService jobCoordinatorService;
+    private final JobLaunchService jobLaunchService;
     private final JobSearchService jobSearchService;
-    private final AttachmentService attachmentService;
+    private final JobCoordinatorService jobCoordinatorService;
     private final ApplicationResourceAssembler applicationResourceAssembler;
     private final ClusterResourceAssembler clusterResourceAssembler;
     private final CommandResourceAssembler commandResourceAssembler;
@@ -151,6 +166,12 @@ public class JobRestController {
     private final JobPersistenceService jobPersistenceService;
     private final Environment environment;
 
+    // TODO: V3 Execution only
+    private final AttachmentService attachmentService;
+
+    // TODO: Temporary way to flip between v3 and v4. Marco working at more programmatic way.
+    private final boolean agentExecution;
+
     // Metrics
     private final Counter submitJobWithoutAttachmentsRate;
     private final Counter submitJobWithAttachmentsRate;
@@ -158,9 +179,9 @@ public class JobRestController {
     /**
      * Constructor.
      *
-     * @param jobCoordinatorService     The job coordinator service to use.
+     * @param jobLaunchService          The {@link JobLaunchService} implementation to use
      * @param jobSearchService          The search service to use
-     * @param attachmentService         The attachment service to use to save attachments.
+     * @param jobCoordinatorService     The job coordinator service to use.
      * @param resourceAssemblers        The encapsulation of all the V3 resource assemblers
      * @param genieHostInfo             Information about the host that the Genie process is running on
      * @param restTemplate              The rest template for http requests
@@ -170,13 +191,14 @@ public class JobRestController {
      * @param jobPersistenceService     Job persistence service
      * @param agentRoutingService       Agent routing service
      * @param environment               The application environment to pull dynamic properties from
+     * @param attachmentService         The attachment service to use to save attachments.
      */
     @Autowired
     @SuppressWarnings("checkstyle:parameternumber")
     public JobRestController(
-        final JobCoordinatorService jobCoordinatorService,
+        final JobLaunchService jobLaunchService,
         final JobSearchService jobSearchService,
-        final AttachmentService attachmentService,
+        final JobCoordinatorService jobCoordinatorService,
         final ResourceAssemblers resourceAssemblers,
         final GenieHostInfo genieHostInfo,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
@@ -185,11 +207,12 @@ public class JobRestController {
         final MeterRegistry registry,
         final JobPersistenceService jobPersistenceService,
         final AgentRoutingService agentRoutingService,
-        final Environment environment
+        final Environment environment,
+        final AttachmentService attachmentService
     ) {
-        this.jobCoordinatorService = jobCoordinatorService;
+        this.jobLaunchService = jobLaunchService;
         this.jobSearchService = jobSearchService;
-        this.attachmentService = attachmentService;
+        this.jobCoordinatorService = jobCoordinatorService;
         this.applicationResourceAssembler = resourceAssemblers.getApplicationResourceAssembler();
         this.clusterResourceAssembler = resourceAssemblers.getClusterResourceAssembler();
         this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
@@ -206,6 +229,14 @@ public class JobRestController {
         this.jobPersistenceService = jobPersistenceService;
         this.environment = environment;
 
+        // TODO: V3 Only. Remove.
+        this.attachmentService = attachmentService;
+
+        // TODO: Remove once programmatic method exists
+        //       Could evaluate it every job submission if we want it to be a fast property but not worth trouble
+        //       right now
+        this.agentExecution = this.environment.getProperty(AGENT_JOB_EXECUTION_KEY, Boolean.class, false);
+
         // Set up the metrics
         this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
         this.submitJobWithAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithAttachments.rate");
@@ -219,7 +250,8 @@ public class JobRestController {
      * @param userAgent          The user agent string
      * @param httpServletRequest The http servlet request
      * @return The submitted job
-     * @throws GenieException For any error
+     * @throws GenieException        For any error
+     * @throws GenieCheckedException For V4 Agent Execution errors
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -228,7 +260,7 @@ public class JobRestController {
         @RequestHeader(value = FORWARDED_FOR_HEADER, required = false) @Nullable final String clientHost,
         @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
-    ) throws GenieException {
+    ) throws GenieException, GenieCheckedException {
         log.info("[submitJob] Called json method type to submit job: {}", jobRequest);
         this.submitJobWithoutAttachmentsRate.increment();
         return this.handleSubmitJob(jobRequest, null, clientHost, userAgent, httpServletRequest);
@@ -243,7 +275,8 @@ public class JobRestController {
      * @param userAgent          The user agent string
      * @param httpServletRequest The http servlet request
      * @return The submitted job
-     * @throws GenieException For any error
+     * @throws GenieException        For any error
+     * @throws GenieCheckedException For V4 Agent Execution errors
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -253,7 +286,7 @@ public class JobRestController {
         @RequestHeader(value = FORWARDED_FOR_HEADER, required = false) @Nullable final String clientHost,
         @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
-    ) throws GenieException {
+    ) throws GenieException, GenieCheckedException {
         log.info(
             "[submitJob] Called multipart method to submit job: {}, with {} attachments",
             jobRequest,
@@ -269,7 +302,7 @@ public class JobRestController {
         @Nullable final String clientHost,
         @Nullable final String userAgent,
         final HttpServletRequest httpServletRequest
-    ) throws GenieException {
+    ) throws GenieException, GenieCheckedException {
         // TODO: This is quick and dirty and we may want to handle it better overall for the system going forward
         //       e.g. should it be in an filter that we can do for more APIs?
         //            should value be cached rather than checking every time?
@@ -291,79 +324,12 @@ public class JobRestController {
             localClientHost = httpServletRequest.getRemoteAddr();
         }
 
-        final JobRequest jobRequestWithId;
-        // If the job request does not contain an id create one else use the one provided.
         final String jobId;
-        final Optional<String> jobIdOptional = jobRequest.getId();
-        if (jobIdOptional.isPresent() && StringUtils.isNotBlank(jobIdOptional.get())) {
-            jobId = jobIdOptional.get();
-            jobRequestWithId = jobRequest;
+        if (this.agentExecution) {
+            jobId = this.agentExecution(jobRequest, attachments, localClientHost, userAgent);
         } else {
-            jobId = UUID.randomUUID().toString();
-            final JobRequest.Builder builder = new JobRequest.Builder(
-                jobRequest.getName(),
-                jobRequest.getUser(),
-                jobRequest.getVersion(),
-                jobRequest.getClusterCriterias(),
-                jobRequest.getCommandCriteria()
-            )
-                .withId(jobId)
-                .withDisableLogArchival(jobRequest.isDisableLogArchival())
-                .withTags(jobRequest.getTags())
-                .withConfigs(jobRequest.getConfigs())
-                .withDependencies(jobRequest.getDependencies())
-                .withApplications(jobRequest.getApplications());
-
-            jobRequest.getCommandArgs().ifPresent(builder::withCommandArgs);
-            jobRequest.getCpu().ifPresent(builder::withCpu);
-            jobRequest.getMemory().ifPresent(builder::withMemory);
-            jobRequest.getGroup().ifPresent(builder::withGroup);
-            jobRequest.getSetupFile().ifPresent(builder::withSetupFile);
-            jobRequest.getDescription().ifPresent(builder::withDescription);
-            jobRequest.getEmail().ifPresent(builder::withEmail);
-            jobRequest.getTimeout().ifPresent(builder::withTimeout);
-            jobRequest.getMetadata().ifPresent(builder::withMetadata);
-            jobRequest.getGrouping().ifPresent(builder::withGrouping);
-            jobRequest.getGroupingInstance().ifPresent(builder::withGroupingInstance);
-
-            jobRequestWithId = builder.build();
+            jobId = this.embeddedExecution(jobRequest, attachments, localClientHost, userAgent);
         }
-
-        // Download attachments
-        int numAttachments = 0;
-        long totalSizeOfAttachments = 0L;
-        if (attachments != null) {
-            log.info("Saving attachments for job {}", jobId);
-            numAttachments = attachments.length;
-            for (final MultipartFile attachment : attachments) {
-                totalSizeOfAttachments += attachment.getSize();
-                log.info(
-                    "Attachment for job: {} name: {} Size: {}",
-                    jobId,
-                    attachment.getOriginalFilename(),
-                    attachment.getSize()
-                );
-                try {
-                    String originalFilename = attachment.getOriginalFilename();
-                    if (originalFilename == null) {
-                        originalFilename = UUID.randomUUID().toString();
-                    }
-                    this.attachmentService.save(jobId, originalFilename, attachment.getInputStream());
-                } catch (final IOException ioe) {
-                    throw new GenieServerException("Failed to save job attachment", ioe);
-                }
-            }
-        }
-
-        final JobMetadata metadata = new JobMetadata
-            .Builder()
-            .withClientHost(localClientHost)
-            .withUserAgent(userAgent)
-            .withNumAttachments(numAttachments)
-            .withTotalSizeOfAttachments(totalSizeOfAttachments)
-            .build();
-
-        this.jobCoordinatorService.coordinateJob(jobRequestWithId, metadata);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
@@ -555,6 +521,11 @@ public class JobRestController {
         final HttpServletResponse response
     ) throws GenieException, IOException {
         log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
+
+        if (this.jobPersistenceService.getJobStatus(id).isFinished()) {
+            // Job is already done no need to kill
+            return;
+        }
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
         if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
@@ -847,5 +818,128 @@ public class JobRestController {
         } else {
             return this.jobSearchService.getJobHost(jobId);
         }
+    }
+
+    // TODO: Remove this once fully moved to agent execution
+    private String embeddedExecution(
+        final JobRequest jobRequest,
+        @Nullable final MultipartFile[] attachments,
+        final String clientHost,
+        @Nullable final String userAgent
+    ) throws GenieException {
+        final JobRequest jobRequestWithId;
+        // If the job request does not contain an id create one else use the one provided.
+        final String jobId;
+        final Optional<String> jobIdOptional = jobRequest.getId();
+        if (jobIdOptional.isPresent() && StringUtils.isNotBlank(jobIdOptional.get())) {
+            jobId = jobIdOptional.get();
+            jobRequestWithId = jobRequest;
+        } else {
+            jobId = UUID.randomUUID().toString();
+            final JobRequest.Builder builder = new JobRequest.Builder(
+                jobRequest.getName(),
+                jobRequest.getUser(),
+                jobRequest.getVersion(),
+                jobRequest.getClusterCriterias(),
+                jobRequest.getCommandCriteria()
+            )
+                .withId(jobId)
+                .withDisableLogArchival(jobRequest.isDisableLogArchival())
+                .withTags(jobRequest.getTags())
+                .withConfigs(jobRequest.getConfigs())
+                .withDependencies(jobRequest.getDependencies())
+                .withApplications(jobRequest.getApplications());
+
+            jobRequest.getCommandArgs().ifPresent(builder::withCommandArgs);
+            jobRequest.getCpu().ifPresent(builder::withCpu);
+            jobRequest.getMemory().ifPresent(builder::withMemory);
+            jobRequest.getGroup().ifPresent(builder::withGroup);
+            jobRequest.getSetupFile().ifPresent(builder::withSetupFile);
+            jobRequest.getDescription().ifPresent(builder::withDescription);
+            jobRequest.getEmail().ifPresent(builder::withEmail);
+            jobRequest.getTimeout().ifPresent(builder::withTimeout);
+            jobRequest.getMetadata().ifPresent(builder::withMetadata);
+            jobRequest.getGrouping().ifPresent(builder::withGrouping);
+            jobRequest.getGroupingInstance().ifPresent(builder::withGroupingInstance);
+
+            jobRequestWithId = builder.build();
+        }
+
+        // Download attachments
+        int numAttachments = 0;
+        long totalSizeOfAttachments = 0L;
+        if (attachments != null) {
+            log.info("Saving attachments for job {}", jobId);
+            numAttachments = attachments.length;
+            for (final MultipartFile attachment : attachments) {
+                totalSizeOfAttachments += attachment.getSize();
+                log.info(
+                    "Attachment for job: {} name: {} Size: {}",
+                    jobId,
+                    attachment.getOriginalFilename(),
+                    attachment.getSize()
+                );
+                try {
+                    String originalFilename = attachment.getOriginalFilename();
+                    if (originalFilename == null) {
+                        originalFilename = UUID.randomUUID().toString();
+                    }
+                    this.attachmentService.save(jobId, originalFilename, attachment.getInputStream());
+                } catch (final IOException ioe) {
+                    throw new GenieServerException("Failed to save job attachment", ioe);
+                }
+            }
+        }
+
+        final JobMetadata metadata = new JobMetadata
+            .Builder()
+            .withClientHost(clientHost)
+            .withUserAgent(userAgent)
+            .withNumAttachments(numAttachments)
+            .withTotalSizeOfAttachments(totalSizeOfAttachments)
+            .build();
+
+        this.jobCoordinatorService.coordinateJob(jobRequestWithId, metadata);
+        return jobId;
+    }
+
+    private String agentExecution(
+        final JobRequest jobRequest,
+        @Nullable final MultipartFile[] attachments,
+        final String clientHost,
+        @Nullable final String userAgent
+    ) throws GenieException, GenieCheckedException {
+        // Get attachments metadata
+        int numAttachments = 0;
+        long totalSizeOfAttachments = 0L;
+        if (attachments != null) {
+            numAttachments = attachments.length;
+            for (final MultipartFile attachment : attachments) {
+                totalSizeOfAttachments += attachment.getSize();
+            }
+        }
+
+        final JobRequestMetadata metadata = new JobRequestMetadata(
+            new ApiClientMetadata(clientHost, userAgent),
+            null,
+            numAttachments,
+            totalSizeOfAttachments
+        );
+
+        final JobSubmission.Builder jobSubmissionBuilder = new JobSubmission.Builder(
+            DtoConverters.toV4JobRequest(jobRequest),
+            metadata
+        );
+
+        if (attachments != null) {
+            jobSubmissionBuilder.withAttachments(
+                Arrays
+                    .stream(attachments)
+                    .map(MultipartFile::getResource)
+                    .collect(Collectors.toSet())
+            );
+        }
+
+        return this.jobLaunchService.launchJob(jobSubmissionBuilder.build());
     }
 }
