@@ -3,6 +3,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.AgentRpcEndpointsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.interceptors.AgentRpcInterceptorsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.agent.inspectors.AgentInspectorsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.agent.launchers.AgentLaunchersAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.agent.resources.AgentResourcesAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.agent.services.AgentServicesAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.apis.ApisAutoConfiguration,\
