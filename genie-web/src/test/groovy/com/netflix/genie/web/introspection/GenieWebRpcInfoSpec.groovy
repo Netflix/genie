@@ -15,29 +15,29 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.dtos
+package com.netflix.genie.web.introspection
 
 import spock.lang.Specification
 
 /**
- * Specifications for {@link GenieWebHostInfo}.
+ * Specifications for {@link GenieWebRpcInfo}.
  *
  * @author tgianos
  */
-class GenieWebHostInfoSpec extends Specification {
+class GenieWebRpcInfoSpec extends Specification {
 
     def "can create and execute POJO methods"() {
-        def hostname = UUID.randomUUID().toString()
+        def port = 18_809
 
         when:
-        def info = new GenieWebHostInfo(hostname)
+        def info = new GenieWebRpcInfo(port)
 
         then:
-        info.getHostname() == hostname
+        info.getRpcPort() == port
 
         when:
-        def info2 = new GenieWebHostInfo(hostname)
-        def info3 = new GenieWebHostInfo(hostname + UUID.randomUUID().toString())
+        def info2 = new GenieWebRpcInfo(port)
+        def info3 = new GenieWebRpcInfo(port + 1)
 
         then:
         info == info2

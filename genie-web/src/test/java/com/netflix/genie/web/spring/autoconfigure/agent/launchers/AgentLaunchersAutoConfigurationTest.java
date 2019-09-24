@@ -19,8 +19,8 @@ package com.netflix.genie.web.spring.autoconfigure.agent.launchers;
 
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.data.services.JobSearchService;
-import com.netflix.genie.web.dtos.GenieWebHostInfo;
-import com.netflix.genie.web.dtos.GenieWebRpcInfo;
+import com.netflix.genie.web.introspection.GenieWebHostInfo;
+import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import com.netflix.genie.web.util.ExecutorFactory;
 import io.micrometer.core.instrument.MeterRegistry;

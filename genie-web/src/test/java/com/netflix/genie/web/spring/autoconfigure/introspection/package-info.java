@@ -15,28 +15,14 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.dtos;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 /**
- * Container class for RPC related properties.
+ * Tests for this package.
  *
  * @author tgianos
  * @since 4.0.0
  */
-@RequiredArgsConstructor
-@Getter
-@EqualsAndHashCode(doNotUseGetters = true)
-@ToString(doNotUseGetters = true)
-public class GenieWebRpcInfo {
-    @Min(value = 1, message = "The minimum value for the RPC port is 1")
-    @Max(value = 65_535, message = "The maximum value for the RPC port is 65,535")
-    private final int rpcPort;
-}
+@ParametersAreNonnullByDefault
+package com.netflix.genie.web.spring.autoconfigure.introspection;
+
+import javax.annotation.ParametersAreNonnullByDefault;

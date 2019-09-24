@@ -10,10 +10,10 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas.HateoasAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.aspects.AspectsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration,\
-  com.netflix.genie.web.spring.autoconfigure.dtos.DtosAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.events.EventsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.events.NotificationsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.health.HealthAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.introspection.IntrospectionAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.jobs.JobsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.properties.converters.PropertyConvertersAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.services.ServicesAutoConfiguration,\

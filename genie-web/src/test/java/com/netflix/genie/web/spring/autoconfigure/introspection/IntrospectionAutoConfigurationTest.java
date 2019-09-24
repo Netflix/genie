@@ -15,10 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.spring.autoconfigure.dtos;
+package com.netflix.genie.web.spring.autoconfigure.introspection;
 
-import com.netflix.genie.web.dtos.GenieWebHostInfo;
-import com.netflix.genie.web.dtos.GenieWebRpcInfo;
+import com.netflix.genie.web.introspection.GenieWebHostInfo;
+import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import io.grpc.Server;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -30,12 +30,12 @@ import org.springframework.context.annotation.Bean;
 import java.net.InetAddress;
 
 /**
- * Tests for {@link DtosAutoConfiguration}.
+ * Tests for {@link IntrospectionAutoConfiguration}.
  *
  * @author tgianos
  * @since 4.0.0
  */
-public class DtosAutoConfigurationTest {
+public class IntrospectionAutoConfigurationTest {
 
     private static final int EXPECTED_SERVER_PORT = 2482;
 
@@ -43,7 +43,7 @@ public class DtosAutoConfigurationTest {
         new ApplicationContextRunner()
             .withConfiguration(
                 AutoConfigurations.of(
-                    DtosAutoConfiguration.class
+                    IntrospectionAutoConfiguration.class
                 )
             );
 
