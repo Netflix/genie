@@ -73,6 +73,7 @@ com.netflix.genie.web.dtos
 com.netflix.genie.web.events
 com.netflix.genie.web.exceptions.checked
 com.netflix.genie.web.health
+com.netflix.genie.web.introspection
 com.netflix.genie.web.jobs
 com.netflix.genie.web.jobs.workflow
 com.netflix.genie.web.jobs.workflow.impl
@@ -87,6 +88,7 @@ com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers
 com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints
 com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.interceptors
 com.netflix.genie.web.spring.autoconfigure.agent.inspectors
+com.netflix.genie.web.spring.autoconfigure.agent.launchers
 com.netflix.genie.web.spring.autoconfigure.agent.resources
 com.netflix.genie.web.spring.autoconfigure.agent.services
 com.netflix.genie.web.spring.autoconfigure.apis
@@ -95,6 +97,7 @@ com.netflix.genie.web.spring.autoconfigure.aspects
 com.netflix.genie.web.spring.autoconfigure.data
 com.netflix.genie.web.spring.autoconfigure.events
 com.netflix.genie.web.spring.autoconfigure.health
+com.netflix.genie.web.spring.autoconfigure.introspection
 com.netflix.genie.web.spring.autoconfigure.jobs
 com.netflix.genie.web.spring.autoconfigure.properties.converters
 com.netflix.genie.web.spring.autoconfigure.services
