@@ -32,7 +32,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.util.GenieObjectMapper;
-import com.netflix.genie.web.dtos.GenieWebHostInfo;
+import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

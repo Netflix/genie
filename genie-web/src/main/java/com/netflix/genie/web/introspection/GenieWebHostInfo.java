@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.dtos;
+package com.netflix.genie.web.introspection;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import lombok.EqualsAndHashCode;

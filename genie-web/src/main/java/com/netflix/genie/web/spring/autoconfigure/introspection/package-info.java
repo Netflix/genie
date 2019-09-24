@@ -17,12 +17,12 @@
  */
 
 /**
- * Autoconfigurations for any singletons from the {@literal dtos} package.
+ * Auto configurations for the introspection module.
  *
  * @author tgianos
  * @since 4.0.0
  */
 @ParametersAreNonnullByDefault
-package com.netflix.genie.web.spring.autoconfigure.dtos;
+package com.netflix.genie.web.spring.autoconfigure.introspection;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -15,12 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.spring.autoconfigure.dtos;
+package com.netflix.genie.web.spring.autoconfigure.introspection;
 
 import com.amazonaws.util.EC2MetadataUtils;
 import com.netflix.genie.web.agent.apis.rpc.servers.GRpcServerUtils;
-import com.netflix.genie.web.dtos.GenieWebHostInfo;
-import com.netflix.genie.web.dtos.GenieWebRpcInfo;
+import com.netflix.genie.web.introspection.GenieWebHostInfo;
+import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers.AgentRpcServersAutoConfiguration;
 import io.grpc.Server;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +45,7 @@ import java.net.UnknownHostException;
         AgentRpcServersAutoConfiguration.class
     }
 )
-public class DtosAutoConfiguration {
+public class IntrospectionAutoConfiguration {
 
     /**
      * Get the {@link GenieWebHostInfo} for this application. This is the default fallback implementation if no other

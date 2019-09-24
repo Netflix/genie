@@ -21,10 +21,10 @@ import com.google.common.collect.Lists
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.web.data.services.JobSearchService
-import com.netflix.genie.web.dtos.GenieWebHostInfo
-import com.netflix.genie.web.dtos.GenieWebRpcInfo
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException
+import com.netflix.genie.web.introspection.GenieWebHostInfo
+import com.netflix.genie.web.introspection.GenieWebRpcInfo
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties
 import com.netflix.genie.web.util.ExecutorFactory
 import io.micrometer.core.instrument.MeterRegistry
