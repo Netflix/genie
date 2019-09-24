@@ -122,7 +122,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
             getTags() >> Lists.newArrayList()
             getCreated() >> Instant.now()
             getStatus() >> JobStatus.FAILED
-            getCommandCriterion() >> criterion;
+            getCommandCriterion() >> criterion
             getClusterCriteria() >> Lists.newArrayList(criterion)
             getApplications() >> Lists.newArrayList()
             _ >> empty
@@ -194,14 +194,14 @@ class JobFinishedSNSPublisherSpec extends Specification {
             getTags() >> Lists.newArrayList()
             getCreated() >> Instant.now()
             getStatus() >> JobStatus.FAILED
-            getCommandCriterion() >> criterion;
+            getCommandCriterion() >> criterion
             getClusterCriteria() >> Lists.newArrayList(criterion)
             getApplications() >> Lists.newArrayList(app1, app2)
             getCommand() >> Optional.of(command)
             getCluster() >> Optional.of(cluster)
 
             // Non-string fields
-            getMetadata() >> Optional.of(jobMetadata);
+            getMetadata() >> Optional.of(jobMetadata)
             getStarted() >> Optional.of(Instant.now())
             getFinished() >> Optional.of(Instant.now())
             getRequestedMemory() >> Optional.of(512)

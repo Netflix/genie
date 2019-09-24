@@ -70,7 +70,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
     private static final String CLUSTERS_ID_LIST_PATH = CLUSTERS_LIST_PATH + ".id";
     private static final String CLUSTER_COMMANDS_LINK_PATH = "_links.commands.href";
     private static final String CLUSTERS_COMMANDS_LINK_PATH = CLUSTERS_LIST_PATH + "._links.commands.href";
-    private static final  List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("bash");
+    private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("bash");
 
     /**
      * {@inheritDoc}

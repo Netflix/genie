@@ -543,7 +543,7 @@ class JobSetupServiceImplSpec extends Specification {
 
         then:
         allFiles.each {
-            // Check all directories not deleted, even the empty dependencies one
+                // Check all directories not deleted, even the empty dependencies one
             file -> assert file.exists()
         }
     }

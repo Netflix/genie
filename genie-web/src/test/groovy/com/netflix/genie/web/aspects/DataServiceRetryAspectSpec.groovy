@@ -47,7 +47,7 @@ class DataServiceRetryAspectSpec extends Specification {
         dataServiceRetryProperties.setNoOfRetries(2)
         dataServiceRetryProperties.setMaxInterval(10)
         dataServiceRetryProperties.setInitialInterval(10)
-        dataServiceRetryAspect = new DataServiceRetryAspect(dataServiceRetryProperties);
+        dataServiceRetryAspect = new DataServiceRetryAspect(dataServiceRetryProperties)
     }
 
     def testProfile() {

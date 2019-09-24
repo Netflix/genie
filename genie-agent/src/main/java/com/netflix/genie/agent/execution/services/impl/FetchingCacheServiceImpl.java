@@ -163,7 +163,7 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
                     resourceCacheId,
                     resourceLastModified
                 )
-            );
+            )
         ) {
             //Critical section begin
             lock.lock();
