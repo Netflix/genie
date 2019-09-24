@@ -173,7 +173,7 @@ public class JobKickoffTask extends GenieBaseTask {
                     .build();
                 context.put(JobConstants.JOB_EXECUTION_DTO_KEY, jobExecution);
             } catch (final IOException ie) {
-                throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
+                throw new GenieServerException("Unable to start command " + command, ie);
             }
             log.info("Finished Job Kickoff Task for job {}", jobId);
             MetricsUtils.addSuccessTags(tags);

@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -144,7 +144,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
      * @throws GenieException Exception if the file does not load
      */
     protected File loadFile(final String path) throws GenieException {
-        final byte[] pathBytes = path.getBytes(Charset.forName("UTF-8"));
+        final byte[] pathBytes = path.getBytes(StandardCharsets.UTF_8);
         final String pathUUID = UUID.nameUUIDFromBytes(pathBytes).toString();
         final String cacheFilePath = String.format("%s/%s", this.baseCacheLocation, pathUUID);
         final File cacheFile = new File(cacheFilePath);

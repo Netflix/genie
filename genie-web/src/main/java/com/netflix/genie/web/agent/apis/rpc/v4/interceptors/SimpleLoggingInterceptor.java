@@ -63,7 +63,7 @@ public class SimpleLoggingInterceptor implements ServerInterceptor {
                     log.warn(
                         "gRPC error: {} -> {}: {}",
                         call.getMethodDescriptor().getFullMethodName(),
-                        String.valueOf(status.getCode().value()),
+                        status.getCode().value(),
                         (status.getCause() != null ? status.getCause().getMessage() : NO_CAUSE),
                         status.getCause()
                     );

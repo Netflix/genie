@@ -31,7 +31,7 @@ class AgentRoutingServiceImplSpec extends Specification {
     String jobId
 
     void setup() {
-        service = new AgentRoutingServiceImpl(persistenceService, genieHostInfo);
+        service = new AgentRoutingServiceImpl(persistenceService, genieHostInfo)
         jobId = UUID.randomUUID().toString()
     }
 

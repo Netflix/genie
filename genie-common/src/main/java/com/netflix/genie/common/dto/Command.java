@@ -109,9 +109,9 @@ public class Command extends ExecutionEnvironmentDTO {
 
         private final CommandStatus bStatus;
         private final long bCheckDelay;
+        private final List<String> bExecutableAndArguments = Lists.newArrayList();
         private String bExecutable;
         private Integer bMemory;
-        private final List<String> bExecutableAndArguments = Lists.newArrayList();
 
         /**
          * Constructor which has required fields.

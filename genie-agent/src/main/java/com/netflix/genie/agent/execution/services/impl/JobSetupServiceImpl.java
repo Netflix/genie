@@ -194,7 +194,7 @@ class JobSetupServiceImpl implements JobSetupService {
 
             case DEPENDENCIES_CLEANUP:
                 final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
-                    (Pattern[]) Lists.newArrayList(
+                    Lists.newArrayList(
                         PathUtils.jobClusterDirectoryPath(jobDirectoryPath.toFile(), ".*"),
                         PathUtils.jobCommandDirectoryPath(jobDirectoryPath.toFile(), ".*"),
                         PathUtils.jobApplicationDirectoryPath(jobDirectoryPath.toFile(), ".*")

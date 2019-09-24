@@ -133,7 +133,7 @@ class StreamBufferSpec extends Specification {
         inputStream != null
 
         when:
-        inputStream.read(b, -1, 10);
+        inputStream.read(b, -1, 10)
 
         then:
         thrown(IndexOutOfBoundsException)
