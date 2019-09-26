@@ -45,4 +45,13 @@ public interface JpaAgentConnectionRepository extends JpaIdRepository<AgentConne
      * @return The number of connections on the given server
      */
     long countByServerHostnameEquals(@NotBlank String serverHostName);
+
+
+    /**
+     * Delete all rows associated with a given server identified by {@code serverHostName}.
+     *
+     * @param serverHostName The hostname of the server whose connections to purge
+     * @return the number of deleted records
+     */
+    int deleteByServerHostnameEquals(String serverHostName);
 }

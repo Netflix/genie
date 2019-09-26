@@ -96,6 +96,11 @@ public class JpaAgentConnectionPersistenceServiceImpl implements AgentConnection
         return this.agentConnectionRepository.countByServerHostnameEquals(hostname);
     }
 
+    @Override
+    public int removeAllAgentConnectionToServer(@NotBlank final String hostname) {
+        return this.agentConnectionRepository.deleteByServerHostnameEquals(hostname);
+    }
+
     private Optional<AgentConnectionEntity> getAgentConnection(@NotBlank final String jobId) {
         return this.agentConnectionRepository.findByJobId(jobId);
     }

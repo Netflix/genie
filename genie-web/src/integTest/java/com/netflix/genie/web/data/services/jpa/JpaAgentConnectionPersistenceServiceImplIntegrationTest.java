@@ -40,6 +40,8 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
     private static final String HOST1 = "host1";
     private static final String JOB2 = "job2";
     private static final String HOST2 = "host2";
+    private static final String JOB3 = "job3";
+    private static final String HOST3 = "host3";
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
@@ -146,6 +148,37 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
             this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
             Matchers.is(0L)
         );
+
+        // Create new connections
+        this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST1);
+        this.agentConnectionPersistenceService.saveAgentConnection(JOB2, HOST1);
+        this.agentConnectionPersistenceService.saveAgentConnection(JOB3, HOST2);
+        verifyExpectedConnections(
+            Pair.of(JOB1, HOST1),
+            Pair.of(JOB2, HOST1),
+            Pair.of(JOB3, HOST2)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST3),
+            Matchers.is(0)
+        );
+        verifyExpectedConnections(
+            Pair.of(JOB1, HOST1),
+            Pair.of(JOB2, HOST1),
+            Pair.of(JOB3, HOST2)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST1),
+            Matchers.is(2)
+        );
+        verifyExpectedConnections(
+            Pair.of(JOB3, HOST2)
+        );
+        Assert.assertThat(
+            this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST2),
+            Matchers.is(1)
+        );
+        verifyExpectedConnections();
     }
 
     @SafeVarargs
