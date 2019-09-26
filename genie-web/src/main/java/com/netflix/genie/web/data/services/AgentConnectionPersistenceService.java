@@ -71,4 +71,13 @@ public interface AgentConnectionPersistenceService {
      * @return The number of agents currently connected to the given server
      */
     long getNumAgentConnectionsOnServer(@NotBlank String hostname);
+
+    /**
+     * Drop all records of agent connections to the specified hostname.
+     * This can be used to conveniently clean data related to a host when failure of the latter is detected.
+     *
+     * @param hostname the server hostname
+     * @return the number of connections purged from persistent storage
+     */
+    int removeAllAgentConnectionToServer(@NotBlank String hostname);
 }
