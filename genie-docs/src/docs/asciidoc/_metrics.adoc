@@ -397,6 +397,12 @@ for multiple errors.
 |JobResolverServiceImpl
 |status, exceptionClass
 
+|genie.tasks.clusterChecker.connectionsReaped.counter
+|Counts the number of agent connections the leader reaped due to the host being unhealthy
+|count
+|ClusterCheckerTask
+|host
+
 |genie.tasks.clusterChecker.failedHealthCheck.counter
 |Counts the number of time the leader retrieved health status of a remote node and one of the (non-ignored) indicators
 had a status different than UP
