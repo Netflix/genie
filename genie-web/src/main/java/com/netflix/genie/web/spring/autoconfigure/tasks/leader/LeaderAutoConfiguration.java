@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.tasks.leader;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.FilePersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
@@ -145,13 +146,14 @@ public class LeaderAutoConfiguration {
     /**
      * Create a {@link ClusterCheckerTask} if one hasn't been supplied.
      *
-     * @param genieHostInfo         Information about the host this Genie process is running on
-     * @param properties            The properties to use to configure the task
-     * @param jobSearchService      The job search service to use
-     * @param jobPersistenceService The job persistence service to use
-     * @param restTemplate          The rest template for http calls
-     * @param webEndpointProperties The properties where Spring actuator is running
-     * @param registry              The spectator registry for getting metrics
+     * @param genieHostInfo                     Information about the host this Genie process is running on
+     * @param properties                        The properties to use to configure the task
+     * @param jobSearchService                  The job search service to use
+     * @param jobPersistenceService             The job persistence service to use
+     * @param agentConnectionPersistenceService The agent connection persistence service
+     * @param restTemplate                      The rest template for http calls
+     * @param webEndpointProperties             The properties where Spring actuator is running
+     * @param registry                          The spectator registry for getting metrics
      * @return The {@link ClusterCheckerTask} instance
      */
     @Bean
@@ -161,6 +163,7 @@ public class LeaderAutoConfiguration {
         final ClusterCheckerProperties properties,
         final JobSearchService jobSearchService,
         final JobPersistenceService jobPersistenceService,
+        final AgentConnectionPersistenceService agentConnectionPersistenceService,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final WebEndpointProperties webEndpointProperties,
         final MeterRegistry registry
@@ -170,6 +173,7 @@ public class LeaderAutoConfiguration {
             properties,
             jobSearchService,
             jobPersistenceService,
+            agentConnectionPersistenceService,
             restTemplate,
             webEndpointProperties,
             registry

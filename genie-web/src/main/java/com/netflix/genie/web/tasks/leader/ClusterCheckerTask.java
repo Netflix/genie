@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
@@ -66,11 +67,13 @@ public class ClusterCheckerTask extends LeadershipTask {
     private static final String BAD_RESPONSE_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.invalidResponse.counter";
     private static final String BAD_HOST_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.unreachableHost.counter";
     private static final String FAILED_JOBS_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.jobsMarkedFailed.counter";
+    private static final String REAPED_CONNECTIONS_METRIC_NAME = "genie.tasks.clusterChecker.connectionsReaped.counter";
 
     private final String hostname;
     private final ClusterCheckerProperties properties;
     private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
+    private final AgentConnectionPersistenceService agentConnectionPersistenceService;
     private final RestTemplate restTemplate;
     private final MeterRegistry registry;
     private final String scheme;
@@ -82,19 +85,21 @@ public class ClusterCheckerTask extends LeadershipTask {
     /**
      * Constructor.
      *
-     * @param genieHostInfo         Information about the host this Genie process is running on
-     * @param properties            The properties to use to configure the task
-     * @param jobSearchService      The job search service to use
-     * @param jobPersistenceService The job persistence service to use
-     * @param restTemplate          The rest template for http calls
-     * @param webEndpointProperties The properties where Spring actuator is running
-     * @param registry              The spectator registry for getting metrics
+     * @param genieHostInfo                     Information about the host this Genie process is running on
+     * @param properties                        The properties to use to configure the task
+     * @param jobSearchService                  The job search service to use
+     * @param jobPersistenceService             The job persistence service to use
+     * @param agentConnectionPersistenceService The agent connections persistence service
+     * @param restTemplate                      The rest template for http calls
+     * @param webEndpointProperties             The properties where Spring actuator is running
+     * @param registry                          The spectator registry for getting metrics
      */
     public ClusterCheckerTask(
         @NotNull final GenieHostInfo genieHostInfo,
         @NotNull final ClusterCheckerProperties properties,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final AgentConnectionPersistenceService agentConnectionPersistenceService,
         @NotNull final RestTemplate restTemplate,
         @NotNull final WebEndpointProperties webEndpointProperties,
         @NotNull final MeterRegistry registry
@@ -103,6 +108,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.properties = properties;
         this.jobSearchService = jobSearchService;
         this.jobPersistenceService = jobPersistenceService;
+        this.agentConnectionPersistenceService = agentConnectionPersistenceService;
         this.restTemplate = restTemplate;
         this.registry = registry;
         this.scheme = this.properties.getScheme() + "://";
@@ -134,6 +140,12 @@ public class ClusterCheckerTask extends LeadershipTask {
                         this.updateJobsToFailedOnHost(host);
                     } catch (Exception e) {
                         log.error("Unable to update jobs on host {} due to exception", host, e);
+                        result = false;
+                    }
+                    try {
+                        this.cleanupAgentConnectionsToHost(host);
+                    } catch (RuntimeException e) {
+                        log.error("Unable to drop agent connections to host {} due to exception", host, e);
                         result = false;
                     }
                 } else {
@@ -171,6 +183,24 @@ public class ClusterCheckerTask extends LeadershipTask {
                 }
             }
         );
+    }
+
+    private void cleanupAgentConnectionsToHost(final String host) {
+        final Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
+        tags.add(Tag.of(MetricsConstants.TagKeys.HOST, host));
+        int reapedConnectionsCount = 1;
+        try {
+            reapedConnectionsCount = this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host);
+            log.info("Dropped {} agent connections to host {}", reapedConnectionsCount, host);
+        } catch (RuntimeException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            log.error("Unable to drop agent connections to host {}", host, e);
+            throw e;
+        } finally {
+            // Increment whenever there is an attept to reap connection
+            // (and tag wether it was successful or not).
+            this.registry.counter(REAPED_CONNECTIONS_METRIC_NAME, tags).increment(reapedConnectionsCount);
+        }
     }
 
     private void validateHostAndUpdateErrorCount(final String host) {

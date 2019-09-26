@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.util.GenieHostInfo
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.properties.ClusterCheckerProperties
@@ -44,6 +45,7 @@ class ClusterCheckerTaskSpec extends Specification {
     ClusterCheckerProperties properties
     JobSearchService jobSearchService
     JobPersistenceService jobPersistenceService
+    AgentConnectionPersistenceService agentConnectionPersistenceService
     RestTemplate restTemplate
     MeterRegistry meterRegistry
 
@@ -59,6 +61,7 @@ class ClusterCheckerTaskSpec extends Specification {
 
         this.jobSearchService = Mock(JobSearchService.class)
         this.jobPersistenceService = Mock(JobPersistenceService.class)
+        this.agentConnectionPersistenceService = Mock(AgentConnectionPersistenceService)
         this.restTemplate = Mock(RestTemplate.class)
         this.meterRegistry = new SimpleMeterRegistry()
 
@@ -72,6 +75,7 @@ class ClusterCheckerTaskSpec extends Specification {
             this.properties,
             this.jobSearchService,
             this.jobPersistenceService,
+            this.agentConnectionPersistenceService,
             this.restTemplate,
             serverProperties,
             meterRegistry
@@ -251,6 +255,51 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE,
             MetricsConstants.TagKeys.EXCEPTION_CLASS, jobPersistenceServiceException.class.getCanonicalName()
         ).count() == 1
+
+        1 * this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host2) >> { throw new RuntimeException("...") }
+        1 * this.meterRegistry.counter(
+            ClusterCheckerTask.REAPED_CONNECTIONS_METRIC_NAME,
+            MetricsConstants.TagKeys.HOST, host2,
+            MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE,
+            MetricsConstants.TagKeys.EXCEPTION_CLASS, RuntimeException.class.getCanonicalName()
+        ).count() == 1
+
+        when:
+        this.task.run()
+
+        then:
+        1 * this.jobSearchService.getAllHostsWithActiveJobs() >> hosts
+        1 * this.restTemplate.getForObject(host1url, String.class) >> healthyResponse
+        1 * this.restTemplate.getForObject(host2url, String.class) >> { throw restException }
+        1 * this.restTemplate.getForObject(host3url, String.class) >> healthyResponse
+
+        this.task.getErrorCountsSize() == 0
+        this.meterRegistry.counter(
+            ClusterCheckerTask.BAD_HOST_COUNT_METRIC_NAME,
+            MetricsConstants.TagKeys.HOST, host2
+        ).count() == 4
+
+        1 * this.jobSearchService.getAllActiveJobsOnHost(host2) >> [job2]
+        1 * this.jobPersistenceService.setJobCompletionInformation(
+            job2.getId().get(),
+            JobExecution.LOST_EXIT_CODE,
+            JobStatus.FAILED,
+            "Genie leader can't reach node running job. Assuming node and job are lost.",
+            null,
+            null
+        )
+        1 * this.meterRegistry.counter(
+            ClusterCheckerTask.FAILED_JOBS_COUNT_METRIC_NAME,
+            MetricsConstants.TagKeys.HOST, host2,
+            MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS
+        ).count() == 2
+
+        1 * this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host2) >> 4
+        1 * this.meterRegistry.counter(
+            ClusterCheckerTask.REAPED_CONNECTIONS_METRIC_NAME,
+            MetricsConstants.TagKeys.HOST, host2,
+            MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS
+        ).count() == 4
 
         when:
         this.task.cleanup()
