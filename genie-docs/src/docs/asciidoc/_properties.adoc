@@ -313,6 +313,11 @@ determined by Zookeeper or other mechanism via Spring
 |5
 |no
 
+|genie.retry.sns.noOfRetries
+|The number of times to retry requests to SNS before failure
+|5
+|no
+
 |genie.s3filetransfer.strictUrlCheckEnabled
 |Whether to strictly check an S3 URL for illegal characters before attempting to use it
 |false
