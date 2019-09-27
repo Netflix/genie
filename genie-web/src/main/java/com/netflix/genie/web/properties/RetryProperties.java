@@ -64,10 +64,10 @@ public class RetryProperties {
     private long maxInterval = 60_000L;
 
     @Valid
-    private S3RetryProperties s3 = new S3RetryProperties();
+    private RetryProperties.ServiceSpecificProperties s3 = new ServiceSpecificProperties();
 
     /**
-     * Retry properties related to S3.
+     * Retry properties specific to a particular service.
      *
      * @author tgianos
      * @since 4.0.0
@@ -75,7 +75,7 @@ public class RetryProperties {
     @Validated
     @Getter
     @Setter
-    public static class S3RetryProperties {
+    public static class ServiceSpecificProperties {
 
         @Min(1)
         private int noOfRetries = 5;
