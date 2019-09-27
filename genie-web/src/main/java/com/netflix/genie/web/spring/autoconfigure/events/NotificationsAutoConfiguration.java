@@ -27,7 +27,9 @@ import com.netflix.genie.web.events.JobFinishedSNSPublisher;
 import com.netflix.genie.web.events.JobNotificationMetricPublisher;
 import com.netflix.genie.web.events.JobStateChangeSNSPublisher;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
+import com.netflix.genie.web.spring.autoconfigure.aws.AWSAutoConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -91,7 +93,7 @@ public class NotificationsAutoConfiguration {
     public JobStateChangeSNSPublisher jobNotificationsSNSPublisher(
         final SNSNotificationsProperties properties,
         final MeterRegistry registry,
-        final AmazonSNS snsClient
+        @Qualifier(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME) final AmazonSNS snsClient
     ) {
         return new JobStateChangeSNSPublisher(
             snsClient,
@@ -116,7 +118,7 @@ public class NotificationsAutoConfiguration {
     public JobFinishedSNSPublisher jobFinishedSNSPublisher(
         final SNSNotificationsProperties properties,
         final MeterRegistry registry,
-        final AmazonSNS snsClient,
+        @Qualifier(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME) final AmazonSNS snsClient,
         final JobPersistenceService jobPersistenceService
     ) {
         return new JobFinishedSNSPublisher(
