@@ -66,6 +66,9 @@ public class RetryProperties {
     @Valid
     private RetryProperties.ServiceSpecificProperties s3 = new ServiceSpecificProperties();
 
+    @Valid
+    private RetryProperties.ServiceSpecificProperties sns = new ServiceSpecificProperties();
+
     /**
      * Retry properties specific to a particular service.
      *
