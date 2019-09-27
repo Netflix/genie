@@ -9,6 +9,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.spring.autoconfigure.apis.ApisAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas.HateoasAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.aspects.AspectsAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.aws.AWSAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.data.DataAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.events.EventsAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.events.NotificationsAutoConfiguration,\
