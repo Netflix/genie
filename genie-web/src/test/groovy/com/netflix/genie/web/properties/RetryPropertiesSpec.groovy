@@ -35,18 +35,23 @@ class RetryPropertiesSpec extends Specification {
         properties.getNoOfRetries() == 5
         properties.getInitialInterval() == 10_000L
         properties.getMaxInterval() == 60_000L
+        properties.getS3() != null
+        properties.getS3().getNoOfRetries() == 5
 
         when:
         def newNoOfRetries = RandomSuppliers.INT.get()
         def newInitialInterval = RandomSuppliers.LONG.get()
         def newMaxInterval = RandomSuppliers.LONG.get()
+        def newS3NoOfRetries = RandomSuppliers.INT.get()
         properties.setNoOfRetries(newNoOfRetries)
         properties.setInitialInterval(newInitialInterval)
         properties.setMaxInterval(newMaxInterval)
+        properties.getS3().setNoOfRetries(newS3NoOfRetries)
 
         then:
         properties.getNoOfRetries() == newNoOfRetries
         properties.getInitialInterval() == newInitialInterval
         properties.getMaxInterval() == newMaxInterval
+        properties.getS3().getNoOfRetries() == newS3NoOfRetries
     }
 }
