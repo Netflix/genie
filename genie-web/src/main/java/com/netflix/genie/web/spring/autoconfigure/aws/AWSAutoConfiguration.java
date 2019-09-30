@@ -51,10 +51,13 @@ public class AWSAutoConfiguration {
 
     /**
      * The name of the {@link AmazonSNS} client created specifically for job state notifications.
+     *
+     * Note: this name must match the bean name defined in
+     * {@link org.springframework.cloud.aws.messaging.config.annotation.SNSConfiguration} in order to override it.
      */
-    public static final String SNS_CLIENT_BEAN_NAME = "JobNotificationsSNSClient";
-    private static final String SNS_CLIENT_CONFIGURATION_BEAN_NAME = "JobNotificationsSNSClientConfiguration";
-    private static final String SNS_CLIENT_RETRY_POLICY_BEAN_NAME = "JobNotificationsSNSClientRetryPolicy";
+    public static final String SNS_CLIENT_BEAN_NAME = "amazonSNS";
+    private static final String SNS_CLIENT_CONFIGURATION_BEAN_NAME = "SNSClientConfiguration";
+    private static final String SNS_CLIENT_RETRY_POLICY_BEAN_NAME = "SNSClientRetryPolicy";
 
     /**
      * Create a named {@link RetryPolicy} to be used by the {@link AmazonSNS} client, unless a bean by that name

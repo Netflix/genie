@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.aws;
 
 import com.amazonaws.retry.RetryPolicy;
+import com.amazonaws.services.sns.AmazonSNS;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -25,6 +26,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
+import org.springframework.cloud.aws.core.config.AmazonWebserviceClientConfigurationUtils;
 
 /**
  * Tests for behavior of {@link AWSAutoConfiguration}.
@@ -63,10 +65,10 @@ public class AWSAutoConfigurationTest {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
-                Assertions.assertThat(context).hasBean("JobNotificationsSNSClientRetryPolicy");
-                Assertions.assertThat(context).hasBean("JobNotificationsSNSClientConfiguration");
+                Assertions.assertThat(context).hasBean("SNSClientRetryPolicy");
+                Assertions.assertThat(context).hasBean("SNSClientConfiguration");
                 Assertions.assertThat(
-                    context.getBean("JobNotificationsSNSClientRetryPolicy", RetryPolicy.class).getMaxErrorRetry()
+                    context.getBean("SNSClientRetryPolicy", RetryPolicy.class).getMaxErrorRetry()
                 ).isEqualTo(3);
             }
         );
@@ -85,5 +87,16 @@ public class AWSAutoConfigurationTest {
                 Assertions.assertThat(context).doesNotHaveBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
             }
         );
+    }
+
+    /**
+     * Test that the name qualifier for the custom AmazonSNS bean matches the one generated as part of Spring Cloud
+     * AWS Messaging configuration (and hence the latter is not created).
+     */
+    @Test
+    public void testSpringCloudAWSBeanNameOverride() {
+        Assertions.assertThat(
+            AmazonWebserviceClientConfigurationUtils.getBeanName(String.valueOf(AmazonSNS.class))
+        ).isEqualTo(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
     }
 }
