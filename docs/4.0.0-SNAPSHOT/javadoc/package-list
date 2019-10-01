@@ -94,6 +94,7 @@ com.netflix.genie.web.spring.autoconfigure.agent.services
 com.netflix.genie.web.spring.autoconfigure.apis
 com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas
 com.netflix.genie.web.spring.autoconfigure.aspects
+com.netflix.genie.web.spring.autoconfigure.aws
 com.netflix.genie.web.spring.autoconfigure.data
 com.netflix.genie.web.spring.autoconfigure.events
 com.netflix.genie.web.spring.autoconfigure.health
