@@ -41,6 +41,7 @@ import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.Instant
 
@@ -1010,5 +1011,39 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getCriteria().getClusterCriteria().get(1).getName().isPresent()
         !v4JobRequest.getCriteria().getClusterCriteria().get(1).getStatus().isPresent()
         v4JobRequest.getCriteria().getClusterCriteria().get(1).getTags().isEmpty()
+    }
+
+    @Unroll
+    def "Can convert V3 Job Request to V4 with command args tokenization: #tokenize"() {
+
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def expectedCommandArgs
+        if (tokenize) {
+            expectedCommandArgs = commandArgs
+        } else {
+            expectedCommandArgs = [StringUtils.join(commandArgs, StringUtils.SPACE)] as List
+        }
+        def v3JobRequest = new com.netflix.genie.common.dto.JobRequest.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            Lists.newArrayList(
+                new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString())),
+            ),
+                Sets.newHashSet(UUID.randomUUID().toString())
+        )
+            .withCommandArgs(commandArgs)
+            .build()
+
+        when:
+        def v4JobRequest = DtoConverters.toV4JobRequest(v3JobRequest, tokenize)
+
+        then:
+        v4JobRequest.getCommandArgs() == expectedCommandArgs
+
+        where:
+        tokenize | _
+        true     | _
+        false    | _
     }
 }
