@@ -38,4 +38,10 @@ public interface AgentFileStreamService {
      * Stop the service.
      */
     void stop();
+
+    /**
+     * Request the service perform an update outside of the regular schedule to make sure the server has the most
+     * up-to-date view of local files.
+     */
+    void forceServerSync();
 }

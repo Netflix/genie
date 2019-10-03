@@ -172,6 +172,17 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         manifestMessage == remoteService.manifestMessageReceived.get(1)
 
         when:
+        agentFileStreamService.forceServerSync()
+
+        then:
+        1 * this.jobDirectoryManifestService.invalidateCachedDirectoryManifest(temporaryFolder.getRoot().toPath())
+        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
+        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
+        1 == remoteService.activeSyncStreams.size()
+        3 == remoteService.manifestMessageReceived.size()
+        manifestMessage == remoteService.manifestMessageReceived.get(2)
+
+        when:
         this.grpcServerRule.getChannel().shutdownNow()
         runnableCapture.run()
 
