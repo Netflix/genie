@@ -34,7 +34,7 @@ public interface JobDirectoryManifestService {
     /**
      * Produces a {@link DirectoryManifest} for the given job.
      *
-     * @param jobDirectoryPath the job id
+     * @param jobDirectoryPath the job directory
      * @return a {@link DirectoryManifest}
      * @throws IOException if the manifest cannot be created.
      */
@@ -42,4 +42,11 @@ public interface JobDirectoryManifestService {
         Path jobDirectoryPath
     ) throws IOException;
 
+    /**
+     * If the implementation caches manifests to avoid excessive I/O, then demand the given cache entry be dropped,
+     * thus forcing a re-creation of manifest from scratch.
+     *
+     * @param jobDirectoryPath the job directory
+     */
+    void invalidateCachedDirectoryManifest(Path jobDirectoryPath);
 }

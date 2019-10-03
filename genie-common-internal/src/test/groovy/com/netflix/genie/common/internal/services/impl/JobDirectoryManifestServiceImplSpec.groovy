@@ -117,6 +117,14 @@ class JobDirectoryManifestServiceImplSpec extends Specification {
         _ * ticker.read() >> 0
 
         when:
+        service.invalidateCachedDirectoryManifest(Paths.get("/temp/foo"))
+        service.getDirectoryManifest(Paths.get("/temp/foo"))
+
+        then:
+        1 * factory.getDirectoryManifest(Paths.get("/temp/foo"), false) >> Mock(DirectoryManifest)
+        _ * ticker.read() >> 0
+
+        when:
         service.getDirectoryManifest(Paths.get("/temp/foo"))
 
         then:
