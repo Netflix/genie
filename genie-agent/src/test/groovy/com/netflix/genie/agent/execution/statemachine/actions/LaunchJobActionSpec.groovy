@@ -21,6 +21,7 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.process.JobProcessManager
+import com.netflix.genie.agent.execution.services.AgentFileStreamService
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
@@ -35,6 +36,7 @@ class LaunchJobActionSpec extends Specification {
     LaunchJobAction action
     JobProcessManager jobProcessManager
     AgentJobService agentJobService
+    AgentFileStreamService agentFileStreamService
     File jobDirectory
     List<String> commandArgs
     List<String> jobArgs
@@ -51,7 +53,8 @@ class LaunchJobActionSpec extends Specification {
         this.interactive = true
         this.jobProcessManager = Mock(JobProcessManager)
         this.agentJobService = Mock(AgentJobService)
-        this.action = new LaunchJobAction(executionContext, jobProcessManager, agentJobService)
+        this.agentFileStreamService = Mock(AgentFileStreamService)
+        this.action = new LaunchJobAction(executionContext, jobProcessManager, agentJobService, agentFileStreamService)
     }
 
     void cleanup() {
@@ -70,6 +73,7 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(10)
         1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, 10)
+        1 * agentFileStreamService.forceServerSync()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
         1 * executionContext.setCurrentJobStatus(JobStatus.RUNNING)
@@ -114,6 +118,7 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
         1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null)
+        1 * agentFileStreamService.forceServerSync()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String) >> { throw exception }
         0 * executionContext.setCurrentJobStatus(_)
