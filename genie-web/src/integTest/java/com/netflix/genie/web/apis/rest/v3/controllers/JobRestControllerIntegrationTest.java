@@ -267,12 +267,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
     private void submitAndCheckJob(final int documentationId, final boolean archiveJob) throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "echo hello world");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "echo hello world");
 
         final String clusterTag = LOCALHOST_CLUSTER_TAG;
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
@@ -726,7 +721,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         if (this.agentExecution) {
             validatableResponse
                 .body(HOST_NAME_PATH, Matchers.notNullValue())
-                .body(PROCESS_ID_PATH, Matchers.notNullValue())
+                .body(PROCESS_ID_PATH, Matchers.nullValue())
                 .body(CHECK_DELAY_PATH, Matchers.nullValue())
                 .body(EXIT_CODE_PATH, Matchers.nullValue());
         } else {
@@ -944,12 +939,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void canSubmitJobWithAttachments() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "echo hello world");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
             new ClusterCriteria(Sets.newHashSet(LOCALHOST_CLUSTER_TAG))
@@ -1009,12 +999,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodMissingCluster() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "echo hello world");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet("undefined");
@@ -1057,12 +1042,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodInvalidClusterCriteria() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "echo hello world");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(" ", "", null)));
@@ -1109,12 +1089,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodInvalidCommandCriteria() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "echo hello world");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("ok")));
@@ -1161,12 +1136,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodMissingCommand() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "echo hello world");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'echo hello world'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1209,12 +1179,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testSubmitJobMethodKill() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "sleep 60");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'sleep 60'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "'sleep 60'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1349,13 +1314,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             commandCriteria
         )
             .withTimeout(5)
-            .withDisableLogArchival(true);
-
-        if (this.agentExecution) {
-            builder.withCommandArgs(Lists.newArrayList("-c", "sleep 60"));
-        } else {
-            builder.withCommandArgs("-c 'sleep 60'");
-        }
+            .withDisableLogArchival(true)
+            .withCommandArgs(Lists.newArrayList("-c", "'sleep 60'"));
 
         final JobRequest jobRequest = builder.build();
 
@@ -1398,11 +1358,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     public void testSubmitJobMethodFailure() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "exit 1");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'exit 1'");
-        }
+        commandArgs = Lists.newArrayList("-c", "'exit 1'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1438,7 +1394,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
         this.waitForDone(id);
 
-        Assert.assertEquals(this.getStatus(id), JobStatus.FAILED);
+        Assert.assertEquals(JobStatus.FAILED, this.getStatus(id));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1461,12 +1417,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     @Test
     public void testResponseContentType() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final List<String> commandArgs;
-        if (this.agentExecution) {
-            commandArgs = Lists.newArrayList("-c", "echo hello");
-        } else {
-            commandArgs = Lists.newArrayList("-c", "'echo hello'");
-        }
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
         final String utf8 = "UTF-8";
 
         final JobRequest jobRequest = new JobRequest.Builder(

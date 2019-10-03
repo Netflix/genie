@@ -927,7 +927,7 @@ public class JobRestController {
         );
 
         final JobSubmission.Builder jobSubmissionBuilder = new JobSubmission.Builder(
-            DtoConverters.toV4JobRequest(jobRequest),
+            DtoConverters.toV4JobRequest(jobRequest, true),
             metadata
         );
 
