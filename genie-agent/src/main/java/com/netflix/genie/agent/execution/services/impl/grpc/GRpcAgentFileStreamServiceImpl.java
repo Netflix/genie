@@ -137,6 +137,21 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized void forceServerSync() {
+        if (started.get()) {
+            try {
+                this.jobDirectoryManifestService.invalidateCachedDirectoryManifest(jobDirectoryPath);
+                this.pushManifest();
+            } catch (Exception e) {
+                log.error("Failed to force push a fresh manifest", e);
+            }
+        }
+    }
+
     private synchronized void pushManifest() {
         if (started.get()) {
             final AgentManifestMessage jobFileManifest;
