@@ -106,9 +106,10 @@ public class StateMachineActionsAutoConfiguration {
     /**
      * Provide a lazy {@link LaunchJobAction} bean.
      *
-     * @param executionContext  The job execution context to use
-     * @param jobProcessManager The launch job service to use
-     * @param agentJobService   The agent job service to use
+     * @param executionContext       The job execution context to use
+     * @param jobProcessManager      The launch job service to use
+     * @param agentJobService        The agent job service to use
+     * @param agentFileStreamService The agent file stream service to use
      * @return A {@link LaunchJobAction} instance
      */
     @Bean
@@ -116,9 +117,10 @@ public class StateMachineActionsAutoConfiguration {
     public LaunchJobAction launchJobAction(
         final ExecutionContext executionContext,
         final JobProcessManager jobProcessManager,
-        final AgentJobService agentJobService
+        final AgentJobService agentJobService,
+        final AgentFileStreamService agentFileStreamService
     ) {
-        return new LaunchJobAction(executionContext, jobProcessManager, agentJobService);
+        return new LaunchJobAction(executionContext, jobProcessManager, agentJobService, agentFileStreamService);
     }
 
     /**

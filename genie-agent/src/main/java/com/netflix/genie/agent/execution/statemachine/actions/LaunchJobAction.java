@@ -22,6 +22,7 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
+import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
@@ -43,15 +44,18 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
     private final JobProcessManager jobProcessManager;
     private final AgentJobService agentJobService;
+    private final AgentFileStreamService agentFileStreamService;
 
     LaunchJobAction(
         final ExecutionContext executionContext,
         final JobProcessManager jobProcessManager,
-        final AgentJobService agentJobService
+        final AgentJobService agentJobService,
+        final AgentFileStreamService agentFileStreamService
     ) {
         super(executionContext);
         this.jobProcessManager = jobProcessManager;
         this.agentJobService = agentJobService;
+        this.agentFileStreamService = agentFileStreamService;
     }
 
     @Override
@@ -87,6 +91,8 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         } catch (final JobLaunchException e) {
             throw new RuntimeException("Failed to launch job", e);
         }
+
+        this.agentFileStreamService.forceServerSync();
 
         try {
             this.agentJobService.changeJobStatus(
