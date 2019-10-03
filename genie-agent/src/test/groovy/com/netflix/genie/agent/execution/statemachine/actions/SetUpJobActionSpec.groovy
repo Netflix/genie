@@ -100,6 +100,7 @@ class SetUpJobActionSpec extends Specification {
         1 * jobSetupService.downloadJobResources(spec, jobDir) >> setupFiles
         1 * jobSetupService.setupJobEnvironment(jobDir, spec, setupFiles) >> envMap
         1 * executionContext.setJobEnvironment(envMap)
+        1 * fileStreamService.forceServerSync()
         event == Events.SETUP_JOB_COMPLETE
 
         when:

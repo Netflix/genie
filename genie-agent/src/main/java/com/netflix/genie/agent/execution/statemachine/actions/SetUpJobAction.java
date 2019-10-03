@@ -132,6 +132,8 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             throw new RuntimeException("Failed set job status to INIT", e);
         }
 
+        this.agentFileStreamService.forceServerSync();
+
         return Events.SETUP_JOB_COMPLETE;
     }
 
