@@ -80,4 +80,12 @@ public class JobDirectoryManifestServiceImpl implements JobDirectoryManifestServ
             throw e;
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void invalidateCachedDirectoryManifest(final Path jobDirectoryPath) {
+        this.cache.invalidate(jobDirectoryPath);
+    }
 }
