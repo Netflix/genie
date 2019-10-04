@@ -49,7 +49,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
@@ -62,7 +61,6 @@ import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
-import org.springframework.test.context.TestPropertySource;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -89,11 +87,6 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-@TestPropertySource(
-    properties = {
-        JobRestController.AGENT_JOB_EXECUTION_KEY + "=false"
-    }
-)
 public class JobRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobRestControllerIntegrationTest.class);
@@ -168,20 +161,28 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     // related to charset headers
     private static final String GB18030_TXT = "GB18030.txt";
 
+    private final boolean agentExecution;
     private ResourceLoader resourceLoader;
     private JsonNode metadata;
     private String schedulerJobName;
     private String schedulerRunId;
-    private boolean agentExecution;
 
     @Autowired
     private JobsLocationsProperties jobsLocationsProperties;
 
     @Autowired
-    private Environment environment;
-
-    @Autowired
     private GenieWebHostInfo genieHostInfo;
+
+    /**
+     * Constructor.
+     */
+    public JobRestControllerIntegrationTest() {
+        this(false);
+    }
+
+    JobRestControllerIntegrationTest(final boolean agentExecution) {
+        this.agentExecution = agentExecution;
+    }
 
     /**
      * {@inheritDoc}
@@ -211,11 +212,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         this.createAllClusters();
         this.createAllCommands();
         this.linkAllEntities();
-        this.agentExecution = this.environment.getProperty(
-            JobRestController.AGENT_JOB_EXECUTION_KEY,
-            Boolean.class,
-            false
-        );
     }
 
     /**
