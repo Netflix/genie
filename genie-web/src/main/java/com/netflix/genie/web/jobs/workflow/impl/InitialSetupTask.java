@@ -110,8 +110,11 @@ public class InitialSetupTask extends GenieBaseTask {
                 jobExecEnv.getMemory(),
                 jobExecEnv.getJobRequest().getTags(),
                 jobExecEnv.getJobRequest().getGrouping().orElse(""),
-                jobExecEnv.getJobRequest().getGroupingInstance().orElse("")
+                jobExecEnv.getJobRequest().getGroupingInstance().orElse(""),
+                jobExecEnv.getJobRequest().getUser(),
+                jobExecEnv.getJobRequest().getGroup().orElse("")
             );
+
 
             // create environment variables for the job request
             this.createJobRequestEnvironmentVariables(writer, jobExecEnv.getJobRequest());
@@ -360,7 +363,9 @@ public class InitialSetupTask extends GenieBaseTask {
         final int memory,
         final Set<String> tags,
         final String grouping,
-        final String groupingInstance
+        final String groupingInstance,
+        final String user,
+        final String group
     ) throws IOException {
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_JOB_ID_ENV_VAR
@@ -432,6 +437,30 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + groupingInstance
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + LINE_SEPARATOR
+        );
+
+        // Append new line
+        writer.write(LINE_SEPARATOR);
+
+        // create environment variable for username and user group
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_USER_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + user
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + LINE_SEPARATOR
+        );
+
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_USER_GROUP_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + group
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );

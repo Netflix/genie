@@ -138,6 +138,8 @@ public class InitialSetupTaskTest {
         final String cltCritTag1 = "bar";
         final String cltCritTag2 = "baz";
         final String cltCritTag3 = "foo";
+        final String user = "user-name";
+        final String group = "user-group";
 
         final Cluster mockCluster = Mockito.mock(Cluster.class);
         Mockito.when(mockCluster.getId()).thenReturn(clusterId);
@@ -183,7 +185,9 @@ public class InitialSetupTaskTest {
             memory,
             jobTags,
             jobGrouping,
-            jobGroupingInstance
+            jobGroupingInstance,
+            user,
+            group
         );
         this.initialSetupTask.createJobRequestEnvironmentVariables(mockWriter, mockJobRequest);
 
@@ -221,6 +225,9 @@ public class InitialSetupTaskTest {
             + "export GENIE_JOB_GROUPING=\"" + jobGrouping + "\"\n"
             + "\n"
             + "export GENIE_JOB_GROUPING_INSTANCE=\"" + jobGroupingInstance + "\"\n"
+            + "\n"
+            + "export GENIE_USER=\"" + user + "\"\n"
+            + "export GENIE_USER_GROUP=\"" + group + "\"\n"
             + "\n"
             + "export GENIE_REQUESTED_COMMAND_TAGS=\"" + cmdCritTag1 + "," + cmdCritTag2 + "," + cmdCritTag3 + "\"\n"
             + "\n"

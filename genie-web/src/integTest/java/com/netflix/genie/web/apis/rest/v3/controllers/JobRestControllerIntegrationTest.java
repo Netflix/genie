@@ -1777,6 +1777,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
             .replace("JOB_TAGS_PLACEHOLDER", JOB_TAG_1 + "," + JOB_TAG_2)
             .replace("JOB_GROUPING_PLACEHOLDER", JOB_GROUPING)
-            .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE);
+            .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE)
+            .replace("GENIE_USER_PLACEHOLDER", JOB_USER)
+            .replace("GENIE_USER_GROUP_PLACEHOLDER", "");
     }
 }
