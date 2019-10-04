@@ -750,18 +750,17 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
             .body(ID_PATH, Matchers.is(id))
             .body(CREATED_PATH, Matchers.notNullValue())
-            .body(UPDATED_PATH, Matchers.notNullValue());
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()));
 
         // TODO: Fix the difference here
         if (this.agentExecution) {
             validatableResponse
-                .body(HOST_NAME_PATH, Matchers.notNullValue())
                 .body(PROCESS_ID_PATH, Matchers.nullValue())
                 .body(CHECK_DELAY_PATH, Matchers.nullValue())
                 .body(EXIT_CODE_PATH, Matchers.nullValue());
         } else {
             validatableResponse
-                .body(HOST_NAME_PATH, Matchers.is(this.genieHostInfo.getHostname()))
                 .body(PROCESS_ID_PATH, Matchers.notNullValue())
                 .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
                 .body(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE));
