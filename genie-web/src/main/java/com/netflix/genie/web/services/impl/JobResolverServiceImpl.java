@@ -562,6 +562,8 @@ public class JobResolverServiceImpl implements JobResolverService {
             JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR,
             "[" + StringUtils.join(clusterCriteriaTags, ',') + "]"
         );
+        envVariables.put(JobConstants.GENIE_USER_ENV_VAR, jobRequest.getMetadata().getUser());
+        envVariables.put(JobConstants.GENIE_USER_GROUP_ENV_VAR, jobRequest.getMetadata().getGroup().orElse(""));
         return envVariables.build();
     }
 

@@ -293,6 +293,16 @@ public final class JobConstants {
     public static final String GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR = "GENIE_REQUESTED_CLUSTER_TAGS";
 
     /**
+     * Environment variable for the Genie username the job request.
+     */
+    public static final String GENIE_USER_ENV_VAR = "GENIE_USER";
+
+    /**
+     * Environment variable for the Genie user group the job request.
+     */
+    public static final String GENIE_USER_GROUP_ENV_VAR = "GENIE_USER_GROUP";
+
+    /**
      * Process ID.
      **/
     public static final String PID = "pid";

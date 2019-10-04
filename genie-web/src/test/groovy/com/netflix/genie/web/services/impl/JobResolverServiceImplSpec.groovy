@@ -131,7 +131,7 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpec.getCommand().getId() == commandId
         jobSpec.getApplications().isEmpty()
         !jobSpec.isInteractive()
-        jobSpec.getEnvironmentVariables().size() == 17
+        jobSpec.getEnvironmentVariables().size() == 19
         jobSpec.getArchiveLocation() == Optional.of(requestedArchiveLocationPrefix + File.separator + jobId)
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
         jobEnvironment.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
@@ -160,7 +160,7 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecNoArchivalData.getCommand().getId() == commandId
         jobSpecNoArchivalData.getApplications().isEmpty()
         !jobSpecNoArchivalData.isInteractive()
-        jobSpecNoArchivalData.getEnvironmentVariables().size() == 17
+        jobSpecNoArchivalData.getEnvironmentVariables().size() == 19
         jobSpecNoArchivalData.getArchiveLocation() ==
             Optional.of(
                 StringUtils.endsWith(jobsProperties.getLocations().getArchives().toString(), File.separator)
@@ -197,7 +197,7 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecSavedData.getCommand().getId() == commandId
         jobSpecSavedData.getApplications().isEmpty()
         !jobSpecSavedData.isInteractive()
-        jobSpecSavedData.getEnvironmentVariables().size() == 17
+        jobSpecSavedData.getEnvironmentVariables().size() == 19
         jobSpecSavedData.getArchiveLocation() ==
             Optional.of(
                 StringUtils.endsWith(jobsProperties.getLocations().getArchives().toString(), File.separator)
@@ -249,6 +249,7 @@ class JobResolverServiceImplSpec extends Specification {
             Mock(MeterRegistry),
             jobsProperties
         )
+        def user = UUID.randomUUID().toString()
         def jobId = UUID.randomUUID().toString()
         def jobName = UUID.randomUUID().toString()
         def clusterId = UUID.randomUUID().toString()
@@ -275,7 +276,7 @@ class JobResolverServiceImplSpec extends Specification {
             null,
             null,
             new JobMetadata
-                .Builder(jobName, UUID.randomUUID().toString())
+                .Builder(jobName, user)
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .withGrouping(grouping)
                 .withGroupingInstance(groupingInstance)
@@ -340,6 +341,8 @@ class JobResolverServiceImplSpec extends Specification {
         envVariables.get(JobConstants.GENIE_JOB_TAGS_ENV_VAR) == service.tagsToString(jobRequest.getMetadata().getTags())
         envVariables.get(JobConstants.GENIE_JOB_GROUPING_ENV_VAR) == grouping
         envVariables.get(JobConstants.GENIE_JOB_GROUPING_INSTANCE_ENV_VAR) == groupingInstance
+        envVariables.get(JobConstants.GENIE_USER_ENV_VAR) == user
+        envVariables.get(JobConstants.GENIE_USER_GROUP_ENV_VAR) == ""
     }
 
     def "Can convert V4 Criterion to V3 tags"() {
