@@ -62,7 +62,7 @@ public class AgentMetadataImpl implements AgentMetadata {
 
     private static String getAgentHostNameOrFallback() {
         try {
-            final String hostName = InetAddress.getLocalHost().getHostName();
+            final String hostName = InetAddress.getLocalHost().getCanonicalHostName();
             if (!StringUtils.isBlank(hostName)) {
                 return hostName;
             }
