@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -147,11 +148,19 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final String CMD1_USER = "genie";
     private static final String CMD1_VERSION = "1.0";
     private static final String CMD1_EXECUTABLE = "/bin/bash";
+    private static final String CMD1_TAGS
+        = BASH_COMMAND_TAG + ","
+        + "genie.id:" + CMD1_ID + ","
+        + "genie.name:" + CMD1_NAME;
     private static final ArrayList<String> CMD1_EXECUTABLE_AND_ARGS = Lists.newArrayList(CMD1_EXECUTABLE);
     private static final String CLUSTER1_ID = "cluster1";
     private static final String CLUSTER1_NAME = "Local laptop";
     private static final String CLUSTER1_USER = "genie";
     private static final String CLUSTER1_VERSION = "1.0";
+    private static final String CLUSTER1_TAGS
+        = "genie.id:" + CLUSTER1_ID + ","
+        + "genie.name:" + CLUSTER1_NAME + ","
+        + LOCALHOST_CLUSTER_TAG;
     private static final String JOB_TAG_1 = "aTag";
     private static final String JOB_TAG_2 = "zTag";
     private static final Set<String> JOB_TAGS = Sets.newHashSet(JOB_TAG_1, JOB_TAG_2);
@@ -172,6 +181,9 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
     @Autowired
     private GenieWebHostInfo genieHostInfo;
+
+    @Autowired
+    private Resource jobDirResource;
 
     /**
      * Constructor.
@@ -630,6 +642,33 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .body(Matchers.is(setupFileContents));
+
+        // Validate content of 'run' file
+        if (!this.agentExecution) {
+            // check that the generated run file is correct
+            final String runShFileName = SystemUtils.IS_OS_LINUX ? "linux-runsh.txt" : "non-linux-runsh.txt";
+            final String runFile = this.getResourceURI(BASE_DIR + runShFileName);
+            final String runFileContent = new String(
+                Files.readAllBytes(Paths.get(new URI(runFile))),
+                StandardCharsets.UTF_8
+            );
+            final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + id;
+            final String expectedRunFileContent = this.getExpectedRunContents(
+                runFileContent,
+                jobWorkingDir,
+                id
+            );
+
+            RestAssured
+                .given(this.getRequestSpecification())
+                .filter(fileResultFilter)
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/{id}/output/{filePath}", id, "run")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .body(Matchers.is(expectedRunFileContent));
+        }
     }
 
     private void checkJobRequest(
@@ -1720,5 +1759,24 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
     private String getResourceURI(final String location) throws IOException {
         return this.resourceLoader.getResource(location).getURI().toString();
+    }
+
+    private String getExpectedRunContents(
+        final String runFileContents,
+        final String jobWorkingDir,
+        final String jobId
+    ) {
+        return runFileContents
+            .replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER", jobWorkingDir)
+            .replace("JOB_ID_PLACEHOLDER", jobId)
+            .replace("COMMAND_ID_PLACEHOLDER", CMD1_ID)
+            .replace("COMMAND_NAME_PLACEHOLDER", CMD1_NAME)
+            .replace("COMMAND_TAGS_PLACEHOLDER", CMD1_TAGS)
+            .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
+            .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
+            .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
+            .replace("JOB_TAGS_PLACEHOLDER", JOB_TAG_1 + "," + JOB_TAG_2)
+            .replace("JOB_GROUPING_PLACEHOLDER", JOB_GROUPING)
+            .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE);
     }
 }
