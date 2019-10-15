@@ -27,7 +27,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
@@ -83,17 +83,17 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     private final MeterRegistry meterRegistry;
     private final LoadingCache<String, ManifestCacheValue> manifestCache;
     private final GenieResourceHandler.Factory genieResourceHandlerFactory;
-    private final JobDirectoryManifestService jobDirectoryManifestService;
+    private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
 
     /**
      * Constructor.
      *
-     * @param resourceLoader              The application resource loader used to get references to resources
-     * @param jobPersistenceService       The job persistence service used to get information about a job
-     * @param jobFileService              The service responsible for managing the job directory for V3 Jobs
-     * @param agentFileStreamService      The service providing file manifest for active agent jobs
-     * @param meterRegistry               The meter registry used to keep track of metrics
-     * @param jobDirectoryManifestService The job directory manifest service
+     * @param resourceLoader                     The application resource loader used to get references to resources
+     * @param jobPersistenceService              The job persistence service used to get information about a job
+     * @param jobFileService                     The service responsible for managing the job directory for V3 Jobs
+     * @param agentFileStreamService             The service providing file manifest for active agent jobs
+     * @param meterRegistry                      The meter registry used to keep track of metrics
+     * @param jobDirectoryManifestCreatorService The job directory manifest service
      */
     public JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
@@ -101,7 +101,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final JobFileService jobFileService,
         final AgentFileStreamService agentFileStreamService,
         final MeterRegistry meterRegistry,
-        final JobDirectoryManifestService jobDirectoryManifestService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
         this(
             resourceLoader,
@@ -110,7 +110,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             agentFileStreamService,
             meterRegistry,
             new GenieResourceHandler.Factory(),
-            jobDirectoryManifestService
+            jobDirectoryManifestCreatorService
         );
     }
 
@@ -125,7 +125,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final AgentFileStreamService agentFileStreamService,
         final MeterRegistry meterRegistry,
         final GenieResourceHandler.Factory genieResourceHandlerFactory,
-        final JobDirectoryManifestService jobDirectoryManifestService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
 
         this.resourceLoader = resourceLoader;
@@ -134,7 +134,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         this.agentFileStreamService = agentFileStreamService;
         this.meterRegistry = meterRegistry;
         this.genieResourceHandlerFactory = genieResourceHandlerFactory;
-        this.jobDirectoryManifestService = jobDirectoryManifestService;
+        this.jobDirectoryManifestCreatorService = jobDirectoryManifestCreatorService;
 
         // TODO: This is a local cache. It might be valuable to have a shared cluster cache?
         // TODO: May want to tweak parameters or make them configurable
@@ -267,7 +267,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             }
             final Path jobDirPath = Paths.get(jobDirRoot);
 
-            final DirectoryManifest manifest = this.jobDirectoryManifestService.getDirectoryManifest(jobDirPath);
+            final DirectoryManifest manifest = this.jobDirectoryManifestCreatorService.getDirectoryManifest(jobDirPath);
             this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
         } else {
             // Archived job

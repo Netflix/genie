@@ -22,7 +22,7 @@ import com.netflix.genie.agent.execution.services.AgentFileStreamService
 import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.proto.AgentFileMessage
 import com.netflix.genie.proto.AgentManifestMessage
 import com.netflix.genie.proto.FileStreamServiceGrpc
@@ -52,7 +52,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
     FileStreamServiceGrpc.FileStreamServiceStub client
     TaskScheduler taskScheduler
     JobDirectoryManifestProtoConverter converter
-    JobDirectoryManifestService jobDirectoryManifestService
+    JobDirectoryManifestCreatorService jobDirectoryManifestService
     String jobId
     ScheduledFuture<?> scheduledTask
     RemoteService remoteService
@@ -65,7 +65,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         this.scheduledTask = Mock(ScheduledFuture)
         this.taskScheduler = Mock(TaskScheduler)
         this.converter = Mock(JobDirectoryManifestProtoConverter)
-        this.jobDirectoryManifestService = Mock(JobDirectoryManifestService)
+        this.jobDirectoryManifestService = Mock(JobDirectoryManifestCreatorService)
 
         this.remoteService = new RemoteService()
         this.grpcServerRule.getServiceRegistry().addService(remoteService)

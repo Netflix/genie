@@ -29,7 +29,8 @@ import java.nio.file.Path;
  * @author mprimi
  * @since 4.0.0
  */
-public interface JobDirectoryManifestService {
+// TODO: Move this into the Agent codebase once v3 embedded execution no longer needed on server
+public interface JobDirectoryManifestCreatorService {
 
     /**
      * Produces a {@link DirectoryManifest} for the given job.

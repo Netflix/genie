@@ -23,10 +23,10 @@ import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.JobArchiveServiceImpl;
-import com.netflix.genie.common.internal.services.impl.JobDirectoryManifestServiceImpl;
+import com.netflix.genie.common.internal.services.impl.JobDirectoryManifestCreatorServiceImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -84,20 +84,20 @@ public class CommonServicesAutoConfiguration {
     }
 
     /**
-     * Provide a {@link JobDirectoryManifestService} if no override is defined.
+     * Provide a {@link JobDirectoryManifestCreatorService} if no override is defined.
      * The manifest produced by this service do not include checksum for entries and caches manifests recently created.
      *
      * @param directoryManifestFactory the factory to produce the manifest if needed
      * @param cache                    the cache to use
-     * @return a {@link JobDirectoryManifestService}
+     * @return a {@link JobDirectoryManifestCreatorService}
      */
     @Bean
-    @ConditionalOnMissingBean(JobDirectoryManifestService.class)
-    public JobDirectoryManifestService jobDirectoryManifestService(
+    @ConditionalOnMissingBean(JobDirectoryManifestCreatorService.class)
+    public JobDirectoryManifestCreatorServiceImpl jobDirectoryManifestCreatorService(
         final DirectoryManifest.Factory directoryManifestFactory,
         @Qualifier("jobDirectoryManifestCache") final Cache<Path, DirectoryManifest> cache
     ) {
-        return new JobDirectoryManifestServiceImpl(directoryManifestFactory, cache, false);
+        return new JobDirectoryManifestCreatorServiceImpl(directoryManifestFactory, cache, false);
     }
 
     /**

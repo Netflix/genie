@@ -256,7 +256,9 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.EXCEPTION_CLASS, jobPersistenceServiceException.class.getCanonicalName()
         ).count() == 1
 
-        1 * this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host2) >> { throw new RuntimeException("...") }
+        1 * this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host2) >> {
+            throw new RuntimeException("...")
+        }
         1 * this.meterRegistry.counter(
             ClusterCheckerTask.REAPED_CONNECTIONS_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2,

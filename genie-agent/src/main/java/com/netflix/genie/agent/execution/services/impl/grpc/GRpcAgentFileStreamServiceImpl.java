@@ -22,7 +22,7 @@ import com.google.protobuf.ByteString;
 import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import com.netflix.genie.proto.AgentFileMessage;
 import com.netflix.genie.proto.AgentManifestMessage;
@@ -71,7 +71,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     private final StreamObserver<ServerControlMessage> responseObserver;
     private final Semaphore concurrentTransfersSemaphore;
     private final Set<FileTransfer> activeFileTransfers;
-    private final JobDirectoryManifestService jobDirectoryManifestService;
+    private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
 
     private StreamObserver<AgentManifestMessage> controlStreamObserver;
     private String jobId;
@@ -83,12 +83,12 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
         final FileStreamServiceGrpc.FileStreamServiceStub fileStreamServiceStub,
         final TaskScheduler taskScheduler,
         final JobDirectoryManifestProtoConverter manifestProtoConverter,
-        final JobDirectoryManifestService jobDirectoryManifestService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
         this.fileStreamServiceStub = fileStreamServiceStub;
         this.taskScheduler = taskScheduler;
         this.manifestProtoConverter = manifestProtoConverter;
-        this.jobDirectoryManifestService = jobDirectoryManifestService;
+        this.jobDirectoryManifestCreatorService = jobDirectoryManifestCreatorService;
         this.trigger = new ExponentialBackOffTrigger(
             ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_BEGIN,
             1000, //TODO make configurable
@@ -144,7 +144,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
     public synchronized void forceServerSync() {
         if (started.get()) {
             try {
-                this.jobDirectoryManifestService.invalidateCachedDirectoryManifest(jobDirectoryPath);
+                this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
                 this.pushManifest();
             } catch (Exception e) {
                 log.error("Failed to force push a fresh manifest", e);
@@ -158,7 +158,7 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
             try {
                 jobFileManifest = manifestProtoConverter.manifestToProtoMessage(
                     this.jobId,
-                    this.jobDirectoryManifestService.getDirectoryManifest(this.jobDirectoryPath)
+                    this.jobDirectoryManifestCreatorService.getDirectoryManifest(this.jobDirectoryPath)
                 );
             } catch (final IOException e) {
                 log.error("Failed to construct manifest", e);
