@@ -21,7 +21,7 @@ import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
 import com.netflix.genie.web.agent.services.AgentFileStreamService
 import com.netflix.genie.web.data.services.JobPersistenceService
@@ -56,7 +56,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     Resource resource
     JobDirectoryServerServiceImpl.GenieResourceHandler.Factory handlerFactory
     JobDirectoryServerServiceImpl.GenieResourceHandler handler
-    JobDirectoryManifestService jobDirectoryManifestService
+    JobDirectoryManifestCreatorService jobDirectoryManifestService
 
     void setup() {
         this.resourceLoader = Mock(ResourceLoader)
@@ -66,7 +66,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.meterRegistry = Mock(MeterRegistry)
         this.handlerFactory = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler.Factory)
         this.handler = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler)
-        this.jobDirectoryManifestService = Mock(JobDirectoryManifestService)
+        this.jobDirectoryManifestService = Mock(JobDirectoryManifestCreatorService)
         this.service = new JobDirectoryServerServiceImpl(resourceLoader, jobPersistenceService, jobFileService, agentFileStreamService, meterRegistry, handlerFactory, jobDirectoryManifestService)
 
         this.request = Mock(HttpServletRequest)

@@ -20,7 +20,7 @@ package com.netflix.genie.common.internal.configs;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import org.assertj.core.api.Assertions;
@@ -106,7 +106,7 @@ public class CommonServicesAutoConfigurationTest {
     public void testJobDirectoryManifestService() {
         this.contextRunner.run(
             context -> {
-                Assertions.assertThat(context).hasSingleBean(JobDirectoryManifestService.class);
+                Assertions.assertThat(context).hasSingleBean(JobDirectoryManifestCreatorService.class);
             }
         );
     }

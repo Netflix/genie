@@ -21,7 +21,7 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.Ticker
 import com.netflix.genie.common.internal.dto.DirectoryManifest
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Unit test for JobDirectoryManifestServiceImplSpec
  */
-class JobDirectoryManifestServiceImplSpec extends Specification {
+class JobDirectoryManifestCreatorServiceImplSpec extends Specification {
     DirectoryManifest.Factory factory
     Cache<Path, DirectoryManifest> cache
 
@@ -52,7 +52,7 @@ class JobDirectoryManifestServiceImplSpec extends Specification {
     @Unroll
     def "GetDirectoryManifest cache (checksum: #includeChecksum)"() {
         setup:
-        JobDirectoryManifestService service = new JobDirectoryManifestServiceImpl(factory, cache, includeChecksum)
+        JobDirectoryManifestCreatorService service = new JobDirectoryManifestCreatorServiceImpl(factory, cache, includeChecksum)
 
         when:
         for (int i = 0; i < 10; i++) {
@@ -76,7 +76,7 @@ class JobDirectoryManifestServiceImplSpec extends Specification {
     ) {
         setup:
         boolean includeChecksum = false
-        JobDirectoryManifestService service = new JobDirectoryManifestServiceImpl(factory, cache, includeChecksum)
+        JobDirectoryManifestCreatorService service = new JobDirectoryManifestCreatorServiceImpl(factory, cache, includeChecksum)
 
         when:
         service.getDirectoryManifest(Paths.get("/temp/foo"))
@@ -105,7 +105,7 @@ class JobDirectoryManifestServiceImplSpec extends Specification {
             .expireAfterWrite(1, TimeUnit.HOURS)
             .ticker(ticker)
             .build()
-        JobDirectoryManifestService service = new JobDirectoryManifestServiceImpl(factory, cache, false)
+        JobDirectoryManifestCreatorService service = new JobDirectoryManifestCreatorServiceImpl(factory, cache, false)
 
         when:
         for (int i = 0; i < 10; i++) {

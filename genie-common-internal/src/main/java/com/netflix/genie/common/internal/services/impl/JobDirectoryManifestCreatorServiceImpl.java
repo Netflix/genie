@@ -19,21 +19,21 @@ package com.netflix.genie.common.internal.services.impl;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
-import com.netflix.genie.common.internal.services.JobDirectoryManifestService;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * Implementation of {@link JobDirectoryManifestService} that caches manifests produced by the factory for a few
+ * Implementation of {@link JobDirectoryManifestCreatorService} that caches manifests produced by the factory for a few
  * seconds, thus avoiding re-calculating the same for subsequent requests (e.g. a user navigating a tree true the UI).
  *
  * @author mprimi
  * @since 4.0.0
  */
 @Slf4j
-public class JobDirectoryManifestServiceImpl implements JobDirectoryManifestService {
+public class JobDirectoryManifestCreatorServiceImpl implements JobDirectoryManifestCreatorService {
 
     private final Cache<Path, DirectoryManifest> cache;
     private final DirectoryManifest.Factory factory;
@@ -46,7 +46,7 @@ public class JobDirectoryManifestServiceImpl implements JobDirectoryManifestServ
      * @param cache           the loading cache to use
      * @param includeChecksum whether to produce manifests that include checksums
      */
-    public JobDirectoryManifestServiceImpl(
+    public JobDirectoryManifestCreatorServiceImpl(
         final DirectoryManifest.Factory factory,
         final Cache<Path, DirectoryManifest> cache,
         final boolean includeChecksum

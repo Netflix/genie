@@ -1030,7 +1030,7 @@ class DtoConvertersSpec extends Specification {
             Lists.newArrayList(
                 new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString())),
             ),
-                Sets.newHashSet(UUID.randomUUID().toString())
+            Sets.newHashSet(UUID.randomUUID().toString())
         )
             .withCommandArgs(commandArgs)
             .build()
