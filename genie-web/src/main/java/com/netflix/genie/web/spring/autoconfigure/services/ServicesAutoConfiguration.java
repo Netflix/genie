@@ -42,6 +42,7 @@ import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.properties.ScriptLoadBalancerProperties;
+import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.FileTransferFactory;
@@ -55,6 +56,7 @@ import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.MailService;
+import com.netflix.genie.web.services.impl.ArchivedJobServiceImpl;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.web.services.impl.DiskJobFileServiceImpl;
 import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
@@ -542,5 +544,23 @@ public class ServicesAutoConfiguration {
         final MeterRegistry registry
     ) {
         return new JobLaunchServiceImpl(jobPersistenceService, jobResolverService, agentLauncher, registry);
+    }
+
+    /**
+     * Provide a {@link ArchivedJobService} implementation if one hasn't been provided already.
+     *
+     * @param jobPersistenceService The {@link JobPersistenceService} implementation to use
+     * @param resourceLoader        The {@link ResourceLoader} to use
+     * @param meterRegistry         The {@link MeterRegistry} implementation to use
+     * @return A {@link ArchivedJobServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(ArchivedJobService.class)
+    public ArchivedJobServiceImpl archivedJobService(
+        final JobPersistenceService jobPersistenceService,
+        final ResourceLoader resourceLoader,
+        final MeterRegistry meterRegistry
+    ) {
+        return new ArchivedJobServiceImpl(jobPersistenceService, resourceLoader, meterRegistry);
     }
 }
