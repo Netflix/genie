@@ -67,5 +67,6 @@ class GenieWebCheckedExceptionsSpec extends Specification {
         AgentLaunchException     | _
         IdAlreadyExistsException | _
         SaveAttachmentException  | _
+        JobNotArchivedException  | _
     }
 }
