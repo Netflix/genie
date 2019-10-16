@@ -397,6 +397,12 @@ for multiple errors.
 |JobResolverServiceImpl
 |status, exceptionClass
 
+|genie.web.services.archivedJobService.getArchivedJobMetadata.timer
+|The time taken to fetch the metadata of an archived job if it isn't already cached
+|nanoseconds
+|ArchivedJobServiceImpl
+|status, exceptionClass
+
 |genie.tasks.clusterChecker.connectionsReaped.counter
 |Counts the number of agent connections the leader reaped due to the host being unhealthy
 |count
