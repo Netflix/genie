@@ -30,6 +30,7 @@ import java.nio.file.Path;
  * @author tgianos
  * @since 4.0.0
  */
+// TODO: Move this to the agent codebase once v3 embedded execution removed from server
 public interface JobArchiveService {
 
     /**
