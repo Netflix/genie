@@ -63,11 +63,12 @@ class GenieWebCheckedExceptionsSpec extends Specification {
         exception.getCause() == cause
 
         where:
-        exceptionClass           | _
-        AgentLaunchException     | _
-        IdAlreadyExistsException | _
-        SaveAttachmentException  | _
-        JobNotArchivedException  | _
-        JobNotFoundException     | _
+        exceptionClass                        | _
+        AgentLaunchException                  | _
+        IdAlreadyExistsException              | _
+        SaveAttachmentException               | _
+        JobNotArchivedException               | _
+        JobNotFoundException                  | _
+        JobDirectoryManifestNotFoundException | _
     }
 }
