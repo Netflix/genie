@@ -18,30 +18,26 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
-import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.dtos.ArchivedJobMetadata;
+import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;
+import com.netflix.genie.web.exceptions.checked.JobNotArchivedException;
+import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
+import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobFileService;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
@@ -81,9 +77,9 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     private final JobFileService jobFileService;
     private final AgentFileStreamService agentFileStreamService;
     private final MeterRegistry meterRegistry;
-    private final LoadingCache<String, ManifestCacheValue> manifestCache;
     private final GenieResourceHandler.Factory genieResourceHandlerFactory;
     private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
+    private final ArchivedJobService archivedJobService;
 
     /**
      * Constructor.
@@ -91,6 +87,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
      * @param resourceLoader                     The application resource loader used to get references to resources
      * @param jobPersistenceService              The job persistence service used to get information about a job
      * @param agentFileStreamService             The service providing file manifest for active agent jobs
+     * @param archivedJobService                 The {@link ArchivedJobService} implementation to use to get archived
+     *                                           job data
      * @param meterRegistry                      The meter registry used to keep track of metrics
      * @param jobFileService                     The service responsible for managing the job directory for V3 Jobs
      * @param jobDirectoryManifestCreatorService The job directory manifest service
@@ -99,6 +97,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
         final AgentFileStreamService agentFileStreamService,
+        final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
         final JobFileService jobFileService,
         final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
@@ -107,6 +106,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             resourceLoader,
             jobPersistenceService,
             agentFileStreamService,
+            archivedJobService,
             new GenieResourceHandler.Factory(),
             meterRegistry,
             jobFileService,
@@ -122,6 +122,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
         final AgentFileStreamService agentFileStreamService,
+        final ArchivedJobService archivedJobService,
         final GenieResourceHandler.Factory genieResourceHandlerFactory,
         final MeterRegistry meterRegistry,
         final JobFileService jobFileService,
@@ -134,49 +135,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         this.meterRegistry = meterRegistry;
         this.genieResourceHandlerFactory = genieResourceHandlerFactory;
         this.jobDirectoryManifestCreatorService = jobDirectoryManifestCreatorService;
-
-        // TODO: This is a local cache. It might be valuable to have a shared cluster cache?
-        // TODO: May want to tweak parameters or make them configurable
-        // TODO: Should we expire more proactively than just waiting for size to fill up?
-        this.manifestCache = CacheBuilder
-            .newBuilder()
-            .maximumSize(50L)
-            .recordStats()
-            .build(
-                new CacheLoader<String, ManifestCacheValue>() {
-                    @Override
-                    public ManifestCacheValue load(final String key) throws Exception {
-                        // TODO: Probably need more specific exceptions so we can map them to response codes
-                        final String archiveLocation = jobPersistenceService
-                            .getJobArchiveLocation(key)
-                            .orElseThrow(() -> new JobNotArchivedException("Job " + key + " wasn't archived"));
-
-                        final URI jobDirectoryRoot = new URI(archiveLocation + SLASH).normalize();
-
-                        final URI manifestLocation;
-                        if (StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)) {
-                            manifestLocation = jobDirectoryRoot.resolve(JobArchiveService.MANIFEST_NAME).normalize();
-                        } else {
-                            manifestLocation = jobDirectoryRoot
-                                .resolve(JobArchiveService.MANIFEST_DIRECTORY + SLASH)
-                                .resolve(JobArchiveService.MANIFEST_NAME)
-                                .normalize();
-                        }
-
-                        final Resource manifestResource = resourceLoader.getResource(manifestLocation.toString());
-                        if (!manifestResource.exists()) {
-                            throw new GenieNotFoundException("No job manifest exists at " + manifestLocation);
-                        }
-                        final DirectoryManifest manifest = GenieObjectMapper
-                            .getMapper()
-                            .readValue(manifestResource.getInputStream(), DirectoryManifest.class);
-
-                        return new ManifestCacheValue(manifest, jobDirectoryRoot);
-                    }
-                }
-            );
-
-        // TODO: Record metrics for cache using stats() method return
+        this.archivedJobService = archivedJobService;
     }
 
     /**
@@ -226,7 +185,6 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         }
 
         if (jobStatus.isActive() && isV4) {
-
             final Optional<DirectoryManifest> manifest = this.agentFileStreamService.getManifest(jobId);
             if (!manifest.isPresent()) {
                 log.error("Manifest not found for active job: {}", jobId);
@@ -244,7 +202,6 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             }
 
             this.handleRequest(baseUri, relativePath, request, response, manifest.get(), jobDirRoot);
-
         } else if (jobStatus.isActive()) {
             // Active V3 job
 
@@ -273,19 +230,17 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             final DirectoryManifest manifest;
             final URI jobDirRoot;
             try {
-                final ManifestCacheValue cacheValue = this.manifestCache.get(jobId);
-                manifest = cacheValue.getManifest();
-                jobDirRoot = cacheValue.getJobDirectoryRoot();
+                final ArchivedJobMetadata archivedJobMetadata = this.archivedJobService.getArchivedJobMetadata(jobId);
+                manifest = archivedJobMetadata.getManifest();
+                jobDirRoot = archivedJobMetadata.getJobDirectoryRoot();
+            } catch (final JobNotArchivedException e) {
+                response.sendError(HttpStatus.PRECONDITION_FAILED.value(), e.getMessage());
+                return;
+            } catch (final JobNotFoundException | JobDirectoryManifestNotFoundException e) {
+                response.sendError(HttpStatus.NOT_FOUND.value(), e.getMessage());
+                return;
             } catch (final Exception e) {
-                // TODO: more fine grained exception handling
-                if (e.getCause() instanceof JobNotArchivedException) {
-                    // will be thrown from the manifest loader
-                    log.error(e.getCause().getMessage(), e.getCause());
-                    response.sendError(HttpStatus.NOT_FOUND.value(), e.getCause().getMessage());
-                } else {
-                    log.error(e.getMessage(), e);
-                    response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
-                }
+                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
                 return;
             }
             this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
@@ -452,34 +407,6 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             ResourceHttpRequestHandler get(final String mediaType, final Resource jobResource) {
                 return new GenieResourceHandler(mediaType, jobResource);
             }
-        }
-    }
-
-    /**
-     * A simple POJO for a compound value of related information to a job to store in a cache.
-     *
-     * @author tgianos
-     * @see CacheLoader#load(Object)
-     * @since 4.0.0
-     */
-    @Getter
-    @AllArgsConstructor
-    @EqualsAndHashCode(doNotUseGetters = true)
-    @ToString(doNotUseGetters = true)
-    private static class ManifestCacheValue {
-        private final DirectoryManifest manifest;
-        private final URI jobDirectoryRoot;
-    }
-
-    /**
-     * Simple exception to represent when a job wasn't archived so it's impossible to get the output.
-     *
-     * @author tgianos
-     * @since 4.0.0
-     */
-    private static class JobNotArchivedException extends RuntimeException {
-        JobNotArchivedException(final String message) {
-            super(message);
         }
     }
 }

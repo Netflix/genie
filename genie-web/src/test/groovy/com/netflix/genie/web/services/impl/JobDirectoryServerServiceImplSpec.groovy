@@ -21,10 +21,15 @@ import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.dto.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
 import com.netflix.genie.web.agent.services.AgentFileStreamService
 import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException
+import com.netflix.genie.web.exceptions.checked.JobNotArchivedException
+import com.netflix.genie.web.exceptions.checked.JobNotFoundException
+import com.netflix.genie.web.services.ArchivedJobService
 import com.netflix.genie.web.services.JobDirectoryServerService
 import com.netflix.genie.web.services.JobFileService
 import io.micrometer.core.instrument.MeterRegistry
@@ -62,6 +67,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     JobDirectoryServerServiceImpl.GenieResourceHandler.Factory handlerFactory
     JobDirectoryServerServiceImpl.GenieResourceHandler handler
     JobDirectoryManifestCreatorService jobDirectoryManifestService
+    ArchivedJobService archivedJobService
 
     void setup() {
         this.resourceLoader = Mock(ResourceLoader)
@@ -72,10 +78,12 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.handlerFactory = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler.Factory)
         this.handler = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler)
         this.jobDirectoryManifestService = Mock(JobDirectoryManifestCreatorService)
+        this.archivedJobService = Mock(ArchivedJobService)
         this.service = new JobDirectoryServerServiceImpl(
             this.resourceLoader,
             this.jobPersistenceService,
             this.agentFileStreamService,
+            this.archivedJobService,
             this.handlerFactory,
             this.meterRegistry,
             this.jobFileService,
@@ -162,14 +170,54 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * this.handler.handleRequest(this.request, this.response)
     }
 
-    def "Job done but not archived returns 404"() {
+    def "Archived job exceptions respond with the expected error codes"() {
+        def jobNotFoundErrorMessage = "No job with id " + JOB_ID + " exists"
+        def notArchivedErrorMessage = "Job " + JOB_ID + " wasn't archived"
+        def manifestNotFoundErrorMessage = "No directory manifest for job " + JOB_ID + " exists"
+        def runtimeMessage = "Something went wrong"
+
         when:
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.SUCCEEDED
         1 * this.jobPersistenceService.isV4(JOB_ID) >> false
-        1 * this.jobPersistenceService.getJobArchiveLocation(JOB_ID) >> Optional.empty()
-        1 * this.response.sendError(HttpStatus.NOT_FOUND.value(), "Job " + JOB_ID + " wasn't archived")
+        1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
+            throw new JobNotFoundException(jobNotFoundErrorMessage)
+        }
+        1 * this.response.sendError(HttpStatus.NOT_FOUND.value(), jobNotFoundErrorMessage)
+
+        when:
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.FAILED
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
+            throw new JobNotArchivedException(notArchivedErrorMessage)
+        }
+        1 * this.response.sendError(HttpStatus.PRECONDITION_FAILED.value(), notArchivedErrorMessage)
+
+        when:
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.KILLED
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
+            throw new JobDirectoryManifestNotFoundException(manifestNotFoundErrorMessage)
+        }
+        1 * this.response.sendError(HttpStatus.NOT_FOUND.value(), manifestNotFoundErrorMessage)
+
+        when:
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.INVALID
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
+            throw new GenieRuntimeException(runtimeMessage)
+        }
+        1 * this.response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), runtimeMessage)
     }
 }
