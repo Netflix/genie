@@ -37,11 +37,16 @@ import spock.lang.Specification
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+/**
+ * Specifications for {@link JobDirectoryServerServiceImpl}.
+ *
+ * @author mprimi
+ */
 class JobDirectoryServerServiceImplSpec extends Specification {
     static final String JOB_ID = "123456"
-    static final String relPath = "bar/foo.txt"
-    static final URL BASE_URL = new URL("https", "genie.netflix.net", 8080, "/jobs/" + JOB_ID + "/output/" + relPath)
-    static final URI EXPECTED_V4_FILE_URI = AgentFileProtocolResolver.createUri(JOB_ID, "/" + relPath)
+    static final String REL_PATH = "bar/foo.txt"
+    static final URL BASE_URL = new URL("https", "genie.com", 8080, "/jobs/" + JOB_ID + "/output/" + REL_PATH)
+    static final URI EXPECTED_V4_FILE_URI = AgentFileProtocolResolver.createUri(JOB_ID, "/" + REL_PATH)
 
     ResourceLoader resourceLoader
     JobPersistenceService jobPersistenceService
@@ -67,7 +72,15 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.handlerFactory = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler.Factory)
         this.handler = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler)
         this.jobDirectoryManifestService = Mock(JobDirectoryManifestCreatorService)
-        this.service = new JobDirectoryServerServiceImpl(resourceLoader, jobPersistenceService, jobFileService, agentFileStreamService, meterRegistry, handlerFactory, jobDirectoryManifestService)
+        this.service = new JobDirectoryServerServiceImpl(
+            this.resourceLoader,
+            this.jobPersistenceService,
+            this.jobFileService,
+            this.agentFileStreamService,
+            this.meterRegistry,
+            this.handlerFactory,
+            this.jobDirectoryManifestService
+        )
 
         this.request = Mock(HttpServletRequest)
         this.response = Mock(HttpServletResponse)
@@ -81,11 +94,11 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         Exception e = new GenieNotFoundException("...")
 
         when:
-        service.serveResource(JOB_ID, BASE_URL, relPath, request, response)
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * jobPersistenceService.getJobStatus(JOB_ID) >> { throw e }
-        1 * response.sendError(404, e.getMessage())
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> { throw e }
+        1 * this.response.sendError(404, e.getMessage())
     }
 
     def "ServeResource -- job not found (v4)"() {
@@ -93,12 +106,12 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         Exception e = new GenieJobNotFoundException("...")
 
         when:
-        service.serveResource(JOB_ID, BASE_URL, relPath, request, response)
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, request, response)
 
         then:
-        1 * jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * jobPersistenceService.isV4(JOB_ID) >> { throw e }
-        1 * response.sendError(404, e.getMessage())
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> { throw e }
+        1 * this.response.sendError(404, e.getMessage())
     }
 
     def "ServeResource -- invalid URI"() {
@@ -107,56 +120,56 @@ class JobDirectoryServerServiceImplSpec extends Specification {
 
     def "ServeResource -- Active V4 job, manifest not found"() {
         when:
-        service.serveResource(JOB_ID, BASE_URL, relPath, request, response)
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * jobPersistenceService.isV4(JOB_ID) >> true
-        1 * agentFileStreamService.getManifest(JOB_ID) >> Optional.empty()
-        1 * response.sendError(503, _ as String)
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.empty()
+        1 * this.response.sendError(503, _ as String)
     }
 
     def "ServeResource -- Active V4 job, manifest entry not found"() {
         setup:
 
         when:
-        service.serveResource(JOB_ID, BASE_URL, relPath, request, response)
+        service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * jobPersistenceService.isV4(JOB_ID) >> true
-        1 * agentFileStreamService.getManifest(JOB_ID) >> Optional.of(manifest)
-        1 * manifest.getEntry(relPath) >> Optional.empty()
-        1 * response.sendError(404, _ as String)
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
+        1 * this.manifest.getEntry(REL_PATH) >> Optional.empty()
+        1 * this.response.sendError(404, _ as String)
     }
 
     def "ServeResource -- Active V4 job, return resource"() {
         setup:
 
         when:
-        service.serveResource(JOB_ID, BASE_URL, relPath, request, response)
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * jobPersistenceService.isV4(JOB_ID) >> true
-        1 * agentFileStreamService.getManifest(JOB_ID) >> Optional.of(manifest)
-        1 * manifest.getEntry(relPath) >> Optional.of(manifestEntry)
-        1 * manifestEntry.isDirectory() >> false
-        1 * manifestEntry.getPath() >> relPath
-        1 * resourceLoader.getResource(EXPECTED_V4_FILE_URI.toString()) >> resource
-        1 * manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
-        1 * handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> handler
-        1 * handler.handleRequest(request, response)
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
+        1 * this.manifest.getEntry(REL_PATH) >> Optional.of(this.manifestEntry)
+        1 * this.manifestEntry.isDirectory() >> false
+        1 * this.manifestEntry.getPath() >> REL_PATH
+        1 * this.resourceLoader.getResource(EXPECTED_V4_FILE_URI.toString()) >> this.resource
+        1 * this.manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
+        1 * this.handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> this.handler
+        1 * this.handler.handleRequest(this.request, this.response)
     }
 
     def "Job done but not archived returns 404"() {
         when:
-        this.service.serveResource(JOB_ID, BASE_URL, relPath, request, response)
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.SUCCEEDED
         1 * this.jobPersistenceService.isV4(JOB_ID) >> false
         1 * this.jobPersistenceService.getJobArchiveLocation(JOB_ID) >> Optional.empty()
-        1 * response.sendError(HttpStatus.NOT_FOUND.value(), "Job " + JOB_ID + " wasn't archived")
+        1 * this.response.sendError(HttpStatus.NOT_FOUND.value(), "Job " + JOB_ID + " wasn't archived")
     }
 }
