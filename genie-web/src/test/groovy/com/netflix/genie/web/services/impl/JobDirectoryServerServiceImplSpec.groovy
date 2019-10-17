@@ -75,10 +75,10 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service = new JobDirectoryServerServiceImpl(
             this.resourceLoader,
             this.jobPersistenceService,
-            this.jobFileService,
             this.agentFileStreamService,
-            this.meterRegistry,
             this.handlerFactory,
+            this.meterRegistry,
+            this.jobFileService,
             this.jobDirectoryManifestService
         )
 

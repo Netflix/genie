@@ -90,26 +90,26 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
      *
      * @param resourceLoader                     The application resource loader used to get references to resources
      * @param jobPersistenceService              The job persistence service used to get information about a job
-     * @param jobFileService                     The service responsible for managing the job directory for V3 Jobs
      * @param agentFileStreamService             The service providing file manifest for active agent jobs
      * @param meterRegistry                      The meter registry used to keep track of metrics
+     * @param jobFileService                     The service responsible for managing the job directory for V3 Jobs
      * @param jobDirectoryManifestCreatorService The job directory manifest service
      */
     public JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
-        final JobFileService jobFileService,
         final AgentFileStreamService agentFileStreamService,
         final MeterRegistry meterRegistry,
+        final JobFileService jobFileService,
         final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
         this(
             resourceLoader,
             jobPersistenceService,
-            jobFileService,
             agentFileStreamService,
-            meterRegistry,
             new GenieResourceHandler.Factory(),
+            meterRegistry,
+            jobFileService,
             jobDirectoryManifestCreatorService
         );
     }
@@ -121,13 +121,12 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
-        final JobFileService jobFileService,
         final AgentFileStreamService agentFileStreamService,
-        final MeterRegistry meterRegistry,
         final GenieResourceHandler.Factory genieResourceHandlerFactory,
+        final MeterRegistry meterRegistry,
+        final JobFileService jobFileService,
         final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
-
         this.resourceLoader = resourceLoader;
         this.jobPersistenceService = jobPersistenceService;
         this.jobFileService = jobFileService;
