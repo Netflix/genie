@@ -454,6 +454,8 @@ public class ServicesAutoConfiguration {
      * @param resourceLoader                     The application resource loader used to get references to resources
      * @param jobPersistenceService              The job persistence service used to get information about a job
      * @param agentFileStreamService             The service to request a file from an agent running a job
+     * @param archivedJobService                 The {@link ArchivedJobService} implementation to use to get archived
+     *                                           job data
      * @param meterRegistry                      The meter registry used to keep track of metrics
      * @param jobFileService                     The service responsible for managing the job working directory on disk
      *                                           for V3 Jobs
@@ -466,6 +468,7 @@ public class ServicesAutoConfiguration {
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
         final AgentFileStreamService agentFileStreamService,
+        final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
         final JobFileService jobFileService,
         final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
@@ -474,6 +477,7 @@ public class ServicesAutoConfiguration {
             resourceLoader,
             jobPersistenceService,
             agentFileStreamService,
+            archivedJobService,
             meterRegistry,
             jobFileService,
             jobDirectoryManifestCreatorService
