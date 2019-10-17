@@ -453,10 +453,10 @@ public class ServicesAutoConfiguration {
      *
      * @param resourceLoader                     The application resource loader used to get references to resources
      * @param jobPersistenceService              The job persistence service used to get information about a job
-     * @param jobFileService                     The service responsible for managing the job working directory on disk
-     *                                           for V3 Jobs
      * @param agentFileStreamService             The service to request a file from an agent running a job
      * @param meterRegistry                      The meter registry used to keep track of metrics
+     * @param jobFileService                     The service responsible for managing the job working directory on disk
+     *                                           for V3 Jobs
      * @param jobDirectoryManifestCreatorService The job directory manifest service
      * @return An instance of {@link JobDirectoryServerServiceImpl}
      */
@@ -465,17 +465,17 @@ public class ServicesAutoConfiguration {
     public JobDirectoryServerServiceImpl jobDirectoryServerService(
         final ResourceLoader resourceLoader,
         final JobPersistenceService jobPersistenceService,
-        final JobFileService jobFileService,
         final AgentFileStreamService agentFileStreamService,
         final MeterRegistry meterRegistry,
+        final JobFileService jobFileService,
         final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
         return new JobDirectoryServerServiceImpl(
             resourceLoader,
             jobPersistenceService,
-            jobFileService,
             agentFileStreamService,
             meterRegistry,
+            jobFileService,
             jobDirectoryManifestCreatorService
         );
     }
