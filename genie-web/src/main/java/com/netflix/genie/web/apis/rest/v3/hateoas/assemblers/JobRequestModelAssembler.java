@@ -20,9 +20,11 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobRequestResource;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import javax.annotation.Nonnull;
 
 /**
  * Assembles Job Request resources out of JobRequest DTOs.
@@ -30,7 +32,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest, JobRequestResource> {
+public class JobRequestModelAssembler implements RepresentationModelAssembler<JobRequest, EntityModel<JobRequest>> {
 
     private static final String JOB_LINK = "job";
     private static final String EXECUTION_LINK = "execution";
@@ -42,30 +44,31 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
      * {@inheritDoc}
      */
     @Override
-    public JobRequestResource toResource(final JobRequest jobRequest) {
+    @Nonnull
+    public EntityModel<JobRequest> toModel(final JobRequest jobRequest) {
         final String id = jobRequest.getId().orElseThrow(IllegalArgumentException::new);
-        final JobRequestResource jobRequestResource = new JobRequestResource(jobRequest);
+        final EntityModel<JobRequest> jobRequestModel = new EntityModel<>(jobRequest);
 
         try {
-            jobRequestResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            jobRequestModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobRequest(id)
                 ).withSelfRel()
             );
 
-            jobRequestResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            jobRequestModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJob(id)
                 ).withRel(JOB_LINK)
             );
 
-            jobRequestResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            jobRequestModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobExecution(id)
                 ).withRel(EXECUTION_LINK)
@@ -89,25 +92,25 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
 //                ).withRel("output")
 //            );
 
-            jobRequestResource.add(
-                ControllerLinkBuilder
+            jobRequestModel.add(
+                WebMvcLinkBuilder
                     .linkTo(JobRestController.class)
                     .slash(id)
                     .slash(OUTPUT_LINK)
                     .withRel(OUTPUT_LINK)
             );
 
-            jobRequestResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            jobRequestModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobStatus(id)
                 ).withRel(STATUS_LINK)
             );
 
-            jobRequestResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            jobRequestModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobMetadata(id)
                 ).withRel(METADATA_LINK)
@@ -117,6 +120,6 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
             throw new RuntimeException(ge);
         }
 
-        return jobRequestResource;
+        return jobRequestModel;
     }
 }

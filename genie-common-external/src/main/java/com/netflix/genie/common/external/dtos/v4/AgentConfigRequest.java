@@ -49,9 +49,7 @@ public class AgentConfigRequest implements Serializable {
     private final boolean interactive;
     // TODO: Switch to Path
     private final File requestedJobDirectoryLocation;
-    // TODO: Remove transient once Jackson 2.10 is picked up as dependency:
-    //       https://github.com/FasterXML/jackson-databind/issues/18
-    private final transient JsonNode ext;
+    private final JsonNode ext;
 
     private AgentConfigRequest(final Builder builder) {
         this.archivingDisabled = builder.bArchivingDisabled;

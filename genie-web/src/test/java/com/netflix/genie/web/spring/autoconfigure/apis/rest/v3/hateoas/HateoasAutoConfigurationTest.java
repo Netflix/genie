@@ -17,16 +17,16 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas;
 
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -54,16 +54,16 @@ class HateoasAutoConfigurationTest {
     void expectedHateoasBeansAreCreated() {
         this.contextRunner.run(
             context -> {
-                Assertions.assertThat(context).hasSingleBean(ApplicationResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(ClusterResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(CommandResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(JobExecutionResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(JobMetadataResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(JobRequestResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(JobResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(JobSearchResultResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(RootResourceAssembler.class);
-                Assertions.assertThat(context).hasSingleBean(ResourceAssemblers.class);
+                Assertions.assertThat(context).hasSingleBean(ApplicationModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(ClusterModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(CommandModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(JobExecutionModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(JobMetadataModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(JobRequestModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(JobModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(JobSearchResultModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(RootModelAssembler.class);
+                Assertions.assertThat(context).hasSingleBean(EntityModelAssemblers.class);
             }
         );
     }

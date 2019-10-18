@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
@@ -27,15 +28,16 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
 import io.restassured.RestAssured;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,10 +48,9 @@ import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
 
 import java.net.URI;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -127,7 +128,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API + "/{id}", id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(ID_PATH, Matchers.is(id))
             .body(CREATED_PATH, Matchers.notNullValue())
             .body(UPDATED_PATH, Matchers.notNullValue())
@@ -174,7 +175,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API + "/{id}", ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(ID_PATH, Matchers.is(ID))
             .body(CREATED_PATH, Matchers.notNullValue())
             .body(UPDATED_PATH, Matchers.notNullValue())
@@ -282,7 +283,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(CLUSTERS_LIST_PATH, Matchers.hasSize(3))
             .body(CLUSTERS_ID_LIST_PATH, Matchers.containsInAnyOrder(id1, id2, id3))
             .body(
@@ -303,7 +304,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(CLUSTERS_LIST_PATH, Matchers.hasSize(2));
 
         // Query by name
@@ -316,7 +317,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(CLUSTERS_LIST_PATH, Matchers.hasSize(1))
             .body(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id2));
 
@@ -330,7 +331,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(CLUSTERS_LIST_PATH, Matchers.hasSize(2))
             .body(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id3))
             .body(CLUSTERS_LIST_PATH + "[1].id", Matchers.is(id1));
@@ -345,7 +346,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(CLUSTERS_LIST_PATH, Matchers.hasSize(1))
             .body(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id1));
 
@@ -377,11 +378,13 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                     .get(clusterResource, ID)
                     .then()
                     .statusCode(Matchers.is(HttpStatus.OK.value()))
-                    .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                    .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
                     .extract()
                     .asByteArray(),
-                ClusterResource.class
+                new TypeReference<EntityModel<Cluster>>() {
+                }
             ).getContent();
+        Assertions.assertThat(createdCluster).isNotNull();
         Assert.assertThat(createdCluster.getStatus(), Matchers.is(ClusterStatus.UP));
 
         final Cluster.Builder updateCluster = new Cluster.Builder(
@@ -425,7 +428,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterResource, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(STATUS_PATH, Matchers.is(ClusterStatus.OUT_OF_SERVICE.toString()));
 
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
@@ -452,7 +455,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterResource, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(NAME_PATH, Matchers.is(NAME));
 
         final String newName = UUID.randomUUID().toString();
@@ -484,7 +487,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterResource, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(NAME_PATH, Matchers.is(newName));
 
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
@@ -804,7 +807,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
@@ -857,7 +860,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("[0].id", Matchers.is(commandId1))
             .body("[1].id", Matchers.is(commandId2));
@@ -905,7 +908,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(3))
             .body("[0].id", Matchers.is(commandId1))
             .body("[1].id", Matchers.is(commandId2))
@@ -940,7 +943,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("[0].id", Matchers.is(commandId3));
     }
@@ -962,7 +965,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
@@ -1013,7 +1016,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("[0].id", Matchers.is(commandId1))
             .body("[1].id", Matchers.is(commandId2));
@@ -1036,7 +1039,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
     }
 
@@ -1099,7 +1102,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
     }
 
@@ -1174,7 +1177,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("[0].id", Matchers.is(commandId1))
             .body("[1].id", Matchers.is(commandId3));
@@ -1187,7 +1190,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API + "/{id}/clusters", commandId1)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("[0].id", Matchers.is(ID));
 
@@ -1198,7 +1201,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API + "/{id}/clusters", commandId2)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
 
         RestAssured
@@ -1208,17 +1211,16 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API + "/{id}/clusters", commandId3)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("[0].id", Matchers.is(ID));
     }
 
     /**
-     * This test "documents" a known bug in Spring HATEOAS links that results in doubly-encoded pagination links.
+     * This test "documents" a known bug in Spring HATEOAS links that resulted in doubly-encoded pagination links.
      * https://github.com/spring-projects/spring-hateoas/issues/559
-     * Currently, we work around this bug in the UI by decoding these elements (see Pagination.js).
-     * If this test starts failing, it may be because the behavior has been corrected, and the workaround may be
-     * removed.
+     * We worked around this bug in the UI by decoding these elements (see Pagination.js).
+     * This test now documents the contract that this bug should be fixed.
      *
      * @throws Exception on error
      */
@@ -1253,58 +1255,63 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             null
         );
 
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(3L);
 
         final URLEncoder urlEncoder = new URLEncoder();
 
         final String unencodedNameQuery = "Test %";
         final String singleEncodedNameQuery = urlEncoder.encode(unencodedNameQuery, StandardCharsets.UTF_8);
-        final String doubleEncodedNameQuery = urlEncoder.encode(singleEncodedNameQuery, StandardCharsets.UTF_8);
 
         // Query by name with wildcard and get the second page containing a single result (out of 3)
-        final JsonNode responseJsonNode = GenieObjectMapper.getMapper().readTree(
-            RestAssured
-                .given(this.getRequestSpecification())
-                .param("name", unencodedNameQuery)
-                .param("size", 1)
-                .param("page", 1)
-                .when()
-                .port(this.port)
-                .get(CLUSTERS_API)
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
-                .body(CLUSTERS_LIST_PATH, Matchers.hasSize(1))
-                .extract()
-                .asByteArray()
-        );
+        final JsonNode responseJsonNode = GenieObjectMapper
+            .getMapper()
+            .readTree(
+                RestAssured
+                    .given(this.getRequestSpecification())
+                    .param("name", unencodedNameQuery)
+                    .param("size", 1)
+                    .param("page", 1)
+                    .when()
+                    .port(this.port)
+                    .get(CLUSTERS_API)
+                    .then()
+                    .statusCode(Matchers.is(HttpStatus.OK.value()))
+                    .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+                    .body(CLUSTERS_LIST_PATH, Matchers.hasSize(1))
+                    .extract()
+                    .asByteArray()
+            );
 
         // Self link is not double-encoded
-        Assert.assertTrue(
-            responseJsonNode
-                .get("_links")
-                .get("self")
-                .get("href")
-                .asText()
-                .contains(singleEncodedNameQuery));
+        Assertions
+            .assertThat(
+                responseJsonNode
+                    .get("_links")
+                    .get("self")
+                    .get("href")
+                    .asText()
+            )
+            .contains(singleEncodedNameQuery);
 
-        // Pagination links are double-encoded
+        // Pagination links that were double-encoded
         final String[] doubleEncodedHREFS = new String[]{
             "first", "next", "prev", "last",
         };
 
         for (String doubleEncodedHref : doubleEncodedHREFS) {
-            final String linkString = responseJsonNode.get("_links").get(doubleEncodedHref).get("href").asText();
-            Assert.assertNotNull(linkString);
-            final HashMap<String, String> params = Maps.newHashMap();
-            URLEncodedUtils.parse(new URI(linkString), StandardCharsets.UTF_8)
+            final String linkString = responseJsonNode
+                .get("_links")
+                .get(doubleEncodedHref)
+                .get("href")
+                .asText();
+            Assertions.assertThat(linkString).isNotBlank();
+            final Map<String, String> params = Maps.newHashMap();
+            URLEncodedUtils
+                .parse(new URI(linkString), StandardCharsets.UTF_8)
                 .forEach(nameValuePair -> params.put(nameValuePair.getName(), nameValuePair.getValue()));
 
-            Assert.assertTrue(params.containsKey("name"));
-            // Correct: singleEncodedNameQuery, actual: doubleEncodedNameQuery
-            Assert.assertEquals(doubleEncodedNameQuery, params.get("name"));
-            final String decoded = URLDecoder.decode(params.get("name"), StandardCharsets.UTF_8.name());
-            Assert.assertEquals(singleEncodedNameQuery, decoded);
+            Assertions.assertThat(params).containsKey("name");
+            Assertions.assertThat(params.get("name")).isEqualTo(unencodedNameQuery);
         }
     }
 

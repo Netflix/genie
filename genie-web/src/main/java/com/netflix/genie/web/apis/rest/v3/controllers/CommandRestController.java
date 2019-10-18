@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -30,13 +32,10 @@ import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +45,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -90,25 +90,25 @@ import java.util.stream.Collectors;
 public class CommandRestController {
 
     private final CommandPersistenceService commandPersistenceService;
-    private final CommandResourceAssembler commandResourceAssembler;
-    private final ApplicationResourceAssembler applicationResourceAssembler;
-    private final ClusterResourceAssembler clusterResourceAssembler;
+    private final CommandModelAssembler commandModelAssembler;
+    private final ApplicationModelAssembler applicationModelAssembler;
+    private final ClusterModelAssembler clusterModelAssembler;
 
     /**
      * Constructor.
      *
      * @param commandPersistenceService The command configuration service to use.
-     * @param resourceAssemblers        The encapsulation of all available V3 resource assemblers
+     * @param entityModelAssemblers     The encapsulation of all available V3 resource assemblers
      */
     @Autowired
     public CommandRestController(
         final CommandPersistenceService commandPersistenceService,
-        final ResourceAssemblers resourceAssemblers
+        final EntityModelAssemblers entityModelAssemblers
     ) {
         this.commandPersistenceService = commandPersistenceService;
-        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
-        this.applicationResourceAssembler = resourceAssemblers.getApplicationResourceAssembler();
-        this.clusterResourceAssembler = resourceAssemblers.getClusterResourceAssembler();
+        this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
+        this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
+        this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
     }
 
     /**
@@ -143,9 +143,9 @@ public class CommandRestController {
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public CommandResource getCommand(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Command> getCommand(@PathVariable("id") final String id) throws GenieException {
         log.info("Called to get command with id {}", id);
-        return this.commandResourceAssembler.toResource(
+        return this.commandModelAssembler.toModel(
             DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id))
         );
     }
@@ -164,7 +164,7 @@ public class CommandRestController {
      */
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<CommandResource> getCommands(
+    public PagedModel<EntityModel<Command>> getCommands(
         @RequestParam(value = "name", required = false) @Nullable final String name,
         @RequestParam(value = "user", required = false) @Nullable final String user,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
@@ -256,9 +256,9 @@ public class CommandRestController {
         }
 
         // Build the self link which will be used for the next, previous, etc links
-        final Link self = ControllerLinkBuilder
+        final Link self = WebMvcLinkBuilder
             .linkTo(
-                ControllerLinkBuilder
+                WebMvcLinkBuilder
                     .methodOn(CommandRestController.class)
                     .getCommands(
                         name,
@@ -270,9 +270,9 @@ public class CommandRestController {
                     )
             ).withSelfRel();
 
-        return assembler.toResource(
+        return assembler.toModel(
             commands,
-            this.commandResourceAssembler,
+            this.commandModelAssembler,
             self
         );
     }
@@ -593,14 +593,14 @@ public class CommandRestController {
      */
     @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ApplicationResource> getApplicationsForCommand(
+    public List<EntityModel<Application>> getApplicationsForCommand(
         @PathVariable("id") final String id
     ) throws GenieException {
         log.info("Called with id {}", id);
         return this.commandPersistenceService.getApplicationsForCommand(id)
             .stream()
             .map(DtoConverters::toV3Application)
-            .map(this.applicationResourceAssembler::toResource)
+            .map(this.applicationModelAssembler::toModel)
             .collect(Collectors.toList());
     }
 
@@ -665,7 +665,7 @@ public class CommandRestController {
      */
     @GetMapping(value = "/{id}/clusters", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<ClusterResource> getClustersForCommand(
+    public Set<EntityModel<Cluster>> getClustersForCommand(
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws GenieException {
@@ -684,7 +684,7 @@ public class CommandRestController {
         return this.commandPersistenceService.getClustersForCommand(id, enumStatuses)
             .stream()
             .map(DtoConverters::toV3Cluster)
-            .map(this.clusterResourceAssembler::toResource)
+            .map(this.clusterModelAssembler::toModel)
             .collect(Collectors.toSet());
     }
 

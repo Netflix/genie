@@ -47,7 +47,7 @@ dependencies {
     compile("io.springfox:springfox-swagger2")
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")
-    compile("javax.persistence:javax.persistence-api")
+    compile("jakarta.persistence:jakarta.persistence-api")
     compile("org.apache.commons:commons-exec")
     compile("org.apache.commons:commons-lang3")
     compile("org.apache.httpcomponents:httpclient")

@@ -17,46 +17,39 @@
  */
 package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
-import com.google.common.collect.Lists;
-import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
-import org.hamcrest.Matchers;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.hateoas.EntityModel;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
- * Unit tests for the CommandResourceAssembler.
+ * Unit tests for the ClusterResourceAssembler.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class CommandResourceAssemblerTest {
+public class ClusterModelAssemblerTest {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
-    private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList(UUID.randomUUID().toString());
-    private static final long CHECK_DELAY = 1000L;
 
-    private Command command;
-    private CommandResourceAssembler assembler;
+    private Cluster cluster;
+    private ClusterModelAssembler assembler;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
-            .withId(ID)
-            .build();
-        this.assembler = new CommandResourceAssembler();
+        this.cluster = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build();
+        this.assembler = new ClusterModelAssembler();
     }
 
     /**
@@ -73,9 +66,9 @@ public class CommandResourceAssemblerTest {
     @Test
     @Ignore
     public void canConvertToResource() {
-        final CommandResource resource = this.assembler.toResource(this.command);
-        Assert.assertThat(resource.getLinks().size(), Matchers.is(2));
-        Assert.assertNotNull(resource.getLink("self"));
-        Assert.assertNotNull(resource.getLink("clusters"));
+        final EntityModel<Cluster> model = this.assembler.toModel(this.cluster);
+        Assert.assertTrue(model.getLinks().hasSize(2));
+        Assert.assertNotNull(model.getLink("self"));
+        Assert.assertNotNull(model.getLink("commands"));
     }
 }

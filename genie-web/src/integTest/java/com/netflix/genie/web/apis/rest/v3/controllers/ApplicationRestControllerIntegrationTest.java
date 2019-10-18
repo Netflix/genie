@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -25,13 +26,14 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
 import io.restassured.RestAssured;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -134,7 +136,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API + "/{id}", id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(ID_PATH, Matchers.is(id))
             .body(UPDATED_PATH, Matchers.notNullValue())
             .body(CREATED_PATH, Matchers.notNullValue())
@@ -195,7 +197,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API + "/{id}", ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(ID_PATH, Matchers.is(ID))
             .body(UPDATED_PATH, Matchers.notNullValue())
             .body(CREATED_PATH, Matchers.notNullValue())
@@ -356,7 +358,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .port(this.port).get(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(APPLICATIONS_LIST_PATH, Matchers.hasSize(7))
             .body(APPLICATIONS_ID_LIST_PATH, Matchers.hasSize(7))
             .body(
@@ -378,7 +380,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(APPLICATIONS_LIST_PATH, Matchers.hasSize(2));
 
         // Query by name
@@ -389,7 +391,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(APPLICATIONS_LIST_PATH, Matchers.hasSize(1))
             .body(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(hiveId));
 
@@ -401,7 +403,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(APPLICATIONS_LIST_PATH, Matchers.hasSize(1))
             .body(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(spark141Id));
 
@@ -414,7 +416,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(APPLICATIONS_LIST_PATH, Matchers.hasSize(6))
             .body(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(hiveId))
             .body(APPLICATIONS_LIST_PATH + "[1].id", Matchers.is(pigId))
@@ -431,7 +433,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(APPLICATIONS_LIST_PATH, Matchers.hasSize(1))
             .body(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(spark131Id));
 
@@ -443,7 +445,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(APPLICATIONS_LIST_PATH, Matchers.hasSize(5))
             .body(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(spark131Id))
             .body(APPLICATIONS_LIST_PATH + "[1].id", Matchers.is(spark140Id))
@@ -480,8 +482,10 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                     .statusCode(Matchers.is(HttpStatus.OK.value()))
                     .extract()
                     .asByteArray(),
-                ApplicationResource.class
+                new TypeReference<EntityModel<Application>>() {
+                }
             ).getContent();
+        Assertions.assertThat(createdApp).isNotNull();
         Assert.assertThat(createdApp.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
 
         final Application.Builder newStatusApp = new Application.Builder(
@@ -525,7 +529,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(applicationResource, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(STATUS_PATH, Matchers.is(ApplicationStatus.INACTIVE.toString()));
 
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
@@ -551,7 +555,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(applicationResource, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(USER_PATH, Matchers.is(USER));
 
         final String newUser = UUID.randomUUID().toString();
@@ -583,7 +587,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(applicationResource, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(USER_PATH, Matchers.is(newUser));
 
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
@@ -1018,7 +1022,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                     .get(applicationCommandsAPI, ID)
                     .then()
                     .statusCode(Matchers.is(HttpStatus.OK.value()))
-                    .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                    .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
                     .extract()
                     .asByteArray(),
                 Command[].class
@@ -1062,7 +1066,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(applicationCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("[0].id", Matchers.is(command1Id));
     }

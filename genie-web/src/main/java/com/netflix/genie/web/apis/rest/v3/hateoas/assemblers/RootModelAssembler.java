@@ -25,10 +25,12 @@ import com.netflix.genie.web.apis.rest.v3.controllers.ClusterRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.CommandRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
 import com.netflix.genie.web.apis.rest.v3.controllers.RootRestController;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.RootResource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import javax.annotation.Nonnull;
 
 /**
  * Assembles root resource from a JsonNode.
@@ -36,7 +38,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
  * @author tgianos
  * @since 3.0.0
  */
-public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootResource> {
+public class RootModelAssembler implements RepresentationModelAssembler<JsonNode, EntityModel<JsonNode>> {
 
     private static final String APPLICATIONS_LINK = "applications";
     private static final String COMMANDS_LINK = "commands";
@@ -48,45 +50,46 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
      */
     @Override
     @SuppressFBWarnings("NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS")
-    public RootResource toResource(final JsonNode metadata) {
-        final RootResource rootResource = new RootResource(metadata);
+    @Nonnull
+    public EntityModel<JsonNode> toModel(final JsonNode metadata) {
+        final EntityModel<JsonNode> rootResource = new EntityModel<>(metadata);
 
         try {
             rootResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(RootRestController.class)
                         .getRoot()
                 ).withSelfRel()
             );
 
             rootResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(ApplicationRestController.class)
                         .createApplication(null)
                 ).withRel(APPLICATIONS_LINK)
             );
 
             rootResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(CommandRestController.class)
                         .createCommand(null)
                 ).withRel(COMMANDS_LINK)
             );
 
             rootResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(ClusterRestController.class)
                         .createCluster(null)
                 ).withRel(CLUSTERS_LINK)
             );
 
             rootResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(JobRestController.class)
                         .submitJob(null, null, null, null)
                 ).withRel(JOBS_LINK)

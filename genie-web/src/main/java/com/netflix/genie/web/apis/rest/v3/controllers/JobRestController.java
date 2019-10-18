@@ -20,6 +20,11 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.io.ByteStreams;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
@@ -37,23 +42,15 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundEx
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobExecutionResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobMetadataResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobRequestResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobSearchResultResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.dtos.JobSubmission;
@@ -74,10 +71,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -143,14 +141,14 @@ public class JobRestController {
     private final JobLaunchService jobLaunchService;
     private final JobSearchService jobSearchService;
     private final JobCoordinatorService jobCoordinatorService;
-    private final ApplicationResourceAssembler applicationResourceAssembler;
-    private final ClusterResourceAssembler clusterResourceAssembler;
-    private final CommandResourceAssembler commandResourceAssembler;
-    private final JobResourceAssembler jobResourceAssembler;
-    private final JobRequestResourceAssembler jobRequestResourceAssembler;
-    private final JobExecutionResourceAssembler jobExecutionResourceAssembler;
-    private final JobMetadataResourceAssembler jobMetadataResourceAssembler;
-    private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
+    private final ApplicationModelAssembler applicationModelAssembler;
+    private final ClusterModelAssembler clusterModelAssembler;
+    private final CommandModelAssembler commandModelAssembler;
+    private final JobModelAssembler jobModelAssembler;
+    private final JobRequestModelAssembler jobRequestModelAssembler;
+    private final JobExecutionModelAssembler jobExecutionModelAssembler;
+    private final JobMetadataModelAssembler jobMetadataModelAssembler;
+    private final JobSearchResultModelAssembler jobSearchResultModelAssembler;
     private final String hostname;
     private final RestTemplate restTemplate;
     private final JobDirectoryServerService jobDirectoryServerService;
@@ -173,7 +171,7 @@ public class JobRestController {
      * @param jobLaunchService          The {@link JobLaunchService} implementation to use
      * @param jobSearchService          The search service to use
      * @param jobCoordinatorService     The job coordinator service to use.
-     * @param resourceAssemblers        The encapsulation of all the V3 resource assemblers
+     * @param entityModelAssemblers     The encapsulation of all the V3 resource assemblers
      * @param genieHostInfo             Information about the host that the Genie process is running on
      * @param restTemplate              The rest template for http requests
      * @param jobDirectoryServerService The service to handle serving back job directory resources
@@ -191,7 +189,7 @@ public class JobRestController {
         final JobLaunchService jobLaunchService,
         final JobSearchService jobSearchService,
         final JobCoordinatorService jobCoordinatorService,
-        final ResourceAssemblers resourceAssemblers,
+        final EntityModelAssemblers entityModelAssemblers,
         final GenieHostInfo genieHostInfo,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final JobDirectoryServerService jobDirectoryServerService,
@@ -206,14 +204,14 @@ public class JobRestController {
         this.jobLaunchService = jobLaunchService;
         this.jobSearchService = jobSearchService;
         this.jobCoordinatorService = jobCoordinatorService;
-        this.applicationResourceAssembler = resourceAssemblers.getApplicationResourceAssembler();
-        this.clusterResourceAssembler = resourceAssemblers.getClusterResourceAssembler();
-        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
-        this.jobResourceAssembler = resourceAssemblers.getJobResourceAssembler();
-        this.jobRequestResourceAssembler = resourceAssemblers.getJobRequestResourceAssembler();
-        this.jobExecutionResourceAssembler = resourceAssemblers.getJobExecutionResourceAssembler();
-        this.jobMetadataResourceAssembler = resourceAssemblers.getJobMetadataResourceAssembler();
-        this.jobSearchResultResourceAssembler = resourceAssemblers.getJobSearchResultResourceAssembler();
+        this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
+        this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
+        this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
+        this.jobModelAssembler = entityModelAssemblers.getJobModelAssembler();
+        this.jobRequestModelAssembler = entityModelAssemblers.getJobRequestModelAssembler();
+        this.jobExecutionModelAssembler = entityModelAssemblers.getJobExecutionModelAssembler();
+        this.jobMetadataModelAssembler = entityModelAssemblers.getJobMetadataModelAssembler();
+        this.jobSearchResultModelAssembler = entityModelAssemblers.getJobSearchResultModelAssembler();
         this.hostname = genieHostInfo.getHostname();
         this.restTemplate = restTemplate;
         this.jobDirectoryServerService = jobDirectoryServerService;
@@ -341,9 +339,9 @@ public class JobRestController {
      * @throws GenieException For any error
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public JobResource getJob(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Job> getJob(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJob] Called for job with id: {}", id);
-        return this.jobResourceAssembler.toResource(this.jobSearchService.getJob(id));
+        return this.jobModelAssembler.toModel(this.jobSearchService.getJob(id));
     }
 
     /**
@@ -391,7 +389,7 @@ public class JobRestController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @SuppressWarnings("checkstyle:parameternumber")
-    public PagedResources<JobSearchResultResource> findJobs(
+    public PagedModel<EntityModel<JobSearchResult>> findJobs(
         @RequestParam(value = "id", required = false) @Nullable final String id,
         @RequestParam(value = "name", required = false) @Nullable final String name,
         @RequestParam(value = "user", required = false) @Nullable final String user,
@@ -445,9 +443,9 @@ public class JobRestController {
         }
 
         // Build the self link which will be used for the next, previous, etc links
-        final Link self = ControllerLinkBuilder
+        final Link self = WebMvcLinkBuilder
             .linkTo(
-                ControllerLinkBuilder
+                WebMvcLinkBuilder
                     .methodOn(JobRestController.class)
                     .findJobs(
                         id,
@@ -470,7 +468,7 @@ public class JobRestController {
                     )
             ).withSelfRel();
 
-        return assembler.toResource(
+        return assembler.toModel(
             this.jobSearchService.findJobs(
                 id,
                 name,
@@ -489,7 +487,7 @@ public class JobRestController {
                 groupingInstance,
                 page
             ),
-            this.jobSearchResultResourceAssembler,
+            this.jobSearchResultModelAssembler,
             self
         );
     }
@@ -572,10 +570,10 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/request", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public JobRequestResource getJobRequest(
+    public EntityModel<JobRequest> getJobRequest(
         @PathVariable("id") final String id) throws GenieException {
         log.info("[getJobRequest] Called for job request with id {}", id);
-        return this.jobRequestResourceAssembler.toResource(this.jobSearchService.getJobRequest(id));
+        return this.jobRequestModelAssembler.toModel(this.jobSearchService.getJobRequest(id));
     }
 
     /**
@@ -587,11 +585,11 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/execution", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public JobExecutionResource getJobExecution(
+    public EntityModel<JobExecution> getJobExecution(
         @PathVariable("id") final String id
     ) throws GenieException {
         log.info("[getJobExecution] Called for job execution with id {}", id);
-        return this.jobExecutionResourceAssembler.toResource(this.jobSearchService.getJobExecution(id));
+        return this.jobExecutionModelAssembler.toModel(this.jobSearchService.getJobExecution(id));
     }
 
     /**
@@ -604,9 +602,9 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/metadata", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public JobMetadataResource getJobMetadata(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<JobMetadata> getJobMetadata(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJobMetadata] Called for job metadata with id {}", id);
-        return this.jobMetadataResourceAssembler.toResource(this.jobSearchService.getJobMetadata(id));
+        return this.jobMetadataModelAssembler.toModel(this.jobSearchService.getJobMetadata(id));
     }
 
     /**
@@ -618,9 +616,9 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/cluster", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ClusterResource getJobCluster(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Cluster> getJobCluster(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJobCluster] Called for job with id {}", id);
-        return this.clusterResourceAssembler.toResource(this.jobSearchService.getJobCluster(id));
+        return this.clusterModelAssembler.toModel(this.jobSearchService.getJobCluster(id));
     }
 
     /**
@@ -632,9 +630,9 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/command", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public CommandResource getJobCommand(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Command> getJobCommand(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJobCommand] Called for job with id {}", id);
-        return this.commandResourceAssembler.toResource(this.jobSearchService.getJobCommand(id));
+        return this.commandModelAssembler.toModel(this.jobSearchService.getJobCommand(id));
     }
 
     /**
@@ -646,13 +644,15 @@ public class JobRestController {
      */
     @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ApplicationResource> getJobApplications(@PathVariable("id") final String id) throws GenieException {
+    public List<EntityModel<Application>> getJobApplications(
+        @PathVariable("id") final String id
+    ) throws GenieException {
         log.info("[getJobApplications] Called for job with id {}", id);
 
         return this.jobSearchService
             .getJobApplications(id)
             .stream()
-            .map(this.applicationResourceAssembler::toResource)
+            .map(this.applicationModelAssembler::toModel)
             .collect(Collectors.toList());
     }
 

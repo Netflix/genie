@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -30,8 +31,6 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.assertj.core.api.Assertions;
@@ -40,6 +39,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,6 +51,7 @@ import org.springframework.restdocs.snippet.Attributes;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -177,7 +178,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API + "/{id}", id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(ID_PATH, Matchers.is(id))
             .body(CREATED_PATH, Matchers.notNullValue())
             .body(UPDATED_PATH, Matchers.notNullValue())
@@ -291,7 +292,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API + "/{id}", ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(ID_PATH, Matchers.is(ID))
             .body(CREATED_PATH, Matchers.notNullValue())
             .body(UPDATED_PATH, Matchers.notNullValue())
@@ -430,7 +431,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(COMMANDS_LIST_PATH, Matchers.hasSize(3))
             .body(COMMANDS_ID_LIST_PATH, Matchers.containsInAnyOrder(id1, id2, id3))
             .body(
@@ -464,7 +465,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(COMMANDS_LIST_PATH, Matchers.hasSize(2));
 
         // Query by name
@@ -477,7 +478,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(COMMANDS_LIST_PATH, Matchers.hasSize(1))
             .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id2));
 
@@ -491,7 +492,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(COMMANDS_LIST_PATH, Matchers.hasSize(1))
             .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id3));
 
@@ -505,7 +506,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(COMMANDS_LIST_PATH, Matchers.hasSize(2))
             .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id3))
             .body(COMMANDS_LIST_PATH + "[1].id", Matchers.is(id1));
@@ -520,7 +521,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(COMMANDS_LIST_PATH, Matchers.hasSize(1))
             .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id1));
 
@@ -554,11 +555,13 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                     .get(commandResource, ID)
                     .then()
                     .statusCode(Matchers.is(HttpStatus.OK.value()))
-                    .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                    .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
                     .extract()
                     .asByteArray(),
-                CommandResource.class
+                new TypeReference<EntityModel<Command>>() {
+                }
             ).getContent();
+        Assertions.assertThat(createdCommand).isNotNull();
         Assert.assertThat(createdCommand.getStatus(), Matchers.is(CommandStatus.ACTIVE));
 
         final Command.Builder updateCommand = new Command.Builder(
@@ -604,7 +607,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandResource, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(STATUS_PATH, Matchers.is(CommandStatus.INACTIVE.toString()));
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
@@ -633,7 +636,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandResource, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(NAME_PATH, Matchers.is(NAME));
 
         final String newName = UUID.randomUUID().toString();
@@ -665,7 +668,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandResource, id)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body(NAME_PATH, Matchers.is(newName));
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
@@ -1089,7 +1092,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
@@ -1144,7 +1147,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("[0].id", Matchers.is(applicationId1))
             .body("[1].id", Matchers.is(applicationId2));
@@ -1204,7 +1207,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(3))
             .body("[0].id", Matchers.is(applicationId1))
             .body("[1].id", Matchers.is(applicationId2))
@@ -1233,7 +1236,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
@@ -1292,7 +1295,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("[0].id", Matchers.is(applicationId1))
             .body("[1].id", Matchers.is(applicationId2));
@@ -1315,7 +1318,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("[0].id", Matchers.is(applicationId2))
             .body("[1].id", Matchers.is(applicationId1));
@@ -1342,7 +1345,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(3))
             .body("[0].id", Matchers.is(applicationId1))
             .body("[1].id", Matchers.is(applicationId2))
@@ -1366,7 +1369,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
     }
 
@@ -1435,7 +1438,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
     }
 
@@ -1520,7 +1523,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(2))
             .body("[0].id", Matchers.is(applicationId1))
             .body("[1].id", Matchers.is(applicationId3));
@@ -1533,7 +1536,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(APPLICATIONS_API + "/{id}/commands", applicationId1)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("[0].id", Matchers.is(ID));
 
@@ -1544,7 +1547,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(APPLICATIONS_API + "/{id}/commands", applicationId2)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.empty());
 
         RestAssured
@@ -1554,7 +1557,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(APPLICATIONS_API + "/{id}/commands", applicationId3)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("[0].id", Matchers.is(ID));
     }
@@ -1626,14 +1629,16 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                     .get(COMMANDS_API + "/{id}/clusters", ID)
                     .then()
                     .statusCode(Matchers.is(HttpStatus.OK.value()))
-                    .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                    .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
                     .body("$", Matchers.hasSize(2))
                     .extract()
                     .asByteArray(),
-                ClusterResource[].class
+                new TypeReference<EntityModel<Cluster>[]>() {
+                }
             )
         )
-            .map(ClusterResource::getContent)
+            .map(EntityModel::getContent)
+            .filter(Objects::nonNull)
             .forEach(
                 cluster -> {
                     final String id = cluster.getId().orElseThrow(IllegalArgumentException::new);
@@ -1674,7 +1679,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API + "/{id}/clusters", ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("$", Matchers.hasSize(1))
             .body("[0].id", Matchers.is(cluster1Id));
     }

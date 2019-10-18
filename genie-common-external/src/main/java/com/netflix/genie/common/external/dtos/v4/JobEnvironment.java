@@ -59,9 +59,7 @@ public class JobEnvironment implements Serializable {
         @NotNull(message = "Environment variable value can't be null")
         @Size(max = 1024, message = "Max environment variable value length is 1024 characters") String>
         environmentVariables;
-    // TODO: Remove transient once Jackson 2.10 is picked up as dependency:
-    //       https://github.com/FasterXML/jackson-databind/issues/18
-    private final transient JsonNode ext;
+    private final JsonNode ext;
 
     private JobEnvironment(final Builder builder) {
         this.cpu = builder.bCpu == null ? DEFAULT_NUM_CPU : builder.bCpu;

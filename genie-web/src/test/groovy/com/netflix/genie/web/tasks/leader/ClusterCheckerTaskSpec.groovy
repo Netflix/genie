@@ -105,7 +105,7 @@ class ClusterCheckerTaskSpec extends Specification {
             getStatusCode() >> HttpStatus.SERVICE_UNAVAILABLE
             getResponseBodyAsString() >> "{" +
                 "\"status\":\"OUT_OF_SERVICE\", " +
-                "\"details\": {" +
+                "\"components\": {" +
                 "  \"db\": { \"status\": \"OUT_OF_SERVICE\"}," +
                 "  \"memory\": { \"status\": \"UP\"}" +
                 "  }" +
@@ -114,7 +114,7 @@ class ClusterCheckerTaskSpec extends Specification {
 
         def healthyResponse = "{" +
             "\"status\":\"UP\", " +
-            "\"details\": {" +
+            "\"components\": {" +
             "  \"db\": { \"status\": \"UP\"}," +
             "  \"memory\": { \"status\": \"UP\"}" +
             "  }" +
@@ -124,7 +124,7 @@ class ClusterCheckerTaskSpec extends Specification {
             getStatusCode() >> HttpStatus.SERVICE_UNAVAILABLE
             getResponseBodyAsString() >> "{" +
                 "\"status\":\"OUT_OF_SERVICE\", " +
-                "\"details\": {" +
+                "\"components\": {" +
                 "  \"db\": { \"status\": \"UP\"}," +
                 "  \"memory\": { \"status\": \"OUT_OF_SERVICE\", \"details\":{\"foo\":\"bar\"} }" +
                 "  }" +

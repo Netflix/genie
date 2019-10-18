@@ -17,16 +17,16 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.apis.rest.v3.hateoas;
 
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,139 +43,139 @@ public class HateoasAutoConfiguration {
     /**
      * Provide a resource assembler for application resources if none already exists.
      *
-     * @return A {@link ApplicationResourceAssembler} instance
+     * @return A {@link ApplicationModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(ApplicationResourceAssembler.class)
-    public ApplicationResourceAssembler applicationResourceAssembler() {
-        return new ApplicationResourceAssembler();
+    @ConditionalOnMissingBean(ApplicationModelAssembler.class)
+    public ApplicationModelAssembler applicationResourceAssembler() {
+        return new ApplicationModelAssembler();
     }
 
     /**
      * Provide a resource assembler for cluster resources if none already exists.
      *
-     * @return A {@link ClusterResourceAssembler} instance
+     * @return A {@link ClusterModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(ClusterResourceAssembler.class)
-    public ClusterResourceAssembler clusterResourceAssembler() {
-        return new ClusterResourceAssembler();
+    @ConditionalOnMissingBean(ClusterModelAssembler.class)
+    public ClusterModelAssembler clusterResourceAssembler() {
+        return new ClusterModelAssembler();
     }
 
     /**
      * Provide a resource assembler for command resources if none already exists.
      *
-     * @return A {@link CommandResourceAssembler} instance
+     * @return A {@link CommandModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(CommandResourceAssembler.class)
-    public CommandResourceAssembler commandResourceAssembler() {
-        return new CommandResourceAssembler();
+    @ConditionalOnMissingBean(CommandModelAssembler.class)
+    public CommandModelAssembler commandResourceAssembler() {
+        return new CommandModelAssembler();
     }
 
     /**
      * Provide a resource assembler for job execution resources if none already exists.
      *
-     * @return A {@link JobExecutionResourceAssembler} instance
+     * @return A {@link JobExecutionModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(JobExecutionResourceAssembler.class)
-    public JobExecutionResourceAssembler jobExecutionResourceAssembler() {
-        return new JobExecutionResourceAssembler();
+    @ConditionalOnMissingBean(JobExecutionModelAssembler.class)
+    public JobExecutionModelAssembler jobExecutionResourceAssembler() {
+        return new JobExecutionModelAssembler();
     }
 
     /**
      * Provide a resource assembler for job metadata resources if none already exists.
      *
-     * @return A {@link JobMetadataResourceAssembler} instance
+     * @return A {@link JobMetadataModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(JobMetadataResourceAssembler.class)
-    public JobMetadataResourceAssembler jobMetadataResourceAssembler() {
-        return new JobMetadataResourceAssembler();
+    @ConditionalOnMissingBean(JobMetadataModelAssembler.class)
+    public JobMetadataModelAssembler jobMetadataResourceAssembler() {
+        return new JobMetadataModelAssembler();
     }
 
     /**
      * Provide a resource assembler for job request resources if none already exists.
      *
-     * @return A {@link JobRequestResourceAssembler} instance
+     * @return A {@link JobRequestModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(JobRequestResourceAssembler.class)
-    public JobRequestResourceAssembler jobRequestResourceAssembler() {
-        return new JobRequestResourceAssembler();
+    @ConditionalOnMissingBean(JobRequestModelAssembler.class)
+    public JobRequestModelAssembler jobRequestResourceAssembler() {
+        return new JobRequestModelAssembler();
     }
 
     /**
      * Provide a resource assembler for job resources if none already exists.
      *
-     * @return A {@link JobResourceAssembler} instance
+     * @return A {@link JobModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(JobResourceAssembler.class)
-    public JobResourceAssembler jobResourceAssembler() {
-        return new JobResourceAssembler();
+    @ConditionalOnMissingBean(JobModelAssembler.class)
+    public JobModelAssembler jobResourceAssembler() {
+        return new JobModelAssembler();
     }
 
     /**
      * Provide a resource assembler for job search result resources if none already exists.
      *
-     * @return A {@link JobSearchResultResourceAssembler} instance
+     * @return A {@link JobSearchResultModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(JobSearchResultResourceAssembler.class)
-    public JobSearchResultResourceAssembler jobSearchResultResourceAssembler() {
-        return new JobSearchResultResourceAssembler();
+    @ConditionalOnMissingBean(JobSearchResultModelAssembler.class)
+    public JobSearchResultModelAssembler jobSearchResultResourceAssembler() {
+        return new JobSearchResultModelAssembler();
     }
 
     /**
      * Provide a resource assembler for the api root resource if none already exists.
      *
-     * @return A {@link RootResourceAssembler} instance
+     * @return A {@link RootModelAssembler} instance
      */
     @Bean
-    @ConditionalOnMissingBean(RootResourceAssembler.class)
-    public RootResourceAssembler rootResourceAssembler() {
-        return new RootResourceAssembler();
+    @ConditionalOnMissingBean(RootModelAssembler.class)
+    public RootModelAssembler rootResourceAssembler() {
+        return new RootModelAssembler();
     }
 
     /**
      * An encapsulation of all the V3 resource assemblers.
      *
-     * @param applicationResourceAssembler     The application assembler
-     * @param clusterResourceAssembler         The cluster assembler
-     * @param commandResourceAssembler         The command assembler
-     * @param jobExecutionResourceAssembler    The job execution assembler
-     * @param jobMetadataResourceAssembler     The job metadata assembler
-     * @param jobRequestResourceAssembler      The job request assembler
-     * @param jobResourceAssembler             The job assembler
-     * @param jobSearchResultResourceAssembler The job search result assembler
-     * @param rootResourceAssembler            The root assembler
-     * @return A {@link ResourceAssemblers} instance
+     * @param applicationModelAssembler     The application assembler
+     * @param clusterModelAssembler         The cluster assembler
+     * @param commandModelAssembler         The command assembler
+     * @param jobExecutionModelAssembler    The job execution assembler
+     * @param jobMetadataModelAssembler     The job metadata assembler
+     * @param jobRequestModelAssembler      The job request assembler
+     * @param jobModelAssembler             The job assembler
+     * @param jobSearchResultModelAssembler The job search result assembler
+     * @param rootModelAssembler            The root assembler
+     * @return A {@link EntityModelAssemblers} instance
      */
     @Bean
-    @ConditionalOnMissingBean(ResourceAssemblers.class)
-    public ResourceAssemblers resourceAssemblers(
-        final ApplicationResourceAssembler applicationResourceAssembler,
-        final ClusterResourceAssembler clusterResourceAssembler,
-        final CommandResourceAssembler commandResourceAssembler,
-        final JobExecutionResourceAssembler jobExecutionResourceAssembler,
-        final JobMetadataResourceAssembler jobMetadataResourceAssembler,
-        final JobRequestResourceAssembler jobRequestResourceAssembler,
-        final JobResourceAssembler jobResourceAssembler,
-        final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
-        final RootResourceAssembler rootResourceAssembler
+    @ConditionalOnMissingBean(EntityModelAssemblers.class)
+    public EntityModelAssemblers resourceAssemblers(
+        final ApplicationModelAssembler applicationModelAssembler,
+        final ClusterModelAssembler clusterModelAssembler,
+        final CommandModelAssembler commandModelAssembler,
+        final JobExecutionModelAssembler jobExecutionModelAssembler,
+        final JobMetadataModelAssembler jobMetadataModelAssembler,
+        final JobRequestModelAssembler jobRequestModelAssembler,
+        final JobModelAssembler jobModelAssembler,
+        final JobSearchResultModelAssembler jobSearchResultModelAssembler,
+        final RootModelAssembler rootModelAssembler
     ) {
-        return new ResourceAssemblers(
-            applicationResourceAssembler,
-            clusterResourceAssembler,
-            commandResourceAssembler,
-            jobExecutionResourceAssembler,
-            jobMetadataResourceAssembler,
-            jobRequestResourceAssembler,
-            jobResourceAssembler,
-            jobSearchResultResourceAssembler,
-            rootResourceAssembler
+        return new EntityModelAssemblers(
+            applicationModelAssembler,
+            clusterModelAssembler,
+            commandModelAssembler,
+            jobExecutionModelAssembler,
+            jobMetadataModelAssembler,
+            jobRequestModelAssembler,
+            jobModelAssembler,
+            jobSearchResultModelAssembler,
+            rootModelAssembler
         );
     }
 }
