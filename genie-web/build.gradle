@@ -33,6 +33,7 @@ dependencies {
     compile(project(":genie-proto"))
 
     compile("com.amazonaws:aws-java-sdk-sts")
+    compile("com.github.ben-manes.caffeine:caffeine")
     compile("com.github.fge:json-patch")
     compile("com.google.guava:guava")
     compile("commons-codec:commons-codec")
@@ -54,6 +55,7 @@ dependencies {
     compile("org.flywaydb:flyway-core")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-aop")
+    compile("org.springframework.boot:spring-boot-starter-cache")
     compile("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude group: "org.hibernate.javax.persistence"
     }

@@ -27,6 +27,7 @@ import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundExce
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
 import com.netflix.genie.web.services.ArchivedJobService;
+import com.netflix.genie.web.spring.autoconfigure.CachingAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.RetryAutoConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -36,6 +37,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -59,7 +62,8 @@ import java.util.UUID;
 @ContextConfiguration(
     classes = {
         ArchivedJobServiceImplIntegrationTest.ArchivedJobServiceConfig.class,
-        RetryAutoConfiguration.class
+        RetryAutoConfiguration.class,
+        CachingAutoConfiguration.class
     },
     loader = AnnotationConfigContextLoader.class
 )
@@ -189,6 +193,12 @@ public class ArchivedJobServiceImplIntegrationTest {
         Assertions.assertThat(metadata.getJobId()).isEqualTo(JOB_ID);
         Assertions.assertThat(metadata.getManifest()).isEqualTo(expectedManifest);
         Assertions.assertThat(metadata.getJobDirectoryRoot()).isEqualTo(expectedJobDirectoryRoot);
+
+        // Verify that subsequent gets resolved from the cache
+        final ArchivedJobMetadata cachedMetadata = this.archivedJobService.getArchivedJobMetadata(JOB_ID);
+        Assertions.assertThat(cachedMetadata).isEqualTo(metadata);
+
+        // This should only have actually been used one time despite two service API calls
         Mockito
             .verify(this.jobPersistenceService, Mockito.times(1))
             .getJobArchiveLocation(JOB_ID);
@@ -196,6 +206,12 @@ public class ArchivedJobServiceImplIntegrationTest {
 
     @Configuration
     static class ArchivedJobServiceConfig {
+
+        @Bean
+        public CacheManager cacheManager() {
+            // provide a cache manager to test caching
+            return new CaffeineCacheManager();
+        }
 
         @Bean
         public ArchivedJobServiceImpl archivedJobService(

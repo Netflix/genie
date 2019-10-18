@@ -35,6 +35,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.retry.annotation.Backoff;
@@ -92,6 +93,12 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
      * {@inheritDoc}
      */
     @Override
+    @Cacheable(
+        cacheNames = {
+            "archivedJobMetadata"
+        },
+        sync = true
+    )
     @Retryable(
         maxAttemptsExpression = "#{${" + ArchivedJobServiceImpl.GET_METADATA_NUM_RETRY_PROPERTY_NAME + ":5}}",
         include = {

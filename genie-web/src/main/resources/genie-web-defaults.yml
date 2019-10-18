@@ -118,6 +118,9 @@ spring:
     name: genie
   banner:
     location: genie-banner.txt
+  cache:
+    caffeine:
+      spec: maximumSize=100,expireAfterAccess=600s
   cloud:
     zookeeper:
       enabled: false
