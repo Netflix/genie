@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
@@ -36,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +56,13 @@ import java.util.Set;
  */
 @Slf4j
 public class ArchivedJobServiceImpl implements ArchivedJobService {
+    @VisibleForTesting
+    static final String GET_METADATA_NUM_RETRY_PROPERTY_NAME = "genie.retry.archived-job-get-metadata.noOfRetries";
+    private static final String GET_METADATA_INITIAL_DELAY_PROPERTY_NAME
+        = "genie.retry.archived-job-get-metadata.noOfRetries";
+    private static final String GET_METADATA_MULTIPLIER_PROPERTY_NAME
+        = "genie.retry.archived-job-get-metadata.multiplier";
+
     private static final String SLASH = "/";
     private static final String GET_ARCHIVED_JOB_METADATA_METRIC_NAME
         = "genie.web.services.archivedJobService.getArchivedJobMetadata.timer";
@@ -82,6 +92,16 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
      * {@inheritDoc}
      */
     @Override
+    @Retryable(
+        maxAttemptsExpression = "#{${" + ArchivedJobServiceImpl.GET_METADATA_NUM_RETRY_PROPERTY_NAME + ":5}}",
+        include = {
+            JobDirectoryManifestNotFoundException.class
+        },
+        backoff = @Backoff(
+            delayExpression = "#{${" + ArchivedJobServiceImpl.GET_METADATA_INITIAL_DELAY_PROPERTY_NAME + ":1000}}",
+            multiplierExpression = "#{${" + ArchivedJobServiceImpl.GET_METADATA_MULTIPLIER_PROPERTY_NAME + ":2.0}}"
+        )
+    )
     public ArchivedJobMetadata getArchivedJobMetadata(
         final String jobId
     ) throws JobNotFoundException, JobNotArchivedException, JobDirectoryManifestNotFoundException {
@@ -108,6 +128,8 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
                 throw new GenieRuntimeException("Unable to create URI from archive location: " + archiveLocation, e);
             }
 
+            // TODO: This is pretty hardcoded and we may want to store direct link
+            //       to manifest in database or something
             final URI manifestLocation;
             if (StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)) {
                 manifestLocation = jobDirectoryRoot.resolve(JobArchiveService.MANIFEST_NAME).normalize();

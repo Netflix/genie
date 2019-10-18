@@ -22,6 +22,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.spring.autoconfigure.tasks.leader.LeaderAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.tasks.node.NodeAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.MailAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.RetryAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.SwaggerAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\

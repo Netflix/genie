@@ -2,8 +2,7 @@
 
 This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/[Spring Boot] reference documentation
-and the http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Spring Cloud] documentation.
+http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/[Spring Boot] reference documentation and the http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Spring Cloud] documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.
 
 === Default Properties
@@ -293,6 +292,22 @@ determined by Zookeeper or other mechanism via Spring
 |false
 |no
 
+|genie.retry.archived-job-get-metadata.initialDelay
+|The initial interval between retries to get archived job metadata. Milliseconds
+|1000
+|no
+
+|genie.retry.archived-job-get-metadata.multiplier
+|The amount the delay should increase on every retry. e.g. start at 1 second -> 2 seconds -> 4 seconds with a value
+of 2.0
+|2.0
+|no
+
+|genie.retry.archived-job-get-metadata.noOfRetries
+|The number of times to retry requests to get archived job metadata before failure
+|5
+|no
+
 |genie.retry.initialInterval
 |The amount of time to wait after initial failure before retrying the first time in milliseconds
 |10000
@@ -384,9 +399,9 @@ See: `genie.tasks.database-cleanup.expression`
 
 |genie.tasks.database-cleanup.maxDeletedPerTransaction
 |The number of job records (across multiple tables) to delete from the database
- in a single transaction. Genie will loop and perform multiple transactions until
- all jobs older than the retention time are deleted.
- This is a soft limit, it could be rounded up to the next multiple of page size.
+in a single transaction. Genie will loop and perform multiple transactions until
+all jobs older than the retention time are deleted.
+This is a soft limit, it could be rounded up to the next multiple of page size.
 |1000
 |no
 
