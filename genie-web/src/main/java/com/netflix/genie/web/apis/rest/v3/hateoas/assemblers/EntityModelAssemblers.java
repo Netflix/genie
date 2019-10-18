@@ -28,14 +28,14 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
-public class ResourceAssemblers {
-    private final ApplicationResourceAssembler applicationResourceAssembler;
-    private final ClusterResourceAssembler clusterResourceAssembler;
-    private final CommandResourceAssembler commandResourceAssembler;
-    private final JobExecutionResourceAssembler jobExecutionResourceAssembler;
-    private final JobMetadataResourceAssembler jobMetadataResourceAssembler;
-    private final JobRequestResourceAssembler jobRequestResourceAssembler;
-    private final JobResourceAssembler jobResourceAssembler;
-    private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
-    private final RootResourceAssembler rootResourceAssembler;
+public class EntityModelAssemblers {
+    private final ApplicationModelAssembler applicationModelAssembler;
+    private final ClusterModelAssembler clusterModelAssembler;
+    private final CommandModelAssembler commandModelAssembler;
+    private final JobExecutionModelAssembler jobExecutionModelAssembler;
+    private final JobMetadataModelAssembler jobMetadataModelAssembler;
+    private final JobRequestModelAssembler jobRequestModelAssembler;
+    private final JobModelAssembler jobModelAssembler;
+    private final JobSearchResultModelAssembler jobSearchResultModelAssembler;
+    private final RootModelAssembler rootModelAssembler;
 }

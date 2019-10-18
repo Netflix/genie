@@ -16,7 +16,7 @@ const Pagination = props => {
       <li key="1">
         <PageLink
           pageType={props.pageType}
-          url={decodeURI(decodeURI(props.links.first.href))} // Workaround for double encoding
+          url={props.links.first.href}
           text="&laquo;"
         />
       </li>
@@ -27,7 +27,7 @@ const Pagination = props => {
       <li key="2">
         <PageLink
           pageType={props.pageType}
-          url={decodeURI(decodeURI(props.links.prev.href))} // Workaround for double encoding
+          url={props.links.prev.href}
           text="&larr; Previous"
         />
       </li>
@@ -38,7 +38,7 @@ const Pagination = props => {
       <li key="3">
         <PageLink
           pageType={props.pageType}
-          url={decodeURI(decodeURI(props.links.next.href))} // Workaround for double encoding
+          url={props.links.next.href}
           text="Next &rarr;"
         />
       </li>
@@ -49,7 +49,7 @@ const Pagination = props => {
       <li key="4">
         <PageLink
           pageType={props.pageType}
-          url={decodeURI(decodeURI(props.links.last.href))} // Workaround for double encoding
+          url={props.links.last.href}
           text="&raquo;"
         />
       </li>

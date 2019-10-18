@@ -20,9 +20,11 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.JobSearchResultResource;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import javax.annotation.Nonnull;
 
 /**
  * Assembles Job resources out of job search result DTOs.
@@ -30,19 +32,21 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobSearchResultResourceAssembler implements ResourceAssembler<JobSearchResult, JobSearchResultResource> {
+public class JobSearchResultModelAssembler
+    implements RepresentationModelAssembler<JobSearchResult, EntityModel<JobSearchResult>> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public JobSearchResultResource toResource(final JobSearchResult job) {
-        final JobSearchResultResource jobResource = new JobSearchResultResource(job);
+    @Nonnull
+    public EntityModel<JobSearchResult> toModel(final JobSearchResult job) {
+        final EntityModel<JobSearchResult> jobSearchResultModel = new EntityModel<>(job);
 
         try {
-            jobResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            jobSearchResultModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJob(job.getId())
                 ).withSelfRel()
@@ -52,6 +56,6 @@ public class JobSearchResultResourceAssembler implements ResourceAssembler<JobSe
             throw new RuntimeException(ge);
         }
 
-        return jobResource;
+        return jobSearchResultModel;
     }
 }

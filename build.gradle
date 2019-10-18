@@ -124,8 +124,8 @@ configure(javaProjects) {
                 entry "springfox-swagger-ui"
                 entry "springfox-bean-validators"
             }
-            dependency("javax.el:javax.el-api:3.0.1-b06")
-            dependency("javax.persistence:javax.persistence-api:2.2")
+            dependency("jakarta.el:jakarta.el-api:3.0.3")
+            dependency("jakarta.persistence:jakarta.persistence-api:2.2.3")
             dependency("net.sf.jtidy:jtidy:r938")
             dependency("net.jcip:jcip-annotations:1.0")
             dependency("org.apache.commons:commons-configuration2:2.5")
@@ -224,8 +224,8 @@ configure(javaProjects) {
 
         testCompileOnly("com.google.code.findbugs:annotations")
 
-        testRuntimeOnly("javax.el:javax.el-api")
-        testRuntimeOnly("org.glassfish:javax.el")
+        testRuntimeOnly("jakarta.el:jakarta.el-api")
+        testRuntimeOnly("org.glassfish:jakarta.el")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
         testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
     }

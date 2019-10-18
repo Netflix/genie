@@ -63,7 +63,7 @@ public class RootRestControllerIntegrationTest extends RestControllerIntegration
             .get("/api/v3")
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
             .body("content.description", Matchers.notNullValue())
             .body(LINKS_PATH + ".keySet().size()", Matchers.is(5))
             .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))

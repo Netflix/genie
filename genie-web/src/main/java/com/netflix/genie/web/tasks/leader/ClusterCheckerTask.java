@@ -262,7 +262,9 @@ public class ClusterCheckerTask extends LeadershipTask {
         // Ignore the top-level health (it's not UP if this code is executing) and instead look at individual
         // indicators, as some of them may be ignored.
         boolean hostHealthy = true;
-        for (final Map.Entry<String, HealthIndicatorDetails> entry : healthEndpointResponse.getDetails().entrySet()) {
+        for (
+            final Map.Entry<String, HealthIndicatorDetails> entry : healthEndpointResponse.getComponents().entrySet()
+        ) {
             final String healthIndicatorName = entry.getKey();
             final HealthIndicatorDetails healthIndicator = entry.getValue();
 
@@ -331,6 +333,6 @@ public class ClusterCheckerTask extends LeadershipTask {
     @NoArgsConstructor
     private static class HealthEndpointResponse {
         private Status status;
-        private Map<String, HealthIndicatorDetails> details;
+        private Map<String, HealthIndicatorDetails> components;
     }
 }

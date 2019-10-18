@@ -19,12 +19,11 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.RootResource;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.hateoas.EntityModel;
 
 /**
  * Unit tests for the RootResourceAssembler.
@@ -32,16 +31,16 @@ import org.junit.Test;
  * @author tgianos
  * @since 3.0.0
  */
-public class RootResourceAssemblerTest {
+public class RootModelAssemblerTest {
 
-    private RootResourceAssembler assembler;
+    private RootModelAssembler assembler;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.assembler = new RootResourceAssembler();
+        this.assembler = new RootModelAssembler();
     }
 
     /**
@@ -60,13 +59,13 @@ public class RootResourceAssemblerTest {
     public void canConvertToResource() {
         final JsonNode node
             = JsonNodeFactory.instance.objectNode().set("description", JsonNodeFactory.instance.textNode("blah"));
-        final RootResource resource = this.assembler.toResource(node);
-        Assert.assertThat(resource.getLinks().size(), Matchers.is(5));
-        Assert.assertNotNull(resource.getContent());
-        Assert.assertNotNull(resource.getLink("self"));
-        Assert.assertNotNull(resource.getLink("applications"));
-        Assert.assertNotNull(resource.getLink("commands"));
-        Assert.assertNotNull(resource.getLink("clusters"));
-        Assert.assertNotNull(resource.getLink("jobs"));
+        final EntityModel<JsonNode> model = this.assembler.toModel(node);
+        Assert.assertTrue(model.getLinks().hasSize(5));
+        Assert.assertNotNull(model.getContent());
+        Assert.assertNotNull(model.getLink("self"));
+        Assert.assertNotNull(model.getLink("applications"));
+        Assert.assertNotNull(model.getLink("commands"));
+        Assert.assertNotNull(model.getLink("clusters"));
+        Assert.assertNotNull(model.getLink("jobs"));
     }
 }

@@ -26,16 +26,16 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobExecutionModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -46,7 +46,6 @@ import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.util.JobExecutionModeSelector;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -66,6 +65,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.mock.http.client.MockClientHttpResponse;
+import org.springframework.mock.web.DelegatingServletOutputStream;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -73,6 +73,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -844,7 +845,7 @@ class JobRestControllerTest {
         Mockito.when(entity.getContent()).thenReturn(bis);
         Mockito.when(forwardResponse.getEntity()).thenReturn(entity);
 
-        final ByteArrayServletOutputStream bos = new ByteArrayServletOutputStream();
+        final DelegatingServletOutputStream bos = new DelegatingServletOutputStream(new ByteArrayOutputStream());
         Mockito.when(response.getOutputStream()).thenReturn(bos);
 
         final ClientHttpRequestFactory factory = Mockito.mock(ClientHttpRequestFactory.class);
@@ -877,7 +878,7 @@ class JobRestControllerTest {
         );
         jobController.getJobOutput(jobId, null, request, response);
 
-        Assertions.assertThat(new String(bos.toByteArray(), StandardCharsets.UTF_8)).isEqualTo(text);
+        Assertions.assertThat(bos.getTargetStream().toString()).isEqualTo(text);
         Mockito.verify(request, Mockito.times(1)).getHeader(HttpHeaders.ACCEPT);
         Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt());
@@ -924,17 +925,17 @@ class JobRestControllerTest {
             .withMessage(errorMessage);
     }
 
-    private ResourceAssemblers createMockResourceAssembler() {
-        return new ResourceAssemblers(
-            Mockito.mock(ApplicationResourceAssembler.class),
-            Mockito.mock(ClusterResourceAssembler.class),
-            Mockito.mock(CommandResourceAssembler.class),
-            Mockito.mock(JobExecutionResourceAssembler.class),
-            Mockito.mock(JobMetadataResourceAssembler.class),
-            Mockito.mock(JobRequestResourceAssembler.class),
-            Mockito.mock(JobResourceAssembler.class),
-            Mockito.mock(JobSearchResultResourceAssembler.class),
-            Mockito.mock(RootResourceAssembler.class)
+    private EntityModelAssemblers createMockResourceAssembler() {
+        return new EntityModelAssemblers(
+            Mockito.mock(ApplicationModelAssembler.class),
+            Mockito.mock(ClusterModelAssembler.class),
+            Mockito.mock(CommandModelAssembler.class),
+            Mockito.mock(JobExecutionModelAssembler.class),
+            Mockito.mock(JobMetadataModelAssembler.class),
+            Mockito.mock(JobRequestModelAssembler.class),
+            Mockito.mock(JobModelAssembler.class),
+            Mockito.mock(JobSearchResultModelAssembler.class),
+            Mockito.mock(RootModelAssembler.class)
         );
     }
 }

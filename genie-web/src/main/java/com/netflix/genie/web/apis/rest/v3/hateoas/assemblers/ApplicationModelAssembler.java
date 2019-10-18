@@ -20,9 +20,11 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.ApplicationRestController;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import javax.annotation.Nonnull;
 
 /**
  * Assembles Application resources out of applications.
@@ -30,7 +32,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
  * @author tgianos
  * @since 3.0.0
  */
-public class ApplicationResourceAssembler implements ResourceAssembler<Application, ApplicationResource> {
+public class ApplicationModelAssembler implements RepresentationModelAssembler<Application, EntityModel<Application>> {
 
     private static final String COMMANDS_LINK = "commands";
 
@@ -38,22 +40,23 @@ public class ApplicationResourceAssembler implements ResourceAssembler<Applicati
      * {@inheritDoc}
      */
     @Override
-    public ApplicationResource toResource(final Application application) {
+    @Nonnull
+    public EntityModel<Application> toModel(final Application application) {
         final String id = application.getId().orElseThrow(IllegalArgumentException::new);
-        final ApplicationResource applicationResource = new ApplicationResource(application);
+        final EntityModel<Application> applicationModel = new EntityModel<>(application);
 
         try {
-            applicationResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            applicationModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(ApplicationRestController.class)
                         .getApplication(id)
                 ).withSelfRel()
             );
 
-            applicationResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            applicationModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(ApplicationRestController.class)
                         .getCommandsForApplication(id, null)
                 ).withRel(COMMANDS_LINK)
@@ -63,6 +66,6 @@ public class ApplicationResourceAssembler implements ResourceAssembler<Applicati
             throw new RuntimeException(ge);
         }
 
-        return applicationResource;
+        return applicationModel;
     }
 }

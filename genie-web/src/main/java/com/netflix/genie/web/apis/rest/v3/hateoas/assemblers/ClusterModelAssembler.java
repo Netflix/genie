@@ -20,9 +20,11 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.ClusterRestController;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import javax.annotation.Nonnull;
 
 /**
  * Assembles Cluster resources out of clusters.
@@ -30,7 +32,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
  * @author tgianos
  * @since 3.0.0
  */
-public class ClusterResourceAssembler implements ResourceAssembler<Cluster, ClusterResource> {
+public class ClusterModelAssembler implements RepresentationModelAssembler<Cluster, EntityModel<Cluster>> {
 
     private static final String COMMANDS_LINK = "commands";
 
@@ -38,22 +40,23 @@ public class ClusterResourceAssembler implements ResourceAssembler<Cluster, Clus
      * {@inheritDoc}
      */
     @Override
-    public ClusterResource toResource(final Cluster cluster) {
+    @Nonnull
+    public EntityModel<Cluster> toModel(final Cluster cluster) {
         final String id = cluster.getId().orElseThrow(IllegalArgumentException::new);
-        final ClusterResource clusterResource = new ClusterResource(cluster);
+        final EntityModel<Cluster> clusterModel = new EntityModel<>(cluster);
 
         try {
-            clusterResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            clusterModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(ClusterRestController.class)
                         .getCluster(id)
                 ).withSelfRel()
             );
 
-            clusterResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            clusterModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(ClusterRestController.class)
                         .getCommandsForCluster(id, null)
                 ).withRel(COMMANDS_LINK)
@@ -63,6 +66,6 @@ public class ClusterResourceAssembler implements ResourceAssembler<Cluster, Clus
             throw new RuntimeException(ge);
         }
 
-        return clusterResource;
+        return clusterModel;
     }
 }

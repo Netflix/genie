@@ -19,10 +19,10 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.RootResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,16 +41,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class RootRestController {
 
-    private final RootResourceAssembler rootResourceAssembler;
+    private final RootModelAssembler rootModelAssembler;
 
     /**
      * Constructor.
      *
-     * @param rootResourceAssembler The assembler to use to construct resources.
+     * @param rootModelAssembler The assembler to use to construct resources.
      */
     @Autowired
-    public RootRestController(final RootResourceAssembler rootResourceAssembler) {
-        this.rootResourceAssembler = rootResourceAssembler;
+    public RootRestController(final RootModelAssembler rootModelAssembler) {
+        this.rootModelAssembler = rootModelAssembler;
     }
 
     /**
@@ -60,7 +60,7 @@ public class RootRestController {
      */
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public RootResource getRoot() {
+    public EntityModel<JsonNode> getRoot() {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         final JsonNode node = factory
             .objectNode()
@@ -68,6 +68,6 @@ public class RootRestController {
                 "description",
                 factory.textNode("Genie V3 API")
             );
-        return this.rootResourceAssembler.toResource(node);
+        return this.rootModelAssembler.toModel(node);
     }
 }

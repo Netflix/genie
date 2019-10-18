@@ -22,17 +22,16 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +41,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -83,23 +83,23 @@ import java.util.stream.Collectors;
 public class ApplicationRestController {
 
     private final ApplicationPersistenceService applicationPersistenceService;
-    private final ApplicationResourceAssembler applicationResourceAssembler;
-    private final CommandResourceAssembler commandResourceAssembler;
+    private final ApplicationModelAssembler applicationModelAssembler;
+    private final CommandModelAssembler commandModelAssembler;
 
     /**
      * Constructor.
      *
      * @param applicationPersistenceService The application configuration service to use.
-     * @param resourceAssemblers            The encapsulation of all the available V3 resource assemblers
+     * @param entityModelAssemblers         The encapsulation of all the available V3 resource assemblers
      */
     @Autowired
     public ApplicationRestController(
         final ApplicationPersistenceService applicationPersistenceService,
-        final ResourceAssemblers resourceAssemblers
+        final EntityModelAssemblers entityModelAssemblers
     ) {
         this.applicationPersistenceService = applicationPersistenceService;
-        this.applicationResourceAssembler = resourceAssemblers.getApplicationResourceAssembler();
-        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
+        this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
+        this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
     }
 
     /**
@@ -154,7 +154,7 @@ public class ApplicationRestController {
      */
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<ApplicationResource> getApplications(
+    public PagedModel<EntityModel<Application>> getApplications(
         @RequestParam(value = "name", required = false) @Nullable final String name,
         @RequestParam(value = "user", required = false) @Nullable final String user,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
@@ -231,15 +231,15 @@ public class ApplicationRestController {
                 .map(DtoConverters::toV3Application);
         }
 
-        final Link self = ControllerLinkBuilder.linkTo(
-            ControllerLinkBuilder
+        final Link self = WebMvcLinkBuilder.linkTo(
+            WebMvcLinkBuilder
                 .methodOn(ApplicationRestController.class)
                 .getApplications(name, user, statuses, tags, type, page, assembler)
         ).withSelfRel();
 
-        return assembler.toResource(
+        return assembler.toModel(
             applications,
-            this.applicationResourceAssembler,
+            this.applicationModelAssembler,
             self
         );
     }
@@ -253,9 +253,9 @@ public class ApplicationRestController {
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Application> getApplication(@PathVariable("id") final String id) throws GenieException {
         log.info("Called to get Application for id {}", id);
-        return this.applicationResourceAssembler.toResource(
+        return this.applicationModelAssembler.toModel(
             DtoConverters.toV3Application(this.applicationPersistenceService.getApplication(id))
         );
     }
@@ -547,7 +547,7 @@ public class ApplicationRestController {
      * @throws GenieException For any error
      */
     @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
-    public Set<CommandResource> getCommandsForApplication(
+    public Set<EntityModel<Command>> getCommandsForApplication(
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws GenieException {
@@ -566,7 +566,7 @@ public class ApplicationRestController {
         return this.applicationPersistenceService.getCommandsForApplication(id, enumStatuses)
             .stream()
             .map(DtoConverters::toV3Command)
-            .map(this.commandResourceAssembler::toResource)
+            .map(this.commandModelAssembler::toModel)
             .collect(Collectors.toSet());
     }
 }

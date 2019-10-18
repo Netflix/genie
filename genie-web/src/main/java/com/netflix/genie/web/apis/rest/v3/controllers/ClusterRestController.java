@@ -22,17 +22,16 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
-import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
+import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +41,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -85,23 +85,23 @@ import java.util.stream.Collectors;
 public class ClusterRestController {
 
     private final ClusterPersistenceService clusterPersistenceService;
-    private final ClusterResourceAssembler clusterResourceAssembler;
-    private final CommandResourceAssembler commandResourceAssembler;
+    private final ClusterModelAssembler clusterModelAssembler;
+    private final CommandModelAssembler commandModelAssembler;
 
     /**
      * Constructor.
      *
      * @param clusterPersistenceService The cluster configuration service to use.
-     * @param resourceAssemblers        The encapsulation of all available V3 resource assemblers
+     * @param entityModelAssemblers     The encapsulation of all available V3 resource assemblers
      */
     @Autowired
     public ClusterRestController(
         final ClusterPersistenceService clusterPersistenceService,
-        final ResourceAssemblers resourceAssemblers
+        final EntityModelAssemblers entityModelAssemblers
     ) {
         this.clusterPersistenceService = clusterPersistenceService;
-        this.clusterResourceAssembler = resourceAssemblers.getClusterResourceAssembler();
-        this.commandResourceAssembler = resourceAssemblers.getCommandResourceAssembler();
+        this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
+        this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
     }
 
     /**
@@ -136,9 +136,9 @@ public class ClusterRestController {
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ClusterResource getCluster(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Cluster> getCluster(@PathVariable("id") final String id) throws GenieException {
         log.info("Called with id: {}", id);
-        return this.clusterResourceAssembler.toResource(
+        return this.clusterModelAssembler.toModel(
             DtoConverters.toV3Cluster(this.clusterPersistenceService.getCluster(id))
         );
     }
@@ -159,7 +159,7 @@ public class ClusterRestController {
      */
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<ClusterResource> getClusters(
+    public PagedModel<EntityModel<Cluster>> getClusters(
         @RequestParam(value = "name", required = false) @Nullable final String name,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses,
         @RequestParam(value = "tag", required = false) @Nullable final Set<String> tags,
@@ -257,9 +257,9 @@ public class ClusterRestController {
         }
 
         // Build the self link which will be used for the next, previous, etc links
-        final Link self = ControllerLinkBuilder
+        final Link self = WebMvcLinkBuilder
             .linkTo(
-                ControllerLinkBuilder
+                WebMvcLinkBuilder
                     .methodOn(ClusterRestController.class)
                     .getClusters(
                         name,
@@ -272,9 +272,9 @@ public class ClusterRestController {
                     )
             ).withSelfRel();
 
-        return assembler.toResource(
+        return assembler.toModel(
             clusters,
-            this.clusterResourceAssembler,
+            this.clusterModelAssembler,
             self
         );
     }
@@ -596,7 +596,7 @@ public class ClusterRestController {
      */
     @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<CommandResource> getCommandsForCluster(
+    public List<EntityModel<Command>> getCommandsForCluster(
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
     ) throws GenieException {
@@ -615,7 +615,7 @@ public class ClusterRestController {
         return this.clusterPersistenceService.getCommandsForCluster(id, enumStatuses)
             .stream()
             .map(DtoConverters::toV3Command)
-            .map(this.commandResourceAssembler::toResource)
+            .map(this.commandModelAssembler::toModel)
             .collect(Collectors.toList());
     }
 

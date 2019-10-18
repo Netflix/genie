@@ -17,8 +17,12 @@
  */
 
 /**
- * Classes used to assemble resources from model objects.
+ * Classes used to assemble entity models from resources.
  *
  * @author tgianos
+ * @since 3.0.0
  */
+@ParametersAreNonnullByDefault
 package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
+
+import javax.annotation.ParametersAreNonnullByDefault;

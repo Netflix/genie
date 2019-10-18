@@ -20,9 +20,11 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.CommandRestController;
-import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import javax.annotation.Nonnull;
 
 /**
  * Assembles Command resources out of commands.
@@ -30,7 +32,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
  * @author tgianos
  * @since 3.0.0
  */
-public class CommandResourceAssembler implements ResourceAssembler<Command, CommandResource> {
+public class CommandModelAssembler implements RepresentationModelAssembler<Command, EntityModel<Command>> {
 
     private static final String APPLICATIONS_LINK = "applications";
     private static final String CLUSTERS_LINK = "clusters";
@@ -39,30 +41,31 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
      * {@inheritDoc}
      */
     @Override
-    public CommandResource toResource(final Command command) {
+    @Nonnull
+    public EntityModel<Command> toModel(final Command command) {
         final String id = command.getId().orElseThrow(IllegalArgumentException::new);
-        final CommandResource commandResource = new CommandResource(command);
+        final EntityModel<Command> commandModel = new EntityModel<>(command);
 
         try {
-            commandResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            commandModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(CommandRestController.class)
                         .getCommand(id)
                 ).withSelfRel()
             );
 
-            commandResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            commandModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(CommandRestController.class)
                         .getApplicationsForCommand(id)
                 ).withRel(APPLICATIONS_LINK)
             );
 
-            commandResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
+            commandModel.add(
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder
                         .methodOn(CommandRestController.class)
                         .getClustersForCommand(id, null)
                 ).withRel(CLUSTERS_LINK)
@@ -72,6 +75,6 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
             throw new RuntimeException(ge);
         }
 
-        return commandResource;
+        return commandModel;
     }
 }

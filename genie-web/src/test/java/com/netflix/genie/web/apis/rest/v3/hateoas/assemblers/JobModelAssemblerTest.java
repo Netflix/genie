@@ -15,45 +15,58 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.apis.rest.v3.hateoas.resources;
+package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
-import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.search.JobSearchResult;
+import com.netflix.genie.common.dto.Job;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.hateoas.EntityModel;
 
-import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Unit tests for the JobResource class.
+ * Unit tests for the JobResourceAssembler.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class JobSearchResultResourceTest {
+public class JobModelAssemblerTest {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
-    private static final Instant STARTED = Instant.now();
+    private static final String VERSION = UUID.randomUUID().toString();
 
-    private JobSearchResult jobSearchResult;
+    private Job job;
+    private JobModelAssembler assembler;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.jobSearchResult = new JobSearchResult(ID, NAME, USER, JobStatus.RUNNING, STARTED, null, null, null);
+        this.job = new Job.Builder(NAME, USER, VERSION).withId(ID).build();
+        this.assembler = new JobModelAssembler();
     }
 
     /**
-     * Make sure we can build the resource.
+     * Make sure we can construct the assembler.
      */
     @Test
-    public void canBuildResource() {
-        Assert.assertNotNull(new JobSearchResultResource(this.jobSearchResult));
+    public void canConstruct() {
+        Assert.assertNotNull(this.assembler);
+    }
+
+    /**
+     * Make sure we can convert the DTO to a resource with links.
+     */
+    @Test
+    @Ignore
+    public void canConvertToResource() {
+        final EntityModel<Job> model = this.assembler.toModel(this.job);
+        Assert.assertTrue(model.getLinks().hasSize(1));
+        Assert.assertNotNull(model.getLink("self"));
     }
 }
