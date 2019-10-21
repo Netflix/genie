@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-10-14</span>
+<span id="revdate">2019-10-21</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4759,8 +4759,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR3/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation and the <a href="http://cloud.spring.io/spring-cloud-static/Greenwich.SR3/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -5117,6 +5116,25 @@ determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.archived-job-get-metadata.initialDelay</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The initial interval between retries to get archived job metadata. Milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.archived-job-get-metadata.multiplier</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount the delay should increase on every retry. e.g. start at 1 second &#8594; 2 seconds &#8594; 4 seconds with a value
+of 2.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.archived-job-get-metadata.noOfRetries</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of times to retry requests to get archived job metadata before failure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.initialInterval</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time to wait after initial failure before retrying the first time in milliseconds</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
@@ -5225,9 +5243,9 @@ See: <code>genie.tasks.database-cleanup.expression</code></p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.maxDeletedPerTransaction</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of job records (across multiple tables) to delete from the database
- in a single transaction. Genie will loop and perform multiple transactions until
- all jobs older than the retention time are deleted.
- This is a soft limit, it could be rounded up to the next multiple of page size.</p></td>
+in a single transaction. Genie will loop and perform multiple transactions until
+all jobs older than the retention time are deleted.
+This is a soft limit, it could be rounded up to the next multiple of page size.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -6145,6 +6163,13 @@ for multiple errors.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.web.services.archivedJobService.getArchivedJobMetadata.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The time taken to fetch the metadata of an archived job if it isn&#8217;t already cached</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ArchivedJobServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.clusterChecker.connectionsReaped.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of agent connections the leader reaped due to the host being unhealthy</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -6290,7 +6315,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-10-14 19:37:43 UTC
+Last updated 2019-10-21 17:50:15 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
