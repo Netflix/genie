@@ -145,7 +145,7 @@ class ArchivedJobServiceImplSpec extends Specification {
         1 * manifestResource.getInputStream() >> manifestByteStream
         metadata.getJobId() == jobId
         metadata.getManifest() == manifest
-        metadata.getJobDirectoryRoot() == new URI(archiveLocation)
+        metadata.getArchiveBaseUri() == new URI(archiveLocation)
 
         cleanup:
         try {
