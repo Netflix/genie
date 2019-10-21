@@ -31,7 +31,6 @@ import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
@@ -152,11 +151,6 @@ public class JobKickoffTask extends GenieBaseTask {
                 .redirectOutput(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH))
                 .redirectError(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
 
-            //
-            // Check if file can be executed. This is to fix issue where execution of the run script fails because
-            // the file may be used by some other program
-            //
-            canExecute(runScript);
             try {
                 final Process process = pb.start();
                 final int processId = this.getProcessId(process);
@@ -185,18 +179,6 @@ public class JobKickoffTask extends GenieBaseTask {
                 .timer(JOB_KICKOFF_TASK_TIMER_NAME, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
-    }
-
-    private boolean canExecute(final String runScriptFile) {
-        try {
-            return retryTemplate.execute(c -> {
-                FileUtils.touch(new File(runScriptFile));
-                return true;
-            });
-        } catch (Exception e) {
-            log.warn("Failed touching the run script file", e);
-        }
-        return false;
     }
 
     // Helper method to add write permissions to a directory for the group owner
