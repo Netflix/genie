@@ -574,7 +574,7 @@ public class JobClient {
             if (System.currentTimeMillis() - startTime < blockTimeout) {
                 Thread.sleep(pollTime);
             } else {
-                throw new GenieTimeoutException("Timed out waiting for job to finish");
+                throw new GenieTimeoutException("Timed out waiting for job to finish: " + jobId);
             }
         }
     }
