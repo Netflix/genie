@@ -83,8 +83,7 @@ public class GenieExceptionMapper {
      */
     @ExceptionHandler(GenieException.class)
     public ResponseEntity<Object> handleGenieException(final GenieException e) {
-        this.countException(e);
-        log.error(e.getLocalizedMessage(), e);
+        this.countExceptionAndLog(e);
         HttpStatus status = HttpStatus.resolve(e.getErrorCode());
         if (status == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -100,7 +99,7 @@ public class GenieExceptionMapper {
      */
     @ExceptionHandler(GenieRuntimeException.class)
     public ResponseEntity<Object> handleGenieRuntimeException(final GenieRuntimeException e) {
-        this.countException(e);
+        this.countExceptionAndLog(e);
         if (
             e instanceof GenieApplicationNotFoundException
                 || e instanceof GenieCommandNotFoundException
@@ -124,7 +123,7 @@ public class GenieExceptionMapper {
      */
     @ExceptionHandler(GenieCheckedException.class)
     public ResponseEntity<Object> handleGenieCheckedException(final GenieCheckedException e) {
-        this.countException(e);
+        this.countExceptionAndLog(e);
         if (e instanceof GenieJobResolutionException) {
             // Mapped to Precondition failed to maintain existing contract with V3
             return new ResponseEntity<>(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
@@ -152,8 +151,7 @@ public class GenieExceptionMapper {
                 builder.append(cv.getMessage());
             }
         }
-        this.countException(cve);
-        log.error(cve.getLocalizedMessage(), cve);
+        this.countExceptionAndLog(cve);
         return new ResponseEntity<>(builder.toString(), HttpStatus.PRECONDITION_FAILED);
     }
 
@@ -165,13 +163,12 @@ public class GenieExceptionMapper {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        this.countException(e);
-        final String errorMessage = e.getMessage();
-        log.error(errorMessage, e);
+        this.countExceptionAndLog(e);
+        final String errorMessage = e.getLocalizedMessage();
         return new ResponseEntity<>(errorMessage, HttpStatus.PRECONDITION_FAILED);
     }
 
-    private void countException(final Exception e) {
+    private void countExceptionAndLog(final Exception e) {
         final Set<Tag> tags = Sets.newHashSet(
             Tags.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName())
         );
@@ -183,5 +180,8 @@ public class GenieExceptionMapper {
         }
 
         this.registry.counter(CONTROLLER_EXCEPTION_COUNTER_NAME, tags).increment();
+
+        log.error("{}: {}", e.getClass().getSimpleName(), e.getLocalizedMessage());
+        log.debug("{}: {}", e.getClass().getCanonicalName(), e.getMessage(), e);
     }
 }
