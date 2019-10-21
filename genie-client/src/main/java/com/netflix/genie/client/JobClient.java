@@ -459,10 +459,6 @@ public class JobClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
-        // TODO: Why Not? -- TJG 9/6/2019
-        if (!this.getJobStatus(jobId).equals(JobStatus.SUCCEEDED)) {
-            throw new GenieClientException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
-        }
         final ResponseBody body = this.jobService.getJobStdout(jobId).execute().body();
         if (body == null) {
             throw new GenieClientException("No data for job std out returned");
