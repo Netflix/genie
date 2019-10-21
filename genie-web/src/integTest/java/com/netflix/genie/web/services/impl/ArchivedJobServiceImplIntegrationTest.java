@@ -177,7 +177,7 @@ public class ArchivedJobServiceImplIntegrationTest {
         final String archiveLocation = new ClassPathResource("archivedJobServiceImpl", this.getClass())
             .getURI()
             .toString();
-        final URI expectedJobDirectoryRoot = new URI(archiveLocation + "/").normalize();
+        final URI expectedArchiveRootUri = new URI(archiveLocation + "/").normalize();
 
         final DirectoryManifest expectedManifest = GenieObjectMapper.getMapper().readValue(
             new ClassPathResource("archivedJobServiceImpl/genie/manifest.json", this.getClass()).getFile(),
@@ -192,7 +192,7 @@ public class ArchivedJobServiceImplIntegrationTest {
 
         Assertions.assertThat(metadata.getJobId()).isEqualTo(JOB_ID);
         Assertions.assertThat(metadata.getManifest()).isEqualTo(expectedManifest);
-        Assertions.assertThat(metadata.getJobDirectoryRoot()).isEqualTo(expectedJobDirectoryRoot);
+        Assertions.assertThat(metadata.getArchiveBaseUri()).isEqualTo(expectedArchiveRootUri);
 
         // Verify that subsequent gets resolved from the cache
         final ArchivedJobMetadata cachedMetadata = this.archivedJobService.getArchivedJobMetadata(JOB_ID);

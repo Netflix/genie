@@ -38,5 +38,5 @@ import java.net.URI;
 public class ArchivedJobMetadata {
     private final String jobId;
     private final DirectoryManifest manifest;
-    private final URI jobDirectoryRoot;
+    private final URI archiveBaseUri;
 }

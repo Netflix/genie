@@ -232,7 +232,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             try {
                 final ArchivedJobMetadata archivedJobMetadata = this.archivedJobService.getArchivedJobMetadata(jobId);
                 manifest = archivedJobMetadata.getManifest();
-                jobDirRoot = archivedJobMetadata.getJobDirectoryRoot();
+                jobDirRoot = archivedJobMetadata.getArchiveBaseUri();
             } catch (final JobNotArchivedException e) {
                 response.sendError(HttpStatus.PRECONDITION_FAILED.value(), e.getMessage());
                 return;

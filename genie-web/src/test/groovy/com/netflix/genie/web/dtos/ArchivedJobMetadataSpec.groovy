@@ -29,15 +29,15 @@ class ArchivedJobMetadataSpec extends Specification {
     def "can create and do all POJO operations"() {
         def jobId = UUID.randomUUID().toString()
         def manifest = Mock(DirectoryManifest)
-        def jobDirectoryRoot = URI.create("file:/tmp/blah")
+        def archiveBaseUri = URI.create("file:/tmp/blah")
 
         when:
-        def metadata = new ArchivedJobMetadata(jobId, manifest, jobDirectoryRoot)
+        def metadata = new ArchivedJobMetadata(jobId, manifest, archiveBaseUri)
 
         then:
         metadata.getJobId() == jobId
         metadata.getManifest() == manifest
-        metadata.getJobDirectoryRoot() == jobDirectoryRoot
+        metadata.getArchiveBaseUri() == archiveBaseUri
 
         when:
         def metadata2 = new ArchivedJobMetadata(
@@ -45,7 +45,7 @@ class ArchivedJobMetadataSpec extends Specification {
             Mock(DirectoryManifest),
             URI.create("http://someurl.com")
         )
-        def metadata3 = new ArchivedJobMetadata(jobId, manifest, jobDirectoryRoot)
+        def metadata3 = new ArchivedJobMetadata(jobId, manifest, archiveBaseUri)
 
         then:
         metadata != metadata2
