@@ -26,12 +26,11 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.util.MetricsUtils;
+import com.netflix.genie.web.util.UNIXUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.support.RetryTemplate;
@@ -119,7 +118,11 @@ public class JobKickoffTask extends GenieBaseTask {
             }
             // Create user, if enabled
             if (isUserCreationEnabled) {
-                createUser(user, jobRequest.getGroup().orElse(null));
+                try {
+                    UNIXUtils.createUser(user, jobRequest.getGroup().orElse(null), executor);
+                } catch (IOException ioexception) {
+                    throw new GenieServerException("Could not create user " + user, ioexception);
+                }
             }
             final List<String> command = new ArrayList<>();
 
@@ -131,10 +134,18 @@ public class JobKickoffTask extends GenieBaseTask {
 
             // Set the ownership to the user and run as the user, if enabled
             if (isRunAsUserEnabled) {
-                changeOwnershipOfDirectory(jobWorkingDirectory, user);
+                try {
+                    UNIXUtils.changeOwnershipOfDirectory(jobWorkingDirectory, user, executor);
+                } catch (IOException ioexception) {
+                    throw new GenieServerException("Could not change ownership", ioexception);
+                }
 
                 // This is needed because the genie.log file is still generated as the user running Genie system.
-                makeDirGroupWritable(jobWorkingDirectory + "/genie/logs");
+                try {
+                    UNIXUtils.makeDirGroupWritable(jobWorkingDirectory + "/genie/logs", executor);
+                } catch (IOException e) {
+                    throw new GenieServerException("Could not make the job working logs directory group writable.", e);
+                }
                 command.add("sudo");
                 command.add("-u");
                 command.add(user);
@@ -178,92 +189,6 @@ public class JobKickoffTask extends GenieBaseTask {
             this.getRegistry()
                 .timer(JOB_KICKOFF_TASK_TIMER_NAME, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-    }
-
-    // Helper method to add write permissions to a directory for the group owner
-    private void makeDirGroupWritable(final String dir) throws GenieServerException {
-        log.debug("Adding write permissions for the directory {} for the group.", dir);
-        final CommandLine commandLIne = new CommandLine("sudo").addArgument("chmod").addArgument("g+w")
-            .addArgument(dir);
-
-        try {
-            this.executor.execute(commandLIne);
-        } catch (IOException ioe) {
-            throw new GenieServerException("Could not make the job working logs directory group writable.", ioe);
-        }
-    }
-
-    /**
-     * Create user on the system. Synchronized to prevent multiple threads from trying to create user at the same time.
-     *
-     * @param user  user id
-     * @param group group id
-     * @throws GenieException If there is any problem.
-     */
-    protected synchronized void createUser(final String user, final String group) throws GenieException {
-
-        // First check if user already exists
-        final CommandLine idCheckCommandLine = new CommandLine("id").addArgument("-u").addArgument(user);
-
-        try {
-            this.executor.execute(idCheckCommandLine);
-            log.debug("User already exists");
-        } catch (final IOException ioe) {
-            log.debug("User does not exist. Creating it now.");
-
-            // Determine if the group is valid by checking that its not null and not same as user.
-            final boolean isGroupValid = StringUtils.isNotBlank(group) && !group.equals(user);
-
-            // Create the group for the user if its not the same as the user.
-            if (isGroupValid) {
-                log.debug("Group and User are different so creating group now.");
-                final CommandLine groupCreateCommandLine = new CommandLine("sudo").addArgument("groupadd")
-                    .addArgument(group);
-
-                // We create the group and ignore the error as it will fail if group already exists.
-                // If the failure is due to some other reason, then user creation will fail and we catch that.
-                try {
-                    log.debug("Running command to create group:  [{}]", groupCreateCommandLine);
-                    this.executor.execute(groupCreateCommandLine);
-                } catch (IOException ioexception) {
-                    log.debug("Group creation threw an error as it might already exist", ioexception);
-                }
-            }
-
-            final CommandLine userCreateCommandLine = new CommandLine("sudo").addArgument("useradd").addArgument(user);
-            if (isGroupValid) {
-                userCreateCommandLine.addArgument("-G").addArgument(group);
-            }
-            userCreateCommandLine.addArgument("-M");
-
-            try {
-                log.debug("Running command to create user: [{}]", userCreateCommandLine);
-                this.executor.execute(userCreateCommandLine);
-            } catch (IOException ioexception) {
-                throw new GenieServerException("Could not create user " + user, ioexception);
-            }
-        }
-    }
-
-    /**
-     * Method to change the ownership of a directory.
-     *
-     * @param dir  The directory to change the ownership of.
-     * @param user Userid of the user.
-     * @throws GenieException If there is a problem.
-     */
-    protected void changeOwnershipOfDirectory(
-        final String dir,
-        final String user) throws GenieException {
-
-        final CommandLine commandLine = new CommandLine("sudo").addArgument("chown").addArgument("-R")
-            .addArgument(user).addArgument(dir);
-
-        try {
-            this.executor.execute(commandLine);
-        } catch (IOException ioexception) {
-            throw new GenieServerException("Could not change ownership", ioexception);
         }
     }
 
