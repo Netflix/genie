@@ -33,6 +33,7 @@ import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.S3FileTransferImpl;
+import com.netflix.genie.web.util.JobExecutionModeSelector;
 import com.netflix.genie.web.util.ProcessChecker;
 import com.netflix.genie.web.util.UnixProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -46,6 +47,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -252,5 +254,24 @@ public class JobsAutoConfiguration {
         } else {
             throw new BeanCreationException("No implementation available for non-UNIX systems");
         }
+    }
+
+    /**
+     * Create a {@link JobExecutionModeSelector} if one does not exist.
+     *
+     * @param environment   The environment
+     * @param meterRegistry The metrics registry to use
+     * @return a {@link JobExecutionModeSelector}
+     */
+    @Bean
+    @ConditionalOnMissingBean(JobExecutionModeSelector.class)
+    public JobExecutionModeSelector jobExecutionModeSelector(
+        final Environment environment,
+        final MeterRegistry meterRegistry
+    ) {
+        return new JobExecutionModeSelector(
+            environment,
+            meterRegistry
+        );
     }
 }

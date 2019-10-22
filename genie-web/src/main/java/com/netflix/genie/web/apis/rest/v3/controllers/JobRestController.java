@@ -19,7 +19,6 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
@@ -62,6 +61,7 @@ import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobLaunchService;
+import com.netflix.genie.web.util.JobExecutionModeSelector;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -133,14 +133,6 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v3/jobs")
 @Slf4j
 public class JobRestController {
-    /**
-     * Name of key to get whether to use the agent for job execution or not.
-     * <p>
-     * TODO: Totally temporary way to switch agent execution on or off.
-     */
-    @VisibleForTesting
-    static final String AGENT_JOB_EXECUTION_KEY = "genie.jobs.execution.agent";
-
     private static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
     private static final String NAME_HEADER_COOKIE = "cookie";
@@ -168,9 +160,7 @@ public class JobRestController {
 
     // TODO: V3 Execution only
     private final AttachmentService attachmentService;
-
-    // TODO: Temporary way to flip between v3 and v4. Marco working at more programmatic way.
-    private final boolean agentExecution;
+    private final JobExecutionModeSelector jobExecutionModeSelector;
 
     // Metrics
     private final Counter submitJobWithoutAttachmentsRate;
@@ -192,6 +182,7 @@ public class JobRestController {
      * @param agentRoutingService       Agent routing service
      * @param environment               The application environment to pull dynamic properties from
      * @param attachmentService         The attachment service to use to save attachments.
+     * @param jobExecutionModeSelector  The execution mode (agent vs. embedded) mode selector
      */
     @Autowired
     @SuppressWarnings("checkstyle:parameternumber")
@@ -208,7 +199,8 @@ public class JobRestController {
         final JobPersistenceService jobPersistenceService,
         final AgentRoutingService agentRoutingService,
         final Environment environment,
-        final AttachmentService attachmentService
+        final AttachmentService attachmentService,
+        final JobExecutionModeSelector jobExecutionModeSelector
     ) {
         this.jobLaunchService = jobLaunchService;
         this.jobSearchService = jobSearchService;
@@ -231,11 +223,7 @@ public class JobRestController {
 
         // TODO: V3 Only. Remove.
         this.attachmentService = attachmentService;
-
-        // TODO: Remove once programmatic method exists
-        //       Could evaluate it every job submission if we want it to be a fast property but not worth trouble
-        //       right now
-        this.agentExecution = this.environment.getProperty(AGENT_JOB_EXECUTION_KEY, Boolean.class, false);
+        this.jobExecutionModeSelector = jobExecutionModeSelector;
 
         // Set up the metrics
         this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
@@ -324,8 +312,9 @@ public class JobRestController {
             localClientHost = httpServletRequest.getRemoteAddr();
         }
 
+        final boolean agentExecution = this.jobExecutionModeSelector.executeWithAgent(jobRequest, httpServletRequest);
         final String jobId;
-        if (this.agentExecution) {
+        if (agentExecution) {
             jobId = this.agentExecution(jobRequest, attachments, localClientHost, userAgent);
         } else {
             jobId = this.embeddedExecution(jobRequest, attachments, localClientHost, userAgent);

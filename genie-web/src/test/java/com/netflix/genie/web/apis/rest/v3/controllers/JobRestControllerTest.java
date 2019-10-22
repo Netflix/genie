@@ -43,6 +43,7 @@ import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
 import com.netflix.genie.web.services.JobLaunchService;
+import com.netflix.genie.web.util.JobExecutionModeSelector;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
@@ -92,6 +93,7 @@ class JobRestControllerTest {
     private String hostname;
     private RestTemplate restTemplate;
     private JobDirectoryServerService jobDirectoryServerService;
+    private JobExecutionModeSelector jobExecutionModeSelector;
     private JobsProperties jobsProperties;
     private Environment environment;
 
@@ -108,11 +110,13 @@ class JobRestControllerTest {
         this.hostname = UUID.randomUUID().toString();
         this.restTemplate = Mockito.mock(RestTemplate.class);
         this.jobDirectoryServerService = Mockito.mock(JobDirectoryServerService.class);
+        this.jobExecutionModeSelector = Mockito.mock(JobExecutionModeSelector.class);
         this.jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         this.environment = Mockito.mock(Environment.class);
-        Mockito
-            .when(this.environment.getProperty(JobRestController.AGENT_JOB_EXECUTION_KEY, Boolean.class, false))
-            .thenReturn(false);
+        Mockito.when(this.jobExecutionModeSelector.executeWithAgent(
+            Mockito.any(JobRequest.class),
+            Mockito.any(HttpServletRequest.class))
+        ).thenReturn(false);
 
         final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         final Counter counter = Mockito.mock(Counter.class);
@@ -131,7 +135,8 @@ class JobRestControllerTest {
             this.jobPersistenceService,
             this.agentRoutingService,
             this.environment,
-            Mockito.mock(AttachmentService.class)
+            Mockito.mock(AttachmentService.class),
+            jobExecutionModeSelector
         );
     }
 
@@ -851,7 +856,8 @@ class JobRestControllerTest {
             this.jobPersistenceService,
             this.agentRoutingService,
             this.environment,
-            Mockito.mock(AttachmentService.class)
+            Mockito.mock(AttachmentService.class),
+            this.jobExecutionModeSelector
         );
         jobController.getJobOutput(jobId, null, request, response);
 
