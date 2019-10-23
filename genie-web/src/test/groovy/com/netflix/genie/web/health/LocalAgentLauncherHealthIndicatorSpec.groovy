@@ -41,7 +41,6 @@ class LocalAgentLauncherHealthIndicatorSpec extends Specification {
         def properties = Mock(LocalAgentLauncherProperties) {
             getMaxTotalJobMemory() >> maxTotalJobMemory
             getMaxJobMemory() >> maxJobMemory
-            getExecutable() >> ["java", "-jar", "/tmp/genie-agent.jar"]
         }
 
         def healthIndicator = new LocalAgentLauncherHealthIndicator(

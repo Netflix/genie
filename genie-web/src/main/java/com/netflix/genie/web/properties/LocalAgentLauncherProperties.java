@@ -18,6 +18,7 @@
 package com.netflix.genie.web.properties;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,6 +28,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Properties related to launching Agent processes locally.
@@ -46,10 +48,50 @@ public class LocalAgentLauncherProperties {
     public static final String PROPERTY_PREFIX = "genie.agent.launcher.local";
 
     /**
+     * Placeholder for server port in command-line-template.
+     */
+    public static final String SERVER_PORT_PLACEHOLDER = "<SERVER_PORT_PLACEHOLDER>";
+
+    /**
+     * Placeholder for job id in command-line-template.
+     */
+    public static final String JOB_ID_PLACEHOLDER = "<JOB_ID_PLACEHOLDER>";
+
+    /**
+     * Placeholder for agent jar path in command-line-template.
+     */
+    public static final String AGENT_JAR_PLACEHOLDER = "<AGENT_JAR_PLACEHOLDER>";
+
+    /**
      * The command that should be run to execute the Genie agent. Required.
      */
-    @NotEmpty(message = "The agent executable cannot be empty or it will be impossible to launch an agent process")
-    private List<@NotBlank String> executable = Lists.newArrayList("java", "-jar", "/tmp/genie-agent.jar");
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    @NotEmpty(message = "The command-line launch template cannot be empty")
+    private List<@NotBlank String> launchCommandTemplate = Lists.newArrayList(
+        "java",
+        "-jar", AGENT_JAR_PLACEHOLDER,
+        "exec",
+        "--serverHost", "127.0.0.1",
+        "--serverPort", SERVER_PORT_PLACEHOLDER,
+        "--api-job",
+        "--jobId", JOB_ID_PLACEHOLDER
+    );
+
+    /**
+     * The path to the agent jar.
+     */
+    @NotEmpty(message = "The agent jar path cannot be empty")
+    private String agentJarPath = "/tmp/genie-agent.jar";
+
+    /**
+     * Additional environment variables set for the agent.
+     */
+    private Map<@NotEmpty String, String> additionalEnvironment = Maps.newHashMap();
+
+    /**
+     * Capturing the agent stdout and stderr streams to file for debugging purposes.
+     */
+    private boolean processOutputCaptureEnabled;
 
     /**
      * Defaults to 10 GB (10,240 MB).
@@ -62,4 +104,9 @@ public class LocalAgentLauncherProperties {
      */
     @Min(value = 1L, message = "The minimum value is 1MB but the value should likely be set much higher")
     private long maxTotalJobMemory = 30_720L;
+
+    /**
+     * Launch agent as the user in the job request (launches as the server user if false).
+     */
+    private boolean runAsUserEnabled;
 }
