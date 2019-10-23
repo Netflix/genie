@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
+import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import com.netflix.genie.web.util.JobExecutionModeSelector;
 import org.springframework.test.context.TestPropertySource;
 
@@ -28,7 +29,8 @@ import org.springframework.test.context.TestPropertySource;
  */
 @TestPropertySource(
     properties = {
-        JobExecutionModeSelector.DEFAULT_EXECUTE_WITH_AGENT_PROPERTY + "=true"
+        JobExecutionModeSelector.DEFAULT_EXECUTE_WITH_AGENT_PROPERTY + "=true",
+        LocalAgentLauncherProperties.PROPERTY_PREFIX + ".run-as-user=false",
     }
 )
 public class JobRestControllerAgentExecutionIntegrationTest extends JobRestControllerIntegrationTest {

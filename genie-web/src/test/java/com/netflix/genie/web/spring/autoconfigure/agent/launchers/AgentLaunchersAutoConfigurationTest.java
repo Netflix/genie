@@ -59,36 +59,10 @@ class AgentLaunchersAutoConfigurationTest {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
-                final LocalAgentLauncherProperties properties = context.getBean(LocalAgentLauncherProperties.class);
-                Assertions.assertThat(properties.getExecutable()).isNotEmpty();
-                Assertions
-                    .assertThat(properties.getExecutable())
-                    .containsExactly("java", "-jar", "/tmp/genie-agent.jar");
                 Assertions.assertThat(context).hasSingleBean(ExecutorFactory.class);
                 Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherImpl.class);
             }
         );
-    }
-
-    /**
-     * Make sure the property is completely overwritten for the executable.
-     */
-    @Test
-    void testOverrideExecutable() {
-        this.contextRunner
-            .withPropertyValues("genie.agent.launcher.local.executable=blah,/tmp/genie-agent-2.jar")
-            .run(
-                context -> {
-                    Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
-                    final LocalAgentLauncherProperties properties = context.getBean(LocalAgentLauncherProperties.class);
-                    Assertions.assertThat(properties.getExecutable()).isNotEmpty();
-                    Assertions
-                        .assertThat(properties.getExecutable())
-                        .containsExactly("blah", "/tmp/genie-agent-2.jar");
-                    Assertions.assertThat(context).hasSingleBean(ExecutorFactory.class);
-                    Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherImpl.class);
-                }
-            );
     }
 
     static class UserConfig {

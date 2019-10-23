@@ -17,23 +17,21 @@
  */
 package com.netflix.genie.web.agent.launchers.impl
 
-import com.google.common.collect.Lists
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.dtos.ResolvedJob
-import com.netflix.genie.web.exceptions.checked.AgentLaunchException
 import com.netflix.genie.web.introspection.GenieWebHostInfo
 import com.netflix.genie.web.introspection.GenieWebRpcInfo
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties
 import com.netflix.genie.web.util.ExecutorFactory
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.commons.exec.CommandLine
-import org.apache.commons.exec.ExecuteResultHandler
 import org.apache.commons.exec.Executor
 import org.apache.commons.lang3.SystemUtils
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Specifications for {@link LocalAgentLauncherImpl}.
@@ -42,138 +40,110 @@ import spock.lang.Specification
  */
 class LocalAgentLauncherImplSpec extends Specification {
 
-    def "Can Launch Agent"() {
-        def hostname = UUID.randomUUID().toString()
-        def rpcPort = 9090
-        def genieHostInfo = Mock(GenieWebHostInfo) {
-            getHostname() >> hostname
-        }
-        def genieRpcInfo = Mock(GenieWebRpcInfo) {
-            getRpcPort() >> rpcPort
-        }
-        def jobSearchService = Mock(JobSearchService)
-        def executable = Lists.newArrayList("java", "-jar", "genie-agent.jar")
-        def properties = Mock(LocalAgentLauncherProperties)
-        def factory = Mock(ExecutorFactory)
-        def registry = Mock(MeterRegistry)
+    static final int RPC_PORT = new Random().nextInt()
+    static final String JOB_ID = UUID.randomUUID().toString()
+    static final String USERNAME = UUID.randomUUID().toString()
+    static final List<String> expectedCommandLineBase = [
+        "java", "-jar", "/tmp/genie-agent.jar",
+        "exec",
+        "--serverHost", "127.0.0.1",
+        "--serverPort", String.valueOf(RPC_PORT),
+        "--api-job",
+        "--jobId", JOB_ID
+    ] as List<String>
 
-        def jobId = UUID.randomUUID().toString()
-        def jobMemory = 10_240
-        def jobSpecification = Mock(JobSpecification) {
-            getJob() >> Mock(JobSpecification.ExecutionResource) {
-                getId() >> jobId
-            }
-        }
-        def jobEnvironment = Mock(JobEnvironment) {
-            getMemory() >> jobMemory
-        }
-        def jobMetadata = Mock(JobMetadata)
-        def resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, jobMetadata)
-        def executor = Mock(Executor)
+    GenieWebHostInfo hostInfo
+    GenieWebRpcInfo rpcInfo
+    JobSearchService jobSearchService
+    LocalAgentLauncherProperties launchProperties
+    ExecutorFactory executorFactory
+    MeterRegistry meterRegistry
 
-        def expectedLinuxExecutable = "setsid"
-        String[] expectedLinuxArguments = [
-            "java",
-            "-jar",
-            "genie-agent.jar",
-            "exec",
-            "--serverHost",
-            "127.0.0.1",
-            "--serverPort",
-            Integer.toString(rpcPort),
-            "--no-cleanup",
-            "--api-job",
-            "--jobId",
-            jobId
-        ]
+    LocalAgentLauncherImpl launcher
+    String hostname
+    ResolvedJob resolvedJob
+    JobMetadata jobMetadata
+    JobEnvironment jobEnvironment
+    int jobMemory
+    JobSpecification jobSpec
+    JobSpecification.ExecutionResource job
+    Executor sharedExecutor
+    Executor executor
+    Map<String, String> additionalEnvironment
 
-        def expectedNonLinuxExecutable = "java"
-        String[] expectedNonLinuxArguments = [
-            "-jar",
-            "genie-agent.jar",
-            "exec",
-            "--serverHost",
-            "127.0.0.1",
-            "--serverPort",
-            Integer.toString(rpcPort),
-            "--no-cleanup",
-            "--api-job",
-            "--jobId",
-            jobId
-        ]
+    def setup() {
+        this.hostInfo = Mock(GenieWebHostInfo)
+        this.rpcInfo = Mock(GenieWebRpcInfo)
+        this.jobSearchService = Mock(JobSearchService)
+        this.launchProperties = new LocalAgentLauncherProperties()
+        this.executorFactory = Mock(ExecutorFactory)
+        this.meterRegistry = Mock(MeterRegistry)
+
+        this.sharedExecutor = Mock(Executor)
+        this.hostname = UUID.randomUUID().toString()
+        this.resolvedJob = Mock(ResolvedJob)
+        this.jobMetadata = Mock(JobMetadata)
+        this.jobEnvironment = Mock(JobEnvironment)
+        this.jobMemory = 100
+        this.jobSpec = Mock(JobSpecification)
+        this.job = Mock(JobSpecification.ExecutionResource)
+        this.executor = Mock(Executor)
+        this.additionalEnvironment = [foo: "bar"]
+    }
+
+    @Unroll
+    def "Launch agent (runAsUser: #runAsUser)" (boolean runAsUser, List<String> expectedCommandLine) {
+        this.launchProperties.setRunAsUserEnabled(runAsUser)
+        this.launchProperties.setAdditionalEnvironment(additionalEnvironment)
+
+        expectedCommandLine = (SystemUtils.IS_OS_LINUX ? ["setsid"] : []) + expectedCommandLine
 
         when:
-        def launcher = new LocalAgentLauncherImpl(
-            genieHostInfo,
-            genieRpcInfo,
+        this.launcher = new LocalAgentLauncherImpl(
+            hostInfo,
+            rpcInfo,
             jobSearchService,
-            properties,
-            factory,
-            registry
+            launchProperties,
+            executorFactory,
+            meterRegistry
         )
 
         then:
-        1 * properties.getExecutable() >> executable
+        1 * this.hostInfo.getHostname() >> this.hostname
+        1 * this.rpcInfo.getRpcPort() >> RPC_PORT
+        1 * this.executorFactory.newInstance(false) >> this.sharedExecutor
 
-        when: "A resolved job passes all checks"
-        launcher.launchAgent(resolvedJob)
+        when:
+        this.launcher.launchAgent(this.resolvedJob)
 
-        then: "An agent is successfully launched"
-        1 * properties.getMaxJobMemory() >> jobMemory + 1
-        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> 0
-        1 * properties.getMaxTotalJobMemory() >> jobMemory + 1
-        1 * factory.newInstance(true) >> executor
-        1 * executor.execute(
-            {
-                CommandLine commandLine ->
-                    if (SystemUtils.IS_OS_LINUX) {
-                        assert commandLine.getExecutable() == expectedLinuxExecutable
-                        assert commandLine.getArguments() == expectedLinuxArguments
-                    } else {
-                        assert commandLine.getExecutable() == expectedNonLinuxExecutable
-                        assert commandLine.getArguments() == expectedNonLinuxArguments
-                    }
-            },
-            {
-                ExecuteResultHandler handler ->
-                    assert handler != null
-                    assert handler instanceof LocalAgentLauncherImpl.AgentResultHandler
-            }
-        )
-
-        when: "The job requests more memory than the system is configured to allow for a max per job"
-        launcher.launchAgent(resolvedJob)
-
-        then: "An AgentLaunchException is thrown"
-        2 * properties.getMaxJobMemory() >> jobMemory - 1
-        0 * jobSearchService.getUsedMemoryOnHost(hostname)
-        0 * properties.getMaxTotalJobMemory()
-        0 * factory.newInstance(true)
-        0 * executor.execute(_ as CommandLine, _ as ExecuteResultHandler)
-        thrown(AgentLaunchException)
-
-        when: "Running the job would put the system over the max configured memory"
-        launcher.launchAgent(resolvedJob)
-
-        then: "An AgentLaunchException is thrown"
-        1 * properties.getMaxJobMemory() >> jobMemory + 1
-        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> jobMemory
-        2 * properties.getMaxTotalJobMemory() >> jobMemory
-        0 * factory.newInstance(true)
-        0 * executor.execute(_ as CommandLine, _ as ExecuteResultHandler)
-        thrown(AgentLaunchException)
-
-        when: "The command line can't be executed"
-        launcher.launchAgent(resolvedJob)
-
-        then: "An AgentLaunchException is thrown"
-        1 * properties.getMaxJobMemory() >> jobMemory + 1
-        1 * jobSearchService.getUsedMemoryOnHost(hostname) >> 0
-        1 * properties.getMaxTotalJobMemory() >> jobMemory + 1
-        1 * factory.newInstance(true) >> executor
-        1 * executor.execute(_ as CommandLine, _ as ExecuteResultHandler) >> {
-            throw new IOException("Something broke")
+        then:
+        1 * this.resolvedJob.getJobMetadata() >> this.jobMetadata
+        1 * this.jobMetadata.getUser() >> USERNAME
+        if (runAsUser) {
+            1 * this.jobMetadata.getGroup() >> Optional.empty()
+        } else {
+            0 * this.jobMetadata.getGroup() >> Optional.empty()
         }
-        thrown(AgentLaunchException)
+
+        1 * this.resolvedJob.getJobEnvironment() >> this.jobEnvironment
+        1 * this.jobEnvironment.getMemory() >> this.jobMemory
+        1 * this.resolvedJob.getJobSpecification() >> this.jobSpec
+        1 * this.jobSpec.getJob() >> this.job
+        1 * this.job.getId() >> JOB_ID
+        1 * this.jobSearchService.getUsedMemoryOnHost(this.hostname)
+        1 * this.executorFactory.newInstance(true) >> executor
+        1 * this.executor.execute(_ as CommandLine, _ as Map, _ as LocalAgentLauncherImpl.AgentResultHandler) >> {
+            args ->
+                CommandLine commandLine = args[0] as CommandLine
+                Map<String, String> env = args[1] as Map<String, String>
+                assert expectedCommandLine.toString() == commandLine.toString()
+                assert env.get("foo") == "bar"
+                assert env.size() > 1
+        }
+
+        where:
+        runAsUser | expectedCommandLine
+        false     | expectedCommandLineBase
+        true      | ["sudo", "-E", "-u", USERNAME]  + expectedCommandLineBase
     }
 }

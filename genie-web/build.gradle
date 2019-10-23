@@ -126,7 +126,7 @@ license {
 integrationTest {
     dependsOn project.findProject(":genie-agent-app").tasks.bootJar
     outputs.dir snippetsDir
-    systemProperty("genie.agent.launcher.local.executable", "java,-jar,${configurations.genieAgent.asPath}")
+    systemProperty("genie.agent.launcher.local.agent-jar-path", "${configurations.genieAgent.asPath}")
 }
 
 // This is needed cause some things like attributes for asciidoctor don't serialize project.version properly at runtime

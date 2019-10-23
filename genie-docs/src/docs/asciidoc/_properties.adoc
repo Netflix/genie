@@ -35,19 +35,39 @@ Whereas static properties values are bound during application startup and do not
 |
 |yes
 
-|genie.agent.launcher.local.executable
-|The system command that the launcher should use to launch an agent process. Ordered list of arguments.
-|java -jar /tmp/genie-agent.jar
+|genie.agent.launcher.local.additional-environment
+|Environment variables to set when spawning an agent (in addition to the inherited server environment)
+|
 |no
 
-|genie.agent.launcher.local.maxJobMemory
+|genie.agent.launcher.local.agent-jar-path
+|The location of the agent jar. The value is substituted in the command template if the corresponding placeholder is present.
+|/tmp/genie-agent.jar
+|no
+
+|genie.agent.launcher.local.launch-command-template
+|The system command that the launcher should use to launch an agent process. Ordered list of arguments. Contains placeholders that will be replaced at runtime.
+|java -jar <AGENT_JAR_PLACEHOLDER> exec --serverHost 127.0.0.1 --serverPort <SERVER_PORT_PLACEHOLDER> --api-job --jobId <JOB_ID_PLACEHOLDER>
+|no
+
+|genie.agent.launcher.local.max-job-memory
 |The maximum amount of memory, in megabytes, that a job can be allocated while using the local launcher
 |10240
 |no
 
-|genie.agent.launcher.local.maxTotalJobMemory
+|genie.agent.launcher.local.max-total-job-memory
 |The total number of MB out of the system memory that Genie can use for running agents
 |30720
+|no
+
+|genie.agent.launcher.local.process-output-capture-enabled
+|Whether to capture stdout and stderr from the forked agent subprocess to a file for debugging purposes
+|false
+|no
+
+|genie.agent.launcher.local.run-as-user-enabled
+|Whether to launch the agent subprocess as the user specified in the job request
+|false
 |no
 
 |genie.aws.credentials.role
