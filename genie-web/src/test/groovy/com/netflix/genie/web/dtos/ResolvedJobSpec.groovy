@@ -18,6 +18,7 @@
 package com.netflix.genie.web.dtos
 
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment
+import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import spock.lang.Specification
 
@@ -31,17 +32,19 @@ class ResolvedJobSpec extends Specification {
     def "can create and do all POJO operations"() {
         def jobSpecification = Mock(JobSpecification)
         def jobEnvironment = Mock(JobEnvironment)
+        def jobMetadata = Mock(JobMetadata)
 
         when:
-        def resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment)
+        def resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, jobMetadata)
 
         then:
         resolvedJob.getJobSpecification() == jobSpecification
         resolvedJob.getJobEnvironment() == jobEnvironment
+        resolvedJob.getJobMetadata() == jobMetadata
 
         when:
-        def resolvedJob2 = new ResolvedJob(Mock(JobSpecification), Mock(JobEnvironment))
-        def resolvedJob3 = new ResolvedJob(jobSpecification, jobEnvironment)
+        def resolvedJob2 = new ResolvedJob(Mock(JobSpecification), Mock(JobEnvironment), Mock(JobMetadata))
+        def resolvedJob3 = new ResolvedJob(jobSpecification, jobEnvironment, jobMetadata)
 
         then:
         resolvedJob != resolvedJob2

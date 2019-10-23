@@ -100,6 +100,7 @@ public class JobCoordinatorServiceImplTest {
     private MeterRegistry registry;
     private Timer coordinationTimer;
     private Timer setJobEnvironmentTimer;
+    private com.netflix.genie.common.internal.dto.v4.JobMetadata v4JobMetadata;
 
     /**
      * Setup for the tests.
@@ -119,6 +120,7 @@ public class JobCoordinatorServiceImplTest {
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
         this.commandPersistenceService = Mockito.mock(CommandPersistenceService.class);
         this.specificationService = Mockito.mock(JobResolverService.class);
+        this.v4JobMetadata = Mockito.mock(com.netflix.genie.common.internal.dto.v4.JobMetadata.class);
 
         this.registry = Mockito.mock(MeterRegistry.class);
         this.coordinationTimer = Mockito.mock(Timer.class);
@@ -272,7 +274,7 @@ public class JobCoordinatorServiceImplTest {
             null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
-        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, v4JobMetadata);
 
         Mockito
             .when(
@@ -406,7 +408,7 @@ public class JobCoordinatorServiceImplTest {
             null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
-        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, v4JobMetadata);
 
         Mockito
             .when(
@@ -513,7 +515,7 @@ public class JobCoordinatorServiceImplTest {
             null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
-        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, v4JobMetadata);
 
         Mockito
             .when(
@@ -639,7 +641,7 @@ public class JobCoordinatorServiceImplTest {
             null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
-        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, v4JobMetadata);
 
         Mockito
             .when(
@@ -747,7 +749,7 @@ public class JobCoordinatorServiceImplTest {
             null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
-        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, v4JobMetadata);
 
         Mockito
             .when(
@@ -873,7 +875,7 @@ public class JobCoordinatorServiceImplTest {
             null
         );
         final JobEnvironment jobEnvironment = Mockito.mock(JobEnvironment.class);
-        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment);
+        final ResolvedJob resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, v4JobMetadata);
 
         Mockito
             .when(

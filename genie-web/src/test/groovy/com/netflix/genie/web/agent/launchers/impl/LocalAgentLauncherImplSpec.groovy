@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.launchers.impl
 
 import com.google.common.collect.Lists
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment
+import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.dtos.ResolvedJob
@@ -66,7 +67,8 @@ class LocalAgentLauncherImplSpec extends Specification {
         def jobEnvironment = Mock(JobEnvironment) {
             getMemory() >> jobMemory
         }
-        def resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment)
+        def jobMetadata = Mock(JobMetadata)
+        def resolvedJob = new ResolvedJob(jobSpecification, jobEnvironment, jobMetadata)
         def executor = Mock(Executor)
 
         def expectedLinuxExecutable = "setsid"

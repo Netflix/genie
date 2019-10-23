@@ -316,7 +316,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             .withEnvironmentVariables(environmentVariables)
             .build();
 
-        return new ResolvedJob(jobSpecification, jobEnvironment);
+        return new ResolvedJob(jobSpecification, jobEnvironment, jobRequest.getMetadata());
     }
 
     private Map<Cluster, String> queryForClustersAndCommands(

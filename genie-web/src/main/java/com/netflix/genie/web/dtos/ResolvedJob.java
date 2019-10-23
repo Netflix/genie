@@ -18,6 +18,7 @@
 package com.netflix.genie.web.dtos;
 
 import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
+import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,4 +40,5 @@ public class ResolvedJob {
 
     private final JobSpecification jobSpecification;
     private final JobEnvironment jobEnvironment;
+    private final JobMetadata jobMetadata;
 }
