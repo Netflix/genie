@@ -508,7 +508,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
-            new JobEnvironment.Builder(1_512).build()
+            new JobEnvironment.Builder(1_512).build(),
+            jobRequest.getMetadata()
         );
 
         this.jobPersistenceService.saveResolvedJob(jobId, resolvedJob);
@@ -537,7 +538,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final ResolvedJob resolvedJob1 = new ResolvedJob(
             jobSpecification2,
-            new JobEnvironment.Builder(1_1512).build()
+            new JobEnvironment.Builder(1_1512).build(),
+            jobRequest2.getMetadata()
         );
         this.jobPersistenceService.saveResolvedJob(jobId2, resolvedJob1);
         Assert.assertThat(
@@ -580,7 +582,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
-            new JobEnvironment.Builder(1_512).build()
+            new JobEnvironment.Builder(1_512).build(),
+            jobRequest.getMetadata()
         );
         this.jobPersistenceService.saveResolvedJob(jobId, resolvedJob);
 
@@ -649,7 +652,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         final ResolvedJob resolvedJob = new ResolvedJob(
             jobSpecification,
-            new JobEnvironment.Builder(1_512).build()
+            new JobEnvironment.Builder(1_512).build(),
+            jobRequest.getMetadata()
         );
         this.jobPersistenceService.saveResolvedJob(jobId, resolvedJob);
 
