@@ -18,7 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;

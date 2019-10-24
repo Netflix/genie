@@ -17,48 +17,54 @@
  */
 package com.netflix.genie.common.exceptions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
 /**
- * Test the constructors of the GenieException.
+ * Test the constructors of the {@link GenieServerException}.
  *
  * @author tgianos
  * @since 2.0.0
  */
-public class GenieServerExceptionTest extends Exception {
+class GenieServerExceptionTest {
 
     private static final String ERROR_MESSAGE = "Not Found";
     private static final IOException IOE = new IOException("IOException");
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieServerException On a server issue
      */
-    @Test(expected = GenieServerException.class)
-    public void testTwoArgConstructor() throws GenieServerException {
-        final GenieServerException ge = new GenieServerException(ERROR_MESSAGE, IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
+    @Test
+    void testTwoArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieServerException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieServerException(ERROR_MESSAGE, IOE);
+                }
+            )
+            .withCause(IOE)
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_INTERNAL_ERROR));
     }
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieServerException On a server issue
      */
-    @Test(expected = GenieServerException.class)
-    public void testMessageArgConstructor() throws GenieServerException {
-        final GenieServerException ge = new GenieServerException(ERROR_MESSAGE);
-        Assert.assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertNull(ge.getCause());
-        throw ge;
+    @Test
+    void testMessageArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieServerException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieServerException(ERROR_MESSAGE);
+                }
+            )
+            .withNoCause()
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_INTERNAL_ERROR));
     }
 }

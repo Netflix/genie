@@ -17,18 +17,19 @@
  */
 package com.netflix.genie.common.exceptions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 
 /**
- * Test the constructors of the GenieException.
+ * Test the constructors of the {@link GenieException}.
  *
  * @author tgianos
  * @since 2.0.0
  */
-public class GenieExceptionTest extends Exception {
+class GenieExceptionTest {
 
     private static final int ERROR_CODE = 404;
     private static final String ERROR_MESSAGE = "Not Found";
@@ -36,29 +37,35 @@ public class GenieExceptionTest extends Exception {
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieException On exception
      */
-    @Test(expected = GenieException.class)
-    public void testThreeArgConstructor() throws GenieException {
-        final GenieException ge = new GenieException(ERROR_CODE, ERROR_MESSAGE, IOE);
-        Assert.assertEquals(ERROR_CODE, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
+    @Test
+    void testThreeArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieException(ERROR_CODE, ERROR_MESSAGE, IOE);
+                }
+            )
+            .withCause(IOE)
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_NOT_FOUND));
     }
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieException On exception
      */
-    @Test(expected = GenieException.class)
-    public void testTwoArgConstructorWithMessage() throws GenieException {
-        final GenieException ge = new GenieException(ERROR_CODE, ERROR_MESSAGE);
-        Assert.assertEquals(ERROR_CODE, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertNull(ge.getCause());
-        throw ge;
+    @Test
+    void testTwoArgConstructorWithMessage() {
+        Assertions
+            .assertThatExceptionOfType(GenieException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieException(ERROR_CODE, ERROR_MESSAGE);
+                }
+            )
+            .withNoCause()
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_NOT_FOUND));
     }
 }

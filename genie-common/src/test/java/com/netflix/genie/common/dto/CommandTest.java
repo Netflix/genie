@@ -20,9 +20,8 @@ package com.netflix.genie.common.dto;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class CommandTest {
+class CommandTest {
 
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
@@ -49,55 +48,55 @@ public class CommandTest {
      * Test to make sure we can build a command using the default builder constructor.
      */
     @Test
-    public void canBuildCommand() {
+    void canBuildCommand() {
         final Command command
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY).build();
-        Assert.assertThat(command.getName(), Matchers.is(NAME));
-        Assert.assertThat(command.getUser(), Matchers.is(USER));
-        Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
-        Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
-        Assert.assertThat(command.getExecutableAndArguments(), Matchers.is(EXECUTABLE_AND_ARGS));
-        Assert.assertFalse(command.getSetupFile().isPresent());
-        Assert.assertThat(command.getConfigs(), Matchers.empty());
-        Assert.assertThat(command.getDependencies(), Matchers.empty());
-        Assert.assertFalse(command.getCreated().isPresent());
-        Assert.assertFalse(command.getDescription().isPresent());
-        Assert.assertFalse(command.getId().isPresent());
-        Assert.assertThat(command.getTags(), Matchers.empty());
-        Assert.assertFalse(command.getUpdated().isPresent());
-        Assert.assertFalse(command.getMemory().isPresent());
+        Assertions.assertThat(command.getName()).isEqualTo(NAME);
+        Assertions.assertThat(command.getUser()).isEqualTo(USER);
+        Assertions.assertThat(command.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(command.getStatus()).isEqualTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(command.getExecutable()).isEqualTo(EXECUTABLE);
+        Assertions.assertThat(command.getExecutableAndArguments()).isEqualTo(EXECUTABLE_AND_ARGS);
+        Assertions.assertThat(command.getSetupFile().isPresent()).isFalse();
+        Assertions.assertThat(command.getConfigs()).isEmpty();
+        Assertions.assertThat(command.getDependencies()).isEmpty();
+        Assertions.assertThat(command.getCreated().isPresent()).isFalse();
+        Assertions.assertThat(command.getDescription().isPresent()).isFalse();
+        Assertions.assertThat(command.getId().isPresent()).isFalse();
+        Assertions.assertThat(command.getTags()).isEmpty();
+        Assertions.assertThat(command.getUpdated().isPresent()).isFalse();
+        Assertions.assertThat(command.getMemory().isPresent()).isFalse();
     }
 
     /**
      * Test to make sure we can build a command using the deprecated builder constructor.
      */
     @Test
-    public void canBuildCommandWithDeprecatedConstructor() {
+    void canBuildCommandWithDeprecatedConstructor() {
         final Command command
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY).build();
-        Assert.assertThat(command.getName(), Matchers.is(NAME));
-        Assert.assertThat(command.getUser(), Matchers.is(USER));
-        Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
-        Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
-        Assert.assertThat(command.getExecutableAndArguments(), Matchers.is(EXECUTABLE_AND_ARGS));
-        Assert.assertFalse(command.getSetupFile().isPresent());
-        Assert.assertThat(command.getConfigs(), Matchers.empty());
-        Assert.assertThat(command.getDependencies(), Matchers.empty());
-        Assert.assertFalse(command.getCreated().isPresent());
-        Assert.assertFalse(command.getDescription().isPresent());
-        Assert.assertFalse(command.getId().isPresent());
-        Assert.assertThat(command.getTags(), Matchers.empty());
-        Assert.assertFalse(command.getUpdated().isPresent());
-        Assert.assertFalse(command.getMemory().isPresent());
+        Assertions.assertThat(command.getName()).isEqualTo(NAME);
+        Assertions.assertThat(command.getUser()).isEqualTo(USER);
+        Assertions.assertThat(command.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(command.getStatus()).isEqualTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(command.getExecutable()).isEqualTo(EXECUTABLE);
+        Assertions.assertThat(command.getExecutableAndArguments()).isEqualTo(EXECUTABLE_AND_ARGS);
+        Assertions.assertThat(command.getSetupFile().isPresent()).isFalse();
+        Assertions.assertThat(command.getConfigs()).isEmpty();
+        Assertions.assertThat(command.getDependencies()).isEmpty();
+        Assertions.assertThat(command.getCreated().isPresent()).isFalse();
+        Assertions.assertThat(command.getDescription().isPresent()).isFalse();
+        Assertions.assertThat(command.getId().isPresent()).isFalse();
+        Assertions.assertThat(command.getTags()).isEmpty();
+        Assertions.assertThat(command.getUpdated().isPresent()).isFalse();
+        Assertions.assertThat(command.getMemory().isPresent()).isFalse();
     }
 
     /**
      * Test to make sure we can build a command with all optional parameters.
      */
     @Test
-    public void canBuildCommandWithOptionals() {
+    void canBuildCommandWithOptionals() {
         final Command.Builder builder
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
 
@@ -128,31 +127,31 @@ public class CommandTest {
         builder.withMemory(MEMORY);
 
         final Command command = builder.build();
-        Assert.assertThat(command.getName(), Matchers.is(NAME));
-        Assert.assertThat(command.getUser(), Matchers.is(USER));
-        Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
-        Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
-        Assert.assertThat(command.getExecutableAndArguments(), Matchers.is(EXECUTABLE_AND_ARGS));
-        Assert.assertThat(command.getCheckDelay(), Matchers.is(CHECK_DELAY));
-        Assert.assertThat(command.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
-        Assert.assertThat(command.getConfigs(), Matchers.is(configs));
-        Assert.assertThat(command.getDependencies(), Matchers.is(dependencies));
-        Assert.assertThat(command.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
-        Assert.assertThat(
-            command.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
-        );
-        Assert.assertThat(command.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
-        Assert.assertThat(command.getTags(), Matchers.is(tags));
-        Assert.assertThat(command.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
-        Assert.assertThat(command.getMemory().orElseThrow(IllegalArgumentException::new), Matchers.is(MEMORY));
+        Assertions.assertThat(command.getName()).isEqualTo(NAME);
+        Assertions.assertThat(command.getUser()).isEqualTo(USER);
+        Assertions.assertThat(command.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(command.getStatus()).isEqualTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(command.getExecutable()).isEqualTo(EXECUTABLE);
+        Assertions.assertThat(command.getExecutableAndArguments()).isEqualTo(EXECUTABLE_AND_ARGS);
+        Assertions.assertThat(command.getCheckDelay()).isEqualTo(CHECK_DELAY);
+        Assertions.assertThat(command.getSetupFile().orElseThrow(IllegalArgumentException::new)).isEqualTo(setupFile);
+        Assertions.assertThat(command.getConfigs()).isEqualTo(configs);
+        Assertions.assertThat(command.getDependencies()).isEqualTo(dependencies);
+        Assertions.assertThat(command.getCreated().orElseThrow(IllegalArgumentException::new)).isEqualTo(created);
+        Assertions
+            .assertThat(command.getDescription().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(description);
+        Assertions.assertThat(command.getId().orElseThrow(IllegalArgumentException::new)).isEqualTo(id);
+        Assertions.assertThat(command.getTags()).isEqualTo(tags);
+        Assertions.assertThat(command.getUpdated().orElseThrow(IllegalArgumentException::new)).isEqualTo(updated);
+        Assertions.assertThat(command.getMemory().orElseThrow(IllegalArgumentException::new)).isEqualTo(MEMORY);
     }
 
     /**
      * Test to make sure we can build a command with null collection parameters.
      */
     @Test
-    public void canBuildCommandNullOptionals() {
+    void canBuildCommandNullOptionals() {
         final Command.Builder builder
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
         builder.withSetupFile(null);
@@ -166,28 +165,28 @@ public class CommandTest {
         builder.withMemory(null);
 
         final Command command = builder.build();
-        Assert.assertThat(command.getName(), Matchers.is(NAME));
-        Assert.assertThat(command.getUser(), Matchers.is(USER));
-        Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
-        Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
-        Assert.assertThat(command.getExecutableAndArguments(), Matchers.is(EXECUTABLE_AND_ARGS));
-        Assert.assertFalse(command.getSetupFile().isPresent());
-        Assert.assertThat(command.getConfigs(), Matchers.empty());
-        Assert.assertThat(command.getDependencies(), Matchers.empty());
-        Assert.assertFalse(command.getCreated().isPresent());
-        Assert.assertFalse(command.getDescription().isPresent());
-        Assert.assertFalse(command.getId().isPresent());
-        Assert.assertThat(command.getTags(), Matchers.empty());
-        Assert.assertFalse(command.getUpdated().isPresent());
-        Assert.assertFalse(command.getMemory().isPresent());
+        Assertions.assertThat(command.getName()).isEqualTo(NAME);
+        Assertions.assertThat(command.getUser()).isEqualTo(USER);
+        Assertions.assertThat(command.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(command.getStatus()).isEqualTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(command.getExecutable()).isEqualTo(EXECUTABLE);
+        Assertions.assertThat(command.getExecutableAndArguments()).isEqualTo(EXECUTABLE_AND_ARGS);
+        Assertions.assertThat(command.getSetupFile().isPresent()).isFalse();
+        Assertions.assertThat(command.getConfigs()).isEmpty();
+        Assertions.assertThat(command.getDependencies()).isEmpty();
+        Assertions.assertThat(command.getCreated().isPresent()).isFalse();
+        Assertions.assertThat(command.getDescription().isPresent()).isFalse();
+        Assertions.assertThat(command.getId().isPresent()).isFalse();
+        Assertions.assertThat(command.getTags()).isEmpty();
+        Assertions.assertThat(command.getUpdated().isPresent()).isFalse();
+        Assertions.assertThat(command.getMemory().isPresent()).isFalse();
     }
 
     /**
      * Test equals.
      */
     @Test
-    public void canFindEquality() {
+    void canFindEquality() {
         final Command.Builder builder
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
         builder.withSetupFile(null);
@@ -203,16 +202,15 @@ public class CommandTest {
         builder.withId(UUID.randomUUID().toString());
         final Command command3 = builder.build();
 
-        Assert.assertEquals(command1, command2);
-        Assert.assertEquals(command2, command1);
-        Assert.assertNotEquals(command1, command3);
+        Assertions.assertThat(command1).isEqualTo(command2);
+        Assertions.assertThat(command1).isNotEqualTo(command3);
     }
 
     /**
      * Test hash code.
      */
     @Test
-    public void canUseHashCode() {
+    void canUseHashCode() {
         final Command.Builder builder
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY);
         builder.withSetupFile(null);
@@ -228,23 +226,25 @@ public class CommandTest {
         builder.withId(UUID.randomUUID().toString());
         final Command command3 = builder.build();
 
-        Assert.assertEquals(command1.hashCode(), command2.hashCode());
-        Assert.assertNotEquals(command1.hashCode(), command3.hashCode());
+        Assertions.assertThat(command1.hashCode()).isEqualTo(command2.hashCode());
+        Assertions.assertThat(command1.hashCode()).isNotEqualTo(command3.hashCode());
     }
 
     /**
      * Test creation fails without an executable.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void cantBuildWithoutExecutable() {
-        new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, CHECK_DELAY).build();
+    @Test
+    void cantBuildWithoutExecutable() {
+        Assertions
+            .assertThatIllegalArgumentException()
+            .isThrownBy(() -> new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, CHECK_DELAY).build());
     }
 
     /**
      * Test to make sure we if both executable fields are set, the new one takes precedence.
      */
     @Test
-    public void canBuildWithConflictingExecutableFields() {
+    void canBuildWithConflictingExecutableFields() {
 
         final ArrayList<String> expectedExecutable = Lists.newArrayList("exec", "arg1", "arg2");
 
@@ -254,7 +254,7 @@ public class CommandTest {
             .withExecutableAndArguments(expectedExecutable)
             .build();
 
-        Assert.assertThat(command.getExecutableAndArguments(), Matchers.is(expectedExecutable));
-        Assert.assertThat(command.getExecutable(), Matchers.is(StringUtils.join(expectedExecutable, ' ')));
+        Assertions.assertThat(command.getExecutableAndArguments()).isEqualTo(expectedExecutable);
+        Assertions.assertThat(command.getExecutable()).isEqualTo(StringUtils.join(expectedExecutable, ' '));
     }
 }

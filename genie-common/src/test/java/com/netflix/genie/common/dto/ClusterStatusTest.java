@@ -18,8 +18,8 @@
 package com.netflix.genie.common.dto;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the ClusterStatus enum.
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author tgianos
  * @since 2.0.0
  */
-public class ClusterStatusTest {
+class ClusterStatusTest {
 
     /**
      * Tests whether a valid cluster status is parsed correctly.
@@ -35,32 +35,35 @@ public class ClusterStatusTest {
      * @throws GeniePreconditionException if any precondition isn't met.
      */
     @Test
-    public void testValidClusterStatus() throws GeniePreconditionException {
-        Assert.assertEquals(ClusterStatus.UP,
-            ClusterStatus.parse(ClusterStatus.UP.name().toLowerCase()));
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE,
-            ClusterStatus.parse(ClusterStatus.OUT_OF_SERVICE.name().toLowerCase()));
-        Assert.assertEquals(ClusterStatus.TERMINATED,
-            ClusterStatus.parse(ClusterStatus.TERMINATED.name().toLowerCase()));
+    void testValidClusterStatus() throws GeniePreconditionException {
+        Assertions
+            .assertThat(ClusterStatus.parse(ClusterStatus.UP.name().toLowerCase()))
+            .isEqualByComparingTo(ClusterStatus.UP);
+        Assertions
+            .assertThat(ClusterStatus.parse(ClusterStatus.OUT_OF_SERVICE.name().toLowerCase()))
+            .isEqualByComparingTo(ClusterStatus.OUT_OF_SERVICE);
+        Assertions
+            .assertThat(ClusterStatus.parse(ClusterStatus.TERMINATED.name().toLowerCase()))
+            .isEqualByComparingTo(ClusterStatus.TERMINATED);
     }
 
     /**
      * Tests whether an invalid cluster status throws exception.
-     *
-     * @throws GeniePreconditionException if any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testInvalidClusterStatus() throws GeniePreconditionException {
-        ClusterStatus.parse("DOES_NOT_EXIST");
+    @Test
+    void testInvalidClusterStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> ClusterStatus.parse("DOES_NOT_EXIST"));
     }
 
     /**
      * Tests whether an invalid cluster status throws exception.
-     *
-     * @throws GeniePreconditionException if any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testBlankClusterStatus() throws GeniePreconditionException {
-        ClusterStatus.parse("  ");
+    @Test
+    void testBlankClusterStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> ClusterStatus.parse("  "));
     }
 }

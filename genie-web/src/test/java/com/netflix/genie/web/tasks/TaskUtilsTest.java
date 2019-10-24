@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.tasks;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -31,26 +30,26 @@ import java.time.ZonedDateTime;
  * @author tgianos
  * @since 3.0.0
  */
-public class TaskUtilsTest {
+class TaskUtilsTest {
 
     /**
      * Make sure that since we're in the same package we can construct.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertNotNull(new TaskUtils());
+    void canConstruct() {
+        Assertions.assertThat(new TaskUtils()).isNotNull();
     }
 
     /**
      * Make sure we can get exactly midnight UTC.
      */
     @Test
-    public void canGetMidnightUtc() {
+    void canGetMidnightUtc() {
         final Instant midnightUTC = TaskUtils.getMidnightUTC();
         final ZonedDateTime cal = ZonedDateTime.ofInstant(midnightUTC, ZoneId.of("UTC"));
-        Assert.assertThat(cal.getNano(), Matchers.is(0));
-        Assert.assertThat(cal.getSecond(), Matchers.is(0));
-        Assert.assertThat(cal.getMinute(), Matchers.is(0));
-        Assert.assertThat(cal.getHour(), Matchers.is(0));
+        Assertions.assertThat(cal.getNano()).isEqualTo(0);
+        Assertions.assertThat(cal.getSecond()).isEqualTo(0);
+        Assertions.assertThat(cal.getMinute()).isEqualTo(0);
+        Assertions.assertThat(cal.getHour()).isEqualTo(0);
     }
 }

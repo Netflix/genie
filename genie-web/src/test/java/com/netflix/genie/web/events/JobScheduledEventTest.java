@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.events;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.UUID;
@@ -28,22 +27,21 @@ import java.util.concurrent.Future;
 /**
  * Tests for the JobScheduledEvent class.
  */
-public class JobScheduledEventTest {
+class JobScheduledEventTest {
 
     /**
-     * Make sure we can successfully create a Job Started Event.
+     * Make sure we can successfully create a Job Scheduled Event.
      */
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         final String jobId = UUID.randomUUID().toString();
         final Future<?> task = Mockito.mock(Future.class);
         final int memory = 1_034;
         final Object source = new Object();
         final JobScheduledEvent event = new JobScheduledEvent(jobId, task, memory, source);
-        Assert.assertNotNull(event);
-        Assert.assertThat(event.getId(), Matchers.is(jobId));
-        Assert.assertThat(event.getTask(), Matchers.is(task));
-        Assert.assertThat(event.getMemory(), Matchers.is(memory));
-        Assert.assertThat(event.getSource(), Matchers.is(source));
+        Assertions.assertThat(event.getId()).isEqualTo(jobId);
+        Assertions.assertThat(event.getTask()).isEqualTo(task);
+        Assertions.assertThat(event.getMemory()).isEqualTo(memory);
+        Assertions.assertThat(event.getSource()).isEqualTo(source);
     }
 }

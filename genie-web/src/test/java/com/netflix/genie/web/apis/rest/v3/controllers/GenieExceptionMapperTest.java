@@ -47,8 +47,8 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -70,7 +70,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class GenieExceptionMapperTest {
+class GenieExceptionMapperTest {
 
     private GenieExceptionMapper mapper;
     private MeterRegistry registry;
@@ -79,8 +79,8 @@ public class GenieExceptionMapperTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.registry = Mockito.mock(MeterRegistry.class);
         this.counter = Mockito.mock(Counter.class);
         Mockito
@@ -98,7 +98,7 @@ public class GenieExceptionMapperTest {
      * Test Genie Exceptions.
      */
     @Test
-    public void canHandleGenieExceptions() {
+    void canHandleGenieExceptions() {
         final List<GenieException> exceptions = Arrays.asList(
             new GenieBadRequestException("bad"),
             new GenieConflictException("conflict"),
@@ -135,7 +135,7 @@ public class GenieExceptionMapperTest {
      * Test constraint violation exceptions.
      */
     @Test
-    public void canHandleConstraintViolationExceptions() {
+    void canHandleConstraintViolationExceptions() {
         final ConstraintViolationException exception = new ConstraintViolationException("cve", null);
         final ResponseEntity<Object> response = this.mapper.handleConstraintViolation(exception);
         Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
@@ -157,7 +157,7 @@ public class GenieExceptionMapperTest {
      */
     @Test
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "It's needed for the test")
-    public void canHandleMethodArgumentNotValidExceptions() {
+    void canHandleMethodArgumentNotValidExceptions() {
         // Method is a final class so can't mock it. Just use the current method.
         final Method method = new Object() {
         }.getClass().getEnclosingMethod();
@@ -194,7 +194,7 @@ public class GenieExceptionMapperTest {
      * Make sure the Runtime exceptions map to the expected error code.
      */
     @Test
-    public void canHandleGenieRuntimeExceptions() {
+    void canHandleGenieRuntimeExceptions() {
         final Map<GenieRuntimeException, HttpStatus> exceptions = Maps.newHashMap();
 
         exceptions.put(new GenieApplicationNotFoundException(), HttpStatus.NOT_FOUND);
@@ -215,7 +215,7 @@ public class GenieExceptionMapperTest {
      * Make sure the Runtime exceptions map to the expected error code.
      */
     @Test
-    public void canHandleGenieCheckedExceptions() {
+    void canHandleGenieCheckedExceptions() {
         final Map<GenieCheckedException, HttpStatus> exceptions = Maps.newHashMap();
 
         exceptions.put(new GenieJobResolutionException(), HttpStatus.PRECONDITION_FAILED);

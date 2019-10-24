@@ -21,11 +21,10 @@ import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -39,7 +38,7 @@ import java.time.temporal.ChronoUnit;
  * @author tgianos
  * @since 3.0.0
  */
-public class UnixProcessCheckerTest {
+class UnixProcessCheckerTest {
 
     private static final int PID = 18243;
 
@@ -49,9 +48,9 @@ public class UnixProcessCheckerTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    @BeforeEach
+    void setup() {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         this.executor = Mockito.mock(Executor.class);
         this.tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
         // For standard tests this will keep it from dying
@@ -64,19 +63,16 @@ public class UnixProcessCheckerTest {
      * @throws IOException           on error
      */
     @Test
-    public void canCheckProcess() throws GenieTimeoutException, IOException {
+    void canCheckProcess() throws GenieTimeoutException, IOException {
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
         final UnixProcessChecker processChecker =
             new UnixProcessChecker(PID, this.executor, tomorrow, false);
         processChecker.checkProcess();
         Mockito.verify(this.executor).execute(argumentCaptor.capture());
-        Assert.assertThat(argumentCaptor.getValue().getExecutable(), Matchers.is("kill"));
-        Assert.assertThat(argumentCaptor.getValue().getArguments().length, Matchers.is(2));
-        Assert.assertThat(argumentCaptor.getValue().getArguments()[0], Matchers.is("-0"));
-        Assert.assertThat(
-            argumentCaptor.getValue().getArguments()[1],
-            Matchers.is(Integer.toString(PID))
-        );
+        Assertions.assertThat(argumentCaptor.getValue().getExecutable()).isEqualTo("kill");
+        Assertions.assertThat(argumentCaptor.getValue().getArguments().length).isEqualTo(2);
+        Assertions.assertThat(argumentCaptor.getValue().getArguments()[0]).isEqualTo("-0");
+        Assertions.assertThat(argumentCaptor.getValue().getArguments()[1]).isEqualTo(Integer.toString(PID));
     }
 
     /**
@@ -86,31 +82,31 @@ public class UnixProcessCheckerTest {
      * @throws IOException           on error
      */
     @Test
-    public void canCheckProcessWithSudo() throws GenieTimeoutException, IOException {
+    void canCheckProcessWithSudo() throws GenieTimeoutException, IOException {
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
         final UnixProcessChecker processChecker =
             new UnixProcessChecker(PID, this.executor, tomorrow, true);
         processChecker.checkProcess();
         Mockito.verify(this.executor).execute(argumentCaptor.capture());
-        Assert.assertThat(argumentCaptor.getValue().getExecutable(), Matchers.is("sudo"));
-        Assert.assertThat(argumentCaptor.getValue().getArguments().length, Matchers.is(3));
-        Assert.assertThat(argumentCaptor.getValue().getArguments()[0], Matchers.is("kill"));
-        Assert.assertThat(argumentCaptor.getValue().getArguments()[1], Matchers.is("-0"));
-        Assert.assertThat(
-            argumentCaptor.getValue().getArguments()[2],
-            Matchers.is(Integer.toString(PID))
-        );
+        Assertions.assertThat(argumentCaptor.getValue().getExecutable()).isEqualTo("sudo");
+        Assertions.assertThat(argumentCaptor.getValue().getArguments().length).isEqualTo(3);
+        Assertions.assertThat(argumentCaptor.getValue().getArguments()[0]).isEqualTo("kill");
+        Assertions.assertThat(argumentCaptor.getValue().getArguments()[1]).isEqualTo("-0");
+        Assertions.assertThat(argumentCaptor.getValue().getArguments()[2]).isEqualTo(Integer.toString(PID));
     }
 
     /**
      * Make sure if the timeout has been exceeded then an exception is thrown indicating the process should be killed.
-     *
-     * @throws GenieTimeoutException on timeout
-     * @throws IOException           on any other error
      */
-    @Test(expected = GenieTimeoutException.class)
-    public void canCheckProcessTimeout() throws GenieTimeoutException, IOException {
-        final Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
-        new UnixProcessChecker(PID, this.executor, yesterday, true).checkProcess();
+    @Test
+    void canCheckProcessTimeout() {
+        Assertions
+            .assertThatExceptionOfType(GenieTimeoutException.class)
+            .isThrownBy(
+                () -> {
+                    final Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
+                    new UnixProcessChecker(PID, this.executor, yesterday, true).checkProcess();
+                }
+            );
     }
 }

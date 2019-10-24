@@ -23,7 +23,6 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -52,10 +51,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
@@ -74,7 +71,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
@@ -87,9 +83,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobRestControllerTest {
-
-    private static final Charset UTF_8 = StandardCharsets.UTF_8;
+class JobRestControllerTest {
 
     //Mocked variables
     private JobSearchService jobSearchService;
@@ -106,8 +100,8 @@ public class JobRestControllerTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.agentRoutingService = Mockito.mock(AgentRoutingService.class);
@@ -148,7 +142,7 @@ public class JobRestControllerTest {
      * @throws GenieException On Error
      */
     @Test
-    public void wontForwardKillRequestIfNotEnabled() throws IOException, GenieException {
+    void wontForwardKillRequestIfNotEnabled() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(false);
 
         final String jobId = UUID.randomUUID().toString();
@@ -171,7 +165,7 @@ public class JobRestControllerTest {
      * @throws GenieException on error
      */
     @Test
-    public void wontForwardJobKillRequestIfAlreadyForwarded() throws IOException, GenieException {
+    void wontForwardJobKillRequestIfAlreadyForwarded() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String forwardedFrom = UUID.randomUUID().toString();
@@ -194,7 +188,7 @@ public class JobRestControllerTest {
      * @throws GenieException on error
      */
     @Test
-    public void wontForwardV3JobKillRequestIfOnCorrectHost() throws IOException, GenieException {
+    void wontForwardV3JobKillRequestIfOnCorrectHost() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -222,7 +216,7 @@ public class JobRestControllerTest {
      * @throws GenieException on error
      */
     @Test
-    public void canRespondToV3KillRequestForwardError() throws IOException, GenieException {
+    void canRespondToV3KillRequestForwardError() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -274,7 +268,7 @@ public class JobRestControllerTest {
      * @throws GenieException on error
      */
     @Test
-    public void canForwardV3JobKillRequest() throws IOException, GenieException {
+    void canForwardV3JobKillRequest() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -325,7 +319,7 @@ public class JobRestControllerTest {
      * @throws GenieException on error
      */
     @Test
-    public void wontForwardV4JobKillRequestIfOnCorrectHost() throws IOException, GenieException {
+    void wontForwardV4JobKillRequestIfOnCorrectHost() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -354,7 +348,7 @@ public class JobRestControllerTest {
      * @throws GenieException on error
      */
     @Test
-    public void canRespondToV4KillRequestForwardError() throws IOException, GenieException {
+    void canRespondToV4KillRequestForwardError() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -407,7 +401,7 @@ public class JobRestControllerTest {
      * @throws GenieException on error
      */
     @Test
-    public void canForwardV4JobKillRequest() throws IOException, GenieException {
+    void canForwardV4JobKillRequest() throws IOException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -455,11 +449,10 @@ public class JobRestControllerTest {
     /**
      * Make sure GenieNotFoundException exception thrown on no job found for a job kill request.
      *
-     * @throws IOException    on error
      * @throws GenieException on error
      */
-    @Test(expected = GenieNotFoundException.class)
-    public void missingJobOnJobKillRequestThrowsException() throws IOException, GenieException {
+    @Test
+    void missingJobOnJobKillRequestThrowsException() throws GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -467,9 +460,11 @@ public class JobRestControllerTest {
 
         Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenThrow(new GenieNotFoundException("bad"));
 
-        this.controller.killJob(jobId, null, request, response);
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.controller.killJob(jobId, null, request, response));
 
-        Mockito.verify(this.jobPersistenceService, Mockito.never()).getJobStatus(jobId);
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
         Mockito.verify(this.jobPersistenceService, Mockito.never()).isV4(jobId);
         Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
@@ -487,11 +482,10 @@ public class JobRestControllerTest {
      * Make sure GenieNotFoundException thrown on a missing host name for a v3
      * job kill request gets percolated up.
      *
-     * @throws IOException    on error
      * @throws GenieException on error
      */
-    @Test(expected = GenieNotFoundException.class)
-    public void exceptionThrownMissingHostNameForV3JobKill() throws IOException, GenieException {
+    @Test
+    void exceptionThrownMissingHostNameForV3JobKill() throws GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -501,7 +495,9 @@ public class JobRestControllerTest {
         Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(false);
         Mockito.when(this.jobSearchService.getJobHost(jobId)).thenThrow(new GenieNotFoundException("Testing"));
 
-        this.controller.killJob(jobId, null, request, response);
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.controller.killJob(jobId, null, request, response));
 
         Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
         Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
@@ -521,11 +517,10 @@ public class JobRestControllerTest {
      * Make sure GenieNotFoundException exception thrown on a missing host name for v4 job kill
      * request gets percolated up.
      *
-     * @throws IOException    on error
      * @throws GenieException on error
      */
-    @Test(expected = GenieNotFoundException.class)
-    public void exceptionThrownMissingHostNameForV4JobKill() throws IOException, GenieException {
+    @Test
+    void exceptionThrownMissingHostNameForV4JobKill() throws GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -535,7 +530,9 @@ public class JobRestControllerTest {
         Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(true);
         Mockito.when(this.agentRoutingService.getHostnameForAgentConnection(jobId)).thenReturn(Optional.empty());
 
-        this.controller.killJob(jobId, null, request, response);
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.controller.killJob(jobId, null, request, response));
 
         Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
         Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
@@ -559,7 +556,7 @@ public class JobRestControllerTest {
      * @throws GenieException   on error
      */
     @Test
-    public void wontForwardJobOutputRequestIfNotEnabled() throws IOException, ServletException, GenieException {
+    void wontForwardJobOutputRequestIfNotEnabled() throws IOException, ServletException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(false);
 
         final String jobId = UUID.randomUUID().toString();
@@ -603,7 +600,7 @@ public class JobRestControllerTest {
      * @throws GenieException   on error
      */
     @Test
-    public void wontForwardJobOutputRequestIfAlreadyForwarded() throws IOException, ServletException, GenieException {
+    void wontForwardJobOutputRequestIfAlreadyForwarded() throws IOException, ServletException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String forwardedFrom = "https://localhost:8443/api/v3/jobs/1234/output";
@@ -644,7 +641,7 @@ public class JobRestControllerTest {
      * @throws GenieException   on error
      */
     @Test
-    public void wontForwardJobOutputRequestIfOnCorrectHost() throws IOException, ServletException, GenieException {
+    void wontForwardJobOutputRequestIfOnCorrectHost() throws IOException, ServletException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -699,7 +696,7 @@ public class JobRestControllerTest {
      * @throws GenieException   on error
      */
     @Test
-    public void canHandleForwardJobOutputRequestWithError() throws IOException, ServletException, GenieException {
+    void canHandleForwardJobOutputRequestWithError() throws IOException, ServletException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -773,7 +770,7 @@ public class JobRestControllerTest {
      * @throws GenieException   on error
      */
     @Test
-    public void canHandleForwardJobOutputRequestWithSuccess() throws IOException, ServletException, GenieException {
+    void canHandleForwardJobOutputRequestWithSuccess() throws IOException, ServletException, GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -821,7 +818,7 @@ public class JobRestControllerTest {
         Mockito.when(forwardResponse.getAllHeaders()).thenReturn(new Header[]{contentTypeHeader});
 
         final String text = UUID.randomUUID().toString() + UUID.randomUUID().toString() + UUID.randomUUID().toString();
-        final ByteArrayInputStream bis = new ByteArrayInputStream(text.getBytes(UTF_8));
+        final ByteArrayInputStream bis = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
         final HttpEntity entity = Mockito.mock(HttpEntity.class);
         Mockito.when(entity.getContent()).thenReturn(bis);
         Mockito.when(forwardResponse.getEntity()).thenReturn(entity);
@@ -832,7 +829,7 @@ public class JobRestControllerTest {
         final ClientHttpRequestFactory factory = Mockito.mock(ClientHttpRequestFactory.class);
         final ClientHttpRequest clientHttpRequest = Mockito.mock(ClientHttpRequest.class);
         Mockito.when(clientHttpRequest.execute())
-            .thenReturn(new MockClientHttpResponse(text.getBytes(UTF_8), HttpStatus.OK));
+            .thenReturn(new MockClientHttpResponse(text.getBytes(StandardCharsets.UTF_8), HttpStatus.OK));
         Mockito.when(clientHttpRequest.getHeaders())
             .thenReturn(new HttpHeaders());
         Mockito.when(factory.createRequest(Mockito.any(), Mockito.any())).thenReturn(clientHttpRequest);
@@ -858,7 +855,7 @@ public class JobRestControllerTest {
         );
         jobController.getJobOutput(jobId, null, request, response);
 
-        Assert.assertThat(new String(bos.toByteArray(), UTF_8), Matchers.is(text));
+        Assertions.assertThat(new String(bos.toByteArray(), StandardCharsets.UTF_8)).isEqualTo(text);
         Mockito.verify(request, Mockito.times(1)).getHeader(HttpHeaders.ACCEPT);
         Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt());
@@ -875,37 +872,34 @@ public class JobRestControllerTest {
 
     /**
      * Make sure when job submission is disabled it won't run the job and will return the proper error message.
-     *
-     * @throws GenieException        On unexpected exception
-     * @throws GenieCheckedException On unexpected exception
      */
     @Test
-    public void whenJobSubmissionIsDisabledItThrowsCorrectError() throws GenieException, GenieCheckedException {
+    void whenJobSubmissionIsDisabledItThrowsCorrectError() {
         final String errorMessage = UUID.randomUUID().toString();
-        try {
-            Mockito.when(
-                this.environment.getProperty(
-                    JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY,
-                    Boolean.class,
-                    true
-                )
-            ).thenReturn(false);
-            Mockito.when(
-                this.environment.getProperty(
-                    JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
-                    JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
-                )
-            ).thenReturn(errorMessage);
-            this.controller.submitJob(
-                Mockito.mock(JobRequest.class),
-                null,
-                null,
-                Mockito.mock(HttpServletRequest.class)
-            );
-            Assert.fail("Expected exception not thrown");
-        } catch (final GenieServerUnavailableException e) {
-            Assertions.assertThat(e.getMessage()).isEqualTo(errorMessage);
-        }
+        Mockito.when(
+            this.environment.getProperty(
+                JobConstants.JOB_SUBMISSION_ENABLED_PROPERTY_KEY,
+                Boolean.class,
+                true
+            )
+        ).thenReturn(false);
+        Mockito.when(
+            this.environment.getProperty(
+                JobConstants.JOB_SUBMISSION_DISABLED_MESSAGE_KEY,
+                JobConstants.JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
+            )
+        ).thenReturn(errorMessage);
+
+        Assertions
+            .assertThatExceptionOfType(GenieServerUnavailableException.class)
+            .isThrownBy(() ->
+                this.controller.submitJob(
+                    Mockito.mock(JobRequest.class),
+                    null,
+                    null,
+                    Mockito.mock(HttpServletRequest.class)
+                ))
+            .withMessage(errorMessage);
     }
 
     private ResourceAssemblers createMockResourceAssembler() {

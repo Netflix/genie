@@ -24,7 +24,7 @@ import com.netflix.genie.web.agent.inspectors.impl.RejectAllJobsAgentMetadataIns
 import com.netflix.genie.web.agent.inspectors.impl.WhitelistedVersionAgentMetadataInspector;
 import com.netflix.genie.web.properties.AgentFilterProperties;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -34,7 +34,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  * @author mprimi
  * @since 4.0.0
  */
-public class AgentInspectorsAutoConfigurationTest {
+class AgentInspectorsAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -48,7 +48,7 @@ public class AgentInspectorsAutoConfigurationTest {
      * Test expected context when configuration is enabled.
      */
     @Test
-    public void testContextIfEnabled() {
+    void testContextIfEnabled() {
         this.contextRunner
             .withPropertyValues(
                 "genie.agent.filter.enabled=true"
@@ -69,7 +69,7 @@ public class AgentInspectorsAutoConfigurationTest {
      * Test expected context when configuration is disabled.
      */
     @Test
-    public void testContextIfDisabled() {
+    void testContextIfDisabled() {
         this.contextRunner
             .withPropertyValues(
                 "genie.agent.filter.enabled=nope"
@@ -86,7 +86,7 @@ public class AgentInspectorsAutoConfigurationTest {
      * Test expected context when configuration is not explicitly enabled or disabled.
      */
     @Test
-    public void testContextIfUnspecified() {
+    void testContextIfUnspecified() {
         this.contextRunner
             .withPropertyValues(
                 "genie.some.other.property=true"

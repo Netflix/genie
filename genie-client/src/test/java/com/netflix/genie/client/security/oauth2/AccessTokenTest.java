@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.client.security.oauth2;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit Tests for AccessToken class.
@@ -28,15 +27,15 @@ import org.junit.Test;
  * @author amsharma
  * @since 3.0.0
  */
-public class AccessTokenTest {
+class AccessTokenTest {
 
     private AccessToken accessToken;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.accessToken = new AccessToken();
     }
 
@@ -44,29 +43,29 @@ public class AccessTokenTest {
      * Make sure can set and get the accessToken variable.
      */
     @Test
-    public void canSetAccessToken() {
+    void canSetAccessToken() {
         final String token = "token";
         this.accessToken.setAccessToken(token);
-        Assert.assertThat(this.accessToken.getAccessToken(), Matchers.is(token));
+        Assertions.assertThat(this.accessToken.getAccessToken()).isEqualTo(token);
     }
 
     /**
      * Make sure can set and get the tokenType variable.
      */
     @Test
-    public void canSetTokenType() {
+    void canSetTokenType() {
         final String tokenType = "token_type";
         this.accessToken.setTokenType(tokenType);
-        Assert.assertThat(this.accessToken.getTokenType(), Matchers.is(tokenType));
+        Assertions.assertThat(this.accessToken.getTokenType()).isEqualTo(tokenType);
     }
 
     /**
      * Make sure can set and get the expiresIn variable.
      */
     @Test
-    public void canSetExpiresIn() {
+    void canSetExpiresIn() {
         final int expiresIn = 3600;
         this.accessToken.setExpiresIn(expiresIn);
-        Assert.assertThat(this.accessToken.getExpiresIn(), Matchers.is(expiresIn));
+        Assertions.assertThat(this.accessToken.getExpiresIn()).isEqualTo(expiresIn);
     }
 }

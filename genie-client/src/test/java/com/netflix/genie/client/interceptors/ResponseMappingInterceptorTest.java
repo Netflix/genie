@@ -55,11 +55,9 @@ public class ResponseMappingInterceptorTest {
 
     /**
      * Setup for the tests.
-     *
-     * @throws IOException on error
      */
     @Before
-    public void setup() throws IOException {
+    public void setup() {
         final int port = this.wireMock.port();
         this.uri = "http://localhost:" + port + "/api/v3/jobs";
 

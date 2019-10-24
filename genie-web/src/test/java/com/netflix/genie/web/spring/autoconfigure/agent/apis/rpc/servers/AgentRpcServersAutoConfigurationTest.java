@@ -21,7 +21,7 @@ import com.netflix.genie.web.agent.apis.rpc.servers.GRpcServerManager;
 import com.netflix.genie.web.properties.GRpcServerProperties;
 import io.grpc.Server;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
  * @author tgianos
  * @since 4.0.0
  */
-public class AgentRpcServersAutoConfigurationTest {
+class AgentRpcServersAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -48,7 +48,7 @@ public class AgentRpcServersAutoConfigurationTest {
      * Default beans should be created.
      */
     @Test
-    public void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
+    void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
         this.contextRunner
             .run(
                 context -> {
@@ -63,7 +63,7 @@ public class AgentRpcServersAutoConfigurationTest {
      * User beans override default beans.
      */
     @Test
-    public void expectedBeansExistWhenUserOverrides() {
+    void expectedBeansExistWhenUserOverrides() {
         this.contextRunner
             .withUserConfiguration(UserConfig.class)
             .run(
@@ -92,7 +92,7 @@ public class AgentRpcServersAutoConfigurationTest {
          * @return mock gRPC server
          */
         @Bean
-        public Server userServer() {
+        Server userServer() {
             return Mockito.mock(Server.class);
         }
 
@@ -102,7 +102,7 @@ public class AgentRpcServersAutoConfigurationTest {
          * @return user manager
          */
         @Bean
-        public GRpcServerManager userServerManager() {
+        GRpcServerManager userServerManager() {
             return Mockito.mock(GRpcServerManager.class);
         }
     }

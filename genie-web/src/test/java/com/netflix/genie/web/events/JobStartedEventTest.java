@@ -18,23 +18,22 @@
 package com.netflix.genie.web.events;
 
 import com.netflix.genie.common.dto.JobExecution;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Tests for the JobStartedEvent class.
+ * Tests for the {@link JobStartedEvent} class.
  */
-public class JobStartedEventTest {
+class JobStartedEventTest {
 
     /**
      * Make sure we can successfully create a Job Started Event.
      */
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         final JobExecution jobExecution = new JobExecution
             .Builder(UUID.randomUUID().toString())
             .withProcessId(3029)
@@ -44,8 +43,7 @@ public class JobStartedEventTest {
             .build();
         final Object source = new Object();
         final JobStartedEvent event = new JobStartedEvent(jobExecution, source);
-        Assert.assertNotNull(event);
-        Assert.assertThat(event.getJobExecution(), Matchers.is(jobExecution));
-        Assert.assertThat(event.getSource(), Matchers.is(source));
+        Assertions.assertThat(event.getJobExecution()).isEqualTo(jobExecution);
+        Assertions.assertThat(event.getSource()).isEqualTo(source);
     }
 }

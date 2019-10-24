@@ -24,9 +24,7 @@ import com.netflix.genie.common.internal.aws.s3.S3ProtocolResolverRegistrar;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
@@ -46,7 +44,7 @@ import java.util.Collection;
  * @author tgianos
  * @since 4.0.0
  */
-public class AwsAutoConfigurationTest {
+class AwsAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
@@ -69,7 +67,7 @@ public class AwsAutoConfigurationTest {
      * Test expected context.
      */
     @Test
-    public void testExpectedContext() {
+    void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasSingleBean(AwsRegionProvider.class);
@@ -87,18 +85,10 @@ public class AwsAutoConfigurationTest {
                 if (context instanceof AbstractApplicationContext) {
                     final AbstractApplicationContext aac = (AbstractApplicationContext) context;
                     final Collection<ProtocolResolver> protocolResolvers = aac.getProtocolResolvers();
-                    Assert.assertThat(
-                        protocolResolvers,
-                        Matchers.contains(context.getBean(S3ProtocolResolver.class))
-                    );
-                    Assert.assertThat(
-                        protocolResolvers,
-                        Matchers.not(
-                            Matchers.hasItem(
-                                Matchers.isA(SimpleStorageProtocolResolver.class)
-                            )
-                        )
-                    );
+                    Assertions.assertThat(protocolResolvers).contains(context.getBean(S3ProtocolResolver.class));
+                    Assertions
+                        .assertThat(protocolResolvers)
+                        .doesNotHaveAnyElementsOfTypes(SimpleStorageProtocolResolver.class);
                 }
             }
         );

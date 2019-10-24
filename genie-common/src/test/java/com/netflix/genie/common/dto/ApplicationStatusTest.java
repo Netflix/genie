@@ -18,8 +18,8 @@
 package com.netflix.genie.common.dto;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the ApplicationStatus enum.
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author tgianos
  * @since 2.0.0
  */
-public class ApplicationStatusTest {
+class ApplicationStatusTest {
 
     /**
      * Tests whether a valid application status is parsed correctly.
@@ -35,32 +35,35 @@ public class ApplicationStatusTest {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidApplicationStatus() throws GeniePreconditionException {
-        Assert.assertEquals(ApplicationStatus.ACTIVE,
-            ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()));
-        Assert.assertEquals(ApplicationStatus.DEPRECATED,
-            ApplicationStatus.parse(ApplicationStatus.DEPRECATED.name().toLowerCase()));
-        Assert.assertEquals(ApplicationStatus.INACTIVE,
-            ApplicationStatus.parse(ApplicationStatus.INACTIVE.name().toLowerCase()));
+    void testValidApplicationStatus() throws GeniePreconditionException {
+        Assertions
+            .assertThat(ApplicationStatus.parse(ApplicationStatus.ACTIVE.name().toLowerCase()))
+            .isEqualByComparingTo(ApplicationStatus.ACTIVE);
+        Assertions
+            .assertThat(ApplicationStatus.parse(ApplicationStatus.DEPRECATED.name().toLowerCase()))
+            .isEqualByComparingTo(ApplicationStatus.DEPRECATED);
+        Assertions
+            .assertThat(ApplicationStatus.parse(ApplicationStatus.INACTIVE.name().toLowerCase()))
+            .isEqualByComparingTo(ApplicationStatus.INACTIVE);
     }
 
     /**
      * Tests whether an invalid application status throws exception.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testInvalidApplicationStatus() throws GeniePreconditionException {
-        ApplicationStatus.parse("DOES_NOT_EXIST");
+    @Test
+    void testInvalidApplicationStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> ApplicationStatus.parse("DOES_NOT_EXIST"));
     }
 
     /**
      * Tests whether an invalid application status throws exception.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testBlankApplicationStatus() throws GeniePreconditionException {
-        ApplicationStatus.parse(" ");
+    @Test
+    void testBlankApplicationStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> ApplicationStatus.parse(" "));
     }
 }

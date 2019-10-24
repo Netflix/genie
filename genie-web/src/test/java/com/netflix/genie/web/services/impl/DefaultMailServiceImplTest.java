@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.services.MailService;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -29,20 +29,23 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class DefaultMailServiceImplTest {
+class DefaultMailServiceImplTest {
 
     /**
      * Make sure the email sender doesn't do anything.
-     *
-     * @throws GenieException on error
      */
     @Test
-    public void testNoOp() throws GenieException {
+    void testNoOp() {
         final MailService service = new DefaultMailServiceImpl();
-        service.sendEmail(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        );
+        Assertions
+            .assertThatCode(
+                () ->
+                    service.sendEmail(
+                        UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString()
+                    )
+            )
+            .doesNotThrowAnyException();
     }
 }

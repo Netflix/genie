@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.events;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -29,18 +28,18 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class BaseJobEventTest {
+class BaseJobEventTest {
 
     /**
      * Make sure constructor saves variables properly.
      */
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         final String id = UUID.randomUUID().toString();
         final Object source = new Object();
 
         final BaseJobEvent event = new BaseJobEvent(id, source);
-        Assert.assertThat(event.getId(), Matchers.is(id));
-        Assert.assertThat(event.getSource(), Matchers.is(source));
+        Assertions.assertThat(event.getId()).isEqualTo(id);
+        Assertions.assertThat(event.getSource()).isEqualTo(source);
     }
 }

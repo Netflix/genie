@@ -33,7 +33,7 @@ import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -47,7 +47,7 @@ import org.springframework.scheduling.TaskScheduler;
  * @author tgianos
  * @since 4.0.0
  */
-public class AgentRpcEndpointsAutoConfigurationTest {
+class AgentRpcEndpointsAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -63,7 +63,7 @@ public class AgentRpcEndpointsAutoConfigurationTest {
      * Default beans created.
      */
     @Test
-    public void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
+    void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
         this.contextRunner
             .run(
                 context -> {
@@ -107,7 +107,7 @@ public class AgentRpcEndpointsAutoConfigurationTest {
      * User beans override defaults.
      */
     @Test
-    public void expectedBeansExistWhenUserOverrides() {
+    void expectedBeansExistWhenUserOverrides() {
         this.contextRunner
             .withUserConfiguration(UserConfig.class)
             .run(
@@ -156,27 +156,27 @@ public class AgentRpcEndpointsAutoConfigurationTest {
     @Configuration
     static class RequiredBeans {
         @Bean
-        public TaskScheduler genieTaskScheduler() {
+        TaskScheduler genieTaskScheduler() {
             return Mockito.mock(TaskScheduler.class);
         }
 
         @Bean
-        public AgentRoutingService agentRoutingService() {
+        AgentRoutingService agentRoutingService() {
             return Mockito.mock(AgentRoutingService.class);
         }
 
         @Bean
-        public JobSearchService jobSearchService() {
+        JobSearchService jobSearchService() {
             return Mockito.mock(JobSearchService.class);
         }
 
         @Bean
-        public AgentJobService agentJobService() {
+        AgentJobService agentJobService() {
             return Mockito.mock(AgentJobService.class);
         }
 
         @Bean
-        public GenieHostInfo genieHostInfo() {
+        GenieHostInfo genieHostInfo() {
             return Mockito.mock(GenieHostInfo.class);
         }
     }
@@ -188,37 +188,37 @@ public class AgentRpcEndpointsAutoConfigurationTest {
     static class UserConfig {
 
         @Bean(name = "heartBeatServiceTaskScheduler")
-        public TaskScheduler userHeartBeatScheduler() {
+        TaskScheduler userHeartBeatScheduler() {
             return Mockito.mock(TaskScheduler.class);
         }
 
         @Bean
-        public JobServiceProtoErrorComposer userJobServiceProtoErrorComposer() {
+        JobServiceProtoErrorComposer userJobServiceProtoErrorComposer() {
             return Mockito.mock(JobServiceProtoErrorComposer.class);
         }
 
         @Bean
-        public FileStreamServiceGrpc.FileStreamServiceImplBase userGRpcAgentFileStreamService() {
+        FileStreamServiceGrpc.FileStreamServiceImplBase userGRpcAgentFileStreamService() {
             return Mockito.mock(FileStreamServiceGrpc.FileStreamServiceImplBase.class);
         }
 
         @Bean
-        public HeartBeatServiceGrpc.HeartBeatServiceImplBase userGRpcHeartBeatService() {
+        HeartBeatServiceGrpc.HeartBeatServiceImplBase userGRpcHeartBeatService() {
             return Mockito.mock(HeartBeatServiceGrpc.HeartBeatServiceImplBase.class);
         }
 
         @Bean
-        public JobKillServiceGrpc.JobKillServiceImplBase userGRpcJobKillService() {
+        JobKillServiceGrpc.JobKillServiceImplBase userGRpcJobKillService() {
             return Mockito.mock(JobKillServiceGrpc.JobKillServiceImplBase.class);
         }
 
         @Bean
-        public JobServiceGrpc.JobServiceImplBase userGRpcJobService() {
+        JobServiceGrpc.JobServiceImplBase userGRpcJobService() {
             return Mockito.mock(JobServiceGrpc.JobServiceImplBase.class);
         }
 
         @Bean
-        public PingServiceGrpc.PingServiceImplBase userGRpcPingService() {
+        PingServiceGrpc.PingServiceImplBase userGRpcPingService() {
             return Mockito.mock(PingServiceGrpc.PingServiceImplBase.class);
         }
     }

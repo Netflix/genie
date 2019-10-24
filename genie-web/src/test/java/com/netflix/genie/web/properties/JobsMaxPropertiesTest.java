@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for JobMaxProperties.
@@ -28,15 +27,15 @@ import org.junit.Test;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobsMaxPropertiesTest {
+class JobsMaxPropertiesTest {
 
     private JobsMaxProperties properties;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new JobsMaxProperties();
     }
 
@@ -44,28 +43,28 @@ public class JobsMaxPropertiesTest {
      * Make sure the default properties are set.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertThat(this.properties.getStdOutSize(), Matchers.is(8_589_934_592L));
-        Assert.assertThat(this.properties.getStdErrSize(), Matchers.is(8_589_934_592L));
+    void canConstruct() {
+        Assertions.assertThat(this.properties.getStdOutSize()).isEqualTo(8_589_934_592L);
+        Assertions.assertThat(this.properties.getStdErrSize()).isEqualTo(8_589_934_592L);
     }
 
     /**
      * Make sure can set and get the std out variable.
      */
     @Test
-    public void canSetStdOut() {
+    void canSetStdOut() {
         final long newStdOut = 180_234L;
         this.properties.setStdOutSize(newStdOut);
-        Assert.assertThat(this.properties.getStdOutSize(), Matchers.is(newStdOut));
+        Assertions.assertThat(this.properties.getStdOutSize()).isEqualTo(newStdOut);
     }
 
     /**
      * Make sure can set and get the std err variable.
      */
     @Test
-    public void canSetStdErr() {
+    void canSetStdErr() {
         final long newStdErr = 180234L;
         this.properties.setStdErrSize(newStdErr);
-        Assert.assertThat(this.properties.getStdErrSize(), Matchers.is(newStdErr));
+        Assertions.assertThat(this.properties.getStdErrSize()).isEqualTo(newStdErr);
     }
 }

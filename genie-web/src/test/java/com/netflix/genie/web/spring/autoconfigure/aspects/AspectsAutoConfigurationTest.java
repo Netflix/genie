@@ -24,7 +24,7 @@ import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
  * @author tgianos
  * @since 4.0.0
  */
-public class AspectsAutoConfigurationTest {
+class AspectsAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -52,7 +52,7 @@ public class AspectsAutoConfigurationTest {
      * Make sure all the expected beans are created by the auto configuration.
      */
     @Test
-    public void expectedBeansCreated() {
+    void expectedBeansCreated() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(DataServiceRetryProperties.class);
@@ -68,7 +68,7 @@ public class AspectsAutoConfigurationTest {
      * Dummy user configuration for tests.
      */
     @Configuration
-    protected static class UserConfig {
+    static class UserConfig {
 
         /**
          * Dummy meter registry.

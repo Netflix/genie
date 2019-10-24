@@ -17,27 +17,27 @@
  */
 package com.netflix.genie.web.tasks;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * Tests the TasksCleanup class.
+ * Tests the {@link TasksCleanup} class.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class TasksCleanupTest {
+class TasksCleanupTest {
 
     private ThreadPoolTaskScheduler scheduler;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.scheduler = Mockito.mock(ThreadPoolTaskScheduler.class);
     }
 
@@ -45,7 +45,7 @@ public class TasksCleanupTest {
      * Make sure the thread pool scheduler is shutdown.
      */
     @Test
-    public void canShutdown() {
+    void canShutdown() {
         final ContextClosedEvent event = Mockito.mock(ContextClosedEvent.class);
         final TasksCleanup cleanup = new TasksCleanup(this.scheduler);
         cleanup.onShutdown(event);

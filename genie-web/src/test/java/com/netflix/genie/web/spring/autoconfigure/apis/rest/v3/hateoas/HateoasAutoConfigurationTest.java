@@ -28,7 +28,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultReso
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootResourceAssembler;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -38,7 +38,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  * @author tgianos
  * @since 4.0.0
  */
-public class HateoasAutoConfigurationTest {
+class HateoasAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
@@ -51,7 +51,7 @@ public class HateoasAutoConfigurationTest {
      * Make sure the configuration creates all the expected beans.
      */
     @Test
-    public void expectedHateoasBeansAreCreated() {
+    void expectedHateoasBeansAreCreated() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(ApplicationResourceAssembler.class);

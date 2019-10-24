@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the properties holder class.
@@ -28,15 +27,15 @@ import org.junit.Test;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobsMemoryPropertiesTest {
+class JobsMemoryPropertiesTest {
 
     private JobsMemoryProperties properties;
 
     /**
      * Setup for tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new JobsMemoryProperties();
     }
 
@@ -44,39 +43,39 @@ public class JobsMemoryPropertiesTest {
      * Make sure we have the default properties.
      */
     @Test
-    public void hasDefaultProperties() {
-        Assert.assertThat(this.properties.getDefaultJobMemory(), Matchers.is(1_024));
-        Assert.assertThat(this.properties.getMaxJobMemory(), Matchers.is(10_240));
-        Assert.assertThat(this.properties.getMaxSystemMemory(), Matchers.is(30_720));
+    void hasDefaultProperties() {
+        Assertions.assertThat(this.properties.getDefaultJobMemory()).isEqualTo(1_024);
+        Assertions.assertThat(this.properties.getMaxJobMemory()).isEqualTo(10_240);
+        Assertions.assertThat(this.properties.getMaxSystemMemory()).isEqualTo(30_720);
     }
 
     /**
      * Make sure can set the default job memory.
      */
     @Test
-    public void canSetDefaultJobMemory() {
+    void canSetDefaultJobMemory() {
         final int memory = 1_512;
         this.properties.setDefaultJobMemory(memory);
-        Assert.assertThat(this.properties.getDefaultJobMemory(), Matchers.is(memory));
+        Assertions.assertThat(this.properties.getDefaultJobMemory()).isEqualTo(memory);
     }
 
     /**
      * Make sure can set the max job memory.
      */
     @Test
-    public void canSetMaxJobMemory() {
+    void canSetMaxJobMemory() {
         final int memory = 1_512;
         this.properties.setMaxJobMemory(memory);
-        Assert.assertThat(this.properties.getMaxJobMemory(), Matchers.is(memory));
+        Assertions.assertThat(this.properties.getMaxJobMemory()).isEqualTo(memory);
     }
 
     /**
      * Make sure can set the max system memory.
      */
     @Test
-    public void canSetMaxSystemMemory() {
+    void canSetMaxSystemMemory() {
         final int memory = 1_512;
         this.properties.setMaxSystemMemory(memory);
-        Assert.assertThat(this.properties.getMaxSystemMemory(), Matchers.is(memory));
+        Assertions.assertThat(this.properties.getMaxSystemMemory()).isEqualTo(memory);
     }
 }

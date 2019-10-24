@@ -28,7 +28,7 @@ import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import com.netflix.genie.web.services.JobMetricsService;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Bean;
  * @author tgianos
  * @since 4.0.0
  */
-public class HealthAutoConfigurationTest {
+class HealthAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -55,7 +55,7 @@ public class HealthAutoConfigurationTest {
      * Make sure expected beans are provided for health indicators.
      */
     @Test
-    public void healthBeansCreatedIfNoOthersExist() {
+    void healthBeansCreatedIfNoOthersExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(GenieMemoryHealthIndicator.class);
@@ -69,7 +69,7 @@ public class HealthAutoConfigurationTest {
      * Make sure expected beans are provided for health indicators.
      */
     @Test
-    public void localAgentHealthIndicatorCreatedIfNecessaryBeansExist() {
+    void localAgentHealthIndicatorCreatedIfNecessaryBeansExist() {
         this.contextRunner
             .withUserConfiguration(LocalAgentLaunchMockConfiguration.class)
             .run(
@@ -86,7 +86,7 @@ public class HealthAutoConfigurationTest {
      */
     static class UserConfiguration {
         @Bean
-        public JobMetricsService jobMetricsService() {
+        JobMetricsService jobMetricsService() {
             return new JobMetricsService() {
                 @Override
                 public int getNumActiveJobs() {
@@ -101,12 +101,12 @@ public class HealthAutoConfigurationTest {
         }
 
         @Bean
-        public JobsProperties jobsProperties() {
+        JobsProperties jobsProperties() {
             return Mockito.mock(JobsProperties.class);
         }
 
         @Bean
-        public AgentMetricsService agentMetricsService() {
+        AgentMetricsService agentMetricsService() {
             return new AgentMetricsService() {
             };
         }
@@ -117,22 +117,22 @@ public class HealthAutoConfigurationTest {
      */
     static class LocalAgentLaunchMockConfiguration {
         @Bean
-        public LocalAgentLauncherProperties localAgentLauncherProperties() {
+        LocalAgentLauncherProperties localAgentLauncherProperties() {
             return new LocalAgentLauncherProperties();
         }
 
         @Bean
-        public LocalAgentLauncherImpl localAgentLauncher() {
+        LocalAgentLauncherImpl localAgentLauncher() {
             return Mockito.mock(LocalAgentLauncherImpl.class);
         }
 
         @Bean
-        public JobSearchService jobSearchService() {
+        JobSearchService jobSearchService() {
             return Mockito.mock(JobSearchService.class);
         }
 
         @Bean
-        public GenieHostInfo genieHostInfo() {
+        GenieHostInfo genieHostInfo() {
             return Mockito.mock(GenieHostInfo.class);
         }
     }

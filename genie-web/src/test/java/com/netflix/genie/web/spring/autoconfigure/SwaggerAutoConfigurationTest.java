@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.spring.autoconfigure;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
@@ -29,15 +28,15 @@ import springfox.documentation.spring.web.plugins.Docket;
  * @author tgianos
  * @since 3.0.0
  */
-public class SwaggerAutoConfigurationTest {
+class SwaggerAutoConfigurationTest {
 
     /**
      * Test to make sure the Swagger SpringFox docket is created properly.
      */
     @Test
-    public void canCreateDocket() {
+    void canCreateDocket() {
         final SwaggerAutoConfiguration config = new SwaggerAutoConfiguration();
         final Docket docket = config.genieApi();
-        Assert.assertThat(docket.getDocumentationType(), Matchers.is(DocumentationType.SWAGGER_2));
+        Assertions.assertThat(docket.getDocumentationType()).isEqualTo(DocumentationType.SWAGGER_2);
     }
 }

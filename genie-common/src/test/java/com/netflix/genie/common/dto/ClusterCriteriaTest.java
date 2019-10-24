@@ -18,9 +18,9 @@
 package com.netflix.genie.common.dto;
 
 import com.google.common.collect.Sets;
-import org.hamcrest.Matchers;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.UUID;
@@ -31,33 +31,35 @@ import java.util.UUID;
  * @author tgianos
  * @since 2.0.0
  */
-public class ClusterCriteriaTest {
+class ClusterCriteriaTest {
 
     /**
      * Make sure the constructor create sets properly.
      */
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         final Set<String> tags = Sets.newHashSet("tag1", "tag2");
         final ClusterCriteria cc = new ClusterCriteria(tags);
-        Assert.assertThat(cc.getTags(), Matchers.is(tags));
+        Assertions.assertThat(cc.getTags()).isEqualTo(tags);
     }
 
     /**
      * Test to make sure clients can't modify the internal state.
      */
-    @Test(expected = UnsupportedOperationException.class)
-    public void cantModifyTags() {
+    @Test
+    void cantModifyTags() {
         final Set<String> tags = Sets.newHashSet("tag1", "tag2");
         final ClusterCriteria cc = new ClusterCriteria(tags);
-        cc.getTags().add("this should fail");
+        Assertions
+            .assertThatExceptionOfType(UnsupportedOperationException.class)
+            .isThrownBy(() -> cc.getTags().add("this should fail"));
     }
 
     /**
      * Make sure we can use equals.
      */
     @Test
-    public void canGetEquality() {
+    void canGetEquality() {
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         final ClusterCriteria clusterCriteria1 = new ClusterCriteria(tags);
         final ClusterCriteria clusterCriteria2 = new ClusterCriteria(tags);
@@ -73,7 +75,7 @@ public class ClusterCriteriaTest {
      * Make sure we can use equals.
      */
     @Test
-    public void canGetHashCode() {
+    void canGetHashCode() {
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         final ClusterCriteria clusterCriteria1 = new ClusterCriteria(tags);
         final ClusterCriteria clusterCriteria2 = new ClusterCriteria(tags);

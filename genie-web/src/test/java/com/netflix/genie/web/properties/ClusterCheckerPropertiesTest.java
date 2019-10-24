@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -30,15 +29,15 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class ClusterCheckerPropertiesTest {
+class ClusterCheckerPropertiesTest {
 
     private ClusterCheckerProperties properties;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new ClusterCheckerProperties();
     }
 
@@ -46,50 +45,50 @@ public class ClusterCheckerPropertiesTest {
      * Make sure we get reasonable default properties.
      */
     @Test
-    public void canConstructWithValidProperties() {
-        Assert.assertThat(this.properties.getPort(), Matchers.is(8080));
-        Assert.assertThat(this.properties.getScheme(), Matchers.is("http"));
-        Assert.assertThat(this.properties.getLostThreshold(), Matchers.is(3));
-        Assert.assertThat(this.properties.getRate(), Matchers.is(300000L));
+    void canConstructWithValidProperties() {
+        Assertions.assertThat(this.properties.getPort()).isEqualTo(8080);
+        Assertions.assertThat(this.properties.getScheme()).isEqualTo("http");
+        Assertions.assertThat(this.properties.getLostThreshold()).isEqualTo(3);
+        Assertions.assertThat(this.properties.getRate()).isEqualTo(300000L);
     }
 
     /**
      * Make sure we can set the port.
      */
     @Test
-    public void canSetPort() {
+    void canSetPort() {
         final int port = 7001;
         this.properties.setPort(port);
-        Assert.assertThat(this.properties.getPort(), Matchers.is(port));
+        Assertions.assertThat(this.properties.getPort()).isEqualTo(port);
     }
 
     /**
      * Make sure we can set the scheme.
      */
     @Test
-    public void canSetScheme() {
+    void canSetScheme() {
         final String scheme = UUID.randomUUID().toString();
         this.properties.setScheme(scheme);
-        Assert.assertThat(this.properties.getScheme(), Matchers.is(scheme));
+        Assertions.assertThat(this.properties.getScheme()).isEqualTo(scheme);
     }
 
     /**
      * Make sure we can set the lost threshold.
      */
     @Test
-    public void canSetLostThreshold() {
+    void canSetLostThreshold() {
         final int lostThreshold = 89;
         this.properties.setLostThreshold(lostThreshold);
-        Assert.assertThat(this.properties.getLostThreshold(), Matchers.is(lostThreshold));
+        Assertions.assertThat(this.properties.getLostThreshold()).isEqualTo(lostThreshold);
     }
 
     /**
      * Make sure we can set the check rate.
      */
     @Test
-    public void canSetRate() {
+    void canSetRate() {
         final long rate = 808283L;
         this.properties.setRate(rate);
-        Assert.assertThat(this.properties.getRate(), Matchers.is(rate));
+        Assertions.assertThat(this.properties.getRate()).isEqualTo(rate);
     }
 }

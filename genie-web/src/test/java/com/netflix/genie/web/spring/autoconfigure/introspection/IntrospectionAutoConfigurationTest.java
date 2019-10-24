@@ -21,7 +21,7 @@ import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import io.grpc.Server;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -35,7 +35,7 @@ import java.net.InetAddress;
  * @author tgianos
  * @since 4.0.0
  */
-public class IntrospectionAutoConfigurationTest {
+class IntrospectionAutoConfigurationTest {
 
     private static final int EXPECTED_SERVER_PORT = 2482;
 
@@ -51,7 +51,7 @@ public class IntrospectionAutoConfigurationTest {
      * Make sure when the gRPC server starts as expected the bean is created.
      */
     @Test
-    public void expectedBeansCreated() {
+    void expectedBeansCreated() {
         this.contextRunner
             .withUserConfiguration(ServerStartedConfiguration.class)
             .run(
@@ -72,7 +72,7 @@ public class IntrospectionAutoConfigurationTest {
      * Make sure when the gRPC server doesn't start within the retry context the expected exception is thrown.
      */
     @Test
-    public void expectedExceptionThrownWhenServerIsNotStarted() {
+    void expectedExceptionThrownWhenServerIsNotStarted() {
         this.contextRunner
             .withUserConfiguration(ServerNeverStartsConfiguration.class)
             .run(
@@ -87,7 +87,7 @@ public class IntrospectionAutoConfigurationTest {
      * Make sure when the gRPC server is already terminated we get expected exception.
      */
     @Test
-    public void expectedExceptionThrownWhenServerAlreadyTerminated() {
+    void expectedExceptionThrownWhenServerAlreadyTerminated() {
         this.contextRunner
             .withUserConfiguration(ServerAlreadyTerminatedConfiguration.class)
             .run(
@@ -102,7 +102,7 @@ public class IntrospectionAutoConfigurationTest {
      * Make sure when the gRPC server is already shutdown we get expected exception.
      */
     @Test
-    public void expectedExceptionThrownWhenServerAlreadyShutdown() {
+    void expectedExceptionThrownWhenServerAlreadyShutdown() {
         this.contextRunner
             .withUserConfiguration(ServerAlreadyShutdownConfiguration.class)
             .run(
@@ -115,7 +115,7 @@ public class IntrospectionAutoConfigurationTest {
 
     static class ServerStartedConfiguration {
         @Bean
-        public Server mockGRpcServer() {
+        Server mockGRpcServer() {
             final Server server = Mockito.mock(Server.class);
             Mockito.when(server.isTerminated()).thenReturn(false);
             Mockito.when(server.isShutdown()).thenReturn(false);
@@ -126,7 +126,7 @@ public class IntrospectionAutoConfigurationTest {
 
     static class ServerNeverStartsConfiguration {
         @Bean
-        public Server mockGRpcServer() {
+        Server mockGRpcServer() {
             final Server server = Mockito.mock(Server.class);
             Mockito.when(server.isTerminated()).thenReturn(false);
             Mockito.when(server.isShutdown()).thenReturn(false);
@@ -137,7 +137,7 @@ public class IntrospectionAutoConfigurationTest {
 
     static class ServerAlreadyTerminatedConfiguration {
         @Bean
-        public Server mockGRpcServer() {
+        Server mockGRpcServer() {
             final Server server = Mockito.mock(Server.class);
             Mockito.when(server.isTerminated()).thenReturn(true);
             Mockito.when(server.isShutdown()).thenReturn(false);
@@ -147,7 +147,7 @@ public class IntrospectionAutoConfigurationTest {
 
     static class ServerAlreadyShutdownConfiguration {
         @Bean
-        public Server mockGRpcServer() {
+        Server mockGRpcServer() {
             final Server server = Mockito.mock(Server.class);
             Mockito.when(server.isTerminated()).thenReturn(false);
             Mockito.when(server.isShutdown()).thenReturn(true);

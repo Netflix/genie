@@ -18,9 +18,9 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.web.events.GenieEventBus;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -33,7 +33,7 @@ import org.springframework.integration.leader.event.OnRevokedEvent;
  * @author tgianos
  * @since 3.0.0
  */
-public class LocalLeaderTest {
+class LocalLeaderTest {
 
     private LocalLeader localLeader;
     private GenieEventBus genieEventBus;
@@ -43,8 +43,8 @@ public class LocalLeaderTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
         this.contextRefreshedEvent = Mockito.mock(ContextRefreshedEvent.class);
         this.contextClosedEvent = Mockito.mock(ContextClosedEvent.class);
@@ -53,8 +53,8 @@ public class LocalLeaderTest {
     /**
      * Tear down the tests to prepare for the next iteration.
      */
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         this.localLeader = null;
     }
 
@@ -62,7 +62,7 @@ public class LocalLeaderTest {
      * Make sure the event to grant leadership is fired if the node is the leader.
      */
     @Test
-    public void canStartLeadershipIfLeader() {
+    void canStartLeadershipIfLeader() {
         this.localLeader = new LocalLeader(this.genieEventBus, true);
         this.localLeader.startLeadership(this.contextRefreshedEvent);
         Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
@@ -72,7 +72,7 @@ public class LocalLeaderTest {
      * Make sure the event to grant leadership is not fired if the node is not the leader.
      */
     @Test
-    public void wontStartLeadershipIfNotLeader() {
+    void wontStartLeadershipIfNotLeader() {
         this.localLeader = new LocalLeader(this.genieEventBus, false);
         this.localLeader.startLeadership(this.contextRefreshedEvent);
         Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
@@ -82,7 +82,7 @@ public class LocalLeaderTest {
      * Make sure the event to revoke leadership is fired if the node is the leader.
      */
     @Test
-    public void canStopLeadershipIfLeader() {
+    void canStopLeadershipIfLeader() {
         this.localLeader = new LocalLeader(this.genieEventBus, true);
         this.localLeader.stopLeadership(this.contextClosedEvent);
         Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
@@ -92,7 +92,7 @@ public class LocalLeaderTest {
      * Make sure the event to revoke leadership is not fired if the node is not the leader.
      */
     @Test
-    public void wontStopLeadershipIfNotLeader() {
+    void wontStopLeadershipIfNotLeader() {
         this.localLeader = new LocalLeader(this.genieEventBus, false);
         this.localLeader.stopLeadership(this.contextClosedEvent);
         Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));

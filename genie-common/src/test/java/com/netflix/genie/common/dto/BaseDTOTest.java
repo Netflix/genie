@@ -18,10 +18,9 @@
 package com.netflix.genie.common.dto;
 
 import com.netflix.genie.common.util.GenieObjectMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -30,13 +29,13 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class BaseDTOTest {
+class BaseDTOTest {
 
     /**
      * Test to make sure we can create a valid JSON string from a DTO object.
      */
     @Test
-    public void canCreateValidJsonString() {
+    void canCreateValidJsonString() {
         final Application application = new Application.Builder(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -45,10 +44,6 @@ public class BaseDTOTest {
         ).build();
 
         final String json = application.toString();
-        try {
-            GenieObjectMapper.getMapper().readTree(json);
-        } catch (final IOException ioe) {
-            Assert.fail();
-        }
+        Assertions.assertThatCode(() -> GenieObjectMapper.getMapper().readTree(json)).doesNotThrowAnyException();
     }
 }

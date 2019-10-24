@@ -17,48 +17,54 @@
  */
 package com.netflix.genie.common.exceptions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
 /**
- * Test the constructors of the GenieException.
+ * Test the constructors of the {@link GenieServerUnavailableException}.
  *
  * @author tgianos
  * @since 2.0.0
  */
-public class GenieServerUnavailableExceptionTest extends Exception {
+class GenieServerUnavailableExceptionTest {
 
     private static final String ERROR_MESSAGE = "Cannot Run Jobs";
     private static final IOException IOE = new IOException("IOException");
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieServerUnavailableException When the server is unavailable
      */
-    @Test(expected = GenieServerUnavailableException.class)
-    public void testTwoArgConstructor() throws GenieServerUnavailableException {
-        final GenieServerUnavailableException ge = new GenieServerUnavailableException(ERROR_MESSAGE, IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_UNAVAILABLE, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
+    @Test
+    void testTwoArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieServerUnavailableException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieServerUnavailableException(ERROR_MESSAGE, IOE);
+                }
+            )
+            .withCause(IOE)
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_UNAVAILABLE));
     }
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieServerUnavailableException When the server is unavailable
      */
-    @Test(expected = GenieServerUnavailableException.class)
-    public void testMessageArgConstructor() throws GenieServerUnavailableException {
-        final GenieServerUnavailableException ge = new GenieServerUnavailableException(ERROR_MESSAGE);
-        Assert.assertEquals(HttpURLConnection.HTTP_UNAVAILABLE, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertNull(ge.getCause());
-        throw ge;
+    @Test
+    void testMessageArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieServerUnavailableException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieServerUnavailableException(ERROR_MESSAGE);
+                }
+            )
+            .withNoCause()
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_UNAVAILABLE));
     }
 }

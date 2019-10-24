@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -34,16 +33,16 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class ControllerUtilsTest {
+class ControllerUtilsTest {
 
     /**
      * Test the getRemainingPath method.
      */
     @Test
-    public void canGetRemainingPath() {
+    void canGetRemainingPath() {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).thenReturn(null);
-        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is(""));
+        Assertions.assertThat(ControllerUtils.getRemainingPath(request)).isEqualTo("");
 
         Mockito
             .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
@@ -51,7 +50,7 @@ public class ControllerUtilsTest {
         Mockito
             .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
             .thenReturn("/api/v3/jobs/{id}/output/**");
-        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is("genie/log.out"));
+        Assertions.assertThat(ControllerUtils.getRemainingPath(request)).isEqualTo("genie/log.out");
 
         Mockito
             .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
@@ -59,7 +58,7 @@ public class ControllerUtilsTest {
         Mockito
             .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
             .thenReturn("/api/v3/jobs/{id}/output");
-        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is(""));
+        Assertions.assertThat(ControllerUtils.getRemainingPath(request)).isEqualTo("");
 
         Mockito
             .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
@@ -67,7 +66,7 @@ public class ControllerUtilsTest {
         Mockito
             .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
             .thenReturn("/api/v3/jobs/{id}/output/");
-        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is(""));
+        Assertions.assertThat(ControllerUtils.getRemainingPath(request)).isEqualTo("");
 
         Mockito
             .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
@@ -75,7 +74,7 @@ public class ControllerUtilsTest {
         Mockito
             .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
             .thenReturn("/api/v3/jobs/{id}/output/**");
-        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is("stdout"));
+        Assertions.assertThat(ControllerUtils.getRemainingPath(request)).isEqualTo("stdout");
     }
 
     /**
@@ -84,31 +83,26 @@ public class ControllerUtilsTest {
      * @throws MalformedURLException shouldn't happen
      */
     @Test
-    public void canGetRequestRoot() throws MalformedURLException {
+    void canGetRequestRoot() throws MalformedURLException {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final URL requestURL = new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done?query=hi#DIV");
         final StringBuffer buffer = new StringBuffer(requestURL.toString());
         Mockito.when(request.getRequestURL()).thenReturn(buffer);
 
-        Assert.assertThat(
-            ControllerUtils.getRequestRoot(request, ""),
-            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"))
-        );
-        Assert.assertThat(
-            ControllerUtils.getRequestRoot(request, null),
-            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"))
-        );
-        Assert.assertThat(
-            ControllerUtils.getRequestRoot(request, UUID.randomUUID().toString()),
-            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"))
-        );
-        Assert.assertThat(
-            ControllerUtils.getRequestRoot(request, ".done"),
-            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie"))
-        );
-        Assert.assertThat(
-            ControllerUtils.getRequestRoot(request, "genie/genie.done"),
-            Matchers.is(new URL("https://genie.com/api/v3/jobs/1234/output/"))
-        );
+        Assertions
+            .assertThat(ControllerUtils.getRequestRoot(request, ""))
+            .isEqualTo(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"));
+        Assertions
+            .assertThat(ControllerUtils.getRequestRoot(request, null))
+            .isEqualTo(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"));
+        Assertions
+            .assertThat(ControllerUtils.getRequestRoot(request, UUID.randomUUID().toString()))
+            .isEqualTo(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie.done"));
+        Assertions
+            .assertThat(ControllerUtils.getRequestRoot(request, ".done"))
+            .isEqualTo(new URL("https://genie.com/api/v3/jobs/1234/output/genie/genie"));
+        Assertions
+            .assertThat(ControllerUtils.getRequestRoot(request, "genie/genie.done"))
+            .isEqualTo(new URL("https://genie.com/api/v3/jobs/1234/output/"));
     }
 }

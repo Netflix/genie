@@ -18,7 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.retry.annotation.RetryConfiguration;
@@ -29,7 +29,7 @@ import org.springframework.retry.annotation.RetryConfiguration;
  * @author tgianos
  * @since 4.0.0
  */
-public class RetryAutoConfigurationTest {
+class RetryAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -43,7 +43,7 @@ public class RetryAutoConfigurationTest {
      * The auto configuration creates the expected beans.
      */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 // This configuration should be imported by the @EnableRetry annotation

@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.env.Environment;
 
@@ -29,14 +29,14 @@ import org.springframework.core.env.Environment;
  * @author mprimi
  * @since 3.1.0
  */
-public class JobsActiveLimitPropertiesTest {
+class JobsActiveLimitPropertiesTest {
     private JobsActiveLimitProperties properties;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new JobsActiveLimitProperties();
     }
 
@@ -44,37 +44,39 @@ public class JobsActiveLimitPropertiesTest {
      * Make sure the constructor sets defaults.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertEquals(JobsActiveLimitProperties.DEFAULT_ENABLED, this.properties.isEnabled());
-        Assert.assertEquals(JobsActiveLimitProperties.DEFAULT_COUNT, this.properties.getCount());
-        Assert.assertEquals(JobsActiveLimitProperties.DEFAULT_COUNT, this.properties.getUserLimit("SomeUser"));
+    void canConstruct() {
+        Assertions.assertThat(this.properties.isEnabled()).isEqualTo(JobsActiveLimitProperties.DEFAULT_ENABLED);
+        Assertions.assertThat(this.properties.getCount()).isEqualTo(JobsActiveLimitProperties.DEFAULT_COUNT);
+        Assertions
+            .assertThat(this.properties.getUserLimit("SomeUser"))
+            .isEqualTo(JobsActiveLimitProperties.DEFAULT_COUNT);
     }
 
     /**
      * Make sure we can set the enabled field.
      */
     @Test
-    public void canSetEnabled() {
+    void canSetEnabled() {
         final boolean newEnabledValue = !this.properties.isEnabled();
         this.properties.setEnabled(newEnabledValue);
-        Assert.assertEquals(newEnabledValue, this.properties.isEnabled());
+        Assertions.assertThat(this.properties.isEnabled()).isEqualTo(newEnabledValue);
     }
 
     /**
      * Make sure we can set the count field.
      */
     @Test
-    public void canSetRunAsEnabled() {
+    void canSetRunAsEnabled() {
         final int newCountValue = 2 * this.properties.getCount();
         this.properties.setCount(newCountValue);
-        Assert.assertEquals(newCountValue, this.properties.getCount());
+        Assertions.assertThat(this.properties.getCount()).isEqualTo(newCountValue);
     }
 
     /**
      * Make sure environment is used when looking for a user-specific limit override.
      */
     @Test
-    public void testUserOverrides() {
+    void testUserOverrides() {
         final String userName = "SomeUser";
         final int userLimit = 999;
         final Environment environment = Mockito.mock(Environment.class);
@@ -87,6 +89,6 @@ public class JobsActiveLimitPropertiesTest {
             .thenReturn(userLimit);
         this.properties.setEnvironment(environment);
 
-        Assert.assertEquals(userLimit, this.properties.getUserLimit(userName));
+        Assertions.assertThat(this.properties.getUserLimit(userName)).isEqualTo(userLimit);
     }
 }

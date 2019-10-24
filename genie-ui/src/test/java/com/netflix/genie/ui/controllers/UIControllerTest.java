@@ -17,10 +17,11 @@
  */
 package com.netflix.genie.ui.controllers;
 
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -34,15 +35,15 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class UIControllerTest {
+class UIControllerTest {
 
     private UIController controller;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.controller = new UIController();
     }
 
@@ -50,7 +51,7 @@ public class UIControllerTest {
      * Make sure the getIndex endpoint returns the right template name.
      */
     @Test
-    public void canGetIndex() {
+    void canGetIndex() {
         Assert.assertThat(this.controller.getIndex(), Matchers.is("index"));
     }
 
@@ -60,7 +61,7 @@ public class UIControllerTest {
      * @throws Exception if an error occurs
      */
     @Test
-    public void canGetFile() throws Exception {
+    void canGetFile() throws Exception {
         final String id = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 
@@ -74,9 +75,6 @@ public class UIControllerTest {
         final String encodedId = URLEncoder.encode(id, "UTF-8");
         final String expectedPath = "/api/v3/jobs/" + encodedId + "/output/genie/log.out";
 
-        Assert.assertThat(
-            this.controller.getFile(id, request),
-            Matchers.is("forward:" + expectedPath)
-        );
+        Assertions.assertThat(this.controller.getFile(id, request)).isEqualTo("forward:" + expectedPath);
     }
 }

@@ -18,8 +18,8 @@
 package com.netflix.genie.web.spring.autoconfigure;
 
 import com.netflix.genie.web.properties.MailProperties;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -29,26 +29,26 @@ import org.springframework.mail.javamail.JavaMailSender;
  * @author tgianos
  * @since 4.0.0
  */
-public class MailAutoConfigurationTest {
+class MailAutoConfigurationTest {
 
     /**
      * Confirm we can get a default mail service implementation.
      */
     @Test
-    public void canGetDefaultMailServiceImpl() {
-        Assert.assertNotNull(new MailAutoConfiguration().getDefaultMailServiceImpl());
+    void canGetDefaultMailServiceImpl() {
+        Assertions.assertThat(new MailAutoConfiguration().getDefaultMailServiceImpl()).isNotNull();
     }
 
     /**
      * Confirm we can get a mail service implementation using JavaMailSender.
      */
     @Test
-    public void canGetMailServiceImpl() {
+    void canGetMailServiceImpl() {
         final JavaMailSender javaMailSender = Mockito.mock(JavaMailSender.class);
         final MailProperties properties = new MailProperties();
         properties.setFromAddress("test@genie.com");
-        Assert.assertNotNull(
+        Assertions.assertThat(
             new MailAutoConfiguration().getJavaMailSenderMailService(javaMailSender, properties)
-        );
+        ).isNotNull();
     }
 }

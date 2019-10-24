@@ -231,11 +231,15 @@ configure(javaProjects) {
         testCompile("org.spockframework:spock-core")
         testCompile("org.spockframework:spock-spring")
         testCompile("org.springframework.boot:spring-boot-starter-test")
+        testCompile("org.junit.jupiter:junit-jupiter-api")
+        testCompile("org.junit.jupiter:junit-jupiter-params")
 
         testCompileOnly("com.google.code.findbugs:annotations")
 
         testRuntime("javax.el:javax.el-api")
         testRuntime("org.glassfish:javax.el")
+        testRuntime("org.junit.jupiter:junit-jupiter-engine")
+        testRuntime("org.junit.vintage:junit-vintage-engine")
     }
 
     task removeGeneratedSources(type: Delete) {
@@ -289,6 +293,7 @@ configure(javaProjects) {
     }
 
     test {
+        useJUnitPlatform()
         testLogging {
             if (System.getenv("CI") != null) {
                 events "passed", "skipped", "failed"

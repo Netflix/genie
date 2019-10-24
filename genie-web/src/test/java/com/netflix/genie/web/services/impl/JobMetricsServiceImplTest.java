@@ -20,10 +20,9 @@ package com.netflix.genie.web.services.impl;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.web.data.services.JobSearchService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.UUID;
@@ -34,7 +33,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobMetricsServiceImplTest {
+class JobMetricsServiceImplTest {
 
     private final String hostName = UUID.randomUUID().toString();
     private JobSearchService jobSearchService;
@@ -43,8 +42,8 @@ public class JobMetricsServiceImplTest {
     /**
      * Setup for tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobMetricsService = new JobMetricsServiceImpl(this.jobSearchService, this.hostName);
     }
@@ -53,7 +52,7 @@ public class JobMetricsServiceImplTest {
      * Test to make sure the method returns the number of running jobs.
      */
     @Test
-    public void canGetNumJobs() {
+    void canGetNumJobs() {
         Mockito
             .when(this.jobSearchService.getAllActiveJobsOnHost(this.hostName))
             .thenReturn(
@@ -64,6 +63,6 @@ public class JobMetricsServiceImplTest {
                 )
             );
 
-        Assert.assertThat(this.jobMetricsService.getNumActiveJobs(), Matchers.is(3));
+        Assertions.assertThat(this.jobMetricsService.getNumActiveJobs()).isEqualTo(3);
     }
 }

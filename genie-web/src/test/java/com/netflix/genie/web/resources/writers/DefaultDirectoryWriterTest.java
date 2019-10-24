@@ -18,10 +18,9 @@
 package com.netflix.genie.web.resources.writers;
 
 import com.netflix.genie.common.util.GenieObjectMapper;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.w3c.tidy.Tidy;
 
@@ -29,7 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -40,7 +39,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class DefaultDirectoryWriterTest {
+class DefaultDirectoryWriterTest {
 
     private static final String REQUEST_URL_BASE
         = "http://genie.netflix.com:8080/api/v3/jobs/" + UUID.randomUUID().toString() + "/output";
@@ -81,8 +80,8 @@ public class DefaultDirectoryWriterTest {
     /**
      * Setup the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.writer = new DefaultDirectoryWriter();
         this.directory = Mockito.mock(File.class);
         Mockito.when(this.directory.isDirectory()).thenReturn(true);
@@ -116,66 +115,64 @@ public class DefaultDirectoryWriterTest {
     /**
      * Make sure if the argument passed in isn't a directory an exception is thrown.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void cantGetDirectoryWithoutValidDirectory() {
+    @Test
+    void cantGetDirectoryWithoutValidDirectory() {
         Mockito.when(this.directory.isDirectory()).thenReturn(false);
-        this.writer.getDirectory(this.directory, UUID.randomUUID().toString(), false);
+        Assertions
+            .assertThatIllegalArgumentException()
+            .isThrownBy(() -> this.writer.getDirectory(this.directory, UUID.randomUUID().toString(), false));
     }
 
     /**
      * Make sure an exception is thrown when no request URL is passed in to the method.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void cantGetDirectoryWithoutRequestUrl() {
-        this.writer.getDirectory(this.directory, null, false);
+    @Test
+    void cantGetDirectoryWithoutRequestUrl() {
+        Assertions
+            .assertThatIllegalArgumentException()
+            .isThrownBy(() -> this.writer.getDirectory(this.directory, null, false));
     }
 
     /**
      * Make sure can get a directory with a parent.
      */
     @Test
-    public void canGetDirectoryWithParent() {
+    void canGetDirectoryWithParent() {
         this.setupWithParent();
         final DefaultDirectoryWriter.Directory dir
             = this.writer.getDirectory(this.directory, REQUEST_URL_WITH_PARENT, true);
 
-        Assert.assertThat(dir.getParent(), Matchers.notNullValue());
-        Assert.assertThat(dir.getParent().getName(), Matchers.is(PARENT_NAME));
-        Assert.assertThat(dir.getParent().getUrl(), Matchers.is(PARENT_URL));
-        Assert.assertThat(dir.getParent().getSize(), Matchers.is(PARENT_SIZE));
-        Assert.assertThat(dir.getParent().getLastModified(), Matchers.is(PARENT_LAST_MODIFIED));
+        Assertions.assertThat(dir.getParent()).isNotNull();
+        Assertions.assertThat(dir.getParent().getName()).isEqualTo(PARENT_NAME);
+        Assertions.assertThat(dir.getParent().getUrl()).isEqualTo(PARENT_URL);
+        Assertions.assertThat(dir.getParent().getSize()).isEqualTo(PARENT_SIZE);
+        Assertions.assertThat(dir.getParent().getLastModified()).isEqualTo(PARENT_LAST_MODIFIED);
 
-        Assert.assertThat(dir.getDirectories(), Matchers.notNullValue());
-        Assert.assertThat(dir.getDirectories().size(), Matchers.is(2));
-        Assert.assertThat(
-            dir.getDirectories(),
-            Matchers.containsInAnyOrder(this.directoryEntry1, this.directoryEntry2)
-        );
+        Assertions.assertThat(dir.getDirectories()).isNotNull();
+        Assertions
+            .assertThat(dir.getDirectories())
+            .containsExactlyInAnyOrder(this.directoryEntry1, this.directoryEntry2);
 
-        Assert.assertThat(dir.getFiles(), Matchers.notNullValue());
-        Assert.assertThat(dir.getFiles().size(), Matchers.is(2));
-        Assert.assertThat(
-            dir.getFiles(),
-            Matchers.containsInAnyOrder(this.fileEntry1, this.fileEntry2)
-        );
+        Assertions.assertThat(dir.getFiles()).isNotNull();
+        Assertions.assertThat(dir.getFiles()).containsExactlyInAnyOrder(this.fileEntry1, this.fileEntry2);
     }
 
     /**
      * Make sure can get a directory without a parent.
      */
     @Test
-    public void canGetDirectoryWithoutParent() {
+    void canGetDirectoryWithoutParent() {
         this.setupWithoutParent();
         final DefaultDirectoryWriter.Directory dir
             = this.writer.getDirectory(this.directory, REQUEST_URL_BASE, false);
 
-        Assert.assertThat(dir.getParent(), Matchers.nullValue());
+        Assertions.assertThat(dir.getParent()).isNull();
 
-        Assert.assertThat(dir.getDirectories(), Matchers.notNullValue());
-        Assert.assertTrue(dir.getDirectories().isEmpty());
+        Assertions.assertThat(dir.getDirectories()).isNotNull();
+        Assertions.assertThat(dir.getDirectories().isEmpty()).isTrue();
 
-        Assert.assertThat(dir.getFiles(), Matchers.notNullValue());
-        Assert.assertTrue(dir.getFiles().isEmpty());
+        Assertions.assertThat(dir.getFiles()).isNotNull();
+        Assertions.assertThat(dir.getFiles().isEmpty()).isTrue();
     }
 
     /**
@@ -184,18 +181,18 @@ public class DefaultDirectoryWriterTest {
      * @throws Exception on any problem
      */
     @Test
-    public void canConvertToHtml() throws Exception {
+    void canConvertToHtml() throws Exception {
         this.setupWithParent();
         final String html = this.writer.toHtml(this.directory, REQUEST_URL_WITH_PARENT, true);
-        Assert.assertThat(html, Matchers.notNullValue());
+        Assertions.assertThat(html).isNotNull();
 
         // Not going to parse the whole HTML to validate contents, too much work.
         // So just make sure HTML is valid so at least it doesn't cause error in browser
         final Tidy tidy = new Tidy();
         final Writer stringWriter = new StringWriter();
-        tidy.parse(new ByteArrayInputStream(html.getBytes(Charset.forName("UTF-8"))), stringWriter);
-        Assert.assertThat(tidy.getParseErrors(), Matchers.is(0));
-        Assert.assertThat(tidy.getParseWarnings(), Matchers.is(0));
+        tidy.parse(new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)), stringWriter);
+        Assertions.assertThat(tidy.getParseErrors()).isEqualTo(0);
+        Assertions.assertThat(tidy.getParseWarnings()).isEqualTo(0);
     }
 
     /**
@@ -204,32 +201,28 @@ public class DefaultDirectoryWriterTest {
      * @throws Exception on any problem
      */
     @Test
-    public void canConvertToJson() throws Exception {
+    void canConvertToJson() throws Exception {
         this.setupWithParent();
         final String json = this.writer.toJson(this.directory, REQUEST_URL_WITH_PARENT, true);
-        Assert.assertThat(json, Matchers.notNullValue());
+        Assertions.assertThat(json).isNotNull();
         final DefaultDirectoryWriter.Directory dir
             = GenieObjectMapper.getMapper().readValue(json, DefaultDirectoryWriter.Directory.class);
 
-        Assert.assertThat(dir.getParent(), Matchers.notNullValue());
-        Assert.assertThat(dir.getParent().getName(), Matchers.is(PARENT_NAME));
-        Assert.assertThat(dir.getParent().getUrl(), Matchers.is(PARENT_URL));
-        Assert.assertThat(dir.getParent().getSize(), Matchers.is(PARENT_SIZE));
-        Assert.assertThat(dir.getParent().getLastModified(), Matchers.is(PARENT_LAST_MODIFIED));
+        Assertions.assertThat(dir.getParent()).isNotNull();
+        Assertions.assertThat(dir.getParent().getName()).isEqualTo(PARENT_NAME);
+        Assertions.assertThat(dir.getParent().getUrl()).isEqualTo(PARENT_URL);
+        Assertions.assertThat(dir.getParent().getSize()).isEqualTo(PARENT_SIZE);
+        Assertions.assertThat(dir.getParent().getLastModified()).isEqualTo(PARENT_LAST_MODIFIED);
 
-        Assert.assertThat(dir.getDirectories(), Matchers.notNullValue());
-        Assert.assertThat(dir.getDirectories().size(), Matchers.is(2));
-        Assert.assertThat(
-            dir.getDirectories(),
-            Matchers.containsInAnyOrder(this.directoryEntry1, this.directoryEntry2)
-        );
+        Assertions.assertThat(dir.getDirectories()).isNotNull();
+        Assertions
+            .assertThat(dir.getDirectories())
+            .containsExactlyInAnyOrder(this.directoryEntry1, this.directoryEntry2);
 
-        Assert.assertThat(dir.getFiles(), Matchers.notNullValue());
-        Assert.assertThat(dir.getFiles().size(), Matchers.is(2));
-        Assert.assertThat(
-            dir.getFiles(),
-            Matchers.containsInAnyOrder(this.fileEntry1, this.fileEntry2)
-        );
+        Assertions.assertThat(dir.getFiles()).isNotNull();
+        Assertions
+            .assertThat(dir.getFiles())
+            .containsExactlyInAnyOrder(this.fileEntry1, this.fileEntry2);
     }
 
     private void setupWithoutParent() {

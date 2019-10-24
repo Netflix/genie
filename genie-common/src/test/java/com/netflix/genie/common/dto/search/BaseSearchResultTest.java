@@ -18,11 +18,9 @@
 package com.netflix.genie.common.dto.search;
 
 import com.netflix.genie.common.util.GenieObjectMapper;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -31,28 +29,28 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class BaseSearchResultTest {
+class BaseSearchResultTest {
 
     /**
      * Make sure the constructor and getters work properly.
      */
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         final String user = UUID.randomUUID().toString();
         final BaseSearchResult searchResult = new BaseSearchResult(id, name, user);
 
-        Assert.assertThat(searchResult.getId(), Matchers.is(id));
-        Assert.assertThat(searchResult.getName(), Matchers.is(name));
-        Assert.assertThat(searchResult.getUser(), Matchers.is(user));
+        Assertions.assertThat(searchResult.getId()).isEqualTo(id);
+        Assertions.assertThat(searchResult.getName()).isEqualTo(name);
+        Assertions.assertThat(searchResult.getUser()).isEqualTo(user);
     }
 
     /**
      * Make sure the equals function only acts on id.
      */
     @Test
-    public void canFindEquality() {
+    void canFindEquality() {
         final String id = UUID.randomUUID().toString();
         final BaseSearchResult searchResult1
             = new BaseSearchResult(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
@@ -64,35 +62,17 @@ public class BaseSearchResultTest {
             UUID.randomUUID().toString()
         );
 
-        Assert.assertEquals(searchResult1, searchResult2);
-        Assert.assertNotEquals(searchResult1, searchResult3);
-    }
-
-    /**
-     * Make sure the hash code function only acts on id.
-     */
-    @Test
-    public void canUseHashCode() {
-        final String id = UUID.randomUUID().toString();
-        final BaseSearchResult searchResult1
-            = new BaseSearchResult(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        final BaseSearchResult searchResult2
-            = new BaseSearchResult(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        final BaseSearchResult searchResult3 = new BaseSearchResult(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        );
-
-        Assert.assertEquals(searchResult1.hashCode(), searchResult2.hashCode());
-        Assert.assertNotEquals(searchResult1.hashCode(), searchResult3.hashCode());
+        Assertions.assertThat(searchResult1).isEqualTo(searchResult2);
+        Assertions.assertThat(searchResult1).isNotEqualTo(searchResult3);
+        Assertions.assertThat(searchResult1.hashCode()).isEqualTo(searchResult2.hashCode());
+        Assertions.assertThat(searchResult1.hashCode()).isNotEqualTo(searchResult3.hashCode());
     }
 
     /**
      * Test to make sure we can create a valid JSON string from a DTO object.
      */
     @Test
-    public void canCreateValidJsonString() {
+    void canCreateValidJsonString() {
         final BaseSearchResult searchResult = new BaseSearchResult(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -100,10 +80,6 @@ public class BaseSearchResultTest {
         );
 
         final String json = searchResult.toString();
-        try {
-            GenieObjectMapper.getMapper().readTree(json);
-        } catch (final IOException ioe) {
-            Assert.fail();
-        }
+        Assertions.assertThatCode(() -> GenieObjectMapper.getMapper().readTree(json)).doesNotThrowAnyException();
     }
 }

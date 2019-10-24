@@ -17,17 +17,15 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.util.Lists;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,7 +35,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobTest {
+class JobTest {
 
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
@@ -49,57 +47,56 @@ public class JobTest {
      */
     @Test
     @SuppressWarnings("deprecation")
-    public void canBuildJobDeprecatedConstructor() {
+    void canBuildJobDeprecatedConstructor() {
         final Job job = new Job.Builder(NAME, USER, VERSION, StringUtils.join(COMMAND_ARGS, StringUtils.SPACE)).build();
-        Assert.assertThat(job.getName(), Matchers.is(NAME));
-        Assert.assertThat(job.getUser(), Matchers.is(USER));
-        Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(
-            job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
-        );
-        Assert.assertFalse(job.getArchiveLocation().isPresent());
-        Assert.assertFalse(job.getClusterName().isPresent());
-        Assert.assertFalse(job.getCommandName().isPresent());
-        Assert.assertFalse(job.getFinished().isPresent());
-        Assert.assertFalse(job.getStarted().isPresent());
-        Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.INIT));
-        Assert.assertFalse(job.getStatusMsg().isPresent());
-        Assert.assertFalse(job.getCreated().isPresent());
-        Assert.assertFalse(job.getDescription().isPresent());
-        Assert.assertFalse(job.getId().isPresent());
-        Assert.assertThat(job.getTags(), Matchers.empty());
-        Assert.assertFalse(job.getUpdated().isPresent());
-        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ZERO));
-        Assert.assertThat(job.getGrouping(), Matchers.is(Optional.empty()));
-        Assert.assertThat(job.getGroupingInstance(), Matchers.is(Optional.empty()));
+        Assertions.assertThat(job.getName()).isEqualTo(NAME);
+        Assertions.assertThat(job.getUser()).isEqualTo(USER);
+        Assertions.assertThat(job.getVersion()).isEqualTo(VERSION);
+        Assertions
+            .assertThat(job.getCommandArgs().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
+        Assertions.assertThat(job.getArchiveLocation().isPresent()).isFalse();
+        Assertions.assertThat(job.getClusterName().isPresent()).isFalse();
+        Assertions.assertThat(job.getCommandName().isPresent()).isFalse();
+        Assertions.assertThat(job.getFinished().isPresent()).isFalse();
+        Assertions.assertThat(job.getStarted().isPresent()).isFalse();
+        Assertions.assertThat(job.getStatus()).isEqualTo(JobStatus.INIT);
+        Assertions.assertThat(job.getStatusMsg().isPresent()).isFalse();
+        Assertions.assertThat(job.getCreated().isPresent()).isFalse();
+        Assertions.assertThat(job.getDescription().isPresent()).isFalse();
+        Assertions.assertThat(job.getId().isPresent()).isFalse();
+        Assertions.assertThat(job.getTags()).isEmpty();
+        Assertions.assertThat(job.getUpdated().isPresent()).isFalse();
+        Assertions.assertThat(job.getRuntime()).isEqualTo(Duration.ZERO);
+        Assertions.assertThat(job.getGrouping().isPresent()).isFalse();
+        Assertions.assertThat(job.getGroupingInstance().isPresent()).isFalse();
     }
 
     /**
      * Test to make sure can build a valid Job using the builder.
      */
     @Test
-    public void canBuildJob() {
+    void canBuildJob() {
         final Job job = new Job.Builder(NAME, USER, VERSION).build();
-        Assert.assertThat(job.getName(), Matchers.is(NAME));
-        Assert.assertThat(job.getUser(), Matchers.is(USER));
-        Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(job.getCommandArgs(), Matchers.is(Optional.empty()));
-        Assert.assertFalse(job.getArchiveLocation().isPresent());
-        Assert.assertFalse(job.getClusterName().isPresent());
-        Assert.assertFalse(job.getCommandName().isPresent());
-        Assert.assertFalse(job.getFinished().isPresent());
-        Assert.assertFalse(job.getStarted().isPresent());
-        Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.INIT));
-        Assert.assertFalse(job.getStatusMsg().isPresent());
-        Assert.assertFalse(job.getCreated().isPresent());
-        Assert.assertFalse(job.getDescription().isPresent());
-        Assert.assertFalse(job.getId().isPresent());
-        Assert.assertThat(job.getTags(), Matchers.empty());
-        Assert.assertFalse(job.getUpdated().isPresent());
-        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ZERO));
-        Assert.assertThat(job.getGrouping(), Matchers.is(Optional.empty()));
-        Assert.assertThat(job.getGroupingInstance(), Matchers.is(Optional.empty()));
+        Assertions.assertThat(job.getName()).isEqualTo(NAME);
+        Assertions.assertThat(job.getUser()).isEqualTo(USER);
+        Assertions.assertThat(job.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(job.getCommandArgs().isPresent()).isFalse();
+        Assertions.assertThat(job.getArchiveLocation().isPresent()).isFalse();
+        Assertions.assertThat(job.getClusterName().isPresent()).isFalse();
+        Assertions.assertThat(job.getCommandName().isPresent()).isFalse();
+        Assertions.assertThat(job.getFinished().isPresent()).isFalse();
+        Assertions.assertThat(job.getStarted().isPresent()).isFalse();
+        Assertions.assertThat(job.getStatus()).isEqualTo(JobStatus.INIT);
+        Assertions.assertThat(job.getStatusMsg().isPresent()).isFalse();
+        Assertions.assertThat(job.getCreated().isPresent()).isFalse();
+        Assertions.assertThat(job.getDescription().isPresent()).isFalse();
+        Assertions.assertThat(job.getId().isPresent()).isFalse();
+        Assertions.assertThat(job.getTags()).isEmpty();
+        Assertions.assertThat(job.getUpdated().isPresent()).isFalse();
+        Assertions.assertThat(job.getRuntime()).isEqualTo(Duration.ZERO);
+        Assertions.assertThat(job.getGrouping().isPresent()).isFalse();
+        Assertions.assertThat(job.getGroupingInstance().isPresent()).isFalse();
     }
 
     /**
@@ -107,7 +104,7 @@ public class JobTest {
      */
     @Test
     @SuppressWarnings("deprecation")
-    public void canBuildJobWithOptionalsDeprecated() {
+    void canBuildJobWithOptionalsDeprecated() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
 
         builder.withCommandArgs(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
@@ -158,43 +155,40 @@ public class JobTest {
         builder.withGroupingInstance(groupingInstance);
 
         final Job job = builder.build();
-        Assert.assertThat(job.getName(), Matchers.is(NAME));
-        Assert.assertThat(job.getUser(), Matchers.is(USER));
-        Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(
-            job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
-        );
-        Assert.assertThat(
-            job.getArchiveLocation().orElseThrow(IllegalArgumentException::new), Matchers.is(archiveLocation)
-        );
-        Assert.assertThat(job.getClusterName().orElseThrow(IllegalArgumentException::new), Matchers.is(clusterName));
-        Assert.assertThat(job.getCommandName().orElseThrow(IllegalArgumentException::new), Matchers.is(commandName));
-        Assert.assertThat(job.getFinished().orElseThrow(IllegalArgumentException::new), Matchers.is(finished));
-        Assert.assertThat(job.getStarted().orElseThrow(IllegalArgumentException::new), Matchers.is(started));
-        Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(job.getStatusMsg().orElseThrow(IllegalArgumentException::new), Matchers.is(statusMsg));
-        Assert.assertThat(job.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
-        Assert.assertThat(job.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description));
-        Assert.assertThat(job.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
-        Assert.assertThat(job.getTags(), Matchers.is(tags));
-        Assert.assertThat(job.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
-        Assert.assertThat(
-            job.getRuntime(),
-            Matchers.is(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()))
-        );
-        Assert.assertThat(job.getGrouping().orElseThrow(IllegalArgumentException::new), Matchers.is(grouping));
-        Assert.assertThat(
-            job.getGroupingInstance().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(groupingInstance)
-        );
+        Assertions.assertThat(job.getName()).isEqualTo(NAME);
+        Assertions.assertThat(job.getUser()).isEqualTo(USER);
+        Assertions.assertThat(job.getVersion()).isEqualTo(VERSION);
+        Assertions
+            .assertThat(job.getCommandArgs().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
+        Assertions
+            .assertThat(job.getArchiveLocation().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(archiveLocation);
+        Assertions.assertThat(job.getClusterName().orElseThrow(IllegalArgumentException::new)).isEqualTo(clusterName);
+        Assertions.assertThat(job.getCommandName().orElseThrow(IllegalArgumentException::new)).isEqualTo(commandName);
+        Assertions.assertThat(job.getFinished().orElseThrow(IllegalArgumentException::new)).isEqualTo(finished);
+        Assertions.assertThat(job.getStarted().orElseThrow(IllegalArgumentException::new)).isEqualTo(started);
+        Assertions.assertThat(job.getStatus()).isEqualTo(JobStatus.SUCCEEDED);
+        Assertions.assertThat(job.getStatusMsg().orElseThrow(IllegalArgumentException::new)).isEqualTo(statusMsg);
+        Assertions.assertThat(job.getCreated().orElseThrow(IllegalArgumentException::new)).isEqualTo(created);
+        Assertions.assertThat(job.getDescription().orElseThrow(IllegalArgumentException::new)).isEqualTo(description);
+        Assertions.assertThat(job.getId().orElseThrow(IllegalArgumentException::new)).isEqualTo(id);
+        Assertions.assertThat(job.getTags()).isEqualTo(tags);
+        Assertions.assertThat(job.getUpdated().orElseThrow(IllegalArgumentException::new)).isEqualTo(updated);
+        Assertions
+            .assertThat(job.getRuntime())
+            .isEqualByComparingTo(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()));
+        Assertions.assertThat(job.getGrouping().orElseThrow(IllegalArgumentException::new)).isEqualTo(grouping);
+        Assertions
+            .assertThat(job.getGroupingInstance().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(groupingInstance);
     }
 
     /**
      * Test to make sure can build a valid Job with optional parameters.
      */
     @Test
-    public void canBuildJobWithOptionals() {
+    void canBuildJobWithOptionals() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
 
         builder.withCommandArgs(COMMAND_ARGS);
@@ -245,43 +239,40 @@ public class JobTest {
         builder.withGroupingInstance(groupingInstance);
 
         final Job job = builder.build();
-        Assert.assertThat(job.getName(), Matchers.is(NAME));
-        Assert.assertThat(job.getUser(), Matchers.is(USER));
-        Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(
-            job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
-        );
-        Assert.assertThat(
-            job.getArchiveLocation().orElseThrow(IllegalArgumentException::new), Matchers.is(archiveLocation)
-        );
-        Assert.assertThat(job.getClusterName().orElseThrow(IllegalArgumentException::new), Matchers.is(clusterName));
-        Assert.assertThat(job.getCommandName().orElseThrow(IllegalArgumentException::new), Matchers.is(commandName));
-        Assert.assertThat(job.getFinished().orElseThrow(IllegalArgumentException::new), Matchers.is(finished));
-        Assert.assertThat(job.getStarted().orElseThrow(IllegalArgumentException::new), Matchers.is(started));
-        Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(job.getStatusMsg().orElseThrow(IllegalArgumentException::new), Matchers.is(statusMsg));
-        Assert.assertThat(job.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
-        Assert.assertThat(job.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description));
-        Assert.assertThat(job.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
-        Assert.assertThat(job.getTags(), Matchers.is(tags));
-        Assert.assertThat(job.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
-        Assert.assertThat(
-            job.getRuntime(),
-            Matchers.is(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()))
-        );
-        Assert.assertThat(job.getGrouping().orElseThrow(IllegalArgumentException::new), Matchers.is(grouping));
-        Assert.assertThat(
-            job.getGroupingInstance().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(groupingInstance)
-        );
+        Assertions.assertThat(job.getName()).isEqualTo(NAME);
+        Assertions.assertThat(job.getUser()).isEqualTo(USER);
+        Assertions.assertThat(job.getVersion()).isEqualTo(VERSION);
+        Assertions
+            .assertThat(job.getCommandArgs().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
+        Assertions
+            .assertThat(job.getArchiveLocation().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(archiveLocation);
+        Assertions.assertThat(job.getClusterName().orElseThrow(IllegalArgumentException::new)).isEqualTo(clusterName);
+        Assertions.assertThat(job.getCommandName().orElseThrow(IllegalArgumentException::new)).isEqualTo(commandName);
+        Assertions.assertThat(job.getFinished().orElseThrow(IllegalArgumentException::new)).isEqualTo(finished);
+        Assertions.assertThat(job.getStarted().orElseThrow(IllegalArgumentException::new)).isEqualTo(started);
+        Assertions.assertThat(job.getStatus()).isEqualTo(JobStatus.SUCCEEDED);
+        Assertions.assertThat(job.getStatusMsg().orElseThrow(IllegalArgumentException::new)).isEqualTo(statusMsg);
+        Assertions.assertThat(job.getCreated().orElseThrow(IllegalArgumentException::new)).isEqualTo(created);
+        Assertions.assertThat(job.getDescription().orElseThrow(IllegalArgumentException::new)).isEqualTo(description);
+        Assertions.assertThat(job.getId().orElseThrow(IllegalArgumentException::new)).isEqualTo(id);
+        Assertions.assertThat(job.getTags()).isEqualTo(tags);
+        Assertions.assertThat(job.getUpdated().orElseThrow(IllegalArgumentException::new)).isEqualTo(updated);
+        Assertions
+            .assertThat(job.getRuntime())
+            .isEqualByComparingTo(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()));
+        Assertions.assertThat(job.getGrouping().orElseThrow(IllegalArgumentException::new)).isEqualTo(grouping);
+        Assertions
+            .assertThat(job.getGroupingInstance().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(groupingInstance);
     }
 
     /**
      * Test to make sure a Job can be successfully built when nulls are inputted.
      */
     @Test
-    public void canBuildJobWithNulls() {
+    void canBuildJobWithNulls() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
         builder.withCommandArgs((List<String>) null);
         builder.withArchiveLocation(null);
@@ -298,30 +289,30 @@ public class JobTest {
         builder.withUpdated(null);
 
         final Job job = builder.build();
-        Assert.assertThat(job.getName(), Matchers.is(NAME));
-        Assert.assertThat(job.getUser(), Matchers.is(USER));
-        Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertFalse(job.getCommandArgs().isPresent());
-        Assert.assertFalse(job.getArchiveLocation().isPresent());
-        Assert.assertFalse(job.getClusterName().isPresent());
-        Assert.assertFalse(job.getCommandName().isPresent());
-        Assert.assertFalse(job.getFinished().isPresent());
-        Assert.assertFalse(job.getStarted().isPresent());
-        Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.INIT));
-        Assert.assertFalse(job.getStatusMsg().isPresent());
-        Assert.assertFalse(job.getCreated().isPresent());
-        Assert.assertFalse(job.getDescription().isPresent());
-        Assert.assertFalse(job.getId().isPresent());
-        Assert.assertThat(job.getTags(), Matchers.empty());
-        Assert.assertFalse(job.getUpdated().isPresent());
-        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ZERO));
+        Assertions.assertThat(job.getName()).isEqualTo(NAME);
+        Assertions.assertThat(job.getUser()).isEqualTo(USER);
+        Assertions.assertThat(job.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(job.getCommandArgs().isPresent()).isFalse();
+        Assertions.assertThat(job.getArchiveLocation().isPresent()).isFalse();
+        Assertions.assertThat(job.getClusterName().isPresent()).isFalse();
+        Assertions.assertThat(job.getCommandName().isPresent()).isFalse();
+        Assertions.assertThat(job.getFinished().isPresent()).isFalse();
+        Assertions.assertThat(job.getStarted().isPresent()).isFalse();
+        Assertions.assertThat(job.getStatus()).isEqualTo(JobStatus.INIT);
+        Assertions.assertThat(job.getStatusMsg().isPresent()).isFalse();
+        Assertions.assertThat(job.getCreated().isPresent()).isFalse();
+        Assertions.assertThat(job.getDescription().isPresent()).isFalse();
+        Assertions.assertThat(job.getId().isPresent()).isFalse();
+        Assertions.assertThat(job.getTags()).isEmpty();
+        Assertions.assertThat(job.getUpdated().isPresent()).isFalse();
+        Assertions.assertThat(job.getRuntime()).isEqualTo(Duration.ZERO);
     }
 
     /**
      * Test equals.
      */
     @Test
-    public void canFindEquality() {
+    void canFindEquality() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
         builder.withCommandArgs((List<String>) null);
         builder.withArchiveLocation(null);
@@ -342,16 +333,15 @@ public class JobTest {
         builder.withId(UUID.randomUUID().toString());
         final Job job3 = builder.build();
 
-        Assert.assertEquals(job1, job2);
-        Assert.assertEquals(job2, job1);
-        Assert.assertNotEquals(job1, job3);
+        Assertions.assertThat(job1).isEqualTo(job2);
+        Assertions.assertThat(job1).isNotEqualTo(job3);
     }
 
     /**
      * Test hash code.
      */
     @Test
-    public void canUseHashCode() {
+    void canUseHashCode() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
         builder.withCommandArgs((List<String>) null);
         builder.withArchiveLocation(null);
@@ -372,39 +362,35 @@ public class JobTest {
         builder.withId(UUID.randomUUID().toString());
         final Job job3 = builder.build();
 
-        Assert.assertEquals(job1.hashCode(), job2.hashCode());
-        Assert.assertNotEquals(job1.hashCode(), job3.hashCode());
+        Assertions.assertThat(job1.hashCode()).isEqualTo(job2.hashCode());
+        Assertions.assertThat(job1.hashCode()).isNotEqualTo(job3.hashCode());
     }
 
     /**
      * Test to prove a bug with command args splitting with trailing whitespace was corrected.
      */
     @Test
-    public void testCommandArgsEdgeCases() {
+    void testCommandArgsEdgeCases() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
 
         String commandArgs = " blah ";
         builder.withCommandArgs(commandArgs);
-        Assert.assertThat(
-            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(" blah ")
-        );
+        Assertions
+            .assertThat(builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(" blah ");
         commandArgs = " blah    ";
         builder.withCommandArgs(commandArgs);
-        Assert.assertThat(
-            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(" blah    ")
-        );
+        Assertions
+            .assertThat(builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(" blah    ");
         commandArgs = "  blah blah     blah\nblah\tblah \"blah\" blah  ";
         builder.withCommandArgs(commandArgs);
-        Assert.assertThat(
-            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is("  blah blah     blah\nblah\tblah \"blah\" blah  ")
-        );
+        Assertions
+            .assertThat(builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo("  blah blah     blah\nblah\tblah \"blah\" blah  ");
         builder.withCommandArgs(Lists.newArrayList("blah", "blah", "  blah", "\nblah", "\"blah\""));
-        Assert.assertThat(
-            builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is("blah blah   blah \nblah \"blah\"")
-        );
+        Assertions
+            .assertThat(builder.build().getCommandArgs().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo("blah blah   blah \nblah \"blah\"");
     }
 }
