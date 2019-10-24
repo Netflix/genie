@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -30,15 +29,15 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobsForwardingPropertiesTest {
+class JobsForwardingPropertiesTest {
 
     private JobsForwardingProperties properties;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new JobsForwardingProperties();
     }
 
@@ -46,38 +45,38 @@ public class JobsForwardingPropertiesTest {
      * Test to make sure default constructor sets default values.
      */
     @Test
-    public void hasDefaultValues() {
-        Assert.assertFalse(this.properties.isEnabled());
-        Assert.assertThat(this.properties.getScheme(), Matchers.is("http"));
-        Assert.assertThat(this.properties.getPort(), Matchers.is(8080));
+    void hasDefaultValues() {
+        Assertions.assertThat(this.properties.isEnabled()).isFalse();
+        Assertions.assertThat(this.properties.getScheme()).isEqualTo("http");
+        Assertions.assertThat(this.properties.getPort()).isEqualTo(8080);
     }
 
     /**
      * Make sure setting the enabled property is persisted.
      */
     @Test
-    public void canEnable() {
+    void canEnable() {
         this.properties.setEnabled(true);
-        Assert.assertTrue(this.properties.isEnabled());
+        Assertions.assertThat(this.properties.isEnabled()).isTrue();
     }
 
     /**
      * Make sure setting the scheme property is persisted.
      */
     @Test
-    public void canSetScheme() {
+    void canSetScheme() {
         final String scheme = UUID.randomUUID().toString();
         this.properties.setScheme(scheme);
-        Assert.assertThat(this.properties.getScheme(), Matchers.is(scheme));
+        Assertions.assertThat(this.properties.getScheme()).isEqualTo(scheme);
     }
 
     /**
      * Make sure setting the port property is persisted.
      */
     @Test
-    public void canSetPort() {
+    void canSetPort() {
         final int port = 443;
         this.properties.setPort(port);
-        Assert.assertThat(this.properties.getPort(), Matchers.is(port));
+        Assertions.assertThat(this.properties.getPort()).isEqualTo(port);
     }
 }

@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for S3FileTransferProperties.
@@ -27,15 +27,15 @@ import org.junit.Test;
  * @author mprimi
  * @since 3.1.0
  */
-public class S3FileTransferPropertiesTest {
+class S3FileTransferPropertiesTest {
 
     private S3FileTransferProperties properties;
 
     /**
      * Setup for tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new S3FileTransferProperties();
     }
 
@@ -43,16 +43,16 @@ public class S3FileTransferPropertiesTest {
      * Make sure constructor sets reasonable defaults.
      */
     @Test
-    public void canGetDefaultValues() {
-        Assert.assertFalse(this.properties.isStrictUrlCheckEnabled());
+    void canGetDefaultValues() {
+        Assertions.assertThat(this.properties.isStrictUrlCheckEnabled()).isFalse();
     }
 
     /**
      * Make sure can enable strict URL checking.
      */
     @Test
-    public void canEnableStrictUrlChecking() {
+    void canEnableStrictUrlChecking() {
         this.properties.setStrictUrlCheckEnabled(true);
-        Assert.assertTrue(this.properties.isStrictUrlCheckEnabled());
+        Assertions.assertThat(this.properties.isStrictUrlCheckEnabled()).isTrue();
     }
 }

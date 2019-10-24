@@ -20,9 +20,8 @@ package com.netflix.genie.common.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GenieException;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -32,15 +31,14 @@ import java.util.List;
  * @author tgianos
  * @since 3.0.0
  */
-public class JsonUtilsTest {
+class JsonUtilsTest {
 
     /**
      * Test the constructor.
      */
     @Test
-    public void canConstructInPackage() {
-        final JsonUtils utils = new JsonUtils();
-        Assert.assertThat(utils, Matchers.notNullValue());
+    void canConstructInPackage() {
+        Assertions.assertThat(new JsonUtils()).isNotNull();
     }
 
     /**
@@ -49,23 +47,25 @@ public class JsonUtilsTest {
      * @throws GenieException On marshalling error
      */
     @Test
-    public void canMarshall() throws GenieException {
+    void canMarshall() throws GenieException {
         final List<String> strings = Lists.newArrayList("one", "two", "three");
-        Assert.assertThat(JsonUtils.marshall(strings), Matchers.is("[\"one\",\"two\",\"three\"]"));
+        Assertions.assertThat(JsonUtils.marshall(strings)).isEqualTo("[\"one\",\"two\",\"three\"]");
     }
 
     /**
-     * Test to make sure can successfully unmarshall a collection.
+     * Test to make sure can successfully un-marshall a collection.
      *
      * @throws GenieException for any problems during the process
      */
     @Test
-    public void canUnmarshall() throws GenieException {
+    void canUnmarshall() throws GenieException {
         final String source = "[\"one\",\"two\",\"three\"]";
         final TypeReference<List<String>> list = new TypeReference<List<String>>() {
         };
 
-        Assert.assertThat(JsonUtils.unmarshall(source, list), Matchers.is(Lists.newArrayList("one", "two", "three")));
-        Assert.assertThat(JsonUtils.unmarshall(null, list), Matchers.is(Lists.newArrayList()));
+        Assertions
+            .assertThat(JsonUtils.unmarshall(source, list))
+            .isEqualTo(Lists.newArrayList("one", "two", "three"));
+        Assertions.assertThat(JsonUtils.unmarshall(null, list)).isEqualTo(Lists.newArrayList());
     }
 }

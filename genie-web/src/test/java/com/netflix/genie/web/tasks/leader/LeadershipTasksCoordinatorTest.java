@@ -19,8 +19,8 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.integration.leader.Context;
 import org.springframework.integration.leader.event.AbstractLeaderEvent;
@@ -38,7 +38,7 @@ import java.util.concurrent.ScheduledFuture;
  * @author tgianos
  * @since 3.0.0
  */
-public class LeadershipTasksCoordinatorTest {
+class LeadershipTasksCoordinatorTest {
 
     private LeadershipTasksCoordinator coordinator;
     private TaskScheduler scheduler;
@@ -49,8 +49,8 @@ public class LeadershipTasksCoordinatorTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.scheduler = Mockito.mock(TaskScheduler.class);
         this.task1 = Mockito.mock(LeadershipTask.class);
         this.task2 = Mockito.mock(LeadershipTask.class);
@@ -63,8 +63,7 @@ public class LeadershipTasksCoordinatorTest {
      * Make sure all leadership activities are started when leadership is granted.
      */
     @Test
-    @SuppressWarnings("unchecked")
-    public void canStartLeadershipTasks() {
+    void canStartLeadershipTasks() {
         final long task1Period = 13238;
         Mockito.when(this.task1.getScheduleType()).thenReturn(GenieTaskScheduleType.FIXED_RATE);
         Mockito.when(this.task1.getFixedRate()).thenReturn(task1Period);
@@ -102,7 +101,7 @@ public class LeadershipTasksCoordinatorTest {
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void canStopLeadershipTasks() {
+    void canStopLeadershipTasks() {
         final long task1Period = 13238;
         Mockito.when(this.task1.getScheduleType()).thenReturn(GenieTaskScheduleType.FIXED_RATE);
         Mockito.when(this.task1.getFixedRate()).thenReturn(task1Period);
@@ -161,7 +160,7 @@ public class LeadershipTasksCoordinatorTest {
      * Make sure unhandled commands are ignored.
      */
     @Test
-    public void doesIgnoreUnknownEvent() {
+    void doesIgnoreUnknownEvent() {
         final AbstractLeaderEvent leaderEvent = new AbstractLeaderEvent(this) {
             /**
              * Gets the {@link Context} associated with this event.

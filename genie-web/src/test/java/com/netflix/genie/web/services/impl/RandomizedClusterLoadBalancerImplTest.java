@@ -21,9 +21,9 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -31,15 +31,15 @@ import org.mockito.Mockito;
  *
  * @author tgianos
  */
-public class RandomizedClusterLoadBalancerImplTest {
+class RandomizedClusterLoadBalancerImplTest {
 
     private RandomizedClusterLoadBalancerImpl clb;
 
     /**
      * Setup the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.clb = new RandomizedClusterLoadBalancerImpl();
     }
 
@@ -49,16 +49,16 @@ public class RandomizedClusterLoadBalancerImplTest {
      * @throws GenieException For any problem if anything went wrong with the test.
      */
     @Test
-    public void testValidClusterList() throws GenieException {
+    void testValidClusterList() throws GenieException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final Cluster cluster2 = Mockito.mock(Cluster.class);
         final Cluster cluster3 = Mockito.mock(Cluster.class);
-        Assert.assertNotNull(
+        Assertions.assertThat(
             this.clb.selectCluster(
                 Sets.newHashSet(cluster1, cluster2, cluster3),
                 Mockito.mock(JobRequest.class)
             )
-        );
+        ).isNotNull();
     }
 
     /**
@@ -67,14 +67,15 @@ public class RandomizedClusterLoadBalancerImplTest {
      * @throws GenieException For any problem if anything went wrong with the test.
      */
     @Test
-    public void testValidClusterListOfOne() throws GenieException {
+    void testValidClusterListOfOne() throws GenieException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
-        Assert.assertEquals(
-            cluster1,
-            this.clb.selectCluster(
-                Sets.newHashSet(cluster1),
-                Mockito.mock(JobRequest.class)
+        Assertions
+            .assertThat(
+                this.clb.selectCluster(
+                    Sets.newHashSet(cluster1),
+                    Mockito.mock(JobRequest.class)
+                )
             )
-        );
+            .isEqualTo(cluster1);
     }
 }

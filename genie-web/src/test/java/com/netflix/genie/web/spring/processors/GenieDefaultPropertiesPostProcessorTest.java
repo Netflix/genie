@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.spring.processors;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -33,7 +32,7 @@ import org.springframework.core.env.PropertySource;
  * @author tgianos
  * @since 4.0.0
  */
-public class GenieDefaultPropertiesPostProcessorTest {
+class GenieDefaultPropertiesPostProcessorTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner();
     private final GenieDefaultPropertiesPostProcessor processor = new GenieDefaultPropertiesPostProcessor();
 
@@ -41,35 +40,37 @@ public class GenieDefaultPropertiesPostProcessorTest {
      * Test to make sure the smoke property is in the environment after the post processor is invoked.
      */
     @Test
-    public void testSmokeProperty() {
+    void testSmokeProperty() {
         this.contextRunner
             .run(
                 context -> {
                     final SpringApplication application = Mockito.mock(SpringApplication.class);
                     final ConfigurableEnvironment environment = context.getEnvironment();
-                    Assert.assertFalse(
+                    Assertions.assertThat(
                         environment
                             .getPropertySources()
                             .contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROPERTY_SOURCE_NAME)
-                    );
-                    Assert.assertFalse(
+                    ).isFalse();
+                    Assertions.assertThat(
                         environment
                             .getPropertySources()
                             .contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROD_PROPERTY_SOURCE_NAME)
-                    );
-                    Assert.assertThat(environment.getProperty("genie.smoke"), Matchers.nullValue());
+                    ).isFalse();
+                    Assertions.assertThat(environment.getProperty("genie.smoke")).isNull();
                     this.processor.postProcessEnvironment(environment, application);
-                    Assert.assertTrue(
+                    Assertions.assertThat(
                         environment
                             .getPropertySources()
                             .contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROPERTY_SOURCE_NAME)
-                    );
-                    Assert.assertFalse(
+                    ).isTrue();
+                    Assertions.assertThat(
                         environment
                             .getPropertySources()
                             .contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROD_PROPERTY_SOURCE_NAME)
-                    );
-                    Assert.assertTrue(environment.getProperty("genie.smoke", Boolean.class, false));
+                    ).isFalse();
+                    Assertions
+                        .assertThat(environment.getProperty("genie.smoke", Boolean.class, false))
+                        .isTrue();
                 }
             );
     }
@@ -78,7 +79,7 @@ public class GenieDefaultPropertiesPostProcessorTest {
      * Test to make sure the prod smoke property is in the environment after the post processor is invoked.
      */
     @Test
-    public void testProdSmokeProperty() {
+    void testProdSmokeProperty() {
         this.contextRunner
             .withPropertyValues("spring.profiles.active=prod")
             .run(
@@ -86,32 +87,33 @@ public class GenieDefaultPropertiesPostProcessorTest {
                     final SpringApplication application = Mockito.mock(SpringApplication.class);
                     final ConfigurableEnvironment environment = context.getEnvironment();
                     final MutablePropertySources propertySources = environment.getPropertySources();
-                    Assert.assertFalse(
+                    Assertions.assertThat(
                         propertySources.contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROPERTY_SOURCE_NAME)
-                    );
-                    Assert.assertFalse(
+                    ).isFalse();
+                    Assertions.assertThat(
                         propertySources.contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROD_PROPERTY_SOURCE_NAME)
-                    );
-                    Assert.assertThat(environment.getProperty("genie.smoke"), Matchers.nullValue());
+                    ).isFalse();
+                    Assertions.assertThat(environment.getProperty("genie.smoke")).isNull();
                     this.processor.postProcessEnvironment(environment, application);
-                    Assert.assertTrue(
+                    Assertions.assertThat(
                         propertySources.contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROPERTY_SOURCE_NAME)
-                    );
-                    Assert.assertTrue(
+                    ).isTrue();
+                    Assertions.assertThat(
                         propertySources.contains(GenieDefaultPropertiesPostProcessor.DEFAULT_PROD_PROPERTY_SOURCE_NAME)
-                    );
+                    ).isTrue();
                     final PropertySource<?> defaultPropertySource
                         = propertySources.get(GenieDefaultPropertiesPostProcessor.DEFAULT_PROPERTY_SOURCE_NAME);
                     final PropertySource<?> defaultProdPropertySource
                         = propertySources.get(GenieDefaultPropertiesPostProcessor.DEFAULT_PROD_PROPERTY_SOURCE_NAME);
-                    Assert.assertNotNull(defaultPropertySource);
-                    Assert.assertNotNull(defaultProdPropertySource);
+                    Assertions.assertThat(defaultPropertySource).isNotNull();
+                    Assertions.assertThat(defaultProdPropertySource).isNotNull();
                     // Lower value = higher precedence. Kind of confusing. had to look at source.
-                    Assert.assertThat(
-                        propertySources.precedenceOf(defaultProdPropertySource),
-                        Matchers.lessThan(propertySources.precedenceOf(defaultPropertySource))
-                    );
-                    Assert.assertFalse(environment.getProperty("genie.smoke", Boolean.class, true));
+                    Assertions
+                        .assertThat(propertySources.precedenceOf(defaultProdPropertySource))
+                        .isLessThan(propertySources.precedenceOf(defaultPropertySource));
+                    Assertions
+                        .assertThat(environment.getProperty("genie.smoke", Boolean.class, true))
+                        .isFalse();
                 }
             );
     }

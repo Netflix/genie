@@ -18,27 +18,26 @@
 package com.netflix.genie.common.dto.search;
 
 import com.netflix.genie.common.dto.JobStatus;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Tests for the JobSearchResult DTO.
+ * Tests for the {@link JobSearchResult} DTO.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class JobSearchResultTest {
+class JobSearchResultTest {
 
     /**
      * Make sure constructor works.
      */
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         final String user = UUID.randomUUID().toString();
@@ -50,33 +49,34 @@ public class JobSearchResultTest {
         final JobSearchResult searchResult
             = new JobSearchResult(id, name, user, status, started, finished, clusterName, commandName);
 
-        Assert.assertThat(searchResult.getId(), Matchers.is(id));
-        Assert.assertThat(searchResult.getName(), Matchers.is(name));
-        Assert.assertThat(searchResult.getUser(), Matchers.is(user));
-        Assert.assertThat(searchResult.getStatus(), Matchers.is(status));
-        Assert.assertThat(searchResult.getStarted().orElseThrow(IllegalArgumentException::new), Matchers.is(started));
-        Assert.assertThat(searchResult.getFinished().orElseThrow(IllegalArgumentException::new), Matchers.is(finished));
-        Assert.assertThat(
-            searchResult.getClusterName().orElseThrow(IllegalArgumentException::new), Matchers.is(clusterName)
-        );
-        Assert.assertThat(
-            searchResult.getCommandName().orElseThrow(IllegalArgumentException::new), Matchers.is(commandName)
-        );
-        Assert.assertThat(
-            searchResult.getRuntime(),
-            Matchers.is(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()))
-        );
+        Assertions.assertThat(searchResult.getId()).isEqualTo(id);
+        Assertions.assertThat(searchResult.getName()).isEqualTo(name);
+        Assertions.assertThat(searchResult.getUser()).isEqualTo(user);
+        Assertions.assertThat(searchResult.getStatus()).isEqualTo(status);
+        Assertions.assertThat(searchResult.getStarted().orElseThrow(IllegalArgumentException::new)).isEqualTo(started);
+        Assertions
+            .assertThat(searchResult.getFinished().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(finished);
+        Assertions
+            .assertThat(searchResult.getClusterName().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(clusterName);
+        Assertions
+            .assertThat(searchResult.getCommandName().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(commandName);
+        Assertions
+            .assertThat(searchResult.getRuntime())
+            .isEqualByComparingTo(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()));
 
         final JobSearchResult searchResult2 = new JobSearchResult(id, name, user, status, null, null, null, null);
 
-        Assert.assertThat(searchResult2.getId(), Matchers.is(id));
-        Assert.assertThat(searchResult2.getName(), Matchers.is(name));
-        Assert.assertThat(searchResult.getUser(), Matchers.is(user));
-        Assert.assertThat(searchResult2.getStatus(), Matchers.is(status));
-        Assert.assertFalse(searchResult2.getStarted().isPresent());
-        Assert.assertFalse(searchResult2.getFinished().isPresent());
-        Assert.assertFalse(searchResult2.getClusterName().isPresent());
-        Assert.assertFalse(searchResult2.getCommandName().isPresent());
-        Assert.assertThat(searchResult2.getRuntime(), Matchers.is(Duration.ZERO));
+        Assertions.assertThat(searchResult2.getId()).isEqualTo(id);
+        Assertions.assertThat(searchResult2.getName()).isEqualTo(name);
+        Assertions.assertThat(searchResult.getUser()).isEqualTo(user);
+        Assertions.assertThat(searchResult2.getStatus()).isEqualTo(status);
+        Assertions.assertThat(searchResult2.getStarted().isPresent()).isFalse();
+        Assertions.assertThat(searchResult2.getFinished().isPresent()).isFalse();
+        Assertions.assertThat(searchResult2.getClusterName().isPresent()).isFalse();
+        Assertions.assertThat(searchResult2.getCommandName().isPresent()).isFalse();
+        Assertions.assertThat(searchResult2.getRuntime()).isEqualTo(Duration.ZERO);
     }
 }

@@ -17,48 +17,54 @@
  */
 package com.netflix.genie.common.exceptions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
 /**
- * Test the constructors of the GenieTimeoutException.
+ * Test the constructors of the {@link GenieTimeoutException}.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class GenieTimeoutExceptionTest extends Exception {
+class GenieTimeoutExceptionTest {
 
     private static final String ERROR_MESSAGE = "Not Found";
     private static final IOException IOE = new IOException("IOException");
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieTimeoutException On an issue
      */
-    @Test(expected = GenieTimeoutException.class)
-    public void testTwoArgConstructor() throws GenieTimeoutException {
-        final GenieTimeoutException ge = new GenieTimeoutException(ERROR_MESSAGE, IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_CLIENT_TIMEOUT, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
+    @Test
+    void testTwoArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieTimeoutException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieTimeoutException(ERROR_MESSAGE, IOE);
+                }
+            )
+            .withCause(IOE)
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_CLIENT_TIMEOUT));
     }
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieTimeoutException On an issue
      */
-    @Test(expected = GenieTimeoutException.class)
-    public void testMessageArgConstructor() throws GenieTimeoutException {
-        final GenieTimeoutException ge = new GenieTimeoutException(ERROR_MESSAGE);
-        Assert.assertEquals(HttpURLConnection.HTTP_CLIENT_TIMEOUT, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertNull(ge.getCause());
-        throw ge;
+    @Test
+    void testMessageArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieTimeoutException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieTimeoutException(ERROR_MESSAGE);
+                }
+            )
+            .withNoCause()
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_CLIENT_TIMEOUT));
     }
 }

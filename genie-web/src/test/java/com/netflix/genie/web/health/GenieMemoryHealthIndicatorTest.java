@@ -19,10 +19,9 @@ package com.netflix.genie.web.health;
 
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobMetricsService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.health.Status;
 
@@ -34,7 +33,7 @@ import java.util.Map;
  * @author tgianos
  * @since 3.0.0
  */
-public class GenieMemoryHealthIndicatorTest {
+class GenieMemoryHealthIndicatorTest {
 
     private static final int MAX_SYSTEM_MEMORY = 10_240;
     private static final int DEFAULT_JOB_MEMORY = 1_024;
@@ -47,13 +46,13 @@ public class GenieMemoryHealthIndicatorTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.jobMetricsService = Mockito.mock(JobMetricsService.class);
-        jobsProperties = JobsProperties.getJobsPropertiesDefaults();
-        jobsProperties.getMemory().setDefaultJobMemory(DEFAULT_JOB_MEMORY);
-        jobsProperties.getMemory().setMaxSystemMemory(MAX_SYSTEM_MEMORY);
-        jobsProperties.getMemory().setMaxJobMemory(MAX_JOB_MEMORY);
+        this.jobsProperties = JobsProperties.getJobsPropertiesDefaults();
+        this.jobsProperties.getMemory().setDefaultJobMemory(DEFAULT_JOB_MEMORY);
+        this.jobsProperties.getMemory().setMaxSystemMemory(MAX_SYSTEM_MEMORY);
+        this.jobsProperties.getMemory().setMaxJobMemory(MAX_JOB_MEMORY);
 
         this.genieMemoryHealthIndicator = new GenieMemoryHealthIndicator(this.jobMetricsService, jobsProperties);
     }
@@ -62,36 +61,39 @@ public class GenieMemoryHealthIndicatorTest {
      * Test to make sure the various health conditions are met.
      */
     @Test
-    public void canGetHealth() {
-        Mockito.when(this.jobMetricsService.getNumActiveJobs()).thenReturn(1, 2, 3);
-        Mockito.when(this.jobMetricsService.getUsedMemory())
+    void canGetHealth() {
+        Mockito
+            .when(this.jobMetricsService.getNumActiveJobs())
+            .thenReturn(1, 2, 3);
+        Mockito
+            .when(this.jobMetricsService.getUsedMemory())
             .thenReturn(1024, 2048, MAX_SYSTEM_MEMORY - MAX_JOB_MEMORY + 1);
-        Assert.assertThat(this.genieMemoryHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
-        Assert.assertThat(this.genieMemoryHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
-        Assert.assertThat(this.genieMemoryHealthIndicator.health().getStatus(), Matchers.is(Status.DOWN));
+        Assertions.assertThat(this.genieMemoryHealthIndicator.health().getStatus()).isEqualTo(Status.UP);
+        Assertions.assertThat(this.genieMemoryHealthIndicator.health().getStatus()).isEqualTo(Status.UP);
+        Assertions.assertThat(this.genieMemoryHealthIndicator.health().getStatus()).isEqualTo(Status.DOWN);
     }
 
     /**
      * Test to make sure invalid property values for job memory default/max don't result in exceptions.
      */
     @Test
-    public void canGetHealthWithInvalidJobSettings() {
-        jobsProperties.getMemory().setDefaultJobMemory(0);
-        jobsProperties.getMemory().setMaxJobMemory(0);
-        final Map<String, Object> healthDetails = genieMemoryHealthIndicator.health().getDetails();
-        Assert.assertEquals(0, healthDetails.get("availableDefaultJobCapacity"));
-        Assert.assertEquals(0, healthDetails.get("availableMaxJobCapacity"));
+    void canGetHealthWithInvalidJobSettings() {
+        this.jobsProperties.getMemory().setDefaultJobMemory(0);
+        this.jobsProperties.getMemory().setMaxJobMemory(0);
+        final Map<String, Object> healthDetails = this.genieMemoryHealthIndicator.health().getDetails();
+        Assertions.assertThat(healthDetails.get("availableDefaultJobCapacity")).isEqualTo(0);
+        Assertions.assertThat(healthDetails.get("availableMaxJobCapacity")).isEqualTo(0);
     }
 
     /**
      * Test to make at full capacity we don't show a negative capacity.
      */
     @Test
-    public void nonNegativeJobsCapacity() {
+    void nonNegativeJobsCapacity() {
         Mockito.when(this.jobMetricsService.getUsedMemory()).thenReturn(MAX_SYSTEM_MEMORY + 100);
-        final Map<String, Object> healthDetails = genieMemoryHealthIndicator.health().getDetails();
-        Assert.assertEquals(0, healthDetails.get("availableDefaultJobCapacity"));
-        Assert.assertEquals(0, healthDetails.get("availableMaxJobCapacity"));
+        final Map<String, Object> healthDetails = this.genieMemoryHealthIndicator.health().getDetails();
+        Assertions.assertThat(healthDetails.get("availableDefaultJobCapacity")).isEqualTo(0);
+        Assertions.assertThat(healthDetails.get("availableMaxJobCapacity")).isEqualTo(0);
     }
 
 }

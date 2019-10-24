@@ -67,6 +67,7 @@ import java.util.concurrent.ScheduledFuture;
  * @author tgianos
  * @since 3.0.0
  */
+// TODO: Switch to Junit 5 once boot upgrades to >= junit 5.4 for @TempDir support
 public class JobMonitoringCoordinatorTest {
 
     private static final String HOSTNAME = UUID.randomUUID().toString();

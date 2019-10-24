@@ -33,8 +33,8 @@ import com.netflix.genie.web.data.services.jpa.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.web.data.services.jpa.JpaJobSearchServiceImpl;
 import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceServiceImpl;
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -44,8 +44,8 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  * @author tgianos
  * @since 4.0.0
  */
-@Ignore("For now this requires a lot of other auto configurations. Hard to isolate.")
-public class DataAutoConfigurationTest {
+@Disabled("For now this requires a lot of other auto configurations. Hard to isolate.")
+class DataAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -59,7 +59,7 @@ public class DataAutoConfigurationTest {
      * All the expected beans exist.
      */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(JpaAgentConnectionRepository.class);

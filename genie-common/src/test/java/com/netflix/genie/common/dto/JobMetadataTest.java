@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.common.dto;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -29,13 +28,13 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobMetadataTest {
+class JobMetadataTest {
 
     /**
      * Test to make sure we can successfully build a JobMetadata class.
      */
     @Test
-    public void canBuild() {
+    void canBuild() {
         final String clientHost = UUID.randomUUID().toString();
         final String userAgent = UUID.randomUUID().toString();
         final int numAttachments = 38;
@@ -53,31 +52,29 @@ public class JobMetadataTest {
             .withStdErrSize(stdErrSize)
             .build();
 
-        Assert.assertThat(metadata.getClientHost().orElseThrow(IllegalArgumentException::new), Matchers.is(clientHost));
-        Assert.assertThat(metadata.getUserAgent().orElseThrow(IllegalArgumentException::new), Matchers.is(userAgent));
-        Assert.assertThat(
-            metadata.getNumAttachments().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(numAttachments)
-        );
-        Assert.assertThat(
-            metadata.getTotalSizeOfAttachments().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(totalSizeOfAttachments)
-        );
-        Assert.assertThat(
-            metadata.getStdOutSize().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(stdOutSize)
-        );
-        Assert.assertThat(
-            metadata.getStdErrSize().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(stdErrSize)
-        );
+        Assertions
+            .assertThat(metadata.getClientHost().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(clientHost);
+        Assertions.assertThat(metadata.getUserAgent().orElseThrow(IllegalArgumentException::new)).isEqualTo(userAgent);
+        Assertions
+            .assertThat(metadata.getNumAttachments().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(numAttachments);
+        Assertions
+            .assertThat(metadata.getTotalSizeOfAttachments().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(totalSizeOfAttachments);
+        Assertions
+            .assertThat(metadata.getStdOutSize().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(stdOutSize);
+        Assertions
+            .assertThat(metadata.getStdErrSize().orElseThrow(IllegalArgumentException::new))
+            .isEqualTo(stdErrSize);
     }
 
     /**
      * Test to make sure we can successfully find equality.
      */
     @Test
-    public void canFindEquality() {
+    void canFindEquality() {
         final String clientHost = UUID.randomUUID().toString();
         final String userAgent = UUID.randomUUID().toString();
         final int numAttachments = 38;
@@ -96,16 +93,16 @@ public class JobMetadataTest {
         builder.withId(UUID.randomUUID().toString());
         final JobMetadata three = builder.build();
 
-        Assert.assertEquals(one, two);
-        Assert.assertNotEquals(one, new Object());
-        Assert.assertNotEquals(one, three);
+        Assertions.assertThat(one).isEqualTo(two);
+        Assertions.assertThat(one).isNotEqualTo(three);
+        Assertions.assertThat(one).isNotEqualTo(new Object());
     }
 
     /**
      * Test to make sure we can successfully find equality.
      */
     @Test
-    public void canUseHashCode() {
+    void canUseHashCode() {
         final String clientHost = UUID.randomUUID().toString();
         final String userAgent = UUID.randomUUID().toString();
         final int numAttachments = 38;
@@ -124,7 +121,7 @@ public class JobMetadataTest {
         builder.withId(UUID.randomUUID().toString());
         final JobMetadata three = builder.build();
 
-        Assert.assertEquals(one.hashCode(), two.hashCode());
-        Assert.assertNotEquals(one.hashCode(), three.hashCode());
+        Assertions.assertThat(one.hashCode()).isEqualTo(two.hashCode());
+        Assertions.assertThat(one.hashCode()).isNotEqualTo(three.hashCode());
     }
 }

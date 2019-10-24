@@ -18,9 +18,8 @@
 package com.netflix.genie.common.dto;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the JobStatus enum.
@@ -28,7 +27,7 @@ import org.junit.Test;
  * @author tgianos
  * @since 2.0.0
  */
-public class JobStatusTest {
+class JobStatusTest {
 
     /**
      * Tests whether a valid job status is parsed correctly.
@@ -36,147 +35,166 @@ public class JobStatusTest {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidJobStatus() throws GeniePreconditionException {
-        Assert.assertEquals(JobStatus.RUNNING, JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.FAILED, JobStatus.parse(JobStatus.FAILED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.INIT, JobStatus.parse(JobStatus.INIT.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.SUCCEEDED, JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.RESERVED, JobStatus.parse(JobStatus.RESERVED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.RESOLVED, JobStatus.parse(JobStatus.RESOLVED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.CLAIMED, JobStatus.parse(JobStatus.CLAIMED.name().toLowerCase()));
-        Assert.assertEquals(JobStatus.ACCEPTED, JobStatus.parse(JobStatus.ACCEPTED.name().toLowerCase()));
+    void testValidJobStatus() throws GeniePreconditionException {
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.RUNNING.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.RUNNING);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.FAILED.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.FAILED);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.KILLED.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.KILLED);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.INIT.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.INIT);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.SUCCEEDED);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.RESERVED.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.RESERVED);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.RESOLVED.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.RESOLVED);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.CLAIMED.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.CLAIMED);
+        Assertions
+            .assertThat(JobStatus.parse(JobStatus.ACCEPTED.name().toLowerCase()))
+            .isEqualByComparingTo(JobStatus.ACCEPTED);
     }
 
     /**
      * Tests whether an invalid job status returns null.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testInvalidJobStatus() throws GeniePreconditionException {
-        JobStatus.parse("DOES_NOT_EXIST");
+    @Test
+    void testInvalidJobStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> JobStatus.parse("DOES_NOT_EXIST"));
     }
 
     /**
      * Tests whether an invalid application status throws exception.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testBlankJobStatus() throws GeniePreconditionException {
-        JobStatus.parse("  ");
+    @Test
+    void testBlankJobStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> JobStatus.parse("  "));
     }
 
     /**
      * Test to make sure isActive is working properly.
      */
     @Test
-    public void testIsActive() {
-        Assert.assertTrue(JobStatus.RUNNING.isActive());
-        Assert.assertTrue(JobStatus.INIT.isActive());
-        Assert.assertFalse(JobStatus.FAILED.isActive());
-        Assert.assertFalse(JobStatus.INVALID.isActive());
-        Assert.assertFalse(JobStatus.KILLED.isActive());
-        Assert.assertFalse(JobStatus.SUCCEEDED.isActive());
-        Assert.assertTrue(JobStatus.RESERVED.isActive());
-        Assert.assertTrue(JobStatus.RESOLVED.isActive());
-        Assert.assertTrue(JobStatus.CLAIMED.isActive());
-        Assert.assertTrue(JobStatus.ACCEPTED.isActive());
+    void testIsActive() {
+        Assertions.assertThat(JobStatus.RUNNING.isActive()).isTrue();
+        Assertions.assertThat(JobStatus.INIT.isActive()).isTrue();
+        Assertions.assertThat(JobStatus.FAILED.isActive()).isFalse();
+        Assertions.assertThat(JobStatus.INVALID.isActive()).isFalse();
+        Assertions.assertThat(JobStatus.KILLED.isActive()).isFalse();
+        Assertions.assertThat(JobStatus.SUCCEEDED.isActive()).isFalse();
+        Assertions.assertThat(JobStatus.RESERVED.isActive()).isTrue();
+        Assertions.assertThat(JobStatus.RESOLVED.isActive()).isTrue();
+        Assertions.assertThat(JobStatus.CLAIMED.isActive()).isTrue();
+        Assertions.assertThat(JobStatus.ACCEPTED.isActive()).isTrue();
     }
 
     /**
      * Test to make sure isFinished is working properly.
      */
     @Test
-    public void testIsFinished() {
-        Assert.assertFalse(JobStatus.RUNNING.isFinished());
-        Assert.assertFalse(JobStatus.INIT.isFinished());
-        Assert.assertTrue(JobStatus.FAILED.isFinished());
-        Assert.assertTrue(JobStatus.INVALID.isFinished());
-        Assert.assertTrue(JobStatus.KILLED.isFinished());
-        Assert.assertTrue(JobStatus.SUCCEEDED.isFinished());
-        Assert.assertFalse(JobStatus.RESERVED.isFinished());
-        Assert.assertFalse(JobStatus.RESOLVED.isFinished());
-        Assert.assertFalse(JobStatus.CLAIMED.isFinished());
-        Assert.assertFalse(JobStatus.ACCEPTED.isFinished());
+    void testIsFinished() {
+        Assertions.assertThat(JobStatus.RUNNING.isFinished()).isFalse();
+        Assertions.assertThat(JobStatus.INIT.isFinished()).isFalse();
+        Assertions.assertThat(JobStatus.FAILED.isFinished()).isTrue();
+        Assertions.assertThat(JobStatus.INVALID.isFinished()).isTrue();
+        Assertions.assertThat(JobStatus.KILLED.isFinished()).isTrue();
+        Assertions.assertThat(JobStatus.SUCCEEDED.isFinished()).isTrue();
+        Assertions.assertThat(JobStatus.RESERVED.isFinished()).isFalse();
+        Assertions.assertThat(JobStatus.RESOLVED.isFinished()).isFalse();
+        Assertions.assertThat(JobStatus.CLAIMED.isFinished()).isFalse();
+        Assertions.assertThat(JobStatus.ACCEPTED.isFinished()).isFalse();
     }
 
     /**
      * Test to make sure isResolvable is working properly.
      */
     @Test
-    public void testIsResolvable() {
-        Assert.assertFalse(JobStatus.RUNNING.isResolvable());
-        Assert.assertFalse(JobStatus.INIT.isResolvable());
-        Assert.assertFalse(JobStatus.FAILED.isResolvable());
-        Assert.assertFalse(JobStatus.INVALID.isResolvable());
-        Assert.assertFalse(JobStatus.KILLED.isResolvable());
-        Assert.assertFalse(JobStatus.SUCCEEDED.isResolvable());
-        Assert.assertTrue(JobStatus.RESERVED.isResolvable());
-        Assert.assertFalse(JobStatus.RESOLVED.isResolvable());
-        Assert.assertFalse(JobStatus.CLAIMED.isResolvable());
-        Assert.assertFalse(JobStatus.ACCEPTED.isResolvable());
+    void testIsResolvable() {
+        Assertions.assertThat(JobStatus.RUNNING.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.INIT.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.FAILED.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.INVALID.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.KILLED.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.SUCCEEDED.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.RESERVED.isResolvable()).isTrue();
+        Assertions.assertThat(JobStatus.RESOLVED.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.CLAIMED.isResolvable()).isFalse();
+        Assertions.assertThat(JobStatus.ACCEPTED.isResolvable()).isFalse();
     }
 
     /**
      * Test to make sure isClaimable is working properly.
      */
     @Test
-    public void testIsClaimable() {
-        Assert.assertFalse(JobStatus.RUNNING.isClaimable());
-        Assert.assertFalse(JobStatus.INIT.isClaimable());
-        Assert.assertFalse(JobStatus.FAILED.isClaimable());
-        Assert.assertFalse(JobStatus.INVALID.isClaimable());
-        Assert.assertFalse(JobStatus.KILLED.isClaimable());
-        Assert.assertFalse(JobStatus.SUCCEEDED.isClaimable());
-        Assert.assertFalse(JobStatus.RESERVED.isClaimable());
-        Assert.assertTrue(JobStatus.RESOLVED.isClaimable());
-        Assert.assertFalse(JobStatus.CLAIMED.isClaimable());
-        Assert.assertTrue(JobStatus.ACCEPTED.isClaimable());
+    void testIsClaimable() {
+        Assertions.assertThat(JobStatus.RUNNING.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.INIT.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.FAILED.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.INVALID.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.KILLED.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.SUCCEEDED.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.RESERVED.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.RESOLVED.isClaimable()).isTrue();
+        Assertions.assertThat(JobStatus.CLAIMED.isClaimable()).isFalse();
+        Assertions.assertThat(JobStatus.ACCEPTED.isClaimable()).isTrue();
     }
 
     /**
      * Make sure all the active statuses are present in the set.
      */
     @Test
-    public void testGetActivesStatuses() {
-        Assert.assertThat(JobStatus.getActiveStatuses().size(), Matchers.is(6));
-        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.INIT));
-        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RUNNING));
-        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RESERVED));
-        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RESOLVED));
-        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.CLAIMED));
-        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.ACCEPTED));
+    void testGetActivesStatuses() {
+        Assertions
+            .assertThat(JobStatus.getActiveStatuses())
+            .containsExactlyInAnyOrder(
+                JobStatus.INIT,
+                JobStatus.RUNNING,
+                JobStatus.RESERVED,
+                JobStatus.RESOLVED,
+                JobStatus.CLAIMED,
+                JobStatus.ACCEPTED
+            );
     }
 
     /**
      * Make sure all the finished statuses are present in the set.
      */
     @Test
-    public void testGetFinishedStatuses() {
-        Assert.assertThat(JobStatus.getFinishedStatuses().size(), Matchers.is(4));
-        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.INVALID));
-        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.FAILED));
-        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.KILLED));
-        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.SUCCEEDED));
+    void testGetFinishedStatuses() {
+        Assertions
+            .assertThat(JobStatus.getFinishedStatuses())
+            .containsExactlyInAnyOrder(JobStatus.INVALID, JobStatus.FAILED, JobStatus.KILLED, JobStatus.SUCCEEDED);
     }
 
     /**
      * Make sure all the claimable status are present in the set.
      */
     @Test
-    public void testGetResolvableStatuses() {
-        Assert.assertThat(JobStatus.getResolvableStatuses().size(), Matchers.is(1));
-        Assert.assertThat(JobStatus.getResolvableStatuses(), Matchers.hasItem(JobStatus.RESERVED));
+    void testGetResolvableStatuses() {
+        Assertions.assertThat(JobStatus.getResolvableStatuses()).containsExactlyInAnyOrder(JobStatus.RESERVED);
     }
 
     /**
      * Make sure all the claimable status are present in the set.
      */
     @Test
-    public void testGetClaimableStatuses() {
-        Assert.assertThat(JobStatus.getClaimableStatuses().size(), Matchers.is(2));
-        Assert.assertThat(JobStatus.getClaimableStatuses(), Matchers.hasItems(JobStatus.RESOLVED, JobStatus.ACCEPTED));
+    void testGetClaimableStatuses() {
+        Assertions
+            .assertThat(JobStatus.getClaimableStatuses())
+            .containsExactlyInAnyOrder(JobStatus.RESOLVED, JobStatus.ACCEPTED);
     }
 }

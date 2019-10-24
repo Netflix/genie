@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -30,15 +29,15 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class DatabaseCleanupPropertiesTest {
+class DatabaseCleanupPropertiesTest {
 
     private DatabaseCleanupProperties properties;
 
     /**
      * Setup for tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new DatabaseCleanupProperties();
     }
 
@@ -46,100 +45,100 @@ public class DatabaseCleanupPropertiesTest {
      * Make sure constructor sets reasonable defaults.
      */
     @Test
-    public void canGetDefaultValues() {
-        Assert.assertFalse(this.properties.isEnabled());
-        Assert.assertThat(this.properties.getExpression(), Matchers.is("0 0 0 * * *"));
-        Assert.assertThat(this.properties.getRetention(), Matchers.is(90));
-        Assert.assertThat(this.properties.getMaxDeletedPerTransaction(), Matchers.is(1000));
-        Assert.assertThat(this.properties.getPageSize(), Matchers.is(1000));
-        Assert.assertFalse(this.properties.isSkipJobsCleanup());
-        Assert.assertFalse(this.properties.isSkipClustersCleanup());
-        Assert.assertFalse(this.properties.isSkipTagsCleanup());
-        Assert.assertFalse(this.properties.isSkipFilesCleanup());
+    void canGetDefaultValues() {
+        Assertions.assertThat(this.properties.isEnabled()).isFalse();
+        Assertions.assertThat(this.properties.getExpression()).isEqualTo("0 0 0 * * *");
+        Assertions.assertThat(this.properties.getRetention()).isEqualTo(90);
+        Assertions.assertThat(this.properties.getMaxDeletedPerTransaction()).isEqualTo(1000);
+        Assertions.assertThat(this.properties.getPageSize()).isEqualTo(1000);
+        Assertions.assertThat(this.properties.isSkipJobsCleanup()).isFalse();
+        Assertions.assertThat(this.properties.isSkipClustersCleanup()).isFalse();
+        Assertions.assertThat(this.properties.isSkipTagsCleanup()).isFalse();
+        Assertions.assertThat(this.properties.isSkipFilesCleanup()).isFalse();
     }
 
     /**
      * Make sure can enable.
      */
     @Test
-    public void canEnable() {
+    void canEnable() {
         this.properties.setEnabled(true);
-        Assert.assertTrue(this.properties.isEnabled());
+        Assertions.assertThat(this.properties.isEnabled()).isTrue();
     }
 
     /**
      * Make sure can set a new cron expression.
      */
     @Test
-    public void canSetExpression() {
+    void canSetExpression() {
         final String expression = UUID.randomUUID().toString();
         this.properties.setExpression(expression);
-        Assert.assertThat(this.properties.getExpression(), Matchers.is(expression));
+        Assertions.assertThat(this.properties.getExpression()).isEqualTo(expression);
     }
 
     /**
      * Make sure can set a new retention time.
      */
     @Test
-    public void canSetRetention() {
+    void canSetRetention() {
         final int retention = 2318;
         this.properties.setRetention(retention);
-        Assert.assertThat(this.properties.getRetention(), Matchers.is(retention));
+        Assertions.assertThat(this.properties.getRetention()).isEqualTo(retention);
     }
 
     /**
      * Make sure can set a max deletion batch size.
      */
     @Test
-    public void canSetMaxDeletedPerTransaction() {
+    void canSetMaxDeletedPerTransaction() {
         final int max = 2318;
         this.properties.setMaxDeletedPerTransaction(max);
-        Assert.assertThat(this.properties.getMaxDeletedPerTransaction(), Matchers.is(max));
+        Assertions.assertThat(this.properties.getMaxDeletedPerTransaction()).isEqualTo(max);
     }
 
     /**
      * Make sure can set a new page size.
      */
     @Test
-    public void canPageSize() {
+    void canPageSize() {
         final int size = 2318;
         this.properties.setPageSize(size);
-        Assert.assertThat(this.properties.getPageSize(), Matchers.is(size));
+        Assertions.assertThat(this.properties.getPageSize()).isEqualTo(size);
     }
 
     /**
      * Make sure can enable Jobs entities cleanup.
      */
     @Test
-    public void canEnableJobsCleanup() {
+    void canEnableJobsCleanup() {
         this.properties.setSkipJobsCleanup(true);
-        Assert.assertTrue(this.properties.isSkipJobsCleanup());
+        Assertions.assertThat(this.properties.isSkipJobsCleanup()).isTrue();
     }
 
     /**
      * Make sure can enable Clusters entities cleanup.
      */
     @Test
-    public void canEnableClustersCleanup() {
+    void canEnableClustersCleanup() {
         this.properties.setSkipClustersCleanup(true);
-        Assert.assertTrue(this.properties.isSkipClustersCleanup());
+        Assertions.assertThat(this.properties.isSkipClustersCleanup()).isTrue();
     }
 
     /**
      * Make sure can enable Tags entities cleanup.
      */
     @Test
-    public void canEnableTagsCleanup() {
+    void canEnableTagsCleanup() {
         this.properties.setSkipTagsCleanup(true);
-        Assert.assertTrue(this.properties.isSkipTagsCleanup());
+        Assertions.assertThat(this.properties.isSkipTagsCleanup()).isTrue();
     }
 
     /**
      * Make sure can enable Files entities cleanup.
      */
     @Test
-    public void canEnableFilesCleanup() {
+    void canEnableFilesCleanup() {
         this.properties.setSkipFilesCleanup(true);
-        Assert.assertTrue(this.properties.isSkipFilesCleanup());
+        Assertions.assertThat(this.properties.isSkipFilesCleanup()).isTrue();
     }
 }

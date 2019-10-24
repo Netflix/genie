@@ -19,10 +19,9 @@ package com.netflix.genie.web.spring.autoconfigure.apis;
 
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -40,15 +39,15 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class ApisAutoConfigurationTest {
+class ApisAutoConfigurationTest {
 
     private ApisAutoConfiguration apisAutoConfiguration;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.apisAutoConfiguration = new ApisAutoConfiguration();
     }
 
@@ -56,26 +55,26 @@ public class ApisAutoConfigurationTest {
      * Make sure we get a valid resource loader.
      */
     @Test
-    public void canGetResourceLoader() {
-        Assert.assertTrue(this.apisAutoConfiguration.resourceLoader() instanceof DefaultResourceLoader);
+    void canGetResourceLoader() {
+        Assertions.assertThat(this.apisAutoConfiguration.resourceLoader()).isInstanceOf(DefaultResourceLoader.class);
     }
 
     /**
      * Make sure we get a valid rest template to use.
      */
     @Test
-    public void canGetRestTemplate() {
-        Assert.assertNotNull(
-            this.apisAutoConfiguration.genieRestTemplate(new HttpProperties(), new RestTemplateBuilder())
-        );
+    void canGetRestTemplate() {
+        Assertions
+            .assertThat(this.apisAutoConfiguration.genieRestTemplate(new HttpProperties(), new RestTemplateBuilder()))
+            .isNotNull();
     }
 
     /**
      * Make sure the default implementation of a directory writer is used in this default configuration.
      */
     @Test
-    public void canGetDirectoryWriter() {
-        Assert.assertNotNull(this.apisAutoConfiguration.directoryWriter());
+    void canGetDirectoryWriter() {
+        Assertions.assertThat(this.apisAutoConfiguration.directoryWriter()).isNotNull();
     }
 
     /**
@@ -85,7 +84,7 @@ public class ApisAutoConfigurationTest {
      * @throws IOException On error
      */
     @Test
-    public void cantGetJobsDirWhenJobsDirInvalid() throws IOException {
+    void cantGetJobsDirWhenJobsDirInvalid() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final URI jobsDirLocation = URI.create("file:/" + UUID.randomUUID().toString());
         final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
@@ -99,15 +98,10 @@ public class ApisAutoConfigurationTest {
         Mockito.when(tmpResource.getFile()).thenReturn(file);
         Mockito.when(file.isDirectory()).thenReturn(false);
 
-        try {
-            this.apisAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
-            Assert.fail();
-        } catch (final IllegalStateException ise) {
-            Assert.assertThat(
-                ise.getMessage(),
-                Matchers.is(jobsDirLocation + " exists but isn't a directory. Unable to continue")
-            );
-        }
+        Assertions
+            .assertThatIllegalStateException()
+            .isThrownBy(() -> this.apisAutoConfiguration.jobsDir(resourceLoader, jobsProperties))
+            .withMessage(jobsDirLocation + " exists but isn't a directory. Unable to continue");
 
         final String localJobsDir = jobsDirLocation + "/";
         Mockito.when(file.isDirectory()).thenReturn(true);
@@ -119,15 +113,10 @@ public class ApisAutoConfigurationTest {
         Mockito.when(jobsDirResource.getFile()).thenReturn(file);
         Mockito.when(file.mkdirs()).thenReturn(false);
 
-        try {
-            this.apisAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
-            Assert.fail();
-        } catch (final IllegalStateException ise) {
-            Assert.assertThat(
-                ise.getMessage(),
-                Matchers.is("Unable to create jobs directory " + jobsDirLocation + " and it doesn't exist.")
-            );
-        }
+        Assertions
+            .assertThatIllegalStateException()
+            .isThrownBy(() -> this.apisAutoConfiguration.jobsDir(resourceLoader, jobsProperties))
+            .withMessage("Unable to create jobs directory " + jobsDirLocation + " and it doesn't exist.");
     }
 
     /**
@@ -136,7 +125,7 @@ public class ApisAutoConfigurationTest {
      * @throws IOException for any problem
      */
     @Test
-    public void canGetJobsDir() throws IOException {
+    void canGetJobsDir() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final URI jobsDirLocation = URI.create("file:///" + UUID.randomUUID().toString() + "/");
         final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
@@ -151,6 +140,6 @@ public class ApisAutoConfigurationTest {
         Mockito.when(file.isDirectory()).thenReturn(true);
 
         final Resource jobsDir = this.apisAutoConfiguration.jobsDir(resourceLoader, jobsProperties);
-        Assert.assertNotNull(jobsDir);
+        Assertions.assertThat(jobsDir).isNotNull();
     }
 }

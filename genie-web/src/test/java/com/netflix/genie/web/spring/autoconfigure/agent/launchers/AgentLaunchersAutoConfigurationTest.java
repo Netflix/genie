@@ -26,7 +26,7 @@ import com.netflix.genie.web.util.ExecutorFactory;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -40,7 +40,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 4.0.0
  */
-public class AgentLaunchersAutoConfigurationTest {
+class AgentLaunchersAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -55,7 +55,7 @@ public class AgentLaunchersAutoConfigurationTest {
      * All the expected beans should exist when the auto configuration is applied.
      */
     @Test
-    public void testExpectedBeansExist() {
+    void testExpectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherProperties.class);
@@ -74,7 +74,7 @@ public class AgentLaunchersAutoConfigurationTest {
      * Make sure the property is completely overwritten for the executable.
      */
     @Test
-    public void testOverrideExecutable() {
+    void testOverrideExecutable() {
         this.contextRunner
             .withPropertyValues("genie.agent.launcher.local.executable=blah,/tmp/genie-agent-2.jar")
             .run(
@@ -93,22 +93,22 @@ public class AgentLaunchersAutoConfigurationTest {
 
     static class UserConfig {
         @Bean
-        public GenieWebHostInfo genieWebHostInfo() {
+        GenieWebHostInfo genieWebHostInfo() {
             return new GenieWebHostInfo(UUID.randomUUID().toString());
         }
 
         @Bean
-        public GenieWebRpcInfo genieWebRpcInfo() {
+        GenieWebRpcInfo genieWebRpcInfo() {
             return new GenieWebRpcInfo(33_433);
         }
 
         @Bean
-        public JobSearchService jobSearchService() {
+        JobSearchService jobSearchService() {
             return Mockito.mock(JobSearchService.class);
         }
 
         @Bean
-        public MeterRegistry meterRegistry() {
+        MeterRegistry meterRegistry() {
             return new SimpleMeterRegistry();
         }
     }

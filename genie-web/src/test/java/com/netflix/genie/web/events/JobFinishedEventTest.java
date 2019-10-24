@@ -17,31 +17,30 @@
  */
 package com.netflix.genie.web.events;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 /**
  * Tests for the JobFinishedEvent class.
  */
-public class JobFinishedEventTest {
+class JobFinishedEventTest {
 
     /**
      * Make sure we can successfully create a Job Finished Event.
      */
     @Test
-    public void canConstruct() {
+    void canConstruct() {
         final String id = UUID.randomUUID().toString();
         final JobFinishedReason reason = JobFinishedReason.PROCESS_COMPLETED;
         final String message = UUID.randomUUID().toString();
         final Object source = new Object();
         final JobFinishedEvent event = new JobFinishedEvent(id, reason, message, source);
-        Assert.assertNotNull(event);
-        Assert.assertThat(event.getId(), Matchers.is(id));
-        Assert.assertThat(event.getReason(), Matchers.is(reason));
-        Assert.assertThat(event.getMessage(), Matchers.is(message));
-        Assert.assertThat(event.getSource(), Matchers.is(source));
+        Assertions.assertThat(event).isNotNull();
+        Assertions.assertThat(event.getId()).isEqualTo(id);
+        Assertions.assertThat(event.getReason()).isEqualTo(reason);
+        Assertions.assertThat(event.getMessage()).isEqualTo(message);
+        Assertions.assertThat(event.getSource()).isEqualTo(source);
     }
 }

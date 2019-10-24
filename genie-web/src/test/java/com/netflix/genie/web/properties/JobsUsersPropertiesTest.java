@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for JobsUsersProperties.
@@ -27,14 +27,14 @@ import org.junit.Test;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobsUsersPropertiesTest {
+class JobsUsersPropertiesTest {
     private JobsUsersProperties properties;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new JobsUsersProperties();
     }
 
@@ -42,26 +42,26 @@ public class JobsUsersPropertiesTest {
      * Make sure the constructor sets defaults.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertFalse(this.properties.isCreationEnabled());
-        Assert.assertFalse(this.properties.isRunAsUserEnabled());
+    void canConstruct() {
+        Assertions.assertThat(this.properties.isCreationEnabled()).isFalse();
+        Assertions.assertThat(this.properties.isRunAsUserEnabled()).isFalse();
     }
 
     /**
      * Make sure we can set the creationEnabled field.
      */
     @Test
-    public void canSetCreationEnabled() {
+    void canSetCreationEnabled() {
         this.properties.setCreationEnabled(true);
-        Assert.assertTrue(this.properties.isCreationEnabled());
+        Assertions.assertThat(this.properties.isCreationEnabled()).isTrue();
     }
 
     /**
      * Make sure we can set the run as user field.
      */
     @Test
-    public void canSetRunAsEnabled() {
+    void canSetRunAsEnabled() {
         this.properties.setRunAsUserEnabled(true);
-        Assert.assertTrue(this.properties.isRunAsUserEnabled());
+        Assertions.assertThat(this.properties.isRunAsUserEnabled()).isTrue();
     }
 }

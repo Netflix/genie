@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for ExponentialBackOffTriggerProperties.
@@ -27,15 +28,15 @@ import org.junit.Test;
  * @author mprimi
  * @since 3.3.9
  */
-public class ExponentialBackOffTriggerPropertiesTest {
+class ExponentialBackOffTriggerPropertiesTest {
 
     private ExponentialBackOffTriggerProperties properties;
 
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         properties = new ExponentialBackOffTriggerProperties();
     }
 
@@ -43,36 +44,36 @@ public class ExponentialBackOffTriggerPropertiesTest {
      * Make sure the constructor sets defaults.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertEquals(100, properties.getMinInterval());
-        Assert.assertEquals(10_000, properties.getMaxInterval());
-        Assert.assertEquals(1.2, properties.getFactor(), 0.001);
+    void canConstruct() {
+        Assertions.assertThat(this.properties.getMinInterval()).isEqualTo(100L);
+        Assertions.assertThat(this.properties.getMaxInterval()).isEqualTo(10_000L);
+        Assertions.assertThat(this.properties.getFactor()).isCloseTo(1.2f, Offset.offset(0.001f));
     }
 
     /**
      * Make sure we can set the minInterval field.
      */
     @Test
-    public void canSetMinInterval() {
-        this.properties.setMinInterval(1234);
-        Assert.assertEquals(1234, this.properties.getMinInterval());
+    void canSetMinInterval() {
+        this.properties.setMinInterval(1_234L);
+        Assertions.assertThat(this.properties.getMinInterval()).isEqualTo(1_234L);
     }
 
     /**
      * Make sure we can set the maxInterval field.
      */
     @Test
-    public void canSetMaxInterval() {
-        this.properties.setMaxInterval(1234);
-        Assert.assertEquals(1234, this.properties.getMaxInterval());
+    void canSetMaxInterval() {
+        this.properties.setMaxInterval(1_234L);
+        Assertions.assertThat(this.properties.getMaxInterval()).isEqualTo(1_234L);
     }
 
     /**
      * Make sure we can set the factor field.
      */
     @Test
-    public void canSetFactor() {
+    void canSetFactor() {
         this.properties.setFactor(2.4f);
-        Assert.assertEquals(2.4f, this.properties.getFactor(), 0.001);
+        Assertions.assertThat(this.properties.getFactor()).isCloseTo(2.4f, Offset.offset(0.001f));
     }
 }

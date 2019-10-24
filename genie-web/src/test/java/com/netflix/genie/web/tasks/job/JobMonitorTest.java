@@ -32,11 +32,10 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEvent;
@@ -54,7 +53,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobMonitorTest {
+class JobMonitorTest {
 
     private static final long DELAY = 180235L;
     private static final long MAX_STD_OUT_LENGTH = 108234203L;
@@ -78,8 +77,8 @@ public class JobMonitorTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         final Instant tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
         this.jobExecution = new JobExecution.Builder(UUID.randomUUID().toString())
             .withProcessId(3808)
@@ -136,10 +135,10 @@ public class JobMonitorTest {
     /**
      * This test should only run on windows machines and asserts that the system fails on Windows.
      */
-    @Test(expected = UnsupportedOperationException.class)
-    public void cantRunOnWindows() {
-        Assume.assumeTrue(SystemUtils.IS_OS_WINDOWS);
-        this.monitor.run();
+    @Test
+    void cantRunOnWindows() {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> this.monitor.run());
     }
 
     /**
@@ -148,8 +147,8 @@ public class JobMonitorTest {
      * @throws IOException on error
      */
     @Test
-    public void canKillProcessOnTooLargeStdOut() throws IOException {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void canKillProcessOnTooLargeStdOut() throws IOException {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         Mockito
             .when(this.executor.execute(Mockito.any(CommandLine.class)))
             .thenReturn(0)
@@ -178,8 +177,8 @@ public class JobMonitorTest {
      * @throws IOException on error
      */
     @Test
-    public void canKillProcessOnTooLargeStdErr() throws IOException {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void canKillProcessOnTooLargeStdErr() throws IOException {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         Mockito
             .when(this.executor.execute(Mockito.any(CommandLine.class)))
             .thenReturn(0)
@@ -208,8 +207,8 @@ public class JobMonitorTest {
      * @throws Exception on error
      */
     @Test
-    public void canCheckRunningProcessOnUnixLikeSystem() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void canCheckRunningProcessOnUnixLikeSystem() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         Mockito.when(this.stdOut.exists()).thenReturn(false);
         Mockito.when(this.stdErr.exists()).thenReturn(false);
@@ -234,8 +233,8 @@ public class JobMonitorTest {
      * @throws Exception on error
      */
     @Test
-    public void canCheckFinishedProcessOnUnixLikeSystem() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void canCheckFinishedProcessOnUnixLikeSystem() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         Mockito.doThrow(new ExecuteException("done", 1)).when(processChecker).checkProcess();
 
         this.monitor.run();
@@ -245,13 +244,10 @@ public class JobMonitorTest {
             .verify(this.genieEventBus, Mockito.times(1))
             .publishAsynchronousEvent(captor.capture());
 
-        Assert.assertNotNull(captor.getValue());
+        Assertions.assertThat(captor.getValue()).isNotNull();
         final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(
-            captor.getValue().getId(),
-            Matchers.is(jobId)
-        );
-        Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
+        Assertions.assertThat(captor.getValue().getId()).isEqualTo(jobId);
+        Assertions.assertThat(captor.getValue().getSource()).isEqualTo(this.monitor);
         Mockito.verify(this.finishedRate, Mockito.times(1)).increment();
     }
 
@@ -261,8 +257,8 @@ public class JobMonitorTest {
      * @throws Exception in case of error
      */
     @Test
-    public void canTryToKillTimedOutProcess() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void canTryToKillTimedOutProcess() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         // Set timeout to yesterday to force timeout when check happens
         final Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
@@ -291,14 +287,11 @@ public class JobMonitorTest {
             .verify(this.genieEventBus, Mockito.times(1))
             .publishSynchronousEvent(captor.capture());
 
-        Assert.assertNotNull(captor.getValue());
+        Assertions.assertThat(captor.getValue()).isNotNull();
         final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(
-            captor.getValue().getId(),
-            Matchers.is(jobId)
-        );
-        Assert.assertThat(captor.getValue().getReason(), Matchers.is(JobStatusMessages.JOB_EXCEEDED_TIMEOUT));
-        Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
+        Assertions.assertThat(captor.getValue().getId()).isEqualTo(jobId);
+        Assertions.assertThat(captor.getValue().getReason()).isEqualTo(JobStatusMessages.JOB_EXCEEDED_TIMEOUT);
+        Assertions.assertThat(captor.getValue().getSource()).isEqualTo(this.monitor);
         Mockito.verify(this.timeoutRate, Mockito.times(1)).increment();
     }
 
@@ -308,8 +301,8 @@ public class JobMonitorTest {
      * @throws Exception on error
      */
     @Test
-    public void cantGetStatusIfErrorOnUnixLikeSystem() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void cantGetStatusIfErrorOnUnixLikeSystem() throws Exception {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         Mockito.doThrow(new IOException()).when(processChecker).checkProcess();
 
@@ -321,21 +314,15 @@ public class JobMonitorTest {
         final ArgumentCaptor<KillJobEvent> eventCaptor = ArgumentCaptor.forClass(KillJobEvent.class);
         Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(eventCaptor.capture());
         final List<KillJobEvent> events = eventCaptor.getAllValues();
-        Assert.assertThat(events.size(), Matchers.is(1));
+        Assertions.assertThat(events.size()).isEqualTo(1);
         final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(
-            events.get(0).getId(),
-            Matchers.is(jobId)
-        );
-        Assert.assertThat(events.get(0).getSource(), Matchers.is(this.monitor));
+        Assertions.assertThat(events.get(0).getId()).isEqualTo(jobId);
+        Assertions.assertThat(events.get(0).getSource()).isEqualTo(this.monitor);
 
         final ArgumentCaptor<JobFinishedEvent> finishedCaptor = ArgumentCaptor.forClass(JobFinishedEvent.class);
         Mockito.verify(this.genieEventBus, Mockito.times(1)).publishAsynchronousEvent(finishedCaptor.capture());
-        Assert.assertThat(
-            finishedCaptor.getValue().getId(),
-            Matchers.is(jobId)
-        );
-        Assert.assertThat(finishedCaptor.getValue().getSource(), Matchers.is(this.monitor));
+        Assertions.assertThat(finishedCaptor.getValue().getId()).isEqualTo(jobId);
+        Assertions.assertThat(finishedCaptor.getValue().getSource()).isEqualTo(this.monitor);
         Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(6)).increment();
     }
 
@@ -343,31 +330,35 @@ public class JobMonitorTest {
      * Make sure the right schedule type is returned.
      */
     @Test
-    public void canGetScheduleType() {
-        Assert.assertThat(this.monitor.getScheduleType(), Matchers.is(GenieTaskScheduleType.TRIGGER));
+    void canGetScheduleType() {
+        Assertions.assertThat(this.monitor.getScheduleType()).isEqualTo(GenieTaskScheduleType.TRIGGER);
     }
 
     /**
      * Make sure asking for a trigger is returns one.
      */
     @Test
-    public void canGetTrigger() {
-        Assert.assertNotNull(this.monitor.getTrigger());
+    void canGetTrigger() {
+        Assertions.assertThat(this.monitor.getTrigger()).isNotNull();
     }
 
     /**
      * Make sure asking for a fixed rate isn't allowed.
      */
-    @Test(expected = UnsupportedOperationException.class)
-    public void cantGetFixedRate() {
-        this.monitor.getFixedRate();
+    @Test
+    void cantGetFixedRate() {
+        Assertions
+            .assertThatExceptionOfType(UnsupportedOperationException.class)
+            .isThrownBy(() -> this.monitor.getFixedRate());
     }
 
     /**
      * Make sure asking for a fixed delay isn't allowed.
      */
-    @Test(expected = UnsupportedOperationException.class)
-    public void cantGetFixedDelay() {
-        Assert.assertThat(DELAY, Matchers.is(this.monitor.getFixedDelay()));
+    @Test
+    void cantGetFixedDelay() {
+        Assertions
+            .assertThatExceptionOfType(UnsupportedOperationException.class)
+            .isThrownBy(() -> this.monitor.getFixedDelay());
     }
 }

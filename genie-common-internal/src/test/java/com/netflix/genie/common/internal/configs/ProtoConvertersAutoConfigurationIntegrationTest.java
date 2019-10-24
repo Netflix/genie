@@ -20,7 +20,7 @@ package com.netflix.genie.common.internal.configs;
 import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -30,7 +30,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  * @author mprimi
  * @since 4.0.0
  */
-public class ProtoConvertersAutoConfigurationIntegrationTest {
+class ProtoConvertersAutoConfigurationIntegrationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
@@ -42,7 +42,7 @@ public class ProtoConvertersAutoConfigurationIntegrationTest {
      * Test expected context.
      */
     @Test
-    public void testExpectedContext() {
+    void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasSingleBean(JobServiceProtoConverter.class);

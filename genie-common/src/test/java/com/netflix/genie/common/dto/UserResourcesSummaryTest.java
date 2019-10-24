@@ -17,28 +17,34 @@
  */
 package com.netflix.genie.common.dto;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test UserResourcesSummary DTO.
  */
-public class UserResourcesSummaryTest {
+class UserResourcesSummaryTest {
 
     /**
      * Test constructor, accessors, equality.
      */
     @Test
-    public void testUserJobCount() {
+    void testUserJobCount() {
         final UserResourcesSummary dto = new UserResourcesSummary("foo", 3, 1024);
 
-        Assert.assertEquals("foo", dto.getUser());
-        Assert.assertEquals(3, dto.getRunningJobsCount());
-        Assert.assertEquals(1024, dto.getUsedMemory());
+        Assertions.assertThat(dto.getUser()).isEqualTo("foo");
+        Assertions.assertThat(dto.getRunningJobsCount()).isEqualTo(3);
+        Assertions.assertThat(dto.getUsedMemory()).isEqualTo(1024);
 
-        Assert.assertEquals(dto, new UserResourcesSummary("foo", 3, 1024));
-        Assert.assertNotEquals(dto, new UserResourcesSummary("bar", 3, 1024));
-        Assert.assertNotEquals(dto, new UserResourcesSummary("foo", 4, 1024));
-        Assert.assertNotEquals(dto, new UserResourcesSummary("foo", 3, 2048));
+        Assertions.assertThat(dto).isEqualTo(new UserResourcesSummary("foo", 3, 1024));
+        Assertions.assertThat(dto).isNotEqualTo(new UserResourcesSummary("bar", 3, 1024));
+        Assertions.assertThat(dto).isNotEqualTo(new UserResourcesSummary("foo", 4, 1024));
+        Assertions.assertThat(dto).isNotEqualTo(new UserResourcesSummary("foo", 3, 2048));
+
+
+        Assertions.assertThat(dto.hashCode()).isEqualTo(new UserResourcesSummary("foo", 3, 1024).hashCode());
+        Assertions.assertThat(dto.hashCode()).isNotEqualTo(new UserResourcesSummary("bar", 3, 1024).hashCode());
+        Assertions.assertThat(dto.hashCode()).isNotEqualTo(new UserResourcesSummary("foo", 4, 1024).hashCode());
+        Assertions.assertThat(dto.hashCode()).isNotEqualTo(new UserResourcesSummary("foo", 3, 2048).hashCode());
     }
 }

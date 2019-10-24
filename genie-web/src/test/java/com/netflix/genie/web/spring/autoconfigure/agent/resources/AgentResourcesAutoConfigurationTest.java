@@ -17,7 +17,8 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.resources;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link AgentResourcesAutoConfiguration}.
@@ -25,13 +26,13 @@ import org.junit.Test;
  * @author tgianos
  * @since 4.0.0
  */
-public class AgentResourcesAutoConfigurationTest {
+class AgentResourcesAutoConfigurationTest {
 
     /**
      * Get a valid agent file protocol resolver.
      */
     @Test
-    public void canGetAgentFileProtocolResolver() {
+    void canGetAgentFileProtocolResolver() {
 //        Assert.assertNotNull(
 //            this.apisAutoConfiguration.agentFileProtocolResolver(
 //                Mockito.mock(AgentFileStreamService.class)
@@ -43,7 +44,7 @@ public class AgentResourcesAutoConfigurationTest {
      * Get a valid agent file protocol resolver registrar.
      */
     @Test
-    public void canGetAgentFileProtocolResolverRegistrar() {
+    void canGetAgentFileProtocolResolverRegistrar() {
 //        Assert.assertNotNull(
 //            this.apisAutoConfiguration.agentFileProtocolResolverRegistrar(
 //                Mockito.mock(AgentFileProtocolResolver.class)

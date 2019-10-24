@@ -18,7 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -31,7 +31,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
  * @author tgianos
  * @since 4.0.0
  */
-public class CachingAutoConfigurationTest {
+class CachingAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -46,7 +46,7 @@ public class CachingAutoConfigurationTest {
      * The auto configuration creates the expected beans.
      */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 // This should be provided by the Spring Boot starter after @EnableCaching is applied

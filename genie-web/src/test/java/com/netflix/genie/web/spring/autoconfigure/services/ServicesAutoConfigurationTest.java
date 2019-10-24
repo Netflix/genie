@@ -67,6 +67,7 @@ import java.util.UUID;
  * @author amsharma
  * @since 3.0.0
  */
+// TODO: Switch to JUnit 5 once version of JUnit 5 >= 5.4 and @TempDir is supported
 public class ServicesAutoConfigurationTest {
 
     /**

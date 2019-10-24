@@ -25,10 +25,9 @@ import com.netflix.genie.web.data.services.TagPersistenceService;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.scheduling.support.CronTrigger;
@@ -37,12 +36,12 @@ import java.time.Instant;
 import java.util.Calendar;
 
 /**
- * Unit tests for DatabaseCleanupTask.
+ * Unit tests for {@link DatabaseCleanupTask}.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class DatabaseCleanupTaskTest {
+class DatabaseCleanupTaskTest {
 
     private DatabaseCleanupProperties cleanupProperties;
     private JobPersistenceService jobPersistenceService;
@@ -54,8 +53,8 @@ public class DatabaseCleanupTaskTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
@@ -75,24 +74,24 @@ public class DatabaseCleanupTaskTest {
      * Make sure the schedule type returns the correct thing.
      */
     @Test
-    public void canGetScheduleType() {
-        Assert.assertThat(this.task.getScheduleType(), Matchers.is(GenieTaskScheduleType.TRIGGER));
+    void canGetScheduleType() {
+        Assertions.assertThat(this.task.getScheduleType()).isEqualTo(GenieTaskScheduleType.TRIGGER);
     }
 
     /**
      * Make sure the trigger returned is accurate.
      */
     @Test
-    public void canGetTrigger() {
+    void canGetTrigger() {
         Mockito.when(this.cleanupProperties.getExpression()).thenReturn("0 0 0 * * *");
-        Assert.assertTrue(this.task.getTrigger() instanceof CronTrigger);
+        Assertions.assertThat(this.task.getTrigger() instanceof CronTrigger).isTrue();
     }
 
     /**
      * Make sure the run method passes in the expected date.
      */
     @Test
-    public void canRun() {
+    void canRun() {
         final int days = 5;
         final int negativeDays = -1 * days;
         final int pageSize = 10;
@@ -140,8 +139,8 @@ public class DatabaseCleanupTaskTest {
             date.set(Calendar.SECOND, 0);
             date.set(Calendar.MILLISECOND, 0);
             date.add(Calendar.DAY_OF_YEAR, negativeDays);
-            Assert.assertThat(argument.getAllValues().get(0).toEpochMilli(), Matchers.is(date.getTime().getTime()));
-            Assert.assertThat(argument.getAllValues().get(1).toEpochMilli(), Matchers.is(date.getTime().getTime()));
+            Assertions.assertThat(argument.getAllValues().get(0).toEpochMilli()).isEqualTo(date.getTime().getTime());
+            Assertions.assertThat(argument.getAllValues().get(1).toEpochMilli()).isEqualTo(date.getTime().getTime());
             Mockito.verify(this.clusterPersistenceService, Mockito.times(2)).deleteTerminatedClusters();
             Mockito
                 .verify(this.filePersistenceService, Mockito.times(2))
@@ -155,8 +154,8 @@ public class DatabaseCleanupTaskTest {
     /**
      * Make sure the run method throws when an error is encountered.
      */
-    @Test(expected = RuntimeException.class)
-    public void cantRun() {
+    @Test
+    void cantRun() {
         final int days = 5;
         final int negativeDays = -1 * days;
         final int pageSize = 10;
@@ -176,14 +175,14 @@ public class DatabaseCleanupTaskTest {
             )
             .thenThrow(new RuntimeException("test"));
 
-        this.task.run();
+        Assertions.assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> this.task.run());
     }
 
     /**
      * Make sure individual cleanup sub-tasks are skipped according to properties.
      */
     @Test
-    public void skipAll() {
+    void skipAll() {
 
         Mockito.when(this.cleanupProperties.isSkipJobsCleanup()).thenReturn(true);
         Mockito.when(this.cleanupProperties.isSkipClustersCleanup()).thenReturn(true);

@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.common.util;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,24 +29,24 @@ import java.time.Instant;
  * @author tgianos
  * @since 3.0.0
  */
-public class TimeUtilsTest {
+class TimeUtilsTest {
 
     /**
      * Can get the duration for various cases.
      */
     @Test
-    public void canGetDuration() {
+    void canGetDuration() {
         final long durationMillis = 50823L;
         final Duration duration = Duration.ofMillis(durationMillis);
         final Instant started = Instant.now();
         final Instant finished = started.plusMillis(durationMillis);
 
-        Assert.assertThat(TimeUtils.getDuration(null, finished), Matchers.is(Duration.ZERO));
-        Assert.assertThat(TimeUtils.getDuration(Instant.EPOCH, finished), Matchers.is(Duration.ZERO));
+        Assertions.assertThat(TimeUtils.getDuration(null, finished)).isEqualByComparingTo(Duration.ZERO);
+        Assertions.assertThat(TimeUtils.getDuration(Instant.EPOCH, finished)).isEqualByComparingTo(Duration.ZERO);
 
-        Assert.assertNotNull(TimeUtils.getDuration(started, null));
-        Assert.assertNotNull(TimeUtils.getDuration(started, Instant.EPOCH));
+        Assertions.assertThat(TimeUtils.getDuration(started, null)).isNotNull();
+        Assertions.assertThat(TimeUtils.getDuration(started, Instant.EPOCH)).isNotNull();
 
-        Assert.assertThat(TimeUtils.getDuration(started, finished), Matchers.is(duration));
+        Assertions.assertThat(TimeUtils.getDuration(started, finished)).isEqualByComparingTo(duration);
     }
 }

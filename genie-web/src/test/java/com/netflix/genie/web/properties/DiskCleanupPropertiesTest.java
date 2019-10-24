@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -30,15 +29,15 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class DiskCleanupPropertiesTest {
+class DiskCleanupPropertiesTest {
 
     private DiskCleanupProperties properties;
 
     /**
      * Setup for tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new DiskCleanupProperties();
     }
 
@@ -46,38 +45,38 @@ public class DiskCleanupPropertiesTest {
      * Make sure constructor sets reasonable defaults.
      */
     @Test
-    public void canGetDefaultValues() {
-        Assert.assertFalse(this.properties.isEnabled());
-        Assert.assertThat(this.properties.getExpression(), Matchers.is("0 0 0 * * *"));
-        Assert.assertThat(this.properties.getRetention(), Matchers.is(3));
+    void canGetDefaultValues() {
+        Assertions.assertThat(this.properties.isEnabled()).isFalse();
+        Assertions.assertThat(this.properties.getExpression()).isEqualTo("0 0 0 * * *");
+        Assertions.assertThat(this.properties.getRetention()).isEqualTo(3);
     }
 
     /**
      * Make sure can enable.
      */
     @Test
-    public void canEnable() {
+    void canEnable() {
         this.properties.setEnabled(true);
-        Assert.assertTrue(this.properties.isEnabled());
+        Assertions.assertThat(this.properties.isEnabled()).isTrue();
     }
 
     /**
      * Make sure can set a new cron expression.
      */
     @Test
-    public void canSetExpression() {
+    void canSetExpression() {
         final String expression = UUID.randomUUID().toString();
         this.properties.setExpression(expression);
-        Assert.assertThat(this.properties.getExpression(), Matchers.is(expression));
+        Assertions.assertThat(this.properties.getExpression()).isEqualTo(expression);
     }
 
     /**
      * Make sure can set a new retention time.
      */
     @Test
-    public void canSetRetention() {
+    void canSetRetention() {
         final int retention = 2318;
         this.properties.setRetention(retention);
-        Assert.assertThat(this.properties.getRetention(), Matchers.is(retention));
+        Assertions.assertThat(this.properties.getRetention()).isEqualTo(retention);
     }
 }

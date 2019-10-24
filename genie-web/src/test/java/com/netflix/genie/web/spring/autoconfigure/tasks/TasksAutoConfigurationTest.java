@@ -21,7 +21,7 @@ import com.netflix.genie.web.properties.TasksExecutorPoolProperties;
 import com.netflix.genie.web.properties.TasksSchedulerPoolProperties;
 import org.apache.commons.exec.Executor;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  * @author tgianos
  * @since 3.0.0
  */
-public class TasksAutoConfigurationTest {
+class TasksAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -45,7 +45,7 @@ public class TasksAutoConfigurationTest {
      * All the expected beans exist.
      */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(TasksExecutorPoolProperties.class);

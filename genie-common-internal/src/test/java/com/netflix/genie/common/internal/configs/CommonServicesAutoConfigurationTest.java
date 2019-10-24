@@ -24,7 +24,7 @@ import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorSer
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.S3JobArchiverImpl;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
@@ -37,7 +37,7 @@ import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoader
  * @author tgianos
  * @since 4.0.0
  */
-public class CommonServicesAutoConfigurationTest {
+class CommonServicesAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
@@ -53,7 +53,7 @@ public class CommonServicesAutoConfigurationTest {
      * Test expected context.
      */
     @Test
-    public void testExpectedContext() {
+    void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasSingleBean(FileSystemJobArchiverImpl.class);
@@ -67,7 +67,7 @@ public class CommonServicesAutoConfigurationTest {
      * Make sure when AWS configuration is involved it gives the right configuration.
      */
     @Test
-    public void testExpectedContextWithAws() {
+    void testExpectedContextWithAws() {
         this.contextRunner
             .withPropertyValues(
                 "cloud.aws.credentials.useDefaultAwsCredentialsChain=true",
@@ -103,11 +103,9 @@ public class CommonServicesAutoConfigurationTest {
      * Make JobDirectoryManifestService beans is configured as expected.
      */
     @Test
-    public void testJobDirectoryManifestService() {
+    void testJobDirectoryManifestService() {
         this.contextRunner.run(
-            context -> {
-                Assertions.assertThat(context).hasSingleBean(JobDirectoryManifestCreatorService.class);
-            }
+            context -> Assertions.assertThat(context).hasSingleBean(JobDirectoryManifestCreatorService.class)
         );
     }
 
@@ -115,11 +113,9 @@ public class CommonServicesAutoConfigurationTest {
      * Make JobDirectoryManifest cache bean is configured as expected.
      */
     @Test
-    public void testJobDirectoryManifestCache() {
+    void testJobDirectoryManifestCache() {
         this.contextRunner.run(
-            context -> {
-                Assertions.assertThat(context).getBean("jobDirectoryManifestCache").isNotNull();
-            }
+            context -> Assertions.assertThat(context).getBean("jobDirectoryManifestCache").isNotNull()
         );
     }
 
@@ -127,11 +123,9 @@ public class CommonServicesAutoConfigurationTest {
      * Make sure DirectoryManifest.Factory bean is configured as expected.
      */
     @Test
-    public void testDirectoryManifestFactory() {
+    void testDirectoryManifestFactory() {
         this.contextRunner.run(
-            context -> {
-                Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Factory.class);
-            }
+            context -> Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Factory.class)
         );
     }
 
@@ -139,11 +133,9 @@ public class CommonServicesAutoConfigurationTest {
      * Make JobDirectoryManifestService beans are configured as expected.
      */
     @Test
-    public void testDirectoryManifestFilter() {
+    void testDirectoryManifestFilter() {
         this.contextRunner.run(
-            context -> {
-                Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Filter.class);
-            }
+            context -> Assertions.assertThat(context).hasSingleBean(DirectoryManifest.Filter.class)
         );
     }
 }

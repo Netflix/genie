@@ -19,7 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.interceptor
 
 import com.netflix.genie.web.agent.apis.rpc.v4.interceptors.SimpleLoggingInterceptor;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
  * @author tgianos
  * @since 4.0.0
  */
-public class AgentRpcInterceptorsAutoConfigurationTest {
+class AgentRpcInterceptorsAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -46,7 +46,7 @@ public class AgentRpcInterceptorsAutoConfigurationTest {
      * Default beans created.
      */
     @Test
-    public void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
+    void expectedBeansExistIfGrpcEnabledAndNoUserBeans() {
         this.contextRunner
             .run(context -> Assertions.assertThat(context).hasSingleBean(SimpleLoggingInterceptor.class));
     }
@@ -55,7 +55,7 @@ public class AgentRpcInterceptorsAutoConfigurationTest {
      * User beans override defaults.
      */
     @Test
-    public void expectedBeansExistWhenUserOverrides() {
+    void expectedBeansExistWhenUserOverrides() {
         this.contextRunner
             .withUserConfiguration(UserConfig.class)
             .run(
@@ -73,7 +73,7 @@ public class AgentRpcInterceptorsAutoConfigurationTest {
     static class UserConfig {
 
         @Bean
-        public SimpleLoggingInterceptor userSimpleLoggingInterceptor() {
+        SimpleLoggingInterceptor userSimpleLoggingInterceptor() {
             return Mockito.mock(SimpleLoggingInterceptor.class);
         }
     }

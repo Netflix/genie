@@ -20,7 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure.aws;
 import com.amazonaws.retry.RetryPolicy;
 import com.amazonaws.services.sns.AmazonSNS;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
@@ -34,7 +34,7 @@ import org.springframework.cloud.aws.core.config.AmazonWebserviceClientConfigura
  * @author mprimi
  * @since 4.0.0
  */
-public class AWSAutoConfigurationTest {
+class AWSAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(
@@ -61,7 +61,7 @@ public class AWSAutoConfigurationTest {
      * Test expected context.
      */
     @Test
-    public void testExpectedContext() {
+    void testExpectedContext() {
         this.contextRunner.run(
             (context) -> {
                 Assertions.assertThat(context).hasBean(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);
@@ -78,7 +78,7 @@ public class AWSAutoConfigurationTest {
      * Test expected context with SNS disabled via property.
      */
     @Test
-    public void testExpectedContextWhenSNSDisabled() {
+    void testExpectedContextWhenSNSDisabled() {
         this.contextRunner
             .withPropertyValues(
                 "genie.notifications.sns.enabled=false"
@@ -94,7 +94,7 @@ public class AWSAutoConfigurationTest {
      * AWS Messaging configuration (and hence the latter is not created).
      */
     @Test
-    public void testSpringCloudAWSBeanNameOverride() {
+    void testSpringCloudAWSBeanNameOverride() {
         Assertions.assertThat(
             AmazonWebserviceClientConfigurationUtils.getBeanName(String.valueOf(AmazonSNS.class))
         ).isEqualTo(AWSAutoConfiguration.SNS_CLIENT_BEAN_NAME);

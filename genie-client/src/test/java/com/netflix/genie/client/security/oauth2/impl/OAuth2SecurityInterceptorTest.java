@@ -17,13 +17,11 @@
  */
 package com.netflix.genie.client.security.oauth2.impl;
 
-import com.netflix.genie.client.exceptions.GenieClientException;
 import okhttp3.Interceptor;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.io.IOException;
 
 /**
  * Unit Tests for OAuth2SecurityInterceptor Class.
@@ -31,7 +29,7 @@ import java.io.IOException;
  * @author amsharma
  * @since 3.0.0
  */
-public class OAuth2SecurityInterceptorTest {
+class OAuth2SecurityInterceptorTest {
 
     private static final String URL = "http://localhost/foo";
     private static final String CLIENT_ID = "client_id";
@@ -41,12 +39,12 @@ public class OAuth2SecurityInterceptorTest {
 
     /**
      * Test to make sure we can construct the object using the constructor.
-     *
-     * @throws GenieClientException If there is any problem.
      */
     @Test
-    public void testCanConstruct() throws GenieClientException {
-        new OAuth2SecurityInterceptor(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+    void testCanConstruct() {
+        Assertions
+            .assertThatCode(() -> new OAuth2SecurityInterceptor(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE))
+            .doesNotThrowAnyException();
     }
 
     /**
@@ -54,10 +52,9 @@ public class OAuth2SecurityInterceptorTest {
      *
      * @throws Exception For any issues.
      */
-    @Test(expected = IOException.class)
-    @Ignore
-    public void testTokenFetchFailure() throws Exception {
-
+    @Disabled
+    @Test
+    void testTokenFetchFailure() throws Exception {
         final Interceptor.Chain chain = Mockito.mock(Interceptor.Chain.class);
         final OAuth2SecurityInterceptor oAuth2SecurityInterceptor = new OAuth2SecurityInterceptor(
             URL,
@@ -67,6 +64,6 @@ public class OAuth2SecurityInterceptorTest {
             SCOPE
         );
 
-        oAuth2SecurityInterceptor.intercept(chain);
+        Assertions.assertThatIOException().isThrownBy(() -> oAuth2SecurityInterceptor.intercept(chain));
     }
 }

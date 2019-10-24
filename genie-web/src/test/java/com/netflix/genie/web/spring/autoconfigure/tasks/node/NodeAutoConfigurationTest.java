@@ -25,7 +25,7 @@ import com.netflix.genie.web.tasks.node.DiskCleanupTask;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -39,7 +39,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  * @author tgianos
  * @since 4.0.0
  */
-public class NodeAutoConfigurationTest {
+class NodeAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -54,7 +54,7 @@ public class NodeAutoConfigurationTest {
      * All the expected beans exist.
      */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(DiskCleanupProperties.class);
@@ -69,7 +69,7 @@ public class NodeAutoConfigurationTest {
      * All the expected beans exist.
      */
     @Test
-    public void optionalBeansCreated() {
+    void optionalBeansCreated() {
         this.contextRunner
             .withPropertyValues(
                 "genie.tasks.disk-cleanup.enabled=true"
@@ -98,7 +98,7 @@ public class NodeAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public ThreadPoolTaskScheduler genieTaskScheduler() {
+        ThreadPoolTaskScheduler genieTaskScheduler() {
             return Mockito.mock(ThreadPoolTaskScheduler.class);
         }
 
@@ -108,7 +108,7 @@ public class NodeAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public JobSearchService jobSearchService() {
+        JobSearchService jobSearchService() {
             return Mockito.mock(JobSearchService.class);
         }
 
@@ -118,7 +118,7 @@ public class NodeAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public Resource jobsDir() {
+        Resource jobsDir() {
             final Resource resource = Mockito.mock(Resource.class);
             Mockito.when(resource.exists()).thenReturn(true);
             return resource;
@@ -130,7 +130,7 @@ public class NodeAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public JobsProperties jobsProperties() {
+        JobsProperties jobsProperties() {
             return JobsProperties.getJobsPropertiesDefaults();
         }
 
@@ -140,7 +140,7 @@ public class NodeAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public MeterRegistry meterRegistry() {
+        MeterRegistry meterRegistry() {
             return Mockito.mock(MeterRegistry.class);
         }
 
@@ -150,7 +150,7 @@ public class NodeAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public Executor executor() {
+        Executor executor() {
             return Mockito.mock(Executor.class);
         }
     }

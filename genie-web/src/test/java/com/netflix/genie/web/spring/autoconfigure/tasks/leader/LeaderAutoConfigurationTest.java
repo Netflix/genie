@@ -43,7 +43,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.listen.Listenable;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -59,7 +59,7 @@ import org.springframework.web.client.RestTemplate;
  * @author tgianos
  * @since 3.1.0
  */
-public class LeaderAutoConfigurationTest {
+class LeaderAutoConfigurationTest {
 
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
@@ -75,7 +75,7 @@ public class LeaderAutoConfigurationTest {
      * All the expected default beans exist.
      */
     @Test
-    public void expectedBeansExist() {
+    void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(AgentCleanupProperties.class);
@@ -102,7 +102,7 @@ public class LeaderAutoConfigurationTest {
      * All the expected optional beans exist.
      */
     @Test
-    public void optionalBeansCreated() {
+    void optionalBeansCreated() {
         this.contextRunner
             .withPropertyValues(
                 "genie.tasks.database-cleanup.enabled=true",
@@ -135,7 +135,7 @@ public class LeaderAutoConfigurationTest {
      * All the expected beans exist when zookeeper is enabled.
      */
     @Test
-    public void expectedZookeeperBeansExist() {
+    void expectedZookeeperBeansExist() {
         this.contextRunner
             .withUserConfiguration(ZookeeperMockConfig.class)
             .run(
@@ -174,7 +174,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public GenieHostInfo genieHostInfo() {
+        GenieHostInfo genieHostInfo() {
             return Mockito.mock(GenieHostInfo.class);
         }
 
@@ -184,7 +184,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public JobSearchService jobSearchService() {
+        JobSearchService jobSearchService() {
             return Mockito.mock(JobSearchService.class);
         }
 
@@ -194,7 +194,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public JobPersistenceService jobPersistenceService() {
+        JobPersistenceService jobPersistenceService() {
             return Mockito.mock(JobPersistenceService.class);
         }
 
@@ -204,7 +204,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public ClusterPersistenceService clusterPersistenceService() {
+        ClusterPersistenceService clusterPersistenceService() {
             return Mockito.mock(ClusterPersistenceService.class);
         }
 
@@ -214,7 +214,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public FilePersistenceService filePersistenceService() {
+        FilePersistenceService filePersistenceService() {
             return Mockito.mock(FilePersistenceService.class);
         }
 
@@ -224,7 +224,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public JobsProperties jobsProperties() {
+        JobsProperties jobsProperties() {
             return JobsProperties.getJobsPropertiesDefaults();
         }
 
@@ -234,7 +234,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public TagPersistenceService tagPersistenceService() {
+        TagPersistenceService tagPersistenceService() {
             return Mockito.mock(TagPersistenceService.class);
         }
 
@@ -244,7 +244,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public RestTemplate genieRestTemplate() {
+        RestTemplate genieRestTemplate() {
             return Mockito.mock(RestTemplate.class);
         }
 
@@ -254,7 +254,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public WebEndpointProperties webEndpointProperties() {
+        WebEndpointProperties webEndpointProperties() {
             return Mockito.mock(WebEndpointProperties.class);
         }
 
@@ -264,7 +264,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public MeterRegistry meterRegistry() {
+        MeterRegistry meterRegistry() {
             return Mockito.mock(MeterRegistry.class);
         }
 
@@ -274,7 +274,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public GenieEventBus genieEventBus() {
+        GenieEventBus genieEventBus() {
             return Mockito.mock(GenieEventBus.class);
         }
 
@@ -284,7 +284,7 @@ public class LeaderAutoConfigurationTest {
          * @return Mocked bean instance
          */
         @Bean
-        public AgentConnectionPersistenceService agentConnectionPersistenceService() {
+        AgentConnectionPersistenceService agentConnectionPersistenceService() {
             return Mockito.mock(AgentConnectionPersistenceService.class);
         }
     }
@@ -302,7 +302,7 @@ public class LeaderAutoConfigurationTest {
          */
         @Bean
         @SuppressWarnings("unchecked")
-        public CuratorFramework curatorFramework() {
+        CuratorFramework curatorFramework() {
             final CuratorFramework curatorFramework = Mockito.mock(CuratorFramework.class);
             Mockito
                 .when(curatorFramework.getConnectionStateListenable())

@@ -17,48 +17,54 @@
  */
 package com.netflix.genie.common.exceptions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
 /**
- * Test the constructors of the GenieException.
+ * Test the constructors of the {@link GenieConflictException}.
  *
  * @author tgianos
  * @since 2.0.0
  */
-public class GenieConflictExceptionTest extends Exception {
+class GenieConflictExceptionTest {
 
     private static final String ERROR_MESSAGE = "Not Found";
     private static final IOException IOE = new IOException("IOException");
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieConflictException On conflict
      */
-    @Test(expected = GenieConflictException.class)
-    public void testTwoArgConstructor() throws GenieConflictException {
-        final GenieConflictException ge = new GenieConflictException(ERROR_MESSAGE, IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_CONFLICT, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
+    @Test
+    void testTwoArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieConflictException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieConflictException(ERROR_MESSAGE, IOE);
+                }
+            )
+            .withCause(IOE)
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_CONFLICT));
     }
 
     /**
      * Test the constructor.
-     *
-     * @throws GenieConflictException On conflict
      */
-    @Test(expected = GenieConflictException.class)
-    public void testMessageArgConstructor() throws GenieConflictException {
-        final GenieConflictException ge = new GenieConflictException(ERROR_MESSAGE);
-        Assert.assertEquals(HttpURLConnection.HTTP_CONFLICT, ge.getErrorCode());
-        Assert.assertEquals(ERROR_MESSAGE, ge.getMessage());
-        Assert.assertNull(ge.getCause());
-        throw ge;
+    @Test
+    void testMessageArgConstructor() {
+        Assertions
+            .assertThatExceptionOfType(GenieConflictException.class)
+            .isThrownBy(
+                () -> {
+                    throw new GenieConflictException(ERROR_MESSAGE);
+                }
+            )
+            .withNoCause()
+            .withMessage(ERROR_MESSAGE)
+            .satisfies(e -> Assertions.assertThat(e.getErrorCode()).isEqualTo(HttpURLConnection.HTTP_CONFLICT));
     }
 }

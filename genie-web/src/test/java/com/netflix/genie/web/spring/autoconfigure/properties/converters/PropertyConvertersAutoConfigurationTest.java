@@ -19,7 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.properties.converters;
 
 import com.netflix.genie.web.properties.converters.URIPropertyConverter;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -29,7 +29,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  * @author tgianos
  * @since 4.0.0
  */
-public class PropertyConvertersAutoConfigurationTest {
+class PropertyConvertersAutoConfigurationTest {
     private ApplicationContextRunner contextRunner =
         new ApplicationContextRunner()
             .withConfiguration(
@@ -42,7 +42,7 @@ public class PropertyConvertersAutoConfigurationTest {
      * Make sure the expected converters are created.
      */
     @Test
-    public void canCreateExpectedConverters() {
+    void canCreateExpectedConverters() {
         this.contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(URIPropertyConverter.class);

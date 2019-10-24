@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -28,7 +28,7 @@ import org.mockito.Mockito;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobsPropertiesTest {
+class JobsPropertiesTest {
 
     private JobsCleanupProperties cleanup;
     private JobsMemoryProperties memory;
@@ -43,8 +43,8 @@ public class JobsPropertiesTest {
     /**
      * Setup for the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.cleanup = Mockito.mock(JobsCleanupProperties.class);
         this.memory = Mockito.mock(JobsMemoryProperties.class);
         this.forwarding = Mockito.mock(JobsForwardingProperties.class);
@@ -54,14 +54,14 @@ public class JobsPropertiesTest {
         this.completionBackOff = Mockito.mock(ExponentialBackOffTriggerProperties.class);
         this.activeLimit = Mockito.mock(JobsActiveLimitProperties.class);
         this.properties = new JobsProperties(
-            cleanup,
-            forwarding,
-            locations,
-            max,
-            memory,
-            users,
-            completionBackOff,
-            activeLimit
+            this.cleanup,
+            this.forwarding,
+            this.locations,
+            this.max,
+            this.memory,
+            this.users,
+            this.completionBackOff,
+            this.activeLimit
         );
     }
 
@@ -69,29 +69,35 @@ public class JobsPropertiesTest {
      * Make sure we can construct.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertNotNull(this.properties.getCleanup());
-        Assert.assertNotNull(this.properties.getMemory());
-        Assert.assertNotNull(this.properties.getForwarding());
-        Assert.assertNotNull(this.properties.getLocations());
-        Assert.assertNotNull(this.properties.getMax());
-        Assert.assertNotNull(this.properties.getUsers());
-        Assert.assertNotNull(this.properties.getCompletionCheckBackOff());
-        Assert.assertNotNull(this.properties.getActiveLimit());
+    void canConstruct() {
+        Assertions.assertThat(this.properties.getCleanup()).isNotNull();
+        Assertions.assertThat(this.properties.getMemory()).isNotNull();
+        Assertions.assertThat(this.properties.getForwarding()).isNotNull();
+        Assertions.assertThat(this.properties.getLocations()).isNotNull();
+        Assertions.assertThat(this.properties.getMax()).isNotNull();
+        Assertions.assertThat(this.properties.getUsers()).isNotNull();
+        Assertions.assertThat(this.properties.getCompletionCheckBackOff()).isNotNull();
+        Assertions.assertThat(this.properties.getActiveLimit()).isNotNull();
     }
 
     /**
      * Make sure all the setters work.
      */
     @Test
-    public void canSet() {
-        this.properties.setCleanup(cleanup);
-        this.properties.setForwarding(forwarding);
-        this.properties.setLocations(locations);
-        this.properties.setMax(max);
-        this.properties.setMemory(memory);
-        this.properties.setUsers(users);
-        this.properties.setCompletionCheckBackOff(completionBackOff);
-        this.properties.setActiveLimit(activeLimit);
+    void canSet() {
+        Assertions
+            .assertThatCode(
+                () -> {
+                    this.properties.setCleanup(this.cleanup);
+                    this.properties.setForwarding(this.forwarding);
+                    this.properties.setLocations(this.locations);
+                    this.properties.setMax(this.max);
+                    this.properties.setMemory(this.memory);
+                    this.properties.setUsers(this.users);
+                    this.properties.setCompletionCheckBackOff(this.completionBackOff);
+                    this.properties.setActiveLimit(this.activeLimit);
+                }
+            )
+            .doesNotThrowAnyException();
     }
 }

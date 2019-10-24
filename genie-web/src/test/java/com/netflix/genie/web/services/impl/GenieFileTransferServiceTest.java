@@ -21,8 +21,9 @@ import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.web.services.FileTransfer;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ import java.util.Map;
  * @author amsharma
  * @since 3.0.0
  */
-public class GenieFileTransferServiceTest {
+class GenieFileTransferServiceTest {
 
     private static final String S3_FILE_PATH = "s3://s3file";
     private static final String LOCAL_FILE_PATH = "file://localfile";
@@ -48,26 +49,27 @@ public class GenieFileTransferServiceTest {
      *
      * @throws GenieException If there is any problem
      */
-    @Before
-    public void setUp() throws GenieException {
-        localFileTransfer = Mockito.mock(LocalFileTransferImpl.class);
-        s3FileTransfer = Mockito.mock(S3FileTransferImpl.class);
+    @BeforeEach
+    void setUp() throws GenieException {
+        this.localFileTransfer = Mockito.mock(LocalFileTransferImpl.class);
+        this.s3FileTransfer = Mockito.mock(S3FileTransferImpl.class);
 
         final Map<String, FileTransfer> fileTransferMap = new ImmutableMap.Builder<String, FileTransfer>()
-            .put("file.system.s3", s3FileTransfer)
-            .put("file.system.file", localFileTransfer).build();
+            .put("file.system.s3", this.s3FileTransfer)
+            .put("file.system.file", this.localFileTransfer)
+            .build();
 
-        genieFileTransferService = new GenieFileTransferService(fileTransferMap::get);
+        this.genieFileTransferService = new GenieFileTransferService(fileTransferMap::get);
     }
 
     /**
      * Test the getFile method in case none of the File transfer impls can handle the file.
-     *
-     * @throws GenieException If there is any problem
      */
-    @Test(expected = GenieNotFoundException.class)
-    public void testGetFileNoValidImplFound() throws GenieException {
-        this.genieFileTransferService.getFile("foo", "bar");
+    @Test
+    void testGetFileNoValidImplFound() {
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.genieFileTransferService.getFile("foo", "bar"));
     }
 
     /**
@@ -76,7 +78,7 @@ public class GenieFileTransferServiceTest {
      * @throws GenieException If there is any problem
      */
     @Test
-    public void testGetFileValidImplFoundFirst() throws GenieException {
+    void testGetFileValidImplFoundFirst() throws GenieException {
         Mockito.when(this.localFileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(true);
         Mockito.when(this.s3FileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(false);
 
@@ -91,7 +93,7 @@ public class GenieFileTransferServiceTest {
      * @throws GenieException If there is any problem
      */
     @Test
-    public void testGetFileValidImplFoundSecond() throws GenieException {
+    void testGetFileValidImplFoundSecond() throws GenieException {
         Mockito.when(this.localFileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(false);
         Mockito.when(this.s3FileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(true);
 
@@ -102,12 +104,12 @@ public class GenieFileTransferServiceTest {
 
     /**
      * Test the putFile method in case none of the File transfer impls can handle the file.
-     *
-     * @throws GenieException If there is any problem
      */
-    @Test(expected = GenieNotFoundException.class)
-    public void testPutFileNoValidImplFound() throws GenieException {
-        this.genieFileTransferService.putFile("foo", "bar");
+    @Test
+    void testPutFileNoValidImplFound() {
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.genieFileTransferService.putFile("foo", "bar"));
     }
 
     /**
@@ -116,7 +118,7 @@ public class GenieFileTransferServiceTest {
      * @throws GenieException If there is any problem
      */
     @Test
-    public void testPutFileValidImplFoundFirst() throws GenieException {
+    void testPutFileValidImplFoundFirst() throws GenieException {
         Mockito.when(this.localFileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(true);
         Mockito.when(this.s3FileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(false);
 
@@ -131,7 +133,7 @@ public class GenieFileTransferServiceTest {
      * @throws GenieException If there is any problem
      */
     @Test
-    public void testPutFileValidImplFoundSecond() throws GenieException {
+    void testPutFileValidImplFoundSecond() throws GenieException {
         Mockito.when(this.localFileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(false);
         Mockito.when(this.s3FileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(true);
 

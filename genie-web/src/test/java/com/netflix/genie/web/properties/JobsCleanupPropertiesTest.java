@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the cleanup properties.
@@ -27,15 +27,15 @@ import org.junit.Test;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobsCleanupPropertiesTest {
+class JobsCleanupPropertiesTest {
 
     private JobsCleanupProperties properties;
 
     /**
      * Setup for tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.properties = new JobsCleanupProperties();
     }
 
@@ -43,16 +43,16 @@ public class JobsCleanupPropertiesTest {
      * Make sure properties are true by default.
      */
     @Test
-    public void canConstruct() {
-        Assert.assertTrue(this.properties.isDeleteDependencies());
+    void canConstruct() {
+        Assertions.assertThat(this.properties.isDeleteDependencies()).isTrue();
     }
 
     /**
      * Make sure can set whether to delete the delete the dependencies.
      */
     @Test
-    public void canSetDeleteDependencies() {
+    void canSetDeleteDependencies() {
         this.properties.setDeleteDependencies(false);
-        Assert.assertFalse(this.properties.isDeleteDependencies());
+        Assertions.assertThat(this.properties.isDeleteDependencies()).isFalse();
     }
 }

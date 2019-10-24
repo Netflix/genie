@@ -52,6 +52,7 @@ import java.util.concurrent.TimeUnit;
  * @author tgianos
  * @since 3.0.0
  */
+// TODO: Upgrade to Junit 5 after JUnit >= 5.4
 public class HttpFileTransferImplTest {
 
     private static final String TEST_URL = "http://localhost/myFile.txt";

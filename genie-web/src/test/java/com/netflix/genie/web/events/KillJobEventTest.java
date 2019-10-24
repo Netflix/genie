@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.web.events;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -29,18 +28,18 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class KillJobEventTest {
+class KillJobEventTest {
 
     /**
      * Make sure can get the Job Id back from the event.
      */
     @Test
-    public void canGetJobId() {
+    void canGetJobId() {
         final String id = UUID.randomUUID().toString();
         final String reason = UUID.randomUUID().toString();
         final KillJobEvent event = new KillJobEvent(id, reason, this);
 
-        Assert.assertThat(event.getId(), Matchers.is(id));
-        Assert.assertThat(event.getReason(), Matchers.is(reason));
+        Assertions.assertThat(event.getId()).isEqualTo(id);
+        Assertions.assertThat(event.getReason()).isEqualTo(reason);
     }
 }

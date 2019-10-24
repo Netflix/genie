@@ -51,6 +51,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
+// TODO: Switch to Junit 5 once boot upgrades to >= junit 5.4 for @TempDir support
 public class DiskCleanupTaskTest {
 
     /**

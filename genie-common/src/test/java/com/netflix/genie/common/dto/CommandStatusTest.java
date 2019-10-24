@@ -18,8 +18,8 @@
 package com.netflix.genie.common.dto;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the CommandStatus enum.
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author tgianos
  * @since 2.0.0
  */
-public class CommandStatusTest {
+class CommandStatusTest {
 
     /**
      * Tests whether a valid command status is parsed correctly.
@@ -35,32 +35,35 @@ public class CommandStatusTest {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testValidCommandStatus() throws GeniePreconditionException {
-        Assert.assertEquals(CommandStatus.ACTIVE,
-            CommandStatus.parse(CommandStatus.ACTIVE.name().toLowerCase()));
-        Assert.assertEquals(CommandStatus.DEPRECATED,
-            CommandStatus.parse(CommandStatus.DEPRECATED.name().toLowerCase()));
-        Assert.assertEquals(CommandStatus.INACTIVE,
-            CommandStatus.parse(CommandStatus.INACTIVE.name().toLowerCase()));
+    void testValidCommandStatus() throws GeniePreconditionException {
+        Assertions
+            .assertThat(CommandStatus.parse(CommandStatus.ACTIVE.name().toLowerCase()))
+            .isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions
+            .assertThat(CommandStatus.parse(CommandStatus.DEPRECATED.name().toLowerCase()))
+            .isEqualByComparingTo(CommandStatus.DEPRECATED);
+        Assertions
+            .assertThat(CommandStatus.parse(CommandStatus.INACTIVE.name().toLowerCase()))
+            .isEqualByComparingTo(CommandStatus.INACTIVE);
     }
 
     /**
      * Tests whether an invalid command status throws exception.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testInvalidCommandStatus() throws GeniePreconditionException {
-        CommandStatus.parse("DOES_NOT_EXIST");
+    @Test
+    void testInvalidCommandStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> CommandStatus.parse("DOES_NOT_EXIST"));
     }
 
     /**
      * Tests whether an invalid application status throws exception.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testBlankCommandStatus() throws GeniePreconditionException {
-        CommandStatus.parse("  ");
+    @Test
+    void testBlankCommandStatus() {
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> CommandStatus.parse("  "));
     }
 }
