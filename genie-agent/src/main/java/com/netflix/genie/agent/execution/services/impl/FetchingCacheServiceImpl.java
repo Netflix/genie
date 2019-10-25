@@ -140,7 +140,18 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
         final String resourceCacheId = getResourceCacheId(sourceFileUri);
 
         // Get a handle to the resource
-        final Resource resource = resourceLoader.getResource(uriString);
+        final Resource resource;
+        try {
+             resource = resourceLoader.getResource(uriString);
+        } catch (Throwable t) {
+            log.error(
+                "Failed to retrieve resource: {}, {} - {}",
+                uriString,
+                t.getClass().getSimpleName(),
+                t.getMessage()
+            );
+            throw t;
+        }
 
         if (!resource.exists()) {
             throw new DownloadException("Resource not found: " + uriString);
