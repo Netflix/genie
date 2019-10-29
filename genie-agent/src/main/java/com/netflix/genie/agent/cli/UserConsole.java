@@ -48,33 +48,80 @@ public final class UserConsole {
      * consumed by Spring.
      */
     private static final String CONSOLE_LOGGER_NAME = "genie-agent";
-    /**
-     * This string path must match the one present in the log appender configuration consumed by Spring.
-     * It represents the initial location of the agent log file.
-     */
-    private static final String LOG_FILE_PATH = "/tmp/genie-agent-%s.log";
+
     /**
      * This system property is set by Spring.
      */
     private static final String PID_SYSTEM_PROPERTY_NAME = "PID";
     /**
-     * The name of the environment variable that can be supplied to have the temporary log file at a non standard
-     * location.
+     * System property or environment variable to override the full path of the logfile.
      */
-    private static final String TEMPORARY_LOG_FILE_ENV_VAR_NAME = "GENIE_AGENT_TEMPORARY_LOG_FILE";
+    private static final String LOG_FILE_PATH_OVERRIDE_PROPERTY_NAME = "GENIE_AGENT_TEMPORARY_LOG_FILE";
+    /**
+     * System property or environment variable to override the directory of the logfile.
+     */
+    private static final String LOG_DIRECTORY_OVERRIDE_PROPERTY_NAME = "GENIE_AGENT_TEMPORARY_LOG_DIRECTORY";
+    /**
+     * System property or environment variable to override the filename of the logfile.
+     */
+    private static final String LOG_FILENAME_OVERRIDE_PROPERTY_NAME = "GENIE_AGENT_TEMPORARY_LOG_FILENAME";
 
+    /**
+     * Fallback/Default value for log directory, if no override is present.
+     */
+    private static final String DEFAULT_LOG_DIRECTORY = "/tmp";
+    /**
+     * Fallback/Default value for log filename, if no override is present.
+     */
+    private static final String DEFAULT_LOG_FILENAME = String.format(
+        "genie-agent-%s.log",
+        System.getProperty(PID_SYSTEM_PROPERTY_NAME, "unknown-pid")
+    );
+
+    /**
+     * Log directory evaluated considering overrides.
+     */
+    private static final String ACTUAL_LOG_DIRECTORY = System.getProperty(
+        LOG_DIRECTORY_OVERRIDE_PROPERTY_NAME,
+        System.getenv().getOrDefault(
+            LOG_DIRECTORY_OVERRIDE_PROPERTY_NAME,
+            DEFAULT_LOG_DIRECTORY
+        )
+    );
+    /**
+     * Log filename evaluated considering overrides.
+     */
+    private static final String ACTUAL_LOG_FILENAME = System.getProperty(
+        LOG_FILENAME_OVERRIDE_PROPERTY_NAME,
+        System.getenv().getOrDefault(
+            LOG_FILENAME_OVERRIDE_PROPERTY_NAME,
+            DEFAULT_LOG_FILENAME
+        )
+    );
+
+    /**
+     * Expected log file path, used unless full path override is provided.
+     */
+    private static final String DEFAULT_LOG_FILE_PATH = ACTUAL_LOG_DIRECTORY + "/" + ACTUAL_LOG_FILENAME;
     /**
      * Stores the current location of the log file.
      * The logfile starts in a temporary location but may move inside the job folder during execution.
      * <p>
      * Note that this value does not set the location of the log, it just tries to guess it.
-     * The file location is determined by the logback configuration.
+     * The file location is determined by the logback configuration (which is expected to follow the same logic).
      */
     private static final AtomicReference<Path> CURRENT_LOG_FILE_PATH = new AtomicReference<>(
         Paths.get(
-            System.getenv().getOrDefault(
-                TEMPORARY_LOG_FILE_ENV_VAR_NAME,
-                String.format(LOG_FILE_PATH, System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???"))
+            // Use property value if set
+            System.getProperty(
+                LOG_FILE_PATH_OVERRIDE_PROPERTY_NAME,
+                // Otherwise use environment variable if set
+                System.getenv().getOrDefault(
+                    LOG_FILE_PATH_OVERRIDE_PROPERTY_NAME,
+                    // Otherwise fallback to default
+                    DEFAULT_LOG_FILE_PATH
+//                    String.format(LOG_FILE_PATH, System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???"))
+                )
             )
         )
     );
