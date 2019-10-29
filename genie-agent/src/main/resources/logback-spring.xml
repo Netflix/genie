@@ -11,7 +11,16 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <property name="LOG_FILE" value="${GENIE_AGENT_TEMPORARY_LOG_FILE:-/tmp/genie-agent-${PID}.log}"/>
+    <!--
+      WARNING: the logic below to evaluate a value for $LOG_FILE is currently mirrored in the UserConsole class.
+      This is necessary in order to "guess" the logfile location and relocate it inside the job folder during execution.
+      Any change to these properties must be reflected in UserConsole for log file reolocation to work properly.
+    -->
+    <property name="DEFAULT_LOG_DIRECTORY" value="${GENIE_AGENT_TEMPORARY_LOG_DIRECTORY:-/tmp}"/>
+    <property name="DEFAULT_LOG_FILENAME" value="${GENIE_AGENT_TEMPORARY_LOG_FILENAME:-genie-agent-${PID}.log}"/>
+    <property name="DEFAULT_LOG_FILE" value="${DEFAULT_LOG_DIRECTORY}/${DEFAULT_LOG_FILENAME}"/>
+    <property name="LOG_FILE" value="${GENIE_AGENT_TEMPORARY_LOG_FILE:-${DEFAULT_LOG_FILE}}"/>
+
     <include resource="genie-agent-file-appender.xml"/>
 
     <property name="CONSOLE_FILTER_LOGGER_NAME" value="genie-agent"/>
