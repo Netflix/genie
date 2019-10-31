@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-10-24</span>
+<span id="revdate">2019-10-31</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4811,21 +4811,45 @@ Whereas static properties values are bound during application startup and do not
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.executable</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system command that the launcher should use to launch an agent process. Ordered list of arguments.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">java -jar /tmp/genie-agent.jar</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.additional-environment</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Environment variables to set when spawning an agent (in addition to the inherited server environment)</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.maxJobMemory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.agent-jar-path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The location of the agent jar. The value is substituted in the command template if the corresponding placeholder is present.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/tmp/genie-agent.jar</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.launch-command-template</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system command that the launcher should use to launch an agent process. Ordered list of arguments. Contains placeholders that will be replaced at runtime.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java -jar &lt;AGENT_JAR_PLACEHOLDER&gt; exec --serverHost 127.0.0.1 --serverPort &lt;SERVER_PORT_PLACEHOLDER&gt; --api-job --jobId &lt;JOB_ID_PLACEHOLDER&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.max-job-memory</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The maximum amount of memory, in megabytes, that a job can be allocated while using the local launcher</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10240</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.maxTotalJobMemory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.max-total-job-memory</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The total number of MB out of the system memory that Genie can use for running agents</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">30720</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.process-output-capture-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to capture stdout and stderr from the forked agent subprocess to a file for debugging purposes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.run-as-user-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to launch the agent subprocess as the user specified in the job request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -6315,7 +6339,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-10-24 17:24:09 UTC
+Last updated 2019-10-31 22:08:22 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
