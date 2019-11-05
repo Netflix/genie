@@ -143,6 +143,21 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |-
 |yes
 
+|genie.jobs.agent-execution.agent-probability
+|Likelihood (0 <= x <= 1.0) that an incoming job is randomly selected to execute with agent, rather than the regular V3 execution codepath
+|null
+|yes
+
+|genie.jobs.agent-execution.force-agent
+|If true, force all jobs to execute in agent mode
+|null
+|yes
+
+|genie.jobs.agent-execution.force-embedded
+|If true, force all jobs to execute in embedded mode
+|null
+|yes
+
 |genie.jobs.cleanup.deleteDependencies
 |Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion
 |true
