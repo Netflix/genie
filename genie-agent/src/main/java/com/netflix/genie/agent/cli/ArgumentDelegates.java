@@ -112,4 +112,12 @@ public interface ArgumentDelegates {
         CleanupStrategy getCleanupStrategy();
     }
 
+    /**
+     * Delegate for agent runtime options.
+     */
+    interface RuntimeConfigurationArguments {
+
+        boolean isLaunchInJobDirectory();
+
+    }
 }
