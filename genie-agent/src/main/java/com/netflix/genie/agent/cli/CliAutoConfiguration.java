@@ -83,10 +83,11 @@ public class CliAutoConfiguration {
     /**
      * Provide a bean for execution command arguments.
      *
-     * @param serverArguments     The server arguments to use
-     * @param cacheArguments      The cache arguments to use
-     * @param jobRequestArguments The job request arguments to use
-     * @param cleanupArguments    The cleanup arguments to use
+     * @param serverArguments               The server arguments to use
+     * @param cacheArguments                The cache arguments to use
+     * @param jobRequestArguments           The job request arguments to use
+     * @param cleanupArguments              The cleanup arguments to use
+     * @param runtimeConfigurationArguments the runtime configuration arguments group
      * @return An instance of {@link com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments}
      */
     @Bean
@@ -94,13 +95,15 @@ public class CliAutoConfiguration {
         final ArgumentDelegates.ServerArguments serverArguments,
         final ArgumentDelegates.CacheArguments cacheArguments,
         final ArgumentDelegates.JobRequestArguments jobRequestArguments,
-        final ArgumentDelegates.CleanupArguments cleanupArguments
+        final ArgumentDelegates.CleanupArguments cleanupArguments,
+        final ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments
     ) {
         return new ExecCommand.ExecCommandArguments(
             serverArguments,
             cacheArguments,
             jobRequestArguments,
-            cleanupArguments
+            cleanupArguments,
+            runtimeConfigurationArguments
         );
     }
 
@@ -336,5 +339,15 @@ public class CliAutoConfiguration {
     @Bean
     public ArgumentDelegates.CleanupArguments cleanupArguments() {
         return new CleanupArgumentsImpl();
+    }
+
+    /**
+     * Provide a {@link com.netflix.genie.agent.cli.ArgumentDelegates.RuntimeConfigurationArguments}.
+     *
+     * @return A {@link RuntimeConfigurationArgumentsImpl} instance
+     */
+    @Bean
+    public ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments() {
+        return new RuntimeConfigurationArgumentsImpl();
     }
 }

@@ -73,7 +73,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["touch"],
             [expectedFile.getAbsolutePath()],
             true,
-            null
+            null,
+            false
         )
 
         then:
@@ -105,7 +106,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["\${ECHO_COMMAND}"],
             [helloWorld],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -137,7 +139,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             ["\$" + envVarName], // Variable should NOT get expanded/evaluated
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -170,7 +173,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["env"],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -191,6 +195,39 @@ class JobProcessManagerImplSpec extends Specification {
         this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(expectedString)
     }
 
+    def "LaunchProcess changing directory before launch"() {
+        String expectedString = this.temporaryFolder.getRoot().getPath()
+
+        when:
+        this.manager.launchProcess(
+            this.temporaryFolder.getRoot(),
+            this.envMap,
+            ["pwd"],
+            [],
+            false,
+            null,
+            true
+        )
+
+        then:
+        noExceptionThrown()
+        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
+
+        when:
+        def result = this.manager.waitFor()
+
+        then:
+        result.getFinalStatus() == JobStatus.SUCCEEDED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
+        result.getStdOutSize() == 0L
+        result.getStdErrSize() == 0L
+        result.getExitCode() == 0
+        this.stdErr.exists()
+        this.stdOut.exists()
+        this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(expectedString)
+    }
+
+
     def "LaunchProcess command error"() {
         File nonExistentFile = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString())
 
@@ -201,7 +238,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["rm"],
             [nonExistentFile.absolutePath],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -232,7 +270,8 @@ class JobProcessManagerImplSpec extends Specification {
             [uuid],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -248,7 +287,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["\$COMMAND"],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -264,7 +304,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -280,7 +321,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -296,7 +338,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -312,7 +355,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -328,7 +372,8 @@ class JobProcessManagerImplSpec extends Specification {
             null,
             null,
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -344,7 +389,8 @@ class JobProcessManagerImplSpec extends Specification {
             [],
             [],
             false,
-            null
+            null,
+            false
         )
 
         then:
@@ -362,7 +408,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["sleep"],
             ["60"],
             true,
-            59
+            59,
+            false
         )
 
         then:
@@ -397,7 +444,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["sleep"],
             ["60"],
             true,
-            null
+            null,
+            false
         )
 
         then:
@@ -434,7 +482,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             ["foo"],
             true,
-            null
+            null,
+            false
         )
 
         then:
@@ -475,7 +524,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             ["foo"],
             true,
-            10
+            10,
+            false
         )
 
         then:
@@ -503,7 +553,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             ["foo"],
             true,
-            null
+            null,
+            false
         )
 
         then:
@@ -517,7 +568,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["echo"],
             ["foo"],
             true,
-            null
+            null,
+            false
         )
 
         then:
@@ -549,7 +601,8 @@ class JobProcessManagerImplSpec extends Specification {
             ["sleep"],
             ["60"],
             true,
-            1
+            1,
+            false
         )
 
         then:

@@ -45,6 +45,7 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
      * @param interactive          launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
      * @param timeout              The optional number of seconds this job is allowed to run before the system will
      *                             kill it
+     * @param launchInJobDirectory launch the job process from the job directory rather than the current directory
      * @throws JobLaunchException if the job process failed to launch
      */
     void launchProcess(
@@ -53,7 +54,8 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
         List<String> commandArguments,
         List<String> jobArguments,
         boolean interactive,
-        @Nullable Integer timeout
+        @Nullable Integer timeout,
+        boolean launchInJobDirectory
     ) throws JobLaunchException;
 
     /**

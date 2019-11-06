@@ -30,6 +30,7 @@ class ExecCommandArgumentsSpec extends Specification {
     ArgumentDelegates.CacheArguments cacheArguments
     ArgumentDelegates.JobRequestArguments jobRequestArguments
     ArgumentDelegates.CleanupArguments cleanupArguments
+    ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments
     MainCommandArguments mainCommandArguments
 
     void setup() {
@@ -38,7 +39,8 @@ class ExecCommandArgumentsSpec extends Specification {
         mainCommandArguments = Mock(MainCommandArguments)
         jobRequestArguments = new JobRequestArgumentsImpl(mainCommandArguments)
         cleanupArguments = new CleanupArgumentsImpl()
-        options = new ExecCommand.ExecCommandArguments(serverArguments, cacheArguments, jobRequestArguments, cleanupArguments)
+        runtimeConfigurationArguments = new RuntimeConfigurationArgumentsImpl()
+        options = new ExecCommand.ExecCommandArguments(serverArguments, cacheArguments, jobRequestArguments, cleanupArguments, runtimeConfigurationArguments)
         jCommander = new JCommander(options)
     }
 
@@ -55,6 +57,7 @@ class ExecCommandArgumentsSpec extends Specification {
         !options.getJobRequestArguments().isInteractive()
         options.getJobRequestArguments().getJobTags().isEmpty()
         options.getCleanupArguments().getCleanupStrategy() == CleanupStrategy.DEPENDENCIES_CLEANUP
+        !options.getRuntimeConfigurationArguments().isLaunchInJobDirectory()
     }
 
     def "Parse"() {
@@ -65,7 +68,8 @@ class ExecCommandArgumentsSpec extends Specification {
             "--cacheDirectory", "/tmp/foo",
             "--clusterCriterion", "NAME=prod",
             "--clusterCriterion", "NAME=test",
-            "--no-cleanup"
+            "--no-cleanup",
+            "--launchInJobDirectory"
         )
 
         then:
@@ -74,6 +78,7 @@ class ExecCommandArgumentsSpec extends Specification {
         "/tmp/foo" == options.getCacheArguments().getCacheDirectory().getAbsolutePath()
         2 == options.getJobRequestArguments().getClusterCriteria().size()
         options.getCleanupArguments().getCleanupStrategy() == CleanupStrategy.NO_CLEANUP
+        options.getRuntimeConfigurationArguments().isLaunchInJobDirectory()
     }
 
     def "InvalidRequestId"() {
