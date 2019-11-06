@@ -4939,6 +4939,24 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.agent-execution.agent-probability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Likelihood (0 &#8656; x &#8656; 1.0) that an incoming job is randomly selected to execute with agent, rather than the regular V3 execution codepath</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.agent-execution.force-agent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true, force all jobs to execute in agent mode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.agent-execution.force-embedded</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true, force all jobs to execute in embedded mode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
@@ -6339,7 +6357,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-11-06 20:42:38 UTC
+Last updated 2019-11-06 21:25:24 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
