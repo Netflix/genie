@@ -71,10 +71,10 @@ public class LocalAgentLauncherProperties {
         "java",
         "-jar", AGENT_JAR_PLACEHOLDER,
         "exec",
-        "--serverHost", "127.0.0.1",
-        "--serverPort", SERVER_PORT_PLACEHOLDER,
+        "--server-host", "127.0.0.1",
+        "--server-port", SERVER_PORT_PLACEHOLDER,
         "--api-job",
-        "--jobId", JOB_ID_PLACEHOLDER
+        "--job-id", JOB_ID_PLACEHOLDER
     );
 
     /**

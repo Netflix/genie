@@ -88,31 +88,31 @@ class JobRequestArgumentsImplSpec extends Specification {
 
         when:
         jCommander.parse(
-            "--jobDirectoryLocation", "/foo/bar",
+            "--job-directory-location", "/foo/bar",
             "--interactive",
-            "--archiveLocationPrefix", archiveLocationPrefix,
+            "--archive-location-prefix", archiveLocationPrefix,
             "--timeout", "10",
-            "--jobId", "FooBar",
-            "--clusterCriterion", "NAME=test",
-            "--clusterCriterion", "NAME=prod",
-            "--commandCriterion", "STATUS=active",
-            "--applicationIds", "app1",
-            "--applicationIds", "app2",
-            "--jobName", "n",
+            "--job-id", "FooBar",
+            "--cluster-criterion", "NAME=test",
+            "--cluster-criterion", "NAME=prod",
+            "--command-criterion", "STATUS=active",
+            "--application-ids", "app1",
+            "--application-ids", "app2",
+            "--job-name", "n",
             "--email", "e",
             "--grouping", "g",
-            "--groupingInstance", "gi",
-            "--jobDescription", "jd",
-            "--jobTag", "t1",
-            "--jobTag", "t2",
-            "--jobVersion", "1.0",
-            "--jobMetadata", "{\"foo\": false}",
+            "--grouping-instance", "gi",
+            "--job-description", "jd",
+            "--job-tag", "t1",
+            "--job-tag", "t2",
+            "--job-version", "1.0",
+            "--job-metadata", "{\"foo\": false}",
             "--api-job",
-            "--jobConfiguration", cfg1.getPath().toString(),
-            "--jobConfiguration", cfg2.getPath().toString(),
-            "--jobDependency", dep1.getPath().toString(),
-            "--jobDependency", dep2.getPath().toString(),
-            "--jobSetup", setup.getPath().toString(),
+            "--job-configuration", cfg1.getPath().toString(),
+            "--job-configuration", cfg2.getPath().toString(),
+            "--job-dependency", dep1.getPath().toString(),
+            "--job-dependency", dep2.getPath().toString(),
+            "--job-setup", setup.getPath().toString(),
         )
 
         then:
@@ -154,10 +154,10 @@ class JobRequestArgumentsImplSpec extends Specification {
         when:
         jCommander.parse(
             "--interactive",
-            "--jobId", "FooBar",
-            "--clusterCriterion", "NAME=test",
-            "--clusterCriterion", "NAME=prod",
-            "--commandCriterion", "STATUS=active",
+            "--job-id", "FooBar",
+            "--cluster-criterion", "NAME=test",
+            "--cluster-criterion", "NAME=prod",
+            "--command-criterion", "STATUS=active",
             "--",
             "foo"
         )
@@ -169,19 +169,19 @@ class JobRequestArgumentsImplSpec extends Specification {
     def "Non S3 url throws ParameterException"() {
 
         when:
-        jCommander.parse("--archiveLocationPrefix", "file://" + UUID.randomUUID().toString())
+        jCommander.parse("--archive-location-prefix", "file://" + UUID.randomUUID().toString())
 
         then:
         thrown(ParameterException)
 
         when:
-        jCommander.parse("--archiveLocationPrefix", UUID.randomUUID().toString())
+        jCommander.parse("--archive-location-prefix", UUID.randomUUID().toString())
 
         then:
         thrown(ParameterException)
 
         when:
-        jCommander.parse("--archiveLocationPrefix", "")
+        jCommander.parse("--archive-location-prefix", "")
 
         then:
         thrown(ParameterException)
@@ -194,13 +194,13 @@ class JobRequestArgumentsImplSpec extends Specification {
         File folder = temporaryFolder.newFolder()
 
         when:
-        jCommander.parse("--jobDependency", folder.toPath().toString())
+        jCommander.parse("--job-dependency", folder.toPath().toString())
 
         then:
         thrown(ParameterException)
 
         when:
-        jCommander.parse("--jobConfiguration", "/file/does/not/exist")
+        jCommander.parse("--job-configuration", "/file/does/not/exist")
 
         then:
         thrown(ParameterException)

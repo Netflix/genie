@@ -55,8 +55,8 @@ class ResolveJobSpecCommandArgumentsSpec extends Specification {
     def "Parse"() {
         when:
         jCommander.parse(
-            "--serverHost", "server.com",
-            "--serverPort", "1234",
+            "--server-host", "server.com",
+            "--server-port", "1234",
             "--spec-id", "666666",
             "--no-request",
             "--output-file", "/foo/spec.json"
@@ -74,7 +74,7 @@ class ResolveJobSpecCommandArgumentsSpec extends Specification {
     def "InvalidRequestId"() {
         when:
         jCommander.parse(
-            "--commandCriterion", "/",
+            "--command-criterion", "/",
         )
 
         then:

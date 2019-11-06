@@ -45,7 +45,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private final MainCommandArguments mainCommandArguments;
 
     @Parameter(
-        names = {"--jobDirectoryLocation"},
+        names = {"--jobDirectoryLocation", "--job-directory-location"},
         description = "The local directory in which the job directory is created and executed from",
         converter = ArgumentConverters.FileConverter.class
     )
@@ -58,7 +58,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private boolean interactive;
 
     @Parameter(
-        names = {"--archiveLocationPrefix"},
+        names = {"--archiveLocationPrefix", "--archive-location-prefix"},
         description = "Prefix for job folder archival location (Currently only s3 URIs are supported)",
         validateWith = ArgumentValidators.S3URIValidator.class
     )
@@ -71,13 +71,13 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private Integer timeout;
 
     @Parameter(
-        names = {"--jobId"},
+        names = {"--jobId", "--job-id"},
         description = "Unique job identifier"
     )
     private String jobId;
 
     @Parameter(
-        names = {"--clusterCriterion"},
+        names = {"--clusterCriterion", "--cluster-criterion"},
         description = "Criterion for cluster selection, can be repeated (see CRITERION SYNTAX)",
         converter = ArgumentConverters.CriterionConverter.class,
         splitter = NoopParameterSplitter.class
@@ -85,20 +85,20 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private List<Criterion> clusterCriteria = Lists.newArrayList();
 
     @Parameter(
-        names = {"--commandCriterion"},
+        names = {"--commandCriterion", "--command-criterion"},
         description = "Criterion for command selection (see CRITERION SYNTAX)",
         converter = ArgumentConverters.CriterionConverter.class
     )
     private Criterion commandCriterion;
 
     @Parameter(
-        names = {"--applicationIds"},
+        names = {"--applicationIds", "--application-ids"},
         description = "Override the applications a command normally depends on, can be repeated"
     )
     private List<String> applicationIds = Lists.newArrayList();
 
     @Parameter(
-        names = {"--jobName"},
+        names = {"--jobName", "--job-name"},
         description = "Name of the job"
     )
     private String jobName;
@@ -123,46 +123,46 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private String grouping;
 
     @Parameter(
-        names = {"--groupingInstance"},
+        names = {"--groupingInstance", "--grouping-instance"},
         description = "Group instance this job belongs to"
     )
     private String groupingInstance;
 
     @Parameter(
-        names = {"--jobDescription"},
+        names = {"--jobDescription", "--job-description"},
         description = "Job description"
     )
     private String jobDescription;
 
     @Parameter(
-        names = {"--jobTag"},
+        names = {"--jobTag", "--job-tag"},
         description = "Job tag, can be repeated",
         splitter = NoopParameterSplitter.class
     )
     private Set<String> jobTags = Sets.newHashSet();
 
     @Parameter(
-        names = {"--jobVersion"},
+        names = {"--jobVersion", "--job-version"},
         description = "Job version"
     )
     private String jobVersion;
 
     @Parameter(
-        names = {"--jobMetadata"},
+        names = {"--jobMetadata", "--job-metadata"},
         description = "JSON job metadata",
         converter = ArgumentConverters.JSONConverter.class
     )
     private JsonNode jobMetadata = GenieObjectMapper.getMapper().createObjectNode();
 
     @Parameter(
-        names = {"--api-job"},
+        names = {"--apiJob", "--api-job"},
         description = "Whether the agent was launched by a Genie server in response to an API job submission",
         hidden = true // Do not expose this option via CLI to users
     )
     private boolean jobRequestedViaAPI;
 
     @Parameter(
-        names = {"--jobConfiguration"},
+        names = {"--jobConfiguration", "--job-configuration"},
         description = "URI or path of a job-level configuration file to attach, can be repeated",
         converter = ArgumentConverters.UriOrLocalPathConverter.class,
         validateValueWith = ArgumentValidators.URIListValidator.class,
@@ -171,7 +171,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private List<String> jobConfigurations = Lists.newArrayList();
 
     @Parameter(
-        names = {"--jobDependency"},
+        names = {"--jobDependency", "--job-dependency"},
         description = "URI or path of a job-level dependency file to attach, can be repeated",
         converter = ArgumentConverters.UriOrLocalPathConverter.class,
         validateValueWith = ArgumentValidators.URIListValidator.class,
@@ -180,7 +180,7 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
     private List<String> jobDependencies = Lists.newArrayList();
 
     @Parameter(
-        names = {"--jobSetup"},
+        names = {"--jobSetup", "--job-setup"},
         description = "URI or path of a job-level setup file to attach. The file is sourced during job setup",
         converter = ArgumentConverters.UriOrLocalPathConverter.class,
         validateValueWith = ArgumentValidators.URIValidator.class

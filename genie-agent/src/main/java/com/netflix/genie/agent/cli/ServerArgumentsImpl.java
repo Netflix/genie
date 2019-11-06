@@ -28,21 +28,21 @@ import lombok.Getter;
 class ServerArgumentsImpl implements ArgumentDelegates.ServerArguments {
 
     @Parameter(
-        names = {"--serverHost"},
+        names = {"--serverHost", "--server-host"},
         description = "Server hostname or address",
         validateWith = ArgumentValidators.StringValidator.class
     )
     private String serverHost = "localhost";
 
     @Parameter(
-        names = {"--serverPort"},
+        names = {"--serverPort", "--server-port"},
         description = "Server port",
         validateWith = ArgumentValidators.PortValidator.class
     )
     private int serverPort = 7979;
 
     @Parameter(
-        names = {"--rpcTimeout"},
+        names = {"--rpcTimeout", "--rpc-timeout"},
         description = "Timeout for blocking RPC calls in seconds",
         validateWith = PositiveInteger.class
     )

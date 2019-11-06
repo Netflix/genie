@@ -28,10 +28,16 @@ import com.netflix.genie.agent.execution.CleanupStrategy;
  */
 class CleanupArgumentsImpl implements ArgumentDelegates.CleanupArguments {
 
-    @Parameter(names = {"--no-cleanup"}, description = "Skip the post-execution cleanup and leave all files in place")
+    @Parameter(
+        names = {"--noCleanup", "--no-cleanup"},
+        description = "Skip the post-execution cleanup and leave all files in place"
+    )
     private boolean skipCleanup;
 
-    @Parameter(names = {"--full-cleanup"}, description = "Remove the entire job folder post-execution")
+    @Parameter(
+        names = {"--fullCleanup", "--full-cleanup"},
+        description = "Remove the entire job folder post-execution"
+    )
     private boolean fullCleanup;
 
     /**

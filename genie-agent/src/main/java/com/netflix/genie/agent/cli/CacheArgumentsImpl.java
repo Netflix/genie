@@ -36,7 +36,7 @@ class CacheArgumentsImpl implements ArgumentDelegates.CacheArguments {
     static final String DEFAULT_CACHE_PATH = "/tmp/genie/cache";
 
     @Parameter(
-        names = {"--cacheDirectory"},
+        names = {"--cacheDirectory", "--cache-directory"},
         description = "Location of the Genie Agent dependencies cache",
         converter = ArgumentConverters.FileConverter.class,
         validateWith = ArgumentValidators.StringValidator.class
