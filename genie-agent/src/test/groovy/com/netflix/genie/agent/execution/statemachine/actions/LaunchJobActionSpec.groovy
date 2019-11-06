@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
@@ -41,6 +42,8 @@ class LaunchJobActionSpec extends Specification {
     List<String> commandArgs
     List<String> jobArgs
     boolean interactive
+    boolean launchInJobDirectory
+    ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments
 
     void setup() {
         this.id = UUID.randomUUID().toString()
@@ -54,13 +57,17 @@ class LaunchJobActionSpec extends Specification {
         this.jobProcessManager = Mock(JobProcessManager)
         this.agentJobService = Mock(AgentJobService)
         this.agentFileStreamService = Mock(AgentFileStreamService)
-        this.action = new LaunchJobAction(executionContext, jobProcessManager, agentJobService, agentFileStreamService)
+        this.runtimeConfigurationArguments = Mock(ArgumentDelegates.RuntimeConfigurationArguments)
+        this.action = new LaunchJobAction(executionContext, jobProcessManager, agentJobService, agentFileStreamService, runtimeConfigurationArguments)
     }
 
     void cleanup() {
     }
 
     def "Successful"() {
+        setup:
+        launchInJobDirectory = true
+
         when:
         def event = action.executeStateAction(executionContext)
 
@@ -72,7 +79,8 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.getJobArgs() >> jobArgs
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(10)
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, 10)
+        1 * runtimeConfigurationArguments.isLaunchInJobDirectory() >> launchInJobDirectory
+        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, 10, launchInJobDirectory)
         1 * agentFileStreamService.forceServerSync()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
@@ -96,7 +104,8 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.getJobArgs() >> jobArgs
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null) >> {
+        1 * runtimeConfigurationArguments.isLaunchInJobDirectory() >> launchInJobDirectory
+        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null, launchInJobDirectory) >> {
             throw exception
         }
         def e = thrown(RuntimeException)
@@ -117,7 +126,8 @@ class LaunchJobActionSpec extends Specification {
         1 * jobSpec.getJobArgs() >> jobArgs
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null)
+        1 * runtimeConfigurationArguments.isLaunchInJobDirectory() >> launchInJobDirectory
+        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null, launchInJobDirectory)
         1 * agentFileStreamService.forceServerSync()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String) >> { throw exception }

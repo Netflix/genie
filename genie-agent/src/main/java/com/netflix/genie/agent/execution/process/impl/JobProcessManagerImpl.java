@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +83,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
         final List<String> commandArguments,
         final List<String> jobArguments,
         final boolean interactive,
-        @Nullable final Integer timeout
+        @Nullable final Integer timeout,
+        final boolean launchInJobDirectory
     ) throws JobLaunchException {
         if (!this.launched.compareAndSet(false, true)) {
             throw new IllegalStateException("Job already launched");
@@ -137,9 +139,10 @@ public class JobProcessManagerImpl implements JobProcessManager {
         commandLine.addAll(jobArguments);
 
         log.info(
-            "Job command-line: {} arguments: {}",
+            "Job command-line: {} arguments: {} (working directory: {})",
             Arrays.toString(commandArguments.toArray()),
-            Arrays.toString(jobArguments.toArray())
+            Arrays.toString(jobArguments.toArray()),
+            launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString()
         );
 
         // Configure arguments
@@ -160,6 +163,10 @@ public class JobProcessManagerImpl implements JobProcessManager {
         log.info("Command-line after expansion: {}", expandedCommandLine);
 
         processBuilder.command(expandedCommandLine);
+
+        if (launchInJobDirectory) {
+            processBuilder.directory(jobDirectory);
+        }
 
         if (interactive) {
             processBuilder.inheritIO();
