@@ -30,7 +30,7 @@ import lombok.Getter;
 class RuntimeConfigurationArgumentsImpl implements ArgumentDelegates.RuntimeConfigurationArguments {
 
     @Parameter(
-        names = {"--launchInJobDirectory"},
+        names = {"--launchInJobDirectory", "--launch-in-job-directory"},
         description = "Whether the job process should be forked within the job directory"
     )
     private boolean launchInJobDirectory;

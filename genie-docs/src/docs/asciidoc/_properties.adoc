@@ -47,7 +47,7 @@ Whereas static properties values are bound during application startup and do not
 
 |genie.agent.launcher.local.launch-command-template
 |The system command that the launcher should use to launch an agent process. Ordered list of arguments. Contains placeholders that will be replaced at runtime.
-|java -jar <AGENT_JAR_PLACEHOLDER> exec --serverHost 127.0.0.1 --serverPort <SERVER_PORT_PLACEHOLDER> --api-job --jobId <JOB_ID_PLACEHOLDER>
+|java -jar <AGENT_JAR_PLACEHOLDER> exec --server-host 127.0.0.1 --server-port <SERVER_PORT_PLACEHOLDER> --api-job --job-id <JOB_ID_PLACEHOLDER>
 |no
 
 |genie.agent.launcher.local.max-job-memory
