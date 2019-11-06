@@ -38,7 +38,7 @@ class LocalAgentLauncherPropertiesSpec extends Specification {
         def properties = new LocalAgentLauncherProperties()
 
         then:
-        properties.getLaunchCommandTemplate() == ["java", "-jar", LocalAgentLauncherProperties.AGENT_JAR_PLACEHOLDER, "exec", "--serverHost", "127.0.0.1", "--serverPort", LocalAgentLauncherProperties.SERVER_PORT_PLACEHOLDER, "--api-job", "--jobId", LocalAgentLauncherProperties.JOB_ID_PLACEHOLDER]
+        properties.getLaunchCommandTemplate() == ["java", "-jar", LocalAgentLauncherProperties.AGENT_JAR_PLACEHOLDER, "exec", "--server-host", "127.0.0.1", "--server-port", LocalAgentLauncherProperties.SERVER_PORT_PLACEHOLDER, "--api-job", "--job-id", LocalAgentLauncherProperties.JOB_ID_PLACEHOLDER]
         properties.getAgentJarPath() == "/tmp/genie-agent.jar"
         properties.getMaxJobMemory() == 10_240
         properties.getMaxTotalJobMemory() == 30_720L

@@ -46,10 +46,10 @@ class LocalAgentLauncherImplSpec extends Specification {
     static final List<String> expectedCommandLineBase = [
         "java", "-jar", "/tmp/genie-agent.jar",
         "exec",
-        "--serverHost", "127.0.0.1",
-        "--serverPort", String.valueOf(RPC_PORT),
+        "--server-host", "127.0.0.1",
+        "--server-port", String.valueOf(RPC_PORT),
         "--api-job",
-        "--jobId", JOB_ID
+        "--job-id", JOB_ID
     ] as List<String>
 
     GenieWebHostInfo hostInfo

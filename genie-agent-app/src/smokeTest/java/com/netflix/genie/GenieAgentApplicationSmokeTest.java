@@ -70,15 +70,15 @@ public class GenieAgentApplicationSmokeTest {
         // Test exec
         runner.run(
             "exec",
-            "--clusterCriterion",
+            "--cluster-criterion",
             "TAGS=type:presto",
-            "--commandCriterion",
+            "--command-criterion",
             "TAGS=type:presto",
-            "--jobName",
+            "--job-name",
             "Dummy Job",
-            "--serverHost",
+            "--server-host",
             "www.genie.com",
-            "--serverPort",
+            "--server-port",
             "9090",
             "--interactive"
         );
@@ -89,9 +89,9 @@ public class GenieAgentApplicationSmokeTest {
             "heartbeat",
             "--duration",
             "1",
-            "--serverHost",
+            "--server-host",
             "www.genie.com",
-            "--serverPort",
+            "--server-port",
             "9090"
         );
         Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
@@ -103,9 +103,9 @@ public class GenieAgentApplicationSmokeTest {
         // Test ping
         runner.run(
             "ping",
-            "--serverHost",
+            "--server-host",
             "www.genie.com",
-            "--serverPort",
+            "--server-port",
             "9090"
         );
         Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.EXEC_FAIL.getCode()));

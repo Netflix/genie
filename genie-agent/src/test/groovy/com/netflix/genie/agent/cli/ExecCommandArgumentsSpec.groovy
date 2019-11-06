@@ -63,13 +63,13 @@ class ExecCommandArgumentsSpec extends Specification {
     def "Parse"() {
         when:
         jCommander.parse(
-            "--serverHost", "server.com",
-            "--serverPort", "1234",
-            "--cacheDirectory", "/tmp/foo",
-            "--clusterCriterion", "NAME=prod",
-            "--clusterCriterion", "NAME=test",
+            "--server-host", "server.com",
+            "--server-port", "1234",
+            "--cache-directory", "/tmp/foo",
+            "--cluster-criterion", "NAME=prod",
+            "--cluster-criterion", "NAME=test",
             "--no-cleanup",
-            "--launchInJobDirectory"
+            "--launch-in-job-directory"
         )
 
         then:
@@ -84,7 +84,7 @@ class ExecCommandArgumentsSpec extends Specification {
     def "InvalidRequestId"() {
         when:
         jCommander.parse(
-            "--commandCriterion", "/",
+            "--command-criterion", "/",
         )
 
         then:
