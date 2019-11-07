@@ -125,6 +125,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
             getCommandCriterion() >> criterion
             getClusterCriteria() >> Lists.newArrayList(criterion)
             getApplications() >> Lists.newArrayList()
+            getCommandArgs() >> Lists.newArrayList()
             _ >> empty
         }
 
@@ -141,7 +142,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsClient.publish(topicARN, _ as String) >> {
             args ->
                 Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
-                Assert.that(eventDetails.entrySet().size() == 46)
+                Assert.that(eventDetails.entrySet().size() == 47)
                 Assert.that(eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 35)
         }
         1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter
@@ -199,6 +200,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
             getApplications() >> Lists.newArrayList(app1, app2)
             getCommand() >> Optional.of(command)
             getCluster() >> Optional.of(cluster)
+            getCommandArgs() >> Lists.newArrayList("arg1", "arg2")
 
             // Non-string fields
             getMetadata() >> Optional.of(jobMetadata)
@@ -226,7 +228,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsClient.publish(topicARN, _ as String) >> {
             args ->
                 Map<String, Object> eventDetails = mapper.convertValue(mapper.readTree(args[1] as String).get(AbstractSNSPublisher.EVENT_DETAILS_KEY_NAME), Map.class)
-                Assert.that(eventDetails.entrySet().size() == 46)
+                Assert.that(eventDetails.entrySet().size() == 47)
                 Assert.that(eventDetails.entrySet().stream().filter({ entry -> entry.getValue() == null }).count() == 0)
         }
         1 * registry.counter("genie.notifications.sns.publish.counter", _) >> counter

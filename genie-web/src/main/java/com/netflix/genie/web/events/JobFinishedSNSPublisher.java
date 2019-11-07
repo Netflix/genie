@@ -75,6 +75,7 @@ public class JobFinishedSNSPublisher
     private static final String JOB_NUM_ATTACHMENTS_KEY_NAME = "jobNumAttachments";
     private static final String JOB_ARCHIVE_LOCATION_KEY_NAME = "jobArchiveLocation";
     private static final String JOB_USED_MEMORY_KEY_NAME = "jobUsedMemory";
+    private static final String JOB_ARGUMENTS_KEY_NAME = "jobArguments";
     private static final String COMMAND_ID_KEY_NAME = "commandId";
     private static final String COMMAND_NAME_KEY_NAME = "commandName";
     private static final String COMMAND_VERSION_KEY_NAME = "commandVersion";
@@ -184,6 +185,7 @@ public class JobFinishedSNSPublisher
         eventDetailsMap.put(JOB_EXIT_CODE_KEY_NAME, job.getExitCode().orElse(null));
         eventDetailsMap.put(JOB_ARCHIVE_LOCATION_KEY_NAME, job.getArchiveLocation().orElse(null));
         eventDetailsMap.put(JOB_USED_MEMORY_KEY_NAME, job.getMemoryUsed().orElse(null));
+        eventDetailsMap.put(JOB_ARGUMENTS_KEY_NAME, job.getCommandArgs());
 
         if (job.getCommand().isPresent()) {
             final Command command = job.getCommand().get();
