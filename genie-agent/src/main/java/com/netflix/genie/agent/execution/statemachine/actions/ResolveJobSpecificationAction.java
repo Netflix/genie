@@ -121,6 +121,8 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
                 throw new RuntimeException("Failed to issue job reservation", e);
             }
 
+            UserConsole.getLogger().info("Successfully reserved job id: {}", jobId);
+
             executionContext.setClaimedJobId(jobId);
             executionContext.setCurrentJobStatus(JobStatus.RESERVED);
 
