@@ -139,6 +139,12 @@ for multiple errors.
 |JobCompletionService
 |error
 
+|genie.jobs.executionMode.counter
+|Counts jobs marked to execute in agent mode (V4) and embedded mode (V3)
+|count
+|JobExecutionModeSelector
+|executeWithAgent, decidingCheck
+
 |genie.jobs.file.cache.hitRate
 |File cache hit ratio
 |ratio
