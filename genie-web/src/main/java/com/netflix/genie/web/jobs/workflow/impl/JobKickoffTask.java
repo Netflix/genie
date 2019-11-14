@@ -151,6 +151,10 @@ public class JobKickoffTask extends GenieBaseTask {
                 command.add(user);
             }
 
+            // Launch via bash rather than executing the run script directly to avoid 'Text file busy' error.
+            // https://bugs.openjdk.java.net/browse/JDK-8068370
+            command.add("bash");
+
             final String runScript = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
