@@ -153,7 +153,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
                 Collections.unmodifiableMap(currentEnvironmentVariables)
             );
         } catch (final EnvUtils.VariableSubstitutionException e) {
-            throw new JobLaunchException("Command executable and arguments variables could not be expanded");
+            throw new JobLaunchException("Command executable and arguments variables could not be expanded", e);
         }
 
         final List<String> expandedCommandLine = Lists.newArrayList();
