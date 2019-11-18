@@ -43,5 +43,5 @@ public class ClusterCheckerProperties {
     private int port = 8080;
     private long rate = 300_000L;
     private int lostThreshold = 3;
-    private String healthIndicatorsToIgnore = "genieMemory,mail,genieAgent";
+    private String healthIndicatorsToIgnore = "genieMemory,mail,genieAgent,localAgentLauncher";
 }
