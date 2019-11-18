@@ -397,7 +397,7 @@ of 2.0
 |genie.tasks.cluster-checker.healthIndicatorsToIgnore
 |The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list
-|genieMemory,mail,genieAgent
+|genieMemory,mail,genieAgent,localAgentLauncher
 |no
 
 |genie.tasks.cluster-checker.lostThreshold

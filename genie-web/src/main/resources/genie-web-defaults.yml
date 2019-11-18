@@ -86,7 +86,7 @@ genie:
       port: 8080
       rate: 300000
       lostThreshold: 3
-      healthIndicatorsToIgnore: genieMemory,mail,genieAgent
+      healthIndicatorsToIgnore: genieMemory,mail,genieAgent,localAgentLauncher
     database-cleanup:
       enabled: true
       expression: 0 0 0 * * *
