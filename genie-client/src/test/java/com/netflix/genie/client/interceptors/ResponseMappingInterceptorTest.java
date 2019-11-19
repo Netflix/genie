@@ -139,8 +139,34 @@ public class ResponseMappingInterceptorTest {
             Assert.assertThat(gce.getErrorCode(), Matchers.is(HttpStatus.SERVICE_UNAVAILABLE.value()));
             Assert.assertThat(
                 gce.getMessage(),
-                Matchers.is(HttpStatus.SERVICE_UNAVAILABLE.value() + ": " + errorMessage + " : " + message)
+                Matchers.is(HttpStatus.SERVICE_UNAVAILABLE.value() + ": " + message)
             );
         }
+
+        WireMock
+            .stubFor(
+                WireMock
+                    .get(WireMock.urlMatching("/api/.*"))
+                    .willReturn(
+                        WireMock
+                            .aResponse()
+                            .withStatusMessage(errorMessage)
+                            .withStatus(HttpStatus.PRECONDITION_FAILED.value())
+                            .withBody("this is not valid JSON")
+                    )
+            );
+
+        try {
+            final Request request = new Request.Builder().url(this.uri).get().build();
+            this.client.newCall(request).execute();
+            Assert.fail();
+        } catch (final GenieClientException gce) {
+            Assert.assertThat(gce.getErrorCode(), Matchers.is(-1));
+            Assert.assertThat(
+                gce.getMessage(),
+                Matchers.is("Failed to parse server response as JSON")
+            );
+        }
+
     }
 }

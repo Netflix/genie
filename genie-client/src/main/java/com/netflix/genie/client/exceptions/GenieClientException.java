@@ -54,6 +54,17 @@ public class GenieClientException extends IOException {
     }
 
     /**
+     * Constructor.
+     *
+     * @param messasge human readable message
+     * @param cause    cause
+     */
+    public GenieClientException(final String messasge, final Throwable cause) {
+        super(messasge, cause);
+        this.errorCode = -1;
+    }
+
+    /**
      * Return the HTTP status code for this exception.
      *
      * @return the HTTP status code

@@ -36,7 +36,7 @@ import java.io.Reader;
  */
 public class ResponseMappingInterceptor implements Interceptor {
 
-    private static final String EMPTY_STRING = "";
+    private static final String NO_MESSAGE_FALLBACK = "No error detailed message in server response";
     private static final String ERROR_MESSAGE_KEY = "message";
 
     /**
@@ -64,19 +64,19 @@ public class ResponseMappingInterceptor implements Interceptor {
                         final JsonNode responseBody = GenieObjectMapper.getMapper().readTree(bodyReader);
                         final String errorMessage =
                             responseBody == null || !responseBody.has(ERROR_MESSAGE_KEY)
-                                ? EMPTY_STRING
+                                ? NO_MESSAGE_FALLBACK
                                 : responseBody.get(ERROR_MESSAGE_KEY).asText();
                         throw new GenieClientException(
                             response.code(),
-                            response.message() + " : " + errorMessage
+                            errorMessage
                         );
                     } catch (final JsonProcessingException jpe) {
-                        throw new GenieClientException(response.code(), response.message() + " " + jpe.getMessage());
+                        throw new GenieClientException("Failed to parse server response as JSON", jpe);
                     }
                 }
             }
 
-            throw new GenieClientException(response.code(), "Unable to find response body to parse error message from");
+            throw new GenieClientException(response.code(), "Server response body is empty");
         }
     }
 }
