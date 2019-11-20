@@ -219,7 +219,12 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .port(this.port)
             .post(CLUSTERS_API)
             .then()
-            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("A version is required and must be at most 255 characters")
+            );
 
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
     }
@@ -569,7 +574,12 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .port(this.port)
             .get(CLUSTERS_API + "/{id}", id2)
             .then()
-            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("No cluster with id")
+            );
 
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(2L));
     }
@@ -861,7 +871,12 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .port(this.port)
             .post(clusterCommandsAPI, ID)
             .then()
-            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("No command ids entered. Unable to add commands.")
+            );
 
         final String commandId3 = UUID.randomUUID().toString();
         this.createConfigResource(

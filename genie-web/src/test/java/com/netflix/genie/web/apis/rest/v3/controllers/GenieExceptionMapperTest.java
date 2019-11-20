@@ -111,7 +111,7 @@ class GenieExceptionMapperTest {
         );
 
         for (final GenieException exception : exceptions) {
-            final ResponseEntity<Object> response = this.mapper.handleGenieException(exception);
+            final ResponseEntity<GenieException> response = this.mapper.handleGenieException(exception);
             final HttpStatus expectedStatus = HttpStatus.resolve(exception.getErrorCode()) != null
                 ? HttpStatus.resolve(exception.getErrorCode())
                 : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -137,7 +137,7 @@ class GenieExceptionMapperTest {
     @Test
     void canHandleConstraintViolationExceptions() {
         final ConstraintViolationException exception = new ConstraintViolationException("cve", null);
-        final ResponseEntity<Object> response = this.mapper.handleConstraintViolation(exception);
+        final ResponseEntity<GeniePreconditionException> response = this.mapper.handleConstraintViolation(exception);
         Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
         Mockito
             .verify(this.registry, Mockito.times(1))
@@ -175,7 +175,8 @@ class GenieExceptionMapperTest {
             bindingResult
         );
 
-        final ResponseEntity<Object> response = this.mapper.handleMethodArgumentNotValidException(exception);
+        final ResponseEntity<GeniePreconditionException> response =
+            this.mapper.handleMethodArgumentNotValidException(exception);
         Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.PRECONDITION_FAILED);
         Mockito
             .verify(this.registry, Mockito.times(1))
@@ -206,7 +207,8 @@ class GenieExceptionMapperTest {
         exceptions.put(new GenieRuntimeException(), HttpStatus.INTERNAL_SERVER_ERROR);
 
         for (final Map.Entry<GenieRuntimeException, HttpStatus> exception : exceptions.entrySet()) {
-            final ResponseEntity<Object> response = this.mapper.handleGenieRuntimeException(exception.getKey());
+            final ResponseEntity<GenieRuntimeException> response =
+                this.mapper.handleGenieRuntimeException(exception.getKey());
             Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(exception.getValue());
         }
     }
@@ -227,7 +229,8 @@ class GenieExceptionMapperTest {
         exceptions.put(new SaveAttachmentException(), HttpStatus.INTERNAL_SERVER_ERROR);
 
         for (final Map.Entry<GenieCheckedException, HttpStatus> exception : exceptions.entrySet()) {
-            final ResponseEntity<Object> response = this.mapper.handleGenieCheckedException(exception.getKey());
+            final ResponseEntity<GenieCheckedException> response =
+                this.mapper.handleGenieCheckedException(exception.getKey());
             Assertions.assertThat(response.getStatusCode()).isEqualByComparingTo(exception.getValue());
         }
     }

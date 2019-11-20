@@ -91,6 +91,8 @@ public abstract class RestControllerIntegrationTestBase {
     static final String DEPENDENCIES_PATH = "dependencies";
     static final String LINKS_PATH = "_links";
     static final String EMBEDDED_PATH = "_embedded";
+    static final String EXCEPTION_MESSAGE_PATH = "message";
+
     // Link Keys
     static final String SELF_LINK_KEY = "self";
     static final String COMMANDS_LINK_KEY = "commands";

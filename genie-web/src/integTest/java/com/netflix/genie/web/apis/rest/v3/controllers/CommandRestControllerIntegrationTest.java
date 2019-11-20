@@ -287,7 +287,13 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .port(this.port)
             .post(COMMANDS_API)
             .then()
-            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("must not be empty"
+                )
+            );
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
     }
@@ -703,7 +709,13 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .port(this.port)
             .get(COMMANDS_API + "/{id}", id2)
             .then()
-            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("No command with id"
+                )
+            );
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(2L));
     }
@@ -1076,7 +1088,12 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .port(this.port)
             .post(commandApplicationsAPI, ID)
             .then()
-            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("No application ids entered. Unable to add applications.")
+            );
 
         final String applicationId3 = UUID.randomUUID().toString();
         this.createConfigResource(

@@ -19,6 +19,7 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
@@ -42,7 +43,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Set;
 
@@ -82,13 +82,13 @@ public class GenieExceptionMapper {
      * @return An {@link ResponseEntity} instance
      */
     @ExceptionHandler(GenieException.class)
-    public ResponseEntity<Object> handleGenieException(final GenieException e) {
+    public ResponseEntity<GenieException> handleGenieException(final GenieException e) {
         this.countExceptionAndLog(e);
         HttpStatus status = HttpStatus.resolve(e.getErrorCode());
         if (status == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
-        return new ResponseEntity<>(e.getLocalizedMessage(), status);
+        return new ResponseEntity<>(e, status);
     }
 
     /**
@@ -98,7 +98,7 @@ public class GenieExceptionMapper {
      * @return A {@link ResponseEntity} with the exception mapped to a {@link HttpStatus}
      */
     @ExceptionHandler(GenieRuntimeException.class)
-    public ResponseEntity<Object> handleGenieRuntimeException(final GenieRuntimeException e) {
+    public ResponseEntity<GenieRuntimeException> handleGenieRuntimeException(final GenieRuntimeException e) {
         this.countExceptionAndLog(e);
         if (
             e instanceof GenieApplicationNotFoundException
@@ -107,11 +107,11 @@ public class GenieExceptionMapper {
                 || e instanceof GenieJobNotFoundException
                 || e instanceof GenieJobSpecificationNotFoundException
         ) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
         } else if (e instanceof GenieIdAlreadyExistsException) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(e, HttpStatus.CONFLICT);
         } else {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -122,15 +122,15 @@ public class GenieExceptionMapper {
      * @return A {@link ResponseEntity} with the exception mapped to a {@link HttpStatus}
      */
     @ExceptionHandler(GenieCheckedException.class)
-    public ResponseEntity<Object> handleGenieCheckedException(final GenieCheckedException e) {
+    public ResponseEntity<GenieCheckedException> handleGenieCheckedException(final GenieCheckedException e) {
         this.countExceptionAndLog(e);
         if (e instanceof GenieJobResolutionException) {
             // Mapped to Precondition failed to maintain existing contract with V3
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
+            return new ResponseEntity<>(e, HttpStatus.PRECONDITION_FAILED);
         } else if (e instanceof IdAlreadyExistsException) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(e, HttpStatus.CONFLICT);
         } else {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -141,18 +141,14 @@ public class GenieExceptionMapper {
      * @return A {@link ResponseEntity} instance
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolation(final ConstraintViolationException cve) {
-        final StringBuilder builder = new StringBuilder();
-        if (cve.getConstraintViolations() != null) {
-            for (final ConstraintViolation<?> cv : cve.getConstraintViolations()) {
-                if (builder.length() != 0) {
-                    builder.append(NEW_LINE);
-                }
-                builder.append(cv.getMessage());
-            }
-        }
+    public ResponseEntity<GeniePreconditionException> handleConstraintViolation(
+        final ConstraintViolationException cve
+    ) {
         this.countExceptionAndLog(cve);
-        return new ResponseEntity<>(builder.toString(), HttpStatus.PRECONDITION_FAILED);
+        return new ResponseEntity<>(
+            new GeniePreconditionException(cve.getMessage(), cve),
+            HttpStatus.PRECONDITION_FAILED
+        );
     }
 
     /**
@@ -162,10 +158,14 @@ public class GenieExceptionMapper {
      * @return A {@link ResponseEntity} instance
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+    public ResponseEntity<GeniePreconditionException> handleMethodArgumentNotValidException(
+        final MethodArgumentNotValidException e
+    ) {
         this.countExceptionAndLog(e);
-        final String errorMessage = e.getLocalizedMessage();
-        return new ResponseEntity<>(errorMessage, HttpStatus.PRECONDITION_FAILED);
+        return new ResponseEntity<>(
+            new GeniePreconditionException(e.getMessage(), e),
+            HttpStatus.PRECONDITION_FAILED
+        );
     }
 
     private void countExceptionAndLog(final Exception e) {
