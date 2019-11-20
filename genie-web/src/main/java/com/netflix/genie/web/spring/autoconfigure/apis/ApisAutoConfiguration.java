@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.apis;
 
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.RetryProperties;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -175,5 +177,18 @@ public class ApisAutoConfiguration {
         // As a result, everything is served as UTF-8
         characterEncodingFilter.setForceEncoding(true);
         return characterEncodingFilter;
+    }
+
+    /**
+     * Customizer for {@link com.fasterxml.jackson.databind.ObjectMapper} used by controllers.
+     *
+     * @return an {@link Jackson2ObjectMapperBuilderCustomizer}
+     */
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer apisObjectMapperCustomizer() {
+        return builder -> {
+            // Register the same PropertyFilters that are registered in the static GenieObjectMapper
+            builder.filters(GenieObjectMapper.FILTER_PROVIDER);
+        };
     }
 }

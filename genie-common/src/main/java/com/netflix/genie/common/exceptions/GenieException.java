@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.common.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.netflix.genie.common.util.GenieObjectMapper;
+
 /**
  * The common exception class that represents a service failure. It includes an
  * HTTP error code and a human-readable error message.
@@ -24,6 +27,7 @@ package com.netflix.genie.common.exceptions;
  * @author skrishnan
  * @author tgianos
  */
+@JsonFilter(GenieObjectMapper.EXCEPTIONS_FILTER_NAME)
 public class GenieException extends Exception {
 
     private static final long serialVersionUID = 1L;
