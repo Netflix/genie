@@ -31,6 +31,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
@@ -270,7 +271,13 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .port(this.port)
             .post(JOBS_API)
             .then()
-            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("The maximum number of characters for the command arguments is 10,000"
+                )
+            );
     }
 
     private void submitAndCheckJob(final int documentationId, final boolean archiveJob) throws Exception {
@@ -935,7 +942,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .port(this.port)
             .post(JOBS_API)
             .then()
-            .statusCode(Matchers.is(HttpStatus.CONFLICT.value()));
+            .statusCode(Matchers.is(HttpStatus.CONFLICT.value()))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE));
     }
 
     private void checkJobArchive(
@@ -1058,12 +1066,25 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         RestAssured
             .given(this.getRequestSpecification())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .accept(MediaType.APPLICATION_JSON_VALUE)
             .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
             .when()
             .port(this.port)
             .post(JOBS_API)
             .then()
-            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString(GeniePreconditionException.class.getCanonicalName())
+            )
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString(
+                    "No cluster/command combination found for the given criteria. Unable to continue"
+                )
+            )
+            .body("stackTrace", Matchers.nullValue());
 
         Assert.assertThat(this.getStatus(jobId), Matchers.is(JobStatus.FAILED));
     }

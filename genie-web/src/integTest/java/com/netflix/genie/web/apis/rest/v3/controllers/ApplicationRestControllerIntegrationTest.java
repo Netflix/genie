@@ -245,7 +245,12 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .port(this.port)
             .post(APPLICATIONS_API)
             .then()
-            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("A version is required and must be at most 255 characters")
+            );
 
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
     }
@@ -686,7 +691,12 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .port(this.port)
             .get(APPLICATIONS_API + "/{id}", id2)
             .then()
-            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(
+                EXCEPTION_MESSAGE_PATH,
+                Matchers.containsString("No application with id")
+            );
 
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(2L));
     }
