@@ -113,12 +113,6 @@ It will have to be added if one is desired otherwise metrics are just published 
 |ScriptLoadBalancer
 |status, exceptionClass, clusterName, clusterId
 
-|genie.jobs.clusters.loadBalancers.script.update.timer
-|Time taken to reload the script
-|nanoseconds
-|ScriptLoadBalancer
-|status, exceptionClass
-
 |genie.jobs.coordination.timer
 |Time taken to initialize the job database record and resolve applications, command, cluster, based on criteria and
 load balancing strategy.

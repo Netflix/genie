@@ -50,38 +50,34 @@ https://docs.oracle.com/javase/8/docs/api/javax/script/ScriptEngine.html[ScriptE
 ===== Configuration
 
 The script load balancer is disabled by default. To enable it an admin must set the property
-`genie.jobs.clusters.load-balancers.script.enabled` to true.
+`genie.scripts.cluster-load-balancer.source` to a valid script URI (e.g.: `file:///myscript.js`,
+`classpath:org/my/package/myscript.groovy`, `s3://my-app/scripts/myscript.js`).
+It is also recommended to set `genie.scripts.cluster-load-balancer.auto-load-enabled` to `true` to enable eager loading
+of the script (default behavior is to load and compile lazily).
+
+
 
 Other properties:
 
 |===
 |Property |Description| Default Value
 
-|genie.jobs.clusters.load-balancers.script.destination
-|The location on disk where the script source file should be stored after it is downloaded from
-`genie.jobs.clusters.loadBalancers.script.source`. The file will be given the same name.
-|file:///tmp/genie/loadbalancers/script/destination/
+|genie.scripts.cluster-load-balancer.source
+|URI of the script to load. `ScriptLoadBalancer` is enabled only if this property is set.
+|null
 
-|genie.jobs.clusters.load-balancers.script.enabled
-|Whether the script based load balancer should be enabled for the system or not.
-See also: `genie.jobs.clusters.loadBalancers.script.source`
-See also: `genie.jobs.clusters.loadBalancers.script.destination`
+|genie.scripts.cluster-load-balancer.auto-load-enabled
+|If true, the script eagerly load during startup, as opposed to lazily load on first use.
 |false
 
-|genie.jobs.clusters.load-balancers.script.refreshRate
-|How frequently to refresh the load balancer script (in milliseconds)
-|300000
-
-|genie.jobs.clusters.load-balancers.script.source
-|The location of the script the load balancer should load to evaluate which cluster to use for a job request
-|file:///tmp/genie/loadBalancers/script/source/loadBalance.js
-
-|genie.jobs.clusters.load-balancers.script.timeout
-|The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
-forces a timeout
+|genie.scripts.cluster-load-balancer.timeout
+|Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
 |5000
 
 |===
+
+See also `genie.scripts-manager.*` properties, which affect this component.
+
 
 ===== Script Contract
 
@@ -163,8 +159,14 @@ is recommended that once an algorithm is well tested it be converted to a true i
 
 Additionally if a script error is made the `ScriptLoadBalancer` will swallow the exceptions and simply return `null`
 from all calls to `selectCluster` until the script is fixed and `refresh` is invoked again. The metric
-`genie.jobs.clusters.load-balancers.script.select.timer` with tag `status` and value `failed` can be used to monitor
+`genie.jobs.clusters.loadBalancers.script.select.timer` with tag `status` and value `failed` can be used to monitor
 this situation.
+
+Two more metrics are relevant in this context.
+`genie.scripts.load.timer` timer for scripts loading (and reloading) can also be used to monitor unavailable resources,
+ compilation errors, etc.
+`genie.scripts.evaluate.timer` timer for script evaluation, can also be used to monitor evaluation errors, timeouts, etc.
+Both metrics are tagged with `scriptUri` in case multiple scripts are loaded.
 
 ==== Wrap Up
 
