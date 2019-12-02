@@ -163,35 +163,6 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |true
 |no
 
-|genie.jobs.clusters.load-balancers.script.destination
-|The location on disk where the script source file should be stored after it is downloaded from
-`genie.jobs.clusters.load-balancers.script.source`. The file will be given the same name.
-|file://${java.io.tmpdir}genie/loadbalancers/script/destination/
-|no
-
-|genie.jobs.clusters.load-balancers.script.enabled
-|Whether the script based load balancer should be enabled for the system or not.
-See also: `genie.jobs.clusters.load-balancers.script.source`
-See also: `genie.jobs.clusters.load-balancers.script.destination`
-|false
-|no
-
-|genie.jobs.clusters.load-balancers.script.refreshRate
-|How frequently to refresh the load balancer script (in milliseconds)
-|300000
-|no
-
-|genie.jobs.clusters.load-balancers.script.source
-|The location of the script the load balancer should load to evaluate which cluster to use for a job request
-|file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js
-|no
-
-|genie.jobs.clusters.load-balancers.script.timeout
-|The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
-forces a timeout
-|5000
-|no
-
 |genie.jobs.completion-check-back-off.factor
 |Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.
 |1.2

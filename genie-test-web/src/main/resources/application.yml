@@ -39,14 +39,6 @@ genie:
     cleanup:
       deleteArchiveFile: true
       deleteDependencies: true
-    clusters:
-      load-balancers:
-        script:
-          destination: file://${java.io.tmpdir}genie/loadbalancers/script/destination/
-          enabled: false
-          refreshRate: 300000
-          source: file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js
-          timeout: 5000
     forwarding:
       enabled: true
       port: 8080

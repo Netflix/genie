@@ -27,8 +27,6 @@ import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.util.GenieObjectMapper;
-import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
-import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import com.netflix.genie.web.properties.ClusterLoadBalancerScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -43,15 +41,11 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 import javax.script.ScriptEngineManager;
-import java.net.URI;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeoutException;
 
 class ClusterLoadBalancerScriptIntegrationTest {
 
@@ -138,7 +132,6 @@ class ClusterLoadBalancerScriptIntegrationTest {
             objectMapper,
             meterRegistry
         );
-
     }
 
     @ParameterizedTest(name = "Select using {0}")
@@ -146,58 +139,14 @@ class ClusterLoadBalancerScriptIntegrationTest {
     void selectClusterTest(
         final String scriptFilename
     ) throws Exception {
-        this.loadScript(scriptFilename);
+        ManagedScriptIntegrationTest.loadScript(scriptFilename,  clusterLoadBalancerScript, scriptProperties);
 
         Assertions.assertThat(
             this.clusterLoadBalancerScript.selectCluster(JOB_REQUEST, ALL_CLUSTERS)
-        ).isEqualTo("1");
+        ).isEqualTo(CLUSTER_1);
 
         Assertions.assertThat(
             this.clusterLoadBalancerScript.selectCluster(JOB_REQUEST, NO_MATCH_CLUSTERS)
         ).isEqualTo(null);
-    }
-
-    @ParameterizedTest(name = "Timeout evaluating {0}")
-    @ValueSource(strings = {"sleep.js", "sleep.groovy"})
-    void selectClusterTimeoutTest(
-        final String scriptFilename
-    ) throws Exception {
-        this.loadScript(scriptFilename);
-
-        this.scriptProperties.setTimeout(1);
-
-        Assertions
-            .assertThatThrownBy(() -> this.clusterLoadBalancerScript.selectCluster(JOB_REQUEST, ALL_CLUSTERS))
-            .isInstanceOf(ScriptExecutionException.class)
-            .hasCauseInstanceOf(TimeoutException.class);
-    }
-
-    private void loadScript(final String scriptFilename) throws Exception {
-        // Find the script resource
-        final URI scriptUri = this.getClass().getResource(scriptFilename).toURI();
-        // Configure script to use it
-        this.scriptProperties.setSource(scriptUri);
-        // Trigger loading of script
-        this.scriptProperties.setAutoLoadEnabled(true);
-        this.clusterLoadBalancerScript.loadPostConstruct();
-
-        // Wait for script to be ready to evaluate
-        final Instant deadline = Instant.now().plus(10, ChronoUnit.SECONDS);
-        boolean scriptLoaded = false;
-        while (!scriptLoaded) {
-            if (Instant.now().isAfter(deadline)) {
-                throw new RuntimeException("Timed out waiting for script to load");
-            }
-            try {
-                this.clusterLoadBalancerScript.selectCluster(JOB_REQUEST, new HashSet<>());
-            } catch (ScriptNotConfiguredException e) {
-                System.out.println("Script not loaded yet...");
-                Thread.sleep(500);
-                continue;
-            } catch (Exception ignored) {
-            }
-            System.out.println("Script loaded");
-            scriptLoaded = true;
-        }
     }
 }
