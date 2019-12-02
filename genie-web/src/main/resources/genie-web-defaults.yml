@@ -35,14 +35,6 @@ genie:
   jobs:
     cleanup:
       deleteDependencies: true
-    clusters:
-      load-balancers:
-        script:
-          destination: file://${java.io.tmpdir:/tmp/}genie/loadbalancers/script/destination/
-          enabled: false
-          refreshRate: 300000
-          source: file://${java.io.tmpdir:/tmp/}genie/loadBalancers/script/source/loadBalance.js
-          timeout: 5000
     forwarding:
       enabled: true
       port: 8080
@@ -75,6 +67,13 @@ genie:
   retry:
     s3:
       noOfRetries: 5
+  scripts-manager:
+    refresh-interval: 300000
+  scripts:
+    cluster-load-balancer:
+      source:
+      auto-load-enabled: false
+      timeout: 5000
   smoke: true
   swagger:
     enabled: false

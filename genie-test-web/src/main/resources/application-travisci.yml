@@ -21,11 +21,6 @@ genie:
     cache:
       location: file:///tmp/genie/cache
   jobs:
-    clusters:
-      load-balancers:
-        script:
-          destination: file:///tmp/genie/loadbalancers/script/destination/
-          source: file:///tmp/genie/loadBalancers/script/source/loadBalance.js
     locations:
       archives: file:///tmp/genie/archives/
       attachments: file:///tmp/genie/attachments/

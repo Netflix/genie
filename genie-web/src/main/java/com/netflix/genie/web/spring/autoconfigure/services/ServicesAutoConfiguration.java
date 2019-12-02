@@ -41,7 +41,7 @@ import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
-import com.netflix.genie.web.properties.ScriptLoadBalancerProperties;
+import com.netflix.genie.web.scripts.ClusterLoadBalancerScript;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -78,19 +78,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.scheduling.TaskScheduler;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
@@ -486,33 +483,21 @@ public class ServicesAutoConfiguration {
 
     /**
      * Produce the {@link ScriptLoadBalancer} instance to use for this Genie node if it was configured by the user.
+     * This bean is only created if the script is configured.
      *
-     * @param asyncTaskExecutor   The asynchronous task executor to use
-     * @param taskScheduler       The task scheduler to use
-     * @param fileTransferService The file transfer service to use
-     * @param environment         The program environment from Spring
-     * @param mapper              The JSON object mapper to use
-     * @param registry            The meter registry for capturing metrics
-     * @return A {@link ScriptLoadBalancer} if one enabled
+     * @param clusterLoadBalancerScript the load balancer script
+     * @param registry the metrics registry
+     * @return a {@link ScriptLoadBalancer}
      */
     @Bean
     @Order(SCRIPT_LOAD_BALANCER_PRECEDENCE)
-    @ConditionalOnProperty(value = ScriptLoadBalancerProperties.ENABLED_PROPERTY, havingValue = "true")
+    @ConditionalOnBean(ClusterLoadBalancerScript.class)
     public ScriptLoadBalancer scriptLoadBalancer(
-        @Qualifier("genieAsyncTaskExecutor") final AsyncTaskExecutor asyncTaskExecutor,
-        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
-        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fileTransferService,
-        final Environment environment,
-        final ObjectMapper mapper,
+        final ClusterLoadBalancerScript clusterLoadBalancerScript,
         final MeterRegistry registry
     ) {
-        log.info("Script load balancing is enabled. Creating a ScriptLoadBalancer.");
         return new ScriptLoadBalancer(
-            asyncTaskExecutor,
-            taskScheduler,
-            fileTransferService,
-            environment,
-            mapper,
+            clusterLoadBalancerScript,
             registry
         );
     }
