@@ -368,6 +368,11 @@ of 2.0
 |5
 |no
 
+|genie.scripts-manager.refresh-interval
+|Interval for the script manager to reload and recompile known scripts (in milliseconds)
+|300000
+|no
+
 |genie.s3filetransfer.strictUrlCheckEnabled
 |Whether to strictly check an S3 URL for illegal characters before attempting to use it
 |false
