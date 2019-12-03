@@ -122,6 +122,11 @@ public final class MetricsConstants {
         public static final String TO_STATE = "toState";
 
         /**
+         * Key to tag the URI for a given script resource.
+         */
+        public static final String SCRIPT_URI = "scriptUri";
+
+        /**
          * Utility class private constructor.
          */
         private TagKeys() {

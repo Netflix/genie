@@ -349,6 +349,18 @@ for multiple errors.
 |AbstractSNSPublisher
 |status, type
 
+|genie.scripts.load.timer
+|Time taken to load (download, read, compile) a given script
+|nanoseconds
+|ScriptManager
+|status, exceptionClass, scriptUri
+
+|genie.scripts.evaluate.timer
+|Time taken to evaluate a given script (if previously compiled successfully)
+|nanoseconds
+|ScriptManager
+|status, exceptionClass, scriptUri
+
 |genie.services.agentJob.handshake.counter
 |Counter for calls to the 'handshake' protocol of the Genie Agent Job Service
 |count
