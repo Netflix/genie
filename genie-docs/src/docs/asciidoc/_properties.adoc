@@ -373,6 +373,21 @@ of 2.0
 |300000
 |no
 
+|genie.scripts.cluster-load-balancer.source
+|URI of the script to load. `ScriptLoadBalancer` is enabled only if this property is set.
+|null
+|no
+
+|genie.scripts.cluster-load-balancer.auto-load-enabled
+|If true, the script eagerly load during startup, as opposed to lazily load on first use.
+|false
+|no
+
+|genie.scripts.cluster-load-balancer.timeout
+|Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
+|5000
+|no
+
 |genie.s3filetransfer.strictUrlCheckEnabled
 |Whether to strictly check an S3 URL for illegal characters before attempting to use it
 |false
