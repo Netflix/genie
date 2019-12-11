@@ -29,6 +29,9 @@ genie:
     cluster-load-balancer:
       source: file:///tmp/genie/loadBalancers/script/source/loadBalance.js
       auto-load-enabled: true
+    execution-mode-filter:
+      source: file:///tmp/genie/scripts/executionModeFilter.js
+      auto-load-enabled: true
   jobs:
     clusters:
       load-balancers:

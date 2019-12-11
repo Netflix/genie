@@ -74,6 +74,10 @@ genie:
       source:
       auto-load-enabled: false
       timeout: 5000
+    execution-mode-filter:
+      source:
+      auto-load-enabled: false
+      timeout: 5000
   smoke: true
   swagger:
     enabled: false
