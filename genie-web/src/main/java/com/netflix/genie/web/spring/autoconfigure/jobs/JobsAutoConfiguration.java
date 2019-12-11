@@ -28,6 +28,7 @@ import com.netflix.genie.web.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.web.jobs.workflow.impl.JobTask;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
+import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
@@ -49,6 +50,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 /**
  * Configuration for Jobs Setup and Run.
@@ -259,19 +262,22 @@ public class JobsAutoConfiguration {
     /**
      * Create a {@link JobExecutionModeSelector} if one does not exist.
      *
-     * @param environment   The environment
-     * @param meterRegistry The metrics registry to use
+     * @param environment               The environment
+     * @param meterRegistry             The metrics registry to use
+     * @param executionModeFilterScript The filter script (if one is loaded)
      * @return a {@link JobExecutionModeSelector}
      */
     @Bean
     @ConditionalOnMissingBean(JobExecutionModeSelector.class)
     public JobExecutionModeSelector jobExecutionModeSelector(
         final Environment environment,
-        final MeterRegistry meterRegistry
+        final MeterRegistry meterRegistry,
+        final Optional<ExecutionModeFilterScript> executionModeFilterScript
     ) {
         return new JobExecutionModeSelector(
             environment,
-            meterRegistry
+            meterRegistry,
+            executionModeFilterScript.orElse(null)
         );
     }
 }

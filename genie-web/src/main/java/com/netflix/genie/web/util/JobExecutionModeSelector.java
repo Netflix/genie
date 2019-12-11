@@ -21,6 +21,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
+import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
+import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.env.Environment;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +48,7 @@ import java.util.Random;
  */
 @Slf4j
 public class JobExecutionModeSelector {
+
 
     /**
      * Functional interface for methods of this class that check the incoming job request and may decide for one or the
@@ -74,12 +79,16 @@ public class JobExecutionModeSelector {
 
     private final Environment environment;
     private final Random random;
+    @Nullable
+    private final ExecutionModeFilterScript executionModeFilterScript;
     private final MeterRegistry meterRegistry;
     private final List<Pair<String, CheckRequestFunction>> checks = ImmutableList.of(
         // Global override that applies to all incoming jobs
         new ImmutablePair<>("global-override", this::checkGlobalOverride),
         // Job has HTTP header explicitly requesting a given execution mode
         new ImmutablePair<>("header-override", this::checkForcingHeader),
+        // Use plug-in script to designate specific jobs based on their type or attributes
+        new ImmutablePair<>("filter-script", this::checkFilterScript),
         // Job execution via agent for a fixed percentage of jobs, chosen randomly
         new ImmutablePair<>("percentage", this::checkProbability)
     );
@@ -87,34 +96,38 @@ public class JobExecutionModeSelector {
     /**
      * Constructor.
      *
-     * @param environment   the environment
-     * @param meterRegistry the meter registry
+     * @param environment               the environment
+     * @param meterRegistry             the meter registry
+     * @param executionModeFilterScript the execution mode selector script
      */
     public JobExecutionModeSelector(
         final Environment environment,
-        final MeterRegistry meterRegistry
+        final MeterRegistry meterRegistry,
+        @Nullable final ExecutionModeFilterScript executionModeFilterScript
     ) {
-        this(new Random(), environment, meterRegistry);
+        this(new Random(), environment, meterRegistry, executionModeFilterScript);
     }
 
     /**
      * Constructor with random generator used for tests.
      *
-     * @param random        the random number generator
-     * @param environment   the environment
-     * @param meterRegistry the meter registry
+     * @param random                    the random number generator
+     * @param environment               the environment
+     * @param meterRegistry             the meter registry
+     * @param executionModeFilterScript the execution mode selector script, if one is configured, or null otherwise
      */
     @VisibleForTesting
     JobExecutionModeSelector(
         final Random random,
         final Environment environment,
-        final MeterRegistry meterRegistry
+        final MeterRegistry meterRegistry,
+        @Nullable final ExecutionModeFilterScript executionModeFilterScript
     ) {
         this.environment = environment;
         this.random = random;
         this.meterRegistry = meterRegistry;
+        this.executionModeFilterScript = executionModeFilterScript;
     }
-
 
     /**
      * Inspect the incoming request and decide whether to execute using the new Agent-based execution mode.
@@ -215,6 +228,26 @@ public class JobExecutionModeSelector {
             log.debug("Job randomly selected for embedded execution");
             return Optional.of(false);
         }
+    }
+
+    /*
+     * If the property is defined that designates a given percentage of jobs to be executed in agent mode, then roll
+     * a dice and assign an execution mode for the job based on that percentage.
+     * If the property is not set, this check expresses no preference.
+     */
+    private Optional<Boolean> checkFilterScript(
+        final JobRequest jobRequest,
+        final HttpServletRequest httpServletRequest
+    ) {
+        if (this.executionModeFilterScript != null) {
+            try {
+                return this.executionModeFilterScript.forceAgentExecution(jobRequest);
+            } catch (ScriptExecutionException | ScriptNotConfiguredException e) {
+                log.error("Script filter error: " + e.getMessage(), e);
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
     }
 
     private void publishMetric(final boolean executeWithAgent, final String checkName) {
