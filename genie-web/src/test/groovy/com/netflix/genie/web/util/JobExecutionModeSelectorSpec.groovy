@@ -19,6 +19,8 @@ package com.netflix.genie.web.util
 
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobRequest
+import com.netflix.genie.web.exceptions.checked.ScriptExecutionException
+import com.netflix.genie.web.scripts.ExecutionModeFilterScript
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
@@ -35,6 +37,7 @@ class JobExecutionModeSelectorSpec extends Specification {
     Counter counter
     JobRequest jobRequest
     HttpServletRequest httpServletRequest
+    ExecutionModeFilterScript filterScript
 
 
     void setup() {
@@ -44,13 +47,14 @@ class JobExecutionModeSelectorSpec extends Specification {
         this.meterRegistry = Mock(MeterRegistry) {
             counter(_ as String, _ as Iterable<Tag>) >> this.counter
         }
+        this.filterScript = Mock(ExecutionModeFilterScript)
         this.jobRequest = Mock(JobRequest)
         this.httpServletRequest = Mock(HttpServletRequest)
     }
 
     def "ExecuteWithAgent with no configuration (using default constructor)"() {
         setup:
-        JobExecutionModeSelector selector = new JobExecutionModeSelector(environment, meterRegistry)
+        JobExecutionModeSelector selector = new JobExecutionModeSelector(environment, meterRegistry, null)
 
         when:
         boolean executeWithAgent = selector.executeWithAgent(jobRequest, httpServletRequest)
@@ -69,7 +73,7 @@ class JobExecutionModeSelectorSpec extends Specification {
 
     def "ExecuteWithAgent"() {
         setup:
-        JobExecutionModeSelector selector = new JobExecutionModeSelector(random, environment, meterRegistry)
+        JobExecutionModeSelector selector = new JobExecutionModeSelector(random, environment, meterRegistry, filterScript)
         boolean executeWithAgent
 
         when: "Global agent override is set"
@@ -114,7 +118,7 @@ class JobExecutionModeSelectorSpec extends Specification {
         1 * this.meterRegistry.counter(JobExecutionModeSelector.METRIC_NAME, getTags("header-override", false)) >> this.counter
         1 * this.counter.increment()
 
-        when: "Probability threshold is set -- selected for agent execution"
+        when: "Filter script chooses agent execution"
         executeWithAgent = selector.executeWithAgent(jobRequest, httpServletRequest)
 
         then:
@@ -123,6 +127,33 @@ class JobExecutionModeSelectorSpec extends Specification {
         1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_EMBEDDED_OVERRIDE_PROPERTY, Boolean, false) >> false
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_AGENT_EXECUTION_HEADER_NAME)
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_EMBEDDED_EXECUTION_HEADER_NAME)
+        1 * this.filterScript.forceAgentExecution(jobRequest) >> Optional.of(true)
+        1 * this.meterRegistry.counter(JobExecutionModeSelector.METRIC_NAME, getTags("filter-script", true)) >> this.counter
+        1 * this.counter.increment()
+
+        when: "Filter script chooses embedded execution"
+        executeWithAgent = selector.executeWithAgent(jobRequest, httpServletRequest)
+
+        then:
+        !executeWithAgent
+        1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_AGENT_OVERRIDE_PROPERTY, Boolean, false) >> false
+        1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_EMBEDDED_OVERRIDE_PROPERTY, Boolean, false) >> false
+        1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_AGENT_EXECUTION_HEADER_NAME)
+        1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_EMBEDDED_EXECUTION_HEADER_NAME)
+        1 * this.filterScript.forceAgentExecution(jobRequest) >> Optional.of(false)
+        1 * this.meterRegistry.counter(JobExecutionModeSelector.METRIC_NAME, getTags("filter-script", true)) >> this.counter
+        1 * this.counter.increment()
+
+        when: "Probability threshold is set -- selected for agent execution (and filter script error)"
+        executeWithAgent = selector.executeWithAgent(jobRequest, httpServletRequest)
+
+        then:
+        executeWithAgent
+        1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_AGENT_OVERRIDE_PROPERTY, Boolean, false) >> false
+        1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_EMBEDDED_OVERRIDE_PROPERTY, Boolean, false) >> false
+        1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_AGENT_EXECUTION_HEADER_NAME)
+        1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_EMBEDDED_EXECUTION_HEADER_NAME)
+        1 * this.filterScript.forceAgentExecution(jobRequest) >> { throw new ScriptExecutionException("...") }
         1 * this.environment.getProperty(JobExecutionModeSelector.AGENT_PROBABILITY_PROPERTY) >> "0.8"
         1 * this.random.nextFloat() >> 0.5f
         1 * this.meterRegistry.counter(JobExecutionModeSelector.METRIC_NAME, getTags("percentage", true)) >> this.counter
@@ -137,6 +168,7 @@ class JobExecutionModeSelectorSpec extends Specification {
         1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_EMBEDDED_OVERRIDE_PROPERTY, Boolean, false) >> false
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_AGENT_EXECUTION_HEADER_NAME)
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_EMBEDDED_EXECUTION_HEADER_NAME)
+        1 * this.filterScript.forceAgentExecution(jobRequest) >> Optional.empty()
         1 * this.environment.getProperty(JobExecutionModeSelector.AGENT_PROBABILITY_PROPERTY) >> "0.8"
         1 * this.random.nextFloat() >> 0.8f
         1 * this.meterRegistry.counter(JobExecutionModeSelector.METRIC_NAME, getTags("percentage", false)) >> this.counter
@@ -151,6 +183,7 @@ class JobExecutionModeSelectorSpec extends Specification {
         1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_EMBEDDED_OVERRIDE_PROPERTY, Boolean, false) >> false
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_AGENT_EXECUTION_HEADER_NAME)
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_EMBEDDED_EXECUTION_HEADER_NAME)
+        1 * this.filterScript.forceAgentExecution(jobRequest) >> Optional.empty()
         1 * this.environment.getProperty(JobExecutionModeSelector.AGENT_PROBABILITY_PROPERTY) >> "30"
         1 * this.environment.getProperty(JobExecutionModeSelector.DEFAULT_EXECUTE_WITH_AGENT_PROPERTY, Boolean, false) >> true
         1 * this.meterRegistry.counter(JobExecutionModeSelector.METRIC_NAME, getTags("default", true)) >> this.counter
@@ -165,6 +198,7 @@ class JobExecutionModeSelectorSpec extends Specification {
         1 * this.environment.getProperty(JobExecutionModeSelector.GLOBAL_EMBEDDED_OVERRIDE_PROPERTY, Boolean, false) >> false
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_AGENT_EXECUTION_HEADER_NAME)
         1 * httpServletRequest.getHeader(JobExecutionModeSelector.FORCE_EMBEDDED_EXECUTION_HEADER_NAME)
+        1 * this.filterScript.forceAgentExecution(jobRequest) >> Optional.empty()
         1 * this.environment.getProperty(JobExecutionModeSelector.AGENT_PROBABILITY_PROPERTY)
         1 * this.environment.getProperty(JobExecutionModeSelector.DEFAULT_EXECUTE_WITH_AGENT_PROPERTY, Boolean, false) >> false
         1 * this.meterRegistry.counter(JobExecutionModeSelector.METRIC_NAME, getTags("default", false)) >> this.counter
