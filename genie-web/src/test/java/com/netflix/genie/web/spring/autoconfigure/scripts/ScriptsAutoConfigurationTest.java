@@ -18,7 +18,9 @@
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
 import com.netflix.genie.web.properties.ClusterLoadBalancerScriptProperties;
+import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.scripts.ClusterLoadBalancerScript;
+import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.scripts.ScriptManager;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.assertj.core.api.Assertions;
@@ -66,6 +68,8 @@ class ScriptsAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(ClusterLoadBalancerScriptProperties.class);
                     Assertions.assertThat(context).doesNotHaveBean(ClusterLoadBalancerScript.class);
+                    Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScriptProperties.class);
+                    Assertions.assertThat(context).doesNotHaveBean(ExecutionModeFilterScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);
                 }
             );
@@ -75,12 +79,15 @@ class ScriptsAutoConfigurationTest {
     void scriptsCreatedIfSourceIsConfigured() {
         this.contextRunner
             .withPropertyValues(
-                ClusterLoadBalancerScriptProperties.SOURCE_PROPERTY + "=file:///script.js"
+                ClusterLoadBalancerScriptProperties.SOURCE_PROPERTY + "=file:///script.js",
+                ExecutionModeFilterScriptProperties.SOURCE_PROPERTY + "=file:///script.js"
             )
             .run(
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(ClusterLoadBalancerScriptProperties.class);
                     Assertions.assertThat(context).hasSingleBean(ClusterLoadBalancerScript.class);
+                    Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScriptProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);
                 }
             );

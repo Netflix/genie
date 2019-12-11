@@ -20,8 +20,10 @@ package com.netflix.genie.web.spring.autoconfigure.scripts;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.ClusterLoadBalancerScriptProperties;
+import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
 import com.netflix.genie.web.scripts.ClusterLoadBalancerScript;
+import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.scripts.ManagedScript;
 import com.netflix.genie.web.scripts.ScriptManager;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -50,6 +52,7 @@ import java.util.concurrent.Executors;
 @EnableConfigurationProperties(
     {
         ClusterLoadBalancerScriptProperties.class,
+        ExecutionModeFilterScriptProperties.class,
         ScriptManagerProperties.class,
     }
 )
@@ -113,6 +116,30 @@ public class ScriptsAutoConfiguration {
         final MeterRegistry meterRegistry
     ) {
         return new ClusterLoadBalancerScript(
+            scriptManager,
+            scriptProperties,
+            GenieObjectMapper.getMapper(),
+            meterRegistry
+        );
+    }
+
+    /**
+     * Create a {@link ExecutionModeFilterScript}, unless one exists.
+     *
+     * @param scriptManager    script manager
+     * @param scriptProperties script properties
+     * @param meterRegistry    meter registry
+     * @return a {@link ExecutionModeFilterScript}
+     */
+    @Bean
+    @ConditionalOnMissingBean(ExecutionModeFilterScript.class)
+    @ConditionalOnProperty(value = ExecutionModeFilterScriptProperties.SOURCE_PROPERTY)
+    ExecutionModeFilterScript executionModeFilterScript(
+        final ScriptManager scriptManager,
+        final ExecutionModeFilterScriptProperties scriptProperties,
+        final MeterRegistry meterRegistry
+    ) {
+        return new ExecutionModeFilterScript(
             scriptManager,
             scriptProperties,
             GenieObjectMapper.getMapper(),
