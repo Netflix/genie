@@ -270,6 +270,8 @@ configure(javaProjects) {
 
     tasks.withType(Test) {
         task ->
+            // Use JUnit 5 with Jupiter
+            useJUnitPlatform()
             // set heap size for the test JVM(s)
             minHeapSize = "256m"
             maxHeapSize = "2g"
@@ -290,18 +292,16 @@ configure(javaProjects) {
 
             reports.html.setDestination(new File("${reporting.baseDir}/test/${task.name}"))
             jacocoTestReport.getExecutionData().plus(files("$buildDir/jacoco/${task.name}.exec"))
-    }
 
-    test {
-        useJUnitPlatform()
-        testLogging {
-            if (System.getenv("CI") != null) {
-                events "passed", "skipped", "failed"
-                exceptionFormat "full"
-            } else {
-                events "failed"
+            // Customize test logging on CI and everywhere else
+            testLogging {
+                if (System.getenv("CI") != null) {
+                    events "passed", "skipped", "failed"
+                    exceptionFormat "full"
+                } else {
+                    events "failed"
+                }
             }
-        }
     }
 
     license {
