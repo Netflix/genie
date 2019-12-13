@@ -95,12 +95,12 @@ public class UserMetricsTask extends LeadershipTask {
      */
     @Override
     public void run() {
-        log.info("Publishing user metrics");
+        log.debug("Publishing user metrics");
 
         final Map<String, UserResourcesSummary> summaries = this.jobSearchService.getUserResourcesSummaries();
 
         // Update number of active users
-        log.info("Number of users with active jobs: {}", summaries.size());
+        log.debug("Number of users with active jobs: {}", summaries.size());
         this.activeUsersCount.set(summaries.size());
 
         // Track users who previously had jobs but no longer do
@@ -118,7 +118,7 @@ public class UserMetricsTask extends LeadershipTask {
             final long jobs = userResourcesSummary.getRunningJobsCount();
             final long memory = userResourcesSummary.getUsedMemory();
 
-            log.info("User {}: {} jobs running, using {}MB", user, jobs, memory);
+            log.debug("User {}: {} jobs running, using {}MB", user, jobs, memory);
 
             this.userResourcesRecordMap.computeIfAbsent(
                 userResourcesSummary.getUser(),
@@ -145,7 +145,7 @@ public class UserMetricsTask extends LeadershipTask {
             ).update(jobs, memory);
         }
 
-        log.info("Done publishing user metrics");
+        log.debug("Done publishing user metrics");
     }
 
     /**
@@ -154,7 +154,7 @@ public class UserMetricsTask extends LeadershipTask {
     @Override
     public void cleanup() {
 
-        log.info("Cleaning up user metrics publishing");
+        log.debug("Cleaning up user metrics publishing");
 
         // Reset all users
         this.userResourcesRecordMap.clear();
