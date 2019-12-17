@@ -44,6 +44,10 @@ public class JobsLocationsProperties {
 
     private static final String SYSTEM_TMP_DIR = System.getProperty("java.io.tmpdir", "/tmp/");
 
+    static {
+        System.out.println("SYSTEM_TMP_DIR=" + SYSTEM_TMP_DIR);
+    }
+
     @NotNull(message = "Archives storage location is required")
     private URI archives = URI.create("file://" + SYSTEM_TMP_DIR + "genie/archives/");
 
