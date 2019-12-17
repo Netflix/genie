@@ -11,7 +11,6 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   echo -e "Build Pull Request #$TRAVIS_PULL_REQUEST => Branch [$TRAVIS_BRANCH]"
   # Build and run all tests, create coverage report
   # ${GRADLE} ${GRADLE_OPTIONS} build codeCoverageReport coveralls
-  echo "java.io.tmpdir: ${java.io.tmpdir}"
   ${GRADLE} ${GRADLE_OPTIONS} :genie-app:smokeTest
   # Re-run genie-web integration tests with MySQL...
   INTEGRATION_TEST_DB=mysql ${GRADLE} ${GRADLE_OPTIONS} genie-web:integrationTest
