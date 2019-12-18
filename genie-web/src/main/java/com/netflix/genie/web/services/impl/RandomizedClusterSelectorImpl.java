@@ -20,7 +20,7 @@ package com.netflix.genie.web.services.impl;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.web.services.ClusterLoadBalancer;
+import com.netflix.genie.web.services.ClusterSelector;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,13 +31,13 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * Basic implementation of a load balancer where a cluster is picked at random.
+ * Basic implementation of a selector where a cluster is picked at random.
  *
  * @author skrishnan
  * @author tgianos
  */
 @Slf4j
-public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
+public class RandomizedClusterSelectorImpl implements ClusterSelector {
 
     /**
      * {@inheritDoc}

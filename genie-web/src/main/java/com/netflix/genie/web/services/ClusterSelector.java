@@ -29,20 +29,20 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 /**
- * Interface for the cluster load-balancer, which returns the "best" cluster to
+ * Interface for the cluster selector, which returns the "best" cluster to
  * run job on from an array of candidates.
  *
  * @author tgianos
  * @since 2.0.0
  */
 @Validated
-public interface ClusterLoadBalancer {
+public interface ClusterSelector {
 
     /**
      * Return best cluster to run job on.
      *
      * @param clusters   An immutable, non-empty list of available clusters to choose from
-     * @param jobRequest The job request these clusters are being load balanced for
+     * @param jobRequest The job request these clusters are being selected for
      * @return the "best" cluster to run job on or null if no cluster selected
      * @throws GenieException if there is any error
      */

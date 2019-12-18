@@ -70,7 +70,7 @@ genie:
   scripts-manager:
     refresh-interval: 300000
   scripts:
-    cluster-load-balancer:
+    cluster-selector:
       source:
       auto-load-enabled: false
       timeout: 5000

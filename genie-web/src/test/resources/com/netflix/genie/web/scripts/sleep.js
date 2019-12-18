@@ -17,7 +17,7 @@
  */
 
 /**
- * Example of misbehaving load balancer JavaScript.
+ * Example of misbehaving JavaScript.
  * Performs a 3 second busy wait. The test invoking this should timeout and kill.
  *
  * @author mprimi

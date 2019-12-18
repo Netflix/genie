@@ -41,10 +41,10 @@ import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
-import com.netflix.genie.web.scripts.ClusterLoadBalancerScript;
+import com.netflix.genie.web.scripts.ClusterSelectorScript;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
-import com.netflix.genie.web.services.ClusterLoadBalancer;
+import com.netflix.genie.web.services.ClusterSelector;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
@@ -69,8 +69,8 @@ import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
-import com.netflix.genie.web.services.impl.RandomizedClusterLoadBalancerImpl;
-import com.netflix.genie.web.services.loadbalancers.script.ScriptLoadBalancer;
+import com.netflix.genie.web.services.impl.RandomizedClusterSelectorImpl;
+import com.netflix.genie.web.services.selectors.ScriptClusterSelector;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -117,13 +117,13 @@ import java.util.List;
 public class ServicesAutoConfiguration {
 
     /**
-     * The relative order of the {@link ScriptLoadBalancer} if one is enabled relative to other
-     * {@link ClusterLoadBalancer} instances that may be in the context. This allows users to fit {@literal 50} more
-     * balancer's between the script load balancer and the default {@link RandomizedClusterLoadBalancerImpl}. If
-     * the user wants to place a balancer implementation before the script one they only need to subtract from this
+     * The relative order of the {@link ScriptClusterSelector} if one is enabled relative to other
+     * {@link ClusterSelector} instances that may be in the context. This allows users to fit {@literal 50} more
+     * selectors between the script selector and the default {@link RandomizedClusterSelectorImpl}. If
+     * the user wants to place a selector implementation before the script one they only need to subtract from this
      * value.
      */
-    public static final int SCRIPT_LOAD_BALANCER_PRECEDENCE = Ordered.LOWEST_PRECEDENCE - 50;
+    public static final int SCRIPT_CLUSTER_SELECTOR_PRECEDENCE = Ordered.LOWEST_PRECEDENCE - 50;
 
     /**
      * Collection of properties related to job execution.
@@ -380,7 +380,7 @@ public class ServicesAutoConfiguration {
      * @param clusterPersistenceService     The service to use to manipulate clusters
      * @param commandPersistenceService     The service to use to manipulate commands
      * @param jobPersistenceService         The job persistence service instance to use
-     * @param clusterLoadBalancerImpls      The load balancer implementations to use
+     * @param clusterSelectorImpls          The selector implementations to use
      * @param registry                      The metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
      * @return A {@link JobResolverServiceImpl} instance
@@ -392,7 +392,7 @@ public class ServicesAutoConfiguration {
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
         final JobPersistenceService jobPersistenceService,
-        @NotEmpty final List<ClusterLoadBalancer> clusterLoadBalancerImpls,
+        @NotEmpty final List<ClusterSelector> clusterSelectorImpls,
         final MeterRegistry registry,
         final JobsProperties jobsProperties
     ) {
@@ -401,7 +401,7 @@ public class ServicesAutoConfiguration {
             clusterPersistenceService,
             commandPersistenceService,
             jobPersistenceService,
-            clusterLoadBalancerImpls,
+            clusterSelectorImpls,
             registry,
             jobsProperties
         );
@@ -482,37 +482,37 @@ public class ServicesAutoConfiguration {
     }
 
     /**
-     * Produce the {@link ScriptLoadBalancer} instance to use for this Genie node if it was configured by the user.
+     * Produce the {@link ScriptClusterSelector} instance to use for this Genie node if it was configured by the user.
      * This bean is only created if the script is configured.
      *
-     * @param clusterLoadBalancerScript the load balancer script
+     * @param clusterSelectorScript the cluster selector script
      * @param registry the metrics registry
-     * @return a {@link ScriptLoadBalancer}
+     * @return a {@link ScriptClusterSelector}
      */
     @Bean
-    @Order(SCRIPT_LOAD_BALANCER_PRECEDENCE)
-    @ConditionalOnBean(ClusterLoadBalancerScript.class)
-    public ScriptLoadBalancer scriptLoadBalancer(
-        final ClusterLoadBalancerScript clusterLoadBalancerScript,
+    @Order(SCRIPT_CLUSTER_SELECTOR_PRECEDENCE)
+    @ConditionalOnBean(ClusterSelectorScript.class)
+    public ScriptClusterSelector scriptClusterSelector(
+        final ClusterSelectorScript clusterSelectorScript,
         final MeterRegistry registry
     ) {
-        return new ScriptLoadBalancer(
-            clusterLoadBalancerScript,
+        return new ScriptClusterSelector(
+            clusterSelectorScript,
             registry
         );
     }
 
     /**
-     * The default cluster load balancer if all others fail.
+     * The default cluster selector if all others fail.
      * <p>
      * Defaults to {@link Ordered#LOWEST_PRECEDENCE}.
      *
-     * @return A {@link RandomizedClusterLoadBalancerImpl} instance
+     * @return A {@link RandomizedClusterSelectorImpl} instance
      */
     @Bean
     @Order
-    public RandomizedClusterLoadBalancerImpl randomizedClusterLoadBalancer() {
-        return new RandomizedClusterLoadBalancerImpl();
+    public RandomizedClusterSelectorImpl randomizedClusterSelector() {
+        return new RandomizedClusterSelectorImpl();
     }
 
     /**

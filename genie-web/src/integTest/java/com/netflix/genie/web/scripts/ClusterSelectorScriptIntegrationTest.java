@@ -27,7 +27,7 @@ import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.util.GenieObjectMapper;
-import com.netflix.genie.web.properties.ClusterLoadBalancerScriptProperties;
+import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -47,7 +47,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-class ClusterLoadBalancerScriptIntegrationTest {
+class ClusterSelectorScriptIntegrationTest {
 
     private static final Cluster CLUSTER_0 = new Cluster(
         "0",
@@ -105,8 +105,8 @@ class ClusterLoadBalancerScriptIntegrationTest {
         CLUSTER_0, CLUSTER_2
     );
 
-    private ClusterLoadBalancerScriptProperties scriptProperties;
-    private ClusterLoadBalancerScript clusterLoadBalancerScript;
+    private ClusterSelectorScriptProperties scriptProperties;
+    private ClusterSelectorScript clusterSelectorScript;
 
     @BeforeEach
     void setUp() {
@@ -125,8 +125,8 @@ class ClusterLoadBalancerScriptIntegrationTest {
             resourceLoader,
             meterRegistry
         );
-        this.scriptProperties = new ClusterLoadBalancerScriptProperties();
-        this.clusterLoadBalancerScript = new ClusterLoadBalancerScript(
+        this.scriptProperties = new ClusterSelectorScriptProperties();
+        this.clusterSelectorScript = new ClusterSelectorScript(
             scriptManager,
             scriptProperties,
             objectMapper,
@@ -135,18 +135,18 @@ class ClusterLoadBalancerScriptIntegrationTest {
     }
 
     @ParameterizedTest(name = "Select using {0}")
-    @ValueSource(strings = {"loadBalance.js", "loadBalance.groovy"})
+    @ValueSource(strings = {"selectCluster.js", "selectCluster.groovy"})
     void selectClusterTest(
         final String scriptFilename
     ) throws Exception {
-        ManagedScriptIntegrationTest.loadScript(scriptFilename,  clusterLoadBalancerScript, scriptProperties);
+        ManagedScriptIntegrationTest.loadScript(scriptFilename, clusterSelectorScript, scriptProperties);
 
         Assertions.assertThat(
-            this.clusterLoadBalancerScript.selectCluster(JOB_REQUEST, ALL_CLUSTERS)
+            this.clusterSelectorScript.selectCluster(JOB_REQUEST, ALL_CLUSTERS)
         ).isEqualTo(CLUSTER_1);
 
         Assertions.assertThat(
-            this.clusterLoadBalancerScript.selectCluster(JOB_REQUEST, NO_MATCH_CLUSTERS)
+            this.clusterSelectorScript.selectCluster(JOB_REQUEST, NO_MATCH_CLUSTERS)
         ).isEqualTo(null);
     }
 }

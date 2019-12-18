@@ -1,13 +1,13 @@
-=== Cluster Load Balancing
+=== Cluster Selection
 
 Genie allows administrators to tag clusters with multiple tags that could reflect any type of domain modeling the
 admins wish to accomplish. Purpose of the cluster, types of data the cluster can access, workload expected are just
 some examples of ways tags could be used to classify clusters. Users submit jobs with a series of tags that help
 Genie identify which cluster to run a job on. Sometimes the tags submitted by the job match multiple clusters. At this
 point Genie needs a mechanism to chose a final runtime target from the set of clusters selected. This is where the
-cluster load balancing feature of Genie comes into play.
+cluster selection feature of Genie comes into play.
 
-Genie has an interface `ClusterLoadBalancer` which can be implemented to provide plugin functionality of algorithms for
+Genie has an interface `ClusterSelector` which can be implemented to provide plugin functionality of algorithms for
 cluster selection. The interface has a single method:
 
 [source,java]
@@ -16,7 +16,7 @@ cluster selection. The interface has a single method:
  * Return best cluster to run job on.
  *
  * @param clusters   An immutable, non-empty list of available clusters to choose from
- * @param jobRequest The job request these clusters are being load balanced for
+ * @param jobRequest The job request these clusters are being considered for
  * @return the "best" cluster to run job on or null if no cluster selected
  * @throws GenieException if there is any error
  */
@@ -24,23 +24,23 @@ cluster selection. The interface has a single method:
 Cluster selectCluster(final List<Cluster> clusters, final JobRequest jobRequest) throws GenieException;
 ----
 
-At startup Genie will collect all beans that implement the `ClusterLoadBalancer` interface and based on their order
+At startup Genie will collect all beans that implement the `ClusterSelector` interface and based on their order
 store them in an invocation order list. Meaning that when multiple clusters are selected from the database based on tags
 Genie will send the list of clusters to the implementations in preference order until one of them returns the cluster to
 use.
 
 Genie currently ships with two implementations of this interface which are described below.
 
-==== RandomizedClusterLoadBalancerImpl
+==== RandomizedClusterSelectorImpl
 
-As the name indicates this load balancer simply uses a random number generator to select a cluster from the list by
-index. There is no intelligence to this load balancer algorithm but it does provide very close to an equal distribution
+As the name indicates this selector simply uses a random number generator to select a cluster from the list by
+index. There is no intelligence to this selection algorithm but it does provide very close to an equal distribution
 between clusters if the same tags are always used.
 
 This implementation is the "default" implementation. It has the lowest priority order so if all other active
 implementations fail to select a cluster this implementation will be invoked and chose randomly.
 
-==== ScriptLoadBalancer
+==== ScriptClusterSelector
 
 This implementation, first introduced in 3.1.0, allows administrators to provide a script to be invoked at runtime to
 decide which cluster to select. Currently `JavaScript` and `Groovy` are supported out of the box but others (like
@@ -49,10 +49,10 @@ https://docs.oracle.com/javase/8/docs/api/javax/script/ScriptEngine.html[ScriptE
 
 ===== Configuration
 
-The script load balancer is disabled by default. To enable it an admin must set the property
-`genie.scripts.cluster-load-balancer.source` to a valid script URI (e.g.: `file:///myscript.js`,
+The script selector is disabled by default. To enable it an admin must set the property
+`genie.scripts.cluster-selector.source` to a valid script URI (e.g.: `file:///myscript.js`,
 `classpath:org/my/package/myscript.groovy`, `s3://my-app/scripts/myscript.js`).
-It is also recommended to set `genie.scripts.cluster-load-balancer.auto-load-enabled` to `true` to enable eager loading
+It is also recommended to set `genie.scripts.cluster-selector.auto-load-enabled` to `true` to enable eager loading
 of the script (default behavior is to load and compile lazily).
 
 
@@ -62,15 +62,15 @@ Other properties:
 |===
 |Property |Description| Default Value
 
-|genie.scripts.cluster-load-balancer.source
-|URI of the script to load. `ScriptLoadBalancer` is enabled only if this property is set.
+|genie.scripts.cluster-selector.source
+|URI of the script to load. `ScriptClusterSelector` is enabled only if this property is set.
 |null
 
-|genie.scripts.cluster-load-balancer.auto-load-enabled
+|genie.scripts.cluster-selector.auto-load-enabled
 |If true, the script eagerly load during startup, as opposed to lazily load on first use.
 |false
 
-|genie.scripts.cluster-load-balancer.timeout
+|genie.scripts.cluster-selector.timeout
 |Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
 |5000
 
@@ -103,7 +103,7 @@ The contract between the script and the Java code is as follows:
 |The id of the cluster selected by the script algorithm that should be used to run the job
 
 |null
-|No cluster was selected and the evaluation should fall back to another cluster load balancing algorithm
+|No cluster was selected and the evaluation should fall back to another selector algorithm
 
 |===
 
@@ -150,16 +150,16 @@ index == -1 ? null : cJson[index].id
 
 ===== Caveats
 
-The script load balancer provides great flexibility for system administrators to test algorithms for cluster load
+The script selector provides great flexibility for system administrators to test algorithms for cluster load
 balancing at runtime. Since the script is refreshed periodically it can even be changed after Genie is running. With
 this flexibility comes the trade off that script evaluation is going to be slower than code running direct JVM byte
-code. The load balancer tries to offset this by compiling and caching the script code in between refresh invocations. It
+code. The selector tries to offset this by compiling and caching the script code in between refresh invocations. It
 is recommended that once an algorithm is well tested it be converted to a true implementation of the
-`ClusterLoadBalancer` interface if performance is desired.
+`ClusterSelector` interface if performance is desired.
 
-Additionally if a script error is made the `ScriptLoadBalancer` will swallow the exceptions and simply return `null`
+Additionally if a script error is made the `ScriptClusterSelector` will swallow the exceptions and simply return `null`
 from all calls to `selectCluster` until the script is fixed and `refresh` is invoked again. The metric
-`genie.jobs.clusters.loadBalancers.script.select.timer` with tag `status` and value `failed` can be used to monitor
+`genie.jobs.clusters.selectors.script.select.timer` with tag `status` and value `failed` can be used to monitor
 this situation.
 
 Two more metrics are relevant in this context.
@@ -170,5 +170,5 @@ Both metrics are tagged with `scriptUri` in case multiple scripts are loaded.
 
 ==== Wrap Up
 
-This section went over the cluster load balancing feature of Genie. This interface provides an extension point for
+This section went over the cluster selection feature of Genie. This interface provides an extension point for
 administrators of Genie to tweak Genie's runtime behavior to suit their needs.

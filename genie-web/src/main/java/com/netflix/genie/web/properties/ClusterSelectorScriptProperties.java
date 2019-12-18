@@ -17,21 +17,24 @@
  */
 package com.netflix.genie.web.properties;
 
-import com.netflix.genie.web.scripts.ClusterLoadBalancerScript;
+import com.netflix.genie.web.scripts.ClusterSelectorScript;
 import com.netflix.genie.web.scripts.ManagedScriptBaseProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Configuration properties for {@link ClusterLoadBalancerScript}.
+ * Properties for {@link ClusterSelectorScript}.
+ *
+ * @author mprimi
+ * @since 4.0.0
  */
-@ConfigurationProperties(prefix = ClusterLoadBalancerScriptProperties.PREFIX)
-public class ClusterLoadBalancerScriptProperties extends ManagedScriptBaseProperties {
+@ConfigurationProperties(prefix = ClusterSelectorScriptProperties.PREFIX)
+public class ClusterSelectorScriptProperties extends ManagedScriptBaseProperties {
     /**
-     * Common prefix for names of properties bound to this object.
+     * Prefix for this properties class.
      */
-    public static final String PREFIX = ManagedScriptBaseProperties.SCRIPTS_PREFIX + ".cluster-load-balancer";
+    public static final String PREFIX = ManagedScriptBaseProperties.SCRIPTS_PREFIX + ".cluster-selector";
     /**
-     * Source script property name.
+     * Name of script source property.
      */
     public static final String SOURCE_PROPERTY = PREFIX + ManagedScriptBaseProperties.SOURCE_PROPERTY_SUFFIX;
 }

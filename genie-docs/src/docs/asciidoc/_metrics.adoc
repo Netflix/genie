@@ -107,15 +107,15 @@ It will have to be added if one is desired otherwise metrics are just published 
 |AgentJobCleanupTask
 |status, exceptionClass
 
-|genie.jobs.clusters.loadBalancers.script.select.timer
+|genie.jobs.clusters.selectors.script.select.timer
 |Time taken by the loaded script to select a cluster among the one passed as input
 |nanoseconds
-|ScriptLoadBalancer
+|ScriptClusterSelector
 |status, exceptionClass, clusterName, clusterId
 
 |genie.jobs.coordination.timer
 |Time taken to initialize the job database record and resolve applications, command, cluster, based on criteria and
-load balancing strategy.
+cluster selection strategy.
 |nanoseconds
 |JobCoordinatorServiceImpl
 |status, exceptionClass
@@ -367,11 +367,11 @@ for multiple errors.
 |JobResolverServiceImpl
 |status, exceptionClass
 
-|genie.services.jobResolver.loadBalancer.counter
-|Counter for cluster load balancer algorithms invocations
+|genie.services.jobResolver.clusterSelector.counter
+|Counter for cluster selector algorithms invocations
 |count
 |JobResolverServiceImpl
-|class, status, clusterName, clusterId, loadBalancerClass
+|class, status, clusterName, clusterId, clusterSelectorClass
 
 |genie.services.jobResolver.resolve.timer
 |Time taken to completely resolve the job
@@ -392,13 +392,13 @@ for multiple errors.
 |-
 
 |genie.services.jobResolver.selectCluster.noneSelected.counter
-|Number of times the cluster load balancing terminated without selecting a cluster
+|Number of times the cluster selection terminated without selecting a cluster
 |count
 |JobResolverServiceImpl
 |-
 
 |genie.services.jobResolver.selectCluster.timer
-|Time taken to select a cluster using the load balancing strategy
+|Time taken to select a cluster using the cluster selection strategy
 |nanoseconds
 |JobResolverServiceImpl
 |status, exceptionClass

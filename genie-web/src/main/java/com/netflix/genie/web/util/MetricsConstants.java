@@ -107,9 +107,9 @@ public final class MetricsConstants {
         public static final String JOBS_USER_LIMIT = "jobsUserLimit";
 
         /**
-         * Key to tag the load balancer class used.
+         * Key to tag the cluster selector class used.
          */
-        public static final String LOAD_BALANCER_CLASS = "loadBalancerClass";
+        public static final String CLUSTER_SELECTOR_CLASS = "clusterSelectorClass";
 
         /**
          * Key to tag the origin/source state of a state transition.

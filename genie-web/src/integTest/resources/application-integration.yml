@@ -26,17 +26,12 @@ genie:
   health:
     maxCpuLoadPercent: 100
   scripts:
-    cluster-load-balancer:
-      source: file:///tmp/genie/loadBalancers/script/source/loadBalance.js
+    cluster-selector:
+      source: file:///tmp/genie/scripts/selectCluster.js
       auto-load-enabled: true
     execution-mode-filter:
       source: file:///tmp/genie/scripts/executionModeFilter.js
       auto-load-enabled: true
-  jobs:
-    clusters:
-      load-balancers:
-        script:
-          enabled: true
 
 # Start gRPC on a random available port to avoid port binding conflicts during
 # integration tests shutting down less than gracefully

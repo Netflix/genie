@@ -27,20 +27,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
- * Test for the cluster load balancer.
+ * Test for the cluster selector.
  *
  * @author tgianos
  */
-class RandomizedClusterLoadBalancerImplTest {
+class RandomizedClusterSelectorImplTest {
 
-    private RandomizedClusterLoadBalancerImpl clb;
+    private RandomizedClusterSelectorImpl clb;
 
     /**
      * Setup the tests.
      */
     @BeforeEach
     void setup() {
-        this.clb = new RandomizedClusterLoadBalancerImpl();
+        this.clb = new RandomizedClusterSelectorImpl();
     }
 
     /**

@@ -19,10 +19,10 @@ package com.netflix.genie.web.spring.autoconfigure.scripts;
 
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.util.GenieObjectMapper;
-import com.netflix.genie.web.properties.ClusterLoadBalancerScriptProperties;
+import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
-import com.netflix.genie.web.scripts.ClusterLoadBalancerScript;
+import com.netflix.genie.web.scripts.ClusterSelectorScript;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.scripts.ManagedScript;
 import com.netflix.genie.web.scripts.ScriptManager;
@@ -51,7 +51,7 @@ import java.util.concurrent.Executors;
 @Configuration
 @EnableConfigurationProperties(
     {
-        ClusterLoadBalancerScriptProperties.class,
+        ClusterSelectorScriptProperties.class,
         ExecutionModeFilterScriptProperties.class,
         ScriptManagerProperties.class,
     }
@@ -100,22 +100,22 @@ public class ScriptsAutoConfiguration {
     }
 
     /**
-     * Create a {@link ClusterLoadBalancerScript} unless one exists.
+     * Create a {@link ClusterSelectorScript} unless one exists.
      *
      * @param scriptManager    script manager
      * @param scriptProperties script properties
      * @param meterRegistry    meter registry
-     * @return a {@link ClusterLoadBalancerScript}
+     * @return a {@link ClusterSelectorScript}
      */
     @Bean
-    @ConditionalOnMissingBean(ClusterLoadBalancerScript.class)
-    @ConditionalOnProperty(value = ClusterLoadBalancerScriptProperties.SOURCE_PROPERTY)
-    ClusterLoadBalancerScript clusterLoadBalancerScript(
+    @ConditionalOnMissingBean(ClusterSelectorScript.class)
+    @ConditionalOnProperty(value = ClusterSelectorScriptProperties.SOURCE_PROPERTY)
+    ClusterSelectorScript clusterSelectorScript(
         final ScriptManager scriptManager,
-        final ClusterLoadBalancerScriptProperties scriptProperties,
+        final ClusterSelectorScriptProperties scriptProperties,
         final MeterRegistry meterRegistry
     ) {
-        return new ClusterLoadBalancerScript(
+        return new ClusterSelectorScript(
             scriptManager,
             scriptProperties,
             GenieObjectMapper.getMapper(),
