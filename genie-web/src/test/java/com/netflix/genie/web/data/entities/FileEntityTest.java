@@ -18,9 +18,8 @@
 package com.netflix.genie.web.data.entities;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolationException;
 import java.util.UUID;
@@ -31,56 +30,60 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.3.0
  */
-public class FileEntityTest extends EntityTestBase {
+class FileEntityTest extends EntityTestBase {
 
     /**
      * Make sure the argument constructor sets the file argument.
      */
     @Test
-    public void canCreateFileEntityWithFile() {
+    void canCreateFileEntityWithFile() {
         final String file = UUID.randomUUID().toString();
         final FileEntity fileEntity = new FileEntity(file);
-        Assert.assertThat(fileEntity.getFile(), Matchers.is(file));
+        Assertions.assertThat(fileEntity.getFile()).isEqualTo(file);
     }
 
     /**
      * Make sure we can create a file.
      */
     @Test
-    public void canCreateFileEntity() {
+    void canCreateFileEntity() {
         final FileEntity fileEntity = new FileEntity();
         final String file = UUID.randomUUID().toString();
         fileEntity.setFile(file);
-        Assert.assertThat(fileEntity.getFile(), Matchers.is(file));
+        Assertions.assertThat(fileEntity.getFile()).isEqualTo(file);
     }
 
     /**
      * Make sure a file can't be validated if it exceeds size limitations.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void cantCreateFileEntityDueToSize() {
+    @Test
+    void cantCreateFileEntityDueToSize() {
         final FileEntity fileEntity = new FileEntity();
         final String file = StringUtils.rightPad(UUID.randomUUID().toString(), 1025);
         fileEntity.setFile(file);
-        this.validate(fileEntity);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(fileEntity));
     }
 
     /**
      * Make sure a file can't be validated if the value is blank.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void cantCreateFileEntityDueToNoFile() {
+    @Test
+    void cantCreateFileEntityDueToNoFile() {
         final FileEntity fileEntity = new FileEntity();
         final String file = "";
         fileEntity.setFile(file);
-        this.validate(fileEntity);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(fileEntity));
     }
 
     /**
      * Test to make sure equals and hash code only care about the unique file.
      */
     @Test
-    public void testEqualsAndHashCode() {
+    void testEqualsAndHashCode() {
         final String file = UUID.randomUUID().toString();
         final FileEntity one = new FileEntity();
         one.setFile(file);
@@ -89,20 +92,20 @@ public class FileEntityTest extends EntityTestBase {
         final FileEntity three = new FileEntity();
         three.setFile(UUID.randomUUID().toString());
 
-        Assert.assertTrue(one.equals(two));
-        Assert.assertFalse(one.equals(three));
-        Assert.assertFalse(two.equals(three));
+        Assertions.assertThat(one).isEqualTo(two);
+        Assertions.assertThat(one).isNotEqualTo(three);
+        Assertions.assertThat(two).isNotEqualTo(three);
 
-        Assert.assertEquals(one.hashCode(), two.hashCode());
-        Assert.assertNotEquals(one.hashCode(), three.hashCode());
-        Assert.assertNotEquals(two.hashCode(), three.hashCode());
+        Assertions.assertThat(one.hashCode()).isEqualTo(two.hashCode());
+        Assertions.assertThat(one.hashCode()).isNotEqualTo(three.hashCode());
+        Assertions.assertThat(two.hashCode()).isNotEqualTo(three.hashCode());
     }
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(new FileEntity().toString());
+    void testToString() {
+        Assertions.assertThat(new FileEntity().toString()).isNotBlank();
     }
 }

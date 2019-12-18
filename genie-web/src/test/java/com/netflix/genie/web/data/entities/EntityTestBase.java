@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.data.entities;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -31,15 +31,15 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class EntityTestBase {
+class EntityTestBase {
 
     private static Validator validator;
 
     /**
      * Setup the validator.
      */
-    @BeforeClass
-    public static void setupClass() {
+    @BeforeAll
+    static void setupClass() {
         final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }

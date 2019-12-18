@@ -22,16 +22,13 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -41,7 +38,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class CommandEntityTest extends EntityTestBase {
+class CommandEntityTest extends EntityTestBase {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final List<String> EXECUTABLE = Lists.newArrayList("/bin/pig13", "-Dblah");
@@ -54,8 +51,8 @@ public class CommandEntityTest extends EntityTestBase {
     /**
      * Setup the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.c = new CommandEntity();
         this.c.setName(NAME);
         this.c.setUser(USER);
@@ -70,203 +67,202 @@ public class CommandEntityTest extends EntityTestBase {
      * Test the default Constructor.
      */
     @Test
-    public void testDefaultConstructor() {
+    void testDefaultConstructor() {
         final CommandEntity entity = new CommandEntity();
-        Assert.assertFalse(entity.getSetupFile().isPresent());
-        Assert.assertThat(entity.getExecutable(), Matchers.empty());
-        Assert.assertThat(entity.getCheckDelay(), Matchers.is(Command.DEFAULT_CHECK_DELAY));
-        Assert.assertNull(entity.getName());
-        Assert.assertNull(entity.getStatus());
-        Assert.assertNull(entity.getUser());
-        Assert.assertNull(entity.getVersion());
-        Assert.assertNotNull(entity.getConfigs());
-        Assert.assertTrue(entity.getConfigs().isEmpty());
-        Assert.assertNotNull(entity.getDependencies());
-        Assert.assertTrue(entity.getDependencies().isEmpty());
-        Assert.assertNotNull(entity.getTags());
-        Assert.assertTrue(entity.getTags().isEmpty());
-        Assert.assertNotNull(entity.getClusters());
-        Assert.assertTrue(entity.getClusters().isEmpty());
-        Assert.assertNotNull(entity.getApplications());
-        Assert.assertTrue(entity.getApplications().isEmpty());
-        Assert.assertFalse(entity.getMemory().isPresent());
+        Assertions.assertThat(entity.getSetupFile()).isNotPresent();
+        Assertions.assertThat(entity.getExecutable()).isEmpty();
+        Assertions.assertThat(entity.getCheckDelay()).isEqualTo(Command.DEFAULT_CHECK_DELAY);
+        Assertions.assertThat(entity.getName()).isNull();
+        Assertions.assertThat(entity.getStatus()).isNull();
+        Assertions.assertThat(entity.getUser()).isNull();
+        Assertions.assertThat(entity.getVersion()).isNull();
+        Assertions.assertThat(entity.getConfigs()).isEmpty();
+        Assertions.assertThat(entity.getDependencies()).isEmpty();
+        Assertions.assertThat(entity.getTags()).isEmpty();
+        Assertions.assertThat(entity.getClusters()).isEmpty();
+        Assertions.assertThat(entity.getApplications()).isEmpty();
+        Assertions.assertThat(entity.getMemory()).isNotPresent();
     }
 
     /**
      * Make sure validation works on valid apps.
      */
     @Test
-    public void testValidate() {
+    void testValidate() {
         this.validate(this.c);
     }
 
     /**
      * Make sure validation works on with failure from super class.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoName() {
+    @Test
+    void testValidateNoName() {
         this.c.setName("");
-        this.validate(this.c);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.c));
     }
 
     /**
      * Make sure validation works on with failure from super class.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoUser() {
+    @Test
+    void testValidateNoUser() {
         this.c.setUser("   ");
-        this.validate(this.c);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.c));
     }
 
     /**
      * Make sure validation works on with failure from super class.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoVersion() {
+    @Test
+    void testValidateNoVersion() {
         this.c.setVersion("");
-        this.validate(this.c);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.c));
     }
 
     /**
      * Make sure validation works on with failure from command.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateEmptyExecutable() {
+    @Test
+    void testValidateEmptyExecutable() {
         this.c.setExecutable(Lists.newArrayList());
-        this.validate(this.c);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.c));
     }
 
     /**
      * Make sure validation works on with failure from command.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateBlankExecutable() {
+    @Test
+    void testValidateBlankExecutable() {
         this.c.setExecutable(Lists.newArrayList("    "));
-        this.validate(this.c);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.c));
     }
 
     /**
      * Make sure validation works on with failure from command.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateExecutableArgumentTooLong() {
+    @Test
+    void testValidateExecutableArgumentTooLong() {
         this.c.setExecutable(Lists.newArrayList(StringUtils.leftPad("", 1025, 'e')));
-        this.validate(this.c);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.c));
     }
 
     /**
      * Make sure validation works on with failure from command.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateBadCheckDelay() {
+    @Test
+    void testValidateBadCheckDelay() {
         this.c.setCheckDelay(0L);
-        this.validate(this.c);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.c));
     }
 
     /**
      * Test setting the status.
      */
     @Test
-    public void testSetStatus() {
+    void testSetStatus() {
         this.c.setStatus(CommandStatus.ACTIVE);
-        Assert.assertEquals(CommandStatus.ACTIVE, this.c.getStatus());
+        Assertions.assertThat(this.c.getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
     }
 
     /**
      * Test setting the setup file.
      */
     @Test
-    public void testSetSetupFile() {
-        Assert.assertFalse(this.c.getSetupFile().isPresent());
+    void testSetSetupFile() {
+        Assertions.assertThat(this.c.getSetupFile()).isNotPresent();
         final String setupFile = "s3://netflix.propFile";
-        final FileEntity setupFileEntity = new FileEntity();
-        setupFileEntity.setFile(setupFile);
+        final FileEntity setupFileEntity = new FileEntity(setupFile);
         this.c.setSetupFile(setupFileEntity);
-        Assert.assertEquals(setupFileEntity, this.c.getSetupFile().orElseThrow(IllegalArgumentException::new));
+        Assertions.assertThat(this.c.getSetupFile()).isPresent().contains(setupFileEntity);
     }
 
     /**
      * Test setting the executable.
      */
     @Test
-    public void testSetExecutable() {
+    void testSetExecutable() {
         this.c.setExecutable(EXECUTABLE);
-        Assert.assertEquals(EXECUTABLE, this.c.getExecutable());
+        Assertions.assertThat(this.c.getExecutable()).isEqualTo(EXECUTABLE);
     }
 
     /**
      * Make sure the check delay setter and getter works properly.
      */
     @Test
-    public void testSetCheckDelay() {
+    void testSetCheckDelay() {
         final long newDelay = 108327L;
-        Assert.assertThat(this.c.getCheckDelay(), Matchers.is(CHECK_DELAY));
+        Assertions.assertThat(this.c.getCheckDelay()).isEqualTo(CHECK_DELAY);
         this.c.setCheckDelay(newDelay);
-        Assert.assertThat(this.c.getCheckDelay(), Matchers.is(newDelay));
+        Assertions.assertThat(this.c.getCheckDelay()).isEqualTo(newDelay);
     }
 
     /**
      * Make sure can set the memory for the command if a user desires it.
      */
     @Test
-    public void testSetMemory() {
-        Assert.assertThat(this.c.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(MEMORY));
+    void testSetMemory() {
+        Assertions.assertThat(this.c.getMemory()).isPresent().contains(MEMORY);
         final int newMemory = MEMORY + 1;
         this.c.setMemory(newMemory);
-        Assert.assertThat(this.c.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(newMemory));
+        Assertions.assertThat(this.c.getMemory()).isPresent().contains(newMemory);
     }
 
     /**
      * Test setting the configs.
      */
     @Test
-    public void testSetConfigs() {
-        Assert.assertNotNull(this.c.getConfigs());
-        Assert.assertTrue(this.c.getConfigs().isEmpty());
-        final FileEntity config = new FileEntity();
-        config.setFile("s3://netflix.configFile");
-        final Set<FileEntity> configs = Sets.newHashSet(config);
+    void testSetConfigs() {
+        Assertions.assertThat(this.c.getConfigs()).isEmpty();
+        final Set<FileEntity> configs = Sets.newHashSet(new FileEntity("s3://netflix.configFile"));
         this.c.setConfigs(configs);
-        Assert.assertEquals(configs, this.c.getConfigs());
+        Assertions.assertThat(this.c.getConfigs()).isEqualTo(configs);
 
         this.c.setConfigs(null);
-        Assert.assertThat(this.c.getConfigs(), Matchers.empty());
+        Assertions.assertThat(this.c.getConfigs()).isEmpty();
     }
 
     /**
      * Test setting the dependencies.
      */
     @Test
-    public void testSetDependencies() {
-        Assert.assertNotNull(this.c.getDependencies());
-        Assert.assertTrue(this.c.getDependencies().isEmpty());
-        final FileEntity dependency = new FileEntity();
-        dependency.setFile("dep1");
-        final Set<FileEntity> dependencies = Sets.newHashSet(dependency);
+    void testSetDependencies() {
+        Assertions.assertThat(this.c.getDependencies()).isEmpty();
+        final Set<FileEntity> dependencies = Sets.newHashSet(new FileEntity("dep1"));
         this.c.setDependencies(dependencies);
-        Assert.assertEquals(dependencies, this.c.getDependencies());
+        Assertions.assertThat(this.c.getDependencies()).isEqualTo(dependencies);
 
         this.c.setDependencies(null);
-        Assert.assertThat(this.c.getDependencies(), Matchers.empty());
+        Assertions.assertThat(this.c.getDependencies()).isEmpty();
     }
 
     /**
      * Test setting the tags.
      */
     @Test
-    public void testSetTags() {
-        Assert.assertNotNull(this.c.getTags());
-        Assert.assertTrue(this.c.getTags().isEmpty());
-        final TagEntity one = new TagEntity();
-        one.setTag("tag1");
-        final TagEntity two = new TagEntity();
-        two.setTag("tag2");
+    void testSetTags() {
+        Assertions.assertThat(this.c.getTags()).isEmpty();
+        final TagEntity one = new TagEntity("tag1");
+        final TagEntity two = new TagEntity("tag2");
         final Set<TagEntity> tags = Sets.newHashSet(one, two);
         this.c.setTags(tags);
-        Assert.assertEquals(tags, this.c.getTags());
+        Assertions.assertThat(this.c.getTags()).isEqualTo(tags);
 
         this.c.setTags(null);
-        Assert.assertThat(this.c.getTags(), Matchers.empty());
+        Assertions.assertThat(this.c.getTags()).isEmpty();
     }
 
     /**
@@ -275,49 +271,43 @@ public class CommandEntityTest extends EntityTestBase {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetApplications() throws GeniePreconditionException {
-        Assert.assertNotNull(this.c.getApplications());
-        Assert.assertTrue(this.c.getApplications().isEmpty());
-        final List<ApplicationEntity> applicationEntities = new ArrayList<>();
+    void testSetApplications() throws GeniePreconditionException {
+        Assertions.assertThat(this.c.getApplications()).isEmpty();
         final ApplicationEntity one = new ApplicationEntity();
         one.setUniqueId("one");
         final ApplicationEntity two = new ApplicationEntity();
         two.setUniqueId("two");
-        applicationEntities.add(one);
-        applicationEntities.add(two);
+        final List<ApplicationEntity> applicationEntities = Lists.newArrayList(one, two);
         this.c.setApplications(applicationEntities);
-        Assert.assertEquals(2, this.c.getApplications().size());
-        Assert.assertTrue(this.c.getApplications().get(0).equals(one));
-        Assert.assertTrue(this.c.getApplications().get(1).equals(two));
-        Assert.assertTrue(one.getCommands().contains(this.c));
-        Assert.assertTrue(two.getCommands().contains(this.c));
+        Assertions.assertThat(this.c.getApplications()).isEqualTo(applicationEntities);
+        Assertions.assertThat(one.getCommands()).contains(this.c);
+        Assertions.assertThat(two.getCommands()).contains(this.c);
 
         applicationEntities.clear();
         applicationEntities.add(two);
         this.c.setApplications(applicationEntities);
-        Assert.assertEquals(1, this.c.getApplications().size());
-        Assert.assertTrue(this.c.getApplications().get(0).equals(two));
-        Assert.assertFalse(one.getCommands().contains(this.c));
-        Assert.assertTrue(two.getCommands().contains(this.c));
+        Assertions.assertThat(this.c.getApplications()).isEqualTo(applicationEntities);
+        Assertions.assertThat(one.getCommands()).doesNotContain(this.c);
+        Assertions.assertThat(two.getCommands()).contains(this.c);
         this.c.setApplications(null);
-        Assert.assertTrue(this.c.getApplications().isEmpty());
-        Assert.assertTrue(one.getCommands().isEmpty());
-        Assert.assertTrue(two.getCommands().isEmpty());
+        Assertions.assertThat(this.c.getApplications()).isEmpty();
+        Assertions.assertThat(one.getCommands()).isEmpty();
+        Assertions.assertThat(two.getCommands()).isEmpty();
     }
 
     /**
      * Make sure if a List with duplicate applications is sent in it fails.
-     *
-     * @throws GeniePreconditionException on duplicate applications
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void cantSetApplicationsIfDuplicates() throws GeniePreconditionException {
+    @Test
+    void cantSetApplicationsIfDuplicates() {
         final ApplicationEntity one = Mockito.mock(ApplicationEntity.class);
         Mockito.when(one.getUniqueId()).thenReturn(UUID.randomUUID().toString());
         final ApplicationEntity two = Mockito.mock(ApplicationEntity.class);
         Mockito.when(two.getUniqueId()).thenReturn(UUID.randomUUID().toString());
 
-        this.c.setApplications(Lists.newArrayList(one, two, one));
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> this.c.setApplications(Lists.newArrayList(one, two, one)));
     }
 
     /**
@@ -326,14 +316,14 @@ public class CommandEntityTest extends EntityTestBase {
      * @throws GeniePreconditionException On error
      */
     @Test
-    public void canAddApplication() throws GeniePreconditionException {
+    void canAddApplication() throws GeniePreconditionException {
         final String id = UUID.randomUUID().toString();
         final ApplicationEntity app = new ApplicationEntity();
         app.setUniqueId(id);
 
         this.c.addApplication(app);
-        Assert.assertThat(this.c.getApplications(), Matchers.hasItem(app));
-        Assert.assertThat(app.getCommands(), Matchers.hasItem(this.c));
+        Assertions.assertThat(this.c.getApplications()).contains(app);
+        Assertions.assertThat(app.getCommands()).contains(this.c);
     }
 
     /**
@@ -341,14 +331,16 @@ public class CommandEntityTest extends EntityTestBase {
      *
      * @throws GeniePreconditionException on duplicate
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void cantAddApplicationThatAlreadyIsInList() throws GeniePreconditionException {
+    @Test
+    void cantAddApplicationThatAlreadyIsInList() throws GeniePreconditionException {
         final String id = UUID.randomUUID().toString();
         final ApplicationEntity app = new ApplicationEntity();
         app.setUniqueId(id);
 
         this.c.addApplication(app);
-        this.c.addApplication(app);
+        Assertions
+            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .isThrownBy(() -> this.c.addApplication(app));
     }
 
     /**
@@ -357,52 +349,49 @@ public class CommandEntityTest extends EntityTestBase {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void canRemoveApplication() throws GeniePreconditionException {
+    void canRemoveApplication() throws GeniePreconditionException {
         final ApplicationEntity one = new ApplicationEntity();
         one.setUniqueId("one");
         final ApplicationEntity two = new ApplicationEntity();
         two.setUniqueId("two");
-        Assert.assertNotNull(this.c.getApplications());
-        Assert.assertTrue(this.c.getApplications().isEmpty());
+        Assertions.assertThat(this.c.getApplications()).isEmpty();
         this.c.addApplication(one);
-        Assert.assertTrue(this.c.getApplications().contains(one));
-        Assert.assertFalse(this.c.getApplications().contains(two));
-        Assert.assertTrue(one.getCommands().contains(this.c));
-        Assert.assertNotNull(two.getCommands());
-        Assert.assertTrue(two.getCommands().isEmpty());
+        Assertions.assertThat(this.c.getApplications()).contains(one);
+        Assertions.assertThat(this.c.getApplications()).doesNotContain(two);
+        Assertions.assertThat(one.getCommands()).contains(this.c);
+        Assertions.assertThat(two.getCommands()).isEmpty();
         this.c.addApplication(two);
-        Assert.assertTrue(this.c.getApplications().contains(one));
-        Assert.assertTrue(this.c.getApplications().contains(two));
-        Assert.assertTrue(one.getCommands().contains(this.c));
-        Assert.assertTrue(two.getCommands().contains(this.c));
+        Assertions.assertThat(this.c.getApplications()).contains(one);
+        Assertions.assertThat(this.c.getApplications()).contains(two);
+        Assertions.assertThat(one.getCommands()).contains(this.c);
+        Assertions.assertThat(two.getCommands()).contains(this.c);
 
         this.c.removeApplication(one);
-        Assert.assertFalse(this.c.getApplications().contains(one));
-        Assert.assertTrue(this.c.getApplications().contains(two));
-        Assert.assertFalse(one.getCommands().contains(this.c));
-        Assert.assertTrue(two.getCommands().contains(this.c));
+        Assertions.assertThat(this.c.getApplications()).doesNotContain(one);
+        Assertions.assertThat(this.c.getApplications()).contains(two);
+        Assertions.assertThat(one.getCommands()).doesNotContain(this.c);
+        Assertions.assertThat(two.getCommands()).contains(this.c);
     }
 
     /**
      * Test setting the clusters.
      */
     @Test
-    public void testSetClusters() {
-        Assert.assertNotNull(this.c.getClusters());
-        Assert.assertTrue(this.c.getClusters().isEmpty());
+    void testSetClusters() {
+        Assertions.assertThat(this.c.getClusters()).isEmpty();
         final Set<ClusterEntity> clusterEntities = Sets.newHashSet(new ClusterEntity());
         this.c.setClusters(clusterEntities);
-        Assert.assertEquals(clusterEntities, this.c.getClusters());
+        Assertions.assertThat(this.c.getClusters()).isEqualTo(clusterEntities);
 
         this.c.setClusters(null);
-        Assert.assertThat(this.c.getClusters(), Matchers.empty());
+        Assertions.assertThat(this.c.getClusters()).isEmpty();
     }
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(this.c.toString());
+    void testToString() {
+        Assertions.assertThat(this.c.toString()).isNotBlank();
     }
 }

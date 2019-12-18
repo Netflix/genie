@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.data.entities;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolationException;
 import java.util.UUID;
@@ -30,7 +29,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class BaseEntityTest extends EntityTestBase {
+class BaseEntityTest extends EntityTestBase {
     private static final String UNIQUE_ID = UUID.randomUUID().toString();
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
@@ -42,8 +41,8 @@ public class BaseEntityTest extends EntityTestBase {
     /**
      * Setup the tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.b = new BaseEntity();
         this.b.setUniqueId(UNIQUE_ID);
         this.b.setName(NAME);
@@ -55,157 +54,164 @@ public class BaseEntityTest extends EntityTestBase {
      * Test the default Constructor.
      */
     @Test
-    public void testDefaultConstructor() {
+    void testDefaultConstructor() {
         final BaseEntity local = new BaseEntity();
-        Assert.assertNotNull(local.getUniqueId());
-        Assert.assertNull(local.getName());
-        Assert.assertNull(local.getUser());
-        Assert.assertNull(local.getVersion());
-        Assert.assertFalse(local.getDescription().isPresent());
-        Assert.assertFalse(local.getSetupFile().isPresent());
-        Assert.assertFalse(local.isRequestedId());
+        Assertions.assertThat(local.getUniqueId()).isNotBlank();
+        Assertions.assertThat(local.getName()).isNull();
+        Assertions.assertThat(local.getUser()).isNull();
+        Assertions.assertThat(local.getVersion()).isNull();
+        Assertions.assertThat(local.getDescription()).isNotPresent();
+        Assertions.assertThat(local.getSetupFile()).isNotPresent();
+        Assertions.assertThat(local.isRequestedId()).isFalse();
     }
 
     /**
      * Test to make sure validation works.
      */
     @Test
-    public void testValidate() {
+    void testValidate() {
         this.validate(this.b);
     }
 
     /**
      * Test to make sure validation works.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateWithNothing() {
-        this.validate(new BaseEntity());
+    @Test
+    void testValidateWithNothing() {
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(new BaseEntity()));
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoName() {
+    @Test
+    void testValidateNoName() {
         this.b.setName("");
-        this.validate(this.b);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.b));
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoUser() {
+    @Test
+    void testValidateNoUser() {
         this.b.setUser("     ");
-        this.validate(this.b);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.b));
     }
 
     /**
      * Test to make sure validation works and throws exception when no name entered.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoVersion() {
+    @Test
+    void testValidateNoVersion() {
         this.b.setVersion("");
-        this.validate(this.b);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(this.b));
     }
 
     /**
      * Test the getting and setting of the unique id.
      */
     @Test
-    public void testSetUniqueId() {
+    void testSetUniqueId() {
         final BaseEntity local = new BaseEntity();
-        Assert.assertNotNull(local.getUniqueId());
-        Assert.assertNotEquals(local.getUniqueId(), UNIQUE_ID);
+        Assertions.assertThat(local.getUniqueId()).isNotBlank();
+        Assertions.assertThat(local.getUniqueId()).isNotEqualTo(UNIQUE_ID);
         local.setUniqueId(UNIQUE_ID);
-        Assert.assertEquals(UNIQUE_ID, local.getUniqueId());
+        Assertions.assertThat(local.getUniqueId()).isEqualTo(UNIQUE_ID);
     }
 
     /**
      * Test to make sure the name is being set properly.
      */
     @Test
-    public void testSetName() {
+    void testSetName() {
         final BaseEntity local = new BaseEntity();
-        Assert.assertNull(local.getName());
+        Assertions.assertThat(local.getName()).isNull();
         local.setName(NAME);
-        Assert.assertEquals(NAME, local.getName());
+        Assertions.assertThat(local.getName()).isEqualTo(NAME);
     }
 
     /**
      * Test to make sure the user is being set properly.
      */
     @Test
-    public void testSetUser() {
+    void testSetUser() {
         final BaseEntity local = new BaseEntity();
-        Assert.assertNull(local.getUser());
+        Assertions.assertThat(local.getUser()).isNull();
         local.setUser(USER);
-        Assert.assertEquals(USER, local.getUser());
+        Assertions.assertThat(local.getUser()).isEqualTo(USER);
     }
 
     /**
      * Test to make sure the version is being set properly.
      */
     @Test
-    public void testSetVersion() {
+    void testSetVersion() {
         final BaseEntity local = new BaseEntity();
-        Assert.assertNull(local.getVersion());
+        Assertions.assertThat(local.getVersion()).isNull();
         local.setVersion(VERSION);
-        Assert.assertThat(local.getVersion(), Matchers.is(VERSION));
+        Assertions.assertThat(local.getVersion()).isEqualTo(VERSION);
     }
 
     /**
      * Test the description get/set.
      */
     @Test
-    public void testSetDescription() {
-        Assert.assertFalse(this.b.getDescription().isPresent());
+    void testSetDescription() {
+        Assertions.assertThat(this.b.getDescription()).isNotPresent();
         final String description = "Test description";
         this.b.setDescription(description);
-        Assert.assertEquals(description, this.b.getDescription().orElseThrow(IllegalArgumentException::new));
+        Assertions.assertThat(this.b.getDescription()).isPresent().contains(description);
     }
 
     /**
      * Test the setup file get/set.
      */
     @Test
-    public void testSetSetupFile() {
-        Assert.assertFalse(this.b.getSetupFile().isPresent());
-        final FileEntity setupFile = new FileEntity();
-        setupFile.setFile(UUID.randomUUID().toString());
+    void testSetSetupFile() {
+        Assertions.assertThat(this.b.getSetupFile()).isNotPresent();
+        final FileEntity setupFile = new FileEntity(UUID.randomUUID().toString());
         this.b.setSetupFile(setupFile);
-        Assert.assertThat(this.b.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
+        Assertions.assertThat(this.b.getSetupFile()).isPresent().contains(setupFile);
         this.b.setSetupFile(null);
-        Assert.assertFalse(this.b.getSetupFile().isPresent());
+        Assertions.assertThat(this.b.getSetupFile()).isNotPresent();
     }
 
     /**
      * Test the metadata setter and getter.
      */
     @Test
-    public void testSetMetadata() {
-        Assert.assertFalse(this.b.getMetadata().isPresent());
+    void testSetMetadata() {
+        Assertions.assertThat(this.b.getMetadata()).isNotPresent();
         this.b.setMetadata(METADATA);
-        Assert.assertThat(this.b.getMetadata().orElseThrow(IllegalArgumentException::new), Matchers.is(METADATA));
+        Assertions.assertThat(this.b.getMetadata()).isPresent().contains(METADATA);
         this.b.setMetadata(null);
-        Assert.assertFalse(this.b.getMetadata().isPresent());
+        Assertions.assertThat(this.b.getMetadata()).isNotPresent();
     }
 
     /**
      * Test the is requested id fields.
      */
     @Test
-    public void testSetRequestedId() {
-        Assert.assertFalse(this.b.isRequestedId());
+    void testSetRequestedId() {
+        Assertions.assertThat(this.b.isRequestedId()).isFalse();
         this.b.setRequestedId(true);
-        Assert.assertTrue(this.b.isRequestedId());
+        Assertions.assertThat(this.b.isRequestedId()).isTrue();
     }
 
     /**
      * Test to make sure equals and hash code only care about the unique id.
      */
     @Test
-    public void testEqualsAndHashCode() {
+    void testEqualsAndHashCode() {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         final BaseEntity one = new BaseEntity();
@@ -218,20 +224,20 @@ public class BaseEntityTest extends EntityTestBase {
         three.setUniqueId(UUID.randomUUID().toString());
         three.setName(name);
 
-        Assert.assertTrue(one.equals(two));
-        Assert.assertFalse(one.equals(three));
-        Assert.assertFalse(two.equals(three));
+        Assertions.assertThat(one).isEqualTo(two);
+        Assertions.assertThat(one).isNotEqualTo(three);
+        Assertions.assertThat(two).isNotEqualTo(three);
 
-        Assert.assertEquals(one.hashCode(), two.hashCode());
-        Assert.assertNotEquals(one.hashCode(), three.hashCode());
-        Assert.assertNotEquals(two.hashCode(), three.hashCode());
+        Assertions.assertThat(one.hashCode()).isEqualTo(two.hashCode());
+        Assertions.assertThat(one.hashCode()).isNotEqualTo(three.hashCode());
+        Assertions.assertThat(two.hashCode()).isNotEqualTo(three.hashCode());
     }
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(this.b.toString());
+    void testToString() {
+        Assertions.assertThat(this.b.toString()).isNotBlank();
     }
 }

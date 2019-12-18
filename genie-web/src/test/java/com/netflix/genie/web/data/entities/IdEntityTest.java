@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.data.entities;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the IdEntity class.
@@ -26,13 +26,13 @@ import org.junit.Test;
  * @author tgianos
  * @since 3.3.0
  */
-public class IdEntityTest {
+class IdEntityTest {
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(new IdEntity().toString());
+    void testToString() {
+        Assertions.assertThat(new IdEntity().toString()).isNotBlank();
     }
 }
