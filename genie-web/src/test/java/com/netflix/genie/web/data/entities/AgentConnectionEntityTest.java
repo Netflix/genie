@@ -20,9 +20,8 @@ package com.netflix.genie.web.data.entities;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -34,7 +33,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.3.0
  */
-public class AgentConnectionEntityTest extends EntityTestBase {
+class AgentConnectionEntityTest extends EntityTestBase {
 
     private static final String JOB = UUID.randomUUID().toString();
     private static final String HOST = UUID.randomUUID().toString();
@@ -43,29 +42,29 @@ public class AgentConnectionEntityTest extends EntityTestBase {
      * Test constructor.
      */
     @Test
-    public void canCreateAgentConnectionEntityWithConstructor() {
+    void canCreateAgentConnectionEntityWithConstructor() {
         final AgentConnectionEntity entity = new AgentConnectionEntity(JOB, HOST);
-        Assert.assertThat(entity.getJobId(), Matchers.is(JOB));
-        Assert.assertThat(entity.getServerHostname(), Matchers.is(HOST));
+        Assertions.assertThat(entity.getJobId()).isEqualTo(JOB);
+        Assertions.assertThat(entity.getServerHostname()).isEqualTo(HOST);
     }
 
     /**
      * Test setters.
      */
     @Test
-    public void canCreateAgentConnectionEntityWithSetters() {
+    void canCreateAgentConnectionEntityWithSetters() {
         final AgentConnectionEntity entity = new AgentConnectionEntity();
         entity.setJobId(JOB);
         entity.setServerHostname(HOST);
-        Assert.assertThat(entity.getJobId(), Matchers.is(JOB));
-        Assert.assertThat(entity.getServerHostname(), Matchers.is(HOST));
+        Assertions.assertThat(entity.getJobId()).isEqualTo(JOB);
+        Assertions.assertThat(entity.getServerHostname()).isEqualTo(HOST);
     }
 
     /**
      * Verify validated fields value.
      */
     @Test
-    public void cantCreateAgentConnectionEntityDueToSize() {
+    void cantCreateAgentConnectionEntityDueToSize() {
 
         final List<Pair<String, String>> invalidParameterPairs = Lists.newArrayList();
 
@@ -87,7 +86,7 @@ public class AgentConnectionEntityTest extends EntityTestBase {
                 continue;
             }
 
-            Assert.fail("Entity unexpectedly passed validation: " + entity.toString());
+            Assertions.fail("Entity unexpectedly passed validation: " + entity.toString());
         }
     }
 
@@ -95,36 +94,36 @@ public class AgentConnectionEntityTest extends EntityTestBase {
      * Test to make sure equals and hash code only care about the unique file.
      */
     @Test
-    public void testEqualsAndHashCode() {
+    void testEqualsAndHashCode() {
         final AgentConnectionEntity e1 = new AgentConnectionEntity(JOB, HOST);
         final AgentConnectionEntity e2 = new AgentConnectionEntity();
         e2.setJobId(JOB);
         e2.setServerHostname(HOST);
 
-        Assert.assertEquals(e1, e2);
-        Assert.assertEquals(e1.hashCode(), e2.hashCode());
+        Assertions.assertThat(e1).isEqualTo(e2);
+        Assertions.assertThat(e1.hashCode()).isEqualTo(e2.hashCode());
 
         final AgentConnectionEntity e3 = new AgentConnectionEntity(JOB, "FOO");
         final AgentConnectionEntity e4 = new AgentConnectionEntity("BAR", HOST);
 
-        Assert.assertNotEquals(e1, e3);
-        Assert.assertNotEquals(e2, e3);
-        Assert.assertNotEquals(e1, e4);
-        Assert.assertNotEquals(e2, e4);
-        Assert.assertNotEquals(e3, e4);
+        Assertions.assertThat(e1).isNotEqualTo(e3);
+        Assertions.assertThat(e2).isNotEqualTo(e3);
+        Assertions.assertThat(e1).isNotEqualTo(e4);
+        Assertions.assertThat(e2).isNotEqualTo(e4);
+        Assertions.assertThat(e3).isNotEqualTo(e4);
 
-        Assert.assertNotEquals(e1.hashCode(), e3.hashCode());
-        Assert.assertNotEquals(e2.hashCode(), e3.hashCode());
-        Assert.assertNotEquals(e1.hashCode(), e4.hashCode());
-        Assert.assertNotEquals(e2.hashCode(), e4.hashCode());
-        Assert.assertNotEquals(e3.hashCode(), e4.hashCode());
+        Assertions.assertThat(e1.hashCode()).isNotEqualTo(e3.hashCode());
+        Assertions.assertThat(e2.hashCode()).isNotEqualTo(e3.hashCode());
+        Assertions.assertThat(e1.hashCode()).isNotEqualTo(e4.hashCode());
+        Assertions.assertThat(e2.hashCode()).isNotEqualTo(e4.hashCode());
+        Assertions.assertThat(e3.hashCode()).isNotEqualTo(e4.hashCode());
     }
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(new AgentConnectionEntity().toString());
+    void testToString() {
+        Assertions.assertThat(new AgentConnectionEntity().toString()).isNotBlank();
     }
 }

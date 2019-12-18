@@ -18,9 +18,8 @@
 package com.netflix.genie.web.data.entities;
 
 import com.google.common.collect.Sets;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.UUID;
@@ -31,107 +30,107 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.3.0
  */
-public class CriterionEntityTest extends EntityTestBase {
+class CriterionEntityTest extends EntityTestBase {
 
     /**
      * Make sure the argument constructor sets the tags argument.
      */
     @Test
-    public void canCreateCriterionEntityWithTags() {
+    void canCreateCriterionEntityWithTags() {
         CriterionEntity entity = new CriterionEntity(null, null, null, null, null);
-        Assert.assertThat(entity.getTags(), Matchers.empty());
+        Assertions.assertThat(entity.getTags()).isEmpty();
         final Set<TagEntity> tags = Sets.newHashSet();
         entity = new CriterionEntity(null, null, null, null, tags);
-        Assert.assertThat(entity.getTags(), Matchers.empty());
+        Assertions.assertThat(entity.getTags()).isEmpty();
         tags.add(new TagEntity(UUID.randomUUID().toString()));
         tags.add(new TagEntity(UUID.randomUUID().toString()));
         entity = new CriterionEntity(null, null, null, null, tags);
-        Assert.assertThat(entity.getTags(), Matchers.is(tags));
+        Assertions.assertThat(entity.getTags()).isEqualTo(tags);
     }
 
     /**
      * Make sure we can create a criterion.
      */
     @Test
-    public void canCreateCriterionEntity() {
+    void canCreateCriterionEntity() {
         final CriterionEntity entity = new CriterionEntity();
-        Assert.assertFalse(entity.getUniqueId().isPresent());
-        Assert.assertFalse(entity.getName().isPresent());
-        Assert.assertFalse(entity.getVersion().isPresent());
-        Assert.assertFalse(entity.getStatus().isPresent());
-        Assert.assertThat(entity.getTags(), Matchers.empty());
+        Assertions.assertThat(entity.getUniqueId()).isNotPresent();
+        Assertions.assertThat(entity.getName()).isNotPresent();
+        Assertions.assertThat(entity.getVersion()).isNotPresent();
+        Assertions.assertThat(entity.getStatus()).isNotPresent();
+        Assertions.assertThat(entity.getTags()).isEmpty();
     }
 
     /**
      * Make sure setter is using the right field.
      */
     @Test
-    public void canSetUniqueId() {
+    void canSetUniqueId() {
         final CriterionEntity entity = new CriterionEntity();
-        Assert.assertFalse(entity.getUniqueId().isPresent());
+        Assertions.assertThat(entity.getUniqueId()).isNotPresent();
         final String uniqueId = UUID.randomUUID().toString();
         entity.setUniqueId(uniqueId);
-        Assert.assertThat(entity.getUniqueId().orElse(null), Matchers.is(uniqueId));
+        Assertions.assertThat(entity.getUniqueId()).isPresent().contains(uniqueId);
     }
 
     /**
      * Make sure setter is using the right field.
      */
     @Test
-    public void canSetName() {
+    void canSetName() {
         final CriterionEntity entity = new CriterionEntity();
-        Assert.assertFalse(entity.getName().isPresent());
+        Assertions.assertThat(entity.getName()).isNotPresent();
         final String name = UUID.randomUUID().toString();
         entity.setName(name);
-        Assert.assertThat(entity.getName().orElse(null), Matchers.is(name));
+        Assertions.assertThat(entity.getName()).isPresent().contains(name);
     }
 
     /**
      * Make sure setter is using the right field.
      */
     @Test
-    public void canSetVersion() {
+    void canSetVersion() {
         final CriterionEntity entity = new CriterionEntity();
-        Assert.assertFalse(entity.getVersion().isPresent());
-        final String status = UUID.randomUUID().toString();
-        entity.setVersion(status);
-        Assert.assertThat(entity.getVersion().orElse(null), Matchers.is(status));
-    }
-
-    /**
-     * Make sure setter is using the right field.
-     */
-    @Test
-    public void canSetStatus() {
-        final CriterionEntity entity = new CriterionEntity();
-        Assert.assertFalse(entity.getStatus().isPresent());
+        Assertions.assertThat(entity.getVersion()).isNotPresent();
         final String version = UUID.randomUUID().toString();
-        entity.setStatus(version);
-        Assert.assertThat(entity.getStatus().orElse(null), Matchers.is(version));
+        entity.setVersion(version);
+        Assertions.assertThat(entity.getVersion()).isPresent().contains(version);
+    }
+
+    /**
+     * Make sure setter is using the right field.
+     */
+    @Test
+    void canSetStatus() {
+        final CriterionEntity entity = new CriterionEntity();
+        Assertions.assertThat(entity.getStatus()).isNotPresent();
+        final String status = UUID.randomUUID().toString();
+        entity.setStatus(status);
+        Assertions.assertThat(entity.getStatus()).isPresent().contains(status);
     }
 
     /**
      * Make sure setting the tags works.
      */
     @Test
-    public void canSetTags() {
+    void canSetTags() {
         final CriterionEntity entity = new CriterionEntity();
-        Assert.assertTrue(entity.getTags().isEmpty());
+        Assertions.assertThat(entity.getTags()).isEmpty();
         entity.setTags(null);
-        Assert.assertTrue(entity.getTags().isEmpty());
+        Assertions.assertThat(entity.getTags()).isEmpty();
         final Set<TagEntity> tags = Sets.newHashSet();
         entity.setTags(tags);
-        Assert.assertTrue(entity.getTags().isEmpty());
+        Assertions.assertThat(entity.getTags()).isEmpty();
         tags.add(new TagEntity(UUID.randomUUID().toString()));
         entity.setTags(tags);
-        Assert.assertEquals(entity.getTags(), tags);
+        Assertions.assertThat(entity.getTags()).isEqualTo(tags);
     }
 
     /**
      * Test to make sure equals and hash code only care about the id of the base class not the tags.
      */
     @Test
-    public void testEqualsAndHashCode() {
+    void testEqualsAndHashCode() {
         final Set<TagEntity> tags = Sets.newHashSet(
             new TagEntity(UUID.randomUUID().toString()),
             new TagEntity(UUID.randomUUID().toString())
@@ -140,20 +139,20 @@ public class CriterionEntityTest extends EntityTestBase {
         final CriterionEntity two = new CriterionEntity(null, null, null, null, tags);
         final CriterionEntity three = new CriterionEntity();
 
-        Assert.assertTrue(one.equals(two));
-        Assert.assertTrue(one.equals(three));
-        Assert.assertTrue(two.equals(three));
+        Assertions.assertThat(one).isEqualTo(two);
+        Assertions.assertThat(one).isEqualTo(three);
+        Assertions.assertThat(two).isEqualTo(three);
 
-        Assert.assertEquals(one.hashCode(), two.hashCode());
-        Assert.assertEquals(one.hashCode(), three.hashCode());
-        Assert.assertEquals(two.hashCode(), three.hashCode());
+        Assertions.assertThat(one.hashCode()).isEqualTo(two.hashCode());
+        Assertions.assertThat(one.hashCode()).isEqualTo(three.hashCode());
+        Assertions.assertThat(two.hashCode()).isEqualTo(three.hashCode());
     }
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(new CriterionEntity().toString());
+    void testToString() {
+        Assertions.assertThat(new CriterionEntity().toString()).isNotBlank();
     }
 }

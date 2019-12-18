@@ -18,9 +18,8 @@
 package com.netflix.genie.web.data.entities;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolationException;
 import java.util.UUID;
@@ -31,78 +30,79 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.3.0
  */
-public class TagEntityTest extends EntityTestBase {
+class TagEntityTest extends EntityTestBase {
 
     /**
      * Make sure the argument constructor sets the tag argument.
      */
     @Test
-    public void canCreateTagEntityWithTag() {
+    void canCreateTagEntityWithTag() {
         final String tag = UUID.randomUUID().toString();
         final TagEntity tagEntity = new TagEntity(tag);
-        Assert.assertThat(tagEntity.getTag(), Matchers.is(tag));
+        Assertions.assertThat(tagEntity.getTag()).isEqualTo(tag);
     }
 
     /**
      * Make sure we can create a tag.
      */
     @Test
-    public void canCreateTagEntity() {
+    void canCreateTagEntity() {
         final TagEntity tagEntity = new TagEntity();
         final String tag = UUID.randomUUID().toString();
         tagEntity.setTag(tag);
-        Assert.assertThat(tagEntity.getTag(), Matchers.is(tag));
+        Assertions.assertThat(tagEntity.getTag()).isEqualTo(tag);
     }
 
     /**
      * Make sure a tag can't be validated if it exceeds size limitations.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void cantCreateTagEntityDueToSize() {
+    @Test
+    void cantCreateTagEntityDueToSize() {
         final TagEntity tagEntity = new TagEntity();
         final String tag = StringUtils.rightPad(UUID.randomUUID().toString(), 256);
         tagEntity.setTag(tag);
-        this.validate(tagEntity);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(tagEntity));
     }
 
     /**
      * Make sure a tag can't be validated if the value is blank.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void cantCreateTagEntityDueToNoTag() {
+    @Test
+    void cantCreateTagEntityDueToNoTag() {
         final TagEntity tagEntity = new TagEntity();
         final String tag = "";
         tagEntity.setTag(tag);
-        this.validate(tagEntity);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(tagEntity));
     }
 
     /**
      * Test to make sure equals and hash code only care about the unique tag.
      */
     @Test
-    public void testEqualsAndHashCode() {
+    void testEqualsAndHashCode() {
         final String tag = UUID.randomUUID().toString();
-        final TagEntity one = new TagEntity();
-        one.setTag(tag);
-        final TagEntity two = new TagEntity();
-        two.setTag(tag);
-        final TagEntity three = new TagEntity();
-        three.setTag(UUID.randomUUID().toString());
+        final TagEntity one = new TagEntity(tag);
+        final TagEntity two = new TagEntity(tag);
+        final TagEntity three = new TagEntity(UUID.randomUUID().toString());
 
-        Assert.assertTrue(one.equals(two));
-        Assert.assertFalse(one.equals(three));
-        Assert.assertFalse(two.equals(three));
+        Assertions.assertThat(one).isEqualTo(two);
+        Assertions.assertThat(one).isNotEqualTo(three);
+        Assertions.assertThat(two).isNotEqualTo(three);
 
-        Assert.assertEquals(one.hashCode(), two.hashCode());
-        Assert.assertNotEquals(one.hashCode(), three.hashCode());
-        Assert.assertNotEquals(two.hashCode(), three.hashCode());
+        Assertions.assertThat(one.hashCode()).isEqualTo(two.hashCode());
+        Assertions.assertThat(one.hashCode()).isNotEqualTo(three.hashCode());
+        Assertions.assertThat(two.hashCode()).isNotEqualTo(three.hashCode());
     }
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(new TagEntity().toString());
+    void testToString() {
+        Assertions.assertThat(new TagEntity().toString()).isNotBlank();
     }
 }

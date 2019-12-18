@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.data.entities;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
@@ -27,16 +27,16 @@ import java.time.Instant;
  *
  * @author tgianos
  */
-public class AuditEntityTest {
+class AuditEntityTest {
 
     /**
      * Test to make sure objects are constructed properly.
      */
     @Test
-    public void testConstructor() {
+    void testConstructor() {
         final AuditEntity a = new AuditEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
+        Assertions.assertThat(a.getCreated()).isNotNull();
+        Assertions.assertThat(a.getUpdated()).isNotNull();
     }
 
     /**
@@ -45,19 +45,19 @@ public class AuditEntityTest {
      * @throws InterruptedException If the process is interrupted
      */
     @Test
-    public void testOnCreateAuditEntity() throws InterruptedException {
+    void testOnCreateAuditEntity() throws InterruptedException {
         final AuditEntity a = new AuditEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
+        Assertions.assertThat(a.getCreated()).isNotNull();
+        Assertions.assertThat(a.getUpdated()).isNotNull();
         final Instant originalCreated = a.getCreated();
         final Instant originalUpdated = a.getUpdated();
         Thread.sleep(1);
         a.onCreateBaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
-        Assert.assertNotEquals(originalCreated, a.getCreated());
-        Assert.assertNotEquals(originalUpdated, a.getUpdated());
-        Assert.assertEquals(a.getCreated(), a.getUpdated());
+        Assertions.assertThat(a.getCreated()).isNotNull();
+        Assertions.assertThat(a.getUpdated()).isNotNull();
+        Assertions.assertThat(a.getCreated()).isNotEqualTo(originalCreated);
+        Assertions.assertThat(a.getUpdated()).isNotEqualTo(originalUpdated);
+        Assertions.assertThat(a.getCreated()).isEqualTo(a.getUpdated());
     }
 
     /**
@@ -66,24 +66,24 @@ public class AuditEntityTest {
      * @throws InterruptedException If the process is interrupted
      */
     @Test
-    public void testOnUpdateAuditEntity() throws InterruptedException {
+    void testOnUpdateAuditEntity() throws InterruptedException {
         final AuditEntity a = new AuditEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
+        Assertions.assertThat(a.getCreated()).isNotNull();
+        Assertions.assertThat(a.getUpdated()).isNotNull();
         a.onCreateBaseEntity();
-        final Instant originalCreate = a.getCreated();
-        final Instant originalUpdate = a.getUpdated();
+        final Instant originalCreated = a.getCreated();
+        final Instant originalUpdated = a.getUpdated();
         Thread.sleep(1);
         a.onUpdateBaseEntity();
-        Assert.assertEquals(originalCreate, a.getCreated());
-        Assert.assertNotEquals(originalUpdate, a.getUpdated());
+        Assertions.assertThat(a.getCreated()).isEqualTo(originalCreated);
+        Assertions.assertThat(a.getUpdated()).isNotEqualTo(originalUpdated);
     }
 
     /**
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(new AuditEntity().toString());
+    void testToString() {
+        Assertions.assertThat(new AuditEntity().toString()).isNotBlank();
     }
 }

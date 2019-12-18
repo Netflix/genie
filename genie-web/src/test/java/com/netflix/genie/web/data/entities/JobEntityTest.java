@@ -21,12 +21,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolationException;
 import java.time.Instant;
@@ -42,7 +39,7 @@ import java.util.stream.Collectors;
  * @author amsharma
  * @author tgianos
  */
-public class JobEntityTest extends EntityTestBase {
+class JobEntityTest extends EntityTestBase {
 
     private static final String USER = "tgianos";
     private static final String NAME = "TomsJob";
@@ -53,8 +50,8 @@ public class JobEntityTest extends EntityTestBase {
     /**
      * Create a job object to be used in a bunch of tests.
      */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.jobEntity = new JobEntity();
         this.jobEntity.setUser(USER);
         this.jobEntity.setName(NAME);
@@ -65,20 +62,20 @@ public class JobEntityTest extends EntityTestBase {
      * Test the default constructor.
      */
     @Test
-    public void testDefaultConstructor() {
+    void testDefaultConstructor() {
         final JobEntity localJobEntity = new JobEntity();
-        Assert.assertNotNull(localJobEntity.getUniqueId());
+        Assertions.assertThat(localJobEntity.getUniqueId()).isNotBlank();
     }
 
     /**
      * Test the parameter based constructor.
      */
     @Test
-    public void testConstructor() {
-        Assert.assertNotNull(this.jobEntity.getUniqueId());
-        Assert.assertEquals(NAME, this.jobEntity.getName());
-        Assert.assertEquals(USER, this.jobEntity.getUser());
-        Assert.assertThat(this.jobEntity.getVersion(), Matchers.is(VERSION));
+    void testConstructor() {
+        Assertions.assertThat(this.jobEntity.getUniqueId()).isNotBlank();
+        Assertions.assertThat(NAME).isEqualTo(this.jobEntity.getName());
+        Assertions.assertThat(USER).isEqualTo(this.jobEntity.getUser());
+        Assertions.assertThat(this.jobEntity.getVersion()).isEqualTo(VERSION);
     }
 
     /**
@@ -86,123 +83,112 @@ public class JobEntityTest extends EntityTestBase {
      * or updating.
      */
     @Test
-    public void testOnCreateJob() {
-        Assert.assertNull(this.jobEntity.getTagSearchString());
+    void testOnCreateJob() {
+        Assertions.assertThat(this.jobEntity.getTagSearchString()).isNull();
         this.jobEntity.onCreateJob();
-        Assert.assertNull(this.jobEntity.getTagSearchString());
-        final TagEntity one = new TagEntity();
-        one.setTag("abc");
-        final TagEntity two = new TagEntity();
-        two.setTag("def");
-        final TagEntity three = new TagEntity();
-        three.setTag("ghi");
+        Assertions.assertThat(this.jobEntity.getTagSearchString()).isNull();
+        final TagEntity one = new TagEntity("abc");
+        final TagEntity two = new TagEntity("def");
+        final TagEntity three = new TagEntity("ghi");
         this.jobEntity.setTags(Sets.newHashSet(three, two, one));
         this.jobEntity.onCreateJob();
-        Assert.assertEquals("|abc||def||ghi|", this.jobEntity.getTagSearchString());
+        Assertions.assertThat(this.jobEntity.getTagSearchString()).isEqualTo("|abc||def||ghi|");
     }
 
     /**
      * Test the execution cluster name get/set.
      */
     @Test
-    public void testSetGetClusterName() {
-        Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
+    void testSetGetClusterName() {
+        Assertions.assertThat(this.jobEntity.getClusterName()).isNotPresent();
         final String clusterName = UUID.randomUUID().toString();
         this.jobEntity.setClusterName(clusterName);
-        final String actualClusterName = this.jobEntity.getClusterName().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualClusterName, Matchers.is(clusterName));
+        Assertions.assertThat(this.jobEntity.getClusterName()).isPresent().contains(clusterName);
     }
 
     /**
      * Test setter and getter for command name.
      */
     @Test
-    public void testSetGetCommandName() {
-        Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
+    void testSetGetCommandName() {
+        Assertions.assertThat(this.jobEntity.getCommandName()).isNotPresent();
         final String commandName = UUID.randomUUID().toString();
         this.jobEntity.setCommandName(commandName);
-        final String actualCommandName = this.jobEntity.getCommandName().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualCommandName, Matchers.is(commandName));
+        Assertions.assertThat(this.jobEntity.getCommandName()).isPresent().contains(commandName);
     }
 
     /**
      * Make sure the setter and getter for command args works properly.
      */
     @Test
-    public void testSetGetCommandArgs() {
-        Assert.assertTrue(this.jobEntity.getCommandArgs().isEmpty());
+    void testSetGetCommandArgs() {
+        Assertions.assertThat(this.jobEntity.getCommandArgs()).isEmpty();
         this.jobEntity.setCommandArgs(null);
-        Assert.assertTrue(this.jobEntity.getCommandArgs().isEmpty());
+        Assertions.assertThat(this.jobEntity.getCommandArgs()).isEmpty();
         final List<String> commandArgs = Lists.newArrayList();
         this.jobEntity.setCommandArgs(commandArgs);
-        Assert.assertTrue(this.jobEntity.getCommandArgs().isEmpty());
+        Assertions.assertThat(this.jobEntity.getCommandArgs()).isEmpty();
         commandArgs.add(UUID.randomUUID().toString());
         this.jobEntity.setCommandArgs(commandArgs);
-        Assert.assertThat(this.jobEntity.getCommandArgs(), Matchers.is(commandArgs));
+        Assertions.assertThat(this.jobEntity.getCommandArgs()).isEqualTo(commandArgs);
     }
 
     /**
      * Test the setter and getter for status.
      */
     @Test
-    public void testSetGetStatus() {
-        Assert.assertThat(this.jobEntity.getStatus(), Matchers.is(JobStatus.RESERVED));
+    void testSetGetStatus() {
+        Assertions.assertThat(this.jobEntity.getStatus()).isEqualByComparingTo(JobStatus.RESERVED);
         this.jobEntity.setStatus(JobStatus.KILLED);
-        Assert.assertEquals(JobStatus.KILLED, this.jobEntity.getStatus());
+        Assertions.assertThat(this.jobEntity.getStatus()).isEqualByComparingTo(JobStatus.KILLED);
     }
 
     /**
      * Test the setter and getter for the status message.
      */
     @Test
-    public void testSetGetStatusMsg() {
-        Assert.assertFalse(this.jobEntity.getStatusMsg().isPresent());
+    void testSetGetStatusMsg() {
+        Assertions.assertThat(this.jobEntity.getStatusMsg()).isNotPresent();
         final String statusMsg = "Job is doing great";
         this.jobEntity.setStatusMsg(statusMsg);
-        final String actualStatusMsg = this.jobEntity.getStatusMsg().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualStatusMsg, Matchers.is(statusMsg));
+        Assertions.assertThat(this.jobEntity.getStatusMsg()).isPresent().contains(statusMsg);
     }
 
     /**
      * Test setter and getter for started.
      */
     @Test
-    public void testSetGetStarted() {
-        Assert.assertFalse(this.jobEntity.getStarted().isPresent());
+    void testSetGetStarted() {
+        Assertions.assertThat(this.jobEntity.getStarted()).isNotPresent();
         final Instant started = Instant.ofEpochMilli(123453L);
         this.jobEntity.setStarted(started);
-        final Instant actualStarted = this.jobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualStarted, Matchers.is(started));
+        Assertions.assertThat(this.jobEntity.getStarted()).isPresent().contains(started);
         this.jobEntity.setStarted(null);
-        Assert.assertFalse(this.jobEntity.getStarted().isPresent());
+        Assertions.assertThat(this.jobEntity.getStarted()).isNotPresent();
     }
 
     /**
      * Test setter and getter for finished.
      */
     @Test
-    public void testSetGetFinished() {
-        Assert.assertFalse(this.jobEntity.getFinished().isPresent());
+    void testSetGetFinished() {
+        Assertions.assertThat(this.jobEntity.getFinished()).isNotPresent();
         final Instant finished = Instant.ofEpochMilli(123453L);
         this.jobEntity.setFinished(finished);
-        final Instant actualFinished = this.jobEntity.getFinished().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualFinished, Matchers.is(finished));
+        Assertions.assertThat(this.jobEntity.getFinished()).isPresent().contains(finished);
         this.jobEntity.setFinished(null);
-        Assert.assertFalse(this.jobEntity.getFinished().isPresent());
+        Assertions.assertThat(this.jobEntity.getFinished()).isNotPresent();
     }
 
     /**
      * Test the setter and getter for archive location.
      */
     @Test
-    public void testSetGetArchiveLocation() {
-        Assert.assertFalse(this.jobEntity.getArchiveLocation().isPresent());
+    void testSetGetArchiveLocation() {
+        Assertions.assertThat(this.jobEntity.getArchiveLocation()).isNotPresent();
         final String archiveLocation = "s3://some/location";
         this.jobEntity.setArchiveLocation(archiveLocation);
-        Assert.assertEquals(
-            archiveLocation,
-            this.jobEntity.getArchiveLocation().orElseThrow(IllegalArgumentException::new)
-        );
+        Assertions.assertThat(this.jobEntity.getArchiveLocation()).isPresent().contains(archiveLocation);
     }
 
     /**
@@ -210,137 +196,136 @@ public class JobEntityTest extends EntityTestBase {
      * changed accordingly.
      */
     @Test
-    public void testSetJobStatus() {
+    void testSetJobStatus() {
         final JobEntity localJobEntity = new JobEntity();
 
         // Times are null on initialization
-        Assert.assertFalse(localJobEntity.getStarted().isPresent());
-        Assert.assertFalse(localJobEntity.getFinished().isPresent());
+        Assertions.assertThat(localJobEntity.getStarted()).isNotPresent();
+        Assertions.assertThat(localJobEntity.getFinished()).isNotPresent();
 
         // start time is not zero on INIT, finish time is still 0
         localJobEntity.setJobStatus(JobStatus.INIT);
-        Assert.assertTrue(localJobEntity.getStarted().isPresent());
-        Assert.assertFalse(localJobEntity.getFinished().isPresent());
+        Assertions.assertThat(localJobEntity.getStarted()).isPresent();
+        Assertions.assertThat(localJobEntity.getFinished()).isNotPresent();
         final Instant started = localJobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
 
         // Shouldn't affect finish time
         localJobEntity.setJobStatus(JobStatus.RUNNING);
-        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.INSTANT), Matchers.is(started));
-        Assert.assertFalse(localJobEntity.getFinished().isPresent());
+        Assertions.assertThat(localJobEntity.getStarted()).isPresent().contains(started);
+        Assertions.assertThat(localJobEntity.getFinished()).isNotPresent();
 
         // finish time is non-zero on completion
         localJobEntity.setJobStatus(JobStatus.SUCCEEDED);
-        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.INSTANT), Matchers.is(started));
-        Assert.assertTrue(localJobEntity.getFinished().isPresent());
+        Assertions.assertThat(localJobEntity.getStarted()).isPresent().contains(started);
+        Assertions.assertThat(localJobEntity.getFinished()).isPresent();
 
         final JobEntity jobEntity2 = new JobEntity();
         // Times are null on initialization
-        Assert.assertFalse(jobEntity2.getStarted().isPresent());
-        Assert.assertFalse(jobEntity2.getFinished().isPresent());
+        Assertions.assertThat(jobEntity2.getStarted()).isNotPresent();
+        Assertions.assertThat(jobEntity2.getFinished()).isNotPresent();
 
         // start time is not zero on INIT, finish time is still 0
         final String initMessage = "We're initializing";
         jobEntity2.setJobStatus(JobStatus.INIT, initMessage);
-        Assert.assertTrue(jobEntity2.getStarted().isPresent());
-        Assert.assertFalse(jobEntity2.getFinished().isPresent());
-        Assert.assertEquals(initMessage, jobEntity2.getStatusMsg().orElseGet(RandomSuppliers.STRING));
+        Assertions.assertThat(jobEntity2.getStarted()).isPresent();
+        Assertions.assertThat(jobEntity2.getFinished()).isNotPresent();
+        Assertions.assertThat(jobEntity2.getStatusMsg()).isPresent().contains(initMessage);
 
         // finish time is non-zero on completion
         final String successMessage = "Job Succeeded";
         jobEntity2.setJobStatus(JobStatus.SUCCEEDED, successMessage);
-        Assert.assertEquals(successMessage, jobEntity2.getStatusMsg().orElseGet(RandomSuppliers.STRING));
-        Assert.assertTrue(jobEntity2.getFinished().isPresent());
+        Assertions.assertThat(jobEntity2.getStatusMsg()).isPresent().contains(successMessage);
+        Assertions.assertThat(jobEntity2.getFinished()).isPresent();
     }
 
     /**
      * Tests setting and getting the (transient) notifiedJobStatus field.
      */
     @Test
-    public void testSetNotifiedJobStatus() {
+    void testSetNotifiedJobStatus() {
         final JobEntity localJobEntity = new JobEntity();
-        Assert.assertNull(localJobEntity.getNotifiedJobStatus());
+        Assertions.assertThat(localJobEntity.getNotifiedJobStatus()).isNull();
         localJobEntity.setNotifiedJobStatus(JobStatus.RUNNING);
-        Assert.assertEquals(JobStatus.RUNNING, localJobEntity.getNotifiedJobStatus());
+        Assertions.assertThat(localJobEntity.getNotifiedJobStatus()).isEqualByComparingTo(JobStatus.RUNNING);
     }
 
     /**
      * Test the setter and the getter for tags.
      */
     @Test
-    public void testSetGetTags() {
-        Assert.assertNotNull(this.jobEntity.getTags());
-        Assert.assertTrue(this.jobEntity.getTags().isEmpty());
-        final TagEntity one = new TagEntity();
-        one.setTag("someTag");
-        final TagEntity two = new TagEntity();
-        two.setTag("someOtherTag");
+    void testSetGetTags() {
+        Assertions.assertThat(this.jobEntity.getTags()).isEmpty();
+        final TagEntity one = new TagEntity("someTag");
+        final TagEntity two = new TagEntity("someOtherTag");
         final Set<TagEntity> tags = Sets.newHashSet(one, two);
         this.jobEntity.setTags(tags);
-        Assert.assertEquals(tags, this.jobEntity.getTags());
+        Assertions.assertThat(this.jobEntity.getTags()).isEqualTo(tags);
 
         this.jobEntity.setTags(null);
-        Assert.assertThat(this.jobEntity.getTags(), Matchers.empty());
+        Assertions.assertThat(this.jobEntity.getTags()).isEmpty();
     }
 
     /**
      * Test Validate ok.
      */
     @Test
-    public void testValidate() {
+    void testValidate() {
         this.validate(this.jobEntity);
     }
 
     /**
      * Test validate with exception from super class.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateBadSuperClass() {
-        this.validate(new JobEntity());
+    @Test
+    void testValidateBadSuperClass() {
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.validate(new JobEntity()));
     }
 
     /**
      * Test to make sure can successfully set the Cluster this job ran on.
      */
     @Test
-    public void canSetCluster() {
+    void canSetCluster() {
         final ClusterEntity cluster = new ClusterEntity();
         final String clusterName = UUID.randomUUID().toString();
         cluster.setName(clusterName);
-        Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
+        Assertions.assertThat(this.jobEntity.getCluster()).isNotPresent();
+        Assertions.assertThat(this.jobEntity.getClusterName()).isNotPresent();
         this.jobEntity.setCluster(cluster);
-        Assert.assertThat(this.jobEntity.getCluster().orElseThrow(IllegalArgumentException::new), Matchers.is(cluster));
-        final String actualClusterName = this.jobEntity.getClusterName().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualClusterName, Matchers.is(clusterName));
+        Assertions.assertThat(this.jobEntity.getCluster()).isPresent().contains(cluster);
+        Assertions.assertThat(this.jobEntity.getClusterName()).isPresent().contains(clusterName);
 
         this.jobEntity.setCluster(null);
-        Assert.assertFalse(this.jobEntity.getCluster().isPresent());
-        Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
+        Assertions.assertThat(this.jobEntity.getCluster()).isNotPresent();
+        Assertions.assertThat(this.jobEntity.getClusterName()).isNotPresent();
     }
 
     /**
      * Test to make sure can successfully set the Command this job ran used.
      */
     @Test
-    public void canSetCommand() {
+    void canSetCommand() {
         final CommandEntity command = new CommandEntity();
         final String commandName = UUID.randomUUID().toString();
         command.setName(commandName);
-        Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
+        Assertions.assertThat(this.jobEntity.getCommand()).isNotPresent();
+        Assertions.assertThat(this.jobEntity.getCommandName()).isNotPresent();
         this.jobEntity.setCommand(command);
-        Assert.assertThat(this.jobEntity.getCommand().orElseThrow(IllegalArgumentException::new), Matchers.is(command));
-        final String actualCommandName = this.jobEntity.getCommandName().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualCommandName, Matchers.is(commandName));
+        Assertions.assertThat(this.jobEntity.getCommand()).isPresent().contains(command);
+        Assertions.assertThat(this.jobEntity.getCommandName()).isPresent().contains(commandName);
 
         this.jobEntity.setCommand(null);
-        Assert.assertFalse(this.jobEntity.getCommand().isPresent());
-        Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
+        Assertions.assertThat(this.jobEntity.getCommand()).isNotPresent();
+        Assertions.assertThat(this.jobEntity.getCommandName()).isNotPresent();
     }
 
     /**
      * Test the application set and get methods.
      */
     @Test
-    public void canSetApplications() {
+    void canSetApplications() {
         final ApplicationEntity application1 = new ApplicationEntity();
         application1.setUniqueId(UUID.randomUUID().toString());
         final ApplicationEntity application2 = new ApplicationEntity();
@@ -349,205 +334,173 @@ public class JobEntityTest extends EntityTestBase {
         application3.setUniqueId(UUID.randomUUID().toString());
         final List<ApplicationEntity> applications = Lists.newArrayList(application1, application2, application3);
 
-        Assert.assertThat(this.jobEntity.getApplications(), Matchers.empty());
+        Assertions.assertThat(this.jobEntity.getApplications()).isEmpty();
         this.jobEntity.setApplications(applications);
-        Assert.assertThat(this.jobEntity.getApplications(), Matchers.is(applications));
+        Assertions.assertThat(this.jobEntity.getApplications()).isEqualTo(applications);
     }
 
     /**
      * Test to make sure can successfully set the host name the job is running on.
      */
     @Test
-    public void canSetHostName() {
+    void canSetAgentHostName() {
         final String hostName = UUID.randomUUID().toString();
         this.jobEntity.setAgentHostname(hostName);
-        Assert.assertThat(
-            this.jobEntity.getAgentHostname().orElse(UUID.randomUUID().toString()),
-            Matchers.is(hostName)
-        );
+        Assertions.assertThat(this.jobEntity.getAgentHostname()).isPresent().contains(hostName);
     }
 
     /**
      * Test to make sure can successfully set the process id of the job.
      */
     @Test
-    public void canSetProcessId() {
+    void canSetProcessId() {
         final int processId = 12309834;
         this.jobEntity.setProcessId(processId);
-        Assert.assertThat(this.jobEntity.getProcessId().orElseGet(RandomSuppliers.INT), Matchers.is(processId));
+        Assertions.assertThat(this.jobEntity.getProcessId()).isPresent().contains(processId);
     }
 
     /**
      * Make sure setting the check delay time period works properly.
      */
     @Test
-    public void canSetCheckDelay() {
-        Assert.assertFalse(this.jobEntity.getCheckDelay().isPresent());
+    void canSetCheckDelay() {
+        Assertions.assertThat(this.jobEntity.getCheckDelay()).isNotPresent();
         final long newDelay = 1803234L;
         this.jobEntity.setCheckDelay(newDelay);
-        Assert.assertThat(
-            this.jobEntity.getCheckDelay().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(newDelay)
-        );
+        Assertions.assertThat(this.jobEntity.getCheckDelay()).isPresent().contains(newDelay);
     }
 
     /**
      * Test to make sure can successfully set the process id of the job.
      */
     @Test
-    public void canSetExitCode() {
+    void canSetExitCode() {
         final int exitCode = 80072043;
         this.jobEntity.setExitCode(exitCode);
-        Assert.assertThat(this.jobEntity.getExitCode().orElseGet(RandomSuppliers.INT), Matchers.is(exitCode));
+        Assertions.assertThat(this.jobEntity.getExitCode()).isPresent().contains(exitCode);
     }
 
     /**
      * Make sure setting memory used works.
      */
     @Test
-    public void canSetMemoryUsed() {
-        Assert.assertFalse(this.jobEntity.getMemoryUsed().isPresent());
+    void canSetMemoryUsed() {
+        Assertions.assertThat(this.jobEntity.getMemoryUsed()).isNotPresent();
         final int memory = 10_240;
         this.jobEntity.setMemoryUsed(memory);
-        Assert.assertThat(this.jobEntity.getMemoryUsed().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
+        Assertions.assertThat(this.jobEntity.getMemoryUsed()).isPresent().contains(memory);
     }
 
     /**
      * Make sure can set the client host name the request came from.
      */
     @Test
-    public void canSetRequestApiClientHostname() {
+    void canSetRequestApiClientHostname() {
         final String clientHost = UUID.randomUUID().toString();
         this.jobEntity.setRequestApiClientHostname(clientHost);
-        Assert.assertThat(
-            this.jobEntity.getRequestApiClientHostname().orElseGet(RandomSuppliers.STRING),
-            Matchers.is(clientHost)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestApiClientHostname()).isPresent().contains(clientHost);
     }
 
     /**
      * Make sure we can set and get the user agent string.
      */
     @Test
-    public void canSetRequestApiClientUserAgent() {
-        Assert.assertFalse(this.jobEntity.getRequestApiClientUserAgent().isPresent());
+    void canSetRequestApiClientUserAgent() {
+        Assertions.assertThat(this.jobEntity.getRequestApiClientUserAgent()).isNotPresent();
         final String userAgent = UUID.randomUUID().toString();
         this.jobEntity.setRequestApiClientUserAgent(userAgent);
-        Assert.assertThat(
-            this.jobEntity.getRequestApiClientUserAgent().orElseGet(RandomSuppliers.STRING),
-            Matchers.is(userAgent)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestApiClientUserAgent()).isPresent().contains(userAgent);
     }
 
     /**
      * Make sure can set the client host name the request came from.
      */
     @Test
-    public void canSetRequestAgentClientHostname() {
+    void canSetRequestAgentClientHostname() {
         final String clientHost = UUID.randomUUID().toString();
         this.jobEntity.setRequestAgentClientHostname(clientHost);
-        Assert.assertThat(
-            this.jobEntity.getRequestAgentClientHostname().orElseGet(RandomSuppliers.STRING),
-            Matchers.is(clientHost)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestAgentClientHostname()).isPresent().contains(clientHost);
     }
 
     /**
      * Make sure can set the client version the request came from.
      */
     @Test
-    public void canSetRequestAgentClientVersion() {
+    void canSetRequestAgentClientVersion() {
         final String version = UUID.randomUUID().toString();
         this.jobEntity.setRequestAgentClientVersion(version);
-        Assert.assertThat(
-            this.jobEntity.getRequestAgentClientVersion().orElseGet(RandomSuppliers.STRING),
-            Matchers.is(version)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestAgentClientVersion()).isPresent().contains(version);
     }
 
     /**
      * Make sure can set the client pid the request came from.
      */
     @Test
-    public void canSetRequestAgentClientPid() {
+    void canSetRequestAgentClientPid() {
         final int pid = 28_000;
         this.jobEntity.setRequestAgentClientPid(pid);
-        Assert.assertThat(
-            this.jobEntity.getRequestAgentClientPid().orElseGet(RandomSuppliers.INT),
-            Matchers.is(pid)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestAgentClientPid()).isPresent().contains(pid);
     }
 
     /**
      * Make sure we can set and get the number of attachments.
      */
     @Test
-    public void canSetNumAttachments() {
-        Assert.assertFalse(this.jobEntity.getNumAttachments().isPresent());
+    void canSetNumAttachments() {
+        Assertions.assertThat(this.jobEntity.getNumAttachments()).isNotPresent();
         final int numAttachments = 380208;
         this.jobEntity.setNumAttachments(numAttachments);
-        Assert.assertThat(
-            this.jobEntity.getNumAttachments().orElseGet(RandomSuppliers.INT), Matchers.is(numAttachments)
-        );
+        Assertions.assertThat(this.jobEntity.getNumAttachments()).isPresent().contains(numAttachments);
     }
 
     /**
      * Make sure we can set and get the total size of the attachments.
      */
     @Test
-    public void canSetTotalSizeOfAttachments() {
-        Assert.assertFalse(this.jobEntity.getTotalSizeOfAttachments().isPresent());
+    void canSetTotalSizeOfAttachments() {
+        Assertions.assertThat(this.jobEntity.getTotalSizeOfAttachments()).isNotPresent();
         final long totalSizeOfAttachments = 90832432L;
         this.jobEntity.setTotalSizeOfAttachments(totalSizeOfAttachments);
-        Assert.assertThat(
-            this.jobEntity.getTotalSizeOfAttachments().orElseGet(RandomSuppliers.LONG),
-            Matchers.is(totalSizeOfAttachments)
-        );
+        Assertions.assertThat(this.jobEntity.getTotalSizeOfAttachments()).isPresent().contains(totalSizeOfAttachments);
     }
 
     /**
      * Make sure we can set and get the size of the std out file.
      */
     @Test
-    public void canSetStdOutSize() {
-        Assert.assertFalse(this.jobEntity.getStdOutSize().isPresent());
+    void canSetStdOutSize() {
+        Assertions.assertThat(this.jobEntity.getStdOutSize()).isNotPresent();
         final long stdOutSize = 90334432L;
         this.jobEntity.setStdOutSize(stdOutSize);
-        Assert.assertThat(
-            this.jobEntity.getStdOutSize().orElseGet(RandomSuppliers.LONG),
-            Matchers.is(stdOutSize)
-        );
+        Assertions.assertThat(this.jobEntity.getStdOutSize()).isPresent().contains(stdOutSize);
     }
 
     /**
      * Make sure we can set and get the size of the std err file.
      */
     @Test
-    public void canSetStdErrSize() {
-        Assert.assertFalse(this.jobEntity.getStdErrSize().isPresent());
+    void canSetStdErrSize() {
+        Assertions.assertThat(this.jobEntity.getStdErrSize()).isNotPresent();
         final long stdErrSize = 9089932L;
         this.jobEntity.setStdErrSize(stdErrSize);
-        Assert.assertThat(
-            this.jobEntity.getStdErrSize().orElseGet(RandomSuppliers.LONG),
-            Matchers.is(stdErrSize)
-        );
+        Assertions.assertThat(this.jobEntity.getStdErrSize()).isPresent().contains(stdErrSize);
     }
 
     /**
      * Make sure can set the group for the job.
      */
     @Test
-    public void canSetGroup() {
+    void canSetGroup() {
         final String group = UUID.randomUUID().toString();
         this.jobEntity.setGenieUserGroup(group);
-        Assert.assertThat(this.jobEntity.getGenieUserGroup().orElseGet(RandomSuppliers.STRING), Matchers.is(group));
+        Assertions.assertThat(this.jobEntity.getGenieUserGroup()).isPresent().contains(group);
     }
 
     /**
      * Make sure can set the cluster criteria.
      */
     @Test
-    public void canSetClusterCriteria() {
+    void canSetClusterCriteria() {
         final Set<TagEntity> one = Sets.newHashSet("one", "two", "three")
             .stream()
             .map(TagEntity::new)
@@ -568,385 +521,350 @@ public class JobEntityTest extends EntityTestBase {
         final List<CriterionEntity> clusterCriteria = Lists.newArrayList(entity1, entity2, entity3);
 
         this.jobEntity.setClusterCriteria(clusterCriteria);
-        Assert.assertThat(this.jobEntity.getClusterCriteria(), Matchers.is(clusterCriteria));
+        Assertions.assertThat(this.jobEntity.getClusterCriteria()).isEqualTo(clusterCriteria);
     }
 
     /**
      * Make sure the setter for the jobEntity class works for JPA for null cluster criterias.
      */
     @Test
-    public void canSetNullClusterCriteria() {
+    void canSetNullClusterCriteria() {
         this.jobEntity.setClusterCriteria(null);
-        Assert.assertThat(this.jobEntity.getClusterCriteria(), Matchers.empty());
+        Assertions.assertThat(this.jobEntity.getClusterCriteria()).isEmpty();
     }
 
     /**
      * Make sure can set the file configs.
      */
     @Test
-    public void canSetConfigs() {
-        final String fileConfigs = UUID.randomUUID().toString();
-        final FileEntity config = new FileEntity();
-        config.setFile(fileConfigs);
-        final Set<FileEntity> configs = Sets.newHashSet(config);
+    void canSetConfigs() {
+        final Set<FileEntity> configs = Sets.newHashSet(new FileEntity(UUID.randomUUID().toString()));
         this.jobEntity.setConfigs(configs);
-        Assert.assertThat(this.jobEntity.getConfigs(), Matchers.is(configs));
+        Assertions.assertThat(this.jobEntity.getConfigs()).isEqualTo(configs);
     }
 
     /**
      * Make sure can set the blank file configs.
      */
     @Test
-    public void canSetNullConfigs() {
+    void canSetNullConfigs() {
         this.jobEntity.setConfigs(null);
-        Assert.assertThat(this.jobEntity.getConfigs(), Matchers.empty());
+        Assertions.assertThat(this.jobEntity.getConfigs()).isEmpty();
     }
 
     /**
      * Make sure can set the file dependencies.
      */
     @Test
-    public void canSetDependencies() {
-        final String fileConfigs = UUID.randomUUID().toString();
-        final FileEntity dependency = new FileEntity();
-        dependency.setFile(fileConfigs);
-        final Set<FileEntity> dependencies = Sets.newHashSet(dependency);
+    void canSetDependencies() {
+        final Set<FileEntity> dependencies = Sets.newHashSet(new FileEntity(UUID.randomUUID().toString()));
         this.jobEntity.setDependencies(dependencies);
-        Assert.assertThat(this.jobEntity.getDependencies(), Matchers.is(dependencies));
+        Assertions.assertThat(this.jobEntity.getDependencies()).isEqualTo(dependencies);
     }
 
     /**
      * Make sure can set the blank file dependencies.
      */
     @Test
-    public void canSetNullDependencies() {
+    void canSetNullDependencies() {
         this.jobEntity.setDependencies(null);
-        Assert.assertThat(this.jobEntity.getDependencies(), Matchers.empty());
+        Assertions.assertThat(this.jobEntity.getDependencies()).isEmpty();
     }
 
     /**
      * Make sure can set whether to disable logs or not.
      */
     @Test
-    public void canSetArchivingDisabled() {
+    void canSetArchivingDisabled() {
         this.jobEntity.setArchivingDisabled(true);
-        Assert.assertTrue(this.jobEntity.isArchivingDisabled());
+        Assertions.assertThat(this.jobEntity.isArchivingDisabled()).isTrue();
     }
 
     /**
      * Make sure can set the email address of the user.
      */
     @Test
-    public void canSetEmail() {
+    void canSetEmail() {
         final String email = UUID.randomUUID().toString();
         this.jobEntity.setEmail(email);
-        Assert.assertThat(this.jobEntity.getEmail().orElseGet(RandomSuppliers.STRING), Matchers.is(email));
+        Assertions.assertThat(this.jobEntity.getEmail()).isPresent().contains(email);
     }
 
     /**
      * Make sure can set the command criteria.
      */
     @Test
-    public void canSetCommandCriteria() {
+    void canSetCommandCriteria() {
         final Set<TagEntity> tags = Sets.newHashSet(
             new TagEntity(UUID.randomUUID().toString()),
             new TagEntity(UUID.randomUUID().toString())
         );
 
         final CriterionEntity commandCriterion = new CriterionEntity(null, null, null, null, tags);
-
         this.jobEntity.setCommandCriterion(commandCriterion);
-        Assert.assertThat(this.jobEntity.getCommandCriterion(), Matchers.is(commandCriterion));
+        Assertions.assertThat(this.jobEntity.getCommandCriterion()).isEqualTo(commandCriterion);
     }
 
     /**
      * Make sure can set the setup file.
      */
     @Test
-    public void canSetSetupFile() {
-        final String setupFile = UUID.randomUUID().toString();
-        final FileEntity setupFileEntity = new FileEntity();
-        setupFileEntity.setFile(setupFile);
+    void canSetSetupFile() {
+        final FileEntity setupFileEntity = new FileEntity(UUID.randomUUID().toString());
         this.jobEntity.setSetupFile(setupFileEntity);
-        Assert.assertThat(
-            this.jobEntity.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFileEntity)
-        );
+        Assertions.assertThat(this.jobEntity.getSetupFile()).isPresent().contains(setupFileEntity);
     }
 
     /**
      * Make sure can set the tags for the job.
      */
     @Test
-    public void canSetTags() {
-        final TagEntity one = new TagEntity();
-        one.setTag(UUID.randomUUID().toString());
-        final TagEntity two = new TagEntity();
-        two.setTag(UUID.randomUUID().toString());
+    void canSetTags() {
+        final TagEntity one = new TagEntity(UUID.randomUUID().toString());
+        final TagEntity two = new TagEntity(UUID.randomUUID().toString());
         final Set<TagEntity> tags = Sets.newHashSet(one, two);
 
         this.jobEntity.setTags(tags);
-        Assert.assertThat(this.jobEntity.getTags(), Matchers.is(tags));
+        Assertions.assertThat(this.jobEntity.getTags()).isEqualTo(tags);
 
         this.jobEntity.setTags(null);
-        Assert.assertThat(this.jobEntity.getTags(), Matchers.empty());
+        Assertions.assertThat(this.jobEntity.getTags()).isEmpty();
     }
 
     /**
      * Make sure can set the number of cpu's to use for the job.
      */
     @Test
-    public void canSetRequestedCpu() {
+    void canSetRequestedCpu() {
         final int cpu = 16;
         this.jobEntity.setRequestedCpu(cpu);
-        Assert.assertThat(this.jobEntity.getRequestedCpu().orElseGet(RandomSuppliers.INT), Matchers.is(cpu));
+        Assertions.assertThat(this.jobEntity.getRequestedCpu()).isPresent().contains(cpu);
     }
 
     /**
      * Make sure can set the amount of memory to use for the job.
      */
     @Test
-    public void canSetRequestedMemory() {
+    void canSetRequestedMemory() {
         final int memory = 2048;
         this.jobEntity.setRequestedMemory(memory);
-        Assert.assertThat(this.jobEntity.getRequestedMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
+        Assertions.assertThat(this.jobEntity.getRequestedMemory()).isPresent().contains(memory);
     }
 
     /**
      * Make sure the jobEntity class sets the applications requested right.
      */
     @Test
-    public void canSetRequestedApplications() {
+    void canSetRequestedApplications() {
         final String application = UUID.randomUUID().toString();
         final List<String> applications = Lists.newArrayList(application);
         this.jobEntity.setRequestedApplications(applications);
-        Assert.assertThat(this.jobEntity.getRequestedApplications(), Matchers.is(applications));
+        Assertions.assertThat(this.jobEntity.getRequestedApplications()).isEqualTo(applications);
     }
 
     /**
      * Make sure can set the timeout date for the job.
      */
     @Test
-    public void canSetRequestedTimeout() {
-        Assert.assertFalse(this.jobEntity.getRequestedTimeout().isPresent());
+    void canSetRequestedTimeout() {
+        Assertions.assertThat(this.jobEntity.getRequestedTimeout()).isNotPresent();
         final int timeout = 28023423;
         this.jobEntity.setRequestedTimeout(timeout);
-        Assert.assertThat(this.jobEntity.getRequestedTimeout().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
+        Assertions.assertThat(this.jobEntity.getRequestedTimeout()).isPresent().contains(timeout);
     }
 
     /**
      * Test the setter.
      */
     @Test
-    public void canSetRequestedEnvironmentVariables() {
-        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.notNullValue());
-        Assert.assertTrue(this.jobEntity.getRequestedEnvironmentVariables().isEmpty());
+    void canSetRequestedEnvironmentVariables() {
+        Assertions.assertThat(this.jobEntity.getRequestedEnvironmentVariables()).isEmpty();
 
         this.jobEntity.setRequestedEnvironmentVariables(null);
-        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.notNullValue());
-        Assert.assertTrue(this.jobEntity.getRequestedEnvironmentVariables().isEmpty());
+        Assertions.assertThat(this.jobEntity.getRequestedEnvironmentVariables()).isEmpty();
 
         final Map<String, String> variables = Maps.newHashMap();
         variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         this.jobEntity.setRequestedEnvironmentVariables(variables);
-        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.is(variables));
+        Assertions.assertThat(this.jobEntity.getRequestedEnvironmentVariables()).isEqualTo(variables);
 
         // Make sure outside modifications of collection don't effect internal class state
         variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.not(variables));
+        Assertions.assertThat(this.jobEntity.getRequestedEnvironmentVariables()).isNotEqualTo(variables);
 
         this.jobEntity.setRequestedEnvironmentVariables(variables);
-        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.is(variables));
+        Assertions.assertThat(this.jobEntity.getRequestedEnvironmentVariables()).isEqualTo(variables);
 
         // Make sure this clears variables
         this.jobEntity.setRequestedEnvironmentVariables(null);
-        Assert.assertTrue(this.jobEntity.getRequestedEnvironmentVariables().isEmpty());
+        Assertions.assertThat(this.jobEntity.getRequestedEnvironmentVariables()).isEmpty();
     }
 
     /**
      * Test the setter.
      */
     @Test
-    public void canSetEnvironmentVariables() {
-        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.notNullValue());
-        Assert.assertTrue(this.jobEntity.getEnvironmentVariables().isEmpty());
+    void canSetEnvironmentVariables() {
+        Assertions.assertThat(this.jobEntity.getEnvironmentVariables()).isEmpty();
 
         this.jobEntity.setEnvironmentVariables(null);
-        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.notNullValue());
-        Assert.assertTrue(this.jobEntity.getEnvironmentVariables().isEmpty());
+        Assertions.assertThat(this.jobEntity.getEnvironmentVariables()).isEmpty();
 
         final Map<String, String> variables = Maps.newHashMap();
         variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         this.jobEntity.setEnvironmentVariables(variables);
-        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.is(variables));
+        Assertions.assertThat(this.jobEntity.getEnvironmentVariables()).isEqualTo(variables);
 
         // Make sure outside modifications of collection don't effect internal class state
         variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.not(variables));
+        Assertions.assertThat(this.jobEntity.getEnvironmentVariables()).isNotEqualTo(variables);
 
         this.jobEntity.setEnvironmentVariables(variables);
-        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.is(variables));
+        Assertions.assertThat(this.jobEntity.getEnvironmentVariables()).isEqualTo(variables);
 
         // Make sure this clears variables
         this.jobEntity.setEnvironmentVariables(null);
-        Assert.assertTrue(this.jobEntity.getEnvironmentVariables().isEmpty());
+        Assertions.assertThat(this.jobEntity.getEnvironmentVariables()).isEmpty();
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetInteractive() {
-        Assert.assertFalse(this.jobEntity.isInteractive());
+    void canSetInteractive() {
+        Assertions.assertThat(this.jobEntity.isInteractive()).isFalse();
         this.jobEntity.setInteractive(true);
-        Assert.assertTrue(this.jobEntity.isInteractive());
+        Assertions.assertThat(this.jobEntity.isInteractive()).isTrue();
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetResolved() {
-        Assert.assertFalse(this.jobEntity.isResolved());
+    void canSetResolved() {
+        Assertions.assertThat(this.jobEntity.isResolved()).isFalse();
         this.jobEntity.setResolved(true);
-        Assert.assertTrue(this.jobEntity.isResolved());
+        Assertions.assertThat(this.jobEntity.isResolved()).isTrue();
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetRequestedJobDirectoryLocation() {
-        Assert.assertFalse(this.jobEntity.getRequestedJobDirectoryLocation().isPresent());
+    void canSetRequestedJobDirectoryLocation() {
+        Assertions.assertThat(this.jobEntity.getRequestedJobDirectoryLocation()).isNotPresent();
         final String location = UUID.randomUUID().toString();
         this.jobEntity.setRequestedJobDirectoryLocation(location);
-        Assert.assertThat(
-            this.jobEntity.getRequestedJobDirectoryLocation().orElse(UUID.randomUUID().toString()),
-            Matchers.is(location)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestedJobDirectoryLocation()).isPresent().contains(location);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetJobDirectoryLocation() {
-        Assert.assertFalse(this.jobEntity.getJobDirectoryLocation().isPresent());
+    void canSetJobDirectoryLocation() {
+        Assertions.assertThat(this.jobEntity.getJobDirectoryLocation()).isNotPresent();
         final String location = UUID.randomUUID().toString();
         this.jobEntity.setJobDirectoryLocation(location);
-        Assert.assertThat(
-            this.jobEntity.getJobDirectoryLocation().orElse(UUID.randomUUID().toString()),
-            Matchers.is(location)
-        );
+        Assertions.assertThat(this.jobEntity.getJobDirectoryLocation()).isPresent().contains(location);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetRequestedAgentConfigExt() {
-        Assert.assertFalse(this.jobEntity.getRequestedAgentConfigExt().isPresent());
+    void canSetRequestedAgentConfigExt() {
+        Assertions.assertThat(this.jobEntity.getRequestedAgentConfigExt()).isNotPresent();
         final String ext = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
         this.jobEntity.setRequestedAgentConfigExt(ext);
-        Assert.assertThat(
-            this.jobEntity.getRequestedAgentConfigExt().orElse(UUID.randomUUID().toString()),
-            Matchers.is(ext)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestedAgentConfigExt()).isPresent().contains(ext);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetRequestedAgentEnvironmentExt() {
-        Assert.assertFalse(this.jobEntity.getRequestedAgentEnvironmentExt().isPresent());
+    void canSetRequestedAgentEnvironmentExt() {
+        Assertions.assertThat(this.jobEntity.getRequestedAgentEnvironmentExt()).isNotPresent();
         final String ext = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
         this.jobEntity.setRequestedAgentEnvironmentExt(ext);
-        Assert.assertThat(
-            this.jobEntity.getRequestedAgentEnvironmentExt().orElse(UUID.randomUUID().toString()),
-            Matchers.is(ext)
-        );
+        Assertions.assertThat(this.jobEntity.getRequestedAgentEnvironmentExt()).isPresent().contains(ext);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetAgentVersion() {
-        Assert.assertFalse(this.jobEntity.getAgentVersion().isPresent());
+    void canSetAgentVersion() {
+        Assertions.assertThat(this.jobEntity.getAgentVersion()).isNotPresent();
         final String version = UUID.randomUUID().toString();
         this.jobEntity.setAgentVersion(version);
-        Assert.assertThat(
-            this.jobEntity.getAgentVersion().orElse(UUID.randomUUID().toString()),
-            Matchers.is(version)
-        );
+        Assertions.assertThat(this.jobEntity.getAgentVersion()).isPresent().contains(version);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetAgentPid() {
-        Assert.assertFalse(this.jobEntity.getAgentPid().isPresent());
+    void canSetAgentPid() {
+        Assertions.assertThat(this.jobEntity.getAgentPid()).isNotPresent();
         final int pid = 31_382;
         this.jobEntity.setAgentPid(pid);
-        Assert.assertThat(
-            this.jobEntity.getAgentPid().orElseGet(RandomSuppliers.INT),
-            Matchers.is(pid)
-        );
+        Assertions.assertThat(this.jobEntity.getAgentPid()).isPresent().contains(pid);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetClaimed() {
-        Assert.assertFalse(this.jobEntity.isClaimed());
+    void canSetClaimed() {
+        Assertions.assertThat(this.jobEntity.isClaimed()).isFalse();
         this.jobEntity.setClaimed(true);
-        Assert.assertTrue(this.jobEntity.isClaimed());
+        Assertions.assertThat(this.jobEntity.isClaimed()).isTrue();
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetV4() {
-        Assert.assertFalse(this.jobEntity.isV4());
+    void canSetV4() {
+        Assertions.assertThat(this.jobEntity.isV4()).isFalse();
         this.jobEntity.setV4(true);
-        Assert.assertTrue(this.jobEntity.isV4());
+        Assertions.assertThat(this.jobEntity.isV4()).isTrue();
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetRequestedArchiveLocationPrefix() {
-        Assert.assertFalse(this.jobEntity.getRequestedArchiveLocationPrefix().isPresent());
+    void canSetRequestedArchiveLocationPrefix() {
+        Assertions.assertThat(this.jobEntity.getRequestedArchiveLocationPrefix()).isNotPresent();
         final String requestedArchiveLocationPrefix = UUID.randomUUID().toString();
         this.jobEntity.setRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix);
-        Assert.assertThat(
-            this.jobEntity.getRequestedArchiveLocationPrefix().get(),
-            Matchers.is(requestedArchiveLocationPrefix)
-        );
+        Assertions
+            .assertThat(this.jobEntity.getRequestedArchiveLocationPrefix())
+            .isPresent()
+            .contains(requestedArchiveLocationPrefix);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetTimeoutUsed() {
+    void canSetTimeoutUsed() {
         Assertions.assertThat(this.jobEntity.getTimeoutUsed()).isEmpty();
         this.jobEntity.setTimeoutUsed(null);
         Assertions.assertThat(this.jobEntity.getTimeoutUsed()).isEmpty();
         final int timeoutUsed = 324_323;
         this.jobEntity.setTimeoutUsed(timeoutUsed);
-        Assertions.assertThat(this.jobEntity.getTimeoutUsed().orElse(timeoutUsed - 1)).isEqualTo(timeoutUsed);
+        Assertions.assertThat(this.jobEntity.getTimeoutUsed()).isPresent().contains(timeoutUsed);
     }
 
     /**
      * Test setter/getter.
      */
     @Test
-    public void canSetApi() {
+    void canSetApi() {
         Assertions.assertThat(this.jobEntity.isApi()).isTrue();
         this.jobEntity.setApi(false);
         Assertions.assertThat(this.jobEntity.isApi()).isFalse();
@@ -956,7 +874,7 @@ public class JobEntityTest extends EntityTestBase {
      * Test the toString method.
      */
     @Test
-    public void testToString() {
-        Assert.assertNotNull(this.jobEntity.toString());
+    void testToString() {
+        Assertions.assertThat(this.jobEntity.toString()).isNotBlank();
     }
 }
