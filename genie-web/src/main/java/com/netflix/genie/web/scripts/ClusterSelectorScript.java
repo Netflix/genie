@@ -25,7 +25,8 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFou
 import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
-import com.netflix.genie.web.properties.ClusterLoadBalancerScriptProperties;
+import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
+import com.netflix.genie.web.services.ClusterSelector;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link ManagedScript} that delegates selection of a job's cluster when more than one choice is
- * available. See also: {@link com.netflix.genie.web.services.ClusterLoadBalancer}.
+ * available. See also: {@link ClusterSelector}.
  * <p>
  * The contract between the script and the Java code is that the script will be supplied global variables
  * {@code clusters} and {@code jobRequest} which will be JSON strings representing the list (array) of clusters
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
  * @author mprimi
  * @since 4.0.0
  */
-public class ClusterLoadBalancerScript extends ManagedScript {
+public class ClusterSelectorScript extends ManagedScript {
     private static final String CLUSTERS_BINDING = "clusters";
     private static final String JOB_REQUEST_BINDING = "jobRequest";
 
@@ -58,9 +59,9 @@ public class ClusterLoadBalancerScript extends ManagedScript {
      * @param mapper        object mapper
      * @param registry      meter registry
      */
-    public ClusterLoadBalancerScript(
+    public ClusterSelectorScript(
         final ScriptManager scriptManager,
-        final ClusterLoadBalancerScriptProperties properties,
+        final ClusterSelectorScriptProperties properties,
         final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
@@ -83,7 +84,7 @@ public class ClusterLoadBalancerScript extends ManagedScript {
         final Set<Cluster> clusters
     ) throws ScriptNotConfiguredException, ScriptExecutionException, GenieClusterNotFoundException {
 
-        // TODO: For now for backwards compatibility with balancer scripts continue writing Clusters out in
+        // TODO: For now for backwards compatibility with selector scripts continue writing Clusters out in
         //       V3 format. Change to V4 once stabilize a bit more
         final Set<com.netflix.genie.common.dto.Cluster> v3Clusters = clusters
             .stream()

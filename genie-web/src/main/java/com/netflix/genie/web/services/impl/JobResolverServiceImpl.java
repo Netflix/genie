@@ -42,7 +42,7 @@ import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.ClusterLoadBalancer;
+import com.netflix.genie.web.services.ClusterSelector;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -106,24 +106,24 @@ public class JobResolverServiceImpl implements JobResolverService {
     private static final String SELECT_APPLICATIONS_TIMER_NAME = "genie.services.jobResolver.selectApplications.timer";
 
     /**
-     * How many times a cluster load balancer is invoked.
+     * How many times a cluster selector is invoked.
      */
-    private static final String SELECT_LOAD_BALANCER_COUNTER_NAME = "genie.services.jobResolver.loadBalancer.counter";
+    private static final String CLUSTER_SELECTOR_COUNTER_NAME = "genie.services.jobResolver.clusterSelector.counter";
 
     private static final String NO_ID_FOUND = "No id found";
     private static final Tag SAVED_TAG = Tag.of("saved", "true");
     private static final Tag NOT_SAVED_TAG = Tag.of("saved", "false");
 
-    private static final String LOAD_BALANCER_STATUS_SUCCESS = "success";
-    private static final String LOAD_BALANCER_STATUS_NO_PREFERENCE = "no preference";
-    private static final String LOAD_BALANCER_STATUS_EXCEPTION = "exception";
-    private static final String LOAD_BALANCER_STATUS_INVALID = "invalid";
+    private static final String CLUSTER_SELECTOR_STATUS_SUCCESS = "success";
+    private static final String CLUSTER_SELECTOR_STATUS_NO_PREFERENCE = "no preference";
+    private static final String CLUSTER_SELECTOR_STATUS_EXCEPTION = "exception";
+    private static final String CLUSTER_SELECTOR_STATUS_INVALID = "invalid";
 
     private final ApplicationPersistenceService applicationPersistenceService;
     private final ClusterPersistenceService clusterPersistenceService;
     private final CommandPersistenceService commandPersistenceService;
     private final JobPersistenceService jobPersistenceService;
-    private final List<ClusterLoadBalancer> clusterLoadBalancerImpls;
+    private final List<ClusterSelector> clusterSelectorImpls;
     private final MeterRegistry registry;
     private final int defaultMemory;
     // TODO: Switch to path
@@ -140,7 +140,7 @@ public class JobResolverServiceImpl implements JobResolverService {
      * @param clusterPersistenceService     The {@link ClusterPersistenceService} to use to manipulate clusters
      * @param commandPersistenceService     The {@link CommandPersistenceService} to use to manipulate commands
      * @param jobPersistenceService         The {@link JobPersistenceService} instance to use
-     * @param clusterLoadBalancerImpls      The {@link ClusterLoadBalancer} implementations to use
+     * @param clusterSelectorImpls          The {@link ClusterSelector} implementations to use
      * @param registry                      The {@link MeterRegistry }metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
      */
@@ -149,7 +149,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
         final JobPersistenceService jobPersistenceService,
-        @NotEmpty final List<ClusterLoadBalancer> clusterLoadBalancerImpls,
+        @NotEmpty final List<ClusterSelector> clusterSelectorImpls,
         final MeterRegistry registry,
         final JobsProperties jobsProperties
     ) {
@@ -157,7 +157,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.clusterPersistenceService = clusterPersistenceService;
         this.commandPersistenceService = commandPersistenceService;
         this.jobPersistenceService = jobPersistenceService;
-        this.clusterLoadBalancerImpls = clusterLoadBalancerImpls;
+        this.clusterSelectorImpls = clusterSelectorImpls;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
 
         final URI jobDirProperty = jobsProperties.getLocations().getJobs();
@@ -361,7 +361,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     .findFirst()
                     .orElseThrow(() -> new GenieServerException("Couldn't get cluster when size was one"));
             } else {
-                cluster = this.selectClusterWithLoadBalancer(counterTags, clusters, id, jobRequest);
+                cluster = this.selectClusterSelector(counterTags, clusters, id, jobRequest);
             }
 
             log.info("Selected cluster {} for job {}", cluster.getId(), id);
@@ -440,28 +440,28 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private Cluster selectClusterWithLoadBalancer(
+    private Cluster selectClusterSelector(
         final Set<Tag> counterTags,
         final Set<Cluster> clusters,
         final String id,
         final JobRequest jobRequest
     ) throws GeniePreconditionException {
         Cluster cluster = null;
-        for (final ClusterLoadBalancer loadBalancer : this.clusterLoadBalancerImpls) {
-            final String loadBalancerClass;
-            if (loadBalancer instanceof TargetClassAware) {
-                final Class<?> targetClass = ((TargetClassAware) loadBalancer).getTargetClass();
+        for (final ClusterSelector clusterSelector : this.clusterSelectorImpls) {
+            final String clusterSelectorClass;
+            if (clusterSelector instanceof TargetClassAware) {
+                final Class<?> targetClass = ((TargetClassAware) clusterSelector).getTargetClass();
                 if (targetClass != null) {
-                    loadBalancerClass = targetClass.getCanonicalName();
+                    clusterSelectorClass = targetClass.getCanonicalName();
                 } else {
-                    loadBalancerClass = loadBalancer.getClass().getCanonicalName();
+                    clusterSelectorClass = clusterSelector.getClass().getCanonicalName();
                 }
             } else {
-                loadBalancerClass = loadBalancer.getClass().getCanonicalName();
+                clusterSelectorClass = clusterSelector.getClass().getCanonicalName();
             }
-            counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, loadBalancerClass));
+            counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
             try {
-                final Cluster selectedCluster = loadBalancer.selectCluster(
+                final Cluster selectedCluster = clusterSelector.selectCluster(
                     clusters,
                     this.toV3JobRequest(id, jobRequest)
                 );
@@ -469,42 +469,42 @@ public class JobResolverServiceImpl implements JobResolverService {
                     // Make sure the cluster existed in the original list of clusters
                     if (clusters.contains(selectedCluster)) {
                         log.debug(
-                            "Successfully selected cluster {} using load balancer {}",
+                            "Successfully selected cluster {} using selector {}",
                             selectedCluster.getId(),
-                            loadBalancerClass
+                            clusterSelectorClass
                         );
                         counterTags.addAll(
                             Lists.newArrayList(
-                                Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_SUCCESS),
+                                Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_SUCCESS),
                                 Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, selectedCluster.getId()),
                                 Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, selectedCluster.getMetadata().getName()),
-                                Tag.of(MetricsConstants.TagKeys.LOAD_BALANCER_CLASS, loadBalancerClass)
+                                Tag.of(MetricsConstants.TagKeys.CLUSTER_SELECTOR_CLASS, clusterSelectorClass)
                             )
                         );
-                        this.registry.counter(SELECT_LOAD_BALANCER_COUNTER_NAME, counterTags).increment();
+                        this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
                         cluster = selectedCluster;
                         break;
                     } else {
                         log.error(
-                            "Successfully selected cluster {} using load balancer {} but it wasn't in original cluster "
+                            "Successfully selected cluster {} using selector {} but it wasn't in original cluster "
                                 + "list {}",
                             selectedCluster.getId(),
-                            loadBalancerClass,
+                            clusterSelectorClass,
                             clusters
                         );
-                        counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_INVALID));
-                        this.registry.counter(SELECT_LOAD_BALANCER_COUNTER_NAME, counterTags).increment();
+                        counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_INVALID));
+                        this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
                     }
                 } else {
                     counterTags.add(
-                        Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_NO_PREFERENCE)
+                        Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_NO_PREFERENCE)
                     );
-                    this.registry.counter(SELECT_LOAD_BALANCER_COUNTER_NAME, counterTags).increment();
+                    this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
                 }
             } catch (final Exception e) {
-                log.error("Cluster load balancer {} threw exception:", loadBalancer, e);
-                counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_EXCEPTION));
-                this.registry.counter(SELECT_LOAD_BALANCER_COUNTER_NAME, counterTags).increment();
+                log.error("Cluster selector {} threw exception:", clusterSelector, e);
+                counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_EXCEPTION));
+                this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
             }
         }
 
@@ -512,7 +512,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         if (cluster == null) {
             this.noClusterSelectedCounter.increment();
             throw new GeniePreconditionException(
-                "Unable to select a cluster from using any of the available load balancer's."
+                "Unable to select a cluster from using any of the available selectors."
             );
         }
 

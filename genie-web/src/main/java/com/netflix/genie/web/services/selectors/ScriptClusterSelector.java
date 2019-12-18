@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services.loadbalancers.script;
+package com.netflix.genie.web.services.selectors;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
@@ -24,8 +24,8 @@ import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
-import com.netflix.genie.web.scripts.ClusterLoadBalancerScript;
-import com.netflix.genie.web.services.ClusterLoadBalancer;
+import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.services.ClusterSelector;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -39,10 +39,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An implementation of the {@link ClusterLoadBalancer} interface which uses user-provided script to make decisions
+ * An implementation of the {@link ClusterSelector} interface which uses user-provided script to make decisions
  * based on the list of clusters and the job request supplied.
  * <p>
- * Note: this LoadBalancer implementation intentionally returns 'null' (a.k.a. 'no preference') in case of error,
+ * Note: this ClusterSelector implementation intentionally returns 'null' (a.k.a. 'no preference') in case of error,
  * rather throwing an exception. For example if the script cannot be loaded, or if an invalid cluster is returned.
  * TODO: this logic of falling back to 'no preference' in case of error should be moved out of this implementation
  * and into the service using this interface.
@@ -51,25 +51,25 @@ import java.util.concurrent.TimeUnit;
  * @since 3.1.0
  */
 @Slf4j
-public class ScriptLoadBalancer implements ClusterLoadBalancer {
+public class ScriptClusterSelector implements ClusterSelector {
 
-    static final String SELECT_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.select.timer";
+    static final String SELECT_TIMER_NAME = "genie.jobs.clusters.selectors.script.select.timer";
     private static final Cluster NO_PREFERENCE = null;
 
     private final MeterRegistry registry;
-    private final ClusterLoadBalancerScript clusterLoadBalancerScript;
+    private final ClusterSelectorScript clusterSelectorScript;
 
     /**
      * Constructor.
      *
-     * @param clusterLoadBalancerScript the cluster load balancer script
+     * @param clusterSelectorScript the cluster selector script
      * @param registry the metrics registry
      */
-    public ScriptLoadBalancer(
-        final ClusterLoadBalancerScript clusterLoadBalancerScript,
+    public ScriptClusterSelector(
+        final ClusterSelectorScript clusterSelectorScript,
         final MeterRegistry registry
     ) {
-        this.clusterLoadBalancerScript = clusterLoadBalancerScript;
+        this.clusterSelectorScript = clusterSelectorScript;
         this.registry = registry;
     }
 
@@ -86,7 +86,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         final Set<Tag> tags = Sets.newHashSet();
 
         try {
-            final Cluster selectedCluster = clusterLoadBalancerScript.selectCluster(jobRequest, clusters);
+            final Cluster selectedCluster = clusterSelectorScript.selectCluster(jobRequest, clusters);
             MetricsUtils.addSuccessTags(tags);
 
             if (selectedCluster == null) {

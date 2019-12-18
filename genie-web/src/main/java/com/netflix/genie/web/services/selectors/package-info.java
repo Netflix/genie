@@ -17,22 +17,12 @@
  */
 
 /**
- * Example load balancer script for JavaScript.
- * clusters and jobRequest variables passed in via script context.
+ * Classes related to plug-in selectors (e.g. ClusterSelector).
  *
  * @author tgianos
  * @since 3.1.0
  */
+@ParametersAreNonnullByDefault
+package com.netflix.genie.web.services.selectors;
 
-var cJson = JSON.parse(clusters);
-// var jJson = JSON.parse(jobRequest);
-
-var index;
-for (index = 0; index < cJson.length; index++) {
-    var cluster = cJson[index];
-    if (cluster.user === "h") {
-        break;
-    }
-}
-
-index < cJson.length ? cJson[index].id : null;
+import javax.annotation.ParametersAreNonnullByDefault;

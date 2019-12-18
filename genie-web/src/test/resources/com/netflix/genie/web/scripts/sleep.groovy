@@ -17,7 +17,7 @@
  */
 
 /**
- * Example of misbehaving load balancer Groovy script.
+ * Example of misbehaving Groovy script.
  * Performs a 3 second wait. The test invoking this should timeout and kill.
  *
  * @author mprimi
