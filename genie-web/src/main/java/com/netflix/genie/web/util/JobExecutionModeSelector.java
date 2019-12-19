@@ -49,16 +49,6 @@ import java.util.Random;
 @Slf4j
 public class JobExecutionModeSelector {
 
-
-    /**
-     * Functional interface for methods of this class that check the incoming job request and may decide for one or the
-     * other execution mode.
-     */
-    @FunctionalInterface
-    private interface CheckRequestFunction {
-        Optional<Boolean> check(JobRequest jobRequest, HttpServletRequest httpServletRequest);
-    }
-
     private static final String PROPERTY_PREFIX = "genie.jobs.agent-execution.";
     private static final Boolean DEFAULT_EXECUTE_WITH_AGENT = false;
     private static final String FORCE_AGENT_EXECUTION_HEADER_NAME = "genie-force-agent-execution";
@@ -263,5 +253,14 @@ public class JobExecutionModeSelector {
                 Tag.of(CHECK_METRIC_TAG_NAME, checkName)
             )
         ).increment();
+    }
+
+    /**
+     * Functional interface for methods of this class that check the incoming job request and may decide for one or the
+     * other execution mode.
+     */
+    @FunctionalInterface
+    private interface CheckRequestFunction {
+        Optional<Boolean> check(JobRequest jobRequest, HttpServletRequest httpServletRequest);
     }
 }
