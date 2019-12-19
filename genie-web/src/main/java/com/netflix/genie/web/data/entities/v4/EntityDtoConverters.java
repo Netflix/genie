@@ -20,7 +20,7 @@ package com.netflix.genie.web.data.entities.v4;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
@@ -28,7 +28,6 @@ import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
-import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.FinishedJob;
@@ -274,11 +273,11 @@ public final class EntityDtoConverters {
         // we can't recover from error anyway in a good way here. Hence re-wrapping checked exception in runtime
         try {
             return builder.build();
-        } catch (final GeniePreconditionException gpe) {
-            log.error("Creating a Criterion DTO from a Criterion entity threw exception", gpe);
+        } catch (final IllegalArgumentException iae) {
+            log.error("Creating a Criterion DTO from a Criterion entity threw exception", iae);
             // TODO: For now this is a generic GenieRuntimeException. If we would like more advanced logic at the
             //       edges (REST API, RPC API) based on type of exceptions we should subclass GenieRuntimeException
-            throw new GenieRuntimeException(gpe);
+            throw new GenieRuntimeException(iae);
         }
     }
 

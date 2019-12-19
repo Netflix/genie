@@ -20,7 +20,7 @@ package com.netflix.genie.agent.cli
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParameterException
 import com.beust.jcommander.ParametersDelegate
-import com.netflix.genie.common.internal.dto.v4.Criterion
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder

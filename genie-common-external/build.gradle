@@ -5,11 +5,17 @@ dependencies {
      * API Dependencies
      *******************************/
 
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    api("org.hibernate.validator:hibernate-validator")
+
     /*******************************
      * Implementation Dependencies
      *******************************/
 
-    implementation(project(":genie-common"))
+    implementation("com.google.guava:guava")
+    implementation("org.apache.commons:commons-lang3")
 
     /*******************************
      * Provided Dependencies

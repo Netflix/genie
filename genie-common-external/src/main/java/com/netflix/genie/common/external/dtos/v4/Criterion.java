@@ -15,11 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.common.internal.dto.v4;
+package com.netflix.genie.common.external.dtos.v4;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableSet;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -54,7 +53,7 @@ public class Criterion {
         @NotEmpty(message = "A tag can't be an empty string")
         @Size(max = 255, message = "A tag can't be longer than 255 characters") String> tags;
 
-    private Criterion(final Builder builder) throws GeniePreconditionException {
+    private Criterion(final Builder builder) throws IllegalArgumentException {
         this.id = builder.bId;
         this.name = builder.bName;
         this.version = builder.bVersion;
@@ -68,7 +67,7 @@ public class Criterion {
                 && StringUtils.isBlank(this.status)
                 && this.tags.isEmpty()
         ) {
-            throw new GeniePreconditionException("Invalid criterion. One of the fields must have a valid value");
+            throw new IllegalArgumentException("Invalid criterion. One of the fields must have a valid value");
         }
     }
 
@@ -193,9 +192,9 @@ public class Criterion {
          * Build an immutable Criterion. A precondition exception will be thrown if all of the fields are empty.
          *
          * @return A criterion which is completely immutable.
-         * @throws GeniePreconditionException A valid Criterion must have at least one field populated
+         * @throws IllegalArgumentException A valid Criterion must have at least one field populated
          */
-        public Criterion build() throws GeniePreconditionException {
+        public Criterion build() throws IllegalArgumentException {
             return new Criterion(this);
         }
     }

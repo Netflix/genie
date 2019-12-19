@@ -24,10 +24,10 @@ import com.google.common.collect.Sets;
 import com.google.protobuf.Int32Value;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
-import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
@@ -368,7 +368,7 @@ public class JobServiceProtoConverter {
                 .withStatus(protoCriterion.getStatus())
                 .withTags(protoCriterion.getTagsList() != null ? Sets.newHashSet(protoCriterion.getTagsList()) : null)
                 .build();
-        } catch (final GeniePreconditionException e) {
+        } catch (final IllegalArgumentException e) {
             throw new GenieConversionException("Failed to convert criterion", e);
         }
     }

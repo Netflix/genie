@@ -26,7 +26,7 @@ import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
-import com.netflix.genie.common.internal.dto.v4.Criterion
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.FinishedJob
