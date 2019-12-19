@@ -20,6 +20,7 @@ package com.netflix.genie.common.internal.dto.v4;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

@@ -19,6 +19,7 @@ package com.netflix.genie.common.internal.dto.v4
 
 import com.google.common.collect.Lists
 import com.netflix.genie.common.dto.CommandStatus
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import spock.lang.Specification
 
 /**

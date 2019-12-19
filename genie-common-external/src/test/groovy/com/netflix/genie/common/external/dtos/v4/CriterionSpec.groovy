@@ -15,10 +15,9 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.common.internal.dto.v4
+package com.netflix.genie.common.external.dtos.v4
 
 import com.google.common.collect.Sets
-import com.netflix.genie.common.exceptions.GeniePreconditionException
 import spock.lang.Specification
 
 /**
@@ -33,19 +32,19 @@ class CriterionSpec extends Specification {
         new Criterion.Builder().withId(null).withName(null).withVersion(null).withStatus(null).withTags(null).build()
 
         then:
-        thrown(GeniePreconditionException)
+        thrown(IllegalArgumentException)
 
         when:
         new Criterion.Builder().withId("").withName("").withVersion("").withStatus("").withTags(Sets.newHashSet()).build()
 
         then:
-        thrown(GeniePreconditionException)
+        thrown(IllegalArgumentException)
 
         when:
         new Criterion.Builder().build()
 
         then:
-        thrown(GeniePreconditionException)
+        thrown(IllegalArgumentException)
     }
 
     def "Can create valid criterion"() {
@@ -176,7 +175,7 @@ class CriterionSpec extends Specification {
             .build()
 
         then:
-        thrown(GeniePreconditionException)
+        thrown(IllegalArgumentException)
 
         when:
         def criterion = new Criterion.Builder()

@@ -19,7 +19,7 @@ package com.netflix.genie.web.data.repositories.jpa;
 
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.internal.dto.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 

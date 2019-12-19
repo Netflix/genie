@@ -27,7 +27,7 @@ import com.netflix.genie.common.internal.dto.v4.Cluster
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
 import com.netflix.genie.common.internal.dto.v4.Command
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata
-import com.netflix.genie.common.internal.dto.v4.Criterion
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest

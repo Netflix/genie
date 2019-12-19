@@ -30,7 +30,7 @@ import com.netflix.genie.common.internal.dto.v4.Cluster
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
 import com.netflix.genie.common.internal.dto.v4.Command
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata
-import com.netflix.genie.common.internal.dto.v4.Criterion
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.internal.dto.v4.FinishedJob
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.web.data.services.JobPersistenceService

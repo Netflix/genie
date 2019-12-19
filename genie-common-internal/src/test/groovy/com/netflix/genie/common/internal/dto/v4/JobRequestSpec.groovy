@@ -19,6 +19,7 @@ package com.netflix.genie.common.internal.dto.v4
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import spock.lang.Specification

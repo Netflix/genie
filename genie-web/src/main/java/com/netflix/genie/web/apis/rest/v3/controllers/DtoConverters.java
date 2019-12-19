@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
@@ -32,7 +33,6 @@ import com.netflix.genie.common.internal.dto.v4.ClusterRequest;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
 import com.netflix.genie.common.internal.dto.v4.CommandRequest;
-import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobArchivalDataRequest;
@@ -552,6 +552,11 @@ public final class DtoConverters {
         }
         builder.withTags(v4Tags);
 
-        return builder.build();
+        // Maintain previous contract for this method even though Criterion now throws a IAE
+        try {
+            return builder.build();
+        } catch (final IllegalArgumentException e) {
+            throw new GeniePreconditionException(e.getMessage(), e);
+        }
     }
 }

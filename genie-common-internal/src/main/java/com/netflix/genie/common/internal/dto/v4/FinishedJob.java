@@ -19,6 +19,7 @@ package com.netflix.genie.common.internal.dto.v4;
 
 import com.google.common.collect.ImmutableList;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
