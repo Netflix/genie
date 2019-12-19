@@ -19,6 +19,7 @@ package com.netflix.genie.client.security.oauth2;
 
 import com.netflix.genie.client.exceptions.GenieClientException;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -109,6 +110,7 @@ class TokenFetcherTest {
      * Test the getToken method for failure.
      */
     @Test
+    @Disabled("Fails from time to time non-deterministically")
     void testGetTokenFailure() {
         Assertions
             .assertThatExceptionOfType(GenieClientException.class)
