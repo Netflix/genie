@@ -142,7 +142,7 @@ class FetchingCacheServiceImpl implements FetchingCacheService {
         // Get a handle to the resource
         final Resource resource;
         try {
-             resource = resourceLoader.getResource(uriString);
+            resource = resourceLoader.getResource(uriString);
         } catch (Throwable t) {
             log.error(
                 "Failed to retrieve resource: {}, {} - {}",

@@ -62,12 +62,12 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
 
 
     private final String hostname;
-    private int rpcPort;
     private final JobSearchService jobSearchService;
     private final LocalAgentLauncherProperties launcherProperties;
     private final ExecutorFactory executorFactory;
     private final MeterRegistry registry;
     private final Executor sharedExecutor;
+    private int rpcPort;
 
     /**
      * Constructor.
