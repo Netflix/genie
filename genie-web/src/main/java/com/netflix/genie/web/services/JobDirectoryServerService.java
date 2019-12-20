@@ -17,12 +17,11 @@
  */
 package com.netflix.genie.web.services;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import org.springframework.validation.annotation.Validated;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -45,8 +44,7 @@ public interface JobDirectoryServerService {
      * @param relativePath The relative path from the root of the job directory of the expected resource
      * @param request      The HTTP request containing all information about the request
      * @param response     The HTTP response where all results should be written
-     * @throws IOException      If there is an error interacting with the response
-     * @throws ServletException If there is an error interacting with the Java Servlet objects
+     * @throws GenieException If there is an error serving the response
      */
     void serveResource(
         String jobId,
@@ -54,5 +52,5 @@ public interface JobDirectoryServerService {
         String relativePath,
         HttpServletRequest request,
         HttpServletResponse response
-    ) throws IOException, ServletException;
+    ) throws GenieException;
 }

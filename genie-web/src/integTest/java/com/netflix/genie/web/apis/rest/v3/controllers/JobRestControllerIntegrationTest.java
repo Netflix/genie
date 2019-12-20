@@ -46,7 +46,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1651,7 +1650,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
      * @throws Exception If there is a problem.
      */
     @Test
-    @Ignore(value = "This test is ignored since it fails. It produces a response with status 406 rather than 404")
     public void testFileNotFound() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
