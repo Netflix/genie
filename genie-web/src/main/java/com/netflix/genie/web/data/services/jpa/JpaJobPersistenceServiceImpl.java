@@ -630,7 +630,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .findByUniqueId(id, IsV4JobProjection.class)
             .orElseThrow(
                 () -> {
-                    final String errorMessage = "No job with id " + id + "exists. Unable to get v4 flag.";
+                    final String errorMessage = "No job with id " + id + " exists. Unable to get v4 flag.";
                     log.error(errorMessage);
                     return new GenieNotFoundException(errorMessage);
                 }
