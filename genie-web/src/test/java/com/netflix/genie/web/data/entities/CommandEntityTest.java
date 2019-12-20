@@ -29,16 +29,39 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Test the command class.
+ * Test the {@link CommandEntity} class.
  *
  * @author tgianos
  */
 class CommandEntityTest extends EntityTestBase {
+
+    // Comparators needed because the default equality check for CriterionEntity is to compare the id field
+    // but that field is set by database code based on insertion and isn't exposed as a setter so substituting
+    // using the uniqueId field here
+    private static final Comparator<? super List<? extends CriterionEntity>> UNIQUE_ID_CRITERIA_LIST_COMPARATOR =
+        (l1, l2) -> {
+            if (l1.size() != l2.size()) {
+                return l1.size() - l2.size();
+            }
+
+            for (int i = 0; i < l1.size(); i++) {
+                final String c1 = l1.get(i).getUniqueId().orElse(UUID.randomUUID().toString());
+                final String c2 = l2.get(i).getUniqueId().orElse(UUID.randomUUID().toString());
+                if (!c1.equals(c2)) {
+                    return c1.compareTo(c2);
+                }
+            }
+            return 0;
+        };
+    private static final Comparator<CriterionEntity> UNIQUE_ID_CRITERION_COMPARATOR = Comparator.comparing(
+        criterion -> criterion.getUniqueId().orElse(UUID.randomUUID().toString())
+    );
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final List<String> EXECUTABLE = Lists.newArrayList("/bin/pig13", "-Dblah");
@@ -393,5 +416,135 @@ class CommandEntityTest extends EntityTestBase {
     @Test
     void testToString() {
         Assertions.assertThat(this.c.toString()).isNotBlank();
+    }
+
+    @Test
+    void canManipulateClusterCriteria() {
+        Assertions.assertThat(this.c.getClusterCriteria()).isEmpty();
+        final CriterionEntity criterion0 = this.createTestCriterion();
+        final CriterionEntity criterion1 = this.createTestCriterion();
+        final CriterionEntity criterion2 = this.createTestCriterion();
+        final CriterionEntity criterion3 = this.createTestCriterion();
+        final CriterionEntity criterion4 = this.createTestCriterion();
+        final CriterionEntity criterion5 = this.createTestCriterion();
+        final CriterionEntity criterion6 = this.createTestCriterion();
+        final CriterionEntity criterion7 = this.createTestCriterion();
+        final CriterionEntity criterion8 = this.createTestCriterion();
+        final List<CriterionEntity> clusterCriteria = Lists.newArrayList(criterion0, criterion1, criterion2);
+        this.c.setClusterCriteria(clusterCriteria);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .usingComparator(UNIQUE_ID_CRITERIA_LIST_COMPARATOR)
+            .isEqualTo(clusterCriteria);
+        this.c.setClusterCriteria(null);
+        Assertions.assertThat(this.c.getClusterCriteria()).isEmpty();
+        this.c.setClusterCriteria(clusterCriteria);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .usingComparator(UNIQUE_ID_CRITERIA_LIST_COMPARATOR)
+            .isEqualTo(clusterCriteria);
+        this.c.setClusterCriteria(Lists.newArrayList());
+        Assertions.assertThat(this.c.getClusterCriteria()).isEmpty();
+        this.c.setClusterCriteria(clusterCriteria);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .usingComparator(UNIQUE_ID_CRITERIA_LIST_COMPARATOR)
+            .isEqualTo(clusterCriteria);
+        this.c.addClusterCriterion(criterion3);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .size()
+            .isEqualTo(4)
+            .returnToIterable()
+            .element(3)
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion3);
+        this.c.addClusterCriterion(criterion4, this.c.getClusterCriteria().size());
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .size()
+            .isEqualTo(5)
+            .returnToIterable()
+            .element(4)
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion4);
+        this.c.addClusterCriterion(criterion5, this.c.getClusterCriteria().size() + 80);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .size()
+            .isEqualTo(6)
+            .returnToIterable()
+            .element(5)
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion5);
+        this.c.addClusterCriterion(criterion6, -5000);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .size()
+            .isEqualTo(7)
+            .returnToIterable()
+            .element(0)
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion6);
+        this.c.addClusterCriterion(criterion7, 0);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .size()
+            .isEqualTo(8)
+            .returnToIterable()
+            .element(0)
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion7);
+        this.c.addClusterCriterion(criterion8, 1);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .size()
+            .isEqualTo(9)
+            .returnToIterable()
+            .element(1)
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion8);
+
+        Assertions
+            .assertThatIllegalArgumentException()
+            .isThrownBy(() -> this.c.removeClusterCriterion(-1));
+        Assertions
+            .assertThatIllegalArgumentException()
+            .isThrownBy(() -> this.c.removeClusterCriterion(this.c.getClusterCriteria().size()));
+        Assertions
+            .assertThat(this.c.removeClusterCriterion(0))
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion7);
+        Assertions
+            .assertThat(this.c.removeClusterCriterion(0))
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion8);
+        Assertions
+            .assertThat(this.c.removeClusterCriterion(0))
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion6);
+        Assertions
+            .assertThat(this.c.removeClusterCriterion(3))
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion3);
+        Assertions
+            .assertThat(this.c.removeClusterCriterion(4))
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion5);
+        Assertions
+            .assertThat(this.c.removeClusterCriterion(3))
+            .usingComparator(UNIQUE_ID_CRITERION_COMPARATOR)
+            .isEqualTo(criterion4);
+        Assertions
+            .assertThat(this.c.getClusterCriteria())
+            .usingComparator(UNIQUE_ID_CRITERIA_LIST_COMPARATOR)
+            .usingComparator(UNIQUE_ID_CRITERIA_LIST_COMPARATOR)
+            .isEqualTo(clusterCriteria);
+    }
+
+    private CriterionEntity createTestCriterion() {
+        final CriterionEntity criterion = new CriterionEntity();
+        criterion.setUniqueId(UUID.randomUUID().toString());
+        return criterion;
     }
 }

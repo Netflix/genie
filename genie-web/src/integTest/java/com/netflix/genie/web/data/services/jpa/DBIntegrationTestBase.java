@@ -23,6 +23,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
@@ -35,7 +36,6 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 /**
  * Base class to save on configuration.
@@ -49,7 +49,6 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
     {
         DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class
     }
 )
@@ -84,6 +83,9 @@ public abstract class DBIntegrationTestBase {
     @Autowired
     protected JpaAgentConnectionRepository agentConnectionRepository;
 
+    @Autowired
+    protected JpaCriterionRepository criterionRepository;
+
     /**
      * Clean out the db after every test.
      */
@@ -93,6 +95,7 @@ public abstract class DBIntegrationTestBase {
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();
+        this.criterionRepository.deleteAll();
         this.fileRepository.deleteAll();
         this.tagRepository.deleteAll();
         this.agentConnectionRepository.deleteAll();

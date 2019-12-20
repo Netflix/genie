@@ -37,6 +37,7 @@
     <job_requested_applications/>
     <criteria_tags/>
     <jobs_cluster_criteria/>
+    <commands_cluster_criteria/>
     <jobs/>
     <clusters/>
     <commands/>

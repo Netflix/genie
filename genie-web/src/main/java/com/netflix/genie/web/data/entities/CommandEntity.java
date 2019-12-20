@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -63,6 +64,7 @@ import java.util.Set;
 public class CommandEntity extends BaseEntity {
 
     private static final long serialVersionUID = -8058995173025433517L;
+    private static final int HIGHEST_CRITERION_PRIORITY = 0;
 
     @ElementCollection
     @CollectionTable(
@@ -142,6 +144,19 @@ public class CommandEntity extends BaseEntity {
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<ClusterEntity> clusters = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "commands_cluster_criteria",
+        joinColumns = {
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    @OrderColumn(name = "priority_order", nullable = false)
+    private List<CriterionEntity> clusterCriteria = new ArrayList<>();
 
     /**
      * Default Constructor.
@@ -272,6 +287,68 @@ public class CommandEntity extends BaseEntity {
         if (clusters != null) {
             this.clusters.addAll(clusters);
         }
+    }
+
+    /**
+     * Set the criteria, in priority order, that this command has for determining which available clusters to use
+     * for a job.
+     *
+     * @param clusterCriteria The cluster criteria
+     */
+    public void setClusterCriteria(@Nullable final List<CriterionEntity> clusterCriteria) {
+        this.clusterCriteria.clear();
+        if (clusterCriteria != null) {
+            this.clusterCriteria.addAll(clusterCriteria);
+        }
+    }
+
+    /**
+     * Add a new cluster criterion as the lowest priority criterion to evaluate for this command.
+     *
+     * @param criterion The {@link CriterionEntity} to add
+     */
+    public void addClusterCriterion(final CriterionEntity criterion) {
+        this.clusterCriteria.add(criterion);
+    }
+
+    /**
+     * Add a new cluster criterion with the given priority.
+     *
+     * @param criterion The new criterion to add
+     * @param priority  The priority with which this criterion should be considered. {@literal 0} would be the highest
+     *                  priority and anything greater than the current size of the existing criteria will just be added
+     *                  to the end of the list. If a priority of {@code < 0} is passed in the criterion is added
+     *                  as the highest priority ({@literal 0}).
+     */
+    public void addClusterCriterion(final CriterionEntity criterion, final int priority) {
+        if (priority <= HIGHEST_CRITERION_PRIORITY) {
+            this.clusterCriteria.add(HIGHEST_CRITERION_PRIORITY, criterion);
+        } else if (priority >= this.clusterCriteria.size()) {
+            this.clusterCriteria.add(criterion);
+        } else {
+            this.clusterCriteria.add(priority, criterion);
+        }
+    }
+
+    /**
+     * Remove the criterion with the given priority from the list of available criterion for this command.
+     *
+     * @param priority The priority of the criterion to remove.
+     * @return The {@link CriterionEntity} which was removed by this operation
+     * @throws IllegalArgumentException If this value is {@code < 0} or {@code > {@link List#size()}} as it becomes
+     *                                  unclear what the user wants to do
+     */
+    public CriterionEntity removeClusterCriterion(final int priority) throws IllegalArgumentException {
+        if (priority < HIGHEST_CRITERION_PRIORITY || priority >= this.clusterCriteria.size()) {
+            throw new IllegalArgumentException(
+                "The priority of the cluster criterion to remove must be "
+                    + HIGHEST_CRITERION_PRIORITY
+                    + "<= priority < "
+                    + this.clusterCriteria.size()
+                    + " for this command currently."
+            );
+        }
+        return this.clusterCriteria.remove(priority);
     }
 
     /**
