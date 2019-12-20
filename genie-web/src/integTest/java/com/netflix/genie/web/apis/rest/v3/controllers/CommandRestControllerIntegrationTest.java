@@ -1659,4 +1659,27 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             Assert.assertThat(this.commandRepository.count(), Matchers.is(++i));
         }
     }
+
+    /**
+     * Test getting a command that does not exist produces the expected error.
+     */
+    @Test
+    public void testCommandNotFound() {
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+
+        final List<String> paths = Lists.newArrayList("", "/applications", "/clusters");
+
+        for (final String relationPath : paths) {
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(COMMANDS_API + "/{id}" + relationPath, ID)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .body(EXCEPTION_CODE_PATH, Matchers.is(404))
+                .body(EXCEPTION_MESSAGE_PATH, Matchers.is("No command with id " + ID + " exists."));
+        }
+    }
 }

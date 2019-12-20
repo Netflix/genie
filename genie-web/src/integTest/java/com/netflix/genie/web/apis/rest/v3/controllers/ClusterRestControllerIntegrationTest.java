@@ -1352,4 +1352,27 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             Assert.assertThat(this.clusterRepository.count(), Matchers.is(++i));
         }
     }
+
+    /**
+     * Test getting a cluster that does not exist produces the expected error.
+     */
+    @Test
+    public void testClusterNotFound() {
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+
+        final List<String> paths = Lists.newArrayList("", "/commands");
+
+        for (final String path : paths) {
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(CLUSTERS_API + "/{id}" + path, ID)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .body(EXCEPTION_CODE_PATH, Matchers.is(404))
+                .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No cluster with id " + ID));
+        }
+    }
 }

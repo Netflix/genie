@@ -1120,4 +1120,27 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             Assert.assertThat(this.applicationRepository.count(), Matchers.is(++i));
         }
     }
+
+    /**
+     * Test getting an application that does not exist produces the expected error.
+     */
+    @Test
+    public void testApplicationNotFound() {
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+
+        final List<String> paths = Lists.newArrayList("", "/commands");
+
+        for (final String path : paths) {
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(APPLICATIONS_API + "/{id}" + path, ID)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .body(EXCEPTION_CODE_PATH, Matchers.is(404))
+                .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No application with id " + ID));
+        }
+    }
 }
