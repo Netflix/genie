@@ -148,9 +148,11 @@ spring:
     baselineOnMigrate: true
     baselineVersion: 3.2.0
   jackson:
-    time-zone: UTC
+    mapper:
+      accept-case-insensitive-enums: true
     serialization:
       write-dates-as-timestamps: false
+    time-zone: UTC
   jpa:
     hibernate:
       ddl-auto: validate

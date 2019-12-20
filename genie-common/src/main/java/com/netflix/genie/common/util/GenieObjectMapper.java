@@ -19,6 +19,7 @@ package com.netflix.genie.common.util;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
@@ -76,6 +77,7 @@ public final class GenieObjectMapper {
         .registerModule(new JavaTimeModule())
         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         .setTimeZone(TimeZone.getTimeZone(ZoneId.of("UTC")))
         .setFilterProvider(FILTER_PROVIDER);
 
