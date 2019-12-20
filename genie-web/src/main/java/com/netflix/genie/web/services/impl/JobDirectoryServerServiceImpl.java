@@ -20,7 +20,11 @@ package com.netflix.genie.web.services.impl;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.util.GenieObjectMapper;
@@ -40,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.ResourceRegionHttpMessageConverter;
@@ -58,7 +61,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Default implementation of {@link JobDirectoryServerService}.
@@ -147,102 +149,70 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final String relativePath,
         final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws IOException, ServletException {
+    ) throws GenieException {
         // TODO: Metrics
         // Is the job running or not?
-        final JobStatus jobStatus;
-        try {
-            jobStatus = this.jobPersistenceService.getJobStatus(jobId);
-        } catch (final GenieNotFoundException e) {
-            log.error(e.getMessage(), e);
-            response.sendError(HttpStatus.NOT_FOUND.value(), e.getMessage());
-            return;
-        }
-
+        final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(jobId);
         // Is it V3 or V4?
-        final boolean isV4;
-        try {
-            isV4 = this.jobPersistenceService.isV4(jobId);
-        } catch (final GenieNotFoundException nfe) {
-            // Really after the last check this shouldn't happen but just in case
-            log.error(nfe.getMessage(), nfe);
-            response.sendError(HttpStatus.NOT_FOUND.value(), nfe.getMessage());
-            return;
-        }
+        final boolean isV4 = this.jobPersistenceService.isV4(jobId);
 
         // Normalize the base url. Make sure it ends in /.
         final URI baseUri;
         try {
             baseUri = new URI(baseUrl.toString() + SLASH).normalize();
         } catch (final URISyntaxException e) {
-            log.error(e.getMessage(), e);
-            response.sendError(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Unable to convert " + baseUrl + " to valid URI"
-            );
-            return;
+            throw new GenieServerException("Unable to convert " + baseUrl + " to valid URI", e);
         }
 
-        if (jobStatus.isActive() && isV4) {
-            final Optional<DirectoryManifest> manifest = this.agentFileStreamService.getManifest(jobId);
-            if (!manifest.isPresent()) {
-                log.error("Manifest not found for active job: {}", jobId);
-                response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), "Could not load manifest for job: " + jobId);
-                return;
-            }
+        final DirectoryManifest manifest;
+        final URI jobDirRoot;
 
-            final URI jobDirRoot;
+        if (jobStatus.isActive() && isV4) { // Active V4 job
+            manifest = this.agentFileStreamService.getManifest(jobId).orElseThrow(
+                () -> new GenieServerUnavailableException("Manifest not found for job " + jobId)
+            );
             try {
                 jobDirRoot = AgentFileProtocolResolver.createUri(jobId, SLASH);
             } catch (final URISyntaxException e) {
-                log.error(e.getMessage(), e);
-                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
-                return;
+                throw new GenieServerException("Failed to construct job directory path", e);
             }
-
-            this.handleRequest(baseUri, relativePath, request, response, manifest.get(), jobDirRoot);
-        } else if (jobStatus.isActive()) {
-            // Active V3 job
-
-            // TODO: Manifest creation could be expensive
+        } else if (jobStatus.isActive()) { // Active V3 job
             final Resource jobDir = this.jobFileService.getJobFileAsResource(jobId, "");
             if (!jobDir.exists()) {
-                log.error("Job directory {} doesn't exist. Unable to serve job contents.", jobDir);
-                response.sendError(HttpStatus.NOT_FOUND.value());
-                return;
+                throw new GenieNotFoundException("Job directory does not exist: " + jobDir);
             }
-            final URI jobDirRoot;
             try {
                 // Make sure the directory ends in a slash. Normalize will ensure only single slash
                 jobDirRoot = new URI(jobDir.getURI().toString() + SLASH).normalize();
-            } catch (final URISyntaxException e) {
-                log.error(e.getMessage(), e);
-                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
-                return;
+            } catch (final URISyntaxException | IOException e) {
+                throw new GenieServerException("Failed to normalize job directory path", e);
             }
             final Path jobDirPath = Paths.get(jobDirRoot);
 
-            final DirectoryManifest manifest = this.jobDirectoryManifestCreatorService.getDirectoryManifest(jobDirPath);
-            this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
-        } else {
-            // Archived job
-            final DirectoryManifest manifest;
-            final URI jobDirRoot;
+            try {
+                manifest = this.jobDirectoryManifestCreatorService.getDirectoryManifest(jobDirPath);
+            } catch (IOException e) {
+                throw new GenieServerException("Failed to construct manifest: " + e.getMessage(), e);
+            }
+        } else { // Archived job
             try {
                 final ArchivedJobMetadata archivedJobMetadata = this.archivedJobService.getArchivedJobMetadata(jobId);
                 manifest = archivedJobMetadata.getManifest();
                 jobDirRoot = archivedJobMetadata.getArchiveBaseUri();
             } catch (final JobNotArchivedException e) {
-                response.sendError(HttpStatus.PRECONDITION_FAILED.value(), e.getMessage());
-                return;
+                throw new GeniePreconditionException("Job outputs were not archived", e);
             } catch (final JobNotFoundException | JobDirectoryManifestNotFoundException e) {
-                response.sendError(HttpStatus.NOT_FOUND.value(), e.getMessage());
-                return;
+                throw new GenieNotFoundException("Failed to retrieve job archived files metadata", e);
             } catch (final Exception e) {
-                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
-                return;
+                throw new GenieServerException("Error job metadata: " + e.getMessage(), e);
             }
+        }
+
+        // Common handling of
+        try {
             this.handleRequest(baseUri, relativePath, request, response, manifest, jobDirRoot);
+        } catch (IOException e) {
+            throw new GenieServerException("Error serving response: " + e.getMessage(), e);
         }
     }
 
@@ -253,22 +223,16 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final HttpServletResponse response,
         final DirectoryManifest manifest,
         final URI jobDirectoryRoot
-    ) throws IOException, ServletException {
+    ) throws IOException, GenieNotFoundException, GenieServerException {
         log.debug(
             "Handle request, baseUri: '{}', relpath: '{}', jobRootUri: '{}'",
             baseUri,
             relativePath,
             jobDirectoryRoot
         );
-        final DirectoryManifest.ManifestEntry entry;
-        final Optional<DirectoryManifest.ManifestEntry> entryOptional = manifest.getEntry(relativePath);
-        if (entryOptional.isPresent()) {
-            entry = entryOptional.get();
-        } else {
-            log.error("No such entry in job manifest: {}", relativePath);
-            response.sendError(HttpStatus.NOT_FOUND.value(), "Not found: " + relativePath);
-            return;
-        }
+        final DirectoryManifest.ManifestEntry entry = manifest.getEntry(relativePath).orElseThrow(
+            () -> new GenieNotFoundException("No such entry in job manifest: " + relativePath)
+        );
 
         if (entry.isDirectory()) {
             // For now maintain the V3 structure
@@ -299,9 +263,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                     }
                 }
             } catch (final IllegalArgumentException iae) {
-                log.error("Encountered unexpected problem traversing the manifest for directory entry {}", entry, iae);
-                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value());
-                return;
+                throw new GenieServerException("Error while traversing files manifest: " + iae.getMessage(), iae);
             }
 
             directories.sort(Comparator.comparing(DefaultDirectoryWriter.Entry::getName));
@@ -331,7 +293,11 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             // Every file really should have a media type but if not use text/plain
             final String mediaType = entry.getMimeType().orElse(MediaType.TEXT_PLAIN_VALUE);
             final ResourceHttpRequestHandler handler = this.genieResourceHandlerFactory.get(mediaType, jobResource);
-            handler.handleRequest(request, response);
+            try {
+                handler.handleRequest(request, response);
+            } catch (ServletException e) {
+                throw new GenieServerException("Servlet exception: " + e.getMessage(), e);
+            }
         }
     }
 

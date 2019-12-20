@@ -19,9 +19,10 @@ package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
+import com.netflix.genie.common.exceptions.GeniePreconditionException
+import com.netflix.genie.common.exceptions.GenieServerException
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException
 import com.netflix.genie.common.internal.dto.DirectoryManifest
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
 import com.netflix.genie.web.agent.services.AgentFileStreamService
@@ -33,25 +34,28 @@ import com.netflix.genie.web.services.ArchivedJobService
 import com.netflix.genie.web.services.JobDirectoryServerService
 import com.netflix.genie.web.services.JobFileService
 import io.micrometer.core.instrument.MeterRegistry
+import org.junit.Ignore
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import java.nio.file.Paths
+
+//TODO serving of a directory entry is not covered by this test due to the usage of static resources.
 
 /**
  * Specifications for {@link JobDirectoryServerServiceImpl}.
- *
- * @author mprimi
  */
 class JobDirectoryServerServiceImplSpec extends Specification {
     static final String JOB_ID = "123456"
     static final String REL_PATH = "bar/foo.txt"
     static final URL BASE_URL = new URL("https", "genie.com", 8080, "/jobs/" + JOB_ID + "/output/" + REL_PATH)
     static final URI EXPECTED_V4_FILE_URI = AgentFileProtocolResolver.createUri(JOB_ID, "/" + REL_PATH)
+    static final URI EXPECTED_V3_JOB_DIR_URI = new URI("file:/tmp/genie/jobs/" + JOB_ID)
 
     ResourceLoader resourceLoader
     JobPersistenceService jobPersistenceService
@@ -97,50 +101,41 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.resource = Mock(Resource)
     }
 
-    def "ServeResource -- job not found (status)"() {
+    def "ServeResource -- job not found (common code)"() {
         setup:
-        Exception e = new GenieNotFoundException("...")
 
-        when:
+        when: "Not found when doing status lookup"
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> { throw e }
-        1 * this.response.sendError(404, e.getMessage())
-    }
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> { throw new GenieNotFoundException("...") }
+        thrown(GenieNotFoundException)
 
-    def "ServeResource -- job not found (v4)"() {
-        setup:
-        Exception e = new GenieNotFoundException("...")
-
-        when:
+        when: "Not found when doing v4 lookup"
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, request, response)
 
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> { throw e }
-        1 * this.response.sendError(404, e.getMessage())
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> { throw new GenieNotFoundException("...") }
+        thrown(GenieNotFoundException)
     }
 
-    def "ServeResource -- invalid URI"() {
-        // TODO -- how to cause URI syntax exception?
-    }
+    def "ServeResource -- Active V4 job"() {
+        setup:
+        DirectoryManifest directoryManifest = Mock(DirectoryManifest)
 
-    def "ServeResource -- Active V4 job, manifest not found"() {
-        when:
+        when: "Manifest not found"
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
         1 * this.jobPersistenceService.isV4(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.empty()
-        1 * this.response.sendError(503, _ as String)
-    }
+        thrown(GenieServerUnavailableException)
 
-    def "ServeResource -- Active V4 job, manifest entry not found"() {
-        setup:
+        // TODO: No easy way to to make agent URI creation fail
 
-        when:
+        when: "Manifest entry not found"
         service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
@@ -148,13 +143,9 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * this.jobPersistenceService.isV4(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
         1 * this.manifest.getEntry(REL_PATH) >> Optional.empty()
-        1 * this.response.sendError(404, _ as String)
-    }
+        thrown(GenieNotFoundException)
 
-    def "ServeResource -- Active V4 job, return resource"() {
-        setup:
-
-        when:
+        when: "Success"
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
@@ -170,54 +161,72 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         1 * this.handler.handleRequest(this.request, this.response)
     }
 
-    def "Archived job exceptions respond with the expected error codes"() {
-        def jobNotFoundErrorMessage = "No job with id " + JOB_ID + " exists"
-        def notArchivedErrorMessage = "Job " + JOB_ID + " wasn't archived"
-        def manifestNotFoundErrorMessage = "No directory manifest for job " + JOB_ID + " exists"
-        def runtimeMessage = "Something went wrong"
+    def "ServeResource -- Active V3 job"() {
+        setup:
+        DirectoryManifest directoryManifest = Mock(DirectoryManifest)
 
+        when: "Job directory not found"
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.jobFileService.getJobFileAsResource(JOB_ID, "") >> resource
+        1 * this.resource.exists() >> false
+        thrown(GenieNotFoundException)
+
+        // TODO no easy way to cause URI syntax exception
+
+        when: "Manifest creation exception"
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.jobFileService.getJobFileAsResource(JOB_ID, "") >> resource
+        1 * this.resource.exists() >> true
+        1 * this.resource.getURI() >> EXPECTED_V3_JOB_DIR_URI
+        1 * this.jobDirectoryManifestService.getDirectoryManifest(_) >> { throw new IOException() }
+        thrown(GenieServerException)
+
+        when: "Success"
+        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
+
+        then:
+        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.jobFileService.getJobFileAsResource(JOB_ID, "") >> resource
+        1 * this.resource.exists() >> true
+        1 * this.resource.getURI() >> EXPECTED_V3_JOB_DIR_URI
+        1 * this.jobDirectoryManifestService.getDirectoryManifest(Paths.get(EXPECTED_V3_JOB_DIR_URI.getPath())) >> manifest
+        1 * this.manifest.getEntry(REL_PATH) >> Optional.of(manifestEntry)
+
+        1 * this.manifestEntry.isDirectory() >> false
+        1 * this.manifestEntry.getPath() >> REL_PATH
+        1 * this.resourceLoader.getResource(EXPECTED_V3_JOB_DIR_URI.toString() + "/" + REL_PATH) >> this.resource
+        1 * this.manifestEntry.getMimeType() >> Optional.of(MediaType.TEXT_PLAIN_VALUE)
+        1 * this.handlerFactory.get(MediaType.TEXT_PLAIN_VALUE, resource) >> this.handler
+        1 * this.handler.handleRequest(this.request, this.response)
+    }
+
+    @Unroll
+    def "ServeResource -- Finished job manifest error: #exception"() {
         when:
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.SUCCEEDED
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
         1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
-            throw new JobNotFoundException(jobNotFoundErrorMessage)
+            throw exception
         }
-        1 * this.response.sendError(HttpStatus.NOT_FOUND.value(), jobNotFoundErrorMessage)
+        thrown(expectedExceptionClass)
 
-        when:
-        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
-
-        then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.FAILED
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
-        1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
-            throw new JobNotArchivedException(notArchivedErrorMessage)
-        }
-        1 * this.response.sendError(HttpStatus.PRECONDITION_FAILED.value(), notArchivedErrorMessage)
-
-        when:
-        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
-
-        then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.KILLED
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
-        1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
-            throw new JobDirectoryManifestNotFoundException(manifestNotFoundErrorMessage)
-        }
-        1 * this.response.sendError(HttpStatus.NOT_FOUND.value(), manifestNotFoundErrorMessage)
-
-        when:
-        this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
-
-        then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.INVALID
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
-        1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
-            throw new GenieRuntimeException(runtimeMessage)
-        }
-        1 * this.response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), runtimeMessage)
+        where:
+        exception | expectedExceptionClass
+        new JobNotArchivedException("...")               | GeniePreconditionException
+        new JobNotFoundException("...")                  | GenieNotFoundException
+        new JobDirectoryManifestNotFoundException("...") | GenieNotFoundException
+        new IOException("...")                           | GenieServerException
+        new RuntimeException("...")                      | GenieServerException
     }
 }
