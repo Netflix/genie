@@ -57,7 +57,10 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true, of = {"status", "executable", "checkDelay", "memory"})
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @Entity
 @Table(name = "commands")
 public class CommandEntity extends BaseEntity {
@@ -102,6 +105,7 @@ public class CommandEntity extends BaseEntity {
             @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<FileEntity> configs = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -114,6 +118,7 @@ public class CommandEntity extends BaseEntity {
             @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<FileEntity> dependencies = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -126,6 +131,7 @@ public class CommandEntity extends BaseEntity {
             @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<TagEntity> tags = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -139,9 +145,11 @@ public class CommandEntity extends BaseEntity {
         }
     )
     @OrderColumn(name = "application_order", nullable = false)
+    @ToString.Exclude
     private List<ApplicationEntity> applications = new ArrayList<>();
 
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<ClusterEntity> clusters = new HashSet<>();
 
     /**

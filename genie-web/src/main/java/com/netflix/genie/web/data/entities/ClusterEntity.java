@@ -52,7 +52,10 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true, of = {"status"})
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @Entity
 @Table(name = "clusters")
 public class ClusterEntity extends BaseEntity implements ClusterCommandsProjection {
@@ -75,6 +78,7 @@ public class ClusterEntity extends BaseEntity implements ClusterCommandsProjecti
             @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<FileEntity> configs = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -87,6 +91,7 @@ public class ClusterEntity extends BaseEntity implements ClusterCommandsProjecti
             @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<FileEntity> dependencies = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -99,6 +104,7 @@ public class ClusterEntity extends BaseEntity implements ClusterCommandsProjecti
             @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<TagEntity> tags = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -112,6 +118,7 @@ public class ClusterEntity extends BaseEntity implements ClusterCommandsProjecti
         }
     )
     @OrderColumn(name = "command_order", nullable = false)
+    @ToString.Exclude
     private List<CommandEntity> commands = new ArrayList<>();
 
     /**

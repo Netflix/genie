@@ -37,7 +37,9 @@ import java.io.Serializable;
  * @since 3.3.0
  */
 @Getter
-@ToString(of = {"id"})
+@ToString(
+    doNotUseGetters = true
+)
 @EqualsAndHashCode(of = {"id"})
 @MappedSuperclass
 public class IdEntity implements IdProjection, Serializable {

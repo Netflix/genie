@@ -84,47 +84,6 @@ import java.util.Set;
 @Setter
 @ToString(
     callSuper = true,
-    of = {
-        "genieUserGroup",
-        "archivingDisabled",
-        "email",
-        "requestedCpu",
-        "requestedMemory",
-        "requestedTimeout",
-        "grouping",
-        "groupingInstance",
-        "requestApiClientHostname",
-        "requestApiClientUserAgent",
-        "requestAgentClientHostname",
-        "requestAgentClientVersion",
-        "requestAgentClientPid",
-        "numAttachments",
-        "totalSizeOfAttachments",
-        "stdOutSize",
-        "stdErrSize",
-        "clusterName",
-        "commandName",
-        "status",
-        "statusMsg",
-        "started",
-        "finished",
-        "agentHostname",
-        "agentVersion",
-        "agentPid",
-        "processId",
-        "checkDelay",
-        "exitCode",
-        "memoryUsed",
-        "archiveLocation",
-        "requestedJobDirectoryLocation",
-        "jobDirectoryLocation",
-        "resolved",
-        "claimed",
-        "v4",
-        "requestedArchiveLocationPrefix",
-        "timeoutUsed",
-        "api"
-    },
     doNotUseGetters = true
 )
 @Entity
@@ -344,11 +303,13 @@ public class JobEntity extends BaseEntity implements
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "requested_agent_config_ext", updatable = false, columnDefinition = "TEXT DEFAULT NULL")
+    @ToString.Exclude
     private String requestedAgentConfigExt;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "requested_agent_environment_ext", updatable = false, columnDefinition = "TEXT DEFAULT NULL")
+    @ToString.Exclude
     private String requestedAgentEnvironmentExt;
 
     @Basic
@@ -361,10 +322,12 @@ public class JobEntity extends BaseEntity implements
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cluster_id")
+    @ToString.Exclude
     private ClusterEntity cluster;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "command_id")
+    @ToString.Exclude
     private CommandEntity command;
 
     @ElementCollection
@@ -376,6 +339,7 @@ public class JobEntity extends BaseEntity implements
     )
     @Column(name = "argument", length = 10_000, nullable = false, updatable = false)
     @OrderColumn(name = "argument_order", nullable = false, updatable = false)
+    @ToString.Exclude
     private List<@NotBlank @Size(max = 10_000) String> commandArgs = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -387,6 +351,7 @@ public class JobEntity extends BaseEntity implements
     )
     @MapKeyColumn(name = "name", updatable = false)
     @Column(name = "value", length = 1024, nullable = false, updatable = false)
+    @ToString.Exclude
     private Map<@NotBlank @Size(max = 255) String, @NotNull @Size(max = 1024) String>
         requestedEnvironmentVariables = Maps.newHashMap();
 
@@ -399,6 +364,7 @@ public class JobEntity extends BaseEntity implements
     )
     @MapKeyColumn(name = "name")
     @Column(name = "value", length = 1024, nullable = false)
+    @ToString.Exclude
     private Map<@NotBlank @Size(max = 255) String, @NotNull @Size(max = 1024) String>
         environmentVariables = Maps.newHashMap();
 
@@ -413,6 +379,7 @@ public class JobEntity extends BaseEntity implements
         }
     )
     @OrderColumn(name = "application_order", nullable = false, updatable = false)
+    @ToString.Exclude
     private List<ApplicationEntity> applications = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -426,10 +393,12 @@ public class JobEntity extends BaseEntity implements
         }
     )
     @OrderColumn(name = "priority_order", nullable = false, updatable = false)
+    @ToString.Exclude
     private List<CriterionEntity> clusterCriteria = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "command_criterion", nullable = false, updatable = false)
+    @ToString.Exclude
     private CriterionEntity commandCriterion;
 
     @ElementCollection
@@ -441,6 +410,7 @@ public class JobEntity extends BaseEntity implements
     )
     @Column(name = "application_id", nullable = false, updatable = false)
     @OrderColumn(name = "application_order", nullable = false, updatable = false)
+    @ToString.Exclude
     private List<String> requestedApplications = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -453,6 +423,7 @@ public class JobEntity extends BaseEntity implements
             @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<FileEntity> configs = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -465,6 +436,7 @@ public class JobEntity extends BaseEntity implements
             @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<FileEntity> dependencies = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -477,9 +449,11 @@ public class JobEntity extends BaseEntity implements
             @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<TagEntity> tags = new HashSet<>();
 
     @Transient
+    @ToString.Exclude
     private JobStatus notifiedJobStatus;
 
     /**
