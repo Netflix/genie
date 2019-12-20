@@ -46,6 +46,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1642,6 +1643,66 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
             .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No job with id " + jobId));
+    }
+
+    /**
+     * Test the requesting a file that does not exist.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    @Ignore(value = "This test is ignored since it fails. It produces a response with status 406 rather than 404")
+    public void testFileNotFound() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
+        final String utf8 = "UTF-8";
+
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("localhost"))),
+            Sets.newHashSet("bash")
+        )
+            .withCommandArgs(commandArgs)
+            .build();
+
+        final String jobId = this.getIdFromLocation(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+                .when()
+                .port(this.port)
+                .post(JOBS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                .extract()
+                .header(HttpHeaders.LOCATION)
+        );
+
+        this.waitForDone(jobId);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .accept(MediaType.ALL_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString(utf8));
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .accept(MediaType.ALL_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/" + UUID.randomUUID().toString())
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
     }
 
     private JobStatus getStatus(final String jobId) throws IOException {
