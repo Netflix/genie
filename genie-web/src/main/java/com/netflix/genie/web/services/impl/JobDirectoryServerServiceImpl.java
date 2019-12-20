@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.DirectoryManifest;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
@@ -164,7 +163,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final boolean isV4;
         try {
             isV4 = this.jobPersistenceService.isV4(jobId);
-        } catch (final GenieJobNotFoundException nfe) {
+        } catch (final GenieNotFoundException nfe) {
             // Really after the last check this shouldn't happen but just in case
             log.error(nfe.getMessage(), nfe);
             response.sendError(HttpStatus.NOT_FOUND.value(), nfe.getMessage());

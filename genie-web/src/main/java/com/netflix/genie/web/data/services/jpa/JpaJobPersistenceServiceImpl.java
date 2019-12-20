@@ -624,7 +624,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     @Transactional(readOnly = true)
     public boolean isV4(
         @NotBlank(message = "Id is missing and is required") final String id
-    ) {
+    ) throws GenieNotFoundException {
         log.debug("Read v4 flag from db for job {} ", id);
         return this.jobRepository
             .findByUniqueId(id, IsV4JobProjection.class)
@@ -632,7 +632,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 () -> {
                     final String errorMessage = "No job with id " + id + "exists. Unable to get v4 flag.";
                     log.error(errorMessage);
-                    return new GenieJobNotFoundException(errorMessage);
+                    return new GenieNotFoundException(errorMessage);
                 }
             ).isV4();
     }

@@ -750,9 +750,11 @@ public class JpaJobPersistenceServiceImplTest {
 
     /**
      * If a job isn't found on querying for v4 flag.
+     *
+     * @throws GenieNotFoundException if the job is not found
      */
-    @Test(expected = GenieJobNotFoundException.class)
-    public void noJobUnableToGetV4() {
+    @Test(expected = GenieNotFoundException.class)
+    public void noJobUnableToGetV4() throws GenieNotFoundException {
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
             .thenReturn(Optional.empty());
@@ -762,9 +764,11 @@ public class JpaJobPersistenceServiceImplTest {
 
     /**
      * If v4 is false in db then return false.
+     *
+     * @throws GenieNotFoundException if the job is not found
      */
     @Test
-    public void v4JobFalseReturnsFalse() {
+    public void v4JobFalseReturnsFalse() throws GenieNotFoundException {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
@@ -777,9 +781,11 @@ public class JpaJobPersistenceServiceImplTest {
 
     /**
      * If v4 is true in db then return true.
+     *
+     * @throws GenieNotFoundException if the job is not found
      */
     @Test
-    public void v4JobTrueReturnsTrue() {
+    public void v4JobTrueReturnsTrue() throws GenieNotFoundException {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
@@ -792,9 +798,11 @@ public class JpaJobPersistenceServiceImplTest {
 
     /**
      * If v4 job is not found in the db then throw a Exception.
+     *
+     * @throws GenieNotFoundException if the job is not found
      */
-    @Test(expected = GenieJobNotFoundException.class)
-    public void v4JobNotFoundThrowsException() {
+    @Test(expected = GenieNotFoundException.class)
+    public void v4JobNotFoundThrowsException() throws GenieNotFoundException {
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(IsV4JobProjection.class)))
             .thenReturn(Optional.empty());

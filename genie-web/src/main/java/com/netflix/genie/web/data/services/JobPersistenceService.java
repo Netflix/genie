@@ -273,11 +273,11 @@ public interface JobPersistenceService {
      *
      * @param id The id of the job
      * @return true if its a v4 job
-     * @throws GenieJobNotFoundException If no job with {@code id} exists
+     * @throws GenieNotFoundException If no job with the given {@code id} exists
      */
     boolean isV4(
         @NotBlank(message = "Id is missing and is required") String id
-    );
+    ) throws GenieNotFoundException;;
 
     /**
      * Get the status for a job with the given {@code id}.
