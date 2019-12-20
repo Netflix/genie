@@ -44,7 +44,10 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-@ToString(callSuper = true, of = {"version", "user", "name"})
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @MappedSuperclass
 public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupFileProjection {
 
@@ -76,10 +79,12 @@ public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupF
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "metadata", columnDefinition = "TEXT DEFAULT NULL")
+    @ToString.Exclude
     private String metadata;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "setup_file")
+    @ToString.Exclude
     private FileEntity setupFile;
 
     /**

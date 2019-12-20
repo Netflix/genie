@@ -39,7 +39,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "uniqueId", callSuper = false)
-@ToString(of = "uniqueId", callSuper = true)
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 public class UniqueIdEntity extends AuditEntity {
 
     @Basic(optional = false)

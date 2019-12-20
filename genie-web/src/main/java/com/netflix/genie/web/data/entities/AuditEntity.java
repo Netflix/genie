@@ -36,7 +36,10 @@ import java.time.Instant;
  * @author tgianos
  */
 @Getter
-@ToString(callSuper = true, of = {"created", "updated"})
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @MappedSuperclass
 public class AuditEntity extends IdEntity implements AuditProjection {
 
@@ -51,6 +54,7 @@ public class AuditEntity extends IdEntity implements AuditProjection {
     @Version
     @Column(name = "entity_version", nullable = false)
     @Getter(AccessLevel.NONE)
+    @ToString.Exclude
     private Integer entityVersion;
 
     /**

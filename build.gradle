@@ -16,7 +16,7 @@ buildscript {
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.0.0"
         classpath "com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1"
         classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
-        classpath "io.franzbecker:gradle-lombok:3.0.0"
+        classpath "io.franzbecker:gradle-lombok:3.2.0"
         /*
          * TODO: Upgrading to 1.3.1 caused problems
          * A problem was found with the configuration of task ':genie-ui:npmInstall'.

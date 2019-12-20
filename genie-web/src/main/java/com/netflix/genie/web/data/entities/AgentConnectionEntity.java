@@ -40,7 +40,10 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, of = {"jobId", "serverHostname"})
-@ToString(callSuper = true, of = {"jobId", "serverHostname"})
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @Entity
 @Table(name = "agent_connections")
 public class AgentConnectionEntity extends AuditEntity {
@@ -64,8 +67,8 @@ public class AgentConnectionEntity extends AuditEntity {
      * @param serverHostname the server with an active connection
      */
     public AgentConnectionEntity(
-        final @NotBlank String jobId,
-        final @NotBlank String serverHostname
+        @NotBlank final String jobId,
+        @NotBlank final String serverHostname
     ) {
         super();
         this.jobId = jobId;

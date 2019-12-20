@@ -39,8 +39,14 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false, of = {"tag"})
-@ToString(callSuper = true, of = {"tag"})
+@EqualsAndHashCode(
+    callSuper = false,
+    doNotUseGetters = true
+)
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @Entity
 @Table(name = "tags")
 public class TagEntity extends AuditEntity {

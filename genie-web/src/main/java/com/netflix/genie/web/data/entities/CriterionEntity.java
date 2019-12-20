@@ -45,7 +45,10 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(callSuper = true, of = {"uniqueId", "name", "version", "status"}, doNotUseGetters = true)
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @Entity
 @Table(name = "criteria")
 public class CriterionEntity extends IdEntity {
@@ -79,6 +82,7 @@ public class CriterionEntity extends IdEntity {
             @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<TagEntity> tags = new HashSet<>();
 
     /**

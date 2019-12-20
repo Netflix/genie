@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Representation of the state of Application Configuration object.
+ * Representation of the state of an Application.
  *
  * @author amsharma
  * @author tgianos
@@ -47,7 +47,10 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true, of = {"status", "type"})
+@ToString(
+    callSuper = true,
+    doNotUseGetters = true
+)
 @Entity
 @Table(name = "applications")
 public class ApplicationEntity extends BaseEntity {
@@ -74,6 +77,7 @@ public class ApplicationEntity extends BaseEntity {
             @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<FileEntity> configs = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -98,9 +102,11 @@ public class ApplicationEntity extends BaseEntity {
             @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @ToString.Exclude
     private Set<TagEntity> tags = new HashSet<>();
 
     @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<CommandEntity> commands = new HashSet<>();
 
     /**
