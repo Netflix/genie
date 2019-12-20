@@ -111,7 +111,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
 
     def "ServeResource -- job not found (v4)"() {
         setup:
-        Exception e = new GenieJobNotFoundException("...")
+        Exception e = new GenieNotFoundException("...")
 
         when:
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, request, response)
