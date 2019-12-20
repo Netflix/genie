@@ -1599,6 +1599,51 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .contentType(Matchers.containsString(utf8));
     }
 
+    /**
+     * Test getting a job that does not exist produces the expected error.
+     */
+    @Test
+    public void testJobNotFound() {
+        Assert.assertThat(this.jobRepository.count(), Matchers.is(0L));
+
+        final String jobId = UUID.randomUUID().toString();
+
+        final ArrayList<String> paths = Lists.newArrayList(
+            "",
+            "/request",
+            "/execution",
+            "/status",
+            "/metadata"
+        );
+
+        for (final String path : paths) {
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/{id}" + path, jobId)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .body(EXCEPTION_CODE_PATH, Matchers.is(HttpStatus.NOT_FOUND.value()))
+                .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No job"))
+                .body(EXCEPTION_MESSAGE_PATH, Matchers.containsString(jobId));
+        }
+
+        // TODO '/output' behaves differently than the rest.
+        // The resource handler composes the response, including in case of error, rather than just throwing.
+        // Would be nice to align this. Hard for now due to support of both V3 and V4 logic.
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No job with id " + jobId));
+    }
+
     private JobStatus getStatus(final String jobId) throws IOException {
         final String statusString = RestAssured
             .given(this.getRequestSpecification())
