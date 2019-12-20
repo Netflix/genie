@@ -80,9 +80,10 @@ com.netflix.genie.web.jobs.workflow.impl
 com.netflix.genie.web.properties
 com.netflix.genie.web.properties.converters
 com.netflix.genie.web.resources.writers
+com.netflix.genie.web.scripts
 com.netflix.genie.web.services
 com.netflix.genie.web.services.impl
-com.netflix.genie.web.services.loadbalancers.script
+com.netflix.genie.web.services.selectors
 com.netflix.genie.web.spring.autoconfigure
 com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers
 com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints
@@ -101,6 +102,7 @@ com.netflix.genie.web.spring.autoconfigure.health
 com.netflix.genie.web.spring.autoconfigure.introspection
 com.netflix.genie.web.spring.autoconfigure.jobs
 com.netflix.genie.web.spring.autoconfigure.properties.converters
+com.netflix.genie.web.spring.autoconfigure.scripts
 com.netflix.genie.web.spring.autoconfigure.services
 com.netflix.genie.web.spring.autoconfigure.tasks
 com.netflix.genie.web.spring.autoconfigure.tasks.leader

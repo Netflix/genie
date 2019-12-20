@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2019-12-13</span>
+<span id="revdate">2019-12-20</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -809,10 +809,10 @@ b.conum * { color: inherit !important; }
 </li>
 <li><a href="#_features_5">7. Features</a>
 <ul class="sectlevel2">
-<li><a href="#_cluster_load_balancing">7.1. Cluster Load Balancing</a>
+<li><a href="#_cluster_selection_2">7.1. Cluster Selection</a>
 <ul class="sectlevel3">
-<li><a href="#_randomizedclusterloadbalancerimpl">7.1.1. RandomizedClusterLoadBalancerImpl</a></li>
-<li><a href="#_scriptloadbalancer">7.1.2. ScriptLoadBalancer</a></li>
+<li><a href="#_randomizedclusterselectorimpl">7.1.1. RandomizedClusterSelectorImpl</a></li>
+<li><a href="#_scriptclusterselector">7.1.2. ScriptClusterSelector</a></li>
 <li><a href="#_wrap_up_5">7.1.3. Wrap Up</a></li>
 </ul>
 </li>
@@ -4184,17 +4184,17 @@ release to contain our old <code>genie-security</code> code.</p>
 <p>This section has documentation pertaining to specific features of Genie that may need specific examples.</p>
 </div>
 <div class="sect2">
-<h3 id="_cluster_load_balancing"><a class="anchor" href="#_cluster_load_balancing"></a><a class="link" href="#_cluster_load_balancing">7.1. Cluster Load Balancing</a></h3>
+<h3 id="_cluster_selection_2"><a class="anchor" href="#_cluster_selection_2"></a><a class="link" href="#_cluster_selection_2">7.1. Cluster Selection</a></h3>
 <div class="paragraph">
 <p>Genie allows administrators to tag clusters with multiple tags that could reflect any type of domain modeling the
 admins wish to accomplish. Purpose of the cluster, types of data the cluster can access, workload expected are just
 some examples of ways tags could be used to classify clusters. Users submit jobs with a series of tags that help
 Genie identify which cluster to run a job on. Sometimes the tags submitted by the job match multiple clusters. At this
 point Genie needs a mechanism to chose a final runtime target from the set of clusters selected. This is where the
-cluster load balancing feature of Genie comes into play.</p>
+cluster selection feature of Genie comes into play.</p>
 </div>
 <div class="paragraph">
-<p>Genie has an interface <code>ClusterLoadBalancer</code> which can be implemented to provide plugin functionality of algorithms for
+<p>Genie has an interface <code>ClusterSelector</code> which can be implemented to provide plugin functionality of algorithms for
 cluster selection. The interface has a single method:</p>
 </div>
 <div class="listingblock">
@@ -4203,7 +4203,7 @@ cluster selection. The interface has a single method:</p>
  * Return best cluster to run job on.
  *
  * @param clusters   An immutable, non-empty list of available clusters to choose from
- * @param jobRequest The job request these clusters are being load balanced for
+ * @param jobRequest The job request these clusters are being considered for
  * @return the "best" cluster to run job on or null if no cluster selected
  * @throws GenieException if there is any error
  */
@@ -4212,7 +4212,7 @@ Cluster selectCluster(final List&lt;Cluster&gt; clusters, final JobRequest jobRe
 </div>
 </div>
 <div class="paragraph">
-<p>At startup Genie will collect all beans that implement the <code>ClusterLoadBalancer</code> interface and based on their order
+<p>At startup Genie will collect all beans that implement the <code>ClusterSelector</code> interface and based on their order
 store them in an invocation order list. Meaning that when multiple clusters are selected from the database based on tags
 Genie will send the list of clusters to the implementations in preference order until one of them returns the cluster to
 use.</p>
@@ -4221,10 +4221,10 @@ use.</p>
 <p>Genie currently ships with two implementations of this interface which are described below.</p>
 </div>
 <div class="sect3">
-<h4 id="_randomizedclusterloadbalancerimpl"><a class="anchor" href="#_randomizedclusterloadbalancerimpl"></a><a class="link" href="#_randomizedclusterloadbalancerimpl">7.1.1. RandomizedClusterLoadBalancerImpl</a></h4>
+<h4 id="_randomizedclusterselectorimpl"><a class="anchor" href="#_randomizedclusterselectorimpl"></a><a class="link" href="#_randomizedclusterselectorimpl">7.1.1. RandomizedClusterSelectorImpl</a></h4>
 <div class="paragraph">
-<p>As the name indicates this load balancer simply uses a random number generator to select a cluster from the list by
-index. There is no intelligence to this load balancer algorithm but it does provide very close to an equal distribution
+<p>As the name indicates this selector simply uses a random number generator to select a cluster from the list by
+index. There is no intelligence to this selection algorithm but it does provide very close to an equal distribution
 between clusters if the same tags are always used.</p>
 </div>
 <div class="paragraph">
@@ -4233,7 +4233,7 @@ implementations fail to select a cluster this implementation will be invoked and
 </div>
 </div>
 <div class="sect3">
-<h4 id="_scriptloadbalancer"><a class="anchor" href="#_scriptloadbalancer"></a><a class="link" href="#_scriptloadbalancer">7.1.2. ScriptLoadBalancer</a></h4>
+<h4 id="_scriptclusterselector"><a class="anchor" href="#_scriptclusterselector"></a><a class="link" href="#_scriptclusterselector">7.1.2. ScriptClusterSelector</a></h4>
 <div class="paragraph">
 <p>This implementation, first introduced in 3.1.0, allows administrators to provide a script to be invoked at runtime to
 decide which cluster to select. Currently <code>JavaScript</code> and <code>Groovy</code> are supported out of the box but others (like
@@ -4243,8 +4243,11 @@ decide which cluster to select. Currently <code>JavaScript</code> and <code>Groo
 <div class="sect4">
 <h5 id="_configuration_2"><a class="anchor" href="#_configuration_2"></a><a class="link" href="#_configuration_2">7.1.2.1. Configuration</a></h5>
 <div class="paragraph">
-<p>The script load balancer is disabled by default. To enable it an admin must set the property
-<code>genie.jobs.clusters.load-balancers.script.enabled</code> to true.</p>
+<p>The script selector is disabled by default. To enable it an admin must set the property
+<code>genie.scripts.cluster-selector.source</code> to a valid script URI (e.g.: <code><a href="file:///myscript.js" class="bare">file:///myscript.js</a></code>,
+<code>classpath:org/my/package/myscript.groovy</code>, <code>s3://my-app/scripts/myscript.js</code>).
+It is also recommended to set <code>genie.scripts.cluster-selector.auto-load-enabled</code> to <code>true</code> to enable eager loading
+of the script (default behavior is to load and compile lazily).</p>
 </div>
 <div class="paragraph">
 <p>Other properties:</p>
@@ -4264,36 +4267,25 @@ decide which cluster to select. Currently <code>JavaScript</code> and <code>Groo
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.destination</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
-<code>genie.jobs.clusters.loadBalancers.script.source</code>. The file will be given the same name.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>ScriptClusterSelector</code> is enabled only if this property is set.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the script based load balancer should be enabled for the system or not.
-See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
-See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.auto-load-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true, the script eagerly load during startup, as opposed to lazily load on first use.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.refreshRate</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.source</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.timeout</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
-forces a timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>See also <code>genie.scripts-manager.*</code> properties, which affect this component.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_script_contract"><a class="anchor" href="#_script_contract"></a><a class="link" href="#_script_contract">7.1.2.2. Script Contract</a></h5>
@@ -4342,7 +4334,7 @@ forces a timeout</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No cluster was selected and the evaluation should fall back to another cluster load balancing algorithm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No cluster was selected and the evaluation should fall back to another selector algorithm</p></td>
 </tr>
 </tbody>
 </table>
@@ -4396,25 +4388,32 @@ index == -1 ? null : cJson[index].id</code></pre>
 <div class="sect4">
 <h5 id="_caveats_2"><a class="anchor" href="#_caveats_2"></a><a class="link" href="#_caveats_2">7.1.2.4. Caveats</a></h5>
 <div class="paragraph">
-<p>The script load balancer provides great flexibility for system administrators to test algorithms for cluster load
+<p>The script selector provides great flexibility for system administrators to test algorithms for cluster load
 balancing at runtime. Since the script is refreshed periodically it can even be changed after Genie is running. With
 this flexibility comes the trade off that script evaluation is going to be slower than code running direct JVM byte
-code. The load balancer tries to offset this by compiling and caching the script code in between refresh invocations. It
+code. The selector tries to offset this by compiling and caching the script code in between refresh invocations. It
 is recommended that once an algorithm is well tested it be converted to a true implementation of the
-<code>ClusterLoadBalancer</code> interface if performance is desired.</p>
+<code>ClusterSelector</code> interface if performance is desired.</p>
 </div>
 <div class="paragraph">
-<p>Additionally if a script error is made the <code>ScriptLoadBalancer</code> will swallow the exceptions and simply return <code>null</code>
+<p>Additionally if a script error is made the <code>ScriptClusterSelector</code> will swallow the exceptions and simply return <code>null</code>
 from all calls to <code>selectCluster</code> until the script is fixed and <code>refresh</code> is invoked again. The metric
-<code>genie.jobs.clusters.load-balancers.script.select.timer</code> with tag <code>status</code> and value <code>failed</code> can be used to monitor
+<code>genie.jobs.clusters.selectors.script.select.timer</code> with tag <code>status</code> and value <code>failed</code> can be used to monitor
 this situation.</p>
+</div>
+<div class="paragraph">
+<p>Two more metrics are relevant in this context.
+<code>genie.scripts.load.timer</code> timer for scripts loading (and reloading) can also be used to monitor unavailable resources,
+ compilation errors, etc.
+<code>genie.scripts.evaluate.timer</code> timer for script evaluation, can also be used to monitor evaluation errors, timeouts, etc.
+Both metrics are tagged with <code>scriptUri</code> in case multiple scripts are loaded.</p>
 </div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_wrap_up_5"><a class="anchor" href="#_wrap_up_5"></a><a class="link" href="#_wrap_up_5">7.1.3. Wrap Up</a></h4>
 <div class="paragraph">
-<p>This section went over the cluster load balancing feature of Genie. This interface provides an extension point for
+<p>This section went over the cluster selection feature of Genie. This interface provides an extension point for
 administrators of Genie to tweak Genie&#8217;s runtime behavior to suit their needs.</p>
 </div>
 </div>
@@ -4825,7 +4824,7 @@ Whereas static properties values are bound during application startup and do not
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.local.launch-command-template</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The system command that the launcher should use to launch an agent process. Ordered list of arguments. Contains placeholders that will be replaced at runtime.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">java -jar &lt;AGENT_JAR_PLACEHOLDER&gt; exec --serverHost 127.0.0.1 --serverPort &lt;SERVER_PORT_PLACEHOLDER&gt; --api-job --jobId &lt;JOB_ID_PLACEHOLDER&gt;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java -jar &lt;AGENT_JAR_PLACEHOLDER&gt; exec --server-host 127.0.0.1 --server-port &lt;SERVER_PORT_PLACEHOLDER&gt; --api-job --job-id &lt;JOB_ID_PLACEHOLDER&gt;</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -4960,40 +4959,6 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.destination</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
-<code>genie.jobs.clusters.load-balancers.script.source</code>. The file will be given the same name.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/loadbalancers/script/destination/" class="bare">file://${java.io.tmpdir}genie/loadbalancers/script/destination/</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the script based load balancer should be enabled for the system or not.
-See also: <code>genie.jobs.clusters.load-balancers.script.source</code>
-See also: <code>genie.jobs.clusters.load-balancers.script.destination</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.refreshRate</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.source</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js" class="bare">file://${java.io.tmpdir}genie/loadBalancers/script/source/loadBalance.js</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.timeout</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
-forces a timeout</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5204,6 +5169,48 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.sns.noOfRetries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of times to retry requests to SNS before failure</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts-manager.refresh-interval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval for the script manager to reload and recompile known scripts (in milliseconds)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>ScriptClusterSelector</code> is enabled only if this property is set.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.auto-load-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true, the script eagerly load during startup, as opposed to lazily load on first use.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.cluster-selector.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.execution-mode-filter.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>ExecutionModeFilterScript</code> is enabled only if this property is set.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.execution-mode-filter.auto-load-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true, the script eagerly load during startup, as opposed to lazily load on first use.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.execution-mode-filter.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5867,23 +5874,16 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.clusters.loadBalancers.script.select.timer</code></p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.clusters.selectors.script.select.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken by the loaded script to select a cluster among the one passed as input</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptLoadBalancer</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptClusterSelector</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, clusterName, clusterId</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.clusters.loadBalancers.script.update.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to reload the script</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptLoadBalancer</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.coordination.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to initialize the job database record and resolve applications, command, cluster, based on criteria and
-load balancing strategy.</p></td>
+cluster selection strategy.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
@@ -6149,6 +6149,20 @@ for multiple errors.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, type</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.scripts.load.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to load (download, read, compile) a given script</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptManager</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, scriptUri</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.scripts.evaluate.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to evaluate a given script (if previously compiled successfully)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>ScriptManager</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, scriptUri</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.agentJob.handshake.counter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter for calls to the 'handshake' protocol of the Genie Agent Job Service</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -6163,11 +6177,11 @@ for multiple errors.</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.loadBalancer.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for cluster load balancer algorithms invocations</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.clusterSelector.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for cluster selector algorithms invocations</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status, clusterName, clusterId, loadBalancerClass</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status, clusterName, clusterId, clusterSelectorClass</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.resolve.timer</code></p></td>
@@ -6192,14 +6206,14 @@ for multiple errors.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.selectCluster.noneSelected.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the cluster load balancing terminated without selecting a cluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the cluster selection terminated without selecting a cluster</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.jobResolver.selectCluster.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to select a cluster using the load balancing strategy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to select a cluster using the cluster selection strategy</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobResolverServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
@@ -6364,7 +6378,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2019-12-13 17:33:33 UTC
+Last updated 2019-12-20 17:28:56 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
