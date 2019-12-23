@@ -54,6 +54,9 @@ import org.apache.http.StatusLine;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
@@ -77,6 +80,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * Unit tests for the Job rest controller.
@@ -693,15 +697,35 @@ class JobRestControllerTest {
             );
     }
 
+    private static Stream<Arguments> forwardJobOutputTestArguments() {
+        final HttpHeaders headers = new HttpHeaders();
+        return Stream.of(
+            Arguments.of(
+                HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", headers, null, null),
+                GenieNotFoundException.class
+            ),
+            Arguments.of(
+                HttpClientErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "Error", headers, null, null),
+                GenieException.class
+            ),
+            Arguments.of(
+                new RuntimeException("..."),
+                GenieException.class
+            )
+        );
+    }
+
     /**
      * Make sure directory forwarding happens when all conditions are met.
      *
-     * @throws IOException      on error
-     * @throws ServletException on error
      * @throws GenieException   on error
      */
-    @Test
-    void canHandleForwardJobOutputRequestWithError() throws IOException, ServletException, GenieException {
+    @ParameterizedTest(name = "Exception: {0} throws {1}")
+    @MethodSource("forwardJobOutputTestArguments")
+    void canHandleForwardJobOutputRequestWithError(
+        final Throwable forwardingException,
+        final Class<? extends Throwable> expectedException
+    ) throws GenieException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -734,7 +758,6 @@ class JobRestControllerTest {
         Mockito.when(request.getRequestURI()).thenReturn(requestURI);
         Mockito.when(request.getHeaderNames()).thenReturn(null);
 
-        final int errorCode = 404;
         Mockito.when(
             this.restTemplate.execute(
                 Mockito.anyString(),
@@ -743,9 +766,11 @@ class JobRestControllerTest {
                 Mockito.any()
             )
         )
-            .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+            .thenThrow(forwardingException);
 
-        this.controller.getJobOutput(jobId, null, request, response);
+        Assertions.assertThatThrownBy(
+            () -> this.controller.getJobOutput(jobId, null, request, response)
+        ).isInstanceOf(expectedException);
 
         Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.restTemplate, Mockito.times(1))
@@ -755,16 +780,7 @@ class JobRestControllerTest {
                 Mockito.any(),
                 Mockito.any()
             );
-        Mockito.verify(response, Mockito.times(1)).sendError(Mockito.eq(errorCode), Mockito.anyString());
-        Mockito
-            .verify(this.jobDirectoryServerService, Mockito.never())
-            .serveResource(
-                Mockito.eq(jobId),
-                Mockito.any(URL.class),
-                Mockito.anyString(),
-                Mockito.eq(request),
-                Mockito.eq(response)
-            );
+
     }
 
     /**

@@ -95,6 +95,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -102,7 +103,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Nullable;
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -659,8 +659,6 @@ public class JobRestController {
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
      * @param response      the servlet response
-     * @throws IOException      on redirect error
-     * @throws ServletException when trying to handle the request
      * @throws GenieException   on any Genie internal error
      */
     @GetMapping(
@@ -677,7 +675,7 @@ public class JobRestController {
         @Nullable final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws IOException, ServletException, GenieException {
+    ) throws GenieException {
         final boolean isV4 = this.jobPersistenceService.isV4(id);
         final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(id);
         final String path = ControllerUtils.getRemainingPath(request);
@@ -713,12 +711,17 @@ public class JobRestController {
                             return null;
                         }
                     );
+                } catch (final HttpClientErrorException.NotFound e) {
+                    throw new GenieNotFoundException("Not Found (via: " + forwardHost + ")", e);
                 } catch (final HttpStatusCodeException e) {
-                    log.error("Failed getting the remote job output from {}. Error: {}", forwardHost, e.getMessage());
-                    response.sendError(e.getStatusCode().value(), e.getStatusText());
+                    throw new GenieException(
+                        e.getStatusCode().value(),
+                        "Proxied request failed: " + e.getMessage(),
+                        e
+                    );
                 } catch (final Exception e) {
                     log.error("Failed getting the remote job output from {}. Error: {}", forwardHost, e.getMessage());
-                    response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+                    throw new GenieServerException("Proxied request error:" + e.getMessage(), e);
                 }
 
                 //No need to search on this node
