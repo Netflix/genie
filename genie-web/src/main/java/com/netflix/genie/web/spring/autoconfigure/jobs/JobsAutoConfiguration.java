@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.jobs;
 
 import com.netflix.genie.common.internal.aws.s3.S3ClientFactory;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.web.jobs.workflow.impl.ClusterTask;
@@ -212,10 +213,11 @@ public class JobsAutoConfiguration {
     /**
      * Create an Job Kickoff Task bean that runs the job.
      *
-     * @param jobsProperties The various jobs properties
-     * @param executor       An instance of an executor
-     * @param genieHostInfo  Info about the host Genie is running on
-     * @param registry       The metrics registry to use
+     * @param jobsProperties                     The various jobs properties
+     * @param executor                           An instance of an executor
+     * @param genieHostInfo                      Info about the host Genie is running on
+     * @param registry                           The metrics registry to use
+     * @param jobDirectoryManifestCreatorService The manifest creation service
      * @return An application task object
      */
     @Bean
@@ -225,14 +227,16 @@ public class JobsAutoConfiguration {
         final JobsProperties jobsProperties,
         final Executor executor,
         final GenieHostInfo genieHostInfo,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
         return new JobKickoffTask(
             jobsProperties.getUsers().isRunAsUserEnabled(),
             jobsProperties.getUsers().isCreationEnabled(),
             executor,
             genieHostInfo.getHostname(),
-            registry
+            registry,
+            jobDirectoryManifestCreatorService
         );
     }
 

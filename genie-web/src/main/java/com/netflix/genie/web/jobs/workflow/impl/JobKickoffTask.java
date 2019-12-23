@@ -24,6 +24,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.util.MetricsUtils;
 import com.netflix.genie.web.util.UNIXUtils;
@@ -63,28 +64,32 @@ public class JobKickoffTask extends GenieBaseTask {
     private final Executor executor;
     private final String hostname;
     private final RetryTemplate retryTemplate;
+    private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
 
     /**
      * Constructor.
      *
-     * @param runAsUserEnabled    Flag that tells if job should be run as user specified in the request
-     * @param userCreationEnabled Flag that tells if the user specified should be created
-     * @param executor            An executor object used to run jobs
-     * @param hostname            Hostname for the node the job is running on
-     * @param registry            The metrics registry to use
+     * @param runAsUserEnabled                   Flag that tells if job should be run as user specified in the request
+     * @param userCreationEnabled                Flag that tells if the user specified should be created
+     * @param executor                           An executor object used to run jobs
+     * @param hostname                           Hostname for the node the job is running on
+     * @param registry                           The metrics registry to use
+     * @param jobDirectoryManifestCreatorService The manifest creator service
      */
     public JobKickoffTask(
         final boolean runAsUserEnabled,
         final boolean userCreationEnabled,
         @NotNull final Executor executor,
         @NotNull final String hostname,
-        @NotNull final MeterRegistry registry
+        @NotNull final MeterRegistry registry,
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
         super(registry);
         this.isRunAsUserEnabled = runAsUserEnabled;
         this.isUserCreationEnabled = userCreationEnabled;
         this.executor = executor;
         this.hostname = hostname;
+        this.jobDirectoryManifestCreatorService = jobDirectoryManifestCreatorService;
         this.retryTemplate = new RetryTemplate();
         this.retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
     }
@@ -165,6 +170,11 @@ public class JobKickoffTask extends GenieBaseTask {
                 .directory(jobExecEnv.getJobWorkingDir())
                 .redirectOutput(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH))
                 .redirectError(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
+
+            // All files are staged, invalidate cached manifest if one exist.
+            this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(
+                jobExecEnv.getJobWorkingDir().toPath()
+            );
 
             try {
                 final Process process = pb.start();

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.jobs.workflow.impl;
 
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.junit.Before;
@@ -40,7 +41,8 @@ public class JobKickoffTaskTest {
             false,
             Mockito.mock(Executor.class),
             "localhost",
-            new SimpleMeterRegistry()
+            new SimpleMeterRegistry(),
+            Mockito.mock(JobDirectoryManifestCreatorService.class)
         );
     }
 }
