@@ -24,7 +24,7 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ApplicationResource;
 import io.restassured.RestAssured;
 import org.hamcrest.Matchers;

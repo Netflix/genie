@@ -26,7 +26,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
 import io.restassured.RestAssured;
 import org.apache.catalina.util.URLEncoder;

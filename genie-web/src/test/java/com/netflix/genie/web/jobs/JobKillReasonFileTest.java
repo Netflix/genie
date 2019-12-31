@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.jobs;
 
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 

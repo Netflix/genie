@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.external.dtos.v4.Criterion
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dtos.v4.Application
 import com.netflix.genie.common.internal.dtos.v4.ApplicationMetadata
@@ -38,7 +39,6 @@ import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dtos.v4.JobMetadata
 import com.netflix.genie.common.internal.dtos.v4.JobRequest
-import com.netflix.genie.common.util.GenieObjectMapper
 import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
 import spock.lang.Unroll

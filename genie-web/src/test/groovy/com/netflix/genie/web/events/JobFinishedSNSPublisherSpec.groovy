@@ -25,6 +25,7 @@ import com.google.common.collect.Maps
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.external.dtos.v4.Criterion
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.v4.Application
 import com.netflix.genie.common.internal.dtos.v4.ApplicationMetadata
 import com.netflix.genie.common.internal.dtos.v4.Cluster
@@ -32,7 +33,6 @@ import com.netflix.genie.common.internal.dtos.v4.ClusterMetadata
 import com.netflix.genie.common.internal.dtos.v4.Command
 import com.netflix.genie.common.internal.dtos.v4.CommandMetadata
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob
-import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.properties.SNSNotificationsProperties
 import io.micrometer.core.instrument.Counter

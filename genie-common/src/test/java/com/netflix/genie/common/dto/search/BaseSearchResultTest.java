@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.dto.search;
 
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

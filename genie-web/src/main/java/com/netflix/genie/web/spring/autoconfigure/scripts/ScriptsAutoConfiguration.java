@@ -18,7 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;

@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.external.dtos.v4.Criterion
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria
@@ -38,7 +39,6 @@ import com.netflix.genie.common.internal.dtos.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
-import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.data.entities.ApplicationEntity
 import com.netflix.genie.web.data.entities.ClusterEntity

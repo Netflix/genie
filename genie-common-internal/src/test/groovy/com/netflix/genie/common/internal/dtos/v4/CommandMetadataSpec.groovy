@@ -20,7 +20,7 @@ package com.netflix.genie.common.internal.dtos.v4
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.CommandStatus
-import com.netflix.genie.common.util.GenieObjectMapper
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import spock.lang.Specification
 
 /**

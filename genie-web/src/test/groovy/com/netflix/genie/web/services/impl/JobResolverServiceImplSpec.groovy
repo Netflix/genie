@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.external.dtos.v4.Criterion
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dtos.v4.Cluster
 import com.netflix.genie.common.internal.dtos.v4.ClusterMetadata
@@ -35,7 +36,6 @@ import com.netflix.genie.common.internal.dtos.v4.JobEnvironmentRequest
 import com.netflix.genie.common.internal.dtos.v4.JobMetadata
 import com.netflix.genie.common.internal.dtos.v4.JobRequest
 import com.netflix.genie.common.internal.jobs.JobConstants
-import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.web.data.services.ApplicationPersistenceService
 import com.netflix.genie.web.data.services.ClusterPersistenceService
 import com.netflix.genie.web.data.services.CommandPersistenceService
