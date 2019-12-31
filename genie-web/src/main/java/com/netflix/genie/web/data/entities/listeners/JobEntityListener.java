@@ -19,11 +19,13 @@ package com.netflix.genie.web.data.entities.listeners;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.entities.JobEntity;
+import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.PostLoad;
 import javax.persistence.PostUpdate;
+import java.util.Optional;
 
 /**
  * Listener for Job JPA entity ({@link JobEntity}).
@@ -50,9 +52,7 @@ public class JobEntityListener {
      *
      * @param persistedJobStatusObserver the observer to notify of persisted job status changes
      */
-    public JobEntityListener(
-        final PersistedJobStatusObserver persistedJobStatusObserver
-    ) {
+    public JobEntityListener(final PersistedJobStatusObserver persistedJobStatusObserver) {
         this.persistedJobStatusObserver = persistedJobStatusObserver;
     }
 
@@ -64,12 +64,32 @@ public class JobEntityListener {
      */
     @PostUpdate
     public void jobUpdate(final JobEntity jobEntity) {
-
-        final JobStatus currentState = jobEntity.getStatus();
-        final JobStatus previouslyNotifiedState = jobEntity.getNotifiedJobStatus();
+        final JobStatus currentState;
+        try {
+            currentState = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
+        } catch (final IllegalArgumentException e) {
+            log.error("Unable to convert current status {} to a valid JobStatus", jobEntity.getStatus(), e);
+            return;
+        }
+        final JobStatus previouslyNotifiedState;
+        final Optional<String> pnsOptional = jobEntity.getNotifiedJobStatus();
+        if (pnsOptional.isPresent()) {
+            try {
+                previouslyNotifiedState = EntityDtoConverters.toJobStatus(pnsOptional.get());
+            } catch (final IllegalArgumentException e) {
+                log.error(
+                    "Unable to convert previously notified status {} to a valid JobStatus",
+                    jobEntity.getStatus(),
+                    e
+                );
+                return;
+            }
+        } else {
+            previouslyNotifiedState = null;
+        }
         final String jobId = jobEntity.getUniqueId();
         if (currentState != previouslyNotifiedState) {
-            log.info(
+            log.debug(
                 "Detected state change for job: {} from: {} to: {}",
                 jobId,
                 previouslyNotifiedState,
@@ -80,7 +100,7 @@ public class JobEntityListener {
             this.persistedJobStatusObserver.notify(jobId, previouslyNotifiedState, currentState);
 
             // Save this as the latest published state
-            jobEntity.setNotifiedJobStatus(currentState);
+            jobEntity.setNotifiedJobStatus(currentState.name());
         }
     }
 

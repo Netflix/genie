@@ -51,7 +51,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses      The job statuses to filter by
      * @return The jobs
      */
-    Set<JobProjection> findByAgentHostnameAndStatusIn(String agentHostname, Set<JobStatus> statuses);
+    Set<JobProjection> findByAgentHostnameAndStatusIn(String agentHostname, Set<String> statuses);
 
     /**
      * Get the number of agent jobs on a given host with the given statuses.
@@ -60,7 +60,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses      The statuses the job should be in e.g. {@link JobStatus#getActiveStatuses()}
      * @return The number of jobs in the given statuses on that node
      */
-    long countByAgentHostnameAndStatusIn(String agentHostname, Set<JobStatus> statuses);
+    long countByAgentHostnameAndStatusIn(String agentHostname, Set<String> statuses);
 
     /**
      * Given the hostname that agents are running on return the total memory their jobs are currently using.
@@ -76,7 +76,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     )
     long getTotalMemoryUsedOnHost(
         @Param("agentHostname") String agentHostname,
-        @Param("statuses") Set<JobStatus> statuses
+        @Param("statuses") Set<String> statuses
     );
 
     /**
@@ -85,7 +85,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses The statuses to search
      * @return The job information requested
      */
-    Set<AgentHostnameProjection> findDistinctByStatusInAndV4IsFalse(Set<JobStatus> statuses);
+    Set<AgentHostnameProjection> findDistinctByStatusInAndV4IsFalse(Set<String> statuses);
 
     /**
      * Deletes all jobs for the given ids.
@@ -103,7 +103,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses the set of statuses
      * @return the count of jobs matching the search criteria
      */
-    Long countJobsByUserAndStatusIn(@NotBlank String user, @NotEmpty Set<JobStatus> statuses);
+    Long countJobsByUserAndStatusIn(@NotBlank String user, @NotEmpty Set<String> statuses);
 
     /**
      * Returns the slice of ids for job requests created before the given date.
@@ -142,7 +142,5 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
             + " AND j.v4 = TRUE"
             + " AND j.uniqueId NOT IN (SELECT c.jobId FROM AgentConnectionEntity c)"
     )
-    Set<UniqueIdProjection> getAgentJobIdsWithNoConnectionInState(
-        @Param("statuses") @NotEmpty Set<JobStatus> statuses
-    );
+    Set<UniqueIdProjection> getAgentJobIdsWithNoConnectionInState(@Param("statuses") @NotEmpty Set<String> statuses);
 }

@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
-import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ApplicationEntity_;
 import com.netflix.genie.web.data.entities.TagEntity;
@@ -59,7 +58,7 @@ public final class JpaApplicationSpecs {
     public static Specification<ApplicationEntity> find(
         @Nullable final String name,
         @Nullable final String user,
-        @Nullable final Set<ApplicationStatus> statuses,
+        @Nullable final Set<String> statuses,
         @Nullable final Set<TagEntity> tags,
         @Nullable final String type
     ) {
@@ -96,7 +95,7 @@ public final class JpaApplicationSpecs {
                     JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(ApplicationEntity_.type), type)
                 );
             }
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 }

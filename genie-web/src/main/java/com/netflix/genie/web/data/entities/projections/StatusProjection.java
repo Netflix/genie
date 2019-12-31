@@ -17,20 +17,18 @@
  */
 package com.netflix.genie.web.data.entities.projections;
 
-import com.netflix.genie.common.dto.JobStatus;
-
 /**
- * Projection for returning only the status of a given job.
+ * Projection for returning only the status of a given resource.
  *
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobStatusProjection {
+public interface StatusProjection {
 
     /**
-     * Get the job status.
+     * Get the current status of this resource.
      *
-     * @return The job status.
+     * @return The status.
      */
-    JobStatus getStatus();
+    String getStatus();
 }

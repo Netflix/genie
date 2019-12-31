@@ -21,8 +21,8 @@ import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.JobEntity_;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -39,7 +39,7 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-public class JpaJobSpecsTest {
+class JpaJobSpecsTest {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String JOB_NAME = "jobName";
@@ -49,7 +49,7 @@ public class JpaJobSpecsTest {
     private static final String COMMAND_NAME = "pig";
     private static final CommandEntity COMMAND = Mockito.mock(CommandEntity.class);
     private static final Set<String> TAGS = Sets.newHashSet();
-    private static final Set<JobStatus> STATUSES = Sets.newHashSet();
+    private static final Set<String> STATUSES = Sets.newHashSet();
     private static final String TAG = UUID.randomUUID().toString();
     private static final Instant MIN_STARTED = Instant.now();
     private static final Instant MAX_STARTED = MIN_STARTED.plus(10, ChronoUnit.MILLIS);
@@ -65,15 +65,15 @@ public class JpaJobSpecsTest {
     /**
      * Setup the mocks.
      */
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setup() {
+    void setup() {
         TAGS.clear();
         TAGS.add(TAG);
 
         STATUSES.clear();
-        STATUSES.add(JobStatus.INIT);
-        STATUSES.add(JobStatus.FAILED);
+        STATUSES.add(JobStatus.INIT.name());
+        STATUSES.add(JobStatus.FAILED.name());
 
         this.root = (Root<JobEntity>) Mockito.mock(Root.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
@@ -97,10 +97,11 @@ public class JpaJobSpecsTest {
         Mockito.when(this.root.get(JobEntity_.user)).thenReturn(userNamePath);
         Mockito.when(this.cb.equal(userNamePath, USER_NAME)).thenReturn(equalUserNamePredicate);
 
-        final Path<JobStatus> statusPath = (Path<JobStatus>) Mockito.mock(Path.class);
+        final Path<String> statusPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.status)).thenReturn(statusPath);
-        Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(JobStatus.class)))
+        Mockito
+            .when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(JobStatus.class)))
             .thenReturn(equalStatusPredicate);
 
         final Path<String> clusterNamePath = (Path<String>) Mockito.mock(Path.class);
@@ -169,7 +170,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithAll() {
+    void testFindWithAll() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -193,7 +194,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -217,7 +218,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithAllLikes() {
+    void testFindWithAllLikes() {
         final String newId = ID + "%";
         final String newName = JOB_NAME + "%";
         final String newUserName = USER_NAME + "%";
@@ -248,7 +249,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.uniqueId), newId);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.name), newName);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.user), newUserName);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.clusterName), newClusterName);
@@ -272,7 +273,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutId() {
+    void testFindWithOutId() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -297,7 +298,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -321,7 +322,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutJobName() {
+    void testFindWithOutJobName() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -346,7 +347,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.never()).like(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -370,7 +371,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutUserName() {
+    void testFindWithOutUserName() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -395,7 +396,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.user), USER_NAME);
         Mockito.verify(this.cb, Mockito.never()).like(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -419,7 +420,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutStatus() {
+    void testFindWithOutStatus() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -443,7 +444,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -467,7 +468,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithEmptyStatus() {
+    void testFindWithEmptyStatus() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -491,7 +492,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -515,7 +516,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutClusterName() {
+    void testFindWithOutClusterName() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -539,7 +540,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -564,7 +565,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutClusterId() {
+    void testFindWithOutClusterId() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -588,7 +589,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -612,7 +613,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutCommandName() {
+    void testFindWithOutCommandName() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -636,7 +637,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -661,7 +662,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutCommandId() {
+    void testFindWithOutCommandId() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -685,7 +686,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -709,7 +710,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutTags() {
+    void testFindWithOutTags() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -733,7 +734,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -755,7 +756,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutMinStarted() {
+    void testFindWithOutMinStarted() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -779,7 +780,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -803,7 +804,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutMaxStarted() {
+    void testFindWithOutMaxStarted() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -827,7 +828,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -851,7 +852,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutMinFinished() {
+    void testFindWithOutMinFinished() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -875,7 +876,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -899,7 +900,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutMaxFinished() {
+    void testFindWithOutMaxFinished() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -923,7 +924,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -947,7 +948,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithEmptyTag() {
+    void testFindWithEmptyTag() {
         TAGS.add("");
         JpaJobSpecs.getFindPredicate(
             this.root,
@@ -972,7 +973,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -992,7 +993,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutGrouping() {
+    void testFindWithOutGrouping() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -1016,7 +1017,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
@@ -1040,7 +1041,7 @@ public class JpaJobSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindWithOutGroupingInstance() {
+    void testFindWithOutGroupingInstance() {
         JpaJobSpecs.getFindPredicate(
             this.root,
             this.cb,
@@ -1064,7 +1065,7 @@ public class JpaJobSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.uniqueId), ID);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.name), JOB_NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.user), USER_NAME);
-        for (final JobStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);

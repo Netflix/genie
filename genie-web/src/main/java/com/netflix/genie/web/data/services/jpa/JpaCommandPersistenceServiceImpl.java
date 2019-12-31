@@ -174,7 +174,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
             JpaCommandSpecs.find(
                 name,
                 user,
-                statuses,
+                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
                 tagEntities
             ),
             page
@@ -521,7 +521,12 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
             throw new GenieNotFoundException("No command with id " + id + " exists.");
         }
         return this.getClusterRepository()
-            .findAll(JpaClusterSpecs.findClustersForCommand(id, statuses))
+            .findAll(
+                JpaClusterSpecs.findClustersForCommand(
+                    id,
+                    statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null
+                )
+            )
             .stream()
             .map(EntityDtoConverters::toV4ClusterDto)
             .collect(Collectors.toSet());
@@ -578,7 +583,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         entity.setUser(metadata.getUser());
         entity.setVersion(metadata.getVersion());
         entity.setDescription(metadata.getDescription().orElse(null));
-        entity.setStatus(metadata.getStatus());
+        entity.setStatus(metadata.getStatus().name());
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
     }
 }

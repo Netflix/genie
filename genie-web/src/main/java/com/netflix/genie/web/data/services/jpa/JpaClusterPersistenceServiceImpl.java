@@ -177,7 +177,13 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         }
 
         final Page<ClusterEntity> clusterEntities = this.getClusterRepository().findAll(
-            JpaClusterSpecs.find(name, statuses, tagEntities, minUpdateTime, maxUpdateTime),
+            JpaClusterSpecs.find(
+                name,
+                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                tagEntities,
+                minUpdateTime,
+                maxUpdateTime
+            ),
             page
         );
 
@@ -492,7 +498,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
             final Set<CommandStatus> notNullStatuses = Sets.newHashSet(statuses);
             return commandEntities
                 .stream()
-                .filter(command -> notNullStatuses.contains(command.getStatus()))
+                .filter(command -> notNullStatuses.contains(EntityDtoConverters.toCommandStatus(command.getStatus())))
                 .map(EntityDtoConverters::toV4CommandDto)
                 .collect(Collectors.toList());
         } else {
@@ -593,7 +599,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         entity.setUser(metadata.getUser());
         entity.setVersion(metadata.getVersion());
         entity.setDescription(metadata.getDescription().orElse(null));
-        entity.setStatus(metadata.getStatus());
+        entity.setStatus(metadata.getStatus().name());
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
     }
 

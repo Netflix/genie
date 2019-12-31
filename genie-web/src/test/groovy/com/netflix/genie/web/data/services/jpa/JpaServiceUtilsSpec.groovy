@@ -94,7 +94,7 @@ class JpaServiceUtilsSpec extends Specification {
             }
         )
         entity.setDependencies(dependencyEntities)
-        entity.setStatus(ApplicationStatus.ACTIVE)
+        entity.setStatus(ApplicationStatus.ACTIVE.name())
 
         when:
         def application = JpaServiceUtils.toApplicationDto(entity)
@@ -124,7 +124,7 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setUser(user)
         def version = UUID.randomUUID().toString()
         entity.setVersion(version)
-        entity.setStatus(ClusterStatus.TERMINATED)
+        entity.setStatus(ClusterStatus.TERMINATED.name())
         def id = UUID.randomUUID().toString()
         entity.setUniqueId(id)
         def created = entity.getCreated()
@@ -194,7 +194,7 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setDescription(description)
         def created = entity.getCreated()
         def updated = entity.getUpdated()
-        entity.setStatus(CommandStatus.DEPRECATED)
+        entity.setStatus(CommandStatus.DEPRECATED.name())
         def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
@@ -293,7 +293,7 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setStarted(started)
         def finished = Instant.now()
         entity.setFinished(finished)
-        entity.setStatus(JobStatus.SUCCEEDED)
+        entity.setStatus(JobStatus.SUCCEEDED.name())
         def statusMessage = UUID.randomUUID().toString()
         entity.setStatusMsg(statusMessage)
 

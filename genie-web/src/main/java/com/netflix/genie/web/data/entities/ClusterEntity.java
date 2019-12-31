@@ -18,7 +18,6 @@
 package com.netflix.genie.web.data.entities;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.web.data.entities.projections.ClusterCommandsProjection;
 import lombok.Getter;
@@ -26,11 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -61,12 +56,6 @@ import java.util.Set;
 public class ClusterEntity extends BaseEntity implements ClusterCommandsProjection {
 
     private static final long serialVersionUID = -5674870110962005872L;
-
-    @Basic(optional = false)
-    @Column(name = "status", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "No cluster status entered and is required.")
-    private ClusterStatus status;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

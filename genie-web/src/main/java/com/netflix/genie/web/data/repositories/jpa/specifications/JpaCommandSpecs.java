@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ApplicationEntity_;
 import com.netflix.genie.web.data.entities.CommandEntity;
@@ -60,7 +59,7 @@ public final class JpaCommandSpecs {
     public static Specification<CommandEntity> find(
         @Nullable final String name,
         @Nullable final String user,
-        @Nullable final Set<CommandStatus> statuses,
+        @Nullable final Set<String> statuses,
         @Nullable final Set<TagEntity> tags
     ) {
         return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
@@ -91,7 +90,7 @@ public final class JpaCommandSpecs {
                 cq.groupBy(root.get(CommandEntity_.id));
                 cq.having(cb.equal(cb.count(root.get(CommandEntity_.id)), tags.size()));
             }
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 
@@ -104,7 +103,7 @@ public final class JpaCommandSpecs {
      */
     public static Specification<CommandEntity> findCommandsForApplication(
         final String applicationId,
-        @Nullable final Set<CommandStatus> statuses
+        @Nullable final Set<String> statuses
     ) {
         return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -123,7 +122,7 @@ public final class JpaCommandSpecs {
                 );
             }
 
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 }

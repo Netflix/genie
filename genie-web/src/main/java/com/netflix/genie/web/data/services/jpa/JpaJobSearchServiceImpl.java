@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -44,8 +45,9 @@ import com.netflix.genie.web.data.entities.projections.JobExecutionProjection;
 import com.netflix.genie.web.data.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.entities.projections.JobProjection;
 import com.netflix.genie.web.data.entities.projections.JobRequestProjection;
-import com.netflix.genie.web.data.entities.projections.JobStatusProjection;
+import com.netflix.genie.web.data.entities.projections.StatusProjection;
 import com.netflix.genie.web.data.entities.projections.UniqueIdProjection;
+import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.data.repositories.jpa.JpaBaseRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
@@ -71,12 +73,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * JPA implementation of the Job Search Service.
@@ -88,11 +90,23 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JpaJobSearchServiceImpl implements JobSearchService {
 
-    private static final EnumSet<JobStatus> USING_MEMORY_JOB_SET = EnumSet.of(
-        JobStatus.CLAIMED,
-        JobStatus.INIT,
-        JobStatus.RUNNING
-    );
+    /**
+     * The set of active statuses as their names.
+     */
+    @VisibleForTesting
+    static final Set<String> ACTIVE_STATUS_SET = JobStatus
+        .getActiveStatuses()
+        .stream()
+        .map(Enum::name)
+        .collect(Collectors.toSet());
+    /**
+     * The set of job statuses which are considered to be using memory on a Genie node.
+     */
+    @VisibleForTesting
+    static final Set<String> USING_MEMORY_JOB_SET = Stream
+        .of(JobStatus.CLAIMED, JobStatus.INIT, JobStatus.RUNNING)
+        .map(Enum::name)
+        .collect(Collectors.toSet());
 
     private final JpaJobRepository jobRepository;
     private final JpaClusterRepository clusterRepository;
@@ -179,7 +193,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 id,
                 jobName,
                 user,
-                statuses,
+                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
                 tags,
                 clusterName,
                 clusterEntity,
@@ -248,8 +262,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     public Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostname) {
         log.debug("Called with hostname {}", hostname);
 
-        final Set<JobProjection> jobs
-            = this.jobRepository.findByAgentHostnameAndStatusIn(hostname, JobStatus.getActiveStatuses());
+        final Set<JobProjection> jobs = this.jobRepository.findByAgentHostnameAndStatusIn(hostname, ACTIVE_STATUS_SET);
 
         return jobs
             .stream()
@@ -265,7 +278,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         log.debug("Called");
 
         return this.jobRepository
-            .findDistinctByStatusInAndV4IsFalse(JobStatus.getActiveStatuses())
+            .findDistinctByStatusInAndV4IsFalse(ACTIVE_STATUS_SET)
             .stream()
             .map(AgentHostnameProjection::getAgentHostname)
             .filter(Optional::isPresent)
@@ -295,10 +308,12 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Deprecated
     public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        return this.jobRepository
-            .findByUniqueId(id, JobStatusProjection.class)
-            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists."))
-            .getStatus();
+        return EntityDtoConverters.toJobStatus(
+            this.jobRepository
+                .findByUniqueId(id, StatusProjection.class)
+                .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists."))
+                .getStatus()
+        );
     }
 
     /**
@@ -397,7 +412,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Override
     public long getActiveJobCountForUser(@NotBlank final String user) throws GenieException {
         log.debug("Called for jobs with user {}", user);
-        final Long count = this.jobRepository.countJobsByUserAndStatusIn(user, JobStatus.getActiveStatuses());
+        final Long count = this.jobRepository.countJobsByUserAndStatusIn(user, ACTIVE_STATUS_SET);
         if (count == null || count < 0) {
             throw new GenieServerException(
                 "Count query for user "
@@ -437,7 +452,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      */
     @Override
     public Set<String> getActiveDisconnectedAgentJobs() {
-        return this.jobRepository.getAgentJobIdsWithNoConnectionInState(JobStatus.getActiveStatuses())
+        return this.jobRepository.getAgentJobIdsWithNoConnectionInState(ACTIVE_STATUS_SET)
             .stream()
             .map(UniqueIdProjection::getUniqueId)
             .collect(Collectors.toSet());
@@ -448,7 +463,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      */
     @Override
     public long getAllocatedMemoryOnHost(final String hostname) {
-        return this.jobRepository.getTotalMemoryUsedOnHost(hostname, JobStatus.getActiveStatuses());
+        return this.jobRepository.getTotalMemoryUsedOnHost(hostname, ACTIVE_STATUS_SET);
     }
 
     /**
@@ -464,7 +479,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      */
     @Override
     public long getActiveJobCountOnHost(final String hostname) {
-        return this.jobRepository.countByAgentHostnameAndStatusIn(hostname, JobStatus.getActiveStatuses());
+        return this.jobRepository.countByAgentHostnameAndStatusIn(hostname, ACTIVE_STATUS_SET);
     }
 
     private <E extends BaseEntity> Optional<E> getEntityOrNull(

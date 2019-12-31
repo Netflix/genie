@@ -73,7 +73,7 @@ public final class JpaServiceUtils {
             applicationEntity.getName(),
             applicationEntity.getUser(),
             applicationEntity.getVersion(),
-            applicationEntity.getStatus()
+            EntityDtoConverters.toApplicationStatus(applicationEntity.getStatus())
         )
             .withId(applicationEntity.getUniqueId())
             .withCreated(applicationEntity.getCreated())
@@ -103,7 +103,7 @@ public final class JpaServiceUtils {
             clusterEntity.getName(),
             clusterEntity.getUser(),
             clusterEntity.getVersion(),
-            clusterEntity.getStatus()
+            EntityDtoConverters.toClusterStatus(clusterEntity.getStatus())
         )
             .withId(clusterEntity.getUniqueId())
             .withCreated(clusterEntity.getCreated())
@@ -132,7 +132,7 @@ public final class JpaServiceUtils {
             commandEntity.getName(),
             commandEntity.getUser(),
             commandEntity.getVersion(),
-            commandEntity.getStatus(),
+            EntityDtoConverters.toCommandStatus(commandEntity.getStatus()),
             commandEntity.getExecutable(),
             commandEntity.getCheckDelay()
         )
@@ -168,7 +168,7 @@ public final class JpaServiceUtils {
             .withCreated(jobProjection.getCreated())
             .withUpdated(jobProjection.getUpdated())
             .withTags(jobProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
-            .withStatus(jobProjection.getStatus())
+            .withStatus(EntityDtoConverters.toJobStatus(jobProjection.getStatus()))
             .withCommandArgs(jobProjection.getCommandArgs());
 
         jobProjection.getDescription().ifPresent(builder::withDescription);

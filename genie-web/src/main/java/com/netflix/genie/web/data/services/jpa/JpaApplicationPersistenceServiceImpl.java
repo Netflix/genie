@@ -168,7 +168,13 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
 
         final Page<ApplicationEntity> applicationEntities = this.getApplicationRepository()
             .findAll(
-                JpaApplicationSpecs.find(name, user, statuses, tagEntities, type),
+                JpaApplicationSpecs.find(
+                    name,
+                    user,
+                    statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                    tagEntities,
+                    type
+                ),
                 page
             );
 
@@ -421,7 +427,12 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
             throw new GenieNotFoundException("No application with id " + id + " exists.");
         }
         return this.getCommandRepository()
-            .findAll(JpaCommandSpecs.findCommandsForApplication(id, statuses))
+            .findAll(
+                JpaCommandSpecs.findCommandsForApplication(
+                    id,
+                    statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null
+                )
+            )
             .stream()
             .map(EntityDtoConverters::toV4CommandDto)
             .collect(Collectors.toSet());
@@ -469,7 +480,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         entity.setUser(metadata.getUser());
         entity.setVersion(metadata.getVersion());
         entity.setDescription(metadata.getDescription().orElse(null));
-        entity.setStatus(metadata.getStatus());
+        entity.setStatus(metadata.getStatus().name());
         entity.setType(metadata.getType().orElse(null));
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
     }

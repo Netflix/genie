@@ -18,7 +18,6 @@
 package com.netflix.genie.web.data.entities;
 
 import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,8 +29,6 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -66,12 +63,6 @@ import java.util.Set;
 public class CommandEntity extends BaseEntity {
 
     private static final long serialVersionUID = -8058995173025433517L;
-
-    @Basic(optional = false)
-    @Column(name = "status", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "No command status entered and is required.")
-    private CommandStatus status;
 
     @ElementCollection
     @CollectionTable(

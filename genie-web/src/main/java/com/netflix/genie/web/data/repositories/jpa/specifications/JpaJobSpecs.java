@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.JobEntity;
@@ -74,7 +73,7 @@ public final class JpaJobSpecs {
         @Nullable final String id,
         @Nullable final String name,
         @Nullable final String user,
-        @Nullable final Set<JobStatus> statuses,
+        @Nullable final Set<String> statuses,
         @Nullable final Set<String> tags,
         @Nullable final String clusterName,
         @Nullable final ClusterEntity cluster,

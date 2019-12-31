@@ -26,7 +26,7 @@ import java.util.Optional;
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobSearchProjection extends JobStatusProjection {
+public interface JobSearchProjection extends StatusProjection {
 
     /**
      * Get the unique identifier of the job.

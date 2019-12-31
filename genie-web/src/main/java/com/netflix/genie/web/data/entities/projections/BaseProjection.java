@@ -49,6 +49,13 @@ public interface BaseProjection extends UniqueIdProjection {
     String getName();
 
     /**
+     * Get the status of this resource as a String.
+     *
+     * @return The status
+     */
+    String getStatus();
+
+    /**
      * Get the description of this resource.
      *
      * @return The description which could be null so it's wrapped in Optional

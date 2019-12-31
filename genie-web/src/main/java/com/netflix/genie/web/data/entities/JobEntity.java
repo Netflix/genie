@@ -18,7 +18,6 @@
 package com.netflix.genie.web.data.entities;
 
 import com.google.common.collect.Maps;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.entities.listeners.JobEntityListener;
 import com.netflix.genie.web.data.entities.projections.JobApiProjection;
 import com.netflix.genie.web.data.entities.projections.JobApplicationsProjection;
@@ -30,6 +29,7 @@ import com.netflix.genie.web.data.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.entities.projections.JobProjection;
 import com.netflix.genie.web.data.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.data.entities.projections.JobSearchProjection;
+import com.netflix.genie.web.data.entities.projections.StatusProjection;
 import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
@@ -48,8 +48,6 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -108,7 +106,8 @@ public class JobEntity extends BaseEntity implements
     JobSpecificationProjection,
     JobArchiveLocationProjection,
     IsV4JobProjection,
-    JobApiProjection {
+    JobApiProjection,
+    StatusProjection {
 
     private static final long serialVersionUID = 2849367731657512224L;
 
@@ -215,11 +214,6 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "command_name")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String commandName;
-
-    @Basic(optional = false)
-    @Column(name = "status", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    private JobStatus status = JobStatus.RESERVED;
 
     @Basic
     @Column(name = "status_msg")
@@ -454,7 +448,7 @@ public class JobEntity extends BaseEntity implements
 
     @Transient
     @ToString.Exclude
-    private JobStatus notifiedJobStatus;
+    private String notifiedJobStatus;
 
     /**
      * Default Constructor.
@@ -750,32 +744,6 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Set job status, and update start/update/finish times, if needed.
-     *
-     * @param jobStatus status for job
-     */
-    void setJobStatus(@NotNull final JobStatus jobStatus) {
-        this.status = jobStatus;
-
-        if (jobStatus == JobStatus.INIT) {
-            this.setStarted(Instant.now());
-        } else if (jobStatus.isFinished()) {
-            this.setFinished(Instant.now());
-        }
-    }
-
-    /**
-     * Sets job status and human-readable message.
-     *
-     * @param newStatus predefined status
-     * @param msg       human-readable message
-     */
-    void setJobStatus(@NotNull final JobStatus newStatus, final String msg) {
-        this.setJobStatus(newStatus);
-        this.setStatusMsg(msg);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -986,6 +954,15 @@ public class JobEntity extends BaseEntity implements
         if (clusterCriteria != null) {
             this.clusterCriteria.addAll(clusterCriteria);
         }
+    }
+
+    /**
+     * Get the previously notified job status if there was one.
+     *
+     * @return The previously notified job status wrapped in an {@link Optional} or {@link Optional#empty()}
+     */
+    public Optional<String> getNotifiedJobStatus() {
+        return Optional.ofNullable(this.notifiedJobStatus);
     }
 
     /**

@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.data.entities.projections.v4;
 
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
@@ -79,13 +78,6 @@ public interface FinishedJobProjection extends BaseProjection {
      * @return The finish date
      */
     Optional<Instant> getFinished();
-
-    /**
-     * Get the job status.
-     *
-     * @return The job status.
-     */
-    JobStatus getStatus();
 
     /**
      * Get the metadata of this entity which is unstructured JSON.
