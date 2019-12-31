@@ -63,7 +63,7 @@ public class ScriptClusterSelector implements ClusterSelector {
      * Constructor.
      *
      * @param clusterSelectorScript the cluster selector script
-     * @param registry the metrics registry
+     * @param registry              the metrics registry
      */
     public ScriptClusterSelector(
         final ClusterSelectorScript clusterSelectorScript,

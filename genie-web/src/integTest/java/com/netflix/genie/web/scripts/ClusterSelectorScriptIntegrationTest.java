@@ -112,7 +112,7 @@ class ClusterSelectorScriptIntegrationTest {
     void setUp() {
         final MeterRegistry meterRegistry = new SimpleMeterRegistry();
         final ScriptManagerProperties scriptManagerProperties = new ScriptManagerProperties();
-        final TaskScheduler taskScheduler =  new ConcurrentTaskScheduler();
+        final TaskScheduler taskScheduler = new ConcurrentTaskScheduler();
         final ExecutorService executorService = Executors.newCachedThreadPool();
         final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
         final ResourceLoader resourceLoader = new DefaultResourceLoader();
