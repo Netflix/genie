@@ -486,7 +486,7 @@ public class ServicesAutoConfiguration {
      * This bean is only created if the script is configured.
      *
      * @param clusterSelectorScript the cluster selector script
-     * @param registry the metrics registry
+     * @param registry              the metrics registry
      * @return a {@link ScriptClusterSelector}
      */
     @Bean

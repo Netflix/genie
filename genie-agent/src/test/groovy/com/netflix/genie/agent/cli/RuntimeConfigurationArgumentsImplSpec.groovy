@@ -18,7 +18,6 @@
 package com.netflix.genie.agent.cli
 
 import com.beust.jcommander.JCommander
-import com.beust.jcommander.ParameterException
 import com.beust.jcommander.ParametersDelegate
 import spock.lang.Specification
 

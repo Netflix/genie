@@ -19,8 +19,8 @@
 /**
  * Tests for script extensions configuration.
  *
- * @since 4.0.0
  * @author mprimi
+ * @since 4.0.0
  */
 @ParametersAreNonnullByDefault
 package com.netflix.genie.web.spring.autoconfigure.scripts;

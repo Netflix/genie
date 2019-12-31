@@ -95,7 +95,8 @@ class ScriptsAutoConfigurationTest {
 
     static class MocksConfiguration {
         @Bean
-        @Qualifier("genieTaskScheduler") TaskScheduler taskScheduler() {
+        @Qualifier("genieTaskScheduler")
+        TaskScheduler taskScheduler() {
             return Mockito.mock(TaskScheduler.class);
         }
 

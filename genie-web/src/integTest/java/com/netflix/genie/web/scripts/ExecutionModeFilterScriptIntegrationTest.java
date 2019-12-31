@@ -53,11 +53,19 @@ class ExecutionModeFilterScriptIntegrationTest {
     private ExecutionModeFilterScriptProperties scriptProperties;
     private ExecutionModeFilterScript executionModeFilterScript;
 
+    private static Stream<Arguments> getEvaluateTestArguments() {
+        return Stream.of(
+            Arguments.of(Optional.of(true)),
+            Arguments.of(Optional.of(false)),
+            Arguments.of(Optional.empty())
+        );
+    }
+
     @BeforeEach
     void setUp() {
         final MeterRegistry meterRegistry = new SimpleMeterRegistry();
         final ScriptManagerProperties scriptManagerProperties = new ScriptManagerProperties();
-        final TaskScheduler taskScheduler =  new ConcurrentTaskScheduler();
+        final TaskScheduler taskScheduler = new ConcurrentTaskScheduler();
         final ExecutorService executorService = Executors.newCachedThreadPool();
         final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
         final ResourceLoader resourceLoader = new DefaultResourceLoader();
@@ -76,14 +84,6 @@ class ExecutionModeFilterScriptIntegrationTest {
             scriptProperties,
             objectMapper,
             meterRegistry
-        );
-    }
-
-    private static Stream<Arguments> getEvaluateTestArguments() {
-        return Stream.of(
-            Arguments.of(Optional.of(true)),
-            Arguments.of(Optional.of(false)),
-            Arguments.of(Optional.empty())
         );
     }
 

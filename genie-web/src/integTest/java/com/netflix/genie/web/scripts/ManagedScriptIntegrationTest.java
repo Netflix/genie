@@ -48,11 +48,36 @@ class ManagedScriptIntegrationTest {
     private TestScriptProperties scriptProperties;
     private TestScript script;
 
+    static void loadScript(
+        final String scriptFilename,
+        final ManagedScript script,
+        final ManagedScriptBaseProperties scriptProperties
+    ) throws Exception {
+        // Find the script resource
+        final URI scriptUri = ExecutionModeFilterScript.class.getResource(scriptFilename).toURI();
+        // Configure script to use it
+        scriptProperties.setSource(scriptUri);
+        // Trigger loading of script
+        scriptProperties.setAutoLoadEnabled(true);
+        script.warmUp();
+
+        // Wait for script to be ready to evaluate
+        final Instant deadline = Instant.now().plus(10, ChronoUnit.SECONDS);
+        while (!script.isReadyToEvaluate()) {
+            if (Instant.now().isAfter(deadline)) {
+                throw new RuntimeException("Timed out waiting for script to load");
+            }
+            System.out.println("Script not loaded yet...");
+            Thread.sleep(500);
+        }
+        System.out.println("Script loaded");
+    }
+
     @BeforeEach
     void setUp() {
         final MeterRegistry meterRegistry = new SimpleMeterRegistry();
         final ScriptManagerProperties scriptManagerProperties = new ScriptManagerProperties();
-        final TaskScheduler taskScheduler =  new ConcurrentTaskScheduler();
+        final TaskScheduler taskScheduler = new ConcurrentTaskScheduler();
         final ExecutorService executorService = Executors.newCachedThreadPool();
         final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
         final ResourceLoader resourceLoader = new DefaultResourceLoader();
@@ -135,30 +160,5 @@ class ManagedScriptIntegrationTest {
     }
 
     private static class TestScriptProperties extends ManagedScriptBaseProperties {
-    }
-
-    static void loadScript(
-        final String scriptFilename,
-        final ManagedScript script,
-        final ManagedScriptBaseProperties scriptProperties
-    ) throws Exception {
-        // Find the script resource
-        final URI scriptUri = ExecutionModeFilterScript.class.getResource(scriptFilename).toURI();
-        // Configure script to use it
-        scriptProperties.setSource(scriptUri);
-        // Trigger loading of script
-        scriptProperties.setAutoLoadEnabled(true);
-        script.warmUp();
-
-        // Wait for script to be ready to evaluate
-        final Instant deadline = Instant.now().plus(10, ChronoUnit.SECONDS);
-        while (!script.isReadyToEvaluate()) {
-            if (Instant.now().isAfter(deadline)) {
-                throw new RuntimeException("Timed out waiting for script to load");
-            }
-            System.out.println("Script not loaded yet...");
-            Thread.sleep(500);
-        }
-        System.out.println("Script loaded");
     }
 }
