@@ -22,7 +22,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.exceptions.GeniePreconditionException
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException
-import com.netflix.genie.common.internal.dto.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
 import com.netflix.genie.web.agent.services.AgentFileStreamService
@@ -34,7 +34,6 @@ import com.netflix.genie.web.services.ArchivedJobService
 import com.netflix.genie.web.services.JobDirectoryServerService
 import com.netflix.genie.web.services.JobFileService
 import io.micrometer.core.instrument.MeterRegistry
-import org.junit.Ignore
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.MediaType
@@ -222,7 +221,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         thrown(expectedExceptionClass)
 
         where:
-        exception | expectedExceptionClass
+        exception                                        | expectedExceptionClass
         new JobNotArchivedException("...")               | GeniePreconditionException
         new JobNotFoundException("...")                  | GenieNotFoundException
         new JobDirectoryManifestNotFoundException("...") | GenieNotFoundException

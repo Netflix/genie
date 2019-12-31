@@ -19,9 +19,9 @@ package com.netflix.genie.web.jobs;
 
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.internal.dto.v4.Application;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.common.internal.dto.v4.Command;
+import com.netflix.genie.common.internal.dtos.v4.Application;
+import com.netflix.genie.common.internal.dtos.v4.Cluster;
+import com.netflix.genie.common.internal.dtos.v4.Command;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

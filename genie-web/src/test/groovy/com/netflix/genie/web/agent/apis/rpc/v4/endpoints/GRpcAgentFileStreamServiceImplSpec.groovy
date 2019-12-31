@@ -19,8 +19,8 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.google.protobuf.ByteString
 import com.netflix.genie.common.exceptions.GenieTimeoutException
-import com.netflix.genie.common.internal.dto.DirectoryManifest
-import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException
 import com.netflix.genie.proto.AgentFileMessage
 import com.netflix.genie.proto.AgentManifestMessage

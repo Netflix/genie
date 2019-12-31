@@ -30,12 +30,12 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
-import com.netflix.genie.common.internal.dto.v4.Application;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dto.v4.JobEnvironment;
-import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dtos.v4.Application;
+import com.netflix.genie.common.internal.dtos.v4.Cluster;
+import com.netflix.genie.common.internal.dtos.v4.Command;
+import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dtos.v4.JobEnvironment;
+import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
@@ -100,7 +100,7 @@ public class JobCoordinatorServiceImplTest {
     private MeterRegistry registry;
     private Timer coordinationTimer;
     private Timer setJobEnvironmentTimer;
-    private com.netflix.genie.common.internal.dto.v4.JobMetadata v4JobMetadata;
+    private com.netflix.genie.common.internal.dtos.v4.JobMetadata v4JobMetadata;
 
     /**
      * Setup for the tests.
@@ -120,7 +120,7 @@ public class JobCoordinatorServiceImplTest {
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
         this.commandPersistenceService = Mockito.mock(CommandPersistenceService.class);
         this.specificationService = Mockito.mock(JobResolverService.class);
-        this.v4JobMetadata = Mockito.mock(com.netflix.genie.common.internal.dto.v4.JobMetadata.class);
+        this.v4JobMetadata = Mockito.mock(com.netflix.genie.common.internal.dtos.v4.JobMetadata.class);
 
         this.registry = Mockito.mock(MeterRegistry.class);
         this.coordinationTimer = Mockito.mock(Timer.class);
@@ -179,7 +179,7 @@ public class JobCoordinatorServiceImplTest {
             .when(
                 this.specificationService.resolveJob(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class),
+                    Mockito.any(com.netflix.genie.common.internal.dtos.v4.JobRequest.class),
                     Mockito.eq(true)
                 )
             )
@@ -280,7 +280,7 @@ public class JobCoordinatorServiceImplTest {
             .when(
                 this.specificationService.resolveJob(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class),
+                    Mockito.any(com.netflix.genie.common.internal.dtos.v4.JobRequest.class),
                     Mockito.eq(true)
                 )
             )
@@ -414,7 +414,7 @@ public class JobCoordinatorServiceImplTest {
             .when(
                 this.specificationService.resolveJob(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class),
+                    Mockito.any(com.netflix.genie.common.internal.dtos.v4.JobRequest.class),
                     Mockito.eq(true)
                 )
             )
@@ -521,7 +521,7 @@ public class JobCoordinatorServiceImplTest {
             .when(
                 this.specificationService.resolveJob(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class),
+                    Mockito.any(com.netflix.genie.common.internal.dtos.v4.JobRequest.class),
                     Mockito.eq(true)
                 )
             )
@@ -647,7 +647,7 @@ public class JobCoordinatorServiceImplTest {
             .when(
                 this.specificationService.resolveJob(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class),
+                    Mockito.any(com.netflix.genie.common.internal.dtos.v4.JobRequest.class),
                     Mockito.eq(true)
                 )
             )
@@ -755,7 +755,7 @@ public class JobCoordinatorServiceImplTest {
             .when(
                 this.specificationService.resolveJob(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class),
+                    Mockito.any(com.netflix.genie.common.internal.dtos.v4.JobRequest.class),
                     Mockito.eq(true)
                 )
             )
@@ -881,7 +881,7 @@ public class JobCoordinatorServiceImplTest {
             .when(
                 this.specificationService.resolveJob(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class),
+                    Mockito.any(com.netflix.genie.common.internal.dtos.v4.JobRequest.class),
                     Mockito.eq(true)
                 )
             )

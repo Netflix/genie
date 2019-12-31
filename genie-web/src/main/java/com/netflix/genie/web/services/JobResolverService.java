@@ -18,7 +18,7 @@
 package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dtos.v4.JobRequest;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import org.springframework.validation.annotation.Validated;

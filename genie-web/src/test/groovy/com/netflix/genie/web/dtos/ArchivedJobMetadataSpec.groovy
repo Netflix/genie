@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.dtos
 
-import com.netflix.genie.common.internal.dto.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import spock.lang.Specification
 /**
  * Specifications for {@link ArchivedJobMetadata}.

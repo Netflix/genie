@@ -21,7 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.netflix.genie.common.internal.dto.v4.JobMetadata;
+import com.netflix.genie.common.internal.dtos.v4.JobMetadata;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.dtos.ResolvedJob;

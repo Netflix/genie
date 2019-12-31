@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints;
 
-import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
-import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
+import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.proto.FileStreamServiceGrpc;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;

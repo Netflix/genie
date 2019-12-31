@@ -19,7 +19,7 @@ package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Sets
 import com.netflix.genie.common.exceptions.GenieNotFoundException
-import com.netflix.genie.common.internal.dto.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.web.data.services.JobPersistenceService

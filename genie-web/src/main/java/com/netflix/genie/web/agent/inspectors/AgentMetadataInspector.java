@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.agent.inspectors;
 
-import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;

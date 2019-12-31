@@ -19,9 +19,9 @@ package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Lists
 import com.netflix.genie.common.dto.JobRequest
-import com.netflix.genie.common.internal.dto.v4.Application
-import com.netflix.genie.common.internal.dto.v4.Cluster
-import com.netflix.genie.common.internal.dto.v4.Command
+import com.netflix.genie.common.internal.dtos.v4.Application
+import com.netflix.genie.common.internal.dtos.v4.Cluster
+import com.netflix.genie.common.internal.dtos.v4.Command
 import com.netflix.genie.web.events.GenieEventBus
 import com.netflix.genie.web.services.JobStateService
 import com.netflix.genie.web.services.JobSubmitterService

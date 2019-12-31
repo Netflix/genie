@@ -20,7 +20,7 @@ package com.netflix.genie.common.internal.services.impl
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.Ticker
-import com.netflix.genie.common.internal.dto.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import spock.lang.Specification
 import spock.lang.Unroll

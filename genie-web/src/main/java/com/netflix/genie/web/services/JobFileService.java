@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.internal.dto.v4.files.JobFileState;
+import com.netflix.genie.common.internal.dtos.v4.files.JobFileState;
 import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 

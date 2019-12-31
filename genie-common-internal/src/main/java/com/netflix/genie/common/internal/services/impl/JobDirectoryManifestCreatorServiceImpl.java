@@ -18,7 +18,7 @@
 package com.netflix.genie.common.internal.services.impl;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.netflix.genie.common.internal.dto.DirectoryManifest;
+import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import lombok.extern.slf4j.Slf4j;
 

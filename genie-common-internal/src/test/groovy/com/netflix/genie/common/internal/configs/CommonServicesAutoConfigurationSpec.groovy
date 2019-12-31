@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.internal.configs
 
-import com.netflix.genie.common.internal.dto.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import spock.lang.Specification
 import spock.lang.Unroll
 
