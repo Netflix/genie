@@ -58,7 +58,7 @@ class ClusterEntityTest extends EntityTestBase {
         this.c.setName(NAME);
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
-        this.c.setStatus(ClusterStatus.UP);
+        this.c.setStatus(ClusterStatus.UP.name());
     }
 
     /**
@@ -123,8 +123,8 @@ class ClusterEntityTest extends EntityTestBase {
      */
     @Test
     void testSetStatus() {
-        this.c.setStatus(ClusterStatus.TERMINATED);
-        Assertions.assertThat(this.c.getStatus()).isEqualByComparingTo(ClusterStatus.TERMINATED);
+        this.c.setStatus(ClusterStatus.TERMINATED.name());
+        Assertions.assertThat(this.c.getStatus()).isEqualTo(ClusterStatus.TERMINATED.name());
     }
 
     /**

@@ -58,7 +58,7 @@ import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.projections.IdProjection;
 import com.netflix.genie.web.data.entities.projections.JobApiProjection;
 import com.netflix.genie.web.data.entities.projections.JobArchiveLocationProjection;
-import com.netflix.genie.web.data.entities.projections.JobStatusProjection;
+import com.netflix.genie.web.data.entities.projections.StatusProjection;
 import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
@@ -350,6 +350,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         log.debug("Attempting to save job submission {}", jobSubmission);
         // TODO: Metrics
         final JobEntity jobEntity = new JobEntity();
+        jobEntity.setStatus(JobStatus.RESERVED.name());
 
         final JobRequest jobRequest = jobSubmission.getJobRequest();
         final JobRequestMetadata jobRequestMetadata = jobSubmission.getJobRequestMetadata();
@@ -435,7 +436,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 return;
             }
             // Make sure if the job is resolvable otherwise don't do anything
-            if (!entity.getStatus().isResolvable()) {
+            if (!EntityDtoConverters.toJobStatus(entity.getStatus()).isResolvable()) {
                 log.error(
                     "Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't save resolved info",
                     id,
@@ -467,7 +468,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             // TODO: There's probably some other fields we want to use from jobEnvironment
 
             entity.setResolved(true);
-            entity.setStatus(JobStatus.RESOLVED);
+            entity.setStatus(JobStatus.RESOLVED.name());
             log.debug("Saved resolved information {} for job with id {}", resolvedJob, id);
         } catch (
             final GenieApplicationNotFoundException
@@ -528,7 +529,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             throw new GenieJobAlreadyClaimedException("Job with id " + id + " is already claimed. Unable to claim.");
         }
 
-        final JobStatus currentStatus = jobEntity.getStatus();
+        final JobStatus currentStatus = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
         // The job must be in one of the claimable states in order to be claimed
         // TODO: Perhaps could use jobEntity.isResolved here also but wouldn't check the case that the job was in a
         //       terminal state like killed or invalid in which case we shouldn't claim it anyway as the agent would
@@ -546,7 +547,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
         // Good to claim
         jobEntity.setClaimed(true);
-        jobEntity.setStatus(JobStatus.CLAIMED);
+        jobEntity.setStatus(JobStatus.CLAIMED.name());
         // TODO: It might be nice to set the status message as well to something like "Job claimed by XYZ..."
         //       we could do this in other places too like after reservation, resolving, etc
 
@@ -587,7 +588,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 () -> new GenieJobNotFoundException("No job with id " + id + " exists. Unable to update status.")
             );
 
-        final JobStatus actualCurrentStatus = jobEntity.getStatus();
+        final JobStatus actualCurrentStatus = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
         if (actualCurrentStatus != currentStatus) {
             throw new GenieInvalidStatusException(
                 "Job "
@@ -645,10 +646,14 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     public JobStatus getJobStatus(
         @NotBlank(message = "Job id is missing and is required") final String id
     ) throws GenieNotFoundException {
-        return this.jobRepository
-            .findByUniqueId(id, JobStatusProjection.class)
-            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists. Unable to get status."))
-            .getStatus();
+        return EntityDtoConverters.toJobStatus(
+            this.jobRepository
+                .findByUniqueId(id, StatusProjection.class)
+                .orElseThrow(
+                    () -> new GenieNotFoundException("No job with id " + id + " exists. Unable to get status.")
+                )
+                .getStatus()
+        );
     }
 
     /**
@@ -697,10 +702,10 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final JobStatus newStatus,
         @Nullable final String statusMsg
     ) {
-        final JobStatus currentStatus = jobEntity.getStatus();
+        final JobStatus currentStatus = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
         // Only change the status if the entity isn't already in a terminal state
         if (currentStatus.isActive()) {
-            jobEntity.setStatus(newStatus);
+            jobEntity.setStatus(newStatus.name());
             jobEntity.setStatusMsg(statusMsg);
 
             if (newStatus.equals(JobStatus.RUNNING)) {
@@ -729,7 +734,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setName(jobRequest.getName());
         jobEntity.setUser(jobRequest.getUser());
         jobEntity.setVersion(jobRequest.getVersion());
-        jobEntity.setStatus(JobStatus.INIT);
+        jobEntity.setStatus(JobStatus.INIT.name());
         jobRequest.getDescription().ifPresent(jobEntity::setDescription);
         jobRequest
             .getMetadata()
@@ -801,7 +806,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         job.getArchiveLocation().ifPresent(jobEntity::setArchiveLocation);
         job.getStarted().ifPresent(jobEntity::setStarted);
         job.getFinished().ifPresent(jobEntity::setFinished);
-        jobEntity.setStatus(job.getStatus());
+        jobEntity.setStatus(job.getStatus().name());
         job.getStatusMsg().ifPresent(jobEntity::setStatusMsg);
 
         // Fields set by system as part of job execution

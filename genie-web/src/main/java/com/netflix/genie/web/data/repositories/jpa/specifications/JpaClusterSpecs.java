@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
-import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity_;
 import com.netflix.genie.web.data.entities.CommandEntity;
@@ -61,7 +60,7 @@ public final class JpaClusterSpecs {
      */
     public static Specification<ClusterEntity> find(
         @Nullable final String name,
-        @Nullable final Set<ClusterStatus> statuses,
+        @Nullable final Set<String> statuses,
         @Nullable final Set<TagEntity> tags,
         @Nullable final Instant minUpdateTime,
         @Nullable final Instant maxUpdateTime
@@ -97,7 +96,7 @@ public final class JpaClusterSpecs {
                 );
             }
 
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 
@@ -110,7 +109,7 @@ public final class JpaClusterSpecs {
      */
     public static Specification<ClusterEntity> findClustersForCommand(
         final String commandId,
-        @Nullable final Set<ClusterStatus> statuses
+        @Nullable final Set<String> statuses
     ) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -130,7 +129,7 @@ public final class JpaClusterSpecs {
                 );
             }
 
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 }

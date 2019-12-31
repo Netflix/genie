@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.data.entities;
 
-import com.netflix.genie.common.dto.ApplicationStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -26,14 +25,11 @@ import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -56,12 +52,6 @@ import java.util.Set;
 public class ApplicationEntity extends BaseEntity {
 
     private static final long serialVersionUID = -8780722054561507963L;
-
-    @Basic(optional = false)
-    @Column(name = "status", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "No application status entered and is required.")
-    private ApplicationStatus status;
 
     @Basic
     @Column(name = "type")

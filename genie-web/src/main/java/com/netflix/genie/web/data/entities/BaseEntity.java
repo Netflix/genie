@@ -71,6 +71,10 @@ public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupF
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String name;
 
+    @Basic(optional = false)
+    @Column(name = "status", nullable = false, length = 20)
+    private String status;
+
     @Basic
     @Column(name = "description", length = 1000)
     @Size(max = 1000, message = "Max length in database is 1000 characters")

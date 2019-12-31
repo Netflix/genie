@@ -138,9 +138,9 @@ class JobEntityTest extends EntityTestBase {
      */
     @Test
     void testSetGetStatus() {
-        Assertions.assertThat(this.jobEntity.getStatus()).isEqualByComparingTo(JobStatus.RESERVED);
-        this.jobEntity.setStatus(JobStatus.KILLED);
-        Assertions.assertThat(this.jobEntity.getStatus()).isEqualByComparingTo(JobStatus.KILLED);
+        Assertions.assertThat(this.jobEntity.getStatus()).isNull();
+        this.jobEntity.setStatus(JobStatus.KILLED.name());
+        Assertions.assertThat(this.jobEntity.getStatus()).isEqualTo(JobStatus.KILLED.name());
     }
 
     /**
@@ -192,61 +192,14 @@ class JobEntityTest extends EntityTestBase {
     }
 
     /**
-     * Tests whether a job status is updated correctly, and update time is
-     * changed accordingly.
-     */
-    @Test
-    void testSetJobStatus() {
-        final JobEntity localJobEntity = new JobEntity();
-
-        // Times are null on initialization
-        Assertions.assertThat(localJobEntity.getStarted()).isNotPresent();
-        Assertions.assertThat(localJobEntity.getFinished()).isNotPresent();
-
-        // start time is not zero on INIT, finish time is still 0
-        localJobEntity.setJobStatus(JobStatus.INIT);
-        Assertions.assertThat(localJobEntity.getStarted()).isPresent();
-        Assertions.assertThat(localJobEntity.getFinished()).isNotPresent();
-        final Instant started = localJobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
-
-        // Shouldn't affect finish time
-        localJobEntity.setJobStatus(JobStatus.RUNNING);
-        Assertions.assertThat(localJobEntity.getStarted()).isPresent().contains(started);
-        Assertions.assertThat(localJobEntity.getFinished()).isNotPresent();
-
-        // finish time is non-zero on completion
-        localJobEntity.setJobStatus(JobStatus.SUCCEEDED);
-        Assertions.assertThat(localJobEntity.getStarted()).isPresent().contains(started);
-        Assertions.assertThat(localJobEntity.getFinished()).isPresent();
-
-        final JobEntity jobEntity2 = new JobEntity();
-        // Times are null on initialization
-        Assertions.assertThat(jobEntity2.getStarted()).isNotPresent();
-        Assertions.assertThat(jobEntity2.getFinished()).isNotPresent();
-
-        // start time is not zero on INIT, finish time is still 0
-        final String initMessage = "We're initializing";
-        jobEntity2.setJobStatus(JobStatus.INIT, initMessage);
-        Assertions.assertThat(jobEntity2.getStarted()).isPresent();
-        Assertions.assertThat(jobEntity2.getFinished()).isNotPresent();
-        Assertions.assertThat(jobEntity2.getStatusMsg()).isPresent().contains(initMessage);
-
-        // finish time is non-zero on completion
-        final String successMessage = "Job Succeeded";
-        jobEntity2.setJobStatus(JobStatus.SUCCEEDED, successMessage);
-        Assertions.assertThat(jobEntity2.getStatusMsg()).isPresent().contains(successMessage);
-        Assertions.assertThat(jobEntity2.getFinished()).isPresent();
-    }
-
-    /**
      * Tests setting and getting the (transient) notifiedJobStatus field.
      */
     @Test
     void testSetNotifiedJobStatus() {
         final JobEntity localJobEntity = new JobEntity();
-        Assertions.assertThat(localJobEntity.getNotifiedJobStatus()).isNull();
-        localJobEntity.setNotifiedJobStatus(JobStatus.RUNNING);
-        Assertions.assertThat(localJobEntity.getNotifiedJobStatus()).isEqualByComparingTo(JobStatus.RUNNING);
+        Assertions.assertThat(localJobEntity.getNotifiedJobStatus()).isNotPresent();
+        localJobEntity.setNotifiedJobStatus(JobStatus.RUNNING.name());
+        Assertions.assertThat(localJobEntity.getNotifiedJobStatus()).isPresent().contains(JobStatus.RUNNING.name());
     }
 
     /**

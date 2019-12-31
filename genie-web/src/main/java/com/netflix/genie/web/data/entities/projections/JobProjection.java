@@ -29,7 +29,7 @@ import java.util.Optional;
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobProjection extends JobCommonFieldsProjection, JobStatusProjection, JobArchiveLocationProjection {
+public interface JobProjection extends JobCommonFieldsProjection, StatusProjection, JobArchiveLocationProjection {
 
     /**
      * Get the current status message of the job.

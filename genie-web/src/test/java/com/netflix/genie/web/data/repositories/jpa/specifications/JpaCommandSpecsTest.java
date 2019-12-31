@@ -20,8 +20,8 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.CommandEntity_;
 import com.netflix.genie.web.data.entities.TagEntity;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -39,7 +39,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class JpaCommandSpecsTest {
+class JpaCommandSpecsTest {
 
     private static final String NAME = "hive";
     private static final String USER_NAME = "tgianos";
@@ -47,7 +47,10 @@ public class JpaCommandSpecsTest {
     private static final TagEntity TAG_2 = new TagEntity("hive");
     private static final TagEntity TAG_3 = new TagEntity("11");
     private static final Set<TagEntity> TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
-    private static final Set<CommandStatus> STATUSES = Sets.newHashSet(CommandStatus.ACTIVE, CommandStatus.INACTIVE);
+    private static final Set<String> STATUSES = Sets.newHashSet(
+        CommandStatus.ACTIVE.name(),
+        CommandStatus.INACTIVE.name()
+    );
 
     private Root<CommandEntity> root;
     private CriteriaQuery<?> cq;
@@ -57,9 +60,9 @@ public class JpaCommandSpecsTest {
     /**
      * Setup some variables.
      */
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setup() {
+    void setup() {
         this.root = (Root<CommandEntity>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
@@ -81,10 +84,11 @@ public class JpaCommandSpecsTest {
         Mockito.when(this.cb.equal(userNamePath, USER_NAME)).thenReturn(equalUserNamePredicate);
         Mockito.when(this.cb.like(userNamePath, USER_NAME)).thenReturn(likeUserNamePredicate);
 
-        final Path<CommandStatus> statusPath = (Path<CommandStatus>) Mockito.mock(Path.class);
+        final Path<String> statusPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(CommandEntity_.status)).thenReturn(statusPath);
-        Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(CommandStatus.class)))
+        Mockito
+            .when(this.cb.equal(Mockito.eq(statusPath), Mockito.anyString()))
             .thenReturn(equalStatusPredicate);
 
         this.tagEntityJoin = (SetJoin<CommandEntity, TagEntity>) Mockito.mock(SetJoin.class);
@@ -102,7 +106,7 @@ public class JpaCommandSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindAll() {
+    void testFindAll() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
             NAME, USER_NAME, STATUSES, TAGS
         );
@@ -112,7 +116,7 @@ public class JpaCommandSpecsTest {
             .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(CommandEntity_.user), USER_NAME);
-        for (final CommandStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
@@ -126,7 +130,7 @@ public class JpaCommandSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindAllLike() {
+    void testFindAllLike() {
         final String newName = NAME + "%";
         final String newUser = USER_NAME + "%";
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
@@ -138,7 +142,7 @@ public class JpaCommandSpecsTest {
             .like(this.root.get(CommandEntity_.name), newName);
         Mockito.verify(this.cb, Mockito.times(1))
             .like(this.root.get(CommandEntity_.user), newUser);
-        for (final CommandStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
@@ -152,7 +156,7 @@ public class JpaCommandSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoName() {
+    void testFindNoName() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
             null, USER_NAME, STATUSES, TAGS
         );
@@ -162,7 +166,7 @@ public class JpaCommandSpecsTest {
             .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(CommandEntity_.user), USER_NAME);
-        for (final CommandStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
@@ -176,7 +180,7 @@ public class JpaCommandSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoUserName() {
+    void testFindNoUserName() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
             NAME, null, STATUSES, TAGS
         );
@@ -186,7 +190,7 @@ public class JpaCommandSpecsTest {
             .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.never())
             .equal(this.root.get(CommandEntity_.user), USER_NAME);
-        for (final CommandStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
@@ -200,7 +204,7 @@ public class JpaCommandSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoTags() {
+    void testFindNoTags() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
             NAME, USER_NAME, STATUSES, null
         );
@@ -210,7 +214,7 @@ public class JpaCommandSpecsTest {
             .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(CommandEntity_.user), USER_NAME);
-        for (final CommandStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
@@ -221,7 +225,7 @@ public class JpaCommandSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoStatuses() {
+    void testFindNoStatuses() {
         final Specification<CommandEntity> spec = JpaCommandSpecs
             .find(NAME, USER_NAME, null, TAGS);
 
@@ -230,7 +234,7 @@ public class JpaCommandSpecsTest {
             .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(CommandEntity_.user), USER_NAME);
-        for (final CommandStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(CommandEntity_.status), status);
         }
@@ -244,7 +248,7 @@ public class JpaCommandSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindEmptyStatuses() {
+    void testFindEmptyStatuses() {
         final Specification<CommandEntity> spec = JpaCommandSpecs
             .find(NAME, USER_NAME, Sets.newHashSet(), TAGS);
 
@@ -253,7 +257,7 @@ public class JpaCommandSpecsTest {
             .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(CommandEntity_.user), USER_NAME);
-        for (final CommandStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(CommandEntity_.status), status);
         }

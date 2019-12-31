@@ -90,6 +90,39 @@ public class JobSearchResult extends BaseSearchResult {
     }
 
     /**
+     * Constructor.
+     *
+     * @param id          The id of the job
+     * @param name        The name of the job
+     * @param user        The user of the job
+     * @param status      The current status of the job
+     * @param started     The start time of the job
+     * @param finished    The finish time of the job
+     * @param clusterName The name of the cluster this job is or was run on
+     * @param commandName The name fo the command this job is or was run with
+     * @throws IllegalArgumentException If the status string can't be parsed into a {@link JobStatus}
+     */
+    public JobSearchResult(
+        @NotBlank final String id,
+        @NotBlank final String name,
+        @NotBlank final String user,
+        @NotBlank final String status,
+        @Nullable final Instant started,
+        @Nullable final Instant finished,
+        @Nullable final String clusterName,
+        @Nullable final String commandName
+    ) throws IllegalArgumentException {
+        super(id, name, user);
+        this.status = JobStatus.valueOf(status);
+        this.started = started;
+        this.finished = finished;
+        this.clusterName = clusterName;
+        this.commandName = commandName;
+
+        this.runtime = TimeUtils.getDuration(this.started, this.finished);
+    }
+
+    /**
      * Get the time the job started.
      *
      * @return The started time or null if not set

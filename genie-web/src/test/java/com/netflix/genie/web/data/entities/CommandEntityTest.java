@@ -57,7 +57,7 @@ class CommandEntityTest extends EntityTestBase {
         this.c.setName(NAME);
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
-        this.c.setStatus(CommandStatus.ACTIVE);
+        this.c.setStatus(CommandStatus.ACTIVE.name());
         this.c.setExecutable(EXECUTABLE);
         this.c.setCheckDelay(CHECK_DELAY);
         this.c.setMemory(MEMORY);
@@ -174,8 +174,8 @@ class CommandEntityTest extends EntityTestBase {
      */
     @Test
     void testSetStatus() {
-        this.c.setStatus(CommandStatus.ACTIVE);
-        Assertions.assertThat(this.c.getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
+        this.c.setStatus(CommandStatus.ACTIVE.name());
+        Assertions.assertThat(this.c.getStatus()).isEqualTo(CommandStatus.ACTIVE.name());
     }
 
     /**

@@ -20,6 +20,10 @@ package com.netflix.genie.web.data.entities.v4;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
+import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
@@ -50,6 +54,7 @@ import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -82,7 +87,7 @@ public final class EntityDtoConverters {
             applicationEntity.getName(),
             applicationEntity.getUser(),
             applicationEntity.getVersion(),
-            applicationEntity.getStatus()
+            toApplicationStatus(applicationEntity.getStatus())
         )
             .withTags(applicationEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
@@ -114,7 +119,7 @@ public final class EntityDtoConverters {
             clusterEntity.getName(),
             clusterEntity.getUser(),
             clusterEntity.getVersion(),
-            clusterEntity.getStatus()
+            toClusterStatus(clusterEntity.getStatus())
         )
             .withTags(clusterEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
@@ -145,7 +150,7 @@ public final class EntityDtoConverters {
             commandEntity.getName(),
             commandEntity.getUser(),
             commandEntity.getVersion(),
-            commandEntity.getStatus()
+            toCommandStatus(commandEntity.getStatus())
         )
             .withTags(commandEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
@@ -294,7 +299,7 @@ public final class EntityDtoConverters {
             finishedJobProjection.getUser(),
             finishedJobProjection.getVersion(),
             finishedJobProjection.getCreated(),
-            finishedJobProjection.getStatus(),
+            toJobStatus(finishedJobProjection.getStatus()),
             finishedJobProjection.getCommandArgs(),
             toCriterionDto(finishedJobProjection.getCommandCriterion()),
             finishedJobProjection.getClusterCriteria()
@@ -473,6 +478,66 @@ public final class EntityDtoConverters {
             archiveLocation,
             jobSpecificationProjection.getTimeoutUsed().orElse(null)
         );
+    }
+
+    /**
+     * Attempt to convert an Application status string that was stored in the database into a known enumeration value
+     * from {@link ApplicationStatus}.
+     *
+     * @param status The status string that was stored in the database. Not null or empty.
+     * @return An {@link ApplicationStatus} instance
+     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
+     */
+    public static ApplicationStatus toApplicationStatus(final String status) throws IllegalArgumentException {
+        if (StringUtils.isBlank(status)) {
+            throw new IllegalArgumentException("No application status entered. Unable to convert.");
+        }
+        return ApplicationStatus.valueOf(status.toUpperCase());
+    }
+
+    /**
+     * Attempt to convert a Command status string that was stored in the database into a known enumeration value
+     * from {@link CommandStatus}.
+     *
+     * @param status The status string that was stored in the database. Not null or empty.
+     * @return An {@link CommandStatus} instance
+     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
+     */
+    public static CommandStatus toCommandStatus(final String status) throws IllegalArgumentException {
+        if (StringUtils.isBlank(status)) {
+            throw new IllegalArgumentException("No command status entered. Unable to convert.");
+        }
+        return CommandStatus.valueOf(status.toUpperCase());
+    }
+
+    /**
+     * Attempt to convert a Cluster status string that was stored in the database into a known enumeration value
+     * from {@link ClusterStatus}.
+     *
+     * @param status The status string that was stored in the database. Not null or empty.
+     * @return An {@link ClusterStatus} instance
+     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
+     */
+    public static ClusterStatus toClusterStatus(final String status) throws IllegalArgumentException {
+        if (StringUtils.isBlank(status)) {
+            throw new IllegalArgumentException("No cluster status entered. Unable to convert.");
+        }
+        return ClusterStatus.valueOf(status.toUpperCase());
+    }
+
+    /**
+     * Attempt to convert a Job status string that was stored in the database into a known enumeration value
+     * from {@link JobStatus}.
+     *
+     * @param status The status string that was stored in the database. Not null or empty.
+     * @return An {@link JobStatus} instance
+     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
+     */
+    public static JobStatus toJobStatus(final String status) throws IllegalArgumentException {
+        if (StringUtils.isBlank(status)) {
+            throw new IllegalArgumentException("No job status entered. Unable to convert.");
+        }
+        return JobStatus.valueOf(status.toUpperCase());
     }
 
     private static JobSpecification.ExecutionResource toExecutionResource(

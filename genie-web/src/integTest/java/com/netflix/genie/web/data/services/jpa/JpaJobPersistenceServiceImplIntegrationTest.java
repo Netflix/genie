@@ -20,6 +20,7 @@ package com.netflix.genie.web.data.services.jpa;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -62,7 +63,6 @@ import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -592,12 +592,12 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .orElseThrow(IllegalArgumentException::new);
 
         Assertions.assertThat(preClaimedJob.isApi()).isTrue();
-        Assert.assertThat(preClaimedJob.getStatus(), Matchers.is(JobStatus.RESOLVED));
-        Assert.assertTrue(preClaimedJob.isResolved());
-        Assert.assertFalse(preClaimedJob.isClaimed());
-        Assert.assertThat(preClaimedJob.getAgentHostname(), Matchers.is(Optional.empty()));
-        Assert.assertThat(preClaimedJob.getAgentVersion(), Matchers.is(Optional.empty()));
-        Assert.assertThat(preClaimedJob.getAgentPid(), Matchers.is(Optional.empty()));
+        Assertions.assertThat(preClaimedJob.getStatus()).isEqualTo(JobStatus.RESOLVED.name());
+        Assertions.assertThat(preClaimedJob.isResolved()).isTrue();
+        Assertions.assertThat(preClaimedJob.isClaimed()).isFalse();
+        Assertions.assertThat(preClaimedJob.getAgentHostname()).isNotPresent();
+        Assertions.assertThat(preClaimedJob.getAgentVersion()).isNotPresent();
+        Assertions.assertThat(preClaimedJob.getAgentPid()).isNotPresent();
 
         final String agentHostname = UUID.randomUUID().toString();
         final String agentVersion = UUID.randomUUID().toString();
@@ -610,12 +610,12 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .findByUniqueId(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        Assert.assertThat(postClaimedJob.getStatus(), Matchers.is(JobStatus.CLAIMED));
-        Assert.assertTrue(postClaimedJob.isResolved());
-        Assert.assertTrue(postClaimedJob.isClaimed());
-        Assert.assertThat(postClaimedJob.getAgentHostname(), Matchers.is(Optional.of(agentHostname)));
-        Assert.assertThat(postClaimedJob.getAgentVersion(), Matchers.is(Optional.of(agentVersion)));
-        Assert.assertThat(postClaimedJob.getAgentPid(), Matchers.is(Optional.of(agentPid)));
+        Assertions.assertThat(postClaimedJob.getStatus()).isEqualTo(JobStatus.CLAIMED.name());
+        Assertions.assertThat(postClaimedJob.isResolved()).isTrue();
+        Assertions.assertThat(postClaimedJob.isClaimed()).isTrue();
+        Assertions.assertThat(postClaimedJob.getAgentHostname()).isPresent().contains(agentHostname);
+        Assertions.assertThat(postClaimedJob.getAgentVersion()).isPresent().contains(agentVersion);
+        Assertions.assertThat(postClaimedJob.getAgentPid()).isPresent().contains(agentPid);
     }
 
     /**
@@ -668,14 +668,19 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .findByUniqueId(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.CLAIMED));
+        Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.CLAIMED.name());
 
-        try {
-            this.jobPersistenceService.updateJobStatus(jobId, JobStatus.RUNNING, JobStatus.FAILED, null);
-            Assert.fail();
-        } catch (final GenieInvalidStatusException e) {
-            // status won't match so it will throw exception
-        }
+        // status won't match so it will throw exception
+        Assertions
+            .assertThatExceptionOfType(GenieInvalidStatusException.class)
+            .isThrownBy(
+                () -> this.jobPersistenceService.updateJobStatus(
+                    jobId,
+                    JobStatus.RUNNING,
+                    JobStatus.FAILED,
+                    null
+                )
+            );
 
         final String initStatusMessage = "Job is initializing";
         this.jobPersistenceService.updateJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, initStatusMessage);
@@ -685,10 +690,10 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .orElseThrow(IllegalArgumentException::new);
 
         Assertions.assertThat(jobEntity.isApi()).isFalse();
-        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.INIT));
-        Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(initStatusMessage)));
-        Assert.assertFalse(jobEntity.getStarted().isPresent());
-        Assert.assertFalse(jobEntity.getFinished().isPresent());
+        Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.INIT.name());
+        Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(initStatusMessage);
+        Assertions.assertThat(jobEntity.getStarted()).isNotPresent();
+        Assertions.assertThat(jobEntity.getFinished()).isNotPresent();
 
         final String runningStatusMessage = "Job is running";
         this.jobPersistenceService.updateJobStatus(jobId, JobStatus.INIT, JobStatus.RUNNING, runningStatusMessage);
@@ -697,10 +702,10 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .findByUniqueId(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.RUNNING));
-        Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(runningStatusMessage)));
-        Assert.assertTrue(jobEntity.getStarted().isPresent());
-        Assert.assertFalse(jobEntity.getFinished().isPresent());
+        Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.RUNNING.name());
+        Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(runningStatusMessage);
+        Assertions.assertThat(jobEntity.getStarted()).isPresent();
+        Assertions.assertThat(jobEntity.getFinished()).isNotPresent();
 
         final String successStatusMessage = "Job completed successfully";
         this.jobPersistenceService.updateJobStatus(jobId, JobStatus.RUNNING, JobStatus.SUCCEEDED, successStatusMessage);
@@ -709,10 +714,10 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .findByUniqueId(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(successStatusMessage)));
-        Assert.assertTrue(jobEntity.getStarted().isPresent());
-        Assert.assertTrue(jobEntity.getFinished().isPresent());
+        Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.SUCCEEDED.name());
+        Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(successStatusMessage);
+        Assertions.assertThat(jobEntity.getStarted()).isPresent();
+        Assertions.assertThat(jobEntity.getFinished()).isPresent();
     }
 
     /**

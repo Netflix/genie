@@ -25,8 +25,8 @@ import com.netflix.genie.common.dto.ApplicationStatus
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
 import com.netflix.genie.common.external.dtos.v4.Criterion
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.FinishedJob
@@ -50,9 +50,11 @@ import com.netflix.genie.web.data.entities.TagEntity
 import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.Instant
 import java.util.function.Consumer
+import java.util.stream.Stream
 
 /**
  * Specifications for {@link EntityDtoConverters}.
@@ -102,7 +104,7 @@ class EntityDtoConvertersSpec extends Specification {
             }
         )
         entity.setDependencies(dependencyEntities)
-        entity.setStatus(ApplicationStatus.ACTIVE)
+        entity.setStatus(ApplicationStatus.ACTIVE.name())
 
         when:
         def application = EntityDtoConverters.toV4ApplicationDto(entity)
@@ -132,7 +134,7 @@ class EntityDtoConvertersSpec extends Specification {
         entity.setUser(user)
         def version = UUID.randomUUID().toString()
         entity.setVersion(version)
-        entity.setStatus(ClusterStatus.TERMINATED)
+        entity.setStatus(ClusterStatus.TERMINATED.name())
         def id = UUID.randomUUID().toString()
         entity.setUniqueId(id)
         def created = entity.getCreated()
@@ -205,7 +207,7 @@ class EntityDtoConvertersSpec extends Specification {
         entity.setDescription(description)
         def created = entity.getCreated()
         def updated = entity.getUpdated()
-        entity.setStatus(CommandStatus.DEPRECATED)
+        entity.setStatus(CommandStatus.DEPRECATED.name())
         def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
         entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
@@ -863,7 +865,6 @@ class EntityDtoConvertersSpec extends Specification {
     }
 
     def "Can convert FinishedJobProjection to FinishedJob DTO"() {
-
         def created = Instant.now()
         def started = created + 5
         def finished = created + 60
@@ -881,7 +882,7 @@ class EntityDtoConvertersSpec extends Specification {
             getUniqueId() >> "command_id"
             getName() >> "command_name"
             getVersion() >> "command_version"
-            getStatus() >> CommandStatus.ACTIVE
+            getStatus() >> CommandStatus.ACTIVE.name()
             getExecutable() >> ["spark"]
             getTags() >> []
             getDescription() >> Optional.empty()
@@ -904,7 +905,7 @@ class EntityDtoConvertersSpec extends Specification {
             getSetupFile() >> Optional.empty()
             getConfigs() >> []
             getDependencies() >> []
-            getStatus() >> ClusterStatus.UP
+            getStatus() >> ClusterStatus.UP.name()
         }
 
         ApplicationEntity applicationEntity = Mock(ApplicationEntity) {
@@ -912,6 +913,7 @@ class EntityDtoConvertersSpec extends Specification {
             getUniqueId() >> "app_id"
             getName() >> "app_name"
             getVersion() >> "app_version"
+            getStatus() >> ApplicationStatus.ACTIVE.name()
             getTags() >> []
             getDescription() >> Optional.empty()
             getMetadata() >> Optional.empty()
@@ -935,7 +937,7 @@ class EntityDtoConvertersSpec extends Specification {
             getUser() >> "user"
             getVersion() >> "version"
             getCreated() >> created
-            getStatus() >> JobStatus.SUCCEEDED
+            getStatus() >> JobStatus.SUCCEEDED.name()
             getCommandArgs() >> ["foo", "bar"]
             getCommandCriterion() >> criterion
             getClusterCriteria() >> [criterion]
@@ -995,5 +997,161 @@ class EntityDtoConvertersSpec extends Specification {
         dto.getApplications().size() == 1
         dto.getTags().size() == 2
         dto.getTags() == Sets.newHashSet(["tag1", "tag2"])
+    }
+
+    @Unroll
+    def "status conversions throw IllegalArgumentException on bad input #input"() {
+        when:
+        EntityDtoConverters.toApplicationStatus(input)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        EntityDtoConverters.toCommandStatus(input)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        EntityDtoConverters.toClusterStatus(input)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        EntityDtoConverters.toJobStatus(input)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        input                        | _
+        ""                           | _
+        null                         | _
+        " "                          | _
+        UUID.randomUUID().toString() | _
+    }
+
+    @Unroll
+    def "can convert #input to application status #status"() {
+        expect:
+        EntityDtoConverters.toApplicationStatus(input) == status
+
+        where:
+        input                                             | status
+        ApplicationStatus.ACTIVE.name()                   | ApplicationStatus.ACTIVE
+        ApplicationStatus.ACTIVE.name().toLowerCase()     | ApplicationStatus.ACTIVE
+        ApplicationStatus.INACTIVE.name()                 | ApplicationStatus.INACTIVE
+        ApplicationStatus.INACTIVE.name().toLowerCase()   | ApplicationStatus.INACTIVE
+        ApplicationStatus.DEPRECATED.name()               | ApplicationStatus.DEPRECATED
+        ApplicationStatus.DEPRECATED.name().toLowerCase() | ApplicationStatus.DEPRECATED
+    }
+
+    @Unroll
+    def "all possible ApplicationStatus values are covered"() {
+        when:
+        EntityDtoConverters.toApplicationStatus(input as String)
+
+        then:
+        noExceptionThrown()
+
+        where:
+        input << Stream.of(ApplicationStatus.values()).map { status -> status.name() }.collect()
+    }
+
+    @Unroll
+    def "can convert #input to command status #status"() {
+        expect:
+        EntityDtoConverters.toCommandStatus(input) == status
+
+        where:
+        input                                         | status
+        CommandStatus.ACTIVE.name()                   | CommandStatus.ACTIVE
+        CommandStatus.ACTIVE.name().toLowerCase()     | CommandStatus.ACTIVE
+        CommandStatus.INACTIVE.name()                 | CommandStatus.INACTIVE
+        CommandStatus.INACTIVE.name().toLowerCase()   | CommandStatus.INACTIVE
+        CommandStatus.DEPRECATED.name()               | CommandStatus.DEPRECATED
+        CommandStatus.DEPRECATED.name().toLowerCase() | CommandStatus.DEPRECATED
+    }
+
+    @Unroll
+    def "all possible CommandStatus values are covered"() {
+        when:
+        EntityDtoConverters.toCommandStatus(input as String)
+
+        then:
+        noExceptionThrown()
+
+        where:
+        input << Stream.of(CommandStatus.values()).map { status -> status.name() }.collect()
+    }
+
+    @Unroll
+    def "can convert #input to cluster status #status"() {
+        expect:
+        EntityDtoConverters.toClusterStatus(input) == status
+
+        where:
+        input                                             | status
+        ClusterStatus.UP.name()                           | ClusterStatus.UP
+        ClusterStatus.UP.name().toLowerCase()             | ClusterStatus.UP
+        ClusterStatus.TERMINATED.name()                   | ClusterStatus.TERMINATED
+        ClusterStatus.TERMINATED.name().toLowerCase()     | ClusterStatus.TERMINATED
+        ClusterStatus.OUT_OF_SERVICE.name()               | ClusterStatus.OUT_OF_SERVICE
+        ClusterStatus.OUT_OF_SERVICE.name().toLowerCase() | ClusterStatus.OUT_OF_SERVICE
+    }
+
+    @Unroll
+    def "all possible ClusterStatus values are covered"() {
+        when:
+        EntityDtoConverters.toClusterStatus(input as String)
+
+        then:
+        noExceptionThrown()
+
+        where:
+        input << Stream.of(ClusterStatus.values()).map { status -> status.name() }.collect()
+    }
+
+    @Unroll
+    def "can convert #input to job status #status"() {
+        expect:
+        EntityDtoConverters.toJobStatus(input) == status
+
+        where:
+        input                                    | status
+        JobStatus.ACCEPTED.name()                | JobStatus.ACCEPTED
+        JobStatus.ACCEPTED.name().toLowerCase()  | JobStatus.ACCEPTED
+        JobStatus.CLAIMED.name()                 | JobStatus.CLAIMED
+        JobStatus.CLAIMED.name().toLowerCase()   | JobStatus.CLAIMED
+        JobStatus.FAILED.name()                  | JobStatus.FAILED
+        JobStatus.FAILED.name().toLowerCase()    | JobStatus.FAILED
+        JobStatus.INIT.name()                    | JobStatus.INIT
+        JobStatus.INIT.name().toLowerCase()      | JobStatus.INIT
+        JobStatus.INVALID.name()                 | JobStatus.INVALID
+        JobStatus.INVALID.name().toLowerCase()   | JobStatus.INVALID
+        JobStatus.KILLED.name()                  | JobStatus.KILLED
+        JobStatus.KILLED.name().toLowerCase()    | JobStatus.KILLED
+        JobStatus.RESOLVED.name()                | JobStatus.RESOLVED
+        JobStatus.RESOLVED.name().toLowerCase()  | JobStatus.RESOLVED
+        JobStatus.RESERVED.name()                | JobStatus.RESERVED
+        JobStatus.RESERVED.name().toLowerCase()  | JobStatus.RESERVED
+        JobStatus.RUNNING.name()                 | JobStatus.RUNNING
+        JobStatus.RUNNING.name().toLowerCase()   | JobStatus.RUNNING
+        JobStatus.SUCCEEDED.name()               | JobStatus.SUCCEEDED
+        JobStatus.SUCCEEDED.name().toLowerCase() | JobStatus.SUCCEEDED
+    }
+
+    @Unroll
+    def "all possible JobStatus values are covered"() {
+        when:
+        EntityDtoConverters.toJobStatus(input as String)
+
+        then:
+        noExceptionThrown()
+
+        where:
+        input << Stream.of(JobStatus.values()).map { status -> status.name() }.collect()
     }
 }

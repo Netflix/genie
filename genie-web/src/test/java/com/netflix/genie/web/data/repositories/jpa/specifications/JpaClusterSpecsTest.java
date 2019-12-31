@@ -20,9 +20,8 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity_;
 import com.netflix.genie.web.data.entities.TagEntity;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -34,7 +33,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.SetJoin;
 import java.time.Instant;
-import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -42,7 +40,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public class JpaClusterSpecsTest {
+class JpaClusterSpecsTest {
 
     private static final String NAME = "h2prod";
     private static final TagEntity TAG_1 = new TagEntity("prod");
@@ -51,7 +49,10 @@ public class JpaClusterSpecsTest {
     private static final ClusterStatus STATUS_1 = ClusterStatus.UP;
     private static final ClusterStatus STATUS_2 = ClusterStatus.OUT_OF_SERVICE;
     private static final Set<TagEntity> TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
-    private static final Set<ClusterStatus> STATUSES = EnumSet.noneOf(ClusterStatus.class);
+    private static final Set<String> STATUSES = Sets.newHashSet(
+        STATUS_1.name(),
+        STATUS_2.name()
+    );
     private static final Instant MIN_UPDATE_TIME = Instant.ofEpochMilli(123467L);
     private static final Instant MAX_UPDATE_TIME = Instant.ofEpochMilli(1234643L);
 
@@ -61,20 +62,11 @@ public class JpaClusterSpecsTest {
     private SetJoin<ClusterEntity, TagEntity> tagEntityJoin;
 
     /**
-     * Setup test wide variables.
-     */
-    @BeforeClass
-    public static void setupClass() {
-        STATUSES.add(STATUS_1);
-        STATUSES.add(STATUS_2);
-    }
-
-    /**
      * Setup some variables.
      */
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setup() {
+    void setup() {
         this.root = (Root<ClusterEntity>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
@@ -100,10 +92,11 @@ public class JpaClusterSpecsTest {
         Mockito.when(this.root.get(ClusterEntity_.updated)).thenReturn(maxUpdatePath);
         Mockito.when(this.cb.lessThan(maxUpdatePath, MAX_UPDATE_TIME)).thenReturn(lessThanPredicate);
 
-        final Path<ClusterStatus> statusPath = (Path<ClusterStatus>) Mockito.mock(Path.class);
+        final Path<String> statusPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ClusterEntity_.status)).thenReturn(statusPath);
-        Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(ClusterStatus.class)))
+        Mockito
+            .when(this.cb.equal(Mockito.eq(statusPath), Mockito.anyString()))
             .thenReturn(equalStatusPredicate);
 
         this.tagEntityJoin = (SetJoin<ClusterEntity, TagEntity>) Mockito.mock(SetJoin.class);
@@ -121,7 +114,7 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindAll() {
+    void testFindAll() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
                 NAME,
@@ -141,7 +134,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
@@ -151,7 +144,7 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindAllLike() {
+    void testFindAllLike() {
         final String newName = NAME + "%";
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
@@ -172,7 +165,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
@@ -182,7 +175,7 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoName() {
+    void testFindNoName() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
                 null,
@@ -204,7 +197,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
@@ -214,7 +207,7 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoStatuses() {
+    void testFindNoStatuses() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
                 NAME,
@@ -235,7 +228,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
@@ -245,11 +238,11 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindEmptyStatuses() {
+    void testFindEmptyStatuses() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
                 NAME,
-                EnumSet.noneOf(ClusterStatus.class),
+                Sets.newHashSet(),
                 TAGS,
                 MIN_UPDATE_TIME,
                 MAX_UPDATE_TIME
@@ -266,7 +259,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
@@ -276,7 +269,7 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoTags() {
+    void testFindNoTags() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
                 NAME,
@@ -294,7 +287,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1))
             .lessThan(this.root.get(ClusterEntity_.updated), MAX_UPDATE_TIME);
         Mockito.verify(this.root, Mockito.never()).join(ClusterEntity_.tags);
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
@@ -304,7 +297,7 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoMinTime() {
+    void testFindNoMinTime() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
                 NAME,
@@ -325,7 +318,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
@@ -335,7 +328,7 @@ public class JpaClusterSpecsTest {
      * Test the find specification.
      */
     @Test
-    public void testFindNoMax() {
+    void testFindNoMax() {
         final Specification<ClusterEntity> spec = JpaClusterSpecs
             .find(
                 NAME,
@@ -356,7 +349,7 @@ public class JpaClusterSpecsTest {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-        for (final ClusterStatus status : STATUSES) {
+        for (final String status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(ClusterEntity_.status), status);
         }

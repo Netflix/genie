@@ -47,7 +47,7 @@ class ApplicationEntityTest extends EntityTestBase {
         this.a.setName(NAME);
         this.a.setUser(USER);
         this.a.setVersion(VERSION);
-        this.a.setStatus(ApplicationStatus.ACTIVE);
+        this.a.setStatus(ApplicationStatus.ACTIVE.name());
     }
 
     /**
@@ -75,7 +75,7 @@ class ApplicationEntityTest extends EntityTestBase {
         this.a.setName(NAME);
         this.a.setUser(USER);
         this.a.setVersion(VERSION);
-        this.a.setStatus(ApplicationStatus.ACTIVE);
+        this.a.setStatus(ApplicationStatus.ACTIVE.name());
         this.validate(this.a);
     }
 
@@ -117,8 +117,8 @@ class ApplicationEntityTest extends EntityTestBase {
      */
     @Test
     void testSetStatus() {
-        this.a.setStatus(ApplicationStatus.ACTIVE);
-        Assertions.assertThat(this.a.getStatus()).isEqualByComparingTo(ApplicationStatus.ACTIVE);
+        this.a.setStatus(ApplicationStatus.ACTIVE.name());
+        Assertions.assertThat(this.a.getStatus()).isEqualTo(ApplicationStatus.ACTIVE.name());
     }
 
     /**
