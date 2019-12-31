@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.netflix.genie.client.exceptions.GenieClientException
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.search.JobSearchResult
-import com.netflix.genie.common.util.GenieObjectMapper
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import okhttp3.ResponseBody
 import retrofit2.Response
 import spock.lang.Specification

@@ -18,7 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.events;
 
 import com.amazonaws.services.sns.AmazonSNS;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserverImpl;
 import com.netflix.genie.web.data.services.JobPersistenceService;

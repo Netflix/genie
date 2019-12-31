@@ -21,7 +21,7 @@ import com.beust.jcommander.IStringConverter
 import com.beust.jcommander.ParameterException
 import com.fasterxml.jackson.databind.JsonNode
 import com.netflix.genie.common.external.dtos.v4.Criterion
-import com.netflix.genie.common.util.GenieObjectMapper
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import org.assertj.core.util.Sets
 import spock.lang.Specification
 import spock.lang.Unroll

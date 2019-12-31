@@ -18,11 +18,11 @@
 package com.netflix.genie.common.internal.services.impl;
 
 import com.google.common.collect.ImmutableList;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
-import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 

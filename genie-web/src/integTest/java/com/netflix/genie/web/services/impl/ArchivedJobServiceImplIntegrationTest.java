@@ -19,8 +19,8 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
-import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;

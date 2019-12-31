@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.apis;
 
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.HttpProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.RetryProperties;

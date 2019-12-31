@@ -18,7 +18,7 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

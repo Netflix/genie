@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.client
 
-import com.netflix.genie.common.util.GenieObjectMapper
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer

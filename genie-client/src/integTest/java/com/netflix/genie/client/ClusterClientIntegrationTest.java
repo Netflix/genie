@@ -25,7 +25,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

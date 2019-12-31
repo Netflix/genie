@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

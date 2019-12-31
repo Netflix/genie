@@ -18,7 +18,7 @@
 package com.netflix.genie.common.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 
 /**
  * The common exception class that represents a service failure. It includes an

@@ -29,6 +29,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
@@ -48,7 +49,6 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
-import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;

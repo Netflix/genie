@@ -18,8 +18,8 @@
 package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;

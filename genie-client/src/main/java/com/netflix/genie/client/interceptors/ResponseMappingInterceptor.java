@@ -20,7 +20,7 @@ package com.netflix.genie.client.interceptors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 import okhttp3.ResponseBody;

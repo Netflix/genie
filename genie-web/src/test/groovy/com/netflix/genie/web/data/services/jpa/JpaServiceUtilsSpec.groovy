@@ -25,7 +25,7 @@ import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.UserResourcesSummary
-import com.netflix.genie.common.util.GenieObjectMapper
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.data.entities.ApplicationEntity
 import com.netflix.genie.web.data.entities.ClusterEntity

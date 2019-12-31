@@ -26,7 +26,7 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;

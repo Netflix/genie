@@ -18,7 +18,7 @@
 package com.netflix.genie.web.resources.writers;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.catalina.util.ServerInfo;

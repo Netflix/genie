@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

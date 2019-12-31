@@ -18,7 +18,7 @@
 package com.netflix.genie.common.internal.exceptions.unchecked;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 
 /**
  * Base class for Genie runtime exceptions.

@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
