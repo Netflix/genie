@@ -59,7 +59,6 @@ public class GenieExceptionMapper {
     // TODO: Not changing this while changing controller package due to need to keep dashboards in sync but we should
     //       rename it going forward - TJG 7/17/19
     static final String CONTROLLER_EXCEPTION_COUNTER_NAME = "genie.web.controllers.exception";
-    private static final String NEW_LINE = "\n";
     private static final String USER_NAME_TAG_KEY = "user";
     private static final String LIMIT_TAG_KEY = "limit";
 
