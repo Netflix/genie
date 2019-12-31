@@ -18,7 +18,7 @@
 package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Sets
-import com.netflix.genie.common.internal.dto.v4.files.JobFileState
+import com.netflix.genie.common.internal.dtos.v4.files.JobFileState
 import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder

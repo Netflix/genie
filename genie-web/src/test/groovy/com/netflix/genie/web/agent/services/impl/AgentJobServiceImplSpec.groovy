@@ -19,9 +19,9 @@ package com.netflix.genie.web.agent.services.impl
 
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
-import com.netflix.genie.common.internal.dto.v4.JobRequest
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata
+import com.netflix.genie.common.internal.dtos.v4.JobRequest
+import com.netflix.genie.common.internal.dtos.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException

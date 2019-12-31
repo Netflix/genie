@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.agent.launchers.impl
 
-import com.netflix.genie.common.internal.dto.v4.JobEnvironment
-import com.netflix.genie.common.internal.dto.v4.JobMetadata
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.v4.JobEnvironment
+import com.netflix.genie.common.internal.dtos.v4.JobMetadata
+import com.netflix.genie.common.internal.dtos.v4.JobSpecification
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.introspection.GenieWebHostInfo
@@ -92,7 +92,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     }
 
     @Unroll
-    def "Launch agent (runAsUser: #runAsUser)" (boolean runAsUser, List<String> expectedCommandLine) {
+    def "Launch agent (runAsUser: #runAsUser)"(boolean runAsUser, List<String> expectedCommandLine) {
         this.launchProperties.setRunAsUserEnabled(runAsUser)
         this.launchProperties.setAdditionalEnvironment(additionalEnvironment)
 
@@ -144,6 +144,6 @@ class LocalAgentLauncherImplSpec extends Specification {
         where:
         runAsUser | expectedCommandLine
         false     | expectedCommandLineBase
-        true      | ["sudo", "-E", "-u", USERNAME]  + expectedCommandLineBase
+        true      | ["sudo", "-E", "-u", USERNAME] + expectedCommandLineBase
     }
 }

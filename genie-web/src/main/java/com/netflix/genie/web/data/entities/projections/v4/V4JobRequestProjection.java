@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Projection of just the fields needed for a V4 {@link com.netflix.genie.common.internal.dto.v4.JobRequest}.
+ * Projection of just the fields needed for a V4 {@link com.netflix.genie.common.internal.dtos.v4.JobRequest}.
  *
  * @author tgianos
  * @since 4.0.0

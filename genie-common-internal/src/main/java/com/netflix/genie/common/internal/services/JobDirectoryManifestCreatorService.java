@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.internal.services;
 
-import com.netflix.genie.common.internal.dto.DirectoryManifest;
+import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 
 import java.io.IOException;
 import java.nio.file.Path;

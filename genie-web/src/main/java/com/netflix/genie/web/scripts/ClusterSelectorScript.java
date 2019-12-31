@@ -20,7 +20,7 @@ package com.netflix.genie.web.scripts;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dtos.v4.Cluster;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;

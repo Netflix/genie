@@ -22,7 +22,7 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.HandshakeException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
+import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata
 import spock.lang.Specification
 
 class InitializeActionSpec extends Specification {

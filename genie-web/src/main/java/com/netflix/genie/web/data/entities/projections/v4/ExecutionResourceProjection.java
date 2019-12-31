@@ -24,7 +24,7 @@ import java.util.Set;
 
 /**
  * A projection for fields from an entity which are needed for an
- * {@link com.netflix.genie.common.internal.dto.v4.JobSpecification.ExecutionResource}.
+ * {@link com.netflix.genie.common.internal.dtos.v4.JobSpecification.ExecutionResource}.
  *
  * @author tgianos
  * @since 4.0.0

@@ -28,9 +28,9 @@ import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionEx
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
-import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
-import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.internal.dtos.v4.AgentJobRequest;
+import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 
 /**

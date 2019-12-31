@@ -19,8 +19,8 @@ package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.google.common.collect.Maps
 import com.netflix.genie.agent.execution.services.AgentFileStreamService
-import com.netflix.genie.common.internal.dto.DirectoryManifest
-import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.proto.AgentFileMessage

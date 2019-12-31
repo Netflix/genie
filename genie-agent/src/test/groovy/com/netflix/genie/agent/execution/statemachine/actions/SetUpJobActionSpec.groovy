@@ -29,7 +29,7 @@ import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.v4.JobSpecification
 import spock.lang.Specification
 
 import java.nio.file.Paths

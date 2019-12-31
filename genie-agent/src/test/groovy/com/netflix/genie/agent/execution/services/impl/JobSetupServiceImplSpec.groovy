@@ -26,8 +26,8 @@ import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.utils.EnvUtils
 import com.netflix.genie.agent.utils.PathUtils
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dtos.v4.JobSpecification
 import com.netflix.genie.common.internal.jobs.JobConstants
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder

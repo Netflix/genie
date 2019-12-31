@@ -20,8 +20,8 @@ package com.netflix.genie.agent.cli
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dtos.v4.AgentJobRequest
+import com.netflix.genie.common.internal.dtos.v4.JobSpecification
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder

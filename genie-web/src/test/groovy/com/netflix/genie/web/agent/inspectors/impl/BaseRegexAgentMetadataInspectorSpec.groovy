@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.agent.inspectors.impl
 
-import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
+import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import org.apache.commons.lang3.NotImplementedException
 import spock.lang.Specification

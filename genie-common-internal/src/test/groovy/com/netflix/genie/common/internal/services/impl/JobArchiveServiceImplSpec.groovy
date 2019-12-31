@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.internal.services.impl
 
-import com.netflix.genie.common.internal.dto.DirectoryManifest
+import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException
 import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.common.internal.services.JobArchiver

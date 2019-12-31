@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.agent.services;
 
-import com.netflix.genie.common.internal.dto.DirectoryManifest;
+import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import org.springframework.core.io.Resource;
 
 import javax.validation.constraints.NotBlank;

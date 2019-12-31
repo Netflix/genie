@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.common.internal.configs;
 
-import com.netflix.genie.common.internal.dto.v4.converters.JobDirectoryManifestProtoConverter;
-import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter;
+import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
