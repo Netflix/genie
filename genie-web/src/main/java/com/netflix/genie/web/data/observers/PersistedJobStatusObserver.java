@@ -17,7 +17,8 @@
  */
 package com.netflix.genie.web.data.observers;
 
-import com.netflix.genie.common.dto.JobStatus;
+
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 
 import javax.annotation.Nullable;
 

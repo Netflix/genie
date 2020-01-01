@@ -19,11 +19,11 @@ package com.netflix.genie.web.data.services.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.internal.dtos.v4.ApplicationMetadata;
-import com.netflix.genie.common.internal.dtos.v4.ApplicationRequest;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.external.dtos.v4.ApplicationMetadata;
+import com.netflix.genie.common.external.dtos.v4.ApplicationRequest;
+import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import org.hamcrest.Matchers;

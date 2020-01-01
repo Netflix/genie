@@ -19,10 +19,10 @@ package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;

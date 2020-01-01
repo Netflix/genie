@@ -22,7 +22,7 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.InvalidStateException
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.execution.statemachine.States
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import org.springframework.statemachine.StateContext
 import org.springframework.statemachine.StateMachine
 import org.springframework.statemachine.action.Action

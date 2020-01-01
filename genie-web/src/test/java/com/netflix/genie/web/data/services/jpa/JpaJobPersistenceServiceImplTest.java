@@ -23,13 +23,13 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -162,7 +162,7 @@ public class JpaJobPersistenceServiceImplTest {
             .build();
 
         final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
-            .withStatus(JobStatus.INIT)
+            .withStatus(com.netflix.genie.common.dto.JobStatus.INIT)
             .withStatusMsg("Job is initializing")
             .withCommandArgs(JOB_1_COMMAND_ARGS)
             .build();
@@ -258,7 +258,7 @@ public class JpaJobPersistenceServiceImplTest {
             .build();
 
         final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
-            .withStatus(JobStatus.INIT)
+            .withStatus(com.netflix.genie.common.dto.JobStatus.INIT)
             .withStatusMsg("Job is initializing")
             .withCommandArgs(JOB_1_COMMAND_ARGS)
             .build();
@@ -288,7 +288,13 @@ public class JpaJobPersistenceServiceImplTest {
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         Assertions
             .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.jobPersistenceService.updateJobStatus(id, JobStatus.RUNNING, JOB_1_STATUS_MSG));
+            .isThrownBy(
+                () -> this.jobPersistenceService.updateJobStatus(
+                    id,
+                    com.netflix.genie.common.dto.JobStatus.RUNNING,
+                    JOB_1_STATUS_MSG
+                )
+            );
     }
 
     /**
@@ -303,7 +309,11 @@ public class JpaJobPersistenceServiceImplTest {
         jobEntity.setStatus(JobStatus.ACCEPTED.name());
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
-        this.jobPersistenceService.updateJobStatus(id, JobStatus.INIT, JOB_1_STATUS_MSG);
+        this.jobPersistenceService.updateJobStatus(
+            id,
+            com.netflix.genie.common.dto.JobStatus.INIT,
+            JOB_1_STATUS_MSG
+        );
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.INIT.name());
         Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(JOB_1_STATUS_MSG);
@@ -325,7 +335,11 @@ public class JpaJobPersistenceServiceImplTest {
         jobEntity.setStatus(JobStatus.INIT.name());
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
-        this.jobPersistenceService.updateJobStatus(id, JobStatus.RUNNING, JOB_1_STATUS_MSG);
+        this.jobPersistenceService.updateJobStatus(
+            id,
+            com.netflix.genie.common.dto.JobStatus.RUNNING,
+            JOB_1_STATUS_MSG
+        );
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.RUNNING.name());
         Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(JOB_1_STATUS_MSG);
@@ -348,7 +362,11 @@ public class JpaJobPersistenceServiceImplTest {
         jobEntity.setStatus(JobStatus.INIT.name());
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
-        this.jobPersistenceService.updateJobStatus(id, JobStatus.FAILED, JOB_1_STATUS_MSG);
+        this.jobPersistenceService.updateJobStatus(
+            id,
+            com.netflix.genie.common.dto.JobStatus.FAILED,
+            JOB_1_STATUS_MSG
+        );
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.FAILED.name());
         Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(JOB_1_STATUS_MSG);
@@ -371,7 +389,11 @@ public class JpaJobPersistenceServiceImplTest {
         jobEntity.setStatus(JobStatus.RUNNING.name());
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
-        this.jobPersistenceService.updateJobStatus(id, JobStatus.KILLED, JOB_1_STATUS_MSG);
+        this.jobPersistenceService.updateJobStatus(
+            id,
+            com.netflix.genie.common.dto.JobStatus.KILLED,
+            JOB_1_STATUS_MSG
+        );
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.KILLED.name());
         Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(JOB_1_STATUS_MSG);
@@ -391,7 +413,11 @@ public class JpaJobPersistenceServiceImplTest {
         jobEntity.setStatus(JobStatus.RUNNING.name());
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
-        this.jobPersistenceService.updateJobStatus(id, JobStatus.SUCCEEDED, JOB_1_STATUS_MSG);
+        this.jobPersistenceService.updateJobStatus(
+            id,
+            com.netflix.genie.common.dto.JobStatus.SUCCEEDED,
+            JOB_1_STATUS_MSG
+        );
 
         Assertions.assertThat(jobEntity.getStatus()).isEqualTo(JobStatus.SUCCEEDED.name());
         Assertions.assertThat(jobEntity.getStatusMsg()).isPresent().contains(JOB_1_STATUS_MSG);
@@ -411,7 +437,11 @@ public class JpaJobPersistenceServiceImplTest {
         jobEntity.setStarted(Instant.EPOCH);
 
         Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.of(jobEntity));
-        this.jobPersistenceService.updateJobStatus(id, JobStatus.SUCCEEDED, JOB_1_STATUS_MSG);
+        this.jobPersistenceService.updateJobStatus(
+            id,
+            com.netflix.genie.common.dto.JobStatus.SUCCEEDED,
+            JOB_1_STATUS_MSG
+        );
 
         Assertions.assertThat(jobEntity.getFinished()).isPresent();
     }
@@ -586,7 +616,7 @@ public class JpaJobPersistenceServiceImplTest {
                 () -> this.jobPersistenceService.setJobCompletionInformation(
                     JOB_1_ID,
                     0,
-                    JobStatus.FAILED,
+                    com.netflix.genie.common.dto.JobStatus.FAILED,
                     UUID.randomUUID().toString(),
                     null,
                     null
@@ -609,7 +639,7 @@ public class JpaJobPersistenceServiceImplTest {
                 () -> this.jobPersistenceService.setJobCompletionInformation(
                     JOB_1_ID,
                     0,
-                    JobStatus.FAILED,
+                    com.netflix.genie.common.dto.JobStatus.FAILED,
                     "k",
                     100L,
                     1L
@@ -628,7 +658,14 @@ public class JpaJobPersistenceServiceImplTest {
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED.name());
         Mockito.when(this.jobRepository.findByUniqueId(JOB_1_ID)).thenReturn(Optional.of(jobEntity));
 
-        this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", null, null);
+        this.jobPersistenceService.setJobCompletionInformation(
+            JOB_1_ID,
+            0,
+            com.netflix.genie.common.dto.JobStatus.FAILED,
+            "k",
+            null,
+            null
+        );
         Mockito.verify(jobEntity, Mockito.times(1)).setStdOutSize(null);
         Mockito.verify(jobEntity, Mockito.times(1)).setStdErrSize(null);
     }
@@ -645,7 +682,14 @@ public class JpaJobPersistenceServiceImplTest {
         Mockito.when(this.jobRepository.findByUniqueId(JOB_1_ID)).thenReturn(Optional.of(jobEntity));
         Mockito.when(jobEntity.getExitCode()).thenReturn(Optional.of(1));
 
-        this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", null, 100L);
+        this.jobPersistenceService.setJobCompletionInformation(
+            JOB_1_ID,
+            0,
+            com.netflix.genie.common.dto.JobStatus.FAILED,
+            "k",
+            null,
+            100L
+        );
         Mockito.verify(jobEntity, Mockito.times(1)).setStdErrSize(100L);
         Mockito.verify(jobEntity, Mockito.times(1)).setStdOutSize(null);
     }

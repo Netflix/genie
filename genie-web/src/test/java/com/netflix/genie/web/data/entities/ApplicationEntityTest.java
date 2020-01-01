@@ -18,7 +18,7 @@
 package com.netflix.genie.web.data.entities;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

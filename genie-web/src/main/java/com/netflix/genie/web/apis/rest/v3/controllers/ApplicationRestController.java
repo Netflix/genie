@@ -22,11 +22,12 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
@@ -176,7 +177,9 @@ public class ApplicationRestController {
         if (statuses != null) {
             enumStatuses = EnumSet.noneOf(ApplicationStatus.class);
             for (final String status : statuses) {
-                enumStatuses.add(ApplicationStatus.parse(status));
+                enumStatuses.add(
+                    DtoConverters.toV4ApplicationStatus(com.netflix.genie.common.dto.ApplicationStatus.parse(status))
+                );
             }
         }
 
@@ -554,7 +557,9 @@ public class ApplicationRestController {
         if (statuses != null) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
-                enumStatuses.add(CommandStatus.parse(status));
+                enumStatuses.add(
+                    DtoConverters.toV4CommandStatus(com.netflix.genie.common.dto.CommandStatus.parse(status))
+                );
             }
         }
 

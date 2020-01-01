@@ -22,7 +22,7 @@ import com.amazonaws.services.sns.model.AuthorizationErrorException
 import com.amazonaws.services.sns.model.PublishResult
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Maps
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.web.properties.SNSNotificationsProperties
 import com.netflix.genie.web.util.MetricsUtils

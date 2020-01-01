@@ -22,11 +22,12 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers;
@@ -182,7 +183,9 @@ public class ClusterRestController {
         if (statuses != null) {
             enumStatuses = EnumSet.noneOf(ClusterStatus.class);
             for (final String status : statuses) {
-                enumStatuses.add(ClusterStatus.parse(status));
+                enumStatuses.add(
+                    DtoConverters.toV4ClusterStatus(com.netflix.genie.common.dto.ClusterStatus.parse(status))
+                );
             }
         }
 
@@ -603,7 +606,9 @@ public class ClusterRestController {
         if (statuses != null) {
             enumStatuses = EnumSet.noneOf(CommandStatus.class);
             for (final String status : statuses) {
-                enumStatuses.add(CommandStatus.parse(status));
+                enumStatuses.add(
+                    DtoConverters.toV4CommandStatus(com.netflix.genie.common.dto.CommandStatus.parse(status))
+                );
             }
         }
 

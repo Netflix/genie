@@ -20,27 +20,24 @@ package com.netflix.genie.web.data.entities.v4;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
-import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
+import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.ApplicationMetadata;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
+import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dtos.v4.Application;
-import com.netflix.genie.common.internal.dtos.v4.ApplicationMetadata;
-import com.netflix.genie.common.internal.dtos.v4.Cluster;
-import com.netflix.genie.common.internal.dtos.v4.ClusterMetadata;
-import com.netflix.genie.common.internal.dtos.v4.Command;
-import com.netflix.genie.common.internal.dtos.v4.CommandMetadata;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
-import com.netflix.genie.common.internal.dtos.v4.JobArchivalDataRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobEnvironmentRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
@@ -54,7 +51,6 @@ import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -81,13 +77,16 @@ public final class EntityDtoConverters {
      *
      * @param applicationEntity The entity to convert
      * @return The immutable DTO representation of the entity data
+     * @throws IllegalArgumentException On invalid field
      */
-    public static Application toV4ApplicationDto(final ApplicationEntity applicationEntity) {
+    public static Application toV4ApplicationDto(
+        final ApplicationEntity applicationEntity
+    ) throws IllegalArgumentException {
         final ApplicationMetadata.Builder metadataBuilder = new ApplicationMetadata.Builder(
             applicationEntity.getName(),
             applicationEntity.getUser(),
             applicationEntity.getVersion(),
-            toApplicationStatus(applicationEntity.getStatus())
+            DtoConverters.toV4ApplicationStatus(applicationEntity.getStatus())
         )
             .withTags(applicationEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
@@ -113,13 +112,14 @@ public final class EntityDtoConverters {
      *
      * @param clusterEntity The entity to convert
      * @return The immutable DTO representation of the entity data
+     * @throws IllegalArgumentException On any invalid field value
      */
-    public static Cluster toV4ClusterDto(final ClusterEntity clusterEntity) {
+    public static Cluster toV4ClusterDto(final ClusterEntity clusterEntity) throws IllegalArgumentException {
         final ClusterMetadata.Builder metadataBuilder = new ClusterMetadata.Builder(
             clusterEntity.getName(),
             clusterEntity.getUser(),
             clusterEntity.getVersion(),
-            toClusterStatus(clusterEntity.getStatus())
+            DtoConverters.toV4ClusterStatus(clusterEntity.getStatus())
         )
             .withTags(clusterEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
@@ -144,13 +144,14 @@ public final class EntityDtoConverters {
      *
      * @param commandEntity The entity to convert
      * @return The immutable DTO representation of the entity data
+     * @throws IllegalArgumentException On any invalid field value
      */
-    public static Command toV4CommandDto(final CommandEntity commandEntity) {
+    public static Command toV4CommandDto(final CommandEntity commandEntity) throws IllegalArgumentException {
         final CommandMetadata.Builder metadataBuilder = new CommandMetadata.Builder(
             commandEntity.getName(),
             commandEntity.getUser(),
             commandEntity.getVersion(),
-            toCommandStatus(commandEntity.getStatus())
+            DtoConverters.toV4CommandStatus(commandEntity.getStatus())
         )
             .withTags(commandEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
@@ -176,8 +177,7 @@ public final class EntityDtoConverters {
     /**
      * Convert a job request entity to a DTO.
      *
-     * @param jobRequestProjection The projection of the {@link com.netflix.genie.web.data.entities.JobEntity} to
-     *                             convert
+     * @param jobRequestProjection The projection of the {@link V4JobRequestProjection} to convert
      * @return The original job request DTO
      * @throws GenieRuntimeException When criterion can't be properly converted
      */
@@ -291,15 +291,18 @@ public final class EntityDtoConverters {
      *
      * @param finishedJobProjection the entity projection
      * @return the DTO representation
+     * @throws IllegalArgumentException On any invalid field
      */
-    public static FinishedJob toFinishedJobDto(final FinishedJobProjection finishedJobProjection) {
+    public static FinishedJob toFinishedJobDto(
+        final FinishedJobProjection finishedJobProjection
+    ) throws IllegalArgumentException {
         final FinishedJob.Builder builder = new FinishedJob.Builder(
             finishedJobProjection.getUniqueId(),
             finishedJobProjection.getName(),
             finishedJobProjection.getUser(),
             finishedJobProjection.getVersion(),
             finishedJobProjection.getCreated(),
-            toJobStatus(finishedJobProjection.getStatus()),
+            DtoConverters.toV4JobStatus(finishedJobProjection.getStatus()),
             finishedJobProjection.getCommandArgs(),
             toCriterionDto(finishedJobProjection.getCommandCriterion()),
             finishedJobProjection.getClusterCriteria()
@@ -478,66 +481,6 @@ public final class EntityDtoConverters {
             archiveLocation,
             jobSpecificationProjection.getTimeoutUsed().orElse(null)
         );
-    }
-
-    /**
-     * Attempt to convert an Application status string that was stored in the database into a known enumeration value
-     * from {@link ApplicationStatus}.
-     *
-     * @param status The status string that was stored in the database. Not null or empty.
-     * @return An {@link ApplicationStatus} instance
-     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
-     */
-    public static ApplicationStatus toApplicationStatus(final String status) throws IllegalArgumentException {
-        if (StringUtils.isBlank(status)) {
-            throw new IllegalArgumentException("No application status entered. Unable to convert.");
-        }
-        return ApplicationStatus.valueOf(status.toUpperCase());
-    }
-
-    /**
-     * Attempt to convert a Command status string that was stored in the database into a known enumeration value
-     * from {@link CommandStatus}.
-     *
-     * @param status The status string that was stored in the database. Not null or empty.
-     * @return An {@link CommandStatus} instance
-     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
-     */
-    public static CommandStatus toCommandStatus(final String status) throws IllegalArgumentException {
-        if (StringUtils.isBlank(status)) {
-            throw new IllegalArgumentException("No command status entered. Unable to convert.");
-        }
-        return CommandStatus.valueOf(status.toUpperCase());
-    }
-
-    /**
-     * Attempt to convert a Cluster status string that was stored in the database into a known enumeration value
-     * from {@link ClusterStatus}.
-     *
-     * @param status The status string that was stored in the database. Not null or empty.
-     * @return An {@link ClusterStatus} instance
-     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
-     */
-    public static ClusterStatus toClusterStatus(final String status) throws IllegalArgumentException {
-        if (StringUtils.isBlank(status)) {
-            throw new IllegalArgumentException("No cluster status entered. Unable to convert.");
-        }
-        return ClusterStatus.valueOf(status.toUpperCase());
-    }
-
-    /**
-     * Attempt to convert a Job status string that was stored in the database into a known enumeration value
-     * from {@link JobStatus}.
-     *
-     * @param status The status string that was stored in the database. Not null or empty.
-     * @return An {@link JobStatus} instance
-     * @throws IllegalArgumentException If the string that was stored in the database couldn't be converted
-     */
-    public static JobStatus toJobStatus(final String status) throws IllegalArgumentException {
-        if (StringUtils.isBlank(status)) {
-            throw new IllegalArgumentException("No job status entered. Unable to convert.");
-        }
-        return JobStatus.valueOf(status.toUpperCase());
     }
 
     private static JobSpecification.ExecutionResource toExecutionResource(

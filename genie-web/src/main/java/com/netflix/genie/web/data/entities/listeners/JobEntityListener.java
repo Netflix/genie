@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.data.entities.listeners;
 
-import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.data.entities.JobEntity;
-import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +66,7 @@ public class JobEntityListener {
     public void jobUpdate(final JobEntity jobEntity) {
         final JobStatus currentState;
         try {
-            currentState = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
+            currentState = DtoConverters.toV4JobStatus(jobEntity.getStatus());
         } catch (final IllegalArgumentException e) {
             log.error("Unable to convert current status {} to a valid JobStatus", jobEntity.getStatus(), e);
             return;
@@ -75,7 +75,7 @@ public class JobEntityListener {
         final Optional<String> pnsOptional = jobEntity.getNotifiedJobStatus();
         if (pnsOptional.isPresent()) {
             try {
-                previouslyNotifiedState = EntityDtoConverters.toJobStatus(pnsOptional.get());
+                previouslyNotifiedState = DtoConverters.toV4JobStatus(pnsOptional.get());
             } catch (final IllegalArgumentException e) {
                 log.error(
                     "Unable to convert previously notified status {} to a valid JobStatus",

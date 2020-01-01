@@ -18,12 +18,12 @@
 package com.netflix.genie.agent.cli;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dtos.v4.AgentJobRequest;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.internal.dtos.v4.JobArchivalDataRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
+import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 

@@ -23,7 +23,7 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.agent.execution.statemachine.actions.BaseStateAction
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import org.apache.commons.lang3.tuple.Triple
 import org.springframework.statemachine.action.Action
 import spock.lang.Specification

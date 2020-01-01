@@ -18,8 +18,8 @@
 package com.netflix.genie.agent.cli
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import com.netflix.genie.common.external.dtos.v4.Criterion
-import com.netflix.genie.common.internal.dtos.v4.AgentJobRequest
 import org.assertj.core.util.Sets
 import spock.lang.Specification
 

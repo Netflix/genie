@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.events;
 
-import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.context.ApplicationEvent;

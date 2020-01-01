@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.data.observers
 
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.web.events.GenieEventBus
 import com.netflix.genie.web.events.JobStateChangeEvent
 import org.springframework.context.ApplicationEvent

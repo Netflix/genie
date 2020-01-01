@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.events
 
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -39,7 +39,5 @@ class JobStateChangeEventSpec extends Specification {
         prevStatus         | nextStatus
         null               | JobStatus.RESERVED
         JobStatus.RESERVED | JobStatus.ACCEPTED
-
     }
-
 }
