@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
-import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.exceptions.GeniePreconditionException
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata
-import com.netflix.genie.common.internal.dtos.v4.JobRequest
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification
+
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
+import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException
@@ -375,7 +375,7 @@ class GRpcJobServiceImplSpec extends Specification {
 
         then:
         0 * agentJobService.updateJobStatus(_, _, _, _)
-        1 * errorMessageComposer.toProtoChangeJobStatusResponse(_ as GeniePreconditionException) >> response
+        1 * errorMessageComposer.toProtoChangeJobStatusResponse(_ as IllegalArgumentException) >> response
         1 * changeJobStatusResponseObserver.onNext(response)
         1 * changeJobStatusResponseObserver.onCompleted()
     }

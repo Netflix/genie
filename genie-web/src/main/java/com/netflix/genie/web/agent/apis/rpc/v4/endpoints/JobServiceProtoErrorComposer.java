@@ -75,6 +75,7 @@ public class JobServiceProtoErrorComposer {
             .put(GenieJobNotFoundException.class, ClaimJobError.Type.NO_SUCH_JOB)
             .put(GenieInvalidStatusException.class, ClaimJobError.Type.INVALID_STATUS)
             .put(ConstraintViolationException.class, ClaimJobError.Type.INVALID_REQUEST)
+            .put(IllegalArgumentException.class, ClaimJobError.Type.INVALID_REQUEST)
             .build();
 
     private static final Map<Class<? extends Exception>, ChangeJobStatusError.Type> CHANGE_JOB_STATUS_ERROR_MAP =
@@ -83,6 +84,7 @@ public class JobServiceProtoErrorComposer {
             .put(GenieInvalidStatusException.class, ChangeJobStatusError.Type.INCORRECT_CURRENT_STATUS)
             .put(GeniePreconditionException.class, ChangeJobStatusError.Type.INVALID_REQUEST)
             .put(ConstraintViolationException.class, ChangeJobStatusError.Type.INVALID_REQUEST)
+            .put(IllegalArgumentException.class, ChangeJobStatusError.Type.INVALID_REQUEST)
             .build();
 
     private static final Map<Class<? extends Exception>, HandshakeResponse.Type> HANDSHAKE_ERROR_MAP =

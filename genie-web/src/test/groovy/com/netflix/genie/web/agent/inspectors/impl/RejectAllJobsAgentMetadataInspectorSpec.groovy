@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.agent.inspectors.impl
 
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import org.springframework.core.env.Environment

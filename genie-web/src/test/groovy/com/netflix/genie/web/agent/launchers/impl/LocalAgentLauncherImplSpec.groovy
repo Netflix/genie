@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.agent.launchers.impl
 
-import com.netflix.genie.common.internal.dtos.v4.JobEnvironment
-import com.netflix.genie.common.internal.dtos.v4.JobMetadata
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification
+import com.netflix.genie.common.external.dtos.v4.JobEnvironment
+import com.netflix.genie.common.external.dtos.v4.JobMetadata
+import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.introspection.GenieWebHostInfo

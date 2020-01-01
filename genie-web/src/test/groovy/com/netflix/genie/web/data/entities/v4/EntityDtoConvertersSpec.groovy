@@ -21,21 +21,21 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
-import com.netflix.genie.common.dto.ApplicationStatus
-import com.netflix.genie.common.dto.ClusterStatus
-import com.netflix.genie.common.dto.CommandStatus
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest
+import com.netflix.genie.common.external.dtos.v4.ApplicationStatus
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus
+import com.netflix.genie.common.external.dtos.v4.CommandStatus
 import com.netflix.genie.common.external.dtos.v4.Criterion
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria
+import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest
+import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest
+import com.netflix.genie.common.external.dtos.v4.JobMetadata
+import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.external.util.GenieObjectMapper
-import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment
-import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob
-import com.netflix.genie.common.internal.dtos.v4.JobArchivalDataRequest
-import com.netflix.genie.common.internal.dtos.v4.JobEnvironmentRequest
-import com.netflix.genie.common.internal.dtos.v4.JobMetadata
-import com.netflix.genie.common.internal.dtos.v4.JobRequest
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
@@ -50,11 +50,9 @@ import com.netflix.genie.web.data.entities.TagEntity
 import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import java.time.Instant
 import java.util.function.Consumer
-import java.util.stream.Stream
 
 /**
  * Specifications for {@link EntityDtoConverters}.
@@ -997,161 +995,5 @@ class EntityDtoConvertersSpec extends Specification {
         dto.getApplications().size() == 1
         dto.getTags().size() == 2
         dto.getTags() == Sets.newHashSet(["tag1", "tag2"])
-    }
-
-    @Unroll
-    def "status conversions throw IllegalArgumentException on bad input #input"() {
-        when:
-        EntityDtoConverters.toApplicationStatus(input)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        when:
-        EntityDtoConverters.toCommandStatus(input)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        when:
-        EntityDtoConverters.toClusterStatus(input)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        when:
-        EntityDtoConverters.toJobStatus(input)
-
-        then:
-        thrown(IllegalArgumentException)
-
-        where:
-        input                        | _
-        ""                           | _
-        null                         | _
-        " "                          | _
-        UUID.randomUUID().toString() | _
-    }
-
-    @Unroll
-    def "can convert #input to application status #status"() {
-        expect:
-        EntityDtoConverters.toApplicationStatus(input) == status
-
-        where:
-        input                                             | status
-        ApplicationStatus.ACTIVE.name()                   | ApplicationStatus.ACTIVE
-        ApplicationStatus.ACTIVE.name().toLowerCase()     | ApplicationStatus.ACTIVE
-        ApplicationStatus.INACTIVE.name()                 | ApplicationStatus.INACTIVE
-        ApplicationStatus.INACTIVE.name().toLowerCase()   | ApplicationStatus.INACTIVE
-        ApplicationStatus.DEPRECATED.name()               | ApplicationStatus.DEPRECATED
-        ApplicationStatus.DEPRECATED.name().toLowerCase() | ApplicationStatus.DEPRECATED
-    }
-
-    @Unroll
-    def "all possible ApplicationStatus values are covered"() {
-        when:
-        EntityDtoConverters.toApplicationStatus(input as String)
-
-        then:
-        noExceptionThrown()
-
-        where:
-        input << Stream.of(ApplicationStatus.values()).map { status -> status.name() }.collect()
-    }
-
-    @Unroll
-    def "can convert #input to command status #status"() {
-        expect:
-        EntityDtoConverters.toCommandStatus(input) == status
-
-        where:
-        input                                         | status
-        CommandStatus.ACTIVE.name()                   | CommandStatus.ACTIVE
-        CommandStatus.ACTIVE.name().toLowerCase()     | CommandStatus.ACTIVE
-        CommandStatus.INACTIVE.name()                 | CommandStatus.INACTIVE
-        CommandStatus.INACTIVE.name().toLowerCase()   | CommandStatus.INACTIVE
-        CommandStatus.DEPRECATED.name()               | CommandStatus.DEPRECATED
-        CommandStatus.DEPRECATED.name().toLowerCase() | CommandStatus.DEPRECATED
-    }
-
-    @Unroll
-    def "all possible CommandStatus values are covered"() {
-        when:
-        EntityDtoConverters.toCommandStatus(input as String)
-
-        then:
-        noExceptionThrown()
-
-        where:
-        input << Stream.of(CommandStatus.values()).map { status -> status.name() }.collect()
-    }
-
-    @Unroll
-    def "can convert #input to cluster status #status"() {
-        expect:
-        EntityDtoConverters.toClusterStatus(input) == status
-
-        where:
-        input                                             | status
-        ClusterStatus.UP.name()                           | ClusterStatus.UP
-        ClusterStatus.UP.name().toLowerCase()             | ClusterStatus.UP
-        ClusterStatus.TERMINATED.name()                   | ClusterStatus.TERMINATED
-        ClusterStatus.TERMINATED.name().toLowerCase()     | ClusterStatus.TERMINATED
-        ClusterStatus.OUT_OF_SERVICE.name()               | ClusterStatus.OUT_OF_SERVICE
-        ClusterStatus.OUT_OF_SERVICE.name().toLowerCase() | ClusterStatus.OUT_OF_SERVICE
-    }
-
-    @Unroll
-    def "all possible ClusterStatus values are covered"() {
-        when:
-        EntityDtoConverters.toClusterStatus(input as String)
-
-        then:
-        noExceptionThrown()
-
-        where:
-        input << Stream.of(ClusterStatus.values()).map { status -> status.name() }.collect()
-    }
-
-    @Unroll
-    def "can convert #input to job status #status"() {
-        expect:
-        EntityDtoConverters.toJobStatus(input) == status
-
-        where:
-        input                                    | status
-        JobStatus.ACCEPTED.name()                | JobStatus.ACCEPTED
-        JobStatus.ACCEPTED.name().toLowerCase()  | JobStatus.ACCEPTED
-        JobStatus.CLAIMED.name()                 | JobStatus.CLAIMED
-        JobStatus.CLAIMED.name().toLowerCase()   | JobStatus.CLAIMED
-        JobStatus.FAILED.name()                  | JobStatus.FAILED
-        JobStatus.FAILED.name().toLowerCase()    | JobStatus.FAILED
-        JobStatus.INIT.name()                    | JobStatus.INIT
-        JobStatus.INIT.name().toLowerCase()      | JobStatus.INIT
-        JobStatus.INVALID.name()                 | JobStatus.INVALID
-        JobStatus.INVALID.name().toLowerCase()   | JobStatus.INVALID
-        JobStatus.KILLED.name()                  | JobStatus.KILLED
-        JobStatus.KILLED.name().toLowerCase()    | JobStatus.KILLED
-        JobStatus.RESOLVED.name()                | JobStatus.RESOLVED
-        JobStatus.RESOLVED.name().toLowerCase()  | JobStatus.RESOLVED
-        JobStatus.RESERVED.name()                | JobStatus.RESERVED
-        JobStatus.RESERVED.name().toLowerCase()  | JobStatus.RESERVED
-        JobStatus.RUNNING.name()                 | JobStatus.RUNNING
-        JobStatus.RUNNING.name().toLowerCase()   | JobStatus.RUNNING
-        JobStatus.SUCCEEDED.name()               | JobStatus.SUCCEEDED
-        JobStatus.SUCCEEDED.name().toLowerCase() | JobStatus.SUCCEEDED
-    }
-
-    @Unroll
-    def "all possible JobStatus values are covered"() {
-        when:
-        EntityDtoConverters.toJobStatus(input as String)
-
-        then:
-        noExceptionThrown()
-
-        where:
-        input << Stream.of(JobStatus.values()).map { status -> status.name() }.collect()
     }
 }

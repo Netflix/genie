@@ -20,7 +20,7 @@ package com.netflix.genie.web.services.impl;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.internal.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

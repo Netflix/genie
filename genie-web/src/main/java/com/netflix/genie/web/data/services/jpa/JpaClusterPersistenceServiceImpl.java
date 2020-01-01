@@ -24,8 +24,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
@@ -33,15 +31,17 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
+import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.Cluster;
-import com.netflix.genie.common.internal.dtos.v4.ClusterMetadata;
-import com.netflix.genie.common.internal.dtos.v4.ClusterRequest;
-import com.netflix.genie.common.internal.dtos.v4.Command;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
-import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
@@ -498,7 +498,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
             final Set<CommandStatus> notNullStatuses = Sets.newHashSet(statuses);
             return commandEntities
                 .stream()
-                .filter(command -> notNullStatuses.contains(EntityDtoConverters.toCommandStatus(command.getStatus())))
+                .filter(command -> notNullStatuses.contains(DtoConverters.toV4CommandStatus(command.getStatus())))
                 .map(EntityDtoConverters::toV4CommandDto)
                 .collect(Collectors.toList());
         } else {

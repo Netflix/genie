@@ -18,7 +18,7 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.JobPersistenceService;

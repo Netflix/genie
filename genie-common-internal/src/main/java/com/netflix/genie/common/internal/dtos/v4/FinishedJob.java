@@ -18,8 +18,12 @@
 package com.netflix.genie.common.internal.dtos.v4;
 
 import com.google.common.collect.ImmutableList;
-import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.external.dtos.v4.CommonMetadata;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

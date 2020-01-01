@@ -20,7 +20,7 @@ package com.netflix.genie.web.services.selectors;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.internal.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;

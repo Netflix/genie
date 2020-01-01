@@ -19,8 +19,8 @@ package com.netflix.genie.web.dtos;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.internal.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobRequestMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

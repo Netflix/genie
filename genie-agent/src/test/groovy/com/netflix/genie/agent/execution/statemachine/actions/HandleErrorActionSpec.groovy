@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import spock.lang.Specification
 
 class HandleErrorActionSpec extends Specification {

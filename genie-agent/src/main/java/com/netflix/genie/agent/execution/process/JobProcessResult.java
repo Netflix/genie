@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.process;
 
-import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

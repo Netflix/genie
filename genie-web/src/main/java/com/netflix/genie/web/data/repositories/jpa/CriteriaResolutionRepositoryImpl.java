@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.data.repositories.jpa;
 
-import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -174,9 +174,9 @@ public class CriteriaResolutionRepositoryImpl implements CriteriaResolutionRepos
     @Getter
     private enum CriteriaType {
 
-        CLUSTER("clusters", "clusters_tags", "cluster_id", ClusterStatus.UP.toString()),
+        CLUSTER("clusters", "clusters_tags", "cluster_id", ClusterStatus.UP.name()),
 
-        COMMAND("commands", "commands_tags", "command_id", CommandStatus.ACTIVE.toString());
+        COMMAND("commands", "commands_tags", "command_id", CommandStatus.ACTIVE.name());
 
         private final String primaryTable;
         private final String tagTable;

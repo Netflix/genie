@@ -16,7 +16,7 @@
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ApplicationEntity_;
 import com.netflix.genie.web.data.entities.TagEntity;

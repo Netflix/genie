@@ -19,8 +19,8 @@ package com.netflix.genie.agent.execution
 
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction
-import com.netflix.genie.common.dto.JobStatus
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification
+import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import org.apache.commons.lang3.tuple.Triple
 import spock.lang.Specification
 import spock.lang.Unroll

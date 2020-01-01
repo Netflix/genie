@@ -29,8 +29,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.internal.dtos.v4.ApiClientMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobRequestMetadata;
+import com.netflix.genie.common.external.dtos.v4.ApiClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
@@ -358,7 +359,10 @@ public class JobRestController {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
             .objectNode()
-            .set("status", factory.textNode(this.jobPersistenceService.getJobStatus(id).toString()));
+            .set(
+                "status",
+                factory.textNode(DtoConverters.toV3JobStatus(this.jobPersistenceService.getJobStatus(id)).toString())
+            );
     }
 
     /**
@@ -677,7 +681,8 @@ public class JobRestController {
         final HttpServletResponse response
     ) throws GenieException {
         final boolean isV4 = this.jobPersistenceService.isV4(id);
-        final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(id);
+        final com.netflix.genie.common.external.dtos.v4.JobStatus jobStatus
+            = this.jobPersistenceService.getJobStatus(id);
         final String path = ControllerUtils.getRemainingPath(request);
         final URL baseUrl;
         try {

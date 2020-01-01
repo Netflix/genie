@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
-import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
@@ -237,8 +237,8 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
     ) {
         try {
             final String id = request.getId();
-            final JobStatus currentStatus = JobStatus.parse(request.getCurrentStatus());
-            final JobStatus newStatus = JobStatus.parse(request.getNewStatus());
+            final JobStatus currentStatus = JobStatus.valueOf(request.getCurrentStatus().toUpperCase());
+            final JobStatus newStatus = JobStatus.valueOf(request.getNewStatus().toUpperCase());
             final String newStatusMessage = request.getNewStatusMessage();
             this.agentJobService.updateJobStatus(id, currentStatus, newStatus, newStatusMessage);
             responseObserver.onNext(ChangeJobStatusResponse.newBuilder().setSuccessful(true).build());

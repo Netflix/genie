@@ -19,13 +19,13 @@ package com.netflix.genie.web.data.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
-import com.netflix.genie.common.internal.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -102,7 +102,7 @@ public interface JobPersistenceService {
      */
     void updateJobStatus(
         @NotBlank(message = "No job id entered. Unable to update.") String id,
-        @NotNull(message = "Status cannot be null.") JobStatus jobStatus,
+        @NotNull(message = "Status cannot be null.") com.netflix.genie.common.dto.JobStatus jobStatus,
         @NotBlank(message = "Status message cannot be empty.") String statusMsg
     ) throws GenieException;
 
@@ -136,7 +136,7 @@ public interface JobPersistenceService {
     void setJobCompletionInformation(
         @NotBlank(message = "No job id entered. Unable to update.") String id,
         int exitCode,
-        @NotNull(message = "No job status entered. Unable to update") JobStatus status,
+        @NotNull(message = "No job status entered.") com.netflix.genie.common.dto.JobStatus status,
         @NotBlank(message = "Status message can't be blank. Unable to update") String statusMessage,
         @Nullable Long stdOutSize,
         @Nullable Long stdErrSize
@@ -231,14 +231,13 @@ public interface JobPersistenceService {
 
     /**
      * Set a job identified by {@code id} to be owned by the agent identified by {@code agentClientMetadata}. The
-     * job status in the system will be set to {@link com.netflix.genie.common.dto.JobStatus#CLAIMED}
+     * job status in the system will be set to {@link JobStatus#CLAIMED}
      *
      * @param id                  The id of the job to claim. Must exist in the system.
      * @param agentClientMetadata The metadata about the client claiming the job
      * @throws GenieJobNotFoundException       if no job with the given {@code id} exists
      * @throws GenieJobAlreadyClaimedException if the job with the given {@code id} already has been claimed
-     * @throws GenieInvalidStatusException     if the current job status is not
-     *                                         {@link com.netflix.genie.common.dto.JobStatus#RESOLVED}
+     * @throws GenieInvalidStatusException     if the current job status is not {@link JobStatus#RESOLVED}
      */
     void claimJob(
         @NotBlank(message = "Job id is missing and is required") String id,

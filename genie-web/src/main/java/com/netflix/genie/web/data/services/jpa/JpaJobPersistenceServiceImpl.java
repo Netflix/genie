@@ -22,26 +22,27 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
+import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
-import com.netflix.genie.common.internal.dtos.v4.JobArchivalDataRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobEnvironment;
-import com.netflix.genie.common.internal.dtos.v4.JobEnvironmentRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobRequestMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
@@ -220,7 +221,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     @Override
     public void updateJobStatus(
         @NotBlank(message = "No job id entered. Unable to update.") final String id,
-        @NotNull(message = "Status cannot be null.") final JobStatus jobStatus,
+        @NotNull(message = "Status cannot be null.") final com.netflix.genie.common.dto.JobStatus jobStatus,
         @NotBlank(message = "Status message cannot be empty.") final String statusMsg
     ) throws GenieException {
         log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
@@ -229,7 +230,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No job exists for the id specified"));
 
-        this.updateJobStatus(jobEntity, jobStatus, statusMsg);
+        this.updateJobStatus(jobEntity, DtoConverters.toV4JobStatus(jobStatus), statusMsg);
     }
 
     /**
@@ -263,7 +264,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     public void setJobCompletionInformation(
         @NotBlank(message = "No job id entered. Unable to update.") final String id,
         final int exitCode,
-        @NotNull(message = "No job status entered. Unable to update") final JobStatus status,
+        @NotNull(message = "No job status entered.") final com.netflix.genie.common.dto.JobStatus status,
         @NotBlank(message = "Status message can't be blank. Unable to update") final String statusMessage,
         @Nullable final Long stdOutSize,
         @Nullable final Long stdErrSize
@@ -281,7 +282,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists unable to update"));
 
-        this.updateJobStatus(jobEntity, status, statusMessage);
+        this.updateJobStatus(jobEntity, DtoConverters.toV4JobStatus(status), statusMessage);
         jobEntity.setExitCode(exitCode);
         jobEntity.setStdOutSize(stdOutSize);
         jobEntity.setStdErrSize(stdErrSize);
@@ -436,7 +437,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 return;
             }
             // Make sure if the job is resolvable otherwise don't do anything
-            if (!EntityDtoConverters.toJobStatus(entity.getStatus()).isResolvable()) {
+            if (!DtoConverters.toV4JobStatus(entity.getStatus()).isResolvable()) {
                 log.error(
                     "Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't save resolved info",
                     id,
@@ -529,7 +530,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             throw new GenieJobAlreadyClaimedException("Job with id " + id + " is already claimed. Unable to claim.");
         }
 
-        final JobStatus currentStatus = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
+        final JobStatus currentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
         // The job must be in one of the claimable states in order to be claimed
         // TODO: Perhaps could use jobEntity.isResolved here also but wouldn't check the case that the job was in a
         //       terminal state like killed or invalid in which case we shouldn't claim it anyway as the agent would
@@ -588,7 +589,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 () -> new GenieJobNotFoundException("No job with id " + id + " exists. Unable to update status.")
             );
 
-        final JobStatus actualCurrentStatus = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
+        final JobStatus actualCurrentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
         if (actualCurrentStatus != currentStatus) {
             throw new GenieInvalidStatusException(
                 "Job "
@@ -646,7 +647,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     public JobStatus getJobStatus(
         @NotBlank(message = "Job id is missing and is required") final String id
     ) throws GenieNotFoundException {
-        return EntityDtoConverters.toJobStatus(
+        return DtoConverters.toV4JobStatus(
             this.jobRepository
                 .findByUniqueId(id, StatusProjection.class)
                 .orElseThrow(
@@ -702,7 +703,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final JobStatus newStatus,
         @Nullable final String statusMsg
     ) {
-        final JobStatus currentStatus = EntityDtoConverters.toJobStatus(jobEntity.getStatus());
+        final JobStatus currentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
         // Only change the status if the entity isn't already in a terminal state
         if (currentStatus.isActive()) {
             jobEntity.setStatus(newStatus.name());

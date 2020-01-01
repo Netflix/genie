@@ -30,7 +30,7 @@ import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.web.apis.rest.v3.controllers.DtoConverters;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.BaseEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
@@ -73,7 +73,7 @@ public final class JpaServiceUtils {
             applicationEntity.getName(),
             applicationEntity.getUser(),
             applicationEntity.getVersion(),
-            EntityDtoConverters.toApplicationStatus(applicationEntity.getStatus())
+            DtoConverters.toV3ApplicationStatus(DtoConverters.toV4ApplicationStatus(applicationEntity.getStatus()))
         )
             .withId(applicationEntity.getUniqueId())
             .withCreated(applicationEntity.getCreated())
@@ -103,7 +103,7 @@ public final class JpaServiceUtils {
             clusterEntity.getName(),
             clusterEntity.getUser(),
             clusterEntity.getVersion(),
-            EntityDtoConverters.toClusterStatus(clusterEntity.getStatus())
+            DtoConverters.toV3ClusterStatus(DtoConverters.toV4ClusterStatus(clusterEntity.getStatus()))
         )
             .withId(clusterEntity.getUniqueId())
             .withCreated(clusterEntity.getCreated())
@@ -132,7 +132,7 @@ public final class JpaServiceUtils {
             commandEntity.getName(),
             commandEntity.getUser(),
             commandEntity.getVersion(),
-            EntityDtoConverters.toCommandStatus(commandEntity.getStatus()),
+            DtoConverters.toV3CommandStatus(DtoConverters.toV4CommandStatus(commandEntity.getStatus())),
             commandEntity.getExecutable(),
             commandEntity.getCheckDelay()
         )
@@ -168,7 +168,7 @@ public final class JpaServiceUtils {
             .withCreated(jobProjection.getCreated())
             .withUpdated(jobProjection.getUpdated())
             .withTags(jobProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
-            .withStatus(EntityDtoConverters.toJobStatus(jobProjection.getStatus()))
+            .withStatus(DtoConverters.toV3JobStatus(DtoConverters.toV4JobStatus(jobProjection.getStatus())))
             .withCommandArgs(jobProjection.getCommandArgs());
 
         jobProjection.getDescription().ifPresent(builder::withDescription);

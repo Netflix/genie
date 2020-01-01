@@ -22,19 +22,18 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.protobuf.Int32Value;
-import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
+import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dtos.v4.AgentJobRequest;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.internal.dtos.v4.JobArchivalDataRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.checked.GenieConversionException;
 import com.netflix.genie.proto.AgentConfig;
 import com.netflix.genie.proto.AgentMetadata;
@@ -524,7 +523,7 @@ public class JobServiceProtoConverter {
                 agentConfigRequest,
                 jobArchivalDataRequest
             );
-        } catch (GeniePreconditionException e) {
+        } catch (final IllegalArgumentException e) {
             throw new GenieConversionException("Failed to compose JobRequest", e);
         }
     }

@@ -27,28 +27,28 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
+import com.netflix.genie.common.external.dtos.v4.ApiClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
+import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.common.internal.dtos.v4.AgentClientMetadata;
-import com.netflix.genie.common.internal.dtos.v4.AgentConfigRequest;
-import com.netflix.genie.common.internal.dtos.v4.ApiClientMetadata;
-import com.netflix.genie.common.internal.dtos.v4.Application;
-import com.netflix.genie.common.internal.dtos.v4.Cluster;
-import com.netflix.genie.common.internal.dtos.v4.Command;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
-import com.netflix.genie.common.internal.dtos.v4.JobArchivalDataRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobEnvironment;
-import com.netflix.genie.common.internal.dtos.v4.JobEnvironmentRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobRequest;
-import com.netflix.genie.common.internal.dtos.v4.JobRequestMetadata;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.data.entities.JobEntity;
@@ -307,7 +307,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .withArchiveLocation(ARCHIVE_LOCATION)
             .withStarted(STARTED)
             .withFinished(FINISHED)
-            .withStatus(STATUS)
+            .withStatus(com.netflix.genie.common.dto.JobStatus.RUNNING)
             .withStatusMsg(STATUS_MSG);
 
         jobBuilder.withCommandArgs(COMMAND_ARGS);
@@ -924,7 +924,7 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             savedJob.getFinished().orElseThrow(IllegalArgumentException::new),
             Matchers.is(FINISHED)
         );
-        Assert.assertThat(savedJob.getStatus(), Matchers.is(STATUS));
+        Assert.assertThat(savedJob.getStatus(), Matchers.is(com.netflix.genie.common.dto.JobStatus.RUNNING));
         Assert.assertThat(
             savedJob.getStatusMsg().orElseThrow(IllegalArgumentException::new),
             Matchers.is(STATUS_MSG)

@@ -22,8 +22,8 @@ import com.netflix.genie.agent.execution.process.JobProcessManager
 import com.netflix.genie.agent.execution.process.JobProcessResult
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
-import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.JobStatusMessages
+import com.netflix.genie.common.external.dtos.v4.JobStatus
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.scheduling.TaskScheduler

@@ -18,13 +18,13 @@
 package com.netflix.genie.web.data.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.internal.dtos.v4.Application;
-import com.netflix.genie.common.internal.dtos.v4.Cluster;
-import com.netflix.genie.common.internal.dtos.v4.Command;
-import com.netflix.genie.common.internal.dtos.v4.CommandRequest;
+import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.external.dtos.v4.CommandRequest;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
@@ -76,7 +76,7 @@ public interface CommandPersistenceService {
      *
      * @param name     Name of command config
      * @param user     The name of the user who created the configuration
-     * @param statuses The status of the applications to get. Can be null.
+     * @param statuses The status of the commands to get. Can be null.
      * @param tags     tags allocated to this command
      * @param page     The page of results to get
      * @return All the commands matching the specified criteria

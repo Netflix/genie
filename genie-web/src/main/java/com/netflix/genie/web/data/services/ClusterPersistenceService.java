@@ -18,14 +18,14 @@
 package com.netflix.genie.web.data.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
-import com.netflix.genie.common.internal.dtos.v4.Cluster;
-import com.netflix.genie.common.internal.dtos.v4.ClusterRequest;
-import com.netflix.genie.common.internal.dtos.v4.Command;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;

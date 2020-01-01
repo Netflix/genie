@@ -19,7 +19,7 @@ package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.CleanupStrategy;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
-import com.netflix.genie.common.internal.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 
 import java.io.File;
 import java.io.IOException;
