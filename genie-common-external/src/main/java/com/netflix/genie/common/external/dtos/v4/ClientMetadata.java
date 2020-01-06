@@ -23,6 +23,7 @@ import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -35,7 +36,9 @@ import java.util.Optional;
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 @SuppressWarnings("checkstyle:finalclass")
-public class ClientMetadata {
+public class ClientMetadata implements Serializable {
+
+    private static final long serialVersionUID = 7973228050794689900L;
 
     @Size(max = 255, message = "The client hostname can't be longer than 255 characters")
     private final String hostname;

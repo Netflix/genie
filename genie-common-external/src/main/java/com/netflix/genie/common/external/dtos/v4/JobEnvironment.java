@@ -30,6 +30,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,7 +45,9 @@ import java.util.Optional;
 @ToString(doNotUseGetters = true)
 @JsonDeserialize(builder = JobEnvironment.Builder.class)
 @SuppressWarnings("checkstyle:finalclass")
-public class JobEnvironment {
+public class JobEnvironment implements Serializable {
+
+    private static final long serialVersionUID = 8478136461571895069L;
     private static final int DEFAULT_NUM_CPU = 1;
     @Min(value = 1, message = "Number of CPU's can't be less than 1")
     private final int cpu;
@@ -56,7 +59,9 @@ public class JobEnvironment {
         @NotNull(message = "Environment variable value can't be null")
         @Size(max = 1024, message = "Max environment variable value length is 1024 characters") String>
         environmentVariables;
-    private final JsonNode ext;
+    // TODO: Remove transient once Jackson 2.10 is picked up as dependency:
+    //       https://github.com/FasterXML/jackson-databind/issues/18
+    private final transient JsonNode ext;
 
     private JobEnvironment(final Builder builder) {
         this.cpu = builder.bCpu == null ? DEFAULT_NUM_CPU : builder.bCpu;

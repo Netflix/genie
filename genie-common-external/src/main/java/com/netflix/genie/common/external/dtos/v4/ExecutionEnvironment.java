@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,7 +42,10 @@ import java.util.stream.Collectors;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-public class ExecutionEnvironment {
+public class ExecutionEnvironment implements Serializable {
+
+    private static final long serialVersionUID = 4614789276383154791L;
+
     private final ImmutableSet<
         @NotEmpty(message = "The config file name can't be empty")
         @Size(max = 1024, message = "Config file name is longer than 1024 characters") String> configs;

@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,9 @@ import java.util.stream.Collectors;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-public class ExecutionResourceCriteria {
+public class ExecutionResourceCriteria implements Serializable {
+
+    private static final long serialVersionUID = 4888642026303173660L;
 
     @NotEmpty(message = "At least one cluster criterion is required")
     private final ImmutableList<@Valid Criterion> clusterCriteria;

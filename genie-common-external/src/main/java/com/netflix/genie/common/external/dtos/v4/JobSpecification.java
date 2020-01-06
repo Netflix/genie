@@ -27,6 +27,7 @@ import lombok.ToString;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +41,9 @@ import java.util.Optional;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-public class JobSpecification {
+public class JobSpecification implements Serializable {
+
+    private static final long serialVersionUID = 4741981587685457902L;
 
     private final ImmutableList<String> executableArgs;
     private final ImmutableList<String> jobArgs;
@@ -166,7 +169,9 @@ public class JobSpecification {
     @Getter
     @EqualsAndHashCode(doNotUseGetters = true)
     @ToString(doNotUseGetters = true)
-    public static class ExecutionResource {
+    public static class ExecutionResource implements Serializable {
+
+        private static final long serialVersionUID = -444882678226048086L;
 
         private final String id;
         private final ExecutionEnvironment executionEnvironment;

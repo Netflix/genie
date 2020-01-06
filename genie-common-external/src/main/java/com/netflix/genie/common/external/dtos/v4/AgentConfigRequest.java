@@ -26,6 +26,7 @@ import lombok.ToString;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import java.io.File;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -38,14 +39,19 @@ import java.util.Optional;
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 @SuppressWarnings("checkstyle:finalclass")
-public class AgentConfigRequest {
+public class AgentConfigRequest implements Serializable {
+
+    private static final long serialVersionUID = 8222386837109375937L;
+
     private final boolean archivingDisabled;
     @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final Integer timeoutRequested;
     private final boolean interactive;
     // TODO: Switch to Path
     private final File requestedJobDirectoryLocation;
-    private final JsonNode ext;
+    // TODO: Remove transient once Jackson 2.10 is picked up as dependency:
+    //       https://github.com/FasterXML/jackson-databind/issues/18
+    private final transient JsonNode ext;
 
     private AgentConfigRequest(final Builder builder) {
         this.archivingDisabled = builder.bArchivingDisabled;

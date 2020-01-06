@@ -31,6 +31,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,7 +45,10 @@ import java.util.stream.Collectors;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-public abstract class CommonMetadata {
+public abstract class CommonMetadata implements Serializable {
+
+    private static final long serialVersionUID = 7789443514882247655L;
+
     @NotBlank(message = "A name is required and must be at most 255 characters")
     @Size(max = 255, message = "The name can be no longer than 255 characters")
     private final String name;

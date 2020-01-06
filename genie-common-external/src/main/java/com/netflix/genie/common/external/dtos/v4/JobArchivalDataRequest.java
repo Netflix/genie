@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -34,7 +35,10 @@ import java.util.Optional;
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 @SuppressWarnings("checkstyle:finalclass")
-public class JobArchivalDataRequest {
+public class JobArchivalDataRequest implements Serializable {
+
+    private static final long serialVersionUID = 4205493568106315662L;
+
     private final String requestedArchiveLocationPrefix;
 
     private JobArchivalDataRequest(final Builder builder) {
