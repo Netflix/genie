@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,7 +44,9 @@ import java.util.stream.Collectors;
 @ToString(doNotUseGetters = true)
 @JsonDeserialize(builder = Criterion.Builder.class)
 @SuppressWarnings("checkstyle:finalclass")
-public class Criterion {
+public class Criterion implements Serializable {
+
+    private static final long serialVersionUID = -8382495858646428806L;
 
     private final String id;
     private final String name;

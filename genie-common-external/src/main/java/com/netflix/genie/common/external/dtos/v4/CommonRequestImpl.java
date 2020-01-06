@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -37,7 +38,10 @@ import java.util.Optional;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-abstract class CommonRequestImpl implements CommonRequest {
+abstract class CommonRequestImpl implements CommonRequest, Serializable {
+
+    private static final long serialVersionUID = 2373945787894868377L;
+
     @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String requestedId;
     @Valid

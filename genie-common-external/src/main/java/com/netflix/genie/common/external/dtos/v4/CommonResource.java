@@ -24,6 +24,7 @@ import lombok.ToString;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -35,7 +36,9 @@ import java.time.Instant;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-abstract class CommonResource {
+abstract class CommonResource implements Serializable {
+
+    private static final long serialVersionUID = -2939351280830204953L;
 
     @NotEmpty(message = "An id is required")
     @Size(max = 255, message = "Max length for the ID is 255 characters")

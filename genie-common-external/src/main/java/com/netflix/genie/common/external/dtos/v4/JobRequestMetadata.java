@@ -23,6 +23,7 @@ import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -35,7 +36,9 @@ import java.util.Optional;
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 @SuppressWarnings("checkstyle:finalclass")
-public class JobRequestMetadata {
+public class JobRequestMetadata implements Serializable {
+
+    private static final long serialVersionUID = -8265590545951599460L;
 
     private final boolean api;
     private final ApiClientMetadata apiClientMetadata;
