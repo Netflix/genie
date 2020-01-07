@@ -315,6 +315,9 @@ configure(javaProjects) {
     spotbugs {
         excludeFilter = new File(project.parent.projectDir, "codequality/spotbugs/excludeFilter.xml")
     }
+    spotbugsTest.enabled = false
+    spotbugsIntegTest.enabled = false
+    spotbugsSmokeTest.enabled = false
 
     tasks.withType(com.github.spotbugs.SpotBugsTask) {
         reports {
