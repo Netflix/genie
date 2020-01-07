@@ -23,6 +23,8 @@ import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
@@ -32,8 +34,7 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,15 +44,13 @@ import org.springframework.data.domain.Sort;
 
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration Tests for the CommandServiceJPAImpl.
+ * Integration Tests for the {@link JpaCommandPersistenceServiceImpl} class.
  *
  * @author tgianos
  */
@@ -103,37 +102,37 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testGetCommand() throws GenieException {
         final Command command1 = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_1_ID, command1.getId());
-        Assert.assertEquals(COMMAND_1_NAME, command1.getMetadata().getName());
-        Assert.assertEquals(COMMAND_1_USER, command1.getMetadata().getUser());
-        Assert.assertEquals(COMMAND_1_VERSION, command1.getMetadata().getVersion());
-        Assert.assertEquals(COMMAND_1_STATUS, command1.getMetadata().getStatus());
-        Assert.assertEquals(COMMAND_1_EXECUTABLE, command1.getExecutable());
-        Assert.assertEquals(3, command1.getMetadata().getTags().size());
-        Assert.assertEquals(2, command1.getResources().getConfigs().size());
-        Assert.assertEquals(0, command1.getResources().getDependencies().size());
+        Assertions.assertThat(command1.getId()).isEqualTo(COMMAND_1_ID);
+        Assertions.assertThat(command1.getMetadata().getName()).isEqualTo(COMMAND_1_NAME);
+        Assertions.assertThat(command1.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
+        Assertions.assertThat(command1.getMetadata().getVersion()).isEqualTo(COMMAND_1_VERSION);
+        Assertions.assertThat(command1.getMetadata().getStatus()).isEqualTo(COMMAND_1_STATUS);
+        Assertions.assertThat(command1.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
+        Assertions.assertThat(command1.getMetadata().getTags().size()).isEqualTo(3);
+        Assertions.assertThat(command1.getResources().getConfigs().size()).isEqualTo(2);
+        Assertions.assertThat(command1.getResources().getDependencies()).isEmpty();
 
         final Command command2 = this.service.getCommand(COMMAND_2_ID);
-        Assert.assertEquals(COMMAND_2_ID, command2.getId());
-        Assert.assertEquals(COMMAND_2_NAME, command2.getMetadata().getName());
-        Assert.assertEquals(COMMAND_2_USER, command2.getMetadata().getUser());
-        Assert.assertEquals(COMMAND_2_VERSION, command2.getMetadata().getVersion());
-        Assert.assertEquals(COMMAND_2_STATUS, command2.getMetadata().getStatus());
-        Assert.assertEquals(COMMAND_2_EXECUTABLE, command2.getExecutable());
-        Assert.assertEquals(2, command2.getMetadata().getTags().size());
-        Assert.assertEquals(1, command2.getResources().getConfigs().size());
-        Assert.assertEquals(1, command2.getResources().getDependencies().size());
+        Assertions.assertThat(command2.getId()).isEqualTo(COMMAND_2_ID);
+        Assertions.assertThat(command2.getMetadata().getName()).isEqualTo(COMMAND_2_NAME);
+        Assertions.assertThat(command2.getMetadata().getUser()).isEqualTo(COMMAND_2_USER);
+        Assertions.assertThat(command2.getMetadata().getVersion()).isEqualTo(COMMAND_2_VERSION);
+        Assertions.assertThat(command2.getMetadata().getStatus()).isEqualTo(COMMAND_2_STATUS);
+        Assertions.assertThat(command2.getExecutable()).isEqualTo(COMMAND_2_EXECUTABLE);
+        Assertions.assertThat(command2.getMetadata().getTags().size()).isEqualTo(2);
+        Assertions.assertThat(command2.getResources().getConfigs().size()).isEqualTo(1);
+        Assertions.assertThat(command2.getResources().getDependencies().size()).isEqualTo(1);
 
         final Command command3 = this.service.getCommand(COMMAND_3_ID);
-        Assert.assertEquals(COMMAND_3_ID, command3.getId());
-        Assert.assertEquals(COMMAND_3_NAME, command3.getMetadata().getName());
-        Assert.assertEquals(COMMAND_3_USER, command3.getMetadata().getUser());
-        Assert.assertEquals(COMMAND_3_VERSION, command3.getMetadata().getVersion());
-        Assert.assertEquals(COMMAND_3_STATUS, command3.getMetadata().getStatus());
-        Assert.assertEquals(COMMAND_3_EXECUTABLE, command3.getExecutable());
-        Assert.assertEquals(3, command3.getMetadata().getTags().size());
-        Assert.assertEquals(1, command3.getResources().getConfigs().size());
-        Assert.assertEquals(2, command3.getResources().getDependencies().size());
+        Assertions.assertThat(command3.getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(command3.getMetadata().getName()).isEqualTo(COMMAND_3_NAME);
+        Assertions.assertThat(command3.getMetadata().getUser()).isEqualTo(COMMAND_3_USER);
+        Assertions.assertThat(command3.getMetadata().getVersion()).isEqualTo(COMMAND_3_VERSION);
+        Assertions.assertThat(command3.getMetadata().getStatus()).isEqualTo(COMMAND_3_STATUS);
+        Assertions.assertThat(command3.getExecutable()).isEqualTo(COMMAND_3_EXECUTABLE);
+        Assertions.assertThat(command3.getMetadata().getTags().size()).isEqualTo(3);
+        Assertions.assertThat(command3.getResources().getConfigs().size()).isEqualTo(1);
+        Assertions.assertThat(command3.getResources().getDependencies().size()).isEqualTo(2);
     }
 
     /**
@@ -142,8 +141,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testGetCommandsByName() {
         final Page<Command> commands = this.service.getCommands(COMMAND_2_NAME, null, null, null, PAGE);
-        Assert.assertEquals(1, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
     }
 
     /**
@@ -152,9 +151,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testGetCommandsByUserName() {
         final Page<Command> commands = this.service.getCommands(null, COMMAND_1_USER, null, null, PAGE);
-        Assert.assertEquals(2, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(1).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_1_ID);
     }
 
     /**
@@ -164,9 +163,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     public void testGetCommandsByStatuses() {
         final Set<CommandStatus> statuses = Sets.newHashSet(CommandStatus.INACTIVE, CommandStatus.DEPRECATED);
         final Page<Command> commands = this.service.getCommands(null, null, statuses, null, PAGE);
-        Assert.assertEquals(2, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
     }
 
     /**
@@ -176,33 +175,33 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     public void testGetCommandsByTags() {
         final Set<String> tags = Sets.newHashSet("prod");
         Page<Command> commands = this.service.getCommands(null, null, null, tags, PAGE);
-        Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_1_ID);
 
         tags.add("pig");
         commands = this.service.getCommands(null, null, null, tags, PAGE);
-        Assert.assertEquals(2, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(1).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_1_ID);
 
         tags.clear();
         tags.add("hive");
         commands = this.service.getCommands(null, null, null, tags, PAGE);
-        Assert.assertEquals(1, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
 
         tags.add("somethingThatWouldNeverReallyExist");
         commands = this.service.getCommands(null, null, null, tags, PAGE);
-        Assert.assertTrue(commands.getContent().isEmpty());
+        Assertions.assertThat(commands.getContent()).isEmpty();
 
         tags.clear();
         commands = this.service.getCommands(null, null, null, tags, PAGE);
-        Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_1_ID);
     }
 
     /**
@@ -212,10 +211,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     public void testGetCommandsDescending() {
         //Default to order by Updated
         final Page<Command> commands = this.service.getCommands(null, null, null, null, PAGE);
-        Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_1_ID);
     }
 
     /**
@@ -226,10 +225,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         final Pageable ascending = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
         final Page<Command> commands = this.service.getCommands(null, null, null, null, ascending);
-        Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(2).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_1_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_2_ID);
     }
 
     /**
@@ -239,10 +238,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     public void testGetCommandsOrderBysName() {
         final Pageable name = PageRequest.of(0, 10, Sort.Direction.DESC, "name");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, name);
-        Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(2).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_1_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_2_ID);
     }
 
     /**
@@ -252,10 +251,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     public void testGetCommandsOrderBysInvalidField() {
         final Pageable invalid = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, invalid);
-        Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
+        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
+        Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_1_ID);
     }
 
     /**
@@ -280,26 +279,20 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             .withCheckDelay(COMMAND_1_CHECK_DELAY)
             .build();
         final String createdId = this.service.createCommand(command);
-        Assert.assertThat(createdId, Matchers.is(id));
+        Assertions.assertThat(createdId).isEqualTo(id);
         final Command created = this.service.getCommand(id);
-        Assert.assertNotNull(this.service.getCommand(id));
-        Assert.assertEquals(id, created.getId());
-        Assert.assertEquals(COMMAND_1_NAME, created.getMetadata().getName());
-        Assert.assertEquals(COMMAND_1_USER, created.getMetadata().getUser());
-        Assert.assertEquals(CommandStatus.ACTIVE, created.getMetadata().getStatus());
-        Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
-        Assert.assertThat(COMMAND_1_CHECK_DELAY, Matchers.is(created.getCheckDelay()));
-        Assert.assertFalse(created.getMemory().isPresent());
+        Assertions.assertThat(created).isNotNull();
+        Assertions.assertThat(created.getId()).isEqualTo(id);
+        Assertions.assertThat(created.getMetadata().getName()).isEqualTo(COMMAND_1_NAME);
+        Assertions.assertThat(created.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
+        Assertions.assertThat(created.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
+        Assertions.assertThat(created.getCheckDelay()).isEqualTo(COMMAND_1_CHECK_DELAY);
+        Assertions.assertThat(created.getMemory()).isNotPresent();
         this.service.deleteCommand(id);
-        try {
-            this.service.getCommand(id);
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                HttpURLConnection.HTTP_NOT_FOUND,
-                ge.getErrorCode()
-            );
-        }
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.service.getCommand(id));
     }
 
     /**
@@ -325,23 +318,17 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             .build();
         final String id = this.service.createCommand(command);
         final Command created = this.service.getCommand(id);
-        Assert.assertNotNull(this.service.getCommand(created.getId()));
-        Assert.assertEquals(COMMAND_1_NAME, created.getMetadata().getName());
-        Assert.assertEquals(COMMAND_1_USER, created.getMetadata().getUser());
-        Assert.assertEquals(CommandStatus.ACTIVE, created.getMetadata().getStatus());
-        Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
-        Assert.assertThat(COMMAND_1_CHECK_DELAY, Matchers.is(created.getCheckDelay()));
-        Assert.assertThat(created.getMemory().orElse(memory + 1), Matchers.is(memory));
+        Assertions.assertThat(created).isNotNull();
+        Assertions.assertThat(created.getMetadata().getName()).isEqualTo(COMMAND_1_NAME);
+        Assertions.assertThat(created.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
+        Assertions.assertThat(created.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
+        Assertions.assertThat(created.getCheckDelay()).isEqualTo(COMMAND_1_CHECK_DELAY);
+        Assertions.assertThat(created.getMemory()).isPresent().contains(memory);
         this.service.deleteCommand(created.getId());
-        try {
-            this.service.getCommand(created.getId());
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                HttpURLConnection.HTTP_NOT_FOUND,
-                ge.getErrorCode()
-            );
-        }
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.service.getCommand(id));
     }
 
     /**
@@ -352,10 +339,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testUpdateCommand() throws GenieException {
         final Command command = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_1_USER, command.getMetadata().getUser());
-        Assert.assertEquals(CommandStatus.ACTIVE, command.getMetadata().getStatus());
-        Assert.assertEquals(3, command.getMetadata().getTags().size());
-        Assert.assertFalse(command.getMemory().isPresent());
+        Assertions.assertThat(command.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
+        Assertions.assertThat(command.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions.assertThat(command.getMetadata().getTags().size()).isEqualTo(3);
+        Assertions.assertThat(command.getMemory()).isNotPresent();
         final Set<String> tags = Sets.newHashSet("yarn", "hadoop");
         tags.addAll(command.getMetadata().getTags());
 
@@ -384,10 +371,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
 
         final Command updated = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_2_USER, updated.getMetadata().getUser());
-        Assert.assertEquals(CommandStatus.INACTIVE, updated.getMetadata().getStatus());
-        Assert.assertEquals(5, updated.getMetadata().getTags().size());
-        Assert.assertThat(updated.getMemory().orElse(memory + 1), Matchers.is(memory));
+        Assertions.assertThat(updated.getMetadata().getUser()).isEqualTo(COMMAND_2_USER);
+        Assertions.assertThat(updated.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.INACTIVE);
+        Assertions.assertThat(updated.getMetadata().getTags().size()).isEqualTo(5);
+        Assertions.assertThat(updated.getMemory()).isPresent().contains(memory);
     }
 
     /**
@@ -395,12 +382,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      *
      * @throws GenieException For any problem
      */
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public void testUpdateCommandWithInvalidCommand() throws GenieException {
         final Command command = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_1_USER, command.getMetadata().getUser());
-        Assert.assertEquals(CommandStatus.ACTIVE, command.getMetadata().getStatus());
-        Assert.assertEquals(3, command.getMetadata().getTags().size());
 
         final Command updateCommand = new Command(
             command.getId(),
@@ -423,7 +407,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             null
         );
 
-        this.service.updateCommand(COMMAND_1_ID, updateCommand);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.service.updateCommand(COMMAND_1_ID, updateCommand));
     }
 
     /**
@@ -451,9 +437,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
         final Command updatedCommand = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(created, updatedCommand.getCreated());
-        Assert.assertNotEquals(updated, updatedCommand.getUpdated());
-        Assert.assertNotEquals(Instant.EPOCH, updatedCommand.getUpdated());
+        Assertions.assertThat(updatedCommand.getCreated()).isEqualTo(created);
+        Assertions.assertThat(updatedCommand.getUpdated()).isNotEqualTo(updated);
+        Assertions.assertThat(updatedCommand.getUpdated()).isNotEqualTo(Instant.EPOCH);
     }
 
     /**
@@ -465,7 +451,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testPatchCommand() throws GenieException, IOException {
         final Command getCommand = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertThat(getCommand.getMetadata().getName(), Matchers.is(COMMAND_1_NAME));
+        Assertions.assertThat(getCommand.getMetadata().getName()).isEqualTo(COMMAND_1_NAME);
         final Instant updateTime = getCommand.getUpdated();
 
         final String patchString
@@ -475,8 +461,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         this.service.patchCommand(COMMAND_1_ID, patch);
 
         final Command updated = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
-        Assert.assertThat(updated.getMetadata().getName(), Matchers.is(COMMAND_2_NAME));
+        Assertions.assertThat(updated.getUpdated()).isNotEqualTo(updateTime);
+        Assertions.assertThat(updated.getMetadata().getName()).isEqualTo(COMMAND_2_NAME);
     }
 
     /**
@@ -486,9 +472,11 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testDeleteAll() throws GenieException {
-        Assert.assertEquals(3, this.service.getCommands(null, null, null, null, PAGE).getNumberOfElements());
+        Assertions
+            .assertThat(this.service.getCommands(null, null, null, null, PAGE).getNumberOfElements())
+            .isEqualTo(3);
         this.service.deleteAllCommands();
-        Assert.assertTrue(this.service.getCommands(null, null, null, null, PAGE).getContent().isEmpty());
+        Assertions.assertThat(this.service.getCommands(null, null, null, null, PAGE).getContent()).isEmpty();
     }
 
     /**
@@ -499,7 +487,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testDelete() throws GenieException {
         List<Command> commands = this.clusterPersistenceService.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assert.assertEquals(3, commands.size());
+        Assertions.assertThat(commands).hasSize(3);
         boolean found = false;
         for (final Command command : commands) {
             if (COMMAND_1_ID.equals(command.getId())) {
@@ -507,11 +495,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
                 break;
             }
         }
-        Assert.assertTrue(found);
+        Assertions.assertThat(found).isTrue();
         // TODO: Fix once Command service goes to V4
-        Set<Command> appCommands
-            = this.appService.getCommandsForApplication(APP_1_ID, null);
-        Assert.assertEquals(1, appCommands.size());
+        Set<Command> appCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        Assertions.assertThat(appCommands).hasSize(1);
         found = false;
         for (final Command command : appCommands) {
             if (COMMAND_1_ID.equals(command.getId())) {
@@ -519,13 +506,13 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
                 break;
             }
         }
-        Assert.assertTrue(found);
+        Assertions.assertThat(found).isTrue();
 
         //Actually delete it
         this.service.deleteCommand(COMMAND_1_ID);
 
         commands = this.clusterPersistenceService.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assert.assertEquals(2, commands.size());
+        Assertions.assertThat(commands).hasSize(2);
         found = false;
         for (final Command command : commands) {
             if (COMMAND_1_ID.equals(command.getId())) {
@@ -533,9 +520,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
                 break;
             }
         }
-        Assert.assertFalse(found);
+        Assertions.assertThat(found).isFalse();
         appCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
-        Assert.assertTrue(appCommands.isEmpty());
+        Assertions.assertThat(appCommands).isEmpty();
 
         //Test a case where the app has no commands to
         //make sure that also works.
@@ -555,13 +542,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
-        Assert.assertEquals(2, this.service.getConfigsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).hasSize(2);
         this.service.addConfigsForCommand(COMMAND_1_ID, newConfigs);
         final Set<String> finalConfigs = this.service.getConfigsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(5, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
+        Assertions.assertThat(finalConfigs).hasSize(5).contains(newConfig1, newConfig2, newConfig3);
     }
 
     /**
@@ -577,13 +561,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
-        Assert.assertEquals(2, this.service.getConfigsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).hasSize(2);
         this.service.updateConfigsForCommand(COMMAND_1_ID, newConfigs);
         final Set<String> finalConfigs = this.service.getConfigsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(3, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
+        Assertions.assertThat(finalConfigs).hasSize(3).contains(newConfig1, newConfig2, newConfig3);
     }
 
     /**
@@ -593,8 +574,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testGetConfigsForCommand() throws GenieException {
-        Assert.assertEquals(2,
-            this.service.getConfigsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).hasSize(2);
     }
 
     /**
@@ -604,9 +584,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testRemoveAllConfigsForCommand() throws GenieException {
-        Assert.assertEquals(2, this.service.getConfigsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).hasSize(2);
         this.service.removeAllConfigsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(0, this.service.getConfigsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
     /**
@@ -617,10 +597,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testRemoveConfigForCommand() throws GenieException {
         final Set<String> configs = this.service.getConfigsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(2, configs.size());
+        Assertions.assertThat(configs).hasSize(2);
         final String removedConfig = configs.iterator().next();
         this.service.removeConfigForCommand(COMMAND_1_ID, removedConfig);
-        Assert.assertFalse(this.service.getConfigsForCommand(COMMAND_1_ID).contains(removedConfig));
+        Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).doesNotContain(removedConfig);
     }
 
     /**
@@ -636,13 +616,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
 
-        Assert.assertEquals(2, this.service.getDependenciesForCommand(COMMAND_3_ID).size());
+        Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_3_ID)).hasSize(2);
         this.service.addDependenciesForCommand(COMMAND_3_ID, newDependencies);
         final Set<String> finalDependencies = this.service.getDependenciesForCommand(COMMAND_3_ID);
-        Assert.assertEquals(5, finalDependencies.size());
-        Assert.assertTrue(finalDependencies.contains(newDependency1));
-        Assert.assertTrue(finalDependencies.contains(newDependency2));
-        Assert.assertTrue(finalDependencies.contains(newDependency3));
+        Assertions.assertThat(finalDependencies).hasSize(5).contains(newDependency1, newDependency2, newDependency3);
     }
 
     /**
@@ -658,13 +635,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
 
-        Assert.assertEquals(0, this.service.getDependenciesForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_1_ID)).isEmpty();
         this.service.updateDependenciesForCommand(COMMAND_1_ID, newDependencies);
         final Set<String> finalDependencies = this.service.getDependenciesForCommand(COMMAND_1_ID);
-        Assert.assertEquals(3, finalDependencies.size());
-        Assert.assertTrue(finalDependencies.contains(newDependency1));
-        Assert.assertTrue(finalDependencies.contains(newDependency2));
-        Assert.assertTrue(finalDependencies.contains(newDependency3));
+        Assertions.assertThat(finalDependencies).hasSize(3).contains(newDependency1, newDependency2, newDependency3);
     }
 
     /**
@@ -674,8 +648,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testGetDependenciesForCommand() throws GenieException {
-        Assert.assertEquals(1,
-            this.service.getDependenciesForCommand(COMMAND_2_ID).size());
+        Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_2_ID)).hasSize(1);
     }
 
     /**
@@ -685,9 +658,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testRemoveAllDependenciesForCommand() throws GenieException {
-        Assert.assertEquals(2, this.service.getDependenciesForCommand(COMMAND_3_ID).size());
+        Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_3_ID)).hasSize(2);
         this.service.removeAllDependenciesForCommand(COMMAND_3_ID);
-        Assert.assertEquals(0, this.service.getDependenciesForCommand(COMMAND_3_ID).size());
+        Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_3_ID)).isEmpty();
     }
 
     /**
@@ -698,10 +671,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testRemoveDependencyForCommand() throws GenieException {
         final Set<String> dependencies = this.service.getDependenciesForCommand(COMMAND_3_ID);
-        Assert.assertEquals(2, dependencies.size());
+        Assertions.assertThat(dependencies).hasSize(2);
         final String removedDependency = dependencies.iterator().next();
         this.service.removeDependencyForCommand(COMMAND_3_ID, removedDependency);
-        Assert.assertFalse(this.service.getDependenciesForCommand(COMMAND_3_ID).contains(removedDependency));
+        Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_3_ID)).doesNotContain(removedDependency);
     }
 
     /**
@@ -711,28 +684,24 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testAddApplicationsForCommand() throws GenieException {
-        Assert.assertTrue(this.service.getApplicationsForCommand(COMMAND_2_ID).isEmpty());
+        Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
-        final List<String> appIds = new ArrayList<>();
-        appIds.add(APP_1_ID);
-        final Set<Command> preCommands
-            = this.appService.getCommandsForApplication(APP_1_ID, null);
-        Assert.assertEquals(1, preCommands.size());
-        Assert.assertEquals(1, preCommands
-            .stream()
-            .filter(command -> COMMAND_1_ID.equals(command.getId()))
-            .count()
-        );
+        final List<String> appIds = Lists.newArrayList(APP_1_ID);
+        final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        Assertions
+            .assertThat(preCommands)
+            .hasSize(1)
+            .hasOnlyOneElementSatisfying(command -> Assertions.assertThat(command.getId()).isEqualTo(COMMAND_1_ID));
 
         this.service.addApplicationsForCommand(COMMAND_2_ID, appIds);
 
-        final Set<Command> savedCommands
-            = this.appService.getCommandsForApplication(APP_1_ID, null);
-        Assert.assertEquals(2, savedCommands.size());
-        Assert.assertThat(
-            this.service.getApplicationsForCommand(COMMAND_2_ID).get(0).getId(),
-            Matchers.is(APP_1_ID)
-        );
+        final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        Assertions.assertThat(savedCommands).hasSize(2);
+        Assertions
+            .assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID))
+            .element(0)
+            .extracting(Application::getId)
+            .isEqualTo(APP_1_ID);
     }
 
     /**
@@ -742,30 +711,22 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testSetApplicationsForCommand() throws GenieException {
-        Assert.assertTrue(this.service.getApplicationsForCommand(COMMAND_2_ID).isEmpty());
+        Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
         final List<String> appIds = Lists.newArrayList(APP_1_ID);
-        final Set<Command> preCommands
-            = this.appService.getCommandsForApplication(APP_1_ID, null);
-        Assert.assertEquals(1, preCommands.size());
-        Assert.assertEquals(1, preCommands
-            .stream()
-            .filter(command -> COMMAND_1_ID.equals(command.getId()))
-            .count()
-        );
+        final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        Assertions
+            .assertThat(preCommands)
+            .hasSize(1)
+            .hasOnlyOneElementSatisfying(command -> Assertions.assertThat(command.getId()).isEqualTo(COMMAND_1_ID));
 
         this.service.setApplicationsForCommand(COMMAND_2_ID, appIds);
 
-        final Set<Command> savedCommands
-            = this.appService.getCommandsForApplication(APP_1_ID, null);
-        Assert.assertEquals(2, savedCommands.size());
-        Assert.assertEquals(
-            1,
-            this.service.getApplicationsForCommand(COMMAND_2_ID)
-                .stream()
-                .filter(application -> APP_1_ID.equals(application.getId()))
-                .count()
-        );
+        final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        Assertions.assertThat(savedCommands).hasSize(2);
+        Assertions
+            .assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID))
+            .hasOnlyOneElementSatisfying(application -> Assertions.assertThat(application.getId()).isEqualTo(APP_1_ID));
     }
 
     /**
@@ -775,11 +736,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testGetApplicationsForCommand() throws GenieException {
-        Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID)
-            .stream()
-            .filter(application -> APP_1_ID.equals(application.getId()))
-            .count()
-        );
+        Assertions
+            .assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID))
+            .hasOnlyOneElementSatisfying(application -> Assertions.assertThat(application.getId()).isEqualTo(APP_1_ID));
     }
 
     /**
@@ -789,9 +748,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testRemoveApplicationsForCommand() throws GenieException {
-        Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).hasSize(1);
         this.service.removeApplicationsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(0, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
     /**
@@ -801,9 +760,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testRemoveApplicationForCommand() throws GenieException {
-        Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).hasSize(1);
         this.service.removeApplicationForCommand(COMMAND_1_ID, APP_1_ID);
-        Assert.assertEquals(0, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
     /**
@@ -819,13 +778,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(3, this.service.getTagsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).hasSize(3);
         this.service.addTagsForCommand(COMMAND_1_ID, newTags);
         final Set<String> finalTags = this.service.getTagsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(6, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
+        Assertions.assertThat(finalTags).hasSize(6).contains(newTag1, newTag2, newTag3);
     }
 
     /**
@@ -841,13 +797,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(3, this.service.getTagsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).hasSize(3);
         this.service.updateTagsForCommand(COMMAND_1_ID, newTags);
         final Set<String> finalTags = this.service.getTagsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(3, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
+        Assertions.assertThat(finalTags).hasSize(3).contains(newTag1, newTag2, newTag3);
     }
 
     /**
@@ -857,7 +810,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testGetTagsForCommand() throws GenieException {
-        Assert.assertEquals(3, this.service.getTagsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).hasSize(3);
     }
 
     /**
@@ -867,9 +820,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testRemoveAllTagsForCommand() throws GenieException {
-        Assert.assertEquals(3, this.service.getTagsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).hasSize(3);
         this.service.removeAllTagsForCommand(COMMAND_1_ID);
-        Assert.assertEquals(0, this.service.getTagsForCommand(COMMAND_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
     /**
@@ -879,9 +832,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testRemoveTagForCommand() throws GenieException {
-        Assert.assertTrue(this.service.getTagsForCommand(COMMAND_1_ID).contains("tez"));
+        Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).contains("tez");
         this.service.removeTagForCommand(COMMAND_1_ID, "tez");
-        Assert.assertFalse(this.service.getTagsForCommand(COMMAND_1_ID).contains("tez"));
+        Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).doesNotContain("tez");
     }
 
     /**
@@ -892,8 +845,10 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testGetCommandsForCommand() throws GenieException {
         final Set<Cluster> clusters = this.service.getClustersForCommand(COMMAND_1_ID, null);
-        Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.iterator().next().getId());
+        Assertions
+            .assertThat(clusters)
+            .hasSize(1)
+            .hasOnlyOneElementSatisfying(cluster -> Assertions.assertThat(cluster.getId()).isEqualTo(CLUSTER_1_ID));
     }
 
     /**
