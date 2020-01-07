@@ -8,7 +8,7 @@ buildscript {
 
     dependencies {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
-        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:8.0.0"
+        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:8.4.1"
         classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
         classpath "org.ajoberstar:gradle-git-publish:2.1.1"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
@@ -17,20 +17,8 @@ buildscript {
         classpath "com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1"
         classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
         classpath "io.franzbecker:gradle-lombok:3.2.0"
-        /*
-         * TODO: Upgrading to 1.3.1 caused problems
-         * A problem was found with the configuration of task ':genie-ui:npmInstall'.
-         * > File '{somePath}/genie/genie-ui/package-lock.json' specified for property '$2' does not exist.
-         */
-        classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
-        /*
-         * TODO: Failed when upgrading to 2.0.0. Looks like a Guava version problem (surprise)
-         * Execution failed for task ':genie-agent:spotbugsIntegTest'.
-         * > Failed to run Gradle SpotBugs Worker
-         *   > Could not create an instance of type com.github.spotbugs.internal.spotbugs.SpotBugsExecutor.
-         *      > com.google.common.collect.ImmutableList.builderWithExpectedSize(I)Lcom/google/common/collect/ImmutableList$Builder;
-         */
-        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.9"
+        classpath "com.netflix.nebula:nebula-node-plugin:1.3.0"
+        classpath "com.github.spotbugs:spotbugs-gradle-plugin:3.0.0"
     }
 }
 
