@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -68,6 +69,7 @@ public class Command extends ExecutionEnvironmentDTO {
         message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
     )
     private final Integer memory;
+    private final List<Criterion> clusterCriteria;
 
     /**
      * Constructor used by the builder.
@@ -88,6 +90,7 @@ public class Command extends ExecutionEnvironmentDTO {
         } else {
             throw new IllegalArgumentException("Cannot build command without 'executable' OR 'executableAndArguments'");
         }
+        this.clusterCriteria = ImmutableList.copyOf(builder.bClusterCriteria);
     }
 
     /**
@@ -110,6 +113,7 @@ public class Command extends ExecutionEnvironmentDTO {
         private final CommandStatus bStatus;
         private final long bCheckDelay;
         private final List<String> bExecutableAndArguments = Lists.newArrayList();
+        private final List<Criterion> bClusterCriteria = Lists.newArrayList();
         private String bExecutable;
         private Integer bMemory;
 
@@ -225,6 +229,21 @@ public class Command extends ExecutionEnvironmentDTO {
             this.bExecutableAndArguments.clear();
             if (executableAndArguments != null) {
                 this.bExecutableAndArguments.addAll(executableAndArguments);
+            }
+            return this;
+        }
+
+        /**
+         * Set the ordered list of {@link Criterion} that should be used to resolve which clusters this command
+         * can run on at any given time.
+         *
+         * @param clusterCriteria The {@link Criterion} in priority order
+         * @return The builder
+         */
+        public Builder withClusterCriteria(@Nullable final List<Criterion> clusterCriteria) {
+            this.bClusterCriteria.clear();
+            if (clusterCriteria != null) {
+                this.bClusterCriteria.addAll(clusterCriteria);
             }
             return this;
         }

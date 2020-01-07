@@ -311,7 +311,8 @@ class JobResolverServiceImplSpec extends Specification {
             ).withTags(commandTags).build(),
             Lists.newArrayList(UUID.randomUUID().toString()),
             null,
-            100L
+            100L,
+            null
         )
 
         when:
@@ -524,7 +525,8 @@ class JobResolverServiceImplSpec extends Specification {
                 .build(),
             executable,
             null,
-            100L
+            100L,
+            null
         )
     }
 

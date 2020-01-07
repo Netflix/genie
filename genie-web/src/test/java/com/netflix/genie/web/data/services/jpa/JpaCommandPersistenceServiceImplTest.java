@@ -145,7 +145,8 @@ class JpaCommandPersistenceServiceImplTest {
                         ).build(),
                         Lists.newArrayList(UUID.randomUUID().toString()),
                         null,
-                        1803L
+                        1803L,
+                        null
                     )
                 )
             );

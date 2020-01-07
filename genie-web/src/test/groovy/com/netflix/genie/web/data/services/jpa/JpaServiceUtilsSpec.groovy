@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.UserResourcesSummary
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.data.entities.ApplicationEntity
@@ -234,6 +235,25 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setCheckDelay(checkDelay)
         def memory = 10_241
         entity.setMemory(memory)
+        def clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        )
+        def clusterCriteriaEntities = clusterCriteria.collect(
+            {
+                def criterionEntity = new CriterionEntity()
+                it.getId().ifPresent(criterionEntity.&setUniqueId)
+                it.getName().ifPresent(criterionEntity.&setName)
+                it.getVersion().ifPresent(criterionEntity.&setVersion)
+                it.getStatus().ifPresent(criterionEntity.&setStatus)
+                criterionEntity.setTags(it.getTags().collect({ tag -> new TagEntity(tag) }).toSet())
+                criterionEntity
+            }
+        )
+        entity.setClusterCriteria(clusterCriteriaEntities)
 
         when:
         def command = JpaServiceUtils.toCommandDto(entity)
@@ -256,6 +276,7 @@ class JpaServiceUtilsSpec extends Specification {
         command.getMemory().orElseGet(RandomSuppliers.INT) == memory
         command.getMetadata().isPresent()
         GenieObjectMapper.getMapper().writeValueAsString(command.getMetadata().get()) == metadata
+        command.getClusterCriteria() == clusterCriteria
     }
 
     def "Can convert Job Projection of Job Entity to Job DTO"() {

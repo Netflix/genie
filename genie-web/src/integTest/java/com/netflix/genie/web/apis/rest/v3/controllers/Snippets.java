@@ -772,6 +772,14 @@ final class Snippets {
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "dependencies"))
                 .description("The dependencies for the command")
                 .type(JsonFieldType.ARRAY)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("clusterCriteria")
+                .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "clusterCriteria"))
+                .description(
+                    "The priority ordered list of criteria to resolve clusters that this command can run jobs on"
+                )
+                .type(JsonFieldType.ARRAY)
                 .optional()
         );
     }

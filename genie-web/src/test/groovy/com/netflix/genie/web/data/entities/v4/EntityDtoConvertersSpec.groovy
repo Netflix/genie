@@ -243,6 +243,25 @@ class EntityDtoConvertersSpec extends Specification {
         entity.setCheckDelay(checkDelay)
         def memory = 10_241
         entity.setMemory(memory)
+        def clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        )
+        def clusterCriteriaEntities = clusterCriteria.collect(
+            {
+                def criterionEntity = new CriterionEntity()
+                it.getId().ifPresent(criterionEntity.&setUniqueId)
+                it.getName().ifPresent(criterionEntity.&setName)
+                it.getVersion().ifPresent(criterionEntity.&setVersion)
+                it.getStatus().ifPresent(criterionEntity.&setStatus)
+                criterionEntity.setTags(it.getTags().collect({ tag -> new TagEntity(tag) }).toSet())
+                criterionEntity
+            }
+        )
+        entity.setClusterCriteria(clusterCriteriaEntities)
 
         when:
         def command = EntityDtoConverters.toV4CommandDto(entity)
@@ -265,6 +284,7 @@ class EntityDtoConvertersSpec extends Specification {
         command.getMetadata().getMetadata().isPresent()
         GenieObjectMapper.getMapper().writeValueAsString(command.getMetadata().getMetadata().get()) == metadata
         command.getCheckDelay() == checkDelay
+        command.getClusterCriteria() == clusterCriteria
     }
 
     def "Can convert job request projection to V4 job request DTO"() {
@@ -890,6 +910,7 @@ class EntityDtoConvertersSpec extends Specification {
             getDependencies() >> []
             getMemory() >> Optional.empty()
             getCheckDelay() >> 100
+            getClusterCriteria() >> []
         }
 
         ClusterEntity clusterEntity = Mock(ClusterEntity) {
