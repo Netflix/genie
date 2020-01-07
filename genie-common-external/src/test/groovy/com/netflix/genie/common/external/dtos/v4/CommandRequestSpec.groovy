@@ -18,6 +18,7 @@
 package com.netflix.genie.common.external.dtos.v4
 
 import com.google.common.collect.Lists
+import com.google.common.collect.Sets
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import spock.lang.Specification
 
@@ -40,6 +41,13 @@ class CommandRequestSpec extends Specification {
         def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def memory = 3_820
         def checkDelay = 380_324L
+        def clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        )
         CommandRequest request
 
         when:
@@ -48,6 +56,7 @@ class CommandRequestSpec extends Specification {
             .withResources(resources)
             .withMemory(memory)
             .withCheckDelay(checkDelay)
+            .withClusterCriteria(clusterCriteria)
             .build()
 
         then:
@@ -57,6 +66,7 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         request.getMemory().orElse(-1) == memory
         request.getCheckDelay().orElse(null) == checkDelay
+        request.getClusterCriteria() == clusterCriteria
 
         when:
         request = new CommandRequest.Builder(metadata, executable).build()
@@ -68,6 +78,7 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         !request.getMemory().isPresent()
         !request.getCheckDelay().isPresent()
+        request.getClusterCriteria().isEmpty()
 
         when: "Optional fields are blank they're ignored"
         def newExecutable = Lists.newArrayList(executable)
@@ -79,6 +90,7 @@ class CommandRequestSpec extends Specification {
             .withResources(resources)
             .withMemory(memory)
             .withCheckDelay(checkDelay)
+            .withClusterCriteria(null)
             .build()
 
         then:
@@ -88,6 +100,7 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         request.getMemory().orElse(-1) == memory
         request.getCheckDelay().orElse(null) == checkDelay
+        request.getClusterCriteria().isEmpty()
     }
 
     def "Test equals"() {
@@ -215,6 +228,9 @@ class CommandRequestSpec extends Specification {
             .withResources(resources)
             .withMemory(RandomSuppliers.INT.get())
             .withCheckDelay(RandomSuppliers.LONG.get())
+            .withClusterCriteria(
+                Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build())
+            )
             .build()
     }
 }

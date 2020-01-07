@@ -551,6 +551,7 @@ class DtoConvertersSpec extends Specification {
         )
         def setupFile = UUID.randomUUID().toString()
         def checkDelay = 380_234L
+        def clusterCriteria = Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build())
         com.netflix.genie.common.dto.Command v3Command
         CommandRequest commandRequest
 
@@ -571,6 +572,7 @@ class DtoConvertersSpec extends Specification {
             .withDependencies(dependencies)
             .withSetupFile(setupFile)
             .withMemory(memory)
+            .withClusterCriteria(clusterCriteria)
             .build()
         commandRequest = DtoConverters.toV4CommandRequest(v3Command)
 
@@ -591,6 +593,7 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
         commandRequest.getCheckDelay().orElse(null) == checkDelay
+        commandRequest.getClusterCriteria() == clusterCriteria
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
@@ -620,6 +623,7 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
         commandRequest.getCheckDelay().orElse(null) == checkDelay
+        commandRequest.getClusterCriteria().isEmpty()
     }
 
     def "Can convert V3 Command to V4 Command"() {
@@ -653,6 +657,9 @@ class DtoConvertersSpec extends Specification {
         def created = Instant.now()
         def updated = Instant.now()
         def checkDelay = 987_345L
+        def clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        )
         Command v4Command
         com.netflix.genie.common.dto.Command v3Command
 
@@ -675,6 +682,7 @@ class DtoConvertersSpec extends Specification {
             .withTags(tags)
             .withDescription(description)
             .withMemory(memory)
+            .withClusterCriteria(clusterCriteria)
             .build()
         v4Command = DtoConverters.toV4Command(v3Command)
 
@@ -697,6 +705,7 @@ class DtoConvertersSpec extends Specification {
         v4Command.getResources().getConfigs() == configs
         v4Command.getResources().getDependencies() == dependencies
         v4Command.getResources().getSetupFile().orElse(null) == setupFile
+        v4Command.getClusterCriteria() == clusterCriteria
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
@@ -728,6 +737,7 @@ class DtoConvertersSpec extends Specification {
         v4Command.getResources().getConfigs().isEmpty()
         v4Command.getResources().getDependencies().isEmpty()
         !v4Command.getResources().getSetupFile().isPresent()
+        v4Command.getClusterCriteria().isEmpty()
     }
 
     def "Can convert V4 Command to V3 Command"() {
@@ -758,6 +768,7 @@ class DtoConvertersSpec extends Specification {
         def setupFile = UUID.randomUUID().toString()
         def created = Instant.now()
         def updated = Instant.now()
+        def clusterCriteria = Lists.newArrayList(new Criterion.Builder().withName(UUID.randomUUID().toString()).build())
         def checkDelay = 987_345L
         Command v4Command
         com.netflix.genie.common.dto.Command v3Command
@@ -779,7 +790,8 @@ class DtoConvertersSpec extends Specification {
                 .build(),
             executable,
             memory,
-            checkDelay
+            checkDelay,
+            clusterCriteria
         )
         v3Command = DtoConverters.toV3Command(v4Command)
 
@@ -801,6 +813,7 @@ class DtoConvertersSpec extends Specification {
         v3Command.getExecutable() == binary + ' ' + defaultBinaryArgument
         v3Command.getMemory().orElse(-1) == memory
         v3Command.getCheckDelay() == checkDelay
+        v3Command.getClusterCriteria() == clusterCriteria
 
         when:
         v4Command = new Command(
@@ -811,7 +824,8 @@ class DtoConvertersSpec extends Specification {
             new CommandMetadata.Builder(name, user, version, status).build(),
             executable,
             null,
-            checkDelay
+            checkDelay,
+            null
         )
         v3Command = DtoConverters.toV3Command(v4Command)
 
@@ -832,6 +846,7 @@ class DtoConvertersSpec extends Specification {
         v3Command.getExecutable() == binary + ' ' + defaultBinaryArgument
         !v3Command.getMemory().isPresent()
         v3Command.getCheckDelay() == checkDelay
+        v3Command.getClusterCriteria().isEmpty()
     }
 
     def "Can convert V4 Job Request to V3"() {

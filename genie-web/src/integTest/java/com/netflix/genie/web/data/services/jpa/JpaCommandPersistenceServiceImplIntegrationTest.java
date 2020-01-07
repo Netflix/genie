@@ -377,7 +377,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .build(),
             command.getExecutable(),
             memory,
-            command.getCheckDelay()
+            command.getCheckDelay(),
+            null
         );
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
@@ -418,7 +419,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .build(),
             command.getExecutable(),
             null,
-            command.getCheckDelay()
+            command.getCheckDelay(),
+            null
         );
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);
@@ -443,7 +445,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             init.getMetadata(),
             init.getExecutable(),
             init.getMemory().orElse(null),
-            init.getCheckDelay()
+            init.getCheckDelay(),
+            init.getClusterCriteria()
         );
 
         this.service.updateCommand(COMMAND_1_ID, updateCommand);

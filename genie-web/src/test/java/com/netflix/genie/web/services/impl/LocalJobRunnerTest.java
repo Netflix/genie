@@ -191,7 +191,8 @@ public class LocalJobRunnerTest {
             new CommandMetadata.Builder(COMMAND_NAME, USER, VERSION, CommandStatus.ACTIVE).build(),
             Lists.newArrayList("foo"),
             null,
-            5000L
+            5000L,
+            null
         );
 
         final int memory = 2438;

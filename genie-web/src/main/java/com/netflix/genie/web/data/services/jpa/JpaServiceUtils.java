@@ -149,6 +149,13 @@ public final class JpaServiceUtils {
         commandEntity.getDescription().ifPresent(builder::withDescription);
         commandEntity.getSetupFile().ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
         setDtoMetadata(builder, commandEntity);
+        builder.withClusterCriteria(
+            commandEntity
+                .getClusterCriteria()
+                .stream()
+                .map(EntityDtoConverters::toCriterionDto)
+                .collect(Collectors.toList())
+        );
 
         return builder.build();
     }

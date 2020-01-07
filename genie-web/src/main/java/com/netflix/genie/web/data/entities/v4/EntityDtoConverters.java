@@ -170,7 +170,12 @@ public final class EntityDtoConverters {
             metadataBuilder.build(),
             commandEntity.getExecutable(),
             commandEntity.getMemory().orElse(null),
-            commandEntity.getCheckDelay()
+            commandEntity.getCheckDelay(),
+            commandEntity
+                .getClusterCriteria()
+                .stream()
+                .map(EntityDtoConverters::toCriterionDto)
+                .collect(Collectors.toList())
         );
     }
 

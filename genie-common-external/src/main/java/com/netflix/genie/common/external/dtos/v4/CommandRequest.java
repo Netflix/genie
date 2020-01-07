@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -65,6 +66,7 @@ public class CommandRequest extends CommonRequestImpl {
     // TODO: This is here for backwards compatibility with Genie 3 while the agent is in development
     //       It will no longer be relevant once the agent is 1 to 1 with a job and not polling
     private final Long checkDelay;
+    private final ImmutableList<Criterion> clusterCriteria;
 
     private CommandRequest(final Builder builder) {
         super(builder);
@@ -72,6 +74,7 @@ public class CommandRequest extends CommonRequestImpl {
         this.executable = builder.bExecutable;
         this.memory = builder.bMemory;
         this.checkDelay = builder.bCheckDelay;
+        this.clusterCriteria = ImmutableList.copyOf(builder.bClusterCriteria);
     }
 
     /**
@@ -103,6 +106,15 @@ public class CommandRequest extends CommonRequestImpl {
     }
 
     /**
+     * Get the ordered list of {@link Criterion} for this command to resolve clusters are runtime.
+     *
+     * @return The ordered list of {@link Criterion} as an immutable list. Any attempt to modify will throw an exception
+     */
+    public List<Criterion> getClusterCriteria() {
+        return this.clusterCriteria;
+    }
+
+    /**
      * Builder for a V4 Command Request.
      *
      * @author tgianos
@@ -112,6 +124,7 @@ public class CommandRequest extends CommonRequestImpl {
 
         private final CommandMetadata bMetadata;
         private final ImmutableList<String> bExecutable;
+        private final List<Criterion> bClusterCriteria = Lists.newArrayList();
         private Integer bMemory;
         private Long bCheckDelay;
 
@@ -157,6 +170,21 @@ public class CommandRequest extends CommonRequestImpl {
          */
         public Builder withCheckDelay(@Nullable final Long checkDelay) {
             this.bCheckDelay = checkDelay;
+            return this;
+        }
+
+        /**
+         * Set the ordered list of {@link Criterion} that should be used to resolve which clusters this command
+         * can run on at any given time.
+         *
+         * @param clusterCriteria The {@link Criterion} in priority order
+         * @return The builder
+         */
+        public Builder withClusterCriteria(@Nullable final List<Criterion> clusterCriteria) {
+            this.bClusterCriteria.clear();
+            if (clusterCriteria != null) {
+                this.bClusterCriteria.addAll(clusterCriteria);
+            }
             return this;
         }
 

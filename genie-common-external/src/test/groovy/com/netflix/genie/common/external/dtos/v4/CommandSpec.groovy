@@ -18,6 +18,7 @@
 package com.netflix.genie.common.external.dtos.v4
 
 import com.google.common.collect.Lists
+import com.google.common.collect.Sets
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import spock.lang.Specification
 
@@ -44,6 +45,13 @@ class CommandSpec extends Specification {
         def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def memory = 280
         def checkDelay = 389_132L
+        def clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        )
         Command command
 
         when:
@@ -55,7 +63,8 @@ class CommandSpec extends Specification {
             metadata,
             executable,
             memory,
-            checkDelay
+            checkDelay,
+            clusterCriteria
         )
 
         then:
@@ -67,6 +76,7 @@ class CommandSpec extends Specification {
         command.getExecutable() == executable
         command.getMemory().orElse(-1) == memory
         command.getCheckDelay() == checkDelay
+        command.getClusterCriteria() == clusterCriteria
 
         when:
         command = new Command(
@@ -77,7 +87,8 @@ class CommandSpec extends Specification {
             metadata,
             executable,
             null,
-            checkDelay
+            checkDelay,
+            null
         )
 
         then:
@@ -89,6 +100,7 @@ class CommandSpec extends Specification {
         command.getExecutable() == executable
         !command.getMemory().isPresent()
         command.getCheckDelay() == checkDelay
+        command.getClusterCriteria().isEmpty()
 
         when: "Executables contain blank strings they are removed"
         def newExecutable = Lists.newArrayList(executable)
@@ -102,7 +114,8 @@ class CommandSpec extends Specification {
             metadata,
             newExecutable,
             null,
-            checkDelay
+            checkDelay,
+            null
         )
 
         then:
@@ -114,6 +127,7 @@ class CommandSpec extends Specification {
         command.getExecutable() == executable
         !command.getMemory().isPresent()
         command.getCheckDelay() == checkDelay
+        command.getClusterCriteria().isEmpty()
     }
 
     def "Test equals"() {
@@ -141,7 +155,8 @@ class CommandSpec extends Specification {
             Mock(CommandMetadata),
             Lists.newArrayList(UUID.randomUUID().toString()),
             RandomSuppliers.INT.get(),
-            RandomSuppliers.LONG.get()
+            RandomSuppliers.LONG.get(),
+            null
         )
 
         then:
@@ -166,8 +181,28 @@ class CommandSpec extends Specification {
         def updated = Instant.now()
         def memory = RandomSuppliers.INT.get()
         def checkDelay = RandomSuppliers.LONG.get()
-        base = new Command(id, created, updated, null, baseMetadata, Lists.newArrayList(binary), memory, checkDelay)
-        comparable = new Command(id, created, updated, null, comparableMetadata, Lists.newArrayList(binary), memory, checkDelay)
+        base = new Command(
+            id,
+            created,
+            updated,
+            null,
+            baseMetadata,
+            Lists.newArrayList(binary),
+            memory,
+            checkDelay,
+            null
+        )
+        comparable = new Command(
+            id,
+            created,
+            updated,
+            null,
+            comparableMetadata,
+            Lists.newArrayList(binary),
+            memory,
+            checkDelay,
+            null
+        )
 
         then:
         base == comparable
@@ -204,8 +239,28 @@ class CommandSpec extends Specification {
         def updated = Instant.now()
         def memory = RandomSuppliers.INT.get()
         def checkDelay = RandomSuppliers.LONG.get()
-        one = new Command(id, created, updated, null, baseMetadata, Lists.newArrayList(binary), memory, checkDelay)
-        two = new Command(id, created, updated, null, comparableMetadata, Lists.newArrayList(binary), memory, checkDelay)
+        one = new Command(
+            id,
+            created,
+            updated,
+            null,
+            baseMetadata,
+            Lists.newArrayList(binary),
+            memory,
+            checkDelay,
+            null
+        )
+        two = new Command(
+            id,
+            created,
+            updated,
+            null,
+            comparableMetadata,
+            Lists.newArrayList(binary),
+            memory,
+            checkDelay,
+            null
+        )
 
         then:
         one.hashCode() == two.hashCode()
@@ -242,8 +297,28 @@ class CommandSpec extends Specification {
         def updated = Instant.now()
         def memory = RandomSuppliers.INT.get()
         def checkDelay = RandomSuppliers.LONG.get()
-        one = new Command(id, created, updated, null, baseMetadata, Lists.newArrayList(binary), memory, checkDelay)
-        two = new Command(id, created, updated, null, comparableMetadata, Lists.newArrayList(binary), memory, checkDelay)
+        one = new Command(
+            id,
+            created,
+            updated,
+            null,
+            baseMetadata,
+            Lists.newArrayList(binary),
+            memory,
+            checkDelay,
+            null
+        )
+        two = new Command(
+            id,
+            created,
+            updated,
+            null,
+            comparableMetadata,
+            Lists.newArrayList(binary),
+            memory,
+            checkDelay,
+            null
+        )
 
         then:
         one.toString() == two.toString()
@@ -262,6 +337,9 @@ class CommandSpec extends Specification {
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def memory = RandomSuppliers.INT.get()
         def checkDelay = RandomSuppliers.LONG.get()
+        def clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString())
+        )
         return new Command(
             id,
             created,
@@ -270,7 +348,8 @@ class CommandSpec extends Specification {
             metadata,
             Lists.newArrayList(UUID.randomUUID().toString()),
             memory,
-            checkDelay
+            checkDelay,
+            clusterCriteria
         )
     }
 }

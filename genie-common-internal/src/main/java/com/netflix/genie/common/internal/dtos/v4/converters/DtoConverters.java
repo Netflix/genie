@@ -309,6 +309,7 @@ public final class DtoConverters {
                 v3Command.getSetupFile().orElse(null)
             )
         );
+        builder.withClusterCriteria(v3Command.getClusterCriteria());
 
         return builder.build();
     }
@@ -348,7 +349,8 @@ public final class DtoConverters {
             metadataBuilder.build(),
             v3Command.getExecutableAndArguments(),
             v3Command.getMemory().orElse(null),
-            v3Command.getCheckDelay()
+            v3Command.getCheckDelay(),
+            v3Command.getClusterCriteria()
         );
     }
 
@@ -377,7 +379,8 @@ public final class DtoConverters {
             .withConfigs(resources.getConfigs())
             .withDependencies(resources.getDependencies())
             .withCreated(v4Command.getCreated())
-            .withUpdated(v4Command.getUpdated());
+            .withUpdated(v4Command.getUpdated())
+            .withClusterCriteria(v4Command.getClusterCriteria());
 
         commandMetadata.getDescription().ifPresent(builder::withDescription);
         commandMetadata.getMetadata().ifPresent(builder::withMetadata);
