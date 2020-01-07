@@ -164,12 +164,6 @@
         <!-- Checks the placement of left curly braces on types, methods and other blocks. -->
         <module name="LeftCurly"/>
 
-        <!-- Checks for long lines. -->
-        <module name="LineLength">
-            <property name="max" value="120"/>
-            <property name="ignorePattern" value="\$File.*\$"/>
-        </module>
-
         <!-- Checks that local final variable names conform to a format specified by the format property. -->
         <module name="LocalFinalVariableName"/>
 
@@ -297,6 +291,12 @@
         <module name="WhitespaceAround"/>
 
         <module name="SuppressWarningsHolder"/>
+    </module>
+
+    <!-- Checks for long lines. -->
+    <module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="\$File.*\$"/>
     </module>
 
     <!-- Detects duplicated keys in properties files. -->
