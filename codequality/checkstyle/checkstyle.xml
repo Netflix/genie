@@ -143,7 +143,6 @@
             <property name="scope" value="public"/>
             <property name="allowThrowsTagsForSubclasses" value="true"/>
             <property name="allowUndeclaredRTE" value="true"/>
-            <property name="allowMissingPropertyJavadoc" value="true"/>
         </module>
 
         <!-- Custom Checkstyle Check to validate Javadoc. -->
@@ -187,6 +186,11 @@
         <!-- Checks the padding between the identifier of a method definition, constructor definition, method call, or
              constructor invocation; and the left parenthesis of the parameter list. -->
         <module name="MethodParamPad"/>
+
+        <!-- Checks for missing Javadoc comments for a method or constructor. -->
+        <module name="MissingJavadocMethod">
+            <property name="allowMissingPropertyJavadoc" value="true"/>
+        </module>
 
         <!-- This class is used to verify that the java.lang.Override annotation is present when the {@inheritDoc}
              javadoc tag is present. -->

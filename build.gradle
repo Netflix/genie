@@ -1,3 +1,4 @@
+import com.github.spotbugs.SpotBugsTask
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
@@ -298,6 +299,7 @@ configure(javaProjects) {
 
     checkstyle {
         configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
+        toolVersion = "8.27"
     }
 
     spotbugs {
@@ -307,7 +309,7 @@ configure(javaProjects) {
     spotbugsIntegTest.enabled = false
     spotbugsSmokeTest.enabled = false
 
-    tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    tasks.withType(SpotBugsTask) {
         reports {
             xml.enabled = false
             html.enabled = true
