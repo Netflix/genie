@@ -18,11 +18,13 @@
 package com.netflix.genie.web.data.services.jpa;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
+import com.netflix.genie.web.data.entities.CriterionEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.TagEntity;
 import com.netflix.genie.web.data.entities.UniqueIdEntity;
@@ -228,5 +230,21 @@ class JpaBaseService {
      */
     Optional<CommandEntity> getCommandEntity(@NotBlank(message = "No command id entered") final String id) {
         return this.commandRepository.findByUniqueId(id);
+    }
+
+    /**
+     * Create a {@link CriterionEntity} from the given {@link Criterion}.
+     *
+     * @param criterion The criterion to convert
+     * @return A matching {@link CriterionEntity}
+     */
+    CriterionEntity toCriterionEntity(final Criterion criterion) {
+        final CriterionEntity criterionEntity = new CriterionEntity();
+        criterion.getId().ifPresent(criterionEntity::setUniqueId);
+        criterion.getName().ifPresent(criterionEntity::setName);
+        criterion.getVersion().ifPresent(criterionEntity::setVersion);
+        criterion.getStatus().ifPresent(criterionEntity::setStatus);
+        criterionEntity.setTags(this.createAndGetTagEntities(criterion.getTags()));
+        return criterionEntity;
     }
 }

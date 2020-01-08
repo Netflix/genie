@@ -19,18 +19,21 @@ package com.netflix.genie.web.data.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.CommandRequest;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -395,4 +398,71 @@ public interface CommandPersistenceService {
         @NotBlank(message = "No command id entered. Unable to get clusters.") String id,
         @Nullable Set<ClusterStatus> statuses
     ) throws GenieException;
+
+    /**
+     * For the given command {@literal id} return the Cluster {@link Criterion} in priority order that is currently
+     * associated with this command if any.
+     *
+     * @param id The id of the command to get the criteria for
+     * @return The cluster criteria in priority order
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    List<Criterion> getClusterCriteriaForCommand(String id) throws GenieNotFoundException;
+
+    /**
+     * Add a new {@link Criterion} to the existing list of cluster criteria for the command identified by {@literal id}.
+     * This new criterion will be the lowest priority criterion.
+     *
+     * @param id        The id of the command to add to
+     * @param criterion The new {@link Criterion} to add
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    void addClusterCriterionForCommand(String id, @Valid Criterion criterion) throws GenieNotFoundException;
+
+    /**
+     * Add a new {@link Criterion} to the existing list of cluster criteria for the command identified by {@literal id}.
+     * The {@literal priority} is the place in the list this new criterion should be placed. A value of {@literal 0}
+     * indicates it should be placed at the front of the list with the highest possible priority. {@literal 1} would be
+     * second in the list etc. If {@literal priority} is {@literal >} the current size of the cluster criteria list
+     * this new criterion will be placed at the end as the lowest priority item.
+     *
+     * @param id        The id of the command to add to
+     * @param criterion The new {@link Criterion} to add
+     * @param priority  The place in the existing cluster criteria list this new criterion should be placed. Min 0.
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    void addClusterCriterionForCommand(
+        String id,
+        @Valid Criterion criterion,
+        @Min(0) int priority
+    ) throws GenieNotFoundException;
+
+    /**
+     * For the command identified by {@literal id} reset the entire list of cluster criteria to match the contents of
+     * {@literal clusterCriteria}.
+     *
+     * @param id              The id of the command to set the cluster criteria for
+     * @param clusterCriteria The priority list of {@link Criterion} to set
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    void setClusterCriteriaForCommand(String id, List<@Valid Criterion> clusterCriteria) throws GenieNotFoundException;
+
+    /**
+     * Remove the {@link Criterion} with the given {@literal priority} from the current list of cluster criteria
+     * associated with the command identified by {@literal id}. A value of {@literal 0} for {@literal priority}
+     * will result in the first element in the list being removed, {@literal 1} the second element and so on.
+     *
+     * @param id       The id of the command to remove the criterion from
+     * @param priority The priority of the criterion to remove
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    void removeClusterCriterionForCommand(String id, @Min(0) int priority) throws GenieNotFoundException;
+
+    /**
+     * Remove all the {@link Criterion} currently associated with the command identified by {@literal id}.
+     *
+     * @param id The id of the command to remove the criteria from
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    void removeAllClusterCriteriaForCommand(String id) throws GenieNotFoundException;
 }

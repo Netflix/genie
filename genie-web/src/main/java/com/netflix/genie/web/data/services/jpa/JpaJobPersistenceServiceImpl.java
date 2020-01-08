@@ -829,16 +829,6 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return jobEntity;
     }
 
-    private CriterionEntity toCriterionEntity(final Criterion criterion) {
-        final CriterionEntity criterionEntity = new CriterionEntity();
-        criterion.getId().ifPresent(criterionEntity::setUniqueId);
-        criterion.getName().ifPresent(criterionEntity::setName);
-        criterion.getVersion().ifPresent(criterionEntity::setVersion);
-        criterion.getStatus().ifPresent(criterionEntity::setStatus);
-        criterionEntity.setTags(this.createAndGetTagEntities(criterion.getTags()));
-        return criterionEntity;
-    }
-
     private void setJobMetadataFields(final JobEntity jobEntity, final JobMetadata jobMetadata) {
         // Required fields
         jobEntity.setName(jobMetadata.getName());

@@ -35,12 +35,14 @@ import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
 import com.netflix.genie.common.external.dtos.v4.CommandRequest;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
+import com.netflix.genie.web.data.entities.CriterionEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.TagEntity;
 import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
@@ -61,6 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -71,7 +74,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the CommandPersistenceService interface.
+ * Implementation of the {@link CommandPersistenceService} interface.
  *
  * @author amsharma
  * @author tgianos
@@ -537,6 +540,117 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Criterion> getClusterCriteriaForCommand(final String id) throws GenieNotFoundException {
+        log.debug("[getClusterCriteriaForCommand] Called to get cluster criteria for command {}", id);
+        final CommandEntity commandEntity = this.findCommand(id);
+        // Note: Throws GenieRuntimeException if unable to convert
+        return commandEntity
+            .getClusterCriteria()
+            .stream()
+            .map(EntityDtoConverters::toCriterionDto)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addClusterCriterionForCommand(
+        final String id,
+        @Valid final Criterion criterion
+    ) throws GenieNotFoundException {
+        log.debug("[addClusterCriterionForCommand] Called to add cluster criteria {} for command {}", criterion, id);
+        final CommandEntity commandEntity = this.findCommand(id);
+        commandEntity.addClusterCriterion(this.toCriterionEntity(criterion));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addClusterCriterionForCommand(
+        final String id,
+        @Valid final Criterion criterion,
+        @Min(0) final int priority
+    ) throws GenieNotFoundException {
+        log.debug(
+            "[addClusterCriterionForCommand] Called to add cluster criteria {} for command {} at priority {}",
+            criterion,
+            id,
+            priority
+        );
+        final CommandEntity commandEntity = this.findCommand(id);
+        commandEntity.addClusterCriterion(this.toCriterionEntity(criterion), priority);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setClusterCriteriaForCommand(
+        final String id,
+        final List<@Valid Criterion> clusterCriteria
+    ) throws GenieNotFoundException {
+        log.debug(
+            "[setClusterCriteriaForCommand] Called to set cluster criteria {} for command {}",
+            clusterCriteria,
+            id
+        );
+        final CommandEntity commandEntity = this.findCommand(id);
+        // First remove all the old criteria
+        this.deleteAllClusterCriteria(commandEntity);
+        // Set the new criteria
+        commandEntity.setClusterCriteria(
+            clusterCriteria
+                .stream()
+                .map(this::toCriterionEntity)
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeClusterCriterionForCommand(
+        final String id,
+        @Min(0) final int priority
+    ) throws GenieNotFoundException {
+        log.debug(
+            "[removeClusterCriterionForCommand] Called to remove cluster criterion with priority {} from command {}",
+            priority,
+            id
+        );
+        final CommandEntity commandEntity = this.findCommand(id);
+        if (priority >= commandEntity.getClusterCriteria().size()) {
+            throw new GenieNotFoundException(
+                "No criterion with priority " + priority + " exists for command " + id + ". Unable to remove."
+            );
+        }
+        try {
+            final CriterionEntity criterionEntity = commandEntity.removeClusterCriterion(priority);
+            log.debug("Successfully removed cluster criterion {} from command {}", criterionEntity, id);
+            // Ensure this dangling criterion is deleted from the database
+            this.getCriterionRepository().delete(criterionEntity);
+        } catch (final IllegalArgumentException e) {
+            log.error("Failed to remove cluster criterion with priority {} from command {}", priority, id, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllClusterCriteriaForCommand(final String id) throws GenieNotFoundException {
+        log.debug("[removeAllClusterCriteriaForCommand] Called to remove all cluster criteria from command {}", id);
+        this.deleteAllClusterCriteria(this.findCommand(id));
+    }
+
+    /**
      * Helper method to find a command entity.
      *
      * @param id The id of the command to find
@@ -561,6 +675,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         this.setEntityResources(resources, entity::setConfigs, entity::setDependencies, entity::setSetupFile);
         this.setEntityTags(metadata.getTags(), entity::setTags);
         this.setEntityCommandMetadata(entity, metadata);
+        request.getClusterCriteria().stream().map(this::toCriterionEntity).forEach(entity::addClusterCriterion);
 
         return entity;
     }
@@ -589,5 +704,14 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         entity.setDescription(metadata.getDescription().orElse(null));
         entity.setStatus(metadata.getStatus().name());
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
+    }
+
+    private void deleteAllClusterCriteria(final CommandEntity commandEntity) {
+        // TODO: Perhaps this should be in the entity itself to encapsulate how its stored?
+        final List<CriterionEntity> persistedEntities = commandEntity.getClusterCriteria();
+        final List<CriterionEntity> entitiesToDelete = Lists.newArrayList(persistedEntities);
+        persistedEntities.clear();
+        // Ensure Criterion aren't left dangling
+        entitiesToDelete.forEach(criterionEntity -> this.getCriterionRepository().delete(criterionEntity));
     }
 }
