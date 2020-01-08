@@ -21,6 +21,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
@@ -66,6 +67,7 @@ class DataAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(JpaApplicationRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaClusterRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaCommandRepository.class);
+                Assertions.assertThat(context).hasSingleBean(JpaCriterionRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaFileRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaJobRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaTagRepository.class);

@@ -51,6 +51,7 @@ import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import lombok.extern.slf4j.Slf4j;
@@ -99,20 +100,23 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
      * @param applicationRepository  The {@link JpaApplicationRepository} to use
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param criterionRepository    The {@link JpaCriterionRepository} to use
      */
     public JpaClusterPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
+        final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository
     ) {
         super(
             tagPersistenceService,
             filePersistenceService,
             applicationRepository,
             clusterRepository,
-            commandRepository
+            commandRepository,
+            criterionRepository
         );
     }
 
