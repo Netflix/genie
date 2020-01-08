@@ -24,9 +24,11 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
@@ -132,6 +134,12 @@ public abstract class RestControllerIntegrationTestBase {
     @Autowired
     protected JpaTagRepository tagRepository;
 
+    @Autowired
+    protected JpaCriterionRepository criterionRepository;
+
+    @Autowired
+    protected JpaAgentConnectionRepository agentConnectionRepository;
+
     private RequestSpecification requestSpecification;
 
     private static String getLinkedResourceExpectedUri(
@@ -167,8 +175,10 @@ public abstract class RestControllerIntegrationTestBase {
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();
+        this.criterionRepository.deleteAll();
         this.fileRepository.deleteAll();
         this.tagRepository.deleteAll();
+        this.agentConnectionRepository.deleteAll();
 
         this.requestSpecification = new RequestSpecBuilder()
             .addFilter(
