@@ -21,10 +21,11 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeExcept
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository
 import spock.lang.Specification
 
 /**
- * Specifications for JpaBaseService class.
+ * Specifications for the {@link JpaBaseService} class.
  *
  * @author tgianos
  */
@@ -40,7 +41,8 @@ class JpaBaseServiceSpec extends Specification {
             fileService,
             Mock(JpaApplicationRepository),
             Mock(JpaClusterRepository),
-            Mock(JpaCommandRepository)
+            Mock(JpaCommandRepository),
+            Mock(JpaCriterionRepository)
         )
 
         when:
@@ -60,7 +62,8 @@ class JpaBaseServiceSpec extends Specification {
             Mock(JpaFilePersistenceService),
             Mock(JpaApplicationRepository),
             Mock(JpaClusterRepository),
-            Mock(JpaCommandRepository)
+            Mock(JpaCommandRepository),
+            Mock(JpaCriterionRepository)
         )
 
         when:

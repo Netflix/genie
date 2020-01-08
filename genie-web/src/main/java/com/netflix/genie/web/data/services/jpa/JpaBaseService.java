@@ -29,6 +29,7 @@ import com.netflix.genie.web.data.entities.UniqueIdEntity;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -55,28 +56,32 @@ class JpaBaseService {
     private final JpaApplicationRepository applicationRepository;
     private final JpaClusterRepository clusterRepository;
     private final JpaCommandRepository commandRepository;
+    private final JpaCriterionRepository criterionRepository;
 
     /**
      * Constructor.
      *
-     * @param tagPersistenceService  The tag persistence service to use
-     * @param filePersistenceService The file persistence service to use
-     * @param applicationRepository  Application repository to use
-     * @param clusterRepository      Cluster repository to use
-     * @param commandRepository      Command repository to use
+     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
+     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
+     * @param applicationRepository  The {@link JpaApplicationRepository} to use
+     * @param clusterRepository      The {@link JpaClusterRepository} to use
+     * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param criterionRepository    The {@link JpaCriterionRepository} to use
      */
     JpaBaseService(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
+        final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository
     ) {
         this.tagPersistenceService = tagPersistenceService;
         this.filePersistenceService = filePersistenceService;
         this.applicationRepository = applicationRepository;
         this.clusterRepository = clusterRepository;
         this.commandRepository = commandRepository;
+        this.criterionRepository = criterionRepository;
     }
 
     /**

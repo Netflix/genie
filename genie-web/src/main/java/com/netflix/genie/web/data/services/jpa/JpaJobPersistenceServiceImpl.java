@@ -68,6 +68,7 @@ import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
@@ -126,6 +127,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * @param applicationRepository  The {@link JpaApplicationRepository} to use
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param criterionRepository    The {@link JpaCriterionRepository} to use
      * @param jobRepository          The {@link JpaJobRepository} to use
      * @param attachmentService      The {@link AttachmentService} implementation to use to persist attachments before
      *                               converting them to dependencies of the job
@@ -136,6 +138,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository,
         final JpaJobRepository jobRepository,
         final AttachmentService attachmentService
     ) {
@@ -144,7 +147,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             filePersistenceService,
             applicationRepository,
             clusterRepository,
-            commandRepository
+            commandRepository,
+            criterionRepository
         );
         this.jobRepository = jobRepository;
         this.attachmentService = attachmentService;

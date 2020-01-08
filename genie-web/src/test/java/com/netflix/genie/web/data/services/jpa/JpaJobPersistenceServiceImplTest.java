@@ -51,6 +51,7 @@ import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.services.AttachmentService;
@@ -112,6 +113,7 @@ public class JpaJobPersistenceServiceImplTest {
             this.applicationRepository,
             this.clusterRepository,
             this.commandRepository,
+            Mockito.mock(JpaCriterionRepository.class),
             this.jobRepository,
             Mockito.mock(AttachmentService.class)
         );

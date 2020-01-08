@@ -21,6 +21,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
@@ -69,6 +70,7 @@ public class DataAutoConfiguration {
      * @param applicationRepository  The {@link JpaApplicationRepository} to use
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param criterionRepository    The {@link JpaCriterionRepository} to use
      * @return A {@link JpaApplicationPersistenceServiceImpl} instance.
      */
     @Bean
@@ -78,14 +80,16 @@ public class DataAutoConfiguration {
         final JpaFilePersistenceService filePersistenceService,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
+        final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository
     ) {
         return new JpaApplicationPersistenceServiceImpl(
             tagPersistenceService,
             filePersistenceService,
             applicationRepository,
             clusterRepository,
-            commandRepository
+            commandRepository,
+            criterionRepository
         );
     }
 
@@ -97,6 +101,7 @@ public class DataAutoConfiguration {
      * @param applicationRepository  The {@link JpaApplicationRepository} to use
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param criterionRepository    The {@link JpaCriterionRepository} to use
      * @return A {@link JpaClusterPersistenceServiceImpl} instance
      */
     @Bean
@@ -106,14 +111,16 @@ public class DataAutoConfiguration {
         final JpaFilePersistenceService filePersistenceService,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
+        final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository
     ) {
         return new JpaClusterPersistenceServiceImpl(
             tagPersistenceService,
             filePersistenceService,
             applicationRepository,
             clusterRepository,
-            commandRepository
+            commandRepository,
+            criterionRepository
         );
     }
 
@@ -125,6 +132,7 @@ public class DataAutoConfiguration {
      * @param applicationRepository  The {@link JpaApplicationRepository} to use
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param criterionRepository    The {@link JpaCriterionRepository} to use
      * @return A {@link JpaCommandPersistenceServiceImpl} instance
      */
     @Bean
@@ -134,14 +142,16 @@ public class DataAutoConfiguration {
         final JpaFilePersistenceService filePersistenceService,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
+        final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository
     ) {
         return new JpaCommandPersistenceServiceImpl(
             tagPersistenceService,
             filePersistenceService,
             applicationRepository,
             clusterRepository,
-            commandRepository
+            commandRepository,
+            criterionRepository
         );
     }
 
@@ -179,6 +189,7 @@ public class DataAutoConfiguration {
      * @param applicationRepository  The {@link JpaApplicationRepository} to use
      * @param clusterRepository      The {@link JpaClusterRepository} to use
      * @param commandRepository      The {@link JpaCommandRepository} to use
+     * @param criterionRepository    The {@link JpaCriterionRepository} to use
      * @param jobRepository          The {@link JpaJobRepository} to use
      * @param attachmentService      The {@link AttachmentService} implementation to use to store attachments for a job
      *                               before they are converted to dependencies
@@ -192,6 +203,7 @@ public class DataAutoConfiguration {
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository,
         final JpaJobRepository jobRepository,
         final AttachmentService attachmentService
     ) {
@@ -201,6 +213,7 @@ public class DataAutoConfiguration {
             applicationRepository,
             clusterRepository,
             commandRepository,
+            criterionRepository,
             jobRepository,
             attachmentService
         );

@@ -35,6 +35,7 @@ import com.netflix.genie.web.data.entities.projections.ClusterCommandsProjection
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +80,8 @@ class JpaClusterPersistenceServiceImplTest {
             this.filePersistenceService,
             Mockito.mock(JpaApplicationRepository.class),
             this.jpaClusterRepository,
-            this.jpaCommandRepository
+            this.jpaCommandRepository,
+            Mockito.mock(JpaCriterionRepository.class)
         );
     }
 
