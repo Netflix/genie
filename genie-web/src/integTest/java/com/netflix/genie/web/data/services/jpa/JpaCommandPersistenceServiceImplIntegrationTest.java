@@ -30,6 +30,7 @@ import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
 import com.netflix.genie.common.external.dtos.v4.CommandRequest;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
@@ -247,14 +248,12 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     /**
      * Test the get commands method order by an invalid field should return the order by default value (updated).
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testGetCommandsOrderBysInvalidField() {
         final Pageable invalid = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
-        final Page<Command> commands = this.service.getCommands(null, null, null, null, invalid);
-        Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
-        Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
-        Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
-        Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_1_ID);
+        Assertions
+            .assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> this.service.getCommands(null, null, null, null, invalid));
     }
 
     /**
@@ -289,6 +288,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
         Assertions.assertThat(created.getCheckDelay()).isEqualTo(COMMAND_1_CHECK_DELAY);
         Assertions.assertThat(created.getMemory()).isNotPresent();
+        Assertions.assertThat(created.getClusterCriteria()).isEmpty();
         this.service.deleteCommand(id);
         Assertions
             .assertThatExceptionOfType(GenieNotFoundException.class)
@@ -302,6 +302,13 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      */
     @Test
     public void testCreateCommandNoId() throws GenieException {
+        final List<Criterion> clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+        );
         final int memory = 512;
         final CommandRequest command = new CommandRequest.Builder(
             new CommandMetadata.Builder(
@@ -315,6 +322,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         )
             .withMemory(memory)
             .withCheckDelay(COMMAND_1_CHECK_DELAY)
+            .withClusterCriteria(clusterCriteria)
             .build();
         final String id = this.service.createCommand(command);
         final Command created = this.service.getCommand(id);
@@ -325,6 +333,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(created.getExecutable()).isEqualTo(COMMAND_1_EXECUTABLE);
         Assertions.assertThat(created.getCheckDelay()).isEqualTo(COMMAND_1_CHECK_DELAY);
         Assertions.assertThat(created.getMemory()).isPresent().contains(memory);
+        Assertions.assertThat(created.getClusterCriteria()).isEqualTo(clusterCriteria);
         this.service.deleteCommand(created.getId());
         Assertions
             .assertThatExceptionOfType(GenieNotFoundException.class)
@@ -853,11 +862,81 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
     /**
      * Test the Get clusters for command function.
-     *
-     * @throws GenieException For any problem
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetClustersForCommandNoId() throws GenieException {
-        this.service.getClustersForCommand("", null);
+    @Test
+    public void testGetClustersForCommandNoId() {
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.service.getClustersForCommand("", null));
+    }
+
+    /**
+     * Test to validate how cluster criteria can be manipulated for a command.
+     *
+     * @throws GenieException On unexpected error
+     */
+    @Test
+    public void testClusterCriteriaManipulation() throws GenieException {
+        final Criterion criterion0 = new Criterion.Builder().withId(UUID.randomUUID().toString()).build();
+        final Criterion criterion1 = new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build();
+        final Criterion criterion2 = new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build();
+        final Criterion criterion3 = new Criterion.Builder().withName(UUID.randomUUID().toString()).build();
+        final Criterion criterion4 = new Criterion
+            .Builder()
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build();
+
+        final List<Criterion> clusterCriteria = Lists.newArrayList(
+            criterion0,
+            criterion1,
+            criterion2
+        );
+
+        final CommandRequest command = new CommandRequest.Builder(
+            new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.ACTIVE
+            )
+                .build(),
+            Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        )
+            .withCheckDelay(1000L)
+            .withClusterCriteria(clusterCriteria)
+            .build();
+
+        final String id = this.service.createCommand(command);
+        Assertions.assertThat(this.service.getClusterCriteriaForCommand(id)).isEqualTo(clusterCriteria);
+
+        this.service.addClusterCriterionForCommand(id, criterion3);
+        Assertions
+            .assertThat(this.service.getClusterCriteriaForCommand(id))
+            .hasSize(4)
+            .element(3)
+            .isEqualTo(criterion3);
+
+        // Illegal argument
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.service.removeClusterCriterionForCommand(id, 4));
+
+        this.service.removeClusterCriterionForCommand(id, 3);
+        Assertions.assertThat(this.service.getClusterCriteriaForCommand(id)).isEqualTo(clusterCriteria);
+
+        this.service.addClusterCriterionForCommand(id, criterion4, 1);
+        Assertions
+            .assertThat(this.service.getClusterCriteriaForCommand(id))
+            .hasSize(4)
+            .element(1)
+            .isEqualTo(criterion4);
+        this.service.removeClusterCriterionForCommand(id, 1);
+        Assertions.assertThat(this.service.getClusterCriteriaForCommand(id)).isEqualTo(clusterCriteria);
+
+        this.service.removeAllClusterCriteriaForCommand(id);
+        Assertions.assertThat(this.service.getClusterCriteriaForCommand(id)).isEmpty();
+
+        this.service.setClusterCriteriaForCommand(id, clusterCriteria);
+        Assertions.assertThat(this.service.getClusterCriteriaForCommand(id)).isEqualTo(clusterCriteria);
     }
 }

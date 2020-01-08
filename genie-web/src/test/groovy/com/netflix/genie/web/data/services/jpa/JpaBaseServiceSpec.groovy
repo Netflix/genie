@@ -17,7 +17,10 @@
  */
 package com.netflix.genie.web.data.services.jpa
 
+import com.google.common.collect.Sets
+import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
+import com.netflix.genie.web.data.entities.TagEntity
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository
@@ -71,5 +74,43 @@ class JpaBaseServiceSpec extends Specification {
 
         then:
         thrown(GenieRuntimeException)
+    }
+
+    def "Can Convert criterion to Criterion Entity"() {
+        def id = UUID.randomUUID().toString()
+        def name = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = UUID.randomUUID().toString()
+        def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def tagService = Mock(JpaTagPersistenceService)
+        def service = new JpaBaseService(
+            tagService,
+            Mock(JpaFilePersistenceService),
+            Mock(JpaApplicationRepository),
+            Mock(JpaClusterRepository),
+            Mock(JpaCommandRepository),
+            Mock(JpaCriterionRepository)
+        )
+        def criterion = new Criterion.Builder()
+            .withId(id)
+            .withName(name)
+            .withVersion(version)
+            .withStatus(status)
+            .withTags(tags)
+            .build()
+
+        when:
+        def criterionEntity = service.toCriterionEntity(criterion)
+
+        then:
+        tags.size() * tagService.createTagIfNotExists(_ as String)
+        tags.size() * tagService.getTag(_ as String) >> {
+            Optional.of(new TagEntity((String) it[0]))
+        }
+        criterionEntity.getUniqueId().orElse(UUID.randomUUID().toString()) == id
+        criterionEntity.getName().orElse(UUID.randomUUID().toString()) == name
+        criterionEntity.getVersion().orElse(UUID.randomUUID().toString()) == version
+        criterionEntity.getStatus().orElse(UUID.randomUUID().toString()) == status
+        criterionEntity.getTags() == tags.collect({ it -> new TagEntity(it) }).toSet()
     }
 }
