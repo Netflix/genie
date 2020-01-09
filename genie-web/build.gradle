@@ -85,10 +85,10 @@ dependencies {
      * Runtime Dependencies
      *******************************/
 
-    runtime("com.h2database:h2")
-    runtime("mysql:mysql-connector-java")
-    runtime("org.codehaus.groovy:groovy-all")
-    runtime("org.postgresql:postgresql")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("mysql:mysql-connector-java")
+    runtimeOnly("org.codehaus.groovy:groovy-all")
+    runtimeOnly("org.postgresql:postgresql")
 
     /*******************************
      * Test Dependencies

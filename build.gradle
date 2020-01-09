@@ -224,10 +224,10 @@ configure(javaProjects) {
 
         testCompileOnly("com.google.code.findbugs:annotations")
 
-        testRuntime("javax.el:javax.el-api")
-        testRuntime("org.glassfish:javax.el")
-        testRuntime("org.junit.jupiter:junit-jupiter-engine")
-        testRuntime("org.junit.vintage:junit-vintage-engine")
+        testRuntimeOnly("javax.el:javax.el-api")
+        testRuntimeOnly("org.glassfish:javax.el")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
     }
 
     task removeGeneratedSources(type: Delete) {
