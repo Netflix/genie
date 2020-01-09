@@ -33,6 +33,11 @@
          consistency regarding their keys. -->
     <module name="Translation"/>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/suppressions.xml"/>
+        <property name="optional" value="false"/>
+    </module>
+
     <module name="SuppressWarningsFilter"/>
 
     <module name="TreeWalker">
