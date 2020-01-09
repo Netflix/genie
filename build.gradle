@@ -298,12 +298,11 @@ configure(javaProjects) {
     }
 
     checkstyle {
-        configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
         toolVersion = "8.27"
     }
 
     spotbugs {
-        excludeFilter = new File(project.parent.projectDir, "codequality/spotbugs/excludeFilter.xml")
+        excludeFilter = new File("$rootProject.projectDir/config/spotbugs/excludeFilter.xml")
     }
     spotbugsTest.enabled = false
     spotbugsIntegTest.enabled = false
