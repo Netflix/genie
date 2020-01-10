@@ -1,0 +1,28 @@
+=== Remove the Cluster Criterion From a Command
+
+==== Description
+
+Remove the `Criterion` with the given `priority` from the current list of cluster criteria associated with the command identified by `id`.
+A value of `0` for `priority` will result in the first element in the list being removed, `1` the second element and so on.
+
+NOTE: `0 <= priority < current criteria length`
+
+==== Endpoint
+
+`DELETE /api/v3/commands/{id}/clusterCriteria/{priority}`
+
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-remove-cluster-criterion-from-command/2
+:id-base: remove-all-cluster-criteria-from-command
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

@@ -1,0 +1,27 @@
+=== Set Cluster Criteria For Command
+
+==== Description
+
+Replace the existing cluster criteria for a command with a new list.
+The criterion are added to the command in the same order they are passed to the service.
+This is the priority order they will be evaluated in.
+
+==== Endpoint
+
+`PUT /api/v3/commands/{id}/clusterCriteria`
+
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-set-cluster-criteria-for-command/2
+:id-base: set-cluster-criteria-for-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

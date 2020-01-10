@@ -1,0 +1,25 @@
+=== Get the Cluster Criteria for a Command
+
+==== Description
+
+Get the priority ordered list of criteria associated with this command that say what attributes a cluster needs to have in order for this command to work on that cluster.
+
+==== Endpoint
+
+`GET /api/v3/commands/{id}/clusterCriteria`
+
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-get-cluster-criteria/2
+:id-base: get-cluster-criteria-for-command
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

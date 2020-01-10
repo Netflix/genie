@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -560,6 +561,7 @@ final class Snippets {
         = new ConstraintDescriptions(JobMetadata.class);
     private static final ConstraintDescriptions APPLICATION_CONSTRAINTS = new ConstraintDescriptions(Application.class);
     private static final ConstraintDescriptions CLUSTER_CONSTRAINTS = new ConstraintDescriptions(Cluster.class);
+    private static final ConstraintDescriptions CRITERION_CONSTRAINTS = new ConstraintDescriptions(Criterion.class);
 
     private Snippets() {
     }
@@ -685,6 +687,36 @@ final class Snippets {
             );
     }
 
+    static RequestFieldsSnippet addClusterCriterionForCommandRequestPayload() {
+        return PayloadDocumentation.requestFields(getCriterionFieldDescriptors());
+    }
+
+    static RequestFieldsSnippet setClusterCriteriaForCommandRequestPayload() {
+        return PayloadDocumentation
+            .requestFields(
+                PayloadDocumentation
+                    .fieldWithPath("[]")
+                    .attributes(EMPTY_CONSTRAINTS)
+                    .description("A priority ordered list of criteria")
+                    .type(JsonFieldType.ARRAY)
+                    .optional()
+            )
+            .andWithPrefix("[].", getCriterionFieldDescriptors());
+    }
+
+    static ResponseFieldsSnippet getClusterCriteriaForCommandResponsePayload() {
+        return PayloadDocumentation
+            .responseFields(
+                PayloadDocumentation
+                    .fieldWithPath("[]")
+                    .attributes(EMPTY_CONSTRAINTS)
+                    .description("A priority ordered list of criteria")
+                    .type(JsonFieldType.ARRAY)
+                    .optional()
+            )
+            .andWithPrefix("[].", getCriterionFieldDescriptors());
+    }
+
     private static FieldDescriptor[] getApplicationFieldDescriptors() {
         return ArrayUtils.addAll(
             getConfigFieldDescriptors(APPLICATION_CONSTRAINTS),
@@ -774,7 +806,7 @@ final class Snippets {
                 .type(JsonFieldType.ARRAY)
                 .optional(),
             PayloadDocumentation
-                .fieldWithPath("clusterCriteria")
+                .subsectionWithPath("clusterCriteria")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "clusterCriteria"))
                 .description(
                     "The priority ordered list of criteria to resolve clusters that this command can run jobs on"
@@ -1164,7 +1196,8 @@ final class Snippets {
                 .parameterWithName("size")
                 .description("The size of the page to get. Default to 64.")
                 .optional(),
-            RequestDocumentation.parameterWithName("sort")
+            RequestDocumentation
+                .parameterWithName("sort")
                 .description("The fields to sort the results by. Defaults to 'updated,desc'.")
                 .optional(),
         };
@@ -1177,5 +1210,40 @@ final class Snippets {
         return Attributes
             .key(CONSTRAINTS)
             .value(StringUtils.collectionToDelimitedString(constraints.descriptionsForProperty(fieldName), ". "));
+    }
+
+    private static FieldDescriptor[] getCriterionFieldDescriptors() {
+        return new FieldDescriptor[]{
+            PayloadDocumentation
+                .fieldWithPath("id")
+                .attributes(getConstraintsForField(CRITERION_CONSTRAINTS, "id"))
+                .description("The unique identifier a resource needs to have to match this criterion")
+                .type(JsonFieldType.STRING)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("name")
+                .attributes(getConstraintsForField(CRITERION_CONSTRAINTS, "name"))
+                .description("The name a resource needs to have to match this criterion")
+                .type(JsonFieldType.STRING)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("version")
+                .attributes(getConstraintsForField(CRITERION_CONSTRAINTS, "version"))
+                .description("The version a resource needs to have to match this criterion")
+                .type(JsonFieldType.STRING)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("status")
+                .attributes(getConstraintsForField(CRITERION_CONSTRAINTS, "status"))
+                .description("The status a resource needs to have to match this criterion")
+                .type(JsonFieldType.STRING)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("tags")
+                .attributes(getConstraintsForField(CRITERION_CONSTRAINTS, "tags"))
+                .description("The set of tags a resource needs to have to match this criterion")
+                .type(JsonFieldType.ARRAY)
+                .optional(),
+        };
     }
 }
