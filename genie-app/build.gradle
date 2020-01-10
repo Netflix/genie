@@ -78,7 +78,7 @@ task dockerPush(group: "Docker", description: "Push the built docker app image t
         System.env."CI"
     }
     doLast {
-        def appName = tasks.jar.baseName.toString()
+        def appName = tasks.jar.archiveBaseName.get()
         for (String tag : this.getDockerTags(appName)) {
             exec {
                 commandLine "docker", "push", tag
