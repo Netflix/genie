@@ -196,6 +196,8 @@ public abstract class RestControllerIntegrationTestBase {
                         Preprocessors.modifyUris().host(URI_HOST).scheme(URI_SCHEME).removePort()
                     )
             )
+//            .addFilter(new RequestLoggingFilter())
+//            .addFilter(new ResponseLoggingFilter())
             .build();
     }
 

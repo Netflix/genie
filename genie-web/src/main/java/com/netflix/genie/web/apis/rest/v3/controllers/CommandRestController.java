@@ -23,9 +23,11 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationResourceAssembler;
@@ -67,6 +69,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
@@ -683,5 +686,106 @@ public class CommandRestController {
             .map(DtoConverters::toV3Cluster)
             .map(this.clusterResourceAssembler::toResource)
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * Get all the {@link Criterion} currently associated with the command in priority order.
+     *
+     * @param id The id of the command to get the criteria for
+     * @return The criteria
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    @GetMapping(value = "/{id}/clusterCriteria", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Criterion> getClusterCriteriaForCommand(
+        @PathVariable("id") final String id
+    ) throws GenieNotFoundException {
+        log.info("Called for command {}", id);
+        return this.commandPersistenceService.getClusterCriteriaForCommand(id);
+    }
+
+    /**
+     * Remove all the {@link Criterion} currently associated with the command.
+     *
+     * @param id The id of the command to remove the criteria for
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    @DeleteMapping(value = "/{id}/clusterCriteria")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeAllClusterCriteriaFromCommand(
+        @PathVariable("id") final String id
+    ) throws GenieNotFoundException {
+        log.info("Called for command {}", id);
+        this.commandPersistenceService.removeAllClusterCriteriaForCommand(id);
+    }
+
+    /**
+     * Add a new {@link Criterion} as the lowest priority criterion for the given command.
+     *
+     * @param id        The id of the command to add the new criterion to
+     * @param criterion The {@link Criterion} to add
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    @PostMapping(value = "/{id}/clusterCriteria", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void addClusterCriterionForCommand(
+        @PathVariable("id") final String id,
+        @RequestBody @Valid final Criterion criterion
+    ) throws GenieNotFoundException {
+        log.info("Called to add {} as the lowest priority cluster criterion for command {}", criterion, id);
+        this.commandPersistenceService.addClusterCriterionForCommand(id, criterion);
+    }
+
+    /**
+     * Set all new cluster criteria for the given command.
+     *
+     * @param id              The id of the command to add the new criteria to
+     * @param clusterCriteria The list of {@link Criterion} in priority order to set for the given command
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    @PutMapping(value = "/{id}/clusterCriteria", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void setClusterCriteriaForCommand(
+        @PathVariable("id") final String id,
+        @RequestBody @Valid final List<Criterion> clusterCriteria
+    ) throws GenieNotFoundException {
+        log.info("Called to set {} as the cluster criteria for command {}", clusterCriteria, id);
+        this.commandPersistenceService.setClusterCriteriaForCommand(id, clusterCriteria);
+    }
+
+    /**
+     * Insert a new cluster criterion for the given command at the supplied priority.
+     *
+     * @param id        The id of the command to add the new criterion for
+     * @param priority  The priority (min 0) to insert the criterion at in the list
+     * @param criterion The {@link Criterion} to add
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    @PutMapping(value = "/{id}/clusterCriteria/{priority}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void insertClusterCriterionForCommand(
+        @PathVariable("id") final String id,
+        @PathVariable("priority") @Min(0) final int priority,
+        @RequestBody @Valid final Criterion criterion
+    ) throws GenieNotFoundException {
+        log.info("Called to insert new criterion {} for command {} with priority {}", criterion, id, priority);
+        this.commandPersistenceService.addClusterCriterionForCommand(id, criterion, priority);
+    }
+
+    /**
+     * Remove the criterion with the given priority from the given command.
+     *
+     * @param id       The id of the command to remove the criterion from
+     * @param priority The priority (min 0, max number of existing criteria minus one) of the criterion to remove
+     * @throws GenieNotFoundException If no command with {@literal id} exists
+     */
+    @DeleteMapping(value = "/{id}/clusterCriteria/{priority}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeClusterCriterionFromCommand(
+        @PathVariable("id") final String id,
+        @PathVariable("priority") @Min(0) final int priority
+    ) throws GenieNotFoundException {
+        log.info("Called to remove the criterion from command {} with priority {}", id, priority);
+        this.commandPersistenceService.removeClusterCriterionForCommand(id, priority);
     }
 }

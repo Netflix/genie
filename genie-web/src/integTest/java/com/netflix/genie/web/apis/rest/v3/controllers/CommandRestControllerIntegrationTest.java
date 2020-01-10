@@ -18,6 +18,8 @@
 package com.netflix.genie.web.apis.rest.v3.controllers;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
@@ -26,10 +28,13 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.apis.rest.v3.hateoas.resources.CommandResource;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -63,24 +68,46 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
     private static final String USER = "genie";
     private static final String VERSION = "1.0.0";
     private static final String EXECUTABLE = "/apps/hive/bin/hive";
-    private static final List<String> EXECUTABLE_AND_ARGS = Lists.newArrayList("/apps/hive/bin/hive");
+    private static final ImmutableList<String> EXECUTABLE_AND_ARGS = ImmutableList.of("/apps/hive/bin/hive");
     private static final long CHECK_DELAY = 10000L;
     private static final String DESCRIPTION = "Hive command v" + VERSION;
     private static final int MEMORY = 1024;
     private static final String CONFIG_1 = "s3:///path/to/config-foo";
     private static final String CONFIG_2 = "s3:///path/to/config-bar";
-    private static final Set<String> CONFIGS = Sets.newHashSet(CONFIG_1, CONFIG_2);
+    private static final ImmutableSet<String> CONFIGS = ImmutableSet.of(CONFIG_1, CONFIG_2);
     private static final String DEP_1 = "/path/to/file/foo";
     private static final String DEP_2 = "/path/to/file/bar";
-    private static final Set<String> DEPENDENCIES = Sets.newHashSet(DEP_1, DEP_2);
+    private static final ImmutableSet<String> DEPENDENCIES = ImmutableSet.of(DEP_1, DEP_2);
     private static final String TAG_1 = "tag:foo";
     private static final String TAG_2 = "tag:bar";
     private static final Set<String> TAGS = Sets.newHashSet(TAG_1, TAG_2);
+    private static final ImmutableList<Criterion> CLUSTER_CRITERIA = ImmutableList.of(
+        new Criterion
+            .Builder()
+            .withId(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build(),
+        new Criterion
+            .Builder()
+            .withId(UUID.randomUUID().toString())
+            .withName("prod")
+            .withVersion("1.0.0")
+            .withStatus(ClusterStatus.UP.name())
+            .withTags(
+                Sets.newHashSet(
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString()
+                )
+            )
+            .build()
+    );
 
     private static final String EXECUTABLE_PATH = "executable";
     private static final String EXECUTABLE_AND_ARGS_PATH = "executableAndArguments";
     private static final String CHECK_DELAY_PATH = "checkDelay";
     private static final String MEMORY_PATH = "memory";
+    private static final String CLUSTER_CRITERIA_PATH = "clusterCriteria";
     private static final String COMMANDS_LIST_PATH = EMBEDDED_PATH + ".commandList";
     private static final String COMMAND_APPS_LINK_PATH = "_links.applications.href";
     private static final String COMMANDS_APPS_LINK_PATH = COMMANDS_LIST_PATH + "._links.applications.href";
@@ -129,6 +156,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 .withConfigs(CONFIGS)
                 .withDependencies(DEPENDENCIES)
                 .withTags(TAGS)
+                .withClusterCriteria(CLUSTER_CRITERIA)
                 .build(),
             createFilter
         );
@@ -169,6 +197,47 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body(TAGS_PATH, Matchers.hasItem("genie.id:" + id))
             .body(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME))
             .body(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2))
+            .body(CLUSTER_CRITERIA_PATH, Matchers.hasSize(CLUSTER_CRITERIA.size()))
+            .body(
+                CLUSTER_CRITERIA_PATH + "[0].id",
+                Matchers.is(CLUSTER_CRITERIA.get(0).getId().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[0].name",
+                Matchers.is(CLUSTER_CRITERIA.get(0).getName().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[0].version",
+                Matchers.is(CLUSTER_CRITERIA.get(0).getVersion().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[0].status",
+                Matchers.is(CLUSTER_CRITERIA.get(0).getStatus().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[0].tags",
+                Matchers.containsInAnyOrder(CLUSTER_CRITERIA.get(0).getTags().toArray(new String[0]))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[1].id",
+                Matchers.is(CLUSTER_CRITERIA.get(1).getId().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[1].name",
+                Matchers.is(CLUSTER_CRITERIA.get(1).getName().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[1].version",
+                Matchers.is(CLUSTER_CRITERIA.get(1).getVersion().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[1].status",
+                Matchers.is(CLUSTER_CRITERIA.get(1).getStatus().orElse(null))
+            )
+            .body(
+                CLUSTER_CRITERIA_PATH + "[1].tags",
+                Matchers.containsInAnyOrder(CLUSTER_CRITERIA.get(1).getTags().toArray(new String[0]))
+            )
             .body(LINKS_PATH + ".keySet().size()", Matchers.is(3))
             .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
             .body(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY))
@@ -243,6 +312,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .body(TAGS_PATH, Matchers.hasItem("genie.id:" + ID))
             .body(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME))
             .body(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2))
+            .body(CLUSTER_CRITERIA_PATH, Matchers.hasSize(0))
             .body(LINKS_PATH + ".keySet().size()", Matchers.is(3))
             .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
             .body(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY))
@@ -1667,7 +1737,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
     public void testCommandNotFound() {
         Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
 
-        final List<String> paths = Lists.newArrayList("", "/applications", "/clusters");
+        final List<String> paths = Lists.newArrayList("", "/applications", "/clusters", "/clusterCriteria");
 
         for (final String relationPath : paths) {
             RestAssured
@@ -1681,5 +1751,259 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 .body(EXCEPTION_CODE_PATH, Matchers.is(404))
                 .body(EXCEPTION_MESSAGE_PATH, Matchers.is("No command with id " + ID + " exists."));
         }
+    }
+
+    /**
+     * Test {@link CommandRestController#getClusterCriteriaForCommand(String)}.
+     *
+     * @throws Exception on unexpected error
+     */
+    @Test
+    public void testGetClusterCriteria() throws Exception {
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Snippets.ID_PATH_PARAM, // Path parameters
+            Snippets.JSON_CONTENT_TYPE_HEADER, // Response Headers
+            Snippets.getClusterCriteriaForCommandResponsePayload() // Response Fields
+        );
+
+        final String id = this.createCommandWithDefaultClusterCriteria();
+
+        // Don't use the helper method as we want to document this call this time
+        final List<Criterion> clusterCriteria = RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getFilter)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusterCriteria", id)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(ContentType.JSON)
+            .extract()
+            .jsonPath()
+            .getList(".", Criterion.class);
+
+        Assertions.assertThat(clusterCriteria).isEqualTo(CLUSTER_CRITERIA);
+    }
+
+    /**
+     * Test {@link CommandRestController#removeAllClusterCriteriaFromCommand(String)}.
+     *
+     * @throws Exception on unexpected error
+     */
+    @Test
+    public void testRemoveAllClusterCriteriaFromCommand() throws Exception {
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Snippets.ID_PATH_PARAM // Path parameters
+        );
+
+        final String id = this.createCommandWithDefaultClusterCriteria();
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(COMMANDS_API + "/{id}/clusterCriteria", id)
+            .then()
+            .statusCode(HttpStatus.OK.value());
+
+        Assertions.assertThat(this.getClusterCriteria(id)).isEmpty();
+    }
+
+    /**
+     * Test {@link CommandRestController#addClusterCriterionForCommand(String, Criterion)}.
+     *
+     * @throws Exception on any error
+     */
+    @Test
+    public void testAddLowestPriorityClusterCriterion() throws Exception {
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Snippets.ID_PATH_PARAM, // Path parameters,
+            Snippets.CONTENT_TYPE_HEADER, // Request Header
+            Snippets.addClusterCriterionForCommandRequestPayload() // Payload Docs
+        );
+
+        final String id = this.createCommandWithDefaultClusterCriteria();
+        final Criterion newCriterion = new Criterion
+            .Builder()
+            .withVersion("3.0.0")
+            .withId(UUID.randomUUID().toString())
+            .withName("adhocCluster")
+            .withStatus(ClusterStatus.UP.name())
+            .withTags(Sets.newHashSet("sched:adhoc", "type:yarn"))
+            .build();
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(addFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(newCriterion))
+            .when()
+            .port(this.port)
+            .post(COMMANDS_API + "/{id}/clusterCriteria", id)
+            .then()
+            .statusCode(HttpStatus.OK.value());
+
+        Assertions
+            .assertThat(this.getClusterCriteria(id))
+            .hasSize(CLUSTER_CRITERIA.size() + 1)
+            .containsSequence(CLUSTER_CRITERIA)
+            .last()
+            .isEqualTo(newCriterion);
+    }
+
+    /**
+     * Test {@link CommandRestController#setClusterCriteriaForCommand(String, List)}.
+     *
+     * @throws Exception On unexpected error
+     */
+    @Test
+    public void testSetClusterCriteriaForCommand() throws Exception {
+        final RestDocumentationFilter setFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Snippets.ID_PATH_PARAM, // Path parameters,
+            Snippets.CONTENT_TYPE_HEADER, // Request Header
+            Snippets.setClusterCriteriaForCommandRequestPayload() // Payload Docs
+        );
+
+        final String id = this.createCommandWithDefaultClusterCriteria();
+        final List<Criterion> newCriteria = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(),
+            new Criterion.Builder().withName(UUID.randomUUID().toString()).build()
+        );
+        Assertions.assertThat(newCriteria).doesNotContainAnyElementsOf(CLUSTER_CRITERIA);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(setFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(newCriteria))
+            .when()
+            .port(this.port)
+            .put(COMMANDS_API + "/{id}/clusterCriteria", id)
+            .then()
+            .statusCode(HttpStatus.OK.value());
+
+        Assertions.assertThat(this.getClusterCriteria(id)).isEqualTo(newCriteria);
+    }
+
+    /**
+     * Test {@link CommandRestController#insertClusterCriterionForCommand(String, int, Criterion)}.
+     *
+     * @throws Exception On unexpected error
+     */
+    @Test
+    public void testInsertClusterCriterionForCommand() throws Exception {
+        final RestDocumentationFilter insertFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            // Path parameters
+            Snippets
+                .ID_PATH_PARAM
+                .and(
+                    RequestDocumentation
+                        .parameterWithName("priority")
+                        .description("Priority of the criterion to insert")
+                ),
+            Snippets.CONTENT_TYPE_HEADER, // Request Header
+            Snippets.addClusterCriterionForCommandRequestPayload() // Payload Docs
+        );
+
+        final String id = this.createCommandWithDefaultClusterCriteria();
+        final Criterion newCriterion = new Criterion
+            .Builder()
+            .withVersion("4.0.0")
+            .withId(UUID.randomUUID().toString())
+            .withName("insightCluster")
+            .withStatus(ClusterStatus.OUT_OF_SERVICE.name())
+            .withTags(Sets.newHashSet("sched:insights", "type:presto"))
+            .build();
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(insertFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(newCriterion))
+            .when()
+            .port(this.port)
+            .put(COMMANDS_API + "/{id}/clusterCriteria/{priority}", id, 1)
+            .then()
+            .statusCode(HttpStatus.OK.value());
+
+        Assertions
+            .assertThat(this.getClusterCriteria(id))
+            .hasSize(CLUSTER_CRITERIA.size() + 1)
+            .containsExactly(CLUSTER_CRITERIA.get(0), newCriterion, CLUSTER_CRITERIA.get(1));
+    }
+
+    /**
+     * Test {@link CommandRestController#removeClusterCriterionFromCommand(String, int)}.
+     *
+     * @throws Exception On unexpected error
+     */
+    @Test
+    public void testRemoveClusterCriterionFromCommand() throws Exception {
+        final RestDocumentationFilter removeFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            // Path parameters
+            Snippets
+                .ID_PATH_PARAM
+                .and(
+                    RequestDocumentation
+                        .parameterWithName("priority")
+                        .description("Priority of the criterion to insert")
+                )
+        );
+
+        final String id = this.createCommandWithDefaultClusterCriteria();
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(removeFilter)
+            .when()
+            .port(this.port)
+            .delete(COMMANDS_API + "/{id}/clusterCriteria/{priority}", id, 1)
+            .then()
+            .statusCode(HttpStatus.OK.value());
+
+        Assertions
+            .assertThat(this.getClusterCriteria(id))
+            .hasSize(CLUSTER_CRITERIA.size() - 1)
+            .containsExactly(CLUSTER_CRITERIA.get(0));
+
+        // Running again throws 404
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .delete(COMMANDS_API + "/{id}/clusterCriteria/{priority}", id, 1)
+            .then()
+            .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    private String createCommandWithDefaultClusterCriteria() throws Exception {
+        return this.createConfigResource(
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+                .withClusterCriteria(CLUSTER_CRITERIA)
+                .build(),
+            null
+        );
+    }
+
+    private List<Criterion> getClusterCriteria(final String id) {
+        return RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusterCriteria", id)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(ContentType.JSON)
+            .extract()
+            .jsonPath()
+            .getList(".", Criterion.class);
     }
 }

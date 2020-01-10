@@ -1,0 +1,26 @@
+=== Add a New Cluster Criterion For Command
+
+==== Description
+
+Add a new cluster criterion to the existing list of cluster criterion for the given command.
+The new criterion will have the lowest priority of all the criterion.
+
+==== Endpoint
+
+`POST /api/v3/commands/{id}/clusterCriteria`
+
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-add-lowest-priority-cluster-criterion/2
+:id-base: add-cluster-criterion-for-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

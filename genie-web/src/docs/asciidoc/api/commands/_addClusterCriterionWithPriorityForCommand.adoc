@@ -1,0 +1,30 @@
+=== Insert a New Cluster Criterion For Command
+
+==== Description
+
+Add a new Criterion to the existing list of cluster criteria for the command identified by `id`.
+The `priority` is the place in the list this new criterion should be placed.
+A value of `0` indicates it should be placed at the front of the list with the highest possible priority.
+`1` would be second in the list etc.
+If `priority` is `>` the current size of the cluster criteria list this new criterion will be placed at the end as the lowest priority item.
+Priority must be `>= 0`.
+
+==== Endpoint
+
+`PUT /api/v3/commands/{id}/clusterCriteria/{priority}`
+
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-insert-cluster-criterion-for-command/2
+:id-base: insert-cluster-criterion-for-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

@@ -1,0 +1,25 @@
+=== Remove all the Cluster Criteria From a Command
+
+==== Description
+
+Remove all the existing cluster criteria from a given command.
+
+==== Endpoint
+
+`DELETE /api/v3/commands/{id}/clusterCriteria`
+
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-remove-all-cluster-criteria-from-command/2
+:id-base: remove-all-cluster-criteria-from-command
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]
