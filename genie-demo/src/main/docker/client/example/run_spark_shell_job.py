@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python
 
 # Copyright 2016 Netflix, Inc.
 #

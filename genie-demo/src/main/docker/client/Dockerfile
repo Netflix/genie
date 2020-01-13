@@ -1,4 +1,4 @@
-from alpine:3.4
+from alpine:3.11
 MAINTAINER NetflixOSS <netflixoss@netflix.com>
 
 RUN apk --no-cache add vim python py-pip python-dev bash g++ \
