@@ -9,7 +9,7 @@ buildscript {
 
     dependencies {
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
-        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:8.4.1"
+        classpath "com.netflix.nebula:gradle-netflixoss-project-plugin:8.4.3"
         classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
         classpath "org.ajoberstar:gradle-git-publish:2.1.1"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
