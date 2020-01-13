@@ -63,11 +63,20 @@ public class S3ProtocolResolver implements ProtocolResolver {
     @Override
     public Resource resolve(final String location, final ResourceLoader resourceLoader) {
         log.debug("Attempting to resolve if {} is a S3 resource or not", location);
+
+        final String normalizedLocation;
+        // Rewrite s3n:// and s3a:// URIs as s3:// for backward compatibility
+        if (location.startsWith("s3n:") || location.startsWith("s3a:")) {
+            normalizedLocation = location.replaceFirst("s3.:", "s3:");
+        } else {
+            normalizedLocation = location;
+        }
+
         final AmazonS3URI s3URI;
         try {
-            s3URI = new AmazonS3URI(location);
+            s3URI = new AmazonS3URI(normalizedLocation);
         } catch (final IllegalArgumentException iae) {
-            log.debug("{} is not a valid S3 resource (Error message: {}).", location, iae.getMessage());
+            log.debug("{} is not a valid S3 resource (Error message: {}).", normalizedLocation, iae.getMessage());
             return null;
         }
 
