@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10};
+var methods = {"i0":10,"i1":10,"i2":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -138,14 +138,15 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html#Command-java.lang.String-java.time.Instant-java.time.Instant-com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment-com.netflix.genie.common.external.dtos.v4.CommandMetadata-java.util.List-java.lang.Integer-long-">Command</a></span>(java.lang.String&nbsp;id,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html#Command-java.lang.String-java.time.Instant-java.time.Instant-com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment-com.netflix.genie.common.external.dtos.v4.CommandMetadata-java.util.List-java.lang.Integer-long-java.util.List-">Command</a></span>(java.lang.String&nbsp;id,
        java.time.Instant&nbsp;created,
        java.time.Instant&nbsp;updated,
        <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ExecutionEnvironment.html" title="class in com.netflix.genie.common.external.dtos.v4">ExecutionEnvironment</a>&nbsp;resources,
        <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandMetadata</a>&nbsp;metadata,
        java.util.List&lt;java.lang.String&gt;&nbsp;executable,
        java.lang.Integer&nbsp;memory,
-       long&nbsp;checkDelay)</code>
+       long&nbsp;checkDelay,
+       java.util.List&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -165,13 +166,19 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html#getClusterCriteria--">getClusterCriteria</a></span>()</code>
+<div class="block">Get the ordered list of <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> for this command to resolve clusters are runtime.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html#getExecutable--">getExecutable</a></span>()</code>
 <div class="block">Get the executable elements (generally a binary followed optionally by default arguments) that should be used
  with this command when executing a job.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html#getMemory--">getMemory</a></span>()</code>
 <div class="block">Get the default amount of memory (in MB) to use for jobs which use this command.</div>
@@ -199,7 +206,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="Command-java.lang.String-java.time.Instant-java.time.Instant-com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment-com.netflix.genie.common.external.dtos.v4.CommandMetadata-java.util.List-java.lang.Integer-long-">
+<a name="Command-java.lang.String-java.time.Instant-java.time.Instant-com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment-com.netflix.genie.common.external.dtos.v4.CommandMetadata-java.util.List-java.lang.Integer-long-java.util.List-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -214,7 +221,9 @@ extends java.lang.Object</pre>
                java.util.List&lt;java.lang.String&gt;&nbsp;executable,
                @Nullable
                java.lang.Integer&nbsp;memory,
-               long&nbsp;checkDelay)</pre>
+               long&nbsp;checkDelay,
+               @Nullable
+               java.util.List&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -224,11 +233,13 @@ extends java.lang.Object</pre>
 <dd><code>resources</code> - The execution resources associated with this command</dd>
 <dd><code>metadata</code> - The metadata associated with this command</dd>
 <dd><code>executable</code> - The executable command that will be used when a job is run with this command. Generally
-                   this will start with the binary and be followed optionally by default arguments. Must have
-                   at least one. Blanks will be removed</dd>
+                        this will start with the binary and be followed optionally by default arguments. Must
+                        have at least one. Blanks will be removed</dd>
 <dd><code>memory</code> - The default memory that should be used to run a job with this command</dd>
-<dd><code>checkDelay</code> - The amount of time (in milliseconds) to delay between checks of job status for jobs run using
-                   this command. Min 1 but preferably much more</dd>
+<dd><code>checkDelay</code> - The amount of time (in milliseconds) to delay between checks of job status for jobs run
+                        using this command. Min 1 but preferably much more</dd>
+<dd><code>clusterCriteria</code> - The ordered list of cluster <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> that should be used to resolve which
+                        clusters this command can run on at job execution time</dd>
 </dl>
 </li>
 </ul>
@@ -257,7 +268,7 @@ extends java.lang.Object</pre>
 <a name="getExecutable--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getExecutable</h4>
 <pre>public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getExecutable()</pre>
@@ -266,6 +277,20 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The executable arguments as an immutable list. Any attempt to modify will throw an exception</dd>
+</dl>
+</li>
+</ul>
+<a name="getClusterCriteria--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getClusterCriteria</h4>
+<pre>public&nbsp;java.util.List&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;getClusterCriteria()</pre>
+<div class="block">Get the ordered list of <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> for this command to resolve clusters are runtime.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The ordered list of <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> as an immutable list. Any attempt to modify will throw an exception</dd>
 </dl>
 </li>
 </ul>

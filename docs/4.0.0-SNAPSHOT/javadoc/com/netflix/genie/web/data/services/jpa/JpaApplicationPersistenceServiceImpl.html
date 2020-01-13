@@ -138,11 +138,12 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#JpaApplicationPersistenceServiceImpl-com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService-com.netflix.genie.web.data.services.jpa.JpaFilePersistenceService-com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository-com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository-com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository-">JpaApplicationPersistenceServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaTagPersistenceService.html" title="interface in com.netflix.genie.web.data.services.jpa">JpaTagPersistenceService</a>&nbsp;tagPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#JpaApplicationPersistenceServiceImpl-com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService-com.netflix.genie.web.data.services.jpa.JpaFilePersistenceService-com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository-com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository-com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository-com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository-">JpaApplicationPersistenceServiceImpl</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaTagPersistenceService.html" title="interface in com.netflix.genie.web.data.services.jpa">JpaTagPersistenceService</a>&nbsp;tagPersistenceService,
                                     <a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaFilePersistenceService.html" title="interface in com.netflix.genie.web.data.services.jpa">JpaFilePersistenceService</a>&nbsp;filePersistenceService,
                                     <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a>&nbsp;applicationRepository,
                                     <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a>&nbsp;clusterRepository,
-                                    <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a>&nbsp;commandRepository)</code>
+                                    <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a>&nbsp;commandRepository,
+                                    <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCriterionRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCriterionRepository</a>&nbsp;criterionRepository)</code>
 <div class="block">Default constructor.</div>
 </td>
 </tr>
@@ -343,7 +344,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JpaApplicationPersistenceServiceImpl-com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService-com.netflix.genie.web.data.services.jpa.JpaFilePersistenceService-com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository-com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository-com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository-">
+<a name="JpaApplicationPersistenceServiceImpl-com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService-com.netflix.genie.web.data.services.jpa.JpaFilePersistenceService-com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository-com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository-com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository-com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -353,7 +354,8 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
                                             <a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaFilePersistenceService.html" title="interface in com.netflix.genie.web.data.services.jpa">JpaFilePersistenceService</a>&nbsp;filePersistenceService,
                                             <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a>&nbsp;applicationRepository,
                                             <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a>&nbsp;clusterRepository,
-                                            <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a>&nbsp;commandRepository)</pre>
+                                            <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a>&nbsp;commandRepository,
+                                            <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCriterionRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCriterionRepository</a>&nbsp;criterionRepository)</pre>
 <div class="block">Default constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -362,6 +364,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
 <dd><code>applicationRepository</code> - The <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa"><code>JpaApplicationRepository</code></a> to use</dd>
 <dd><code>clusterRepository</code> - The <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa"><code>JpaClusterRepository</code></a> to use</dd>
 <dd><code>commandRepository</code> - The <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa"><code>JpaCommandRepository</code></a> to use</dd>
+<dd><code>criterionRepository</code> - The <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCriterionRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa"><code>JpaCriterionRepository</code></a> to use</dd>
 </dl>
 </li>
 </ul>

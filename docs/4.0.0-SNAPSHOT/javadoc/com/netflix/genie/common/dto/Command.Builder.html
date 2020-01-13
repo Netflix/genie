@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":42,"i2":42,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":42,"i3":42,"i4":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -195,6 +195,13 @@ extends <a href="../../../../../com/netflix/genie/common/dto/ExecutionEnvironmen
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html#withClusterCriteria-java.util.List-">withClusterCriteria</a></span>(java.util.List&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code>
+<div class="block">Set the ordered list of <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> that should be used to resolve which clusters this command
+ can run on at any given time.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html#withExecutable-java.lang.String-">withExecutable</a></span>(java.lang.String&nbsp;executable)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
 <div class="block"><span class="deprecationComment">this setter is provided transitionally to make both 'executable' and 'executableAndArguments'
@@ -203,7 +210,7 @@ extends <a href="../../../../../com/netflix/genie/common/dto/ExecutionEnvironmen
 </div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html#withExecutableAndArguments-java.util.List-">withExecutableAndArguments</a></span>(java.util.List&lt;java.lang.String&gt;&nbsp;executableAndArguments)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
@@ -213,7 +220,7 @@ extends <a href="../../../../../com/netflix/genie/common/dto/ExecutionEnvironmen
 </div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html#withMemory-java.lang.Integer-">withMemory</a></span>(java.lang.Integer&nbsp;memory)</code>
 <div class="block">Set the amount of memory (in MB) to default jobs run with this command to use.</div>
@@ -378,6 +385,24 @@ public&nbsp;<a href="../../../../../com/netflix/genie/common/dto/Command.Builder
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>executableAndArguments</code> - the executable and its argument</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The builder</dd>
+</dl>
+</li>
+</ul>
+<a name="withClusterCriteria-java.util.List-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withClusterCriteria</h4>
+<pre>public&nbsp;<a href="../../../../../com/netflix/genie/common/dto/Command.Builder.html" title="class in com.netflix.genie.common.dto">Command.Builder</a>&nbsp;withClusterCriteria(@Nullable
+                                           java.util.List&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</pre>
+<div class="block">Set the ordered list of <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> that should be used to resolve which clusters this command
+ can run on at any given time.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>clusterCriteria</code> - The <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The builder</dd>
 </dl>

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -183,56 +183,82 @@ extends <a href="../../../../../../com/netflix/genie/web/data/entities/BaseEntit
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#addClusterCriterion-com.netflix.genie.web.data.entities.CriterionEntity-">addClusterCriterion</a></span>(<a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a>&nbsp;criterion)</code>
+<div class="block">Add a new cluster criterion as the lowest priority criterion to evaluate for this command.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#addClusterCriterion-com.netflix.genie.web.data.entities.CriterionEntity-int-">addClusterCriterion</a></span>(<a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a>&nbsp;criterion,
+                   int&nbsp;priority)</code>
+<div class="block">Add a new cluster criterion with the given priority.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#equals-java.lang.Object-">equals</a></span>(java.lang.Object&nbsp;o)</code></td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Integer&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#getMemory--">getMemory</a></span>()</code>
 <div class="block">Get the default memory for a job using this command.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#hashCode--">hashCode</a></span>()</code></td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#removeApplication-com.netflix.genie.web.data.entities.ApplicationEntity-">removeApplication</a></span>(@NotNull <a href="../../../../../../com/netflix/genie/web/data/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.entities">ApplicationEntity</a>&nbsp;application)</code>
 <div class="block">Remove an application from this command.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#removeClusterCriterion-int-">removeClusterCriterion</a></span>(int&nbsp;priority)</code>
+<div class="block">Remove the criterion with the given priority from the list of available criterion for this command.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#setApplications-java.util.List-">setApplications</a></span>(java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/data/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.entities">ApplicationEntity</a>&gt;&nbsp;applications)</code>
 <div class="block">Sets the applications for this command.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#setClusterCriteria-java.util.List-">setClusterCriteria</a></span>(java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a>&gt;&nbsp;clusterCriteria)</code>
+<div class="block">Set the criteria, in priority order, that this command has for determining which available clusters to use
+ for a job.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#setClusters-java.util.Set-">setClusters</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/web/data/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.entities">ClusterEntity</a>&gt;&nbsp;clusters)</code>
 <div class="block">Set the clusters this command is available on.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#setConfigs-java.util.Set-">setConfigs</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/web/data/entities/FileEntity.html" title="class in com.netflix.genie.web.data.entities">FileEntity</a>&gt;&nbsp;configs)</code>
 <div class="block">Set all the files associated as configuration files for this cluster.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#setDependencies-java.util.Set-">setDependencies</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/web/data/entities/FileEntity.html" title="class in com.netflix.genie.web.data.entities">FileEntity</a>&gt;&nbsp;dependencies)</code>
 <div class="block">Set all the files associated as dependency files for this cluster.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#setExecutable-java.util.List-">setExecutable</a></span>(@NotEmpty java.util.List&lt;java.lang.String&gt;&nbsp;executable)</code>
 <div class="block">Set the executable and any default arguments for this command.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/entities/CommandEntity.html#setTags-java.util.Set-">setTags</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/web/data/entities/TagEntity.html" title="class in com.netflix.genie.web.data.entities">TagEntity</a>&gt;&nbsp;tags)</code>
 <div class="block">Set all the tags associated to this cluster.</div>
@@ -457,6 +483,75 @@ extends <a href="../../../../../../com/netflix/genie/web/data/entities/BaseEntit
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>clusters</code> - the clusters</dd>
+</dl>
+</li>
+</ul>
+<a name="setClusterCriteria-java.util.List-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setClusterCriteria</h4>
+<pre>public&nbsp;void&nbsp;setClusterCriteria(@Nullable
+                               java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a>&gt;&nbsp;clusterCriteria)</pre>
+<div class="block">Set the criteria, in priority order, that this command has for determining which available clusters to use
+ for a job.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>clusterCriteria</code> - The cluster criteria</dd>
+</dl>
+</li>
+</ul>
+<a name="addClusterCriterion-com.netflix.genie.web.data.entities.CriterionEntity-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addClusterCriterion</h4>
+<pre>public&nbsp;void&nbsp;addClusterCriterion(<a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a>&nbsp;criterion)</pre>
+<div class="block">Add a new cluster criterion as the lowest priority criterion to evaluate for this command.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>criterion</code> - The <a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities"><code>CriterionEntity</code></a> to add</dd>
+</dl>
+</li>
+</ul>
+<a name="addClusterCriterion-com.netflix.genie.web.data.entities.CriterionEntity-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addClusterCriterion</h4>
+<pre>public&nbsp;void&nbsp;addClusterCriterion(<a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a>&nbsp;criterion,
+                                int&nbsp;priority)</pre>
+<div class="block">Add a new cluster criterion with the given priority.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>criterion</code> - The new criterion to add</dd>
+<dd><code>priority</code> - The priority with which this criterion should be considered. 0 would be the highest
+                  priority and anything greater than the current size of the existing criteria will just be added
+                  to the end of the list. If a priority of <code>&lt; 0</code> is passed in the criterion is added
+                  as the highest priority (0).</dd>
+</dl>
+</li>
+</ul>
+<a name="removeClusterCriterion-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeClusterCriterion</h4>
+<pre>public&nbsp;<a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity</a>&nbsp;removeClusterCriterion(int&nbsp;priority)
+                                       throws java.lang.IllegalArgumentException</pre>
+<div class="block">Remove the criterion with the given priority from the list of available criterion for this command.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>priority</code> - The priority of the criterion to remove.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../com/netflix/genie/web/data/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.entities"><code>CriterionEntity</code></a> which was removed by this operation</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.lang.IllegalArgumentException</code> - If this value is <code>&lt; 0</code> or <code>&gt; {@link List#size()}</code> as it becomes
+                                  unclear what the user wants to do</dd>
 </dl>
 </li>
 </ul>

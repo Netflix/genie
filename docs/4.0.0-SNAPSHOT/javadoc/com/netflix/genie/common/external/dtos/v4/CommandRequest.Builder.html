@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -176,6 +176,13 @@ extends com.netflix.genie.common.external.dtos.v4.CommonRequestImpl.Builder&lt;<
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest.Builder</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.Builder.html#withClusterCriteria-java.util.List-">withClusterCriteria</a></span>(java.util.List&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code>
+<div class="block">Set the ordered list of <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> that should be used to resolve which clusters this command
+ can run on at any given time.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest.Builder</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.Builder.html#withMemory-java.lang.Integer-">withMemory</a></span>(java.lang.Integer&nbsp;memory)</code>
 <div class="block">Set the amount of memory (in MB) to default jobs run with this command to use.</div>
 </td>
@@ -265,6 +272,24 @@ extends com.netflix.genie.common.external.dtos.v4.CommonRequestImpl.Builder&lt;<
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>checkDelay</code> - The amount of time (in milliseconds) between checks. Minimum 1 preferably much more</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The builder</dd>
+</dl>
+</li>
+</ul>
+<a name="withClusterCriteria-java.util.List-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withClusterCriteria</h4>
+<pre>public&nbsp;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest.Builder</a>&nbsp;withClusterCriteria(@Nullable
+                                                  java.util.List&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</pre>
+<div class="block">Set the ordered list of <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> that should be used to resolve which clusters this command
+ can run on at any given time.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>clusterCriteria</code> - The <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The builder</dd>
 </dl>
