@@ -59,8 +59,11 @@ class S3ProtocolResolverSpec extends Specification {
         location                                               | can     | resultClosure
         "s3://aBucket/key/path/file.tar.gz"                    | "can"   | successClosure
         "file:/tmp/blah.txt"                                   | "can't" | failedClosure
-        "s3n://aBucket/blah.txt"                               | "can't" | failedClosure
+        "s3n://aBucket/blah.txt"                               | "can"   | successClosure
+        "s3a://aBucket/blah.txt"                               | "can"   | successClosure
+        "s3z://aBucket/blah.txt"                               | "can't" | failedClosure
         "http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg" | "can"   | successClosure
         "http://mybucket.s3.amazonaws.com/puppy.jpg"           | "can"   | successClosure
+        "http://example.com/blah.txt"                          | "can't" | failedClosure
     }
 }
