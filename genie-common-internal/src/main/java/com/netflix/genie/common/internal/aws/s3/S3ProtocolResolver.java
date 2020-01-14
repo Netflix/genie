@@ -40,6 +40,11 @@ import org.springframework.core.task.TaskExecutor;
 @Slf4j
 public class S3ProtocolResolver implements ProtocolResolver {
 
+    private static final String S3N_PROTOCOL = "s3n:";
+    private static final String S3A_PROTOCOL = "s3a:";
+    private static final String S3_REGEX = "s3.:";
+    private static final String S3_REPLACEMENT = "s3:";
+
     private final S3ClientFactory s3ClientFactory;
     private final TaskExecutor s3TaskExecutor;
 
@@ -66,8 +71,8 @@ public class S3ProtocolResolver implements ProtocolResolver {
 
         final String normalizedLocation;
         // Rewrite s3n:// and s3a:// URIs as s3:// for backward compatibility
-        if (location.startsWith("s3n:") || location.startsWith("s3a:")) {
-            normalizedLocation = location.replaceFirst("s3.:", "s3:");
+        if (location.startsWith(S3N_PROTOCOL) || location.startsWith(S3A_PROTOCOL)) {
+            normalizedLocation = location.replaceFirst(S3_REGEX, S3_REPLACEMENT);
         } else {
             normalizedLocation = location;
         }
