@@ -27,6 +27,7 @@ import com.netflix.genie.proto.AgentManifestMessage
 import com.netflix.genie.proto.ServerAckMessage
 import com.netflix.genie.proto.ServerControlMessage
 import io.grpc.stub.StreamObserver
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.Resource
@@ -62,7 +63,8 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
         this.taskScheduler = Mock(TaskScheduler)
         this.service = new GRpcAgentFileStreamServiceImpl(
             converter,
-            taskScheduler
+            taskScheduler,
+            new SimpleMeterRegistry()
         )
         this.serverControlObserver = Mock(StreamObserver)
         this.serverTransmitObserver = Mock(StreamObserver)

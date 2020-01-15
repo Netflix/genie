@@ -34,6 +34,7 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorCom
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.JobSearchService;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -84,15 +85,17 @@ public class AgentRpcEndpointsAutoConfiguration {
      *
      * @param converter     The {@link JobDirectoryManifestProtoConverter} instance to use
      * @param taskScheduler The {@link TaskScheduler} to use to schedule tasks
+     * @param registry      The meter registry
      * @return An instance of {@link GRpcAgentFileStreamServiceImpl}
      */
     @Bean
     @ConditionalOnMissingBean(FileStreamServiceGrpc.FileStreamServiceImplBase.class)
     public GRpcAgentFileStreamServiceImpl gRpcAgentFileStreamService(
         final JobDirectoryManifestProtoConverter converter,
-        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler
+        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
+        final MeterRegistry registry
     ) {
-        return new GRpcAgentFileStreamServiceImpl(converter, taskScheduler);
+        return new GRpcAgentFileStreamServiceImpl(converter, taskScheduler, registry);
     }
 
     /**
@@ -101,15 +104,17 @@ public class AgentRpcEndpointsAutoConfiguration {
      *
      * @param agentRoutingService The {@link AgentRoutingService} implementation to use
      * @param taskScheduler       The {@link TaskScheduler} instance to use
+     * @param registry      The meter registry
      * @return A {@link GRpcHeartBeatServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(HeartBeatServiceGrpc.HeartBeatServiceImplBase.class)
     public GRpcHeartBeatServiceImpl gRpcHeartBeatService(
         final AgentRoutingService agentRoutingService,
-        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler
+        @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler,
+        final MeterRegistry registry
     ) {
-        return new GRpcHeartBeatServiceImpl(agentRoutingService, taskScheduler);
+        return new GRpcHeartBeatServiceImpl(agentRoutingService, taskScheduler, registry);
     }
 
     /**

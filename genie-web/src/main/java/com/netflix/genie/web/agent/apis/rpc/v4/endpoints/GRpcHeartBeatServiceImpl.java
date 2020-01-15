@@ -18,11 +18,13 @@
 package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.proto.AgentHeartBeat;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.ServerHeartBeat;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import io.grpc.stub.StreamObserver;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.TaskScheduler;
@@ -44,8 +46,10 @@ import java.util.concurrent.ScheduledFuture;
 public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServiceImplBase {
 
     private static final long HEART_BEAT_PERIOD_MILLIS = 5_000L; // TODO make configurable
+    private static final String HEARTBEATING_GAUGE_NAME = "genie.agents.heartbeating.gauge";
     private final Map<String, AgentStreamRecord> activeStreamsMap = Maps.newHashMap();
     private final ScheduledFuture<?> sendHeartbeatsFuture;
+    private MeterRegistry registry;
     private final AgentRoutingService agentRoutingService;
 
     /**
@@ -53,16 +57,21 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
      *
      * @param agentRoutingService The {@link AgentRoutingService} implementation to use
      * @param taskScheduler       The {@link TaskScheduler} instance to use
+     * @param registry            The meter registry
      */
     public GRpcHeartBeatServiceImpl(
         final AgentRoutingService agentRoutingService,
-        final TaskScheduler taskScheduler
+        final TaskScheduler taskScheduler,
+        final MeterRegistry registry
     ) {
         this.agentRoutingService = agentRoutingService;
         this.sendHeartbeatsFuture = taskScheduler.scheduleWithFixedDelay(
             this::sendHeartbeats,
             HEART_BEAT_PERIOD_MILLIS
         );
+        this.registry = registry;
+
+        this.registry.gaugeMapSize(HEARTBEATING_GAUGE_NAME, Sets.newHashSet(), activeStreamsMap);
     }
 
     /**

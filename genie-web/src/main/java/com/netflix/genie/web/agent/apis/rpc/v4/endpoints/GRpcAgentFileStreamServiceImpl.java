@@ -34,6 +34,7 @@ import com.netflix.genie.web.agent.resources.AgentFileResourceImpl;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.util.StreamBuffer;
 import io.grpc.stub.StreamObserver;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.TaskScheduler;
@@ -73,6 +74,8 @@ public class GRpcAgentFileStreamServiceImpl
     implements AgentFileStreamService {
 
     private static final long FILE_TRANSFER_BEGIN_TIMEOUT_MILLIS = 3000;
+    private static final String PENDING_TRANSFERS_GAUGE_NAME = "genie.agents.fileTransfers.pending.gauge";
+    private static final String IN_PROGRESS_TRANSFERS_GAUGE_NAME = "genie.agents.fileTransfers.inProgress.gauge";
 
     private final Map<String, ControlStreamObserver> jobIdControlStreamMap = Maps.newConcurrentMap();
     private final Map<String, StreamBuffer> pendingTransferBuffersMap = Maps.newConcurrentMap();
@@ -80,19 +83,25 @@ public class GRpcAgentFileStreamServiceImpl
     private final Map<String, StreamBuffer> inProgressTransferBuffersMap = Maps.newConcurrentMap();
     private final JobDirectoryManifestProtoConverter converter;
     private final TaskScheduler taskScheduler;
+    private final MeterRegistry registry;
 
     /**
      * Constructor.
      *
      * @param converter     The {@link JobDirectoryManifestProtoConverter} instance to use
      * @param taskScheduler A {@link TaskScheduler} instance to use
+     * @param registry      The meter registry
      */
     public GRpcAgentFileStreamServiceImpl(
         final JobDirectoryManifestProtoConverter converter,
-        final TaskScheduler taskScheduler
+        final TaskScheduler taskScheduler,
+        final MeterRegistry registry
     ) {
         this.converter = converter;
         this.taskScheduler = taskScheduler;
+        this.registry = registry;
+        this.registry.gaugeMapSize(PENDING_TRANSFERS_GAUGE_NAME, Sets.newHashSet(), pendingTransferBuffersMap);
+        this.registry.gaugeMapSize(IN_PROGRESS_TRANSFERS_GAUGE_NAME, Sets.newHashSet(), inProgressTransferBuffersMap);
     }
 
     /**
