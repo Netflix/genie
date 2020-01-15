@@ -18,7 +18,7 @@ plugins {
     id "org.ajoberstar.grgit" version "3.1.1"
     id "org.ajoberstar.git-publish" version "2.1.1"
     id "org.springframework.boot" version "${spring_boot_version}" apply false
-    id "org.asciidoctor.convert" version "1.5.9.2" apply false
+    id "org.asciidoctor.jvm.convert" version "2.4.0" apply false
     id "com.gorylenko.gradle-git-properties" version "2.0.0" apply false
     id "com.google.protobuf" version "0.8.8" apply false
     id "io.franzbecker.gradle-lombok" version "3.2.0" apply false
@@ -396,9 +396,9 @@ tasks.coveralls {
 task collectDocumentation(group: "documentation", description: "Copy the documentation from sub-projects") {
     dependsOn "aggregateJavadocs"
 
-    def restDocs = new File(project(":genie-web").buildDir, "asciidoc/html5")
-    def referenceDocs = new File(project(":genie-docs").buildDir, "asciidoc/html5")
-    def demoDocs = new File(project(":genie-demo").buildDir, "asciidoc/html5")
+    def restDocs = new File(project(":genie-web").buildDir, "docs/asciidoc")
+    def referenceDocs = new File(project(":genie-docs").buildDir, "docs/asciidoc")
+    def demoDocs = new File(project(":genie-demo").buildDir, "docs/asciidoc")
     def dockerCompose = new File(project(":genie-demo").projectDir, "src/main/docker/docker-compose.yml")
     def docsDir = new File(project.buildDir, "docs")
 
