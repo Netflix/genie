@@ -17,6 +17,24 @@ It will have to be added if one is desired otherwise metrics are just published 
 |AgentMetricsServiceImpl
 |-
 
+|genie.agents.heartbeating.gauge
+|The number of agents sending heartbeats to the server
+|count
+|GRpcHeartBeatServiceImpl
+|-
+
+|genie.agents.fileTransfers.pending.gauge
+|The number of pending file transfers requested from connected agents
+|count
+|GRpcHeartBeatServiceImpl
+|-
+
+|genie.agents.fileTransfers.inProgress.gauge
+|The number of in progress file transfers from connected agents
+|count
+|GRpcAgentFileStreamServiceImpl
+|-
+
 |genie.api.v3.jobs.submitJobWithoutAttachments.rate
 |Counts the number of jobs submitted without an attachment
 |count
