@@ -134,8 +134,8 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers-">CommandRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
-                     <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ResourceAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ResourceAssemblers</a>&nbsp;resourceAssemblers)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">CommandRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
+                     <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -208,7 +208,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ApplicationResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ApplicationResource</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Application.html" title="class in com.netflix.genie.common.dto">Application</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#getApplicationsForCommand-java.lang.String-">getApplicationsForCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the applications configured for a given command.</div>
 </td>
@@ -220,20 +220,20 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i10" class="altColor">
-<td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.Set&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#getClustersForCommand-java.lang.String-java.util.Set-">getClustersForCommand</a></span>(java.lang.String&nbsp;id,
                      java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Get all the clusters this command is associated with.</div>
 </td>
 </tr>
 <tr id="i11" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#getCommand-java.lang.String-">getCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get Command configuration for given id.</div>
 </td>
 </tr>
 <tr id="i12" class="altColor">
-<td class="colFirst"><code>org.springframework.hateoas.PagedResources&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a>&gt;</code></td>
+<td class="colFirst"><code>org.springframework.hateoas.PagedModel&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#getCommands-java.lang.String-java.lang.String-java.util.Set-java.util.Set-org.springframework.data.domain.Pageable-org.springframework.data.web.PagedResourcesAssembler-">getCommands</a></span>(java.lang.String&nbsp;name,
            java.lang.String&nbsp;user,
            java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
@@ -391,7 +391,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers-">
+<a name="CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -399,12 +399,12 @@ extends java.lang.Object</pre>
 <h4>CommandRestController</h4>
 <pre>@Autowired
 public&nbsp;CommandRestController(<a href="../../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
-                                        <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ResourceAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ResourceAssemblers</a>&nbsp;resourceAssemblers)</pre>
+                                        <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>commandPersistenceService</code> - The command configuration service to use.</dd>
-<dd><code>resourceAssemblers</code> - The encapsulation of all available V3 resource assemblers</dd>
+<dd><code>entityModelAssemblers</code> - The encapsulation of all available V3 resource assemblers</dd>
 </dl>
 </li>
 </ul>
@@ -447,9 +447,9 @@ public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;c
 <pre>@GetMapping(value="/{id}",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a>&nbsp;getCommand(@PathVariable(value="id")
-                                                                                                                                     java.lang.String&nbsp;id)
-                                                                                                                              throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&nbsp;getCommand(@PathVariable(value="id")
+                                                                                                                                                                      java.lang.String&nbsp;id)
+                                                                                                                                                               throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get Command configuration for given id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -469,18 +469,18 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/
 <h4>getCommands</h4>
 <pre>@GetMapping(produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;org.springframework.hateoas.PagedResources&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a>&gt;&nbsp;getCommands(@RequestParam(value="name",required=false) @Nullable
-                                                                                                                                                       java.lang.String&nbsp;name,
-                                                                                                                                                       @RequestParam(value="user",required=false) @Nullable
-                                                                                                                                                       java.lang.String&nbsp;user,
-                                                                                                                                                       @RequestParam(value="status",required=false) @Nullable
-                                                                                                                                                       java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
-                                                                                                                                                       @RequestParam(value="tag",required=false) @Nullable
-                                                                                                                                                       java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
-                                                                                                                                                       @PageableDefault(size=64,sort="updated",direction=DESC)
-                                                                                                                                                       org.springframework.data.domain.Pageable&nbsp;page,
-                                                                                                                                                       org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&nbsp;assembler)
-                                                                                                                                                throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.PagedModel&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&gt;&nbsp;getCommands(@RequestParam(value="name",required=false) @Nullable
+                                                                                                                                                                                    java.lang.String&nbsp;name,
+                                                                                                                                                                                    @RequestParam(value="user",required=false) @Nullable
+                                                                                                                                                                                    java.lang.String&nbsp;user,
+                                                                                                                                                                                    @RequestParam(value="status",required=false) @Nullable
+                                                                                                                                                                                    java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
+                                                                                                                                                                                    @RequestParam(value="tag",required=false) @Nullable
+                                                                                                                                                                                    java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
+                                                                                                                                                                                    @PageableDefault(size=64,sort="updated",direction=DESC)
+                                                                                                                                                                                    org.springframework.data.domain.Pageable&nbsp;page,
+                                                                                                                                                                                    org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&nbsp;assembler)
+                                                                                                                                                                             throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get Command configuration based on user parameters.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -928,9 +928,9 @@ public&nbsp;void&nbsp;addApplicationsForCommand(@PathVariable(value="id")
 <pre>@GetMapping(value="/{id}/applications",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ApplicationResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ApplicationResource</a>&gt;&nbsp;getApplicationsForCommand(@PathVariable(value="id")
-                                                                                                                                                                                     java.lang.String&nbsp;id)
-                                                                                                                                                                              throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Application.html" title="class in com.netflix.genie.common.dto">Application</a>&gt;&gt;&nbsp;getApplicationsForCommand(@PathVariable(value="id")
+                                                                                                                                                                                                                      java.lang.String&nbsp;id)
+                                                                                                                                                                                                               throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the applications configured for a given command.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1022,11 +1022,11 @@ public&nbsp;void&nbsp;removeApplicationForCommand(@PathVariable(value="id")
 <pre>@GetMapping(value="/{id}/clusters",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;java.util.Set&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a>&gt;&nbsp;getClustersForCommand(@PathVariable(value="id")
-                                                                                                                                                                        java.lang.String&nbsp;id,
-                                                                                                                                                                        @RequestParam(value="status",required=false) @Nullable
-                                                                                                                                                                        java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)
-                                                                                                                                                                 throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;java.util.Set&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;&nbsp;getClustersForCommand(@PathVariable(value="id")
+                                                                                                                                                                                                         java.lang.String&nbsp;id,
+                                                                                                                                                                                                         @RequestParam(value="status",required=false) @Nullable
+                                                                                                                                                                                                         java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)
+                                                                                                                                                                                                  throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get all the clusters this command is associated with.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

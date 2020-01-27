@@ -134,10 +134,10 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services">JobLaunchService</a>&nbsp;jobLaunchService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services">JobLaunchService</a>&nbsp;jobLaunchService,
                  <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
                  <a href="../../../../../../../../com/netflix/genie/web/services/JobCoordinatorService.html" title="interface in com.netflix.genie.web.services">JobCoordinatorService</a>&nbsp;jobCoordinatorService,
-                 <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ResourceAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ResourceAssemblers</a>&nbsp;resourceAssemblers,
+                 <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers,
                  <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                  org.springframework.web.client.RestTemplate&nbsp;restTemplate,
                  <a href="../../../../../../../../com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a>&nbsp;jobDirectoryServerService,
@@ -167,7 +167,7 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>org.springframework.hateoas.PagedResources&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobSearchResultResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobSearchResultResource</a>&gt;</code></td>
+<td class="colFirst"><code>org.springframework.hateoas.PagedModel&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/search/JobSearchResult.html" title="class in com.netflix.genie.common.dto.search">JobSearchResult</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#findJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-org.springframework.data.domain.Pageable-org.springframework.data.web.PagedResourcesAssembler-">findJobs</a></span>(java.lang.String&nbsp;id,
         java.lang.String&nbsp;name,
         java.lang.String&nbsp;user,
@@ -189,37 +189,37 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJob-java.lang.String-">getJob</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get job information for given job id.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ApplicationResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ApplicationResource</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Application.html" title="class in com.netflix.genie.common.dto">Application</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobApplications-java.lang.String-">getJobApplications</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the applications used ot run the job.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobCluster-java.lang.String-">getJobCluster</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the cluster the job was run on or is currently running on.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobCommand-java.lang.String-">getJobCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the command the job was run with or is currently running with.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobExecutionResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobExecutionResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobExecution-java.lang.String-">getJobExecution</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the execution information about a job.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobMetadataResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobMetadataResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/JobMetadata.html" title="class in com.netflix.genie.common.dto">JobMetadata</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobMetadata-java.lang.String-">getJobMetadata</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the metadata information about a job.</div>
 </td>
@@ -234,7 +234,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobRequestResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobRequestResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#getJobRequest-java.lang.String-">getJobRequest</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get the original job request.</div>
 </td>
@@ -295,7 +295,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">
+<a name="JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -305,7 +305,7 @@ extends java.lang.Object</pre>
 public&nbsp;JobRestController(<a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services">JobLaunchService</a>&nbsp;jobLaunchService,
                                     <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
                                     <a href="../../../../../../../../com/netflix/genie/web/services/JobCoordinatorService.html" title="interface in com.netflix.genie.web.services">JobCoordinatorService</a>&nbsp;jobCoordinatorService,
-                                    <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ResourceAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ResourceAssemblers</a>&nbsp;resourceAssemblers,
+                                    <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers,
                                     <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
                                     @Qualifier(value="genieRestTemplate")
                                     org.springframework.web.client.RestTemplate&nbsp;restTemplate,
@@ -323,7 +323,7 @@ public&nbsp;JobRestController(<a href="../../../../../../../../com/netflix/genie
 <dd><code>jobLaunchService</code> - The <a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a> implementation to use</dd>
 <dd><code>jobSearchService</code> - The search service to use</dd>
 <dd><code>jobCoordinatorService</code> - The job coordinator service to use.</dd>
-<dd><code>resourceAssemblers</code> - The encapsulation of all the V3 resource assemblers</dd>
+<dd><code>entityModelAssemblers</code> - The encapsulation of all the V3 resource assemblers</dd>
 <dd><code>genieHostInfo</code> - Information about the host that the Genie process is running on</dd>
 <dd><code>restTemplate</code> - The rest template for http requests</dd>
 <dd><code>jobDirectoryServerService</code> - The service to handle serving back job directory resources</dd>
@@ -420,9 +420,9 @@ public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;s
 <h4>getJob</h4>
 <pre>@GetMapping(value="/{id}",
             produces="application/hal+json")
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobResource</a>&nbsp;getJob(@PathVariable(value="id")
-                                                                                                  java.lang.String&nbsp;id)
-                                                                                           throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a>&gt;&nbsp;getJob(@PathVariable(value="id")
+                                                                                                                                   java.lang.String&nbsp;id)
+                                                                                                                            throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get job information for given job id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -464,40 +464,40 @@ public&nbsp;com.fasterxml.jackson.databind.JsonNode&nbsp;getJobStatus(@PathVaria
 <h4>findJobs</h4>
 <pre>@GetMapping(produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;org.springframework.hateoas.PagedResources&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobSearchResultResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobSearchResultResource</a>&gt;&nbsp;findJobs(@RequestParam(value="id",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;id,
-                                                                                                                                                            @RequestParam(value="name",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;name,
-                                                                                                                                                            @RequestParam(value="user",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;user,
-                                                                                                                                                            @RequestParam(value="status",required=false) @Nullable
-                                                                                                                                                            java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
-                                                                                                                                                            @RequestParam(value="tag",required=false) @Nullable
-                                                                                                                                                            java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
-                                                                                                                                                            @RequestParam(value="clusterName",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;clusterName,
-                                                                                                                                                            @RequestParam(value="clusterId",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;clusterId,
-                                                                                                                                                            @RequestParam(value="commandName",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;commandName,
-                                                                                                                                                            @RequestParam(value="commandId",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;commandId,
-                                                                                                                                                            @RequestParam(value="minStarted",required=false) @Nullable
-                                                                                                                                                            java.lang.Long&nbsp;minStarted,
-                                                                                                                                                            @RequestParam(value="maxStarted",required=false) @Nullable
-                                                                                                                                                            java.lang.Long&nbsp;maxStarted,
-                                                                                                                                                            @RequestParam(value="minFinished",required=false) @Nullable
-                                                                                                                                                            java.lang.Long&nbsp;minFinished,
-                                                                                                                                                            @RequestParam(value="maxFinished",required=false) @Nullable
-                                                                                                                                                            java.lang.Long&nbsp;maxFinished,
-                                                                                                                                                            @RequestParam(value="grouping",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;grouping,
-                                                                                                                                                            @RequestParam(value="groupingInstance",required=false) @Nullable
-                                                                                                                                                            java.lang.String&nbsp;groupingInstance,
-                                                                                                                                                            @PageableDefault(sort="created",direction=DESC)
-                                                                                                                                                            org.springframework.data.domain.Pageable&nbsp;page,
-                                                                                                                                                            org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/search/JobSearchResult.html" title="class in com.netflix.genie.common.dto.search">JobSearchResult</a>&gt;&nbsp;assembler)
-                                                                                                                                                     throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.PagedModel&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/search/JobSearchResult.html" title="class in com.netflix.genie.common.dto.search">JobSearchResult</a>&gt;&gt;&nbsp;findJobs(@RequestParam(value="id",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;id,
+                                                                                                                                                                                         @RequestParam(value="name",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;name,
+                                                                                                                                                                                         @RequestParam(value="user",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;user,
+                                                                                                                                                                                         @RequestParam(value="status",required=false) @Nullable
+                                                                                                                                                                                         java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
+                                                                                                                                                                                         @RequestParam(value="tag",required=false) @Nullable
+                                                                                                                                                                                         java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
+                                                                                                                                                                                         @RequestParam(value="clusterName",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;clusterName,
+                                                                                                                                                                                         @RequestParam(value="clusterId",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;clusterId,
+                                                                                                                                                                                         @RequestParam(value="commandName",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;commandName,
+                                                                                                                                                                                         @RequestParam(value="commandId",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;commandId,
+                                                                                                                                                                                         @RequestParam(value="minStarted",required=false) @Nullable
+                                                                                                                                                                                         java.lang.Long&nbsp;minStarted,
+                                                                                                                                                                                         @RequestParam(value="maxStarted",required=false) @Nullable
+                                                                                                                                                                                         java.lang.Long&nbsp;maxStarted,
+                                                                                                                                                                                         @RequestParam(value="minFinished",required=false) @Nullable
+                                                                                                                                                                                         java.lang.Long&nbsp;minFinished,
+                                                                                                                                                                                         @RequestParam(value="maxFinished",required=false) @Nullable
+                                                                                                                                                                                         java.lang.Long&nbsp;maxFinished,
+                                                                                                                                                                                         @RequestParam(value="grouping",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;grouping,
+                                                                                                                                                                                         @RequestParam(value="groupingInstance",required=false) @Nullable
+                                                                                                                                                                                         java.lang.String&nbsp;groupingInstance,
+                                                                                                                                                                                         @PageableDefault(sort="created",direction=DESC)
+                                                                                                                                                                                         org.springframework.data.domain.Pageable&nbsp;page,
+                                                                                                                                                                                         org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/search/JobSearchResult.html" title="class in com.netflix.genie.common.dto.search">JobSearchResult</a>&gt;&nbsp;assembler)
+                                                                                                                                                                                  throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get jobs for given filter criteria.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -563,9 +563,9 @@ public&nbsp;void&nbsp;killJob(@PathVariable(value="id")
 <pre>@GetMapping(value="/{id}/request",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobRequestResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobRequestResource</a>&nbsp;getJobRequest(@PathVariable(value="id")
-                                                                                                                                                   java.lang.String&nbsp;id)
-                                                                                                                                            throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&gt;&nbsp;getJobRequest(@PathVariable(value="id")
+                                                                                                                                                                                    java.lang.String&nbsp;id)
+                                                                                                                                                                             throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the original job request.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -586,9 +586,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/
 <pre>@GetMapping(value="/{id}/execution",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobExecutionResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobExecutionResource</a>&nbsp;getJobExecution(@PathVariable(value="id")
-                                                                                                                                                         java.lang.String&nbsp;id)
-                                                                                                                                                  throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/JobExecution.html" title="class in com.netflix.genie.common.dto">JobExecution</a>&gt;&nbsp;getJobExecution(@PathVariable(value="id")
+                                                                                                                                                                                          java.lang.String&nbsp;id)
+                                                                                                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the execution information about a job.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -609,9 +609,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/
 <pre>@GetMapping(value="/{id}/metadata",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/JobMetadataResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">JobMetadataResource</a>&nbsp;getJobMetadata(@PathVariable(value="id")
-                                                                                                                                                      java.lang.String&nbsp;id)
-                                                                                                                                               throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/JobMetadata.html" title="class in com.netflix.genie.common.dto">JobMetadata</a>&gt;&nbsp;getJobMetadata(@PathVariable(value="id")
+                                                                                                                                                                                       java.lang.String&nbsp;id)
+                                                                                                                                                                                throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the metadata information about a job.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -634,9 +634,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/
 <pre>@GetMapping(value="/{id}/cluster",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a>&nbsp;getJobCluster(@PathVariable(value="id")
-                                                                                                                                                java.lang.String&nbsp;id)
-                                                                                                                                         throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&nbsp;getJobCluster(@PathVariable(value="id")
+                                                                                                                                                                                 java.lang.String&nbsp;id)
+                                                                                                                                                                          throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the cluster the job was run on or is currently running on.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -657,9 +657,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/
 <pre>@GetMapping(value="/{id}/command",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a>&nbsp;getJobCommand(@PathVariable(value="id")
-                                                                                                                                                java.lang.String&nbsp;id)
-                                                                                                                                         throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&nbsp;getJobCommand(@PathVariable(value="id")
+                                                                                                                                                                                 java.lang.String&nbsp;id)
+                                                                                                                                                                          throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the command the job was run with or is currently running with.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -680,9 +680,9 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/
 <pre>@GetMapping(value="/{id}/applications",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ApplicationResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ApplicationResource</a>&gt;&nbsp;getJobApplications(@PathVariable(value="id")
-                                                                                                                                                                              java.lang.String&nbsp;id)
-                                                                                                                                                                       throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Application.html" title="class in com.netflix.genie.common.dto">Application</a>&gt;&gt;&nbsp;getJobApplications(@PathVariable(value="id")
+                                                                                                                                                                                                               java.lang.String&nbsp;id)
+                                                                                                                                                                                                        throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the applications used ot run the job.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

@@ -134,8 +134,8 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#ClusterRestController-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers-">ClusterRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
-                     <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ResourceAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ResourceAssemblers</a>&nbsp;resourceAssemblers)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#ClusterRestController-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">ClusterRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
+                     <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -201,13 +201,13 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a></code></td>
+<td class="colFirst"><code>org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#getCluster-java.lang.String-">getCluster</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Get cluster configuration from unique id.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code>org.springframework.hateoas.PagedResources&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a>&gt;</code></td>
+<td class="colFirst"><code>org.springframework.hateoas.PagedModel&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#getClusters-java.lang.String-java.util.Set-java.util.Set-java.lang.Long-java.lang.Long-org.springframework.data.domain.Pageable-org.springframework.data.web.PagedResourcesAssembler-">getClusters</a></span>(java.lang.String&nbsp;name,
            java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
            java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
@@ -219,7 +219,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a>&gt;</code></td>
+<td class="colFirst"><code>java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#getCommandsForCluster-java.lang.String-java.util.Set-">getCommandsForCluster</a></span>(java.lang.String&nbsp;id,
                      java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Get all the commandIds configured for a given cluster.</div>
@@ -345,7 +345,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="ClusterRestController-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ResourceAssemblers-">
+<a name="ClusterRestController-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -353,12 +353,12 @@ extends java.lang.Object</pre>
 <h4>ClusterRestController</h4>
 <pre>@Autowired
 public&nbsp;ClusterRestController(<a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
-                                        <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ResourceAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ResourceAssemblers</a>&nbsp;resourceAssemblers)</pre>
+                                        <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>clusterPersistenceService</code> - The cluster configuration service to use.</dd>
-<dd><code>resourceAssemblers</code> - The encapsulation of all available V3 resource assemblers</dd>
+<dd><code>entityModelAssemblers</code> - The encapsulation of all available V3 resource assemblers</dd>
 </dl>
 </li>
 </ul>
@@ -401,9 +401,9 @@ public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;c
 <pre>@GetMapping(value="/{id}",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a>&nbsp;getCluster(@PathVariable(value="id")
-                                                                                                                                     java.lang.String&nbsp;id)
-                                                                                                                              throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&nbsp;getCluster(@PathVariable(value="id")
+                                                                                                                                                                      java.lang.String&nbsp;id)
+                                                                                                                                                               throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get cluster configuration from unique id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -423,20 +423,20 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/
 <h4>getClusters</h4>
 <pre>@GetMapping(produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;org.springframework.hateoas.PagedResources&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/ClusterResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">ClusterResource</a>&gt;&nbsp;getClusters(@RequestParam(value="name",required=false) @Nullable
-                                                                                                                                                       java.lang.String&nbsp;name,
-                                                                                                                                                       @RequestParam(value="status",required=false) @Nullable
-                                                                                                                                                       java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
-                                                                                                                                                       @RequestParam(value="tag",required=false) @Nullable
-                                                                                                                                                       java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
-                                                                                                                                                       @RequestParam(value="minUpdateTime",required=false) @Nullable
-                                                                                                                                                       java.lang.Long&nbsp;minUpdateTime,
-                                                                                                                                                       @RequestParam(value="maxUpdateTime",required=false) @Nullable
-                                                                                                                                                       java.lang.Long&nbsp;maxUpdateTime,
-                                                                                                                                                       @PageableDefault(size=64,sort="updated",direction=DESC)
-                                                                                                                                                       org.springframework.data.domain.Pageable&nbsp;page,
-                                                                                                                                                       org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&nbsp;assembler)
-                                                                                                                                                throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;org.springframework.hateoas.PagedModel&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;&nbsp;getClusters(@RequestParam(value="name",required=false) @Nullable
+                                                                                                                                                                                    java.lang.String&nbsp;name,
+                                                                                                                                                                                    @RequestParam(value="status",required=false) @Nullable
+                                                                                                                                                                                    java.util.Set&lt;java.lang.String&gt;&nbsp;statuses,
+                                                                                                                                                                                    @RequestParam(value="tag",required=false) @Nullable
+                                                                                                                                                                                    java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
+                                                                                                                                                                                    @RequestParam(value="minUpdateTime",required=false) @Nullable
+                                                                                                                                                                                    java.lang.Long&nbsp;minUpdateTime,
+                                                                                                                                                                                    @RequestParam(value="maxUpdateTime",required=false) @Nullable
+                                                                                                                                                                                    java.lang.Long&nbsp;maxUpdateTime,
+                                                                                                                                                                                    @PageableDefault(size=64,sort="updated",direction=DESC)
+                                                                                                                                                                                    org.springframework.data.domain.Pageable&nbsp;page,
+                                                                                                                                                                                    org.springframework.data.web.PagedResourcesAssembler&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&nbsp;assembler)
+                                                                                                                                                                             throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get cluster config based on user params. If empty strings are passed for
  they are treated as nulls (not false).</div>
 <dl>
@@ -886,11 +886,11 @@ public&nbsp;void&nbsp;addCommandsForCluster(@PathVariable(value="id")
 <pre>@GetMapping(value="/{id}/commands",
             produces="application/hal+json")
  @ResponseStatus(value=OK)
-public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/resources/CommandResource.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.resources">CommandResource</a>&gt;&nbsp;getCommandsForCluster(@PathVariable(value="id")
-                                                                                                                                                                         java.lang.String&nbsp;id,
-                                                                                                                                                                         @RequestParam(value="status",required=false) @Nullable
-                                                                                                                                                                         java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)
-                                                                                                                                                                  throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&gt;&gt;&nbsp;getCommandsForCluster(@PathVariable(value="id")
+                                                                                                                                                                                                          java.lang.String&nbsp;id,
+                                                                                                                                                                                                          @RequestParam(value="status",required=false) @Nullable
+                                                                                                                                                                                                          java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)
+                                                                                                                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get all the commandIds configured for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

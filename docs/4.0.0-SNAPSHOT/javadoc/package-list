@@ -57,7 +57,6 @@ com.netflix.genie.web.agent.services
 com.netflix.genie.web.agent.services.impl
 com.netflix.genie.web.apis.rest.v3.controllers
 com.netflix.genie.web.apis.rest.v3.hateoas.assemblers
-com.netflix.genie.web.apis.rest.v3.hateoas.resources
 com.netflix.genie.web.aspects
 com.netflix.genie.web.data.entities
 com.netflix.genie.web.data.entities.aggregates
