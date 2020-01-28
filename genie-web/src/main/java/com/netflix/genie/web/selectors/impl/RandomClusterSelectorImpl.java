@@ -15,12 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services.impl;
+package com.netflix.genie.web.selectors.impl;
 
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.web.services.ClusterSelector;
+import com.netflix.genie.web.selectors.ClusterSelector;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +37,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Slf4j
-public class RandomizedClusterSelectorImpl implements ClusterSelector {
+public class RandomClusterSelectorImpl implements ClusterSelector {
 
     /**
      * {@inheritDoc}
