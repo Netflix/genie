@@ -276,7 +276,7 @@ public interface JobPersistenceService {
      */
     boolean isV4(
         @NotBlank(message = "Id is missing and is required") String id
-    ) throws GenieNotFoundException;;
+    ) throws GenieNotFoundException;
 
     /**
      * Get the status for a job with the given {@code id}.

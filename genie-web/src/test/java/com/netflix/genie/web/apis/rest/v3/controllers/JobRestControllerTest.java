@@ -104,6 +104,24 @@ class JobRestControllerTest {
 
     private JobRestController controller;
 
+    private static Stream<Arguments> forwardJobOutputTestArguments() {
+        final HttpHeaders headers = new HttpHeaders();
+        return Stream.of(
+            Arguments.of(
+                HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", headers, null, null),
+                GenieNotFoundException.class
+            ),
+            Arguments.of(
+                HttpClientErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "Error", headers, null, null),
+                GenieException.class
+            ),
+            Arguments.of(
+                new RuntimeException("..."),
+                GenieException.class
+            )
+        );
+    }
+
     /**
      * Setup for the tests.
      */
@@ -698,28 +716,10 @@ class JobRestControllerTest {
             );
     }
 
-    private static Stream<Arguments> forwardJobOutputTestArguments() {
-        final HttpHeaders headers = new HttpHeaders();
-        return Stream.of(
-            Arguments.of(
-                HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", headers, null, null),
-                GenieNotFoundException.class
-            ),
-            Arguments.of(
-                HttpClientErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "Error", headers, null, null),
-                GenieException.class
-            ),
-            Arguments.of(
-                new RuntimeException("..."),
-                GenieException.class
-            )
-        );
-    }
-
     /**
      * Make sure directory forwarding happens when all conditions are met.
      *
-     * @throws GenieException   on error
+     * @throws GenieException on error
      */
     @ParameterizedTest(name = "Exception: {0} throws {1}")
     @MethodSource("forwardJobOutputTestArguments")
