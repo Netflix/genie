@@ -26,7 +26,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFou
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
-import com.netflix.genie.web.services.ClusterSelector;
+import com.netflix.genie.web.selectors.ClusterSelector;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 

@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services.impl;
+package com.netflix.genie.web.selectors.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
@@ -27,20 +27,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
- * Test for the cluster selector.
+ * Test for {@link RandomClusterSelectorImpl}.
  *
  * @author tgianos
  */
-class RandomizedClusterSelectorImplTest {
+class RandomClusterSelectorImplTest {
 
-    private RandomizedClusterSelectorImpl clb;
+    private RandomClusterSelectorImpl clb;
 
     /**
      * Setup the tests.
      */
     @BeforeEach
     void setup() {
-        this.clb = new RandomizedClusterSelectorImpl();
+        this.clb = new RandomClusterSelectorImpl();
     }
 
     /**

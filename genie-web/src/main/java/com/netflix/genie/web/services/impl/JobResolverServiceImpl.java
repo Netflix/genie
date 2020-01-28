@@ -42,7 +42,7 @@ import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.ClusterSelector;
+import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;

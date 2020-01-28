@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2017 Netflix, Inc.
+ *  Copyright 2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
  */
 
 /**
- * Classes related to plug-in selectors (e.g. ClusterSelector).
+ * Auto configuration for the {@literal selectors} module of Genie web.
  *
  * @author tgianos
- * @since 3.1.0
+ * @since 4.0.0
  */
 @ParametersAreNonnullByDefault
-package com.netflix.genie.web.services.selectors;
+package com.netflix.genie.web.spring.autoconfigure.selectors;
 
 import javax.annotation.ParametersAreNonnullByDefault;

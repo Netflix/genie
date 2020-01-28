@@ -41,10 +41,9 @@ import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
-import com.netflix.genie.web.services.ClusterSelector;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
@@ -69,8 +68,6 @@ import com.netflix.genie.web.services.impl.JobLaunchServiceImpl;
 import com.netflix.genie.web.services.impl.JobResolverServiceImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
-import com.netflix.genie.web.services.impl.RandomizedClusterSelectorImpl;
-import com.netflix.genie.web.services.selectors.ScriptClusterSelector;
 import com.netflix.genie.web.tasks.job.JobCompletionService;
 import com.netflix.genie.web.util.ProcessChecker;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -78,13 +75,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.retry.support.RetryTemplate;
@@ -115,15 +109,6 @@ import java.util.List;
 )
 @Slf4j
 public class ServicesAutoConfiguration {
-
-    /**
-     * The relative order of the {@link ScriptClusterSelector} if one is enabled relative to other
-     * {@link ClusterSelector} instances that may be in the context. This allows users to fit {@literal 50} more
-     * selectors between the script selector and the default {@link RandomizedClusterSelectorImpl}. If
-     * the user wants to place a selector implementation before the script one they only need to subtract from this
-     * value.
-     */
-    public static final int SCRIPT_CLUSTER_SELECTOR_PRECEDENCE = Ordered.LOWEST_PRECEDENCE - 50;
 
     /**
      * Collection of properties related to job execution.
@@ -479,40 +464,6 @@ public class ServicesAutoConfiguration {
             jobFileService,
             jobDirectoryManifestCreatorService
         );
-    }
-
-    /**
-     * Produce the {@link ScriptClusterSelector} instance to use for this Genie node if it was configured by the user.
-     * This bean is only created if the script is configured.
-     *
-     * @param clusterSelectorScript the cluster selector script
-     * @param registry              the metrics registry
-     * @return a {@link ScriptClusterSelector}
-     */
-    @Bean
-    @Order(SCRIPT_CLUSTER_SELECTOR_PRECEDENCE)
-    @ConditionalOnBean(ClusterSelectorScript.class)
-    public ScriptClusterSelector scriptClusterSelector(
-        final ClusterSelectorScript clusterSelectorScript,
-        final MeterRegistry registry
-    ) {
-        return new ScriptClusterSelector(
-            clusterSelectorScript,
-            registry
-        );
-    }
-
-    /**
-     * The default cluster selector if all others fail.
-     * <p>
-     * Defaults to {@link Ordered#LOWEST_PRECEDENCE}.
-     *
-     * @return A {@link RandomizedClusterSelectorImpl} instance
-     */
-    @Bean
-    @Order
-    public RandomizedClusterSelectorImpl randomizedClusterSelector() {
-        return new RandomizedClusterSelectorImpl();
     }
 
     /**

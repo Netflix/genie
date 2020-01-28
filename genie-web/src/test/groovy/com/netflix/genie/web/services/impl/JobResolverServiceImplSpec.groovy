@@ -42,7 +42,7 @@ import com.netflix.genie.web.data.services.CommandPersistenceService
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.properties.JobsProperties
-import com.netflix.genie.web.services.ClusterSelector
+import com.netflix.genie.web.selectors.ClusterSelector
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils

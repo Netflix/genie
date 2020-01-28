@@ -37,7 +37,6 @@ import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
@@ -208,19 +207,6 @@ public class ServicesAutoConfigurationTest {
                 Mockito.mock(JobResolverService.class),
                 Mockito.mock(MeterRegistry.class),
                 new GenieHostInfo(UUID.randomUUID().toString())
-            )
-        );
-    }
-
-    /**
-     * Can get a bean for Script Cluster Selector.
-     */
-    @Test
-    public void canGetScriptClusterSelectorBean() {
-        Assert.assertNotNull(
-            this.servicesAutoConfiguration.scriptClusterSelector(
-                Mockito.mock(ClusterSelectorScript.class),
-                Mockito.mock(MeterRegistry.class)
             )
         );
     }

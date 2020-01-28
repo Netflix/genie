@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services.selectors;
+package com.netflix.genie.web.selectors.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
@@ -25,7 +25,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFou
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import com.netflix.genie.web.scripts.ClusterSelectorScript;
-import com.netflix.genie.web.services.ClusterSelector;
+import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
  * @since 3.1.0
  */
 @Slf4j
-public class ScriptClusterSelector implements ClusterSelector {
+public class ScriptClusterSelectorImpl implements ClusterSelector {
 
     static final String SELECT_TIMER_NAME = "genie.jobs.clusters.selectors.script.select.timer";
     private static final Cluster NO_PREFERENCE = null;
@@ -65,7 +65,7 @@ public class ScriptClusterSelector implements ClusterSelector {
      * @param clusterSelectorScript the cluster selector script
      * @param registry              the metrics registry
      */
-    public ScriptClusterSelector(
+    public ScriptClusterSelectorImpl(
         final ClusterSelectorScript clusterSelectorScript,
         final MeterRegistry registry
     ) {

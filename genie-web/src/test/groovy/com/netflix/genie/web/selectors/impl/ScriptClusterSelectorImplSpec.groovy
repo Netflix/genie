@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.services.selectors
+package com.netflix.genie.web.selectors.impl
 
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobRequest
@@ -34,20 +34,20 @@ import spock.lang.Specification
 import java.util.concurrent.TimeUnit
 
 /**
- * Specifications for the ScriptClusterSelector class.
+ * Specifications for the {@link ScriptClusterSelectorImpl} class.
  */
-class ScriptClusterSelectorSpec extends Specification {
+class ScriptClusterSelectorImplSpec extends Specification {
 
     ClusterSelectorScript script
     MeterRegistry registry
-    ScriptClusterSelector scriptClusterSelector
+    ScriptClusterSelectorImpl scriptClusterSelector
     Timer timer
 
     def setup() {
         this.timer = Mock(Timer)
         this.script = Mock(ClusterSelectorScript)
         this.registry = Mock(MeterRegistry)
-        this.scriptClusterSelector = new ScriptClusterSelector(script, registry)
+        this.scriptClusterSelector = new ScriptClusterSelectorImpl(script, registry)
     }
 
     def "selectCluster"() {
@@ -72,7 +72,7 @@ class ScriptClusterSelectorSpec extends Specification {
         then:
         1 * script.selectCluster(jobRequest, clusters) >> null
         1 * registry.timer(
-            ScriptClusterSelector.SELECT_TIMER_NAME,
+            ScriptClusterSelectorImpl.SELECT_TIMER_NAME,
             {
                 it == expectedTags
             }
@@ -87,7 +87,7 @@ class ScriptClusterSelectorSpec extends Specification {
         then:
         1 * script.selectCluster(jobRequest, clusters) >> { throw executionException }
         1 * registry.timer(
-            ScriptClusterSelector.SELECT_TIMER_NAME,
+            ScriptClusterSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
         ) >> timer
         1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
@@ -105,7 +105,7 @@ class ScriptClusterSelectorSpec extends Specification {
         1 * cluster2.getMetadata() >> cluster2metadata
         1 * cluster2metadata.getName() >> "Cluster 2"
         1 * registry.timer(
-            ScriptClusterSelector.SELECT_TIMER_NAME,
+            ScriptClusterSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
         ) >> timer
         1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
