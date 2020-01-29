@@ -41,6 +41,7 @@ import com.netflix.genie.web.data.services.ClusterPersistenceService
 import com.netflix.genie.web.data.services.CommandPersistenceService
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.ResolvedJob
+import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.selectors.ClusterSelector
 import io.micrometer.core.instrument.MeterRegistry
@@ -65,6 +66,7 @@ class JobResolverServiceImplSpec extends Specification {
         def cluster1 = createCluster(cluster1Id)
         def cluster2 = createCluster(cluster2Id)
         def clusters = Sets.newHashSet(cluster1, cluster2)
+        ResourceSelectionResult<Cluster> clusterSelectionResult = Mock(ResourceSelectionResult)
 
         def commandId = UUID.randomUUID().toString()
         def executableBinary = UUID.randomUUID().toString()
@@ -75,14 +77,6 @@ class JobResolverServiceImplSpec extends Specification {
         def command = createCommand(commandId, executable)
 
         def jobId = UUID.randomUUID().toString()
-        def commandArgs = Lists.newArrayList(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        )
         def requestedArchiveLocationPrefix = UUID.randomUUID().toString()
 
         def expectedCommandArgs = executable
@@ -121,7 +115,11 @@ class JobResolverServiceImplSpec extends Specification {
             jobRequest.getCriteria().getClusterCriteria(),
             jobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * clusterSelector.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
+        1 * clusterSelector.selectCluster(
+            clusters,
+            _ as com.netflix.genie.common.dto.JobRequest
+        ) >> clusterSelectionResult
+        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
         jobSpec.getExecutableArgs() == expectedCommandArgs
@@ -150,7 +148,11 @@ class JobResolverServiceImplSpec extends Specification {
             jobRequestNoArchivalData.getCriteria().getClusterCriteria(),
             jobRequestNoArchivalData.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * clusterSelector.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
+        1 * clusterSelector.selectCluster(
+            clusters,
+            _ as com.netflix.genie.common.dto.JobRequest
+        ) >> clusterSelectionResult
+        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
         jobSpecNoArchivalData.getExecutableArgs() == expectedCommandArgs
@@ -186,7 +188,11 @@ class JobResolverServiceImplSpec extends Specification {
             savedJobRequest.getCriteria().getClusterCriteria(),
             savedJobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * clusterSelector.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
+        1 * clusterSelector.selectCluster(
+            clusters,
+            _ as com.netflix.genie.common.dto.JobRequest
+        ) >> clusterSelectionResult
+        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * commandService.getCommand(commandId) >> command
         1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
         1 * jobPersistenceService.saveResolvedJob(jobId, _ as ResolvedJob)

@@ -20,13 +20,14 @@ package com.netflix.genie.web.selectors.impl;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotEmpty;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -39,19 +40,30 @@ import java.util.Set;
 @Slf4j
 public class RandomClusterSelectorImpl implements ClusterSelector {
 
+    private static final String SELECTION_RATIONALE = "Selected randomly";
+    private final Random rand = new Random();
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public Cluster selectCluster(
+    public ResourceSelectionResult<Cluster> selectCluster(
         @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
         @Nonnull @NonNull final JobRequest jobRequest
     ) throws GenieException {
         log.debug("called");
+        final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
+        builder.withSelectionRationale(SELECTION_RATIONALE);
 
         // return a random one
-        final Random rand = new Random();
-
-        return new ArrayList<>(clusters).get(Math.abs(rand.nextInt(clusters.size())));
+        final int index = this.rand.nextInt(clusters.size());
+        final Iterator<Cluster> clusterIterator = clusters.iterator();
+        Cluster selectedCluster = null;
+        int i = 0;
+        while (clusterIterator.hasNext() && i <= index) {
+            selectedCluster = clusterIterator.next();
+            i++;
+        }
+        return builder.withSelectedResource(selectedCluster).build();
     }
 }

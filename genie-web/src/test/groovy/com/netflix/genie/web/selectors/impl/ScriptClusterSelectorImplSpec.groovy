@@ -21,7 +21,7 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException
+import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException
 import com.netflix.genie.web.scripts.ClusterSelectorScript
 import com.netflix.genie.web.util.MetricsConstants
@@ -51,23 +51,20 @@ class ScriptClusterSelectorImplSpec extends Specification {
     }
 
     def "selectCluster"() {
-
         Cluster cluster1 = Mock(Cluster)
         Cluster cluster2 = Mock(Cluster)
-        Cluster cluster3 = Mock(Cluster)
         Set<Cluster> clusters = Sets.newHashSet(cluster1, cluster2)
         ClusterMetadata cluster2metadata = Mock(ClusterMetadata)
         JobRequest jobRequest = Mock(JobRequest)
         Throwable executionException = new ScriptExecutionException("some error")
-        Throwable notFoundException = new GenieClusterNotFoundException("some error")
 
-        Cluster selectedCluster
+        ResourceSelectionResult<Cluster> result
         Set<Tag> expectedTags
 
         when: "Script returns null"
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "null"))
-        selectedCluster = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
+        result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
 
         then:
         1 * script.selectCluster(jobRequest, clusters) >> null
@@ -78,11 +75,11 @@ class ScriptClusterSelectorImplSpec extends Specification {
             }
         ) >> timer
         1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
-        selectedCluster == null
+        !result.getSelectedResource().isPresent()
 
         when: "Script throws"
         expectedTags = MetricsUtils.newFailureTagsSetForException(executionException)
-        selectedCluster = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
+        result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
 
         then:
         1 * script.selectCluster(jobRequest, clusters) >> { throw executionException }
@@ -91,13 +88,13 @@ class ScriptClusterSelectorImplSpec extends Specification {
             { it == expectedTags }
         ) >> timer
         1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
-        selectedCluster == null
+        !result.getSelectedResource().isPresent()
 
         when: "Script selects cluster"
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "cluster2"))
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, "Cluster 2"))
-        selectedCluster = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
+        result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
 
         then:
         1 * script.selectCluster(jobRequest, clusters) >> cluster2
@@ -109,6 +106,6 @@ class ScriptClusterSelectorImplSpec extends Specification {
             { it == expectedTags }
         ) >> timer
         1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
-        selectedCluster == cluster2
+        result.getSelectedResource().orElse(null) == cluster2
     }
 }

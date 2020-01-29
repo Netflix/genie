@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import com.netflix.genie.web.scripts.ClusterSelectorScript;
@@ -54,7 +55,9 @@ import java.util.concurrent.TimeUnit;
 public class ScriptClusterSelectorImpl implements ClusterSelector {
 
     static final String SELECT_TIMER_NAME = "genie.jobs.clusters.selectors.script.select.timer";
-    private static final Cluster NO_PREFERENCE = null;
+    private static final String NULL_TAG = "null";
+    private static final String NULL_RATIONALE = "Script returned null, no preference";
+    private static final String SCRIPT_SELECTED_RATIONALE = "Script selected this cluster";
 
     private final MeterRegistry registry;
     private final ClusterSelectorScript clusterSelectorScript;
@@ -77,33 +80,38 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
      * {@inheritDoc}
      */
     @Override
-    public Cluster selectCluster(
+    public ResourceSelectionResult<Cluster> selectCluster(
         @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
         @Nonnull @NonNull final JobRequest jobRequest
     ) throws GenieException {
         final long selectStart = System.nanoTime();
         log.debug("Called");
         final Set<Tag> tags = Sets.newHashSet();
+        final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
-            final Cluster selectedCluster = clusterSelectorScript.selectCluster(jobRequest, clusters);
+            final Cluster selectedCluster = this.clusterSelectorScript.selectCluster(jobRequest, clusters);
             MetricsUtils.addSuccessTags(tags);
 
             if (selectedCluster == null) {
-                log.debug("Script returned null, no preference");
-                tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "null"));
-                return NO_PREFERENCE;
+                log.debug(NULL_RATIONALE);
+                tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, NULL_TAG));
+                builder.withSelectionRationale(NULL_RATIONALE);
+                return builder.build();
             }
 
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, selectedCluster.getId()));
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, selectedCluster.getMetadata().getName()));
 
-            return selectedCluster;
-
+            return builder
+                .withSelectionRationale(SCRIPT_SELECTED_RATIONALE)
+                .withSelectedResource(selectedCluster)
+                .build();
         } catch (ScriptNotConfiguredException | ScriptExecutionException | GenieClusterNotFoundException e) {
-            log.error("Cluster selection error: " + e.getMessage(), e);
+            final String errorMessage = "Cluster selection error: " + e.getMessage();
+            log.error(errorMessage, e);
             MetricsUtils.addFailureTagsWithException(tags, e);
-            return NO_PREFERENCE;
+            return builder.withSelectionRationale(errorMessage).withSelectedResource(null).build();
         } finally {
             this.registry
                 .timer(SELECT_TIMER_NAME, tags)
