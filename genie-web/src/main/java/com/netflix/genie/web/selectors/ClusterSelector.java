@@ -20,11 +20,11 @@ package com.netflix.genie.web.selectors;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import lombok.NonNull;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
@@ -43,11 +43,10 @@ public interface ClusterSelector {
      *
      * @param clusters   An immutable, non-empty list of available clusters to choose from
      * @param jobRequest The job request these clusters are being selected for
-     * @return the "best" cluster to run job on or null if no cluster selected
+     * @return A {@link ResourceSelectionResult} which contains details about the outcome of the invocation
      * @throws GenieException if there is any error
      */
-    @Nullable
-    Cluster selectCluster(
+    ResourceSelectionResult<Cluster> selectCluster(
         @Nonnull @NonNull @NotEmpty Set<Cluster> clusters,
         @Nonnull @NonNull JobRequest jobRequest
     ) throws GenieException;

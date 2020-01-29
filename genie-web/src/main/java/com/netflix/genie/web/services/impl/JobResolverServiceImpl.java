@@ -41,6 +41,7 @@ import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
+import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.services.JobResolverService;
@@ -65,6 +66,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -448,6 +450,8 @@ public class JobResolverServiceImpl implements JobResolverService {
     ) throws GeniePreconditionException {
         Cluster cluster = null;
         for (final ClusterSelector clusterSelector : this.clusterSelectorImpls) {
+            // TODO: We might want to get rid of this and use the result returned from the selector
+            //       Keeping for now in interest of dev time
             final String clusterSelectorClass;
             if (clusterSelector instanceof TargetClassAware) {
                 final Class<?> targetClass = ((TargetClassAware) clusterSelector).getTargetClass();
@@ -461,11 +465,13 @@ public class JobResolverServiceImpl implements JobResolverService {
             }
             counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
             try {
-                final Cluster selectedCluster = clusterSelector.selectCluster(
+                final ResourceSelectionResult<Cluster> result = clusterSelector.selectCluster(
                     clusters,
                     this.toV3JobRequest(id, jobRequest)
                 );
-                if (selectedCluster != null) {
+                final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
+                if (selectedClusterOptional.isPresent()) {
+                    final Cluster selectedCluster = selectedClusterOptional.get();
                     // Make sure the cluster existed in the original list of clusters
                     if (clusters.contains(selectedCluster)) {
                         log.debug(

@@ -21,10 +21,13 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.Set;
 
 /**
  * Test for {@link RandomClusterSelectorImpl}.
@@ -49,16 +52,19 @@ class RandomClusterSelectorImplTest {
      * @throws GenieException For any problem if anything went wrong with the test.
      */
     @Test
-    void testValidClusterList() throws GenieException {
+    void testValidClusterSet() throws GenieException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final Cluster cluster2 = Mockito.mock(Cluster.class);
         final Cluster cluster3 = Mockito.mock(Cluster.class);
-        Assertions.assertThat(
-            this.clb.selectCluster(
-                Sets.newHashSet(cluster1, cluster2, cluster3),
-                Mockito.mock(JobRequest.class)
-            )
-        ).isNotNull();
+        final Set<Cluster> clusters = Sets.newHashSet(cluster1, cluster2, cluster3);
+        final JobRequest jobRequest = Mockito.mock(JobRequest.class);
+        for (int i = 0; i < 5; i++) {
+            final ResourceSelectionResult<Cluster> result = this.clb.selectCluster(clusters, jobRequest);
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getSelectorClass()).isEqualTo(RandomClusterSelectorImpl.class);
+            Assertions.assertThat(result.getSelectedResource()).isPresent().get().isIn(clusters);
+            Assertions.assertThat(result.getSelectionRationale()).isPresent();
+        }
     }
 
     /**
@@ -67,15 +73,15 @@ class RandomClusterSelectorImplTest {
      * @throws GenieException For any problem if anything went wrong with the test.
      */
     @Test
-    void testValidClusterListOfOne() throws GenieException {
+    void testValidClusterSetOfOne() throws GenieException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
+        final ResourceSelectionResult<Cluster> result = this.clb.selectCluster(
+            Sets.newHashSet(cluster1),
+            Mockito.mock(JobRequest.class)
+        );
         Assertions
-            .assertThat(
-                this.clb.selectCluster(
-                    Sets.newHashSet(cluster1),
-                    Mockito.mock(JobRequest.class)
-                )
-            )
-            .isEqualTo(cluster1);
+            .assertThat(result.getSelectedResource())
+            .isPresent()
+            .contains(cluster1);
     }
 }
