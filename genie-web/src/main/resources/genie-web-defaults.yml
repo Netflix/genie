@@ -115,6 +115,9 @@ management:
   endpoints:
     web:
       base-path: /admin
+    health:
+      show-components: always
+      show-details: always
 
 spring:
   application:
