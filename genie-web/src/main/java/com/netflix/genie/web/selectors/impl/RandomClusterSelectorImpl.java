@@ -27,8 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotEmpty;
-import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -38,10 +36,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Slf4j
-public class RandomClusterSelectorImpl implements ClusterSelector {
-
-    private static final String SELECTION_RATIONALE = "Selected randomly";
-    private final Random rand = new Random();
+public class RandomClusterSelectorImpl extends RandomResourceSelectorBase<Cluster> implements ClusterSelector {
 
     /**
      * {@inheritDoc}
@@ -55,15 +50,7 @@ public class RandomClusterSelectorImpl implements ClusterSelector {
         final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
         builder.withSelectionRationale(SELECTION_RATIONALE);
 
-        // return a random one
-        final int index = this.rand.nextInt(clusters.size());
-        final Iterator<Cluster> clusterIterator = clusters.iterator();
-        Cluster selectedCluster = null;
-        int i = 0;
-        while (clusterIterator.hasNext() && i <= index) {
-            selectedCluster = clusterIterator.next();
-            i++;
-        }
+        final Cluster selectedCluster = this.randomlySelect(clusters);
         return builder.withSelectedResource(selectedCluster).build();
     }
 }
