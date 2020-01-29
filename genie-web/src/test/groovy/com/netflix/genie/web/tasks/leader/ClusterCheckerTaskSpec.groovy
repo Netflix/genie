@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.Job
 import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
+import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.data.services.AgentConnectionPersistenceService
 import com.netflix.genie.web.data.services.JobPersistenceService
@@ -133,6 +134,15 @@ class ClusterCheckerTaskSpec extends Specification {
             getStackTrace() >> new StackTraceElement[0]
             getCause() >> null
         }
+
+        def badResponse1 = "{}"
+        def badResponse2 = "{" +
+            "\"status\":\"UP\"" +
+            "}"
+        def badResponse3 = "{" +
+            "\"status\":\"UP\", " +
+            "\"components\": {}" +
+            "}"
 
         def jobPersistenceServiceException = new GenieNotFoundException("No such job")
 
@@ -302,6 +312,17 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.HOST, host2,
             MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS
         ).count() == 4
+
+        when:
+        this.task.run()
+
+        then:
+        1 * this.jobSearchService.getAllHostsWithActiveJobs() >> hosts
+        1 * this.restTemplate.getForObject(host1url, String.class) >> badResponse1
+        1 * this.restTemplate.getForObject(host2url, String.class) >> badResponse2
+        1 * this.restTemplate.getForObject(host3url, String.class) >> badResponse3
+
+        this.task.getErrorCountsSize() == 0
 
         when:
         this.task.cleanup()

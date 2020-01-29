@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
@@ -325,7 +326,7 @@ public class ClusterCheckerTask extends LeadershipTask {
     @NoArgsConstructor
     private static class HealthIndicatorDetails {
         private Status status;
-        private Map<String, Object> details;
+        private Map<String, Object> details = Maps.newHashMap();
     }
 
     @Getter
@@ -333,6 +334,6 @@ public class ClusterCheckerTask extends LeadershipTask {
     @NoArgsConstructor
     private static class HealthEndpointResponse {
         private Status status;
-        private Map<String, HealthIndicatorDetails> components;
+        private Map<String, HealthIndicatorDetails> components = Maps.newHashMap();
     }
 }
