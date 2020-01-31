@@ -89,23 +89,11 @@ It will have to be added if one is desired otherwise metrics are just published 
 |S3FileTransferImpl
 |status, exceptionClass
 
-|genie.health.endpoint.timer
-|Time taken for the Health endpoint to collect and aggregate state from health indicators
-|nanoseconds
-|HealthCheckMetricsAspect
-|status, exceptionClass
-
-|genie.health.failure.counter
-|Counter for calls each health indicator that reports status other than UP
-|count
-|HealthCheckMetricsAspect
-|status, exceptionClass, healthIndicatorName
-
 |genie.health.indicator.timer
 |Time taken for each health indicator to report its status
 |nanoseconds
 |HealthCheckMetricsAspect
-|status, exceptionClass, healthIndicatorClass
+|healthIndicatorClass, healthIndicatorStatus
 
 |genie.jobs.active.gauge
 |Number of jobs currently active locally
