@@ -32,6 +32,7 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorCom
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.JobSearchService;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -178,6 +179,11 @@ class AgentRpcEndpointsAutoConfigurationTest {
         @Bean
         GenieHostInfo genieHostInfo() {
             return Mockito.mock(GenieHostInfo.class);
+        }
+
+        @Bean
+        MeterRegistry meterRegistry() {
+            return Mockito.mock(MeterRegistry.class);
         }
     }
 
