@@ -17,28 +17,24 @@
  */
 package com.netflix.genie.web.aspects;
 
-import com.google.common.collect.Sets;
-import com.netflix.genie.web.util.MetricsConstants;
-import com.netflix.genie.web.util.MetricsUtils;
+import com.google.common.collect.ImmutableSet;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 
-import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Aspect woven into Spring Boot 'Health' machinery to publish metrics such as time taken, errors and other signals
- * useful for dashboards and alerting.
+ * Aspect around Spring Boot 'HealthIndicator' to publish metrics for status of individual indicator, as well as their
+ * turnaround time.
  *
  * @author mprimi
  * @since 3.2.4
@@ -47,12 +43,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HealthCheckMetricsAspect {
 
-    static final String HEALTH_ENDPOINT_TIMER_NAME = "genie.health.endpoint.timer";
     static final String HEALTH_INDICATOR_TIMER_METRIC_NAME = "genie.health.indicator.timer";
-    private static final String HEALTH_INDICATOR_COUNTER_METRIC_NAME = "genie.health.indicator.counter";
-    private static final String HEALTH_FAILURES_COUNTER_METRIC_NAME = "genie.health.failure.counter";
     private static final String HEALTH_INDICATOR_CLASS_TAG_NAME = "healthIndicatorClass";
-    private static final String HEALTH_INDICATOR_NAME_TAG_NAME = "healthIndicatorName";
+    private static final String HEALTH_INDICATOR_STATUS_TAG_NAME = "healthIndicatorStatus";
 
     private final MeterRegistry registry;
 
@@ -66,173 +59,53 @@ public class HealthCheckMetricsAspect {
     }
 
     /**
-     * Intercept call to the Health endpoint publish a timer tagged with error, status.
-     *
-     * @param joinPoint joinPoint for the actual call to invoke()
-     * @return Health, as returned by the actual invocation
-     * @throws Throwable as thrown by joinPoint.proceed()
+     * Pointcut that matches invocations of {@code HealthIndicator::getHealth(..)}.
      */
-    @Around(
-        "execution("
-            + "  org.springframework.boot.actuate.health.Health"
-            + "  org.springframework.boot.actuate.health.HealthEndpoint.health()"
-            + ")"
+    @Pointcut(""
+        + "target(org.springframework.boot.actuate.health.HealthIndicator+) && "
+        + "execution(org.springframework.boot.actuate.health.Health getHealth(..))"
     )
-    @SuppressWarnings("checkstyle:IllegalThrows") // For propagating Throwable from joinPoint.proceed()
-    public Health healthEndpointInvokeMonitor(final ProceedingJoinPoint joinPoint) throws Throwable {
-        final long start = System.nanoTime();
-        final Health health;
-        Status status = Status.UNKNOWN;
-        final Set<Tag> tags = Sets.newHashSet();
-        try {
-            health = (Health) joinPoint.proceed(joinPoint.getArgs());
-            status = health.getStatus();
-        } catch (final Throwable t) {
-            tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, t.getClass().getCanonicalName()));
-            throw t;
-        } finally {
-            final long turnaround = System.nanoTime() - start;
-            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, status.toString()));
-            log.debug("HealthEndpoint.invoke() completed in {} ns", turnaround);
-            this.registry
-                .timer(HEALTH_ENDPOINT_TIMER_NAME, tags)
-                .record(turnaround, TimeUnit.NANOSECONDS);
-        }
-        return health;
+    public void healthIndicatorGetHealth() {
     }
 
     /**
-     * Intercept call to HealthIndicator beans loaded and publish a timer tagged with error, if any.
+     * Aspect around join point for {@code HealthIndicator::getHealth(..)}.
+     * Measures the turnaround time for the indicator call and publishes it as metric, tagged with indicator class
+     * and the status reported.
      *
-     * @param joinPoint joinPoint for the actual call to health()
-     * @return Health, as returned by the actual invocation
-     * @throws Throwable as thrown by joinPoint.proceed()
+     * @param joinPoint the join point
+     * @return health as reported by the indicator
+     * @throws Throwable in case of exception in the join point
      */
-    @Around(
-        "execution("
-            + "  org.springframework.boot.actuate.health.Health"
-            + "  org.springframework.boot.actuate.health.HealthIndicator.health()"
-            + ")"
-    )
+    @Around("healthIndicatorGetHealth()")
     @SuppressWarnings("checkstyle:IllegalThrows") // For propagating Throwable from joinPoint.proceed()
-    public Health healthIndicatorHealthMonitor(final ProceedingJoinPoint joinPoint) throws Throwable {
+    public Health aroundHealthIndicatorGetHealth(final ProceedingJoinPoint joinPoint) throws Throwable {
+        final String healthIndicatorClass = joinPoint.getTarget().getClass().getSimpleName();
+        log.debug(
+            "Intercepted: {}::{}({})",
+            healthIndicatorClass,
+            joinPoint.getSignature().getName(),
+            Arrays.toString(joinPoint.getArgs())
+        );
+
         final long start = System.nanoTime();
-        final Health h;
-        Throwable throwable = null;
+        Health h = null;
         try {
             h = (Health) joinPoint.proceed(joinPoint.getArgs());
-        } catch (final Throwable t) {
-            throwable = t;
-            throw t;
         } finally {
             final long turnaround = System.nanoTime() - start;
-            recordHealthIndicatorTurnaround(turnaround, joinPoint, throwable);
+            final String healthStatus = (h != null) ? h.getStatus().getCode() : Status.UNKNOWN.getCode();
+
+            log.debug("Indicator {} status: {} (took {}ns)", healthIndicatorClass, healthStatus, turnaround);
+
+            final Set<Tag> tags = ImmutableSet.of(
+                Tag.of(HEALTH_INDICATOR_CLASS_TAG_NAME, healthIndicatorClass),
+                Tag.of(HEALTH_INDICATOR_STATUS_TAG_NAME, healthStatus)
+            );
+            this.registry
+                .timer(HEALTH_INDICATOR_TIMER_METRIC_NAME, tags)
+                .record(turnaround, TimeUnit.NANOSECONDS);
         }
         return h;
-    }
-
-    /**
-     * Intercept call to AbstractHealthIndicator beans loaded and publish a timer tagged with error, if any.
-     * This interception is required because these beans are not captured by HealthIndicator.doHealthCheck(),
-     * even tho they implement that interface.
-     *
-     * @param joinPoint joinPoint for the actual call to doHealthCheck()
-     * @throws Throwable as thrown by joinPoint.proceed()
-     */
-    @Around(
-        "execution("
-            + "  void org.springframework.boot.actuate.health.AbstractHealthIndicator.doHealthCheck("
-            + "      org.springframework.boot.actuate.health.Health.Builder"
-            + "  )"
-            + ")"
-    )
-    @SuppressWarnings("checkstyle:IllegalThrows") // For propagating Throwable from joinPoint.proceed()
-    public void abstractHealthIndicatorDoHealthCheckMonitor(final ProceedingJoinPoint joinPoint) throws Throwable {
-        final long start = System.nanoTime();
-        Throwable throwable = null;
-        try {
-            joinPoint.proceed(joinPoint.getArgs());
-        } catch (final Throwable t) {
-            throwable = t;
-            throw t;
-        } finally {
-            final long turnaround = System.nanoTime() - start;
-            recordHealthIndicatorTurnaround(turnaround, joinPoint, throwable);
-        }
-    }
-
-    private void recordHealthIndicatorTurnaround(
-        final long turnaround,
-        final ProceedingJoinPoint joinPoint,
-        @Nullable final Throwable throwable
-    ) {
-        log.debug(
-            "{} completed in {} ns (exception: {})",
-            joinPoint.getTarget().getClass().getSimpleName(),
-            turnaround,
-            throwable != null ? throwable.getClass().getSimpleName() : "none"
-        );
-        final Set<Tag> tags;
-        if (throwable == null) {
-            tags = MetricsUtils.newSuccessTagsSet();
-        } else {
-            tags = MetricsUtils.newFailureTagsSetForException(throwable);
-        }
-        tags.add(Tag.of(HEALTH_INDICATOR_CLASS_TAG_NAME, joinPoint.getTarget().getClass().getSimpleName()));
-        this.registry
-            .timer(HEALTH_INDICATOR_TIMER_METRIC_NAME, tags)
-            .record(turnaround, TimeUnit.NANOSECONDS);
-    }
-
-    /**
-     * Intercept calls to the main AbstractHealthAggregator and publish counters for number of invocation and failures,
-     * tagged with status and indicator name.
-     *
-     * @param joinPoint joinPoint for the aggregateDetails() call
-     */
-    @Before(
-        "execution("
-            + "  java.util.Map<String, Object> "
-            + "  org.springframework.boot.actuate.health.AbstractHealthAggregator.aggregateDetails("
-            + "    java.util.Map<String, org.springframework.boot.actuate.health.Health>"
-            + "  )"
-            + ")"
-    )
-    public void abstractHealthAggregatorAggregateDetailsMonitor(final JoinPoint joinPoint) {
-        final Map<String, Health> healthDetailsMap;
-        try {
-            @SuppressWarnings("unchecked") final Map<String, Health> map = (Map<String, Health>) joinPoint.getArgs()[0];
-            healthDetailsMap = map;
-        } catch (final Throwable t) {
-            log.warn(
-                "Failed to cast AbstractHealthAggregator health details argument: {}",
-                joinPoint.getArgs(),
-                t
-            );
-            return;
-        }
-
-        healthDetailsMap.forEach(
-            (name, health) -> {
-                final Set<Tag> tags = Sets.newHashSet();
-                tags.add(Tag.of(HEALTH_INDICATOR_NAME_TAG_NAME, name));
-                tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, health.getStatus().getCode()));
-                final boolean isUp = Status.UP.equals(health.getStatus());
-
-                // Count individual health-check executed, and publish tagged with name and status.
-                // Good for dashboards, can be grouped and filtered by either.
-                this.registry
-                    .counter(HEALTH_INDICATOR_COUNTER_METRIC_NAME, tags)
-                    .increment();
-
-                //Count failures (if a healthcheck passees, this counter is incremented by 0), publish tagged with
-                // name and status.
-                // Good for alerting, any aggregate that is greater than zero for some period of time signals a
-                // check that is consistently failing.
-                this.registry
-                    .counter(HEALTH_FAILURES_COUNTER_METRIC_NAME, tags)
-                    .increment(isUp ? 0 : 1);
-            }
-        );
     }
 }
