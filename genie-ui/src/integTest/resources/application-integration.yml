@@ -2,6 +2,10 @@ grpc:
   server:
     port: 0
 
+local:
+  server:
+    port: 0
+
 spring:
   autoconfigure:
     exclude:
