@@ -143,8 +143,9 @@ extends com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceImplBase</p
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html#GRpcHeartBeatServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">GRpcHeartBeatServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
-                        org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html#GRpcHeartBeatServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">GRpcHeartBeatServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                        org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                        io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -202,19 +203,21 @@ extends com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceImplBase</p
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="GRpcHeartBeatServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">
+<a name="GRpcHeartBeatServiceImpl-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>GRpcHeartBeatServiceImpl</h4>
 <pre>public&nbsp;GRpcHeartBeatServiceImpl(<a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
-                                org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
+                                org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentRoutingService</code> - The <a href="../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> implementation to use</dd>
 <dd><code>taskScheduler</code> - The <code>TaskScheduler</code> instance to use</dd>
+<dd><code>registry</code> - The meter registry</dd>
 </dl>
 </li>
 </ul>

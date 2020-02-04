@@ -168,8 +168,9 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/agent/servi
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-">GRpcAgentFileStreamServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
-                              org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">GRpcAgentFileStreamServiceImpl</a></span>(<a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
+                              org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                              io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -239,19 +240,21 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/agent/servi
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-">
+<a name="GRpcAgentFileStreamServiceImpl-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>GRpcAgentFileStreamServiceImpl</h4>
 <pre>public&nbsp;GRpcAgentFileStreamServiceImpl(<a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
-                                      org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
+                                      org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                      io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>converter</code> - The <a href="../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters"><code>JobDirectoryManifestProtoConverter</code></a> instance to use</dd>
 <dd><code>taskScheduler</code> - A <code>TaskScheduler</code> instance to use</dd>
+<dd><code>registry</code> - The meter registry</dd>
 </dl>
 </li>
 </ul>

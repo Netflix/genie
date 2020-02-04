@@ -152,16 +152,18 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcAgentFileStreamService-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-">gRpcAgentFileStreamService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
-                          org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcAgentFileStreamService-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">gRpcAgentFileStreamService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
+                          org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide an implementation of <code>FileStreamServiceGrpc.FileStreamServiceImplBase</code>
  if no other is provided.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcHeartBeatServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">gRpcHeartBeatService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
-                    org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">gRpcHeartBeatService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
+                    org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                    io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Provide an implementation of <code>HeartBeatServiceGrpc.HeartBeatServiceImplBase</code>
  if no other is provided.</div>
 </td>
@@ -272,7 +274,7 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
 </dl>
 </li>
 </ul>
-<a name="gRpcAgentFileStreamService-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-">
+<a name="gRpcAgentFileStreamService-com.netflix.genie.common.internal.dtos.v4.converters.JobDirectoryManifestProtoConverter-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -282,19 +284,21 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
  @ConditionalOnMissingBean(value=com.netflix.genie.proto.FileStreamServiceGrpc.FileStreamServiceImplBase.class)
 public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a>&nbsp;gRpcAgentFileStreamService(<a href="../../../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">JobDirectoryManifestProtoConverter</a>&nbsp;converter,
                                                                                                                                                                                        @Qualifier(value="genieTaskScheduler")
-                                                                                                                                                                                       org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
+                                                                                                                                                                                       org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                                                                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Provide an implementation of <code>FileStreamServiceGrpc.FileStreamServiceImplBase</code>
  if no other is provided.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>converter</code> - The <a href="../../../../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/JobDirectoryManifestProtoConverter.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters"><code>JobDirectoryManifestProtoConverter</code></a> instance to use</dd>
 <dd><code>taskScheduler</code> - The <code>TaskScheduler</code> to use to schedule tasks</dd>
+<dd><code>registry</code> - The meter registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An instance of <a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints"><code>GRpcAgentFileStreamServiceImpl</code></a></dd>
 </dl>
 </li>
 </ul>
-<a name="gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-">
+<a name="gRpcHeartBeatService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -304,13 +308,15 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
  @ConditionalOnMissingBean(value=com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceImplBase.class)
 public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcHeartBeatServiceImpl</a>&nbsp;gRpcHeartBeatService(<a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
                                                                                                                                                                          @Qualifier(value="heartBeatServiceTaskScheduler")
-                                                                                                                                                                         org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
+                                                                                                                                                                         org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                                                         io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Provide an implementation of <code>HeartBeatServiceGrpc.HeartBeatServiceImplBase</code>
  if no other is provided.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentRoutingService</code> - The <a href="../../../../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> implementation to use</dd>
 <dd><code>taskScheduler</code> - The <code>TaskScheduler</code> instance to use</dd>
+<dd><code>registry</code> - The meter registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcHeartBeatServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints"><code>GRpcHeartBeatServiceImpl</code></a> instance</dd>
 </dl>

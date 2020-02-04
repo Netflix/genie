@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-01-31</span>
+<span id="revdate">2020-02-04</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5769,6 +5769,27 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.heartbeating.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of agents sending heartbeats to the server</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcHeartBeatServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.pending.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of pending file transfers requested from connected agents</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcHeartBeatServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.fileTransfers.inProgress.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of in progress file transfers from connected agents</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>GRpcAgentFileStreamServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.api.v3.jobs.submitJobWithoutAttachments.rate</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counts the number of jobs submitted without an attachment</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -5832,25 +5853,11 @@ It will have to be added if one is desired otherwise metrics are just published 
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.endpoint.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken for the Health endpoint to collect and aggregate state from health indicators</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.failure.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for calls each health indicator that reports status other than UP</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, healthIndicatorName</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.indicator.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken for each health indicator to report its status</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, healthIndicatorClass</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>healthIndicatorClass, healthIndicatorStatus</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.active.gauge</code></p></td>
@@ -6378,7 +6385,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-01-31 19:25:19 UTC
+Last updated 2020-02-04 18:37:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
