@@ -44,8 +44,8 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockSnippet;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -106,15 +106,13 @@ public abstract class RestControllerIntegrationTestBase {
     static final Set<String> COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
     private static final String URI_HOST = "genie.example.com";
     private static final String URI_SCHEME = "https";
+    private static final String LOCAL_TEST_SERVER_PORT_PROPERTY_NAME = "local.server.port";
 
     /**
      * Setup for the Spring Rest Docs wiring.
      */
     @Rule
     public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
-
-    @LocalServerPort
-    protected int port;
 
     @Autowired
     protected JpaApplicationRepository applicationRepository;
@@ -139,6 +137,11 @@ public abstract class RestControllerIntegrationTestBase {
 
     @Autowired
     protected JpaAgentConnectionRepository agentConnectionRepository;
+
+    @Autowired
+    protected Environment environment;
+
+    protected int port;
 
     private RequestSpecification requestSpecification;
 
@@ -199,6 +202,11 @@ public abstract class RestControllerIntegrationTestBase {
 //            .addFilter(new RequestLoggingFilter())
 //            .addFilter(new ResponseLoggingFilter())
             .build();
+
+        // The proper way to do this is annotate `port` with @LocalServerPort.
+        // However what looks like a race condition during context initialization makes the test sporadically fail.
+        // This should work more reliably since it happens after context is initialized
+        this.port = this.environment.getRequiredProperty(LOCAL_TEST_SERVER_PORT_PROPERTY_NAME, Integer.class);
     }
 
     /**
