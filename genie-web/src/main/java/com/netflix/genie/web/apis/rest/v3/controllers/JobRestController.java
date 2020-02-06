@@ -663,15 +663,14 @@ public class JobRestController {
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
      * @param response      the servlet response
-     * @throws GenieException   on any Genie internal error
+     * @throws GenieException on any Genie internal error
      */
     @GetMapping(
         value = {
             "/{id}/output",
             "/{id}/output/",
             "/{id}/output/**"
-        },
-        produces = MediaType.ALL_VALUE
+        }
     )
     public void getJobOutput(
         @PathVariable("id") final String id,
