@@ -678,9 +678,6 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         }
 
         // Range request, out of range
-        // This documents known issue where spring produces 406 (in case of boot <= 2.2.2) or 500 (boot > 2.2.2)
-        // Removal of `produces = MediaType.ALL_VALUE` solves this problem but need to wait for internal client update
-        // before truly fixing
         RestAssured
             .given(this.getRequestSpecification())
             .header(HttpHeaders.RANGE, "bytes=10000-")
@@ -688,8 +685,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .port(this.port)
             .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
             .then()
-            .statusCode(Matchers.is(HttpStatus.NOT_ACCEPTABLE.value()));
-//            .statusCode(Matchers.is(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.value()));
+            .statusCode(Matchers.is(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.value()));
     }
 
     private void checkJobRequest(
