@@ -700,15 +700,14 @@ public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getJobOutput</h4>
-<pre>@GetMapping(value={"/{id}/output","/{id}/output/","/{id}/output/**"},
-            produces="*/*")
+<pre>@GetMapping(value={"/{id}/output","/{id}/output/","/{id}/output/**"})
 public&nbsp;void&nbsp;getJobOutput(@PathVariable(value="id")
-                                                                                                                           java.lang.String&nbsp;id,
-                                                                                                                           @RequestHeader(name="Genie-Forwarded-From",required=false) @Nullable
-                                                                                                                           java.lang.String&nbsp;forwardedFrom,
-                                                                                                                           javax.servlet.http.HttpServletRequest&nbsp;request,
-                                                                                                                           javax.servlet.http.HttpServletResponse&nbsp;response)
-                                                                                                                    throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                               java.lang.String&nbsp;id,
+                                                                                               @RequestHeader(name="Genie-Forwarded-From",required=false) @Nullable
+                                                                                               java.lang.String&nbsp;forwardedFrom,
+                                                                                               javax.servlet.http.HttpServletRequest&nbsp;request,
+                                                                                               javax.servlet.http.HttpServletResponse&nbsp;response)
+                                                                                        throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
 <div class="block">Get the job output directory.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
