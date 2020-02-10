@@ -18,21 +18,19 @@
 package com.netflix.genie.web.selectors.impl;
 
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.selectors.ClusterSelector;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nonnull;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 /**
  * Basic implementation of a selector where a cluster is picked at random.
  *
- * @author skrishnan
  * @author tgianos
  */
 @Slf4j
@@ -43,14 +41,17 @@ public class RandomClusterSelectorImpl extends RandomResourceSelectorBase<Cluste
      */
     @Override
     public ResourceSelectionResult<Cluster> selectCluster(
-        @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
-        @Nonnull @NonNull final JobRequest jobRequest
-    ) throws GenieException {
+        @NotEmpty final Set<@Valid Cluster> clusters,
+        @Valid final JobRequest jobRequest
+    ) throws ResourceSelectionException {
         log.debug("called");
         final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
-        builder.withSelectionRationale(SELECTION_RATIONALE);
 
-        final Cluster selectedCluster = this.randomlySelect(clusters);
-        return builder.withSelectedResource(selectedCluster).build();
+        try {
+            final Cluster selectedCluster = this.randomlySelect(clusters);
+            return builder.withSelectionRationale(SELECTION_RATIONALE).withSelectedResource(selectedCluster).build();
+        } catch (final Exception e) {
+            throw new ResourceSelectionException(e);
+        }
     }
 }

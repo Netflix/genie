@@ -19,22 +19,18 @@ package com.netflix.genie.web.selectors.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
-import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
-import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.scripts.ClusterSelectorScript;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nonnull;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -42,11 +38,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * An implementation of the {@link ClusterSelector} interface which uses user-provided script to make decisions
  * based on the list of clusters and the job request supplied.
- * <p>
- * Note: this ClusterSelector implementation intentionally returns 'null' (a.k.a. 'no preference') in case of error,
- * rather throwing an exception. For example if the script cannot be loaded, or if an invalid cluster is returned.
- * TODO: this logic of falling back to 'no preference' in case of error should be moved out of this implementation
- * and into the service using this interface.
  *
  * @author tgianos
  * @since 3.1.0
@@ -81,9 +72,9 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
      */
     @Override
     public ResourceSelectionResult<Cluster> selectCluster(
-        @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
-        @Nonnull @NonNull final JobRequest jobRequest
-    ) throws GenieException {
+        @NotEmpty final Set<@Valid Cluster> clusters,
+        @Valid final JobRequest jobRequest
+    ) throws ResourceSelectionException {
         final long selectStart = System.nanoTime();
         log.debug("Called");
         final Set<Tag> tags = Sets.newHashSet();
@@ -107,11 +98,11 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
                 .withSelectionRationale(SCRIPT_SELECTED_RATIONALE)
                 .withSelectedResource(selectedCluster)
                 .build();
-        } catch (ScriptNotConfiguredException | ScriptExecutionException | GenieClusterNotFoundException e) {
+        } catch (final Throwable e) {
             final String errorMessage = "Cluster selection error: " + e.getMessage();
             log.error(errorMessage, e);
             MetricsUtils.addFailureTagsWithException(tags, e);
-            return builder.withSelectionRationale(errorMessage).withSelectedResource(null).build();
+            throw new ResourceSelectionException(e);
         } finally {
             this.registry
                 .timer(SELECT_TIMER_NAME, tags)

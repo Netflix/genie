@@ -487,7 +487,6 @@ public class JobResolverServiceImpl implements JobResolverService {
                                 Tag.of(MetricsConstants.TagKeys.CLUSTER_SELECTOR_CLASS, clusterSelectorClass)
                             )
                         );
-                        this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
                         cluster = selectedCluster;
                         break;
                     } else {
@@ -499,17 +498,14 @@ public class JobResolverServiceImpl implements JobResolverService {
                             clusters
                         );
                         counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_INVALID));
-                        this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
                     }
                 } else {
-                    counterTags.add(
-                        Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_NO_PREFERENCE)
-                    );
-                    this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
+                    counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_NO_PREFERENCE));
                 }
             } catch (final Exception e) {
-                log.error("Cluster selector {} threw exception:", clusterSelector, e);
+                log.error("Cluster selector {} evaluation threw exception:", clusterSelector, e);
                 counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_EXCEPTION));
+            } finally {
                 this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
             }
         }

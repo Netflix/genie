@@ -20,6 +20,7 @@ package com.netflix.genie.web.selectors;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -43,9 +44,11 @@ public interface CommandSelector {
      * @param jobRequest The job user's original job request
      * @return The a {@link ResourceSelectionResult} instance which contains information about the result of this
      * invocation
+     * @throws ResourceSelectionException When the underlying implementation can't successfully come to a selection
+     *                                    decision
      */
     ResourceSelectionResult<Command> selectCommand(
         @NotEmpty Set<@Valid Command> commands,
         @Valid JobRequest jobRequest
-    );
+    ) throws ResourceSelectionException;
 }

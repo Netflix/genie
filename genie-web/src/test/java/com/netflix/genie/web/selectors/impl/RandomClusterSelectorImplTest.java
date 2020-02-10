@@ -19,9 +19,9 @@ package com.netflix.genie.web.selectors.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,10 +49,10 @@ class RandomClusterSelectorImplTest {
     /**
      * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws GenieException For any problem if anything went wrong with the test.
+     * @throws ResourceSelectionException For any problem if anything went wrong with the test.
      */
     @Test
-    void testValidClusterSet() throws GenieException {
+    void testValidClusterSet() throws ResourceSelectionException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final Cluster cluster2 = Mockito.mock(Cluster.class);
         final Cluster cluster3 = Mockito.mock(Cluster.class);
@@ -70,10 +70,10 @@ class RandomClusterSelectorImplTest {
     /**
      * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws GenieException For any problem if anything went wrong with the test.
+     * @throws ResourceSelectionException For any problem if anything went wrong with the test.
      */
     @Test
-    void testValidClusterSetOfOne() throws GenieException {
+    void testValidClusterSetOfOne() throws ResourceSelectionException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final ResourceSelectionResult<Cluster> result = this.clb.selectCluster(
             Sets.newHashSet(cluster1),

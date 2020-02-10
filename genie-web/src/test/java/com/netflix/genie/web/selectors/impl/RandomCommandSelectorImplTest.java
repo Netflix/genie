@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,9 +49,11 @@ class RandomCommandSelectorImplTest {
 
     /**
      * Test whether a command is returned from a set of candidates.
+     *
+     * @throws ResourceSelectionException on unexpected error
      */
     @Test
-    void testValidCommandSet() {
+    void testValidCommandSet() throws ResourceSelectionException {
         final Command command1 = Mockito.mock(Command.class);
         final Command command2 = Mockito.mock(Command.class);
         final Command command3 = Mockito.mock(Command.class);
@@ -67,9 +70,11 @@ class RandomCommandSelectorImplTest {
 
     /**
      * Test whether a command is returned from a set of candidates.
+     *
+     * @throws ResourceSelectionException on unexpected error
      */
     @Test
-    void testValidCommandSetOfOne() {
+    void testValidCommandSetOfOne() throws ResourceSelectionException {
         final Command command = Mockito.mock(Command.class);
         final ResourceSelectionResult<Command> result = this.selector.selectCommand(
             Sets.newHashSet(command),

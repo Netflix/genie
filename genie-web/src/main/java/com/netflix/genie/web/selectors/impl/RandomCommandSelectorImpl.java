@@ -20,6 +20,7 @@ package com.netflix.genie.web.selectors.impl;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.selectors.CommandSelector;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,12 +45,15 @@ public class RandomCommandSelectorImpl extends RandomResourceSelectorBase<Comman
     public ResourceSelectionResult<Command> selectCommand(
         @NotEmpty final Set<@Valid Command> commands,
         @Valid final JobRequest jobRequest
-    ) {
+    ) throws ResourceSelectionException {
         log.debug("called");
         final ResourceSelectionResult.Builder<Command> builder = new ResourceSelectionResult.Builder<>(this.getClass());
-        builder.withSelectionRationale(SELECTION_RATIONALE);
 
-        final Command selectedCommand = this.randomlySelect(commands);
-        return builder.withSelectedResource(selectedCommand).build();
+        try {
+            final Command selectedCommand = this.randomlySelect(commands);
+            return builder.withSelectionRationale(SELECTION_RATIONALE).withSelectedResource(selectedCommand).build();
+        } catch (final Exception e) {
+            throw new ResourceSelectionException(e);
+        }
     }
 }
