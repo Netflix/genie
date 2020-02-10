@@ -61,7 +61,11 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A class that has the methods to perform various tasks when a job completes.
@@ -85,6 +89,7 @@ public class JobCompletionService {
     private final Executor executor;
     private final boolean deleteDependencies;
     private final boolean runAsUserEnabled;
+    private final ConcurrentMap<String, Lock> jobCompletionHandlingLocksMap;
 
     // Metrics
     private final MeterRegistry registry;
@@ -133,6 +138,7 @@ public class JobCompletionService {
         this.registry = registry;
         // Retry template
         this.retryTemplate = retryTemplate;
+        this.jobCompletionHandlingLocksMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -141,8 +147,22 @@ public class JobCompletionService {
      * @param event The Spring Boot application ready event to startup on
      */
     void handleJobCompletion(final JobFinishedEvent event) {
-        final long start = System.nanoTime();
         final String jobId = event.getId();
+
+        // JobMonitor may fire this event multiple times for a job (if the check happens twice before it gets cancelled)
+        // However the code below should only be executed once. So treat this as a critical section with a lock based
+        // on job id.
+        final Lock lock = this.jobCompletionHandlingLocksMap.computeIfAbsent(
+            jobId,
+            id -> new ReentrantLock()
+        );
+
+        if (!lock.tryLock()) {
+            log.debug("Another thread is already processing job {} completion", jobId);
+            return;
+        }
+
+        final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
 
         try {
@@ -178,6 +198,8 @@ public class JobCompletionService {
             log.error("Failed getting job with id: {}", jobId, e);
             MetricsUtils.addFailureTagsWithException(tags, e);
         } finally {
+            lock.unlock();
+            this.jobCompletionHandlingLocksMap.remove(jobId);
             this.registry
                 .timer(JOB_COMPLETION_TIMER_NAME, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
