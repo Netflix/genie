@@ -677,10 +677,34 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
                 .body(Matchers.is(expectedRunFileContent));
         }
 
+        // Test various edge cases with getting a file
+        // Range request, out of range
+        final int stdOutContentLength = Integer.parseInt(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .when()
+                .port(this.port)
+                .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .extract()
+                .header(HttpHeaders.CONTENT_LENGTH)
+        );
+
+        // Partial content request
+        RestAssured
+            .given(this.getRequestSpecification())
+            .header(HttpHeaders.RANGE, "bytes=" + (stdOutContentLength - 1) + "-")
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PARTIAL_CONTENT.value()));
+
         // Range request, out of range
         RestAssured
             .given(this.getRequestSpecification())
-            .header(HttpHeaders.RANGE, "bytes=10000-")
+            .header(HttpHeaders.RANGE, "bytes=" + stdOutContentLength + "-")
             .when()
             .port(this.port)
             .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
