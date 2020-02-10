@@ -66,12 +66,13 @@ class GenieWebCheckedExceptionsSpec extends Specification {
         exceptionClass                        | _
         AgentLaunchException                  | _
         IdAlreadyExistsException              | _
-        SaveAttachmentException               | _
+        JobDirectoryManifestNotFoundException | _
         JobNotArchivedException               | _
         JobNotFoundException                  | _
-        JobDirectoryManifestNotFoundException | _
-        ScriptNotConfiguredException          | _
+        ResourceSelectionException            | _
+        SaveAttachmentException               | _
         ScriptExecutionException              | _
+        ScriptLoadingException                | _
         ScriptNotConfiguredException          | _
     }
 }
