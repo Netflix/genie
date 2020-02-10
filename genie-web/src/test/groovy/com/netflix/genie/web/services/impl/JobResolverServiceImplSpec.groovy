@@ -66,7 +66,10 @@ class JobResolverServiceImplSpec extends Specification {
         def cluster1 = createCluster(cluster1Id)
         def cluster2 = createCluster(cluster2Id)
         def clusters = Sets.newHashSet(cluster1, cluster2)
-        ResourceSelectionResult<Cluster> clusterSelectionResult = Mock(ResourceSelectionResult)
+        ResourceSelectionResult<Cluster> clusterSelectionResult = Mock(ResourceSelectionResult) {
+            getSelectorClass() >> this.getClass()
+            getSelectionRationale() >> Optional.empty()
+        }
 
         def commandId = UUID.randomUUID().toString()
         def executableBinary = UUID.randomUUID().toString()

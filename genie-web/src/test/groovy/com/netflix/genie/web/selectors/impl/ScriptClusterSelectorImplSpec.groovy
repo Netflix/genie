@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata
 import com.netflix.genie.web.dtos.ResourceSelectionResult
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException
 import com.netflix.genie.web.scripts.ClusterSelectorScript
 import com.netflix.genie.web.util.MetricsConstants
@@ -88,7 +89,7 @@ class ScriptClusterSelectorImplSpec extends Specification {
             { it == expectedTags }
         ) >> timer
         1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
-        !result.getSelectedResource().isPresent()
+        thrown(ResourceSelectionException)
 
         when: "Script selects cluster"
         expectedTags = MetricsUtils.newSuccessTagsSet()
