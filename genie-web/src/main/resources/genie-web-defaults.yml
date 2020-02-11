@@ -115,6 +115,7 @@ management:
   endpoints:
     web:
       base-path: /admin
+  endpoint:
     health:
       show-components: always
       show-details: always
