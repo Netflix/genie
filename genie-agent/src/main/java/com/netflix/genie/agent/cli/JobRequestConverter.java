@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.agent.cli;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest;
@@ -32,6 +33,8 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * Convert job request arguments delegate into an AgentJobRequest.
@@ -41,6 +44,9 @@ import java.util.Set;
  */
 public class JobRequestConverter {
 
+    private static final String SINGLE_QUOTE = "'";
+    private static final String ESCAPED_SINGLE_QUOTE = "'\\''";
+    private static final String SPACE = " ";
     private final Validator validator;
 
     JobRequestConverter(final Validator validator) {
@@ -107,13 +113,17 @@ public class JobRequestConverter {
             jobRequestArguments.getJobSetup()
         );
 
+        // Convert split, parsed arguments received via command-line back to the same single-string, unparsed
+        // format that comes through the V3 API.
+        final List<String> commandArguments = getV3ArgumentsString(jobRequestArguments.getCommandArguments());
+
         final AgentJobRequest agentJobRequest = new AgentJobRequest.Builder(
             jobMetadataBuilder.build(),
             criteria,
             requestedAgentConfig,
             jobArchivalDataRequest
         )
-            .withCommandArgs(jobRequestArguments.getCommandArguments())
+            .withCommandArgs(commandArguments)
             .withRequestedId(jobRequestArguments.getJobId())
             .withResources(jobExecutionResources)
             .build();
@@ -125,6 +135,23 @@ public class JobRequestConverter {
         }
 
         return agentJobRequest;
+    }
+
+    // In order to make all command arguments look the same in a job specification object, transform the
+    // split and unwrapped arguments back into a quoted string.
+    // This allows the downstream agent code to make no special case.
+    // All arguments are coming in as they would from the V3 API.
+    // This means:
+    // - Escape single-quotes
+    // - Wrap each token in single quotes
+    // - Join everything into a single string and send it as a list with just one element
+    private List<String> getV3ArgumentsString(final List<String> commandArguments) {
+        return Lists.newArrayList(
+            commandArguments.stream()
+                .map(s -> s.replaceAll(SINGLE_QUOTE, Matcher.quoteReplacement(ESCAPED_SINGLE_QUOTE)))
+                .map(s -> SINGLE_QUOTE + s + SINGLE_QUOTE)
+                .collect(Collectors.joining(SPACE))
+        );
     }
 
     /**

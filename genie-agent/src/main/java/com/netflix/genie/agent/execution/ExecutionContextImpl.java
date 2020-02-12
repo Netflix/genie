@@ -31,7 +31,6 @@ import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -47,12 +46,12 @@ class ExecutionContextImpl implements ExecutionContext {
 
     private final AtomicReference<File> jobDirectoryRef = new AtomicReference<>();
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
-    private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
     private final AtomicReference<JobStatus> finalJobStatusRef = new AtomicReference<>();
     private final AtomicReference<JobStatus> currentJobStatusRef = new AtomicReference<>();
     private final AtomicReference<String> claimedJobIdRef = new AtomicReference<>();
     private final List<StateAction> cleanupActions = Lists.newArrayList();
     private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors = Lists.newArrayList();
+    private final AtomicReference<File> jobScriptRef = new AtomicReference<>();
 
     ExecutionContextImpl() {
     }
@@ -93,22 +92,6 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public void setJobSpecification(final JobSpecification jobSpecification) {
         setIfNullOrThrow(jobSpecification, jobSpecRef);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<Map<String, String>> getJobEnvironment() {
-        return Optional.ofNullable(jobEnvironmentRef.get());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setJobEnvironment(final Map<String, String> jobEnvironment) {
-        setIfNullOrThrow(jobEnvironment, jobEnvironmentRef);
     }
 
     /**
@@ -214,5 +197,21 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public void setClaimedJobId(@NotBlank final String jobId) {
         setIfNullOrThrow(jobId, claimedJobIdRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobScript(final File jobScript) {
+        setIfNullOrThrow(jobScript, jobScriptRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<File> getJobScript() {
+        return Optional.ofNullable(jobScriptRef.get());
     }
 }

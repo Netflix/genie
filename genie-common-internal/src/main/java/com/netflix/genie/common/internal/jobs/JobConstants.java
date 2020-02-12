@@ -164,6 +164,16 @@ public final class JobConstants {
     public static final String GENIE_AGENT_ENV_SCRIPT_RESOURCE = "genie-env.sh";
 
     /**
+     * Filename for logfile generated during setup (sourcing of entities setup files).
+     */
+    public static final String GENIE_SETUP_LOG_FILE_NAME = "setup.log";
+
+    /**
+     * Filename for environment variables dumped after setup.
+     */
+    public static final String GENIE_AGENT_ENV_FILE_NAME = "env.log";
+
+    /**
      * Genie Agent log file name (after it is relocated inside the job directory).
      */
     public static final String GENIE_AGENT_LOG_FILE_NAME = "agent.log";
@@ -417,6 +427,11 @@ public final class JobConstants {
      */
     public static final String JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE
         = "Job submission is currently disabled. Please try again later.";
+
+    /**
+     * The name of the setup file (for entities that have one) when downloaded in the job directory.
+     */
+    public static final String GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME = "genie_setup.sh";
 
     /**
      * Protected constructor for utility class.

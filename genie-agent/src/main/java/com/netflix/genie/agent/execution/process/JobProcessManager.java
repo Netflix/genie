@@ -23,8 +23,6 @@ import org.springframework.context.ApplicationListener;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Singleton to manage the subprocess for the actual user job this Agent instance is managing.
@@ -39,9 +37,7 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
      * Launch the job process (unless launch was aborted by previous a {@code kill} call).
      *
      * @param jobDirectory         Job directory
-     * @param environmentVariables additional environment variables (to merge on top of inherited environment)
-     * @param commandArguments     command-line executable and its fixed arguments arguments
-     * @param jobArguments         job-specific arguments
+     * @param jobScript            job script (a.k.a. run file)
      * @param interactive          launch in interactive mode (inherit I/O) or batch (no input, write outputs to files)
      * @param timeout              The optional number of seconds this job is allowed to run before the system will
      *                             kill it
@@ -50,9 +46,7 @@ public interface JobProcessManager extends ApplicationListener<KillService.KillE
      */
     void launchProcess(
         File jobDirectory,
-        Map<String, String> environmentVariables,
-        List<String> commandArguments,
-        List<String> jobArguments,
+        File jobScript,
         boolean interactive,
         @Nullable Integer timeout,
         boolean launchInJobDirectory

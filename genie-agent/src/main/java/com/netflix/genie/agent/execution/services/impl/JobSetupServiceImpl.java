@@ -17,40 +17,45 @@
  */
 package com.netflix.genie.agent.execution.services.impl;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
 import com.netflix.genie.agent.execution.CleanupStrategy;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
-import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.RegexRuleSet;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
-import org.springframework.core.io.ClassPathResource;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Collections;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 class JobSetupServiceImpl implements JobSetupService {
 
+    private static final String NEWLINE = System.lineSeparator();
     private final DownloadService downloadService;
 
     JobSetupServiceImpl(
@@ -128,18 +133,18 @@ class JobSetupServiceImpl implements JobSetupService {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public List<File> downloadJobResources(
+    public Set<File> downloadJobResources(
         final JobSpecification jobSpecification,
         final File jobDirectory
     ) throws SetUpJobException {
 
-        final List<java.io.File> setupFiles = Lists.newArrayList();
-
         // Create download manifest for dependencies, configs, setup files for cluster, applications, command, job
         final DownloadService.Manifest jobDownloadsManifest =
-            createDownloadManifest(jobDirectory, jobSpecification, setupFiles);
+            createDownloadManifest(jobDirectory, jobSpecification);
 
         // Download all files into place
         try {
@@ -148,29 +153,50 @@ class JobSetupServiceImpl implements JobSetupService {
             throw new SetUpJobException("Failed to download job dependencies", e);
         }
 
-        return setupFiles;
+        return jobDownloadsManifest.getTargetFiles();
     }
 
-    public Map<String, String> setupJobEnvironment(
-        final File jobDirectory,
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public File createJobScript(
         final JobSpecification jobSpecification,
-        final List<File> setupFiles
+        final File jobDirectory
     ) throws SetUpJobException {
 
-        // Create additional environment variables
-        final Map<String, String> extraEnvironmentVariables =
-            createAdditionalEnvironmentMap(jobDirectory, jobSpecification);
+        final String scriptContent = new JobScriptComposer(jobSpecification, jobDirectory).composeScript();
+        final Path scriptPath = PathUtils.jobScriptPath(jobDirectory);
+        final File scriptFile = scriptPath.toFile();
 
-        // Source set up files and collect resulting environment variables into a file
-        final File jobEnvironmentFile = createJobEnvironmentFile(
-            jobDirectory,
-            setupFiles,
-            jobSpecification.getEnvironmentVariables(),
-            extraEnvironmentVariables
-        );
+        try {
+            // Write the script
+            try (
+                Writer fileWriter = Files.newBufferedWriter(
+                    scriptPath,
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE_NEW,
+                    StandardOpenOption.WRITE,
+                    StandardOpenOption.SYNC,
+                    StandardOpenOption.DSYNC
+                )
+            ) {
+                fileWriter.write(scriptContent);
+                fileWriter.flush();
+            }
 
-        // Collect environment variables into a map
-        return createJobEnvironmentMap(jobEnvironmentFile);
+            // Set script permissions
+            final boolean permissionChangeSuccess = scriptFile.setExecutable(true);
+
+            if (!permissionChangeSuccess) {
+                throw new SetUpJobException("Could not set job script executable permission");
+            }
+
+            return scriptFile;
+
+        } catch (SecurityException | IOException e) {
+            throw new SetUpJobException("Failed to create job script: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -225,21 +251,17 @@ class JobSetupServiceImpl implements JobSetupService {
 
     private DownloadService.Manifest createDownloadManifest(
         final File jobDirectory,
-        final JobSpecification jobSpec,
-        final List<File> setupFiles
+        final JobSpecification jobSpec
     ) throws SetUpJobException {
         // Construct map of files to download and their expected locations in the job directory
         final DownloadService.Manifest.Builder downloadManifestBuilder = downloadService.newManifestBuilder();
-
-        // Track URIs for all setup files
-        final List<URI> setupFileUris = Lists.newArrayList();
 
         // Applications
         final List<JobSpecification.ExecutionResource> applications = jobSpec.getApplications();
         for (final JobSpecification.ExecutionResource application : applications) {
             final Path applicationDirectory =
                 PathUtils.jobApplicationDirectoryPath(jobDirectory, application.getId());
-            addEntitiesFilesToManifest(applicationDirectory, downloadManifestBuilder, application, setupFileUris);
+            addEntitiesFilesToManifest(applicationDirectory, downloadManifestBuilder, application);
         }
 
         // Cluster
@@ -247,14 +269,14 @@ class JobSetupServiceImpl implements JobSetupService {
         final String clusterId = cluster.getId();
         final Path clusterDirectory =
             PathUtils.jobClusterDirectoryPath(jobDirectory, clusterId);
-        addEntitiesFilesToManifest(clusterDirectory, downloadManifestBuilder, cluster, setupFileUris);
+        addEntitiesFilesToManifest(clusterDirectory, downloadManifestBuilder, cluster);
 
         // Command
         final JobSpecification.ExecutionResource command = jobSpec.getCommand();
         final String commandId = command.getId();
         final Path commandDirectory =
             PathUtils.jobCommandDirectoryPath(jobDirectory, commandId);
-        addEntitiesFilesToManifest(commandDirectory, downloadManifestBuilder, command, setupFileUris);
+        addEntitiesFilesToManifest(commandDirectory, downloadManifestBuilder, command);
 
         // Job (does not follow convention, downloads everything in the job root folder).
         try {
@@ -268,11 +290,10 @@ class JobSetupServiceImpl implements JobSetupService {
                     setupFileUri,
                     jobDirectoryPath
                 );
-                downloadManifestBuilder.addFileWithTargetDirectory(
+                downloadManifestBuilder.addFileWithTargetFile(
                     setupFileUri,
-                    jobDirectory
+                    PathUtils.jobEntitySetupFilePath(jobDirectoryPath).toFile()
                 );
-                setupFileUris.add(setupFileUri);
             }
 
             for (final String dependencyUriString : jobExecEnvironment.getDependencies()) {
@@ -302,25 +323,13 @@ class JobSetupServiceImpl implements JobSetupService {
         }
 
         // Build manifest
-        final DownloadService.Manifest manifest = downloadManifestBuilder.build();
-
-        // Populate list of setup files with expected location on disk after download
-        for (final URI setupFileUri : setupFileUris) {
-            final File setupFile = manifest.getTargetLocation(setupFileUri);
-            if (setupFile == null) {
-                throw new SetUpJobException("Failed to look up target location for setup file: " + setupFileUri);
-            }
-            setupFiles.add(setupFile);
-        }
-
-        return manifest;
+        return downloadManifestBuilder.build();
     }
 
     private void addEntitiesFilesToManifest(
         final Path entityLocalDirectory,
         final DownloadService.Manifest.Builder downloadManifestBuilder,
-        final JobSpecification.ExecutionResource executionResource,
-        final List<URI> setupFilesUris
+        final JobSpecification.ExecutionResource executionResource
     ) throws SetUpJobException {
         try {
             final ExecutionEnvironment resourceExecutionEnvironment = executionResource.getExecutionEnvironment();
@@ -332,11 +341,10 @@ class JobSetupServiceImpl implements JobSetupService {
                     setupFileUri,
                     entityLocalDirectory
                 );
-                downloadManifestBuilder.addFileWithTargetDirectory(
+                downloadManifestBuilder.addFileWithTargetFile(
                     setupFileUri,
-                    entityLocalDirectory.toFile()
+                    PathUtils.jobEntitySetupFilePath(entityLocalDirectory).toFile()
                 );
-                setupFilesUris.add(setupFileUri);
             }
 
             final Path entityDependenciesLocalDirectory = PathUtils.jobEntityDependenciesPath(entityLocalDirectory);
@@ -368,130 +376,240 @@ class JobSetupServiceImpl implements JobSetupService {
         }
     }
 
-    private Map<String, String> createAdditionalEnvironmentMap(
-        final File jobDirectory,
-        final JobSpecification jobSpec
-    ) {
-        final ImmutableMap.Builder<String, String> mapBuilder = new ImmutableMap.Builder<>();
+    private static class JobScriptComposer {
+        private static final String SETUP_LOG_ENV_VAR = "__GENIE_SETUP_LOG_FILE";
+        private static final String ENVIRONMENT_LOG_ENV_VAR = "__GENIE_ENVIRONMENT_DUMP_FILE";
 
-        mapBuilder.put(
-            JobConstants.GENIE_JOB_DIR_ENV_VAR,
-            jobDirectory.toString()
-        );
+        private final String jobId;
+        private final List<Pair<String, String>> setupFileReferences;
+        private final List<Pair<String, String>> environmentVariables = Lists.newArrayList();
+        private final String commandLine;
 
-        mapBuilder.put(
-            JobConstants.GENIE_APPLICATION_DIR_ENV_VAR,
-            PathUtils.jobApplicationsDirectoryPath(jobDirectory).toString()
-        );
+        JobScriptComposer(final JobSpecification jobSpecification, final File jobDirectory) {
 
-        mapBuilder.put(
-            JobConstants.GENIE_COMMAND_DIR_ENV_VAR,
-            PathUtils.jobCommandDirectoryPath(jobDirectory, jobSpec.getCommand().getId()).toString()
-        );
+            this.jobId = jobSpecification.getJob().getId();
 
-        mapBuilder.put(
-            JobConstants.GENIE_CLUSTER_DIR_ENV_VAR,
-            PathUtils.jobClusterDirectoryPath(jobDirectory, jobSpec.getCluster().getId()).toString()
-        );
+            // Reference all files in the script in form: "${GENIE_JOB_DIR}/...".
+            // This makes the script easier to relocate (easier to run, re-run on a different system/location).
 
-        return mapBuilder.build();
-    }
+            final Path jobDirectoryPath = jobDirectory.toPath().toAbsolutePath();
 
-    private File createJobEnvironmentFile(
-        final File jobDirectory,
-        final List<File> setUpFiles,
-        final Map<String, String> serverProvidedEnvironment,
-        final Map<String, String> extraEnvironment
-    ) throws SetUpJobException {
-        final Path genieDirectory = PathUtils.jobGenieDirectoryPath(jobDirectory);
-        final Path envScriptPath = PathUtils.composePath(
-            genieDirectory,
-            JobConstants.GENIE_AGENT_ENV_SCRIPT_RESOURCE
-        );
-        final Path envScriptLogPath = PathUtils.composePath(
-            genieDirectory,
-            JobConstants.LOGS_PATH_VAR,
-            JobConstants.GENIE_AGENT_ENV_SCRIPT_LOG_FILE_NAME
-        );
-        final Path envScriptOutputPath = PathUtils.composePath(
-            genieDirectory,
-            JobConstants.GENIE_AGENT_ENV_SCRIPT_OUTPUT_FILE_NAME
-        );
-
-        // Copy env script from resources to genie directory
-        try {
-            Files.copy(
-                new ClassPathResource(JobConstants.GENIE_AGENT_ENV_SCRIPT_RESOURCE).getInputStream(),
-                envScriptPath,
-                StandardCopyOption.REPLACE_EXISTING
+            final String jobSetupLogReference = getPathAsReference(
+                PathUtils.jobSetupLogFilePath(jobDirectory),
+                jobDirectoryPath
             );
-            // Make executable
-            envScriptPath.toFile().setExecutable(true, true);
-        } catch (final IOException e) {
-            throw new SetUpJobException("Could not copy environment script resource: ", e);
-        }
 
-        // Set up process that executes the script
-        final ProcessBuilder processBuilder = new ProcessBuilder()
-            .inheritIO();
+            final String jobEnvironmentLogReference = getPathAsReference(
+                PathUtils.jobEnvironmentLogFilePath(jobDirectory),
+                jobDirectoryPath
+            );
 
-        processBuilder.environment().putAll(serverProvidedEnvironment);
-        processBuilder.environment().putAll(extraEnvironment);
+            final String applicationsDirReference = this.getPathAsReference(
+                PathUtils.jobApplicationsDirectoryPath(jobDirectory),
+                jobDirectoryPath
+            );
 
-        final List<String> commandArgs = Lists.newArrayList(
-            envScriptPath.toString(),
-            envScriptOutputPath.toString(),
-            envScriptLogPath.toString()
-        );
+            final JobSpecification.ExecutionResource cluster = jobSpecification.getCluster();
+            final String clusterId = cluster.getId();
+            final Path clusterDirPath = PathUtils.jobClusterDirectoryPath(jobDirectory, clusterId);
+            final String clusterDirReference = this.getPathAsReference(clusterDirPath, jobDirectoryPath);
 
-        setUpFiles.forEach(f -> commandArgs.add(f.getAbsolutePath()));
+            final JobSpecification.ExecutionResource command = jobSpecification.getCommand();
+            final String commandId = command.getId();
+            final Path commandDirPath = PathUtils.jobCommandDirectoryPath(jobDirectory, commandId);
+            final String commandDirReference = this.getPathAsReference(commandDirPath, jobDirectoryPath);
 
-        processBuilder.command(commandArgs);
+            // Set environment variables generated here
+            this.addEnvVariable(JobConstants.GENIE_JOB_DIR_ENV_VAR, jobDirectoryPath.toString());
+            this.addEnvVariable(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR, applicationsDirReference);
+            this.addEnvVariable(JobConstants.GENIE_COMMAND_DIR_ENV_VAR, commandDirReference);
+            this.addEnvVariable(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR, clusterDirReference);
 
-        // Run the setup script
-        final int exitCode;
-        try {
-            exitCode = processBuilder.start().waitFor();
-        } catch (final IOException e) {
-            throw new SetUpJobException("Could not execute environment setup script", e);
-        } catch (final InterruptedException e) {
-            throw new SetUpJobException("Interrupted while waiting for environment setup script", e);
-        }
+            this.addEnvVariable(SETUP_LOG_ENV_VAR, jobSetupLogReference);
+            this.addEnvVariable(ENVIRONMENT_LOG_ENV_VAR, jobEnvironmentLogReference);
 
-        if (exitCode != 0) {
-            throw new SetUpJobException("Non-zero exit code from environment setup script: " + exitCode);
-        }
+            // And add the rest which come down from the server. (Sorted for determinism)
+            ImmutableSortedMap.copyOf(jobSpecification.getEnvironmentVariables()).forEach(
+                this::addEnvVariable
+            );
 
-        // Check and return the output file
-        final File envScriptOutputFile = envScriptOutputPath.toFile();
+            // Compose list of execution resources
+            final List<Triple<String, JobSpecification.ExecutionResource, Path>> executionResources =
+                Lists.newArrayList();
 
-        if (!envScriptOutputFile.exists()) {
-            throw new SetUpJobException("Expected output file does not exist: " + envScriptOutputPath.toString());
-        }
+            jobSpecification.getApplications().forEach(
+                application -> executionResources.add(
+                    ImmutableTriple.of(
+                        "application",
+                        application,
+                        PathUtils.jobApplicationDirectoryPath(jobDirectory, application.getId())
+                    )
+                )
+            );
 
-        return envScriptOutputFile;
-    }
+            executionResources.add(
+                ImmutableTriple.of("cluster", cluster, PathUtils.jobClusterDirectoryPath(jobDirectory, clusterId))
+            );
+            executionResources.add(
+                ImmutableTriple.of("command", command, PathUtils.jobCommandDirectoryPath(jobDirectory, commandId))
+            );
+            executionResources.add(
+                ImmutableTriple.of("job", jobSpecification.getJob(), jobDirectoryPath)
+            );
 
-    private Map<String, String> createJobEnvironmentMap(
-        final File jobEnvironmentFile
-    ) throws SetUpJobException {
+            // Transform execution resources list to description and file reference list
+            this.setupFileReferences = executionResources.stream()
+                .map(
+                    triple -> {
+                        final String resourceTypeString = triple.getLeft();
+                        final JobSpecification.ExecutionResource resource = triple.getMiddle();
 
-        final Map<String, String> env;
-        try {
-            env = EnvUtils.parseEnvFile(jobEnvironmentFile);
-        } catch (final IOException | EnvUtils.ParseException e) {
-            throw new SetUpJobException(
-                "Failed to parse environment from file: " + jobEnvironmentFile.getAbsolutePath(),
-                e
+                        final String setupFileReference;
+                        if (resource.getExecutionEnvironment().getSetupFile().isPresent()) {
+                            final Path resourceDirectory = triple.getRight();
+                            final Path setupFilePath = PathUtils.jobEntitySetupFilePath(resourceDirectory);
+                            setupFileReference = getPathAsReference(setupFilePath, jobDirectoryPath);
+                        } else {
+                            setupFileReference = null;
+                        }
+
+                        final String resourceDescription = resourceTypeString + " " + resource.getId();
+                        return ImmutablePair.of(resourceDescription, setupFileReference);
+                    }
+                )
+                .collect(Collectors.toList());
+
+            // Compose the final command-line
+
+            this.commandLine = StringUtils.join(
+                ImmutableList.builder()
+                    .addAll(jobSpecification.getExecutableArgs())
+                    .addAll(jobSpecification.getJobArgs())
+                    .build(),
+                " "
             );
         }
 
-        // Variables in environment file are base64 encoded to avoid escaping, quoting.
-        // Decode all values.
-        env.keySet().forEach(key ->
-            env.compute(key, (k, v) -> new String(Base64.decodeBase64(v), StandardCharsets.UTF_8))
-        );
+        // Transform an absolute path to a string that references $GENIE_JOB_DIR/...
+        private String getPathAsReference(final Path path, final Path jobDirectoryPath) {
+            final Path relativePath = jobDirectoryPath.relativize(path);
+            return "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}/" + relativePath;
+        }
 
-        return Collections.unmodifiableMap(env);
+        private void addEnvVariable(final String variableName, final String variableValue) {
+            this.environmentVariables.add(ImmutablePair.of(variableName, variableValue));
+        }
+
+        String composeScript() {
+
+            // Assemble the content of the script
+
+            final StringBuilder sb = new StringBuilder();
+
+            // Script Header Section
+            sb
+                .append("#!/usr/bin/env bash").append(NEWLINE)
+                .append(NEWLINE);
+
+            sb
+                .append("#").append(NEWLINE)
+                .append("# Generated by Genie for job: ").append(this.jobId).append(NEWLINE)
+                .append("#").append(NEWLINE)
+                .append(NEWLINE);
+
+            sb
+                .append("# Error out if any command fails").append(NEWLINE)
+                .append("set -o errexit").append(NEWLINE)
+                .append("# Error out if any command in a pipeline fails").append(NEWLINE)
+                .append("set -o pipefail").append(NEWLINE)
+                .append("# Error out if unknown variable is used").append(NEWLINE)
+                .append("set -o nounset").append(NEWLINE)
+                .append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            // Script Environment Section
+
+            this.environmentVariables.forEach(
+                envVar -> sb
+                    .append("export ")
+                    .append(envVar.getKey())
+                    .append("=\"")
+                    .append(envVar.getValue())
+                    .append("\"")
+                    .append(NEWLINE)
+                    .append(NEWLINE)
+            );
+
+            sb.append(NEWLINE);
+
+            // Script Setup Section
+
+            final String setupFileRedirect = " >> ${" + SETUP_LOG_ENV_VAR + "}";
+
+            sb
+                .append("echo Setup begins: `date '+%Y-%m-%d %H:%M:%S'`")
+                .append(setupFileRedirect)
+                .append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            this.setupFileReferences.forEach(
+                pair -> {
+                    final String resourceDescription = pair.getLeft();
+                    final String setupFileReference = pair.getRight();
+
+                    if (setupFileReference != null) {
+                        sb
+                            .append("echo \"Sourcing setup script for ")
+                            .append(resourceDescription)
+                            .append("\"")
+                            .append(setupFileRedirect)
+                            .append(NEWLINE)
+                            .append("source ")
+                            .append(setupFileReference)
+                            .append(" 2>&1")
+                            .append(setupFileRedirect)
+                            .append(NEWLINE);
+                    } else {
+                        sb
+                            .append("echo \"No setup script for ")
+                            .append(resourceDescription)
+                            .append("\"")
+                            .append(setupFileRedirect)
+                            .append(NEWLINE);
+                    }
+
+                    sb.append(NEWLINE);
+                }
+            );
+
+            sb
+                .append("echo Setup end: `date '+%Y-%m-%d %H:%M:%S'`")
+                .append(setupFileRedirect)
+                .append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            // Dump environment for debugging
+            sb
+                .append("# Dump environment post-setup")
+                .append(NEWLINE)
+                .append("env | sort > ")
+                .append("${").append(ENVIRONMENT_LOG_ENV_VAR).append("}")
+                .append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            // Script Executable Section
+            // N.B. Command *must* be last line of the script for the exit code to be propagated back correctly!
+            sb
+                .append("# Launch the command")
+                .append(NEWLINE)
+                .append(this.commandLine)
+                .append(NEWLINE);
+
+            return sb.toString();
+        }
     }
 }

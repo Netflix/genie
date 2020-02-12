@@ -17,18 +17,15 @@
  */
 package com.netflix.genie.agent.execution.process.impl;
 
-import com.google.common.collect.Lists;
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.process.JobProcessResult;
 import com.netflix.genie.agent.execution.services.KillService;
-import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.TaskScheduler;
 
 import javax.annotation.Nullable;
@@ -37,11 +34,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -79,9 +71,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
     @Override
     public void launchProcess(
         final File jobDirectory,
-        final Map<String, String> environmentVariablesMap,
-        final List<String> commandArguments,
-        final List<String> jobArguments,
+        final File jobScript,
         final boolean interactive,
         @Nullable final Integer timeout,
         final boolean launchInJobDirectory
@@ -103,66 +93,21 @@ public class JobProcessManagerImpl implements JobProcessManager {
             throw new JobLaunchException("Job directory is not writable: " + jobDirectory);
         }
 
-        final Map<String, String> currentEnvironmentVariables = processBuilder.environment();
-
-        if (environmentVariablesMap == null) {
-            throw new JobLaunchException("Job environment variables map is null");
+        if (jobScript == null) {
+            throw new JobLaunchException("Job script is null");
+        } else if (!jobScript.exists() || !jobScript.isFile()) {
+            throw new JobLaunchException("Job script is not a valid file");
+        } else if (!jobScript.canExecute()) {
+            throw new JobLaunchException("Job script is not executable");
         }
-
-        // Merge job environment variables into process inherited environment
-        environmentVariablesMap.forEach((key, value) -> {
-            final String replacedValue = currentEnvironmentVariables.put(key, value);
-            if (StringUtils.isBlank(replacedValue)) {
-                log.debug(
-                    "Added job environment variable: {}={}",
-                    key,
-                    value
-                );
-            } else if (!replacedValue.equals(value)) {
-                log.debug(
-                    "Set job environment variable: {}={} (previous value: {})",
-                    key,
-                    value,
-                    replacedValue
-                );
-            }
-        });
-
-        // Validate arguments
-        if (commandArguments == null) {
-            throw new JobLaunchException("Job command-line arguments is null");
-        } else if (commandArguments.isEmpty()) {
-            throw new JobLaunchException("Job command-line arguments are empty");
-        }
-
-        final List<String> commandLine = Lists.newArrayList(commandArguments);
-        commandLine.addAll(jobArguments);
 
         log.info(
-            "Job command-line: {} arguments: {} (working directory: {})",
-            Arrays.toString(commandArguments.toArray()),
-            Arrays.toString(jobArguments.toArray()),
+            "Executing job script: {} (working directory: {})",
+            jobScript.getAbsolutePath(),
             launchInJobDirectory ? jobDirectory : Paths.get("").toAbsolutePath().normalize().toString()
         );
 
-        // Configure arguments
-        final List<String> expandedCommandArguments;
-        try {
-            expandedCommandArguments = expandCommandLineVariables(
-                commandArguments,
-                Collections.unmodifiableMap(currentEnvironmentVariables)
-            );
-        } catch (final EnvUtils.VariableSubstitutionException e) {
-            throw new JobLaunchException("Command executable and arguments variables could not be expanded", e);
-        }
-
-        final List<String> expandedCommandLine = Lists.newArrayList();
-        expandedCommandLine.addAll(expandedCommandArguments);
-        expandedCommandLine.addAll(jobArguments);
-
-        log.info("Command-line after expansion: {}", expandedCommandLine);
-
-        processBuilder.command(expandedCommandLine);
+        processBuilder.command(jobScript.getAbsolutePath());
 
         if (launchInJobDirectory) {
             processBuilder.directory(jobDirectory);
@@ -290,21 +235,6 @@ public class JobProcessManagerImpl implements JobProcessManager {
         final KillService.KillSource source = event.getKillSource();
         log.info("Stopping state machine due to kill event (source: {})", source);
         this.kill(source);
-    }
-
-    private List<String> expandCommandLineVariables(
-        final List<String> commandLine,
-        final Map<String, String> environmentVariables
-    ) throws EnvUtils.VariableSubstitutionException {
-        final ArrayList<String> expandedCommandLine = new ArrayList<>(commandLine.size());
-
-        for (final String argument : commandLine) {
-            expandedCommandLine.add(
-                EnvUtils.expandShellVariables(argument, environmentVariables)
-            );
-        }
-
-        return Collections.unmodifiableList(expandedCommandLine);
     }
 
     /* TODO: HACK, Process does not expose PID in Java 8 API */

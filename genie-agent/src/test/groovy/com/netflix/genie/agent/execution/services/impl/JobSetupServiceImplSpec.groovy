@@ -24,13 +24,13 @@ import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
 import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.services.JobSetupService
-import com.netflix.genie.agent.utils.EnvUtils
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.internal.jobs.JobConstants
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import org.springframework.core.io.ClassPathResource
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -47,7 +47,6 @@ class JobSetupServiceImplSpec extends Specification {
     ExecutionContext executionContext
 
     Set<URI> manifestUris
-    File dummyFile
 
     DownloadService.Manifest manifest
     DownloadService.Manifest.Builder manifestBuilder
@@ -94,8 +93,6 @@ class JobSetupServiceImplSpec extends Specification {
     Map<String, String> jobServerEnvMap
 
     void setup() {
-        this.dummyFile = temporaryFolder.newFile()
-
         this.executionContext = Mock(ExecutionContext)
 
         this.manifestUris = Sets.newHashSet()
@@ -203,6 +200,7 @@ class JobSetupServiceImplSpec extends Specification {
         }
 
         this.downloadService = Mock(DownloadService)
+
         this.service = new JobSetupServiceImpl(downloadService)
     }
 
@@ -300,46 +298,12 @@ class JobSetupServiceImplSpec extends Specification {
             ])
     }
 
-    def "Setup w/o dependencies and environment"() {
-
-        when:
-        File jobDirectory = service.createJobDirectory(spec)
-
-        then:
-        jobDir == jobDirectory
-
-        when:
-        List<File> setupFiles = service.downloadJobResources(spec, jobDirectory)
-
-        then:
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-
-        when:
-        Map<String, String> jobEnvironment = service.setupJobEnvironment(jobDirectory, spec, setupFiles)
-
-        then:
-        jobEnvironment != null
-        jobEnvironment.get(JobConstants.GENIE_JOB_DIR_ENV_VAR) == jobDir.toString()
-        jobEnvironment.get(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.APPLICATION_PATH_VAR
-        jobEnvironment.get(JobConstants.GENIE_COMMAND_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.COMMAND_PATH_VAR + "/" + command.getId()
-        jobEnvironment.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
-
-        for (File entityDir : [app1Dir, app2Dir, clusterDir, commandDir]) {
-            assert entityDir.exists()
-            def confDir = new File(entityDir, JobConstants.CONFIG_FILE_PATH_PREFIX)
-            assert confDir.exists()
-            assert confDir.list().size() == 0
-            def depsDir = new File(entityDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX)
-            assert depsDir.exists()
-            assert depsDir.list().size() == 0
-        }
-    }
-
-    def "Execute w/ dependencies and environment"() {
+    def "Setup w/ dependencies"() {
         setup:
-        jobServerEnvMap.put("SERVER_VARIABLE_KEY", "SERVER VARIABLE VALUE")
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_Z", "VALUE_Z")
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_X", "VALUE_X")
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_Y", "VALUE_Y")
+
         def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
         jobSetup = Optional.of(setupFileUri.toString())
         app1Setup = Optional.of(setupFileUri.toString())
@@ -358,41 +322,35 @@ class JobSetupServiceImplSpec extends Specification {
         app2Configs.add(configUri.toString())
         commandConfigs.add(configUri.toString())
         clusterConfigs.add(configUri.toString())
-        dummyFile.write(
-            "echo Hello World\n"
-                + "export SETUP_VARIABLE_KEY='SETUP VARIABLE VALUE'\n"
-                + "touch created-by-setup-file.txt\n"
-                + "export TRICKY_VARIABLE=\"'foo\nbar\ny'all'\"\n"
-        )
 
         when:
         File jobDirectory = service.createJobDirectory(spec)
-        List<File> setupFiles = service.downloadJobResources(spec, jobDirectory)
-        Map<String, String> jobEnvironment = service.setupJobEnvironment(jobDirectory, spec, setupFiles)
+        List<File> downloadedFiles = service.downloadJobResources(spec, jobDirectory)
+        File jobScript = service.createJobScript(spec, jobDirectory)
 
         then:
         jobDir == jobDirectory
         1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, app1Dir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, app2Dir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, commandDir)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, clusterDir)
-        5 * manifest.getTargetLocation(setupFileUri) >> dummyFile
+        1 * manifestBuilder.addFileWithTargetFile(setupFileUri, new File(app1Dir, JobConstants.GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME))
+        1 * manifestBuilder.addFileWithTargetFile(setupFileUri, new File(app2Dir, JobConstants.GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME))
+        1 * manifestBuilder.addFileWithTargetFile(setupFileUri, new File(commandDir, JobConstants.GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME))
+        1 * manifestBuilder.addFileWithTargetFile(setupFileUri, new File(clusterDir, JobConstants.GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME))
+        1 * manifestBuilder.addFileWithTargetFile(setupFileUri, new File(jobDir, JobConstants.GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME))
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, jobDir)
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(app1Dir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(app2Dir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(commandDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(dependencyUri, new File(clusterDir, JobConstants.DEPENDENCY_FILE_PATH_PREFIX))
-        0 * manifest.getTargetLocation(dependencyUri)
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, jobDir)
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(app1Dir, JobConstants.CONFIG_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(app2Dir, JobConstants.CONFIG_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(commandDir, JobConstants.CONFIG_FILE_PATH_PREFIX))
         1 * manifestBuilder.addFileWithTargetDirectory(configUri, new File(clusterDir, JobConstants.CONFIG_FILE_PATH_PREFIX))
-        0 * manifest.getTargetLocation(configUri)
+        1 * manifestBuilder.build() >> manifest
+        1 * downloadService.download(manifest)
+        1 * manifest.getTargetFiles()
+        1 * spec.getExecutableArgs() >> ["presto", "-v"]
+        1 * spec.getJobArgs() >> ["--exec", "'select * from table limit 1'"]
 
         expect:
         jobDir.exists()
@@ -400,37 +358,61 @@ class JobSetupServiceImplSpec extends Specification {
         app2Dir.exists()
         clusterDir.exists()
         commandDir.exists()
-        jobEnvironment != null
-        jobEnvironment.get(JobConstants.GENIE_JOB_DIR_ENV_VAR) == jobDir.toString()
-        jobEnvironment.get(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.APPLICATION_PATH_VAR
-        jobEnvironment.get(JobConstants.GENIE_COMMAND_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.COMMAND_PATH_VAR + "/" + command.getId()
-        jobEnvironment.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
-        jobEnvironment.get("SERVER_VARIABLE_KEY") == "SERVER VARIABLE VALUE"
-        jobEnvironment.get("SETUP_VARIABLE_KEY") == "SETUP VARIABLE VALUE"
-        jobEnvironment.get("TRICKY_VARIABLE") == "'foo\nbar\ny'all'"
-        new File("created-by-setup-file.txt").exists()
-        PathUtils.composePath(
-            PathUtils.jobGenieDirectoryPath(jobDir),
-            JobConstants.LOGS_PATH_VAR,
-            JobConstants.GENIE_AGENT_ENV_SCRIPT_LOG_FILE_NAME
-        ).toFile().getText(StandardCharsets.UTF_8.toString()).count("Hello World") == 5
+        jobScript.exists()
+        jobScript.canExecute()
+        def expectedScript = new ClassPathResource("JobSetupServiceImplSpec_run1.test.sh").getInputStream().getText()
+            .replaceAll("<JOB_ID_PLACEHOLDER>", jobId)
+            .replaceAll("<JOB_DIR_PLACEHOLDER>", jobDirectory.toPath().toAbsolutePath().toString())
+            .replaceAll("<COMMAND_ID_PLACEHOLDER>", command.getId())
+            .replaceAll("<CLUSTER_ID_PLACEHOLDER>", cluster.getId())
+            .replaceAll("<JOB_ID_PLACEHOLDER>", job.getId())
+            .replaceAll("<APPLICATION_1_PLACEHOLDER>", app1.getId())
+            .replaceAll("<APPLICATION_2_PLACEHOLDER>", app2.getId())
+        def actualScript = jobScript.getText(StandardCharsets.UTF_8.name())
+        actualScript == expectedScript
     }
 
-    def "SetUp file lookup error"() {
+
+    def "Setup w/o dependencies"() {
         setup:
-        def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
-        jobSetup = Optional.of(setupFileUri.toString())
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_Z", "VALUE_Z")
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_X", "VALUE_X")
+        jobServerEnvMap.put("SERVER_ENVIRONMENT_Y", "VALUE_Y")
 
         when:
         File jobDirectory = service.createJobDirectory(spec)
-        List<File> setupFiles = service.downloadJobResources(spec, jobDirectory)
+        List<File> downloadedFiles = service.downloadJobResources(spec, jobDirectory)
+        File jobScript = service.createJobScript(spec, jobDirectory)
 
         then:
+        jobDir == jobDirectory
         1 * downloadService.newManifestBuilder() >> manifestBuilder
+        0 * manifestBuilder.addFileWithTargetFile(_, _)
+        0 * manifestBuilder.addFileWithTargetDirectory(_, _)
         1 * manifestBuilder.build() >> manifest
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifest.getTargetLocation(setupFileUri) >> null
-        thrown(SetUpJobException)
+        1 * downloadService.download(manifest)
+        1 * manifest.getTargetFiles()
+        1 * spec.getExecutableArgs() >> ["presto", "-v"]
+        1 * spec.getJobArgs() >> ["--exec", "'select * from table limit 10'"]
+
+        expect:
+        jobDir.exists()
+        app1Dir.exists()
+        app2Dir.exists()
+        clusterDir.exists()
+        commandDir.exists()
+        jobScript.exists()
+        jobScript.canExecute()
+        def expectedScript = new ClassPathResource("JobSetupServiceImplSpec_run2.test.sh").getInputStream().getText()
+            .replaceAll("<JOB_ID_PLACEHOLDER>", jobId)
+            .replaceAll("<JOB_DIR_PLACEHOLDER>", jobDirectory.toPath().toAbsolutePath().toString())
+            .replaceAll("<COMMAND_ID_PLACEHOLDER>", command.getId())
+            .replaceAll("<CLUSTER_ID_PLACEHOLDER>", cluster.getId())
+            .replaceAll("<JOB_ID_PLACEHOLDER>", job.getId())
+            .replaceAll("<APPLICATION_1_PLACEHOLDER>", app1.getId())
+            .replaceAll("<APPLICATION_2_PLACEHOLDER>", app2.getId())
+        def actualScript = jobScript.getText(StandardCharsets.UTF_8.name())
+        actualScript == expectedScript
     }
 
     def "Malformed dependency URI"() {
@@ -460,53 +442,6 @@ class JobSetupServiceImplSpec extends Specification {
         1 * downloadService.download(manifest) >> { throw new DownloadException("") }
         def e = thrown(SetUpJobException)
         e.getCause().getClass() == DownloadException
-    }
-
-    def "Setup script error"() {
-        setup:
-        def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
-        jobSetup = Optional.of(setupFileUri.toString())
-        dummyFile.write("exit 1\n")
-
-        when:
-        File jobDirectory = service.createJobDirectory(spec)
-        List<File> setupFiles = service.downloadJobResources(spec, jobDirectory)
-        Map<String, String> jobEnvironment = service.setupJobEnvironment(jobDirectory, spec, setupFiles)
-
-        then:
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifest.getTargetLocation(setupFileUri) >> dummyFile
-        thrown(SetUpJobException)
-    }
-
-    def "Environment file parse error"() {
-        setup:
-        def setupFileUri = URI.create("s3://my-bucket/my-org/my-job/setup.sh")
-        jobSetup = Optional.of(setupFileUri.toString())
-
-        def envFile = PathUtils.composePath(
-            PathUtils.jobGenieDirectoryPath(jobDir),
-            JobConstants.GENIE_AGENT_ENV_SCRIPT_OUTPUT_FILE_NAME
-        ).toFile()
-
-        dummyFile.write("echo \"syntax error!\" >> " + envFile.getAbsolutePath() + "\n")
-
-        when:
-        File jobDirectory = service.createJobDirectory(spec)
-        List<File> setupFiles = service.downloadJobResources(spec, jobDirectory)
-        Map<String, String> jobEnvironment = service.setupJobEnvironment(jobDirectory, spec, setupFiles)
-
-        then:
-        1 * downloadService.newManifestBuilder() >> manifestBuilder
-        1 * manifestBuilder.build() >> manifest
-        1 * downloadService.download(manifest)
-        1 * manifestBuilder.addFileWithTargetDirectory(setupFileUri, jobDir)
-        1 * manifest.getTargetLocation(setupFileUri) >> dummyFile
-        def e = thrown(SetUpJobException)
-        e.getCause().getClass() == EnvUtils.ParseException
     }
 
     def "Skip cleanup"() {
@@ -639,5 +574,4 @@ class JobSetupServiceImplSpec extends Specification {
             file -> assert file.getParentFile().exists()
         }
     }
-
 }

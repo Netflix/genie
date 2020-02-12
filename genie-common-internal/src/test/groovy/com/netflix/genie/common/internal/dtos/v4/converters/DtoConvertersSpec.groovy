@@ -1031,40 +1031,6 @@ class DtoConvertersSpec extends Specification {
     }
 
     @Unroll
-    def "Can convert V3 Job Request to V4 with command args tokenization: #tokenize"() {
-
-        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def expectedCommandArgs
-        if (tokenize) {
-            expectedCommandArgs = commandArgs
-        } else {
-            expectedCommandArgs = [StringUtils.join(commandArgs, StringUtils.SPACE)] as List
-        }
-        def v3JobRequest = new com.netflix.genie.common.dto.JobRequest.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            Lists.newArrayList(
-                new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString())),
-            ),
-            Sets.newHashSet(UUID.randomUUID().toString())
-        )
-            .withCommandArgs(commandArgs)
-            .build()
-
-        when:
-        def v4JobRequest = DtoConverters.toV4JobRequest(v3JobRequest, tokenize)
-
-        then:
-        v4JobRequest.getCommandArgs() == expectedCommandArgs
-
-        where:
-        tokenize | _
-        true     | _
-        false    | _
-    }
-
-    @Unroll
     def "Can convert v3 #v3Status to v4 #v4Status Application Status"() {
         expect:
         DtoConverters.toV4ApplicationStatus(v3Status) == v4Status

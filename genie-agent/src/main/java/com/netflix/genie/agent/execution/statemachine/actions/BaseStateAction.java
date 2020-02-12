@@ -118,10 +118,6 @@ public abstract class BaseStateAction implements StateAction {
         }
     }
 
-    void assertClaimedJobIdPresent() {
-        assertPresent(executionContext.getClaimedJobId(), "claimedJobId");
-    }
-
     private void assertPresent(final Optional<?> optional, final String name) {
         if (!optional.isPresent()) {
             throw new InvalidStateException(
@@ -138,6 +134,10 @@ public abstract class BaseStateAction implements StateAction {
         }
     }
 
+    void assertClaimedJobIdPresent() {
+        assertPresent(executionContext.getClaimedJobId(), "claimedJobId");
+    }
+
     void assertJobSpecificationPresent() {
         assertPresent(executionContext.getJobSpecification(), "jobSpecification");
     }
@@ -146,8 +146,12 @@ public abstract class BaseStateAction implements StateAction {
         assertPresent(executionContext.getJobDirectory(), "jobDirectory");
     }
 
-    void assertJobEnvironmentPresent() {
-        assertPresent(executionContext.getJobEnvironment(), "jobEnvironment");
+    void assertJobScriptPresent() {
+        assertPresent(executionContext.getJobScript(), "jobScript");
+    }
+
+    void assertJobScriptNotPresent() {
+        assertNotPresent(executionContext.getJobScript(), "jobScript");
     }
 
     void assertFinalJobStatusPresent() {
@@ -179,10 +183,6 @@ public abstract class BaseStateAction implements StateAction {
 
     void assertJobDirectoryNotPresent() {
         assertNotPresent(executionContext.getJobDirectory(), "jobDirectory");
-    }
-
-    void assertJobEnvironmentNotPresent() {
-        assertNotPresent(executionContext.getJobEnvironment(), "jobEnvironment");
     }
 
     void assertFinalJobStatusNotPresent() {

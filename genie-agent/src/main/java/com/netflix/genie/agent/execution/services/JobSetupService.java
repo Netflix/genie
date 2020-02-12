@@ -24,8 +24,7 @@ import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Service that sets up a directory for a job to execute in.
@@ -60,25 +59,23 @@ public interface JobSetupService {
      * @return the list of setup files staged
      * @throws SetUpJobException TODO
      */
-    List<File> downloadJobResources(
+    Set<File> downloadJobResources(
         JobSpecification jobSpecification,
         File jobDirectory
     ) throws SetUpJobException;
 
+
     /**
-     * Execute setup scripts for various entities which may alter the layout of the job directory (example: expand
-     * archive dependencies) and/or alter the environment.
+     * Creates the executable script that executes setup and runs the job (a.k.a. run file).
      *
-     * @param jobDirectory     the job directory
      * @param jobSpecification the job specification
-     * @param setupFiles       the list of setup files to evaluate
-     * @return a snapshot of environment variables and their values after setup is complete
-     * @throws SetUpJobException TODO
+     * @param jobDirectory the job directory
+     * @return the generated executable script file
+     * @throws SetUpJobException if the file cannot be created
      */
-    Map<String, String> setupJobEnvironment(
-        File jobDirectory,
+    File createJobScript(
         JobSpecification jobSpecification,
-        List<File> setupFiles
+        File jobDirectory
     ) throws SetUpJobException;
 
     /**

@@ -4,6 +4,7 @@ license {
     exclude "*.yml"
     exclude "*.xml"
     exclude "*.txt"
+    exclude "*.test.sh"
     exclude "META-INF/spring.factories"
 }
 

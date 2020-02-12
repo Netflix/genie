@@ -184,6 +184,19 @@ public final class PathUtils {
     }
 
     /**
+     * Compose the path to the setup file for a given entity.
+     *
+     * @param entityDirectory the entity base directory
+     * @return a Path
+     */
+    public static Path jobEntitySetupFilePath(final Path entityDirectory) {
+        return composePath(
+            entityDirectory,
+            JobConstants.GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME
+        );
+    }
+
+    /**
      * Compose the path to the standard output log file for a job.
      *
      * @param jobDirectory the job directory
@@ -219,6 +232,45 @@ public final class PathUtils {
         return composePath(
             jobGenieLogsDirectoryPath(jobDirectory),
             JobConstants.GENIE_AGENT_LOG_FILE_NAME
+        );
+    }
+
+    /**
+     * Compose the path to the setup log file for a job (sourcing of entities setup files).
+     *
+     * @param jobDirectory the job directory
+     * @return a Path
+     */
+    public static Path jobSetupLogFilePath(final File jobDirectory) {
+        return composePath(
+            jobGenieLogsDirectoryPath(jobDirectory),
+            JobConstants.GENIE_SETUP_LOG_FILE_NAME
+        );
+    }
+
+    /**
+     * Compose the path to the file where environment variables are dumped after running setup.
+     *
+     * @param jobDirectory the job directory
+     * @return a Path
+     */
+    public static Path jobEnvironmentLogFilePath(final File jobDirectory) {
+        return composePath(
+            jobGenieLogsDirectoryPath(jobDirectory),
+            JobConstants.GENIE_AGENT_ENV_FILE_NAME
+        );
+    }
+
+    /**
+     * Compose the path to the job script (a.k.a. run file).
+     *
+     * @param jobDirectory the job directory
+     * @return a Path
+     */
+    public static Path jobScriptPath(final File jobDirectory) {
+        return composePath(
+            jobDirectory,
+            JobConstants.GENIE_JOB_LAUNCHER_SCRIPT
         );
     }
 }

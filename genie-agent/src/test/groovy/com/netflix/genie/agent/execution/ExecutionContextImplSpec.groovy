@@ -32,39 +32,38 @@ class ExecutionContextImplSpec extends Specification {
         ExecutionContext executionContext = new ExecutionContextImpl()
         File directory = Mock()
         JobSpecification spec = Mock()
-        Map<String, String> env = ["foo": "bar"]
         JobStatus finalJobStatus = JobStatus.SUCCEEDED
         Exception exception = new RuntimeException()
         StateAction action1 = Mock(StateAction.SetUpJob)
         StateAction action2 = Mock(StateAction.LaunchJob)
         JobStatus jobStatus = JobStatus.INIT
         String jobId = UUID.randomUUID().toString()
+        File script = Mock(File)
 
         expect:
         !executionContext.getJobDirectory().isPresent()
         !executionContext.getJobSpecification().isPresent()
-        !executionContext.getJobEnvironment().isPresent()
         !executionContext.getFinalJobStatus().isPresent()
         !executionContext.getCurrentJobStatus().isPresent()
         !executionContext.getClaimedJobId().isPresent()
         !executionContext.hasStateActionError()
         executionContext.getStateActionErrors().isEmpty()
         executionContext.getCleanupActions().isEmpty()
+        !executionContext.getJobScript()
 
         when:
         executionContext.setJobDirectory(directory)
         executionContext.setJobSpecification(spec)
-        executionContext.setJobEnvironment(env)
         executionContext.setFinalJobStatus(finalJobStatus)
         executionContext.addStateActionError(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception)
         executionContext.addCleanupActions(action1)
         executionContext.setCurrentJobStatus(jobStatus)
         executionContext.setClaimedJobId(jobId)
+        executionContext.setJobScript(script)
 
         then:
         directory == executionContext.getJobDirectory().get()
         spec == executionContext.getJobSpecification().get()
-        env == executionContext.getJobEnvironment().get()
         finalJobStatus == executionContext.getFinalJobStatus().get()
         executionContext.hasStateActionError()
         1 == executionContext.getStateActionErrors().size()
@@ -73,6 +72,7 @@ class ExecutionContextImplSpec extends Specification {
         action1 == executionContext.getCleanupActions().get(0)
         jobStatus == executionContext.getCurrentJobStatus().get()
         jobId == executionContext.getClaimedJobId().get()
+        script == executionContext.getJobScript().get()
 
         when:
         executionContext.setJobDirectory(Mock(File))
@@ -82,12 +82,6 @@ class ExecutionContextImplSpec extends Specification {
 
         when:
         executionContext.setJobSpecification(Mock(JobSpecification))
-
-        then:
-        thrown(RuntimeException)
-
-        when:
-        executionContext.setJobEnvironment(new HashMap<String, String>())
 
         then:
         thrown(RuntimeException)
@@ -117,6 +111,12 @@ class ExecutionContextImplSpec extends Specification {
 
         when:
         executionContext.setClaimedJobId("xxx")
+
+        then:
+        thrown(RuntimeException)
+
+        when:
+        executionContext.setJobScript(Mock(File))
 
         then:
         thrown(RuntimeException)

@@ -581,6 +581,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Command command,
         final int memory
     ) {
+        // N.B. variables may be evaluated in a different order than they are added to this map (due to serialization).
+        // Hence variables in this set should not depend on each-other.
         final ImmutableMap.Builder<String, String> envVariables = ImmutableMap.builder();
         envVariables.put(JobConstants.GENIE_VERSION_ENV_VAR, VERSION_4);
         envVariables.put(JobConstants.GENIE_CLUSTER_ID_ENV_VAR, cluster.getId());
