@@ -52,8 +52,8 @@ class SetUpJobActionSpec extends Specification {
 
     File jobDir
     List<File> setupFiles
-    Map<String, String> envMap
     CleanupStrategy cleanupStrategy
+    File jobScript
 
     void setup() {
 
@@ -64,8 +64,8 @@ class SetUpJobActionSpec extends Specification {
 
         this.jobDir = Paths.get("/tmp/genie/jobs/" + jobId).toFile()
         this.setupFiles = []
-        this.envMap = [:]
         this.cleanupStrategy = CleanupStrategy.FULL_CLEANUP
+        this.jobScript = Mock(File)
 
         this.agentJobService = Mock(AgentJobService)
         this.jobSetupService = Mock(JobSetupService)
@@ -98,8 +98,8 @@ class SetUpJobActionSpec extends Specification {
         1 * executionContext.setCurrentJobStatus(JobStatus.INIT)
         1 * fileStreamService.start(jobId, jobDir.toPath())
         1 * jobSetupService.downloadJobResources(spec, jobDir) >> setupFiles
-        1 * jobSetupService.setupJobEnvironment(jobDir, spec, setupFiles) >> envMap
-        1 * executionContext.setJobEnvironment(envMap)
+        1 * jobSetupService.createJobScript(spec, jobDir) >> jobScript
+        1 * executionContext.setJobScript(jobScript)
         1 * fileStreamService.forceServerSync()
         event == Events.SETUP_JOB_COMPLETE
 
@@ -159,7 +159,7 @@ class SetUpJobActionSpec extends Specification {
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.CLAIMED)
         1 * executionContext.getJobSpecification() >> Optional.of(spec)
         1 * executionContext.getJobDirectory() >> Optional.empty()
-        1 * executionContext.getJobEnvironment() >> Optional.empty()
+        1 * executionContext.getJobScript() >> Optional.empty()
 
         when:
         action.executePostActionValidation()
@@ -167,6 +167,6 @@ class SetUpJobActionSpec extends Specification {
         then:
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.INIT)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDir)
-        1 * executionContext.getJobEnvironment() >> Optional.of(envMap)
+        1 * executionContext.getJobScript() >> Optional.of(jobScript)
     }
 }

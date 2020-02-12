@@ -33,14 +33,12 @@ class LaunchJobActionSpec extends Specification {
     String id
     ExecutionContext executionContext
     JobSpecification jobSpec
-    Map<String, String> jobEnvironment
     LaunchJobAction action
     JobProcessManager jobProcessManager
     AgentJobService agentJobService
     AgentFileStreamService agentFileStreamService
     File jobDirectory
-    List<String> commandArgs
-    List<String> jobArgs
+    File jobScript
     boolean interactive
     boolean launchInJobDirectory
     ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments
@@ -50,9 +48,7 @@ class LaunchJobActionSpec extends Specification {
         this.executionContext = Mock(ExecutionContext)
         this.jobSpec = Mock(JobSpecification)
         this.jobDirectory = Mock(File)
-        this.jobEnvironment = Mock(Map)
-        this.commandArgs = Mock(List)
-        this.jobArgs = Mock(List)
+        this.jobScript = Mock(File)
         this.interactive = true
         this.jobProcessManager = Mock(JobProcessManager)
         this.agentJobService = Mock(AgentJobService)
@@ -74,13 +70,11 @@ class LaunchJobActionSpec extends Specification {
         then:
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
-        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
-        1 * jobSpec.getExecutableArgs() >> commandArgs
-        1 * jobSpec.getJobArgs() >> jobArgs
+        1 * executionContext.getJobScript() >> Optional.of(jobScript)
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(10)
         1 * runtimeConfigurationArguments.isLaunchInJobDirectory() >> launchInJobDirectory
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, 10, launchInJobDirectory)
+        1 * jobProcessManager.launchProcess(jobDirectory, jobScript, interactive, 10, launchInJobDirectory)
         1 * agentFileStreamService.forceServerSync()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String)
@@ -99,13 +93,11 @@ class LaunchJobActionSpec extends Specification {
         then:
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
-        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
-        1 * jobSpec.getExecutableArgs() >> commandArgs
-        1 * jobSpec.getJobArgs() >> jobArgs
+        1 * executionContext.getJobScript() >> Optional.of(jobScript)
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
         1 * runtimeConfigurationArguments.isLaunchInJobDirectory() >> launchInJobDirectory
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null, launchInJobDirectory) >> {
+        1 * jobProcessManager.launchProcess(jobDirectory, jobScript, interactive, null, launchInJobDirectory) >> {
             throw exception
         }
         def e = thrown(RuntimeException)
@@ -121,13 +113,11 @@ class LaunchJobActionSpec extends Specification {
         then:
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
-        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
-        1 * jobSpec.getExecutableArgs() >> commandArgs
-        1 * jobSpec.getJobArgs() >> jobArgs
+        1 * executionContext.getJobScript() >> Optional.of(jobScript)
         1 * jobSpec.isInteractive() >> interactive
         1 * jobSpec.getTimeout() >> Optional.ofNullable(null)
         1 * runtimeConfigurationArguments.isLaunchInJobDirectory() >> launchInJobDirectory
-        1 * jobProcessManager.launchProcess(jobDirectory, jobEnvironment, commandArgs, jobArgs, interactive, null, launchInJobDirectory)
+        1 * jobProcessManager.launchProcess(jobDirectory, jobScript, interactive, null, launchInJobDirectory)
         1 * agentFileStreamService.forceServerSync()
         1 * executionContext.getClaimedJobId() >> Optional.of(id)
         1 * agentJobService.changeJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, _ as String) >> { throw exception }
@@ -145,7 +135,7 @@ class LaunchJobActionSpec extends Specification {
         1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.INIT)
         1 * executionContext.getJobSpecification() >> Optional.of(jobSpec)
         1 * executionContext.getJobDirectory() >> Optional.of(jobDirectory)
-        1 * executionContext.getJobEnvironment() >> Optional.of(jobEnvironment)
+        1 * executionContext.getJobScript() >> Optional.of(jobScript)
 
         when:
         action.executePostActionValidation()

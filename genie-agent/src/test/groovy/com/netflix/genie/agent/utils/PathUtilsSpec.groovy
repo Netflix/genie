@@ -77,5 +77,21 @@ class PathUtilsSpec extends Specification {
         PathUtils.&jobStdOutPath             | jobDirectoryStr + "/stdout"
         PathUtils.&jobStdErrPath             | jobDirectoryStr + "/stderr"
         PathUtils.&jobAgentLogFilePath       | jobDirectoryStr + "/genie/logs/agent.log"
+        PathUtils.&jobSetupLogFilePath       | jobDirectoryStr + "/genie/logs/setup.log"
+        PathUtils.&jobEnvironmentLogFilePath | jobDirectoryStr + "/genie/logs/env.log"
+        PathUtils.&jobScriptPath             | jobDirectoryStr + "/run"
+    }
+
+    @Unroll
+    def "Entity Setup file path: #expectedPath"() {
+        expect:
+        PathUtils.jobEntitySetupFilePath(entityDirectoryPath).toString() == expectedPath
+
+        where:
+        entityDirectoryPath | expectedPath
+        jobDirectory.toPath() | jobDirectoryStr + "/genie_setup.sh"
+        PathUtils.jobApplicationDirectoryPath(jobDirectory, "my-app") | jobDirectoryStr + "/genie/applications/my-app/genie_setup.sh"
+        PathUtils.jobClusterDirectoryPath(jobDirectory, "my-cluster") | jobDirectoryStr + "/genie/cluster/my-cluster/genie_setup.sh"
+        PathUtils.jobCommandDirectoryPath(jobDirectory, "my-command") | jobDirectoryStr + "/genie/command/my-command/genie_setup.sh"
     }
 }

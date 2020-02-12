@@ -32,7 +32,6 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * Action performed when in state LAUNCH_JOB.
@@ -68,7 +67,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
         assertCurrentJobStatusEqual(JobStatus.INIT);
         assertJobSpecificationPresent();
         assertJobDirectoryPresent();
-        assertJobEnvironmentPresent();
+        assertJobScriptPresent();
     }
 
     /**
@@ -80,15 +79,13 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
         final JobSpecification jobSpec = executionContext.getJobSpecification().get();
         final File jobDirectory = executionContext.getJobDirectory().get();
-        final Map<String, String> jobEnvironment = executionContext.getJobEnvironment().get();
+        final File jobScript = executionContext.getJobScript().get();
         final boolean interactive = jobSpec.isInteractive();
 
         try {
             this.jobProcessManager.launchProcess(
                 jobDirectory,
-                jobEnvironment,
-                jobSpec.getExecutableArgs(),
-                jobSpec.getJobArgs(),
+                jobScript,
                 interactive,
                 jobSpec.getTimeout().orElse(null),
                 this.runtimeConfigurationArguments.isLaunchInJobDirectory()

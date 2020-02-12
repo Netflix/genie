@@ -22,6 +22,7 @@ import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import com.netflix.genie.common.external.dtos.v4.Criterion
 import org.assertj.core.util.Sets
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import javax.validation.ConstraintViolation
 import javax.validation.Validator
@@ -49,7 +50,7 @@ class JobRequestConverterSpec extends Specification {
 
         then:
         jobRequest.getRequestedAgentConfig().getTimeoutRequested() == Optional.ofNullable(jobRequestArgs.getTimeout())
-        jobRequest.getCommandArgs() == jobRequestArgs.getCommandArguments()
+        jobRequest.getCommandArgs().isEmpty()
         jobRequest.getRequestedJobArchivalData().getRequestedArchiveLocationPrefix() == Optional.ofNullable(jobRequestArgs.getArchiveLocationPrefix())
         jobRequest.getRequestedAgentConfig().isInteractive() == jobRequestArgs.isInteractive()
         jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation() == Optional.ofNullable(jobRequestArgs.getJobDirectoryLocation())
@@ -91,7 +92,7 @@ class JobRequestConverterSpec extends Specification {
         1 * jobRequestArgs.getTimeout() >> 10
         jobRequest.getRequestedAgentConfig().getTimeoutRequested().get() == 10
         1 * jobRequestArgs.getCommandArguments() >> ["foo", "bar"].asList()
-        jobRequest.getCommandArgs() == ["foo", "bar"].asList()
+        jobRequest.getCommandArgs() == ["'foo' 'bar'"].asList()
         1 * jobRequestArgs.getArchiveLocationPrefix() >> archiveLocationPrefix
         jobRequest.getRequestedJobArchivalData().getRequestedArchiveLocationPrefix() == Optional.of(archiveLocationPrefix)
         1 * jobRequestArgs.isInteractive() >> true
@@ -129,6 +130,35 @@ class JobRequestConverterSpec extends Specification {
         1 * jobRequestArgs.getJobSetup() >> "setup.sh"
         jobRequest.getResources().getSetupFile() == Optional.of("setup.sh")
         1 * validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
+    }
+
+    @Unroll
+    def "Convert arguments: #providedJobArguments"() {
+
+        setup:
+        ArgumentDelegates.JobRequestArguments jobRequestArgs = Spy(new JobRequestArgumentsImpl(mainCommandArguments))
+        AgentJobRequest jobRequest
+
+        when:
+        jobRequest = converter.agentJobRequestArgsToDTO(jobRequestArgs)
+
+        then:
+        1 * jobRequestArgs.getCommandArguments() >> providedJobArguments
+        1 * validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
+
+        expect:
+        jobRequest.getCommandArgs() == expectedJobArguments
+
+        where:
+        providedJobArguments                    | expectedJobArguments
+        []                                      | []
+        ["foo", "bar"]                          | ["'foo' 'bar'"]
+        ["d'ho!"]                               | ["'d'\\''ho!'"]
+        ["'blah blah'"]                         | ["''\\''blah blah'\\'''"]
+        ["table['column']"]                     | ["'table['\\''column'\\'']'"]
+        ["tables=t1, t2", "columns=\"c1, c2\""] | ["'tables=t1, t2' 'columns=\"c1, c2\"'"]
+        ["--conf", "variable=\$foo"]            | ["'--conf' 'variable=\$foo'"]
+        ["\t\tblah"]                            | ["'\t\tblah'"]
     }
 
     def "Convert fail validation"() {

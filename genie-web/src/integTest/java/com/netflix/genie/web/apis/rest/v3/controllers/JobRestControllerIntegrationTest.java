@@ -165,8 +165,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final String JOB_TAG_1 = "aTag";
     private static final String JOB_TAG_2 = "zTag";
     private static final Set<String> JOB_TAGS = Sets.newHashSet(JOB_TAG_1, JOB_TAG_2);
-    private static final String JOB_GROUPING = UUID.randomUUID().toString();
-    private static final String JOB_GROUPING_INSTANCE = UUID.randomUUID().toString();
+    private static final String JOB_GROUPING = "Workflow.Foo";
+    private static final String JOB_GROUPING_INSTANCE = "Workflow.Foo_Step.Blah-2020021919:12:34.000_1";
     // This file is not UTF-8 encoded. It is uploaded to test server behavior
     // related to charset headers
     private static final String GB18030_TXT = "GB18030.txt";
@@ -561,26 +561,15 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE));
 
-        if (this.agentExecution) {
-            outputDirJsonResponse
-                .body("parent", Matchers.isEmptyOrNullString())
-                .body("directories[0].name", Matchers.is("genie/"))
-                .body("files[0].name", Matchers.is("config1"))
-                .body("files[1].name", Matchers.is("dep1"))
-                .body("files[2].name", Matchers.is("jobsetupfile"))
-                .body("files[3].name", Matchers.is("stderr"))
-                .body("files[4].name", Matchers.is("stdout"));
-        } else {
-            outputDirJsonResponse
-                .body("parent", Matchers.isEmptyOrNullString())
-                .body("directories[0].name", Matchers.is("genie/"))
-                .body("files[0].name", Matchers.is("config1"))
-                .body("files[1].name", Matchers.is("dep1"))
-                .body("files[2].name", Matchers.is("jobsetupfile"))
-                .body("files[3].name", Matchers.is("run"))
-                .body("files[4].name", Matchers.is("stderr"))
-                .body("files[5].name", Matchers.is("stdout"));
-        }
+        outputDirJsonResponse
+            .body("parent", Matchers.blankOrNullString())
+            .body("directories[0].name", Matchers.is("genie/"))
+            .body("files[0].name", Matchers.is("config1"))
+            .body("files[1].name", Matchers.is("dep1"))
+            .body("files[2].name", Matchers.is(this.agentExecution ? "genie_setup.sh" : "jobsetupfile"))
+            .body("files[3].name", Matchers.is("run"))
+            .body("files[4].name", Matchers.is("stderr"))
+            .body("files[5].name", Matchers.is("stdout"));
 
         // Check getting a directory as HTML
         final RestDocumentationFilter htmlResultFilter = RestAssuredRestDocumentation.document(
@@ -648,37 +637,41 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .filter(fileResultFilter)
             .when()
             .port(this.port)
-            .get(JOBS_API + "/{id}/output/{filePath}", id, "jobsetupfile")
+            .get(
+                JOBS_API + "/{id}/output/{filePath}",
+                id,
+                this.agentExecution ? "genie_setup.sh" : "jobsetupfile"
+            )
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .body(Matchers.is(setupFileContents));
 
         // Validate content of 'run' file
-        if (!this.agentExecution) {
-            // check that the generated run file is correct
-            final String runShFileName = SystemUtils.IS_OS_LINUX ? "linux-runsh.txt" : "non-linux-runsh.txt";
-            final String runFile = this.getResourceURI(BASE_DIR + runShFileName);
-            final String runFileContent = new String(
-                Files.readAllBytes(Paths.get(new URI(runFile))),
-                StandardCharsets.UTF_8
-            );
-            final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + id;
-            final String expectedRunFileContent = this.getExpectedRunContents(
-                runFileContent,
-                jobWorkingDir,
-                id
-            );
+        final String expectedFilename = this.agentExecution ? "runsh-agent.txt" : "runsh-embedded.txt";
+        final String runFile = this.getResourceURI(BASE_DIR + expectedFilename);
+        final String runFileContent = new String(
+            Files.readAllBytes(Paths.get(new URI(runFile))),
+            StandardCharsets.UTF_8
+        );
 
-            RestAssured
-                .given(this.getRequestSpecification())
-                .filter(fileResultFilter)
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/{id}/output/{filePath}", id, "run")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .body(Matchers.equalTo(expectedRunFileContent));
-        }
+        final String testJobsDir = this.agentExecution
+            ? this.jobsLocationsProperties.getJobs().getPath()
+            : this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER;
+        final String expectedRunFileContent = this.getExpectedRunContents(
+            runFileContent,
+            testJobsDir + id,
+            id
+        );
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(fileResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "run")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .body(Matchers.equalTo(expectedRunFileContent));
 
         // Check stdout content
         RestAssured
@@ -694,7 +687,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .given(this.getRequestSpecification())
             .when()
             .port(this.port)
-            .get(JOBS_API + "/{id}/output/{filePath}", id, "stdout")
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "stderr")
             .then()
             .body(Matchers.emptyString());
 
@@ -1332,16 +1325,10 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .body("parent", Matchers.isEmptyOrNullString())
             .body("directories[0].name", Matchers.is("genie/"));
 
-        if (this.agentExecution) {
-            outputResponse
-                .body("files[0].name", Matchers.is("stderr"))
-                .body("files[1].name", Matchers.is("stdout"));
-        } else {
-            outputResponse
-                .body("files[0].name", Matchers.is("run"))
-                .body("files[1].name", Matchers.is("stderr"))
-                .body("files[2].name", Matchers.is("stdout"));
-        }
+        outputResponse
+            .body("files[0].name", Matchers.is("run"))
+            .body("files[1].name", Matchers.is("stderr"))
+            .body("files[2].name", Matchers.is("stdout"));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1550,6 +1537,16 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
 
         this.waitForDone(jobId);
 
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString(utf8));
+
         if (this.agentExecution) {
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1565,31 +1562,13 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
                 .given(this.getRequestSpecification())
                 .when()
                 .port(this.port)
-                .get(JOBS_API + "/" + jobId + "/output/genie/logs/env-setup.log")
+                .get(JOBS_API + "/" + jobId + "/output/genie/logs/setup.log")
                 .then()
                 .statusCode(Matchers.is(HttpStatus.OK.value()))
                 .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
                 .contentType(Matchers.containsString(utf8));
 
-            RestAssured
-                .given(this.getRequestSpecification())
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/" + jobId + "/output/genie/env.sh")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-                .contentType(Matchers.containsString(utf8));
         } else {
-            RestAssured
-                .given(this.getRequestSpecification())
-                .when()
-                .port(this.port)
-                .get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log")
-                .then()
-                .statusCode(Matchers.is(HttpStatus.OK.value()))
-                .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-                .contentType(Matchers.containsString(utf8));
 
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1938,18 +1917,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
         final String jobId
     ) {
         return runFileContents
-            .replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER", jobWorkingDir)
-            .replace("JOB_ID_PLACEHOLDER", jobId)
-            .replace("COMMAND_ID_PLACEHOLDER", CMD1_ID)
-            .replace("COMMAND_NAME_PLACEHOLDER", CMD1_NAME)
-            .replace("COMMAND_TAGS_PLACEHOLDER", CMD1_TAGS)
-            .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
-            .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
-            .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
-            .replace("JOB_TAGS_PLACEHOLDER", JOB_TAG_1 + "," + JOB_TAG_2)
-            .replace("JOB_GROUPING_PLACEHOLDER", JOB_GROUPING)
-            .replace("JOB_GROUPING_INSTANCE_PLACEHOLDER", JOB_GROUPING_INSTANCE)
-            .replace("GENIE_USER_PLACEHOLDER", JOB_USER)
-            .replace("GENIE_USER_GROUP_PLACEHOLDER", "");
+            .replaceAll("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER", jobWorkingDir)
+            .replaceAll("JOB_ID_PLACEHOLDER", jobId);
     }
 }

@@ -22,6 +22,7 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.InvalidStateException
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.execution.statemachine.States
+import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import org.springframework.statemachine.StateContext
 import org.springframework.statemachine.StateMachine
@@ -74,6 +75,12 @@ class BaseStateActionSpec extends Specification {
         1 * state.getId() >> States.READY
         1 * executionContext.addCleanupActions(stateAction)
         1 * stateMachine.sendEvent(Events.INITIALIZE_COMPLETE) >> true
+
+        when:
+        stateAction.cleanup()
+
+        then:
+        noExceptionThrown()
     }
 
     def "ExecuteThrows"() {
@@ -237,5 +244,60 @@ class BaseStateActionSpec extends Specification {
         1 * executionContext.getFinalJobStatus() >> Optional.empty()
         thrown(InvalidStateException)
 
+        when:
+        stateAction.assertJobScriptPresent()
+
+        then:
+        1 * executionContext.getJobScript() >> Optional.empty()
+        thrown(InvalidStateException)
+
+        when:
+        stateAction.assertClaimedJobIdPresent()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.empty()
+        thrown(InvalidStateException)
+
+        when:
+        stateAction.assertJobSpecificationPresent()
+
+        then:
+        1 * executionContext.getJobSpecification() >> Optional.empty()
+        thrown(InvalidStateException)
+
+        when:
+        stateAction.assertJobScriptNotPresent()
+
+        then:
+        1 * executionContext.getJobScript() >> Optional.of(Mock(File))
+        thrown(InvalidStateException)
+
+        when:
+        stateAction.assertClaimedJobIdNotPresent()
+
+        then:
+        1 * executionContext.getClaimedJobId() >> Optional.of(UUID.randomUUID().toString())
+        thrown(InvalidStateException)
+
+        when:
+        stateAction.assertCurrentJobStatusNotPresent()
+
+        then:
+        1 * executionContext.getCurrentJobStatus() >> Optional.of(JobStatus.RESERVED)
+        thrown(InvalidStateException)
+
+        when:
+        stateAction.assertJobSpecificationNotPresent()
+
+        then:
+        1 * executionContext.getJobSpecification() >> Optional.of(Mock(JobSpecification))
+        thrown(InvalidStateException)
+
+        when:
+        stateAction.assertFinalJobStatusNotPresent()
+
+        then:
+        1 * executionContext.getFinalJobStatus() >> Optional.of(JobStatus.ACCEPTED)
+        thrown(InvalidStateException)
     }
 }

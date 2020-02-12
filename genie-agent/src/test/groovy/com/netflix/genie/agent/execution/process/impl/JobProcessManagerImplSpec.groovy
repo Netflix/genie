@@ -30,6 +30,7 @@ import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import spock.lang.IgnoreIf
 import spock.lang.Specification
+import spock.lang.Unroll
 import spock.util.environment.OperatingSystem
 
 import java.nio.charset.StandardCharsets
@@ -43,14 +44,12 @@ class JobProcessManagerImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
 
-    Map<String, String> envMap
     File stdOut
     File stdErr
     TaskScheduler scheduler
     JobProcessManager manager
 
     void setup() {
-        this.envMap = [:]
         this.stdOut = PathUtils.jobStdOutPath(temporaryFolder.getRoot()).toFile()
         this.stdErr = PathUtils.jobStdErrPath(temporaryFolder.getRoot()).toFile()
         Files.createDirectories(this.stdOut.getParentFile().toPath())
@@ -62,17 +61,22 @@ class JobProcessManagerImplSpec extends Specification {
     void cleanup() {
     }
 
-    def "LaunchProcess interactive"() {
+    @Unroll
+    def "LaunchProcess, (interactive: #interactive)"() {
         File expectedFile = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString())
-        this.envMap.put("PATH", System.getenv("PATH") + ":/foo")
+        assert !expectedFile.exists()
+
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.append("echo Hello stdout;\n");
+        jobScript.append("echo Hello stderr 1>&2;\n");
+        jobScript.append("touch " + expectedFile +";\n");
+        jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["touch"],
-            [expectedFile.getAbsolutePath()],
-            true,
+            jobScript,
+            interactive,
             null,
             false
         )
@@ -87,123 +91,32 @@ class JobProcessManagerImplSpec extends Specification {
         then:
         result.getFinalStatus() == JobStatus.SUCCEEDED
         result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
-        result.getStdOutSize() == 0L
-        result.getStdErrSize() == 0L
         result.getExitCode() == 0
         expectedFile.exists()
-        !this.stdErr.exists()
-        !this.stdOut.exists()
-    }
+        this.stdErr.exists() == !interactive
+        this.stdOut.exists() == !interactive
+        if (!interactive) {
+            assert this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains("Hello stdout")
+            assert this.stdErr.getText(StandardCharsets.UTF_8.toString()).contains("Hello stderr")
+        }
 
-    def "LaunchProcess noninteractive with executable variable expansion"() {
-        String helloWorld = "Hello World!"
-        this.envMap.put("ECHO_COMMAND", "echo")
-
-        when:
-        this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["\${ECHO_COMMAND}"],
-            [helloWorld],
-            false,
-            null,
-            false
-        )
-
-        then:
-        noExceptionThrown()
-        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
-
-        when:
-        def result = this.manager.waitFor()
-
-        then:
-        result.getFinalStatus() == JobStatus.SUCCEEDED
-        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
-        result.getStdOutSize() == 0L
-        result.getStdErrSize() == 0L
-        result.getExitCode() == 0
-        this.stdErr.exists()
-        this.stdOut.exists()
-        this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(helloWorld)
-    }
-
-    def "LaunchProcess noninteractive without job arguments variable expansion"() {
-        final String envVarName = "MY_VARIABLE";
-        this.envMap.put(envVarName, "If this value shows, then the variable was substituted by its value")
-
-        when:
-        this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["echo"],
-            ["\$" + envVarName], // Variable should NOT get expanded/evaluated
-            false,
-            null,
-            false
-        )
-
-        then:
-        noExceptionThrown()
-        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
-
-        when:
-        def result = this.manager.waitFor()
-
-        then:
-        result.getFinalStatus() == JobStatus.SUCCEEDED
-        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
-        result.getStdOutSize() == 0L
-        result.getStdErrSize() == 0L
-        result.getExitCode() == 0
-        this.stdErr.exists()
-        this.stdOut.exists()
-        this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains("\$" + envVarName)
-    }
-
-    def "LaunchProcess noninteractive and check environment env"() {
-        String uuid = UUID.randomUUID().toString()
-        this.envMap.put("GENIE_UUID", uuid)
-        String expectedString = "GENIE_UUID=" + uuid
-
-        when:
-        this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["env"],
-            [],
-            false,
-            null,
-            false
-        )
-
-        then:
-        noExceptionThrown()
-        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
-
-        when:
-        def result = this.manager.waitFor()
-
-        then:
-        result.getFinalStatus() == JobStatus.SUCCEEDED
-        result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
-        result.getStdOutSize() == 0L
-        result.getStdErrSize() == 0L
-        result.getExitCode() == 0
-        this.stdErr.exists()
-        this.stdOut.exists()
-        this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(expectedString)
+        where:
+        interactive | _
+        true        | _
+        false       | _
     }
 
     def "LaunchProcess changing directory before launch"() {
         String expectedString = this.temporaryFolder.getRoot().getPath()
 
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("pwd\n");
+        jobScript.setExecutable(true)
+
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["pwd"],
-            [],
+            jobScript,
             false,
             null,
             true
@@ -219,24 +132,23 @@ class JobProcessManagerImplSpec extends Specification {
         then:
         result.getFinalStatus() == JobStatus.SUCCEEDED
         result.getFinalStatusMessage() == JobStatusMessages.JOB_FINISHED_SUCCESSFULLY
-        result.getStdOutSize() == 0L
-        result.getStdErrSize() == 0L
         result.getExitCode() == 0
         this.stdErr.exists()
         this.stdOut.exists()
         this.stdOut.getText(StandardCharsets.UTF_8.toString()).contains(expectedString)
     }
 
-
-    def "LaunchProcess command error"() {
+    def "LaunchProcess script error"() {
         File nonExistentFile = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString())
+
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("cat " + nonExistentFile + "\n");
+        jobScript.setExecutable(true)
 
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["rm"],
-            [nonExistentFile.absolutePath],
+            jobScript,
             false,
             null,
             false
@@ -252,57 +164,17 @@ class JobProcessManagerImplSpec extends Specification {
         then:
         result.getFinalStatus() == JobStatus.FAILED
         result.getFinalStatusMessage() == JobStatusMessages.JOB_FAILED
-        result.getStdOutSize() == 0L
-        result.getStdErrSize() == 0L
         result.getExitCode() == 1
         this.stdErr.exists()
         this.stdOut.exists()
         this.stdErr.getText(StandardCharsets.UTF_8.toString()).contains("No such file or directory")
     }
 
-    def "LaunchProcess missing executable"() {
-        String uuid = UUID.randomUUID().toString()
-
-        when:
-        this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            this.envMap,
-            [uuid],
-            [],
-            false,
-            null,
-            false
-        )
-
-        then:
-        thrown(JobLaunchException)
-        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
-    }
-
-    def "LaunchProcess missing environment variable"() {
-        when:
-        this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["\$COMMAND"],
-            [],
-            false,
-            null,
-            false
-        )
-
-        then:
-        thrown(JobLaunchException)
-        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
-    }
-
     def "Job directory null"() {
         when:
         this.manager.launchProcess(
             null,
-            this.envMap,
-            ["echo"],
-            [],
+            Mock(File),
             false,
             null,
             false
@@ -317,9 +189,7 @@ class JobProcessManagerImplSpec extends Specification {
         when:
         this.manager.launchProcess(
             this.temporaryFolder.newFile("foo"),
-            this.envMap,
-            ["echo"],
-            [],
+            Mock(File),
             false,
             null,
             false
@@ -334,9 +204,7 @@ class JobProcessManagerImplSpec extends Specification {
         when:
         this.manager.launchProcess(
             new File(this.temporaryFolder.getRoot(), "foo"),
-            this.envMap,
-            ["echo"],
-            [],
+            Mock(File),
             false,
             null,
             false
@@ -347,29 +215,10 @@ class JobProcessManagerImplSpec extends Specification {
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
-    def "Environment null"() {
+    def "Script is null"() {
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            null,
-            ["echo"],
-            [],
-            false,
-            null,
-            false
-        )
-
-        then:
-        thrown(JobLaunchException)
-        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
-    }
-
-    def "Args not set"() {
-        when:
-        this.manager.launchProcess(
-            this.temporaryFolder.getRoot(),
-            this.envMap,
-            null,
             null,
             false,
             null,
@@ -381,13 +230,31 @@ class JobProcessManagerImplSpec extends Specification {
         0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
     }
 
-    def "Args empty"() {
+    def "Script does not exist"() {
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            [],
-            [],
+            null,
+            false,
+            null,
+            false
+        )
+
+        then:
+        thrown(JobLaunchException)
+        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
+    }
+
+    def "Script is not not executable"() {
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("echo hello world")
+
+        when:
+        this.manager.launchProcess(
+            this.temporaryFolder.getRoot(),
+            null,
             false,
             null,
             false
@@ -401,12 +268,14 @@ class JobProcessManagerImplSpec extends Specification {
     def "Kill running process"() {
         def future = Mock(ScheduledFuture)
 
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("sleep 60 \n");
+        jobScript.setExecutable(true)
+
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["sleep"],
-            ["60"],
+            jobScript,
             true,
             59,
             false
@@ -428,8 +297,6 @@ class JobProcessManagerImplSpec extends Specification {
         then:
         result.getFinalStatus() == JobStatus.KILLED
         result.getFinalStatusMessage() == JobStatusMessages.JOB_KILLED_BY_USER
-        result.getStdOutSize() == 0L
-        result.getStdErrSize() == 0L
         result.getExitCode() == 143
         !this.stdErr.exists()
         !this.stdOut.exists()
@@ -437,12 +304,14 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Kill running process via event"() {
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("sleep 60 \n");
+        jobScript.setExecutable(true)
+
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["sleep"],
-            ["60"],
+            jobScript,
             true,
             null,
             false
@@ -475,12 +344,14 @@ class JobProcessManagerImplSpec extends Specification {
     //       Why should a job that is completed successfully be marked as killed instead of successful? we should fix
     //       this case
     def "Kill completed process"() {
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("echo\n");
+        jobScript.setExecutable(true)
+
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["echo"],
-            ["foo"],
+            jobScript,
             true,
             null,
             false
@@ -511,6 +382,10 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Skip process launch"() {
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("echo\n");
+        jobScript.setExecutable(true)
+
         when:
         this.manager.kill(KillService.KillSource.API_KILL_REQUEST)
 
@@ -520,9 +395,7 @@ class JobProcessManagerImplSpec extends Specification {
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["echo"],
-            ["foo"],
+            jobScript,
             true,
             10,
             false
@@ -546,12 +419,14 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Double launch"() {
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("echo\n");
+        jobScript.setExecutable(true)
+
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["echo"],
-            ["foo"],
+            jobScript,
             true,
             null,
             false
@@ -564,9 +439,7 @@ class JobProcessManagerImplSpec extends Specification {
         when:
         this.manager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["echo"],
-            ["foo"],
+            jobScript,
             true,
             null,
             false
@@ -586,7 +459,11 @@ class JobProcessManagerImplSpec extends Specification {
     }
 
     def "Job killed due to timeout"() {
-        // These really are more of an integration test...
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("sleep 60\n");
+        jobScript.setExecutable(true)
+
+        // This really are more of an integration test...
         def threadPoolScheduler = new ThreadPoolTaskScheduler()
         threadPoolScheduler.setPoolSize(1)
         threadPoolScheduler.setThreadNamePrefix("job-process-manager-impl-spec-")
@@ -597,9 +474,7 @@ class JobProcessManagerImplSpec extends Specification {
         when:
         realManager.launchProcess(
             this.temporaryFolder.getRoot(),
-            this.envMap,
-            ["sleep"],
-            ["60"],
+            jobScript,
             true,
             1,
             false

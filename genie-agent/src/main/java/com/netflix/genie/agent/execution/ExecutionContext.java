@@ -28,7 +28,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -67,20 +66,6 @@ public interface ExecutionContext {
      * @param jobSpecification the job specification
      */
     void setJobSpecification(JobSpecification jobSpecification);
-
-    /**
-     * Get the environment variables map for the job process.
-     *
-     * @return a map of environment variables and values if one was set, or empty
-     */
-    Optional<Map<String, String>> getJobEnvironment();
-
-    /**
-     * Set the job environment variables map.
-     *
-     * @param jobEnvironment a map of environment variables and their value to be passed to the job process at launch
-     */
-    void setJobEnvironment(Map<String, String> jobEnvironment);
 
     /**
      * Enqueue cleanup for a state action.
@@ -165,4 +150,18 @@ public interface ExecutionContext {
      * @param jobId the job id
      */
     void setClaimedJobId(@NotBlank String jobId);
+
+    /**
+     * Set the job script (a.k.a. run file).
+     *
+     * @param jobScript the job script file
+     */
+    void setJobScript(File jobScript);
+
+    /**
+     * Get the job script (a.k.a. run file) if one was generated.
+     *
+     * @return a file handle to the script or empty
+     */
+    Optional<File> getJobScript();
 }

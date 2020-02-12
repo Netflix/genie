@@ -43,6 +43,7 @@ import java.io.IOException;
  * @author tgianos
  * @since 4.0.0
  */
+//TODO this class lacks a test
 @Configuration
 @AutoConfigureAfter(AwsAutoConfiguration.class)
 @Slf4j

@@ -43,7 +43,6 @@ import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
-import com.netflix.genie.common.util.JsonUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
@@ -402,23 +401,6 @@ public final class DtoConverters {
     public static JobRequest toV4JobRequest(
         final com.netflix.genie.common.dto.JobRequest v3JobRequest
     ) throws GeniePreconditionException {
-        return DtoConverters.toV4JobRequest(v3JobRequest, false);
-    }
-
-    /**
-     * Convert a V3 Job Request to a V4 Job Request.
-     *
-     * @param v3JobRequest            The v3 request to convert
-     * @param tokenizeArgumentsString Whether to perform splitting of the command arguments string into separate
-     *                                arguments. This is necessary to execute a request that came through the V3 API
-     *                                using V4 execution code.
-     * @return The V4 version of the information contained in the V3 request
-     * @throws GeniePreconditionException When the criteria is invalid
-     */
-    public static JobRequest toV4JobRequest(
-        final com.netflix.genie.common.dto.JobRequest v3JobRequest,
-        final boolean tokenizeArgumentsString
-    ) throws GeniePreconditionException {
         final ExecutionEnvironment resources = new ExecutionEnvironment(
             v3JobRequest.getConfigs(),
             v3JobRequest.getDependencies(),
@@ -461,12 +443,9 @@ public final class DtoConverters {
 
         final JobArchivalDataRequest.Builder jobArchivalDataRequestBuilder = new JobArchivalDataRequest.Builder();
 
+        // Keep arguments as joined string and store them as first (and only element of the list)
         final List<String> commandArgs = Lists.newArrayList();
-        if (tokenizeArgumentsString) {
-            v3JobRequest.getCommandArgs().ifPresent(args -> commandArgs.addAll(JsonUtils.splitArguments(args)));
-        } else {
-            v3JobRequest.getCommandArgs().ifPresent(commandArgs::add);
-        }
+        v3JobRequest.getCommandArgs().ifPresent(commandArgs::add);
 
         return new JobRequest(
             v3JobRequest.getId().orElse(null),

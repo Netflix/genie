@@ -36,8 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Action performed when in state SETUP_JOB.
@@ -77,7 +76,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         assertJobSpecificationPresent();
         //TODO assert claimed ID matches spec ID
         assertJobDirectoryNotPresent();
-        assertJobEnvironmentNotPresent();
+        assertJobScriptNotPresent();
     }
 
     /**
@@ -99,6 +98,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             // Create job directory
             final File jobDirectory;
             jobDirectory = this.jobSetupService.createJobDirectory(jobSpecification);
+            log.info("Created job directory: " + jobDirectory);
             executionContext.setJobDirectory(jobDirectory);
 
             // Move the agent log file inside the job folder
@@ -117,14 +117,14 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             executionContext.setCurrentJobStatus(JobStatus.INIT);
 
             // Download dependencies, configurations, etc.
-            final List<File> setupFiles = this.jobSetupService.downloadJobResources(jobSpecification, jobDirectory);
+            final Set<File> downloaded = this.jobSetupService.downloadJobResources(jobSpecification, jobDirectory);
+            log.info("Downloaded dependencies: " + downloaded.size());
 
-            final Map<String, String> jobEnvironment = this.jobSetupService.setupJobEnvironment(
-                jobDirectory,
-                jobSpecification,
-                setupFiles
-            );
-            executionContext.setJobEnvironment(jobEnvironment);
+            // Generate `run` file
+            final File jobScript = this.jobSetupService.createJobScript(jobSpecification, jobDirectory);
+            log.info("Generated run script: " + jobScript);
+
+            executionContext.setJobScript(jobScript);
 
         } catch (SetUpJobException e) {
             throw new RuntimeException("Failed to set up job directory and environment", e);
@@ -141,7 +141,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     protected void executePostActionValidation() {
         assertCurrentJobStatusEqual(JobStatus.INIT);
         assertJobDirectoryPresent();
-        assertJobEnvironmentPresent();
+        assertJobScriptPresent();
     }
 
     @Override
