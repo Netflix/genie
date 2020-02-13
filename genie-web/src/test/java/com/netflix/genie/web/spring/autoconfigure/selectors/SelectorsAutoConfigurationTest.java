@@ -18,9 +18,13 @@
 package com.netflix.genie.web.spring.autoconfigure.selectors;
 
 import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.selectors.ClusterSelector;
+import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.selectors.impl.RandomClusterSelectorImpl;
+import com.netflix.genie.web.selectors.impl.RandomCommandSelectorImpl;
 import com.netflix.genie.web.selectors.impl.ScriptClusterSelectorImpl;
+import com.netflix.genie.web.selectors.impl.ScriptCommandSelectorImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
@@ -45,7 +49,8 @@ class SelectorsAutoConfigurationTest {
                 AutoConfigurations.of(
                     SelectorsAutoConfiguration.class
                 )
-            );
+            )
+            .withUserConfiguration(RegistryConfig.class);
 
     @Test
     void canCreateDefaultBeans() {
@@ -58,6 +63,9 @@ class SelectorsAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(ClusterSelector.class);
                 Assertions.assertThat(context).hasSingleBean(RandomClusterSelectorImpl.class);
                 Assertions.assertThat(context).doesNotHaveBean(ScriptClusterSelectorImpl.class);
+                Assertions.assertThat(context).hasSingleBean(CommandSelector.class);
+                Assertions.assertThat(context).hasSingleBean(RandomCommandSelectorImpl.class);
+                Assertions.assertThat(context).doesNotHaveBean(ScriptCommandSelectorImpl.class);
             }
         );
     }
@@ -65,7 +73,7 @@ class SelectorsAutoConfigurationTest {
     @Test
     void canCreateConditionalBeans() {
         this.contextRunner
-            .withUserConfiguration(UserConfig.class)
+            .withUserConfiguration(ScriptsConfig.class)
             .run(
                 context -> {
                     Assertions
@@ -74,14 +82,39 @@ class SelectorsAutoConfigurationTest {
                         .hasSingleBean(ScriptClusterSelectorImpl.class)
                         .getBeans(ClusterSelector.class)
                         .hasSize(2); // No real easy way to test the order
+
+                    Assertions.assertThat(context).hasSingleBean(CommandSelector.class);
+                    Assertions.assertThat(context).doesNotHaveBean(RandomCommandSelectorImpl.class);
+                    Assertions.assertThat(context).hasSingleBean(ScriptCommandSelectorImpl.class);
+                }
+            );
+    }
+
+    @Test
+    void commandSelectorOverrideProvided() {
+        this.contextRunner
+            .withUserConfiguration(ScriptsConfig.class, UserCommandSelectorConfig.class)
+            .run(
+                context -> {
+                    Assertions
+                        .assertThat(context)
+                        .hasSingleBean(RandomClusterSelectorImpl.class)
+                        .hasSingleBean(ScriptClusterSelectorImpl.class)
+                        .getBeans(ClusterSelector.class)
+                        .hasSize(2); // No real easy way to test the order
+
+                    Assertions.assertThat(context).hasSingleBean(CommandSelector.class);
+                    Assertions.assertThat(context).doesNotHaveBean(RandomCommandSelectorImpl.class);
+                    Assertions.assertThat(context).doesNotHaveBean(ScriptCommandSelectorImpl.class);
+                    Assertions.assertThat(context).hasBean("customCommandSelector");
                 }
             );
     }
 
     /**
-     * Dummy user configuration for tests.
+     * Dummy config to create a {@link MeterRegistry} instance.
      */
-    private static class UserConfig {
+    private static class RegistryConfig {
 
         /**
          * Dummy meter registry.
@@ -92,13 +125,38 @@ class SelectorsAutoConfigurationTest {
         public MeterRegistry meterRegistry() {
             return new SimpleMeterRegistry();
         }
+    }
+
+    /**
+     * Dummy scripts configuration for tests.
+     */
+    private static class ScriptsConfig {
 
         /**
-         * Dummy script based selector.
+         * Dummy script based cluster selector.
          */
         @Bean
         public ClusterSelectorScript clusterSelectorScript() {
             return Mockito.mock(ClusterSelectorScript.class);
+        }
+
+        /**
+         * Dummy script based command selector.
+         */
+        @Bean
+        public CommandSelectorManagedScript commandSelectorManagedScript() {
+            return Mockito.mock(CommandSelectorManagedScript.class);
+        }
+    }
+
+    /**
+     * User provided command selector configuration.
+     */
+    private static class UserCommandSelectorConfig {
+
+        @Bean
+        public CommandSelector customCommandSelector() {
+            return Mockito.mock(CommandSelector.class);
         }
     }
 }
