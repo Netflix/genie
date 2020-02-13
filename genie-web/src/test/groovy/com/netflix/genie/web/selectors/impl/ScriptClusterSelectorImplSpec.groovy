@@ -80,7 +80,7 @@ class ScriptClusterSelectorImplSpec extends Specification {
 
         when: "Script throws"
         expectedTags = MetricsUtils.newFailureTagsSetForException(executionException)
-        result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
+        this.scriptClusterSelector.selectCluster(clusters, jobRequest)
 
         then:
         1 * script.selectCluster(jobRequest, clusters) >> { throw executionException }

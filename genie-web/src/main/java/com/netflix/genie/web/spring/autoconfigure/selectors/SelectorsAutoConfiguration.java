@@ -18,15 +18,22 @@
 package com.netflix.genie.web.spring.autoconfigure.selectors;
 
 import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.selectors.ClusterSelector;
+import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.selectors.impl.RandomClusterSelectorImpl;
+import com.netflix.genie.web.selectors.impl.RandomCommandSelectorImpl;
 import com.netflix.genie.web.selectors.impl.ScriptClusterSelectorImpl;
+import com.netflix.genie.web.selectors.impl.ScriptCommandSelectorImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+
+import java.util.Optional;
 
 /**
  * Spring Auto Configuration for the {@literal selectors} module.
@@ -75,5 +82,29 @@ public class SelectorsAutoConfiguration {
     @Order
     public RandomClusterSelectorImpl randomizedClusterSelector() {
         return new RandomClusterSelectorImpl();
+    }
+
+    /**
+     * Provide a default {@link CommandSelector} implementation if no other has been defined in the context already.
+     *
+     * @param commandSelectorManagedScriptOptional An {@link Optional} wrapping a {@link CommandSelectorManagedScript}
+     *                                             instance if one is present in the context else
+     *                                             {@link Optional#empty()}
+     * @param registry                             The {@link MeterRegistry} instance to use
+     * @return A {@link ScriptCommandSelectorImpl} if a {@link CommandSelectorManagedScript} instance as present else
+     * a {@link RandomCommandSelectorImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(CommandSelector.class)
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public CommandSelector commandSelector(
+        final Optional<CommandSelectorManagedScript> commandSelectorManagedScriptOptional,
+        final MeterRegistry registry
+    ) {
+        if (commandSelectorManagedScriptOptional.isPresent()) {
+            return new ScriptCommandSelectorImpl(commandSelectorManagedScriptOptional.get(), registry);
+        } else {
+            return new RandomCommandSelectorImpl();
+        }
     }
 }
