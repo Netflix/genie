@@ -17,12 +17,13 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
-import com.google.common.collect.Lists;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
+import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
 import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.scripts.ManagedScript;
 import com.netflix.genie.web.scripts.ScriptManager;
@@ -39,7 +40,6 @@ import org.springframework.scheduling.TaskScheduler;
 
 import javax.script.ScriptEngineManager;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 
 /**
@@ -52,6 +52,7 @@ import java.util.concurrent.Executors;
 @EnableConfigurationProperties(
     {
         ClusterSelectorScriptProperties.class,
+        CommandSelectorManagedScriptProperties.class,
         ExecutionModeFilterScriptProperties.class,
         ScriptManagerProperties.class,
     }
@@ -89,14 +90,12 @@ public class ScriptsAutoConfiguration {
      * Create a {@link SmartInitializingSingleton} that "warms" known scripts so they're ready for execution on first
      * invocation.
      *
-     * @param managedScrips the managed scripts, if any exist in context
+     * @param managedScripts the managed scripts, if any exist in context
      * @return A {@link ManagedScriptPreLoader} that runs after the application context is ready
      */
     @Bean
-    public ManagedScriptPreLoader managedScriptPreLoader(
-        final Optional<List<ManagedScript>> managedScrips
-    ) {
-        return new ManagedScriptPreLoader(managedScrips.orElse(Lists.newArrayList()));
+    public ManagedScriptPreLoader managedScriptPreLoader(final List<ManagedScript> managedScripts) {
+        return new ManagedScriptPreLoader(managedScripts);
     }
 
     /**
@@ -118,6 +117,30 @@ public class ScriptsAutoConfiguration {
         return new ClusterSelectorScript(
             scriptManager,
             scriptProperties,
+            GenieObjectMapper.getMapper(),
+            meterRegistry
+        );
+    }
+
+    /**
+     * Create a {@link CommandSelectorManagedScript}  if necessary and one doesn't already exist.
+     *
+     * @param scriptManager                          script manager
+     * @param commandSelectorManagedScriptProperties script properties
+     * @param meterRegistry                          meter registry
+     * @return a {@link CommandSelectorManagedScript}
+     */
+    @Bean
+    @ConditionalOnMissingBean(CommandSelectorManagedScript.class)
+    @ConditionalOnProperty(value = CommandSelectorManagedScriptProperties.SOURCE_PROPERTY)
+    CommandSelectorManagedScript commandSelectormanagedScript(
+        final ScriptManager scriptManager,
+        final CommandSelectorManagedScriptProperties commandSelectorManagedScriptProperties,
+        final MeterRegistry meterRegistry
+    ) {
+        return new CommandSelectorManagedScript(
+            scriptManager,
+            commandSelectorManagedScriptProperties,
             GenieObjectMapper.getMapper(),
             meterRegistry
         );
@@ -162,7 +185,7 @@ public class ScriptsAutoConfiguration {
          */
         @Override
         public void afterSingletonsInstantiated() {
-            managedScripts.forEach(ManagedScript::warmUp);
+            this.managedScripts.forEach(ManagedScript::warmUp);
         }
     }
 }

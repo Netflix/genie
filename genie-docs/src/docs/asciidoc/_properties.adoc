@@ -359,6 +359,21 @@ of 2.0
 |5000
 |no
 
+|genie.scripts.command-selector.source
+|URI of the script to load. `ScriptCommandSelector` is enabled only if this property is set.
+|null
+|no
+
+|genie.scripts.command-selector.auto-load-enabled
+|If true, the script eagerly load during startup, as opposed to lazily load on first use.
+|false
+|no
+
+|genie.scripts.command-selector.timeout
+|Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.
+|5000
+|no
+
 |genie.scripts.execution-mode-filter.source
 |URI of the script to load. `ExecutionModeFilterScript` is enabled only if this property is set.
 |null

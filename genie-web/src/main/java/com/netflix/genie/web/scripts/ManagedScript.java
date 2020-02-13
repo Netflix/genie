@@ -23,6 +23,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import io.micrometer.core.instrument.MeterRegistry;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +41,8 @@ import java.util.Map;
  */
 @Slf4j
 public abstract class ManagedScript {
-    protected final ObjectMapper mapper;
+    @Getter(AccessLevel.PROTECTED)
+    private final ObjectMapper mapper;
     private final ScriptManager scriptManager;
     @Getter
     private final ManagedScriptBaseProperties properties;

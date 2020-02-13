@@ -18,8 +18,10 @@
 package com.netflix.genie.web.spring.autoconfigure.scripts;
 
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
+import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.scripts.ScriptManager;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -51,24 +53,17 @@ class ScriptsAutoConfigurationTest {
             );
 
     @Test
-    void scriptManagerCreated() {
-        this.contextRunner
-            .run(
-                context -> {
-                    Assertions.assertThat(context).hasSingleBean(ScriptManager.class);
-                }
-            );
-    }
-
-    @Test
     void scriptsNotCreatedByDefault() {
         this.contextRunner
-            .withPropertyValues()
             .run(
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(ClusterSelectorScriptProperties.class);
-                    Assertions.assertThat(context).doesNotHaveBean(ClusterSelectorScript.class);
+                    Assertions.assertThat(context).hasSingleBean(CommandSelectorManagedScriptProperties.class);
                     Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScriptProperties.class);
+
+                    Assertions.assertThat(context).hasSingleBean(ScriptManager.class);
+                    Assertions.assertThat(context).doesNotHaveBean(ClusterSelectorScript.class);
+                    Assertions.assertThat(context).doesNotHaveBean(CommandSelectorManagedScript.class);
                     Assertions.assertThat(context).doesNotHaveBean(ExecutionModeFilterScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);
                 }
@@ -80,13 +75,18 @@ class ScriptsAutoConfigurationTest {
         this.contextRunner
             .withPropertyValues(
                 ClusterSelectorScriptProperties.SOURCE_PROPERTY + "=file:///script.js",
+                CommandSelectorManagedScriptProperties.SOURCE_PROPERTY + "=file:///script.groovy",
                 ExecutionModeFilterScriptProperties.SOURCE_PROPERTY + "=file:///script.js"
             )
             .run(
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(ClusterSelectorScriptProperties.class);
-                    Assertions.assertThat(context).hasSingleBean(ClusterSelectorScript.class);
+                    Assertions.assertThat(context).hasSingleBean(CommandSelectorManagedScriptProperties.class);
                     Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScriptProperties.class);
+
+                    Assertions.assertThat(context).hasSingleBean(ScriptManager.class);
+                    Assertions.assertThat(context).hasSingleBean(ClusterSelectorScript.class);
+                    Assertions.assertThat(context).hasSingleBean(CommandSelectorManagedScript.class);
                     Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);
                 }
