@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
- @EnableConfigurationProperties(value={<a href="../../../../../../../com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/ExecutionModeFilterScriptProperties.html" title="class in com.netflix.genie.web.properties">ExecutionModeFilterScriptProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/ScriptManagerProperties.html" title="class in com.netflix.genie.web.properties">ScriptManagerProperties.class</a>})
+ @EnableConfigurationProperties(value={<a href="../../../../../../../com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties">CommandSelectorManagedScriptProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/ExecutionModeFilterScriptProperties.html" title="class in com.netflix.genie.web.properties">ExecutionModeFilterScriptProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/properties/ScriptManagerProperties.html" title="class in com.netflix.genie.web.properties">ScriptManagerProperties.class</a>})
 public class <span class="typeNameLabel">ScriptsAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Configuration for script extensions.</div>
@@ -153,7 +153,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.web.spring.autoconfigure.scripts.ScriptsAutoConfiguration.ManagedScriptPreLoader</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/scripts/ScriptsAutoConfiguration.html#managedScriptPreLoader-java.util.Optional-">managedScriptPreLoader</a></span>(java.util.Optional&lt;java.util.List&lt;<a href="../../../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">ManagedScript</a>&gt;&gt;&nbsp;managedScrips)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/scripts/ScriptsAutoConfiguration.html#managedScriptPreLoader-java.util.List-">managedScriptPreLoader</a></span>(java.util.List&lt;<a href="../../../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">ManagedScript</a>&gt;&nbsp;managedScripts)</code>
 <div class="block">Create a <code>SmartInitializingSingleton</code> that "warms" known scripts so they're ready for execution on first
  invocation.</div>
 </td>
@@ -197,19 +197,19 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="managedScriptPreLoader-java.util.Optional-">
+<a name="managedScriptPreLoader-java.util.List-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>managedScriptPreLoader</h4>
 <pre>@Bean
-public&nbsp;com.netflix.genie.web.spring.autoconfigure.scripts.ScriptsAutoConfiguration.ManagedScriptPreLoader&nbsp;managedScriptPreLoader(java.util.Optional&lt;java.util.List&lt;<a href="../../../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">ManagedScript</a>&gt;&gt;&nbsp;managedScrips)</pre>
+public&nbsp;com.netflix.genie.web.spring.autoconfigure.scripts.ScriptsAutoConfiguration.ManagedScriptPreLoader&nbsp;managedScriptPreLoader(java.util.List&lt;<a href="../../../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">ManagedScript</a>&gt;&nbsp;managedScripts)</pre>
 <div class="block">Create a <code>SmartInitializingSingleton</code> that "warms" known scripts so they're ready for execution on first
  invocation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>managedScrips</code> - the managed scripts, if any exist in context</dd>
+<dd><code>managedScripts</code> - the managed scripts, if any exist in context</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>ManagedScriptPreLoader</code> that runs after the application context is ready</dd>
 </dl>

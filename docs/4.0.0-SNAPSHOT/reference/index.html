@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-02-11</span>
+<span id="revdate">2020-02-14</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5196,6 +5196,24 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.command-selector.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>ScriptCommandSelector</code> is enabled only if this property is set.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.command-selector.auto-load-enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If true, the script eagerly load during startup, as opposed to lazily load on first use.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.command-selector.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum script execution time (in milliseconds). After this time has elapsed, evaluation is shut down.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.scripts.execution-mode-filter.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URI of the script to load. <code>ExecutionModeFilterScript</code> is enabled only if this property is set.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
@@ -6385,7 +6403,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-02-11 18:41:01 UTC
+Last updated 2020-02-13 23:59:14 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">

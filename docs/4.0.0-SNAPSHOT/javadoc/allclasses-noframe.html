@@ -129,7 +129,7 @@
 <li><a href="com/netflix/genie/common/external/dtos/v4/ClusterRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/ClusterRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ClusterRestController</a></li>
-<li><a href="com/netflix/genie/web/services/ClusterSelector.html" title="interface in com.netflix.genie.web.services"><span class="interfaceName">ClusterSelector</span></a></li>
+<li><a href="com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors"><span class="interfaceName">ClusterSelector</span></a></li>
 <li><a href="com/netflix/genie/web/scripts/ClusterSelectorScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorScript</a></li>
 <li><a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties</a></li>
 <li><a href="com/netflix/genie/client/apis/ClusterService.html" title="interface in com.netflix.genie.client.apis"><span class="interfaceName">ClusterService</span></a></li>
@@ -149,6 +149,10 @@
 <li><a href="com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/CommandRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">CommandRestController</a></li>
+<li><a href="com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors"><span class="interfaceName">CommandSelector</span></a></li>
+<li><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></li>
+<li><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.CommandSelectionResult.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript.CommandSelectionResult</a></li>
+<li><a href="com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties">CommandSelectorManagedScriptProperties</a></li>
 <li><a href="com/netflix/genie/client/apis/CommandService.html" title="interface in com.netflix.genie.client.apis"><span class="interfaceName">CommandService</span></a></li>
 <li><a href="com/netflix/genie/common/dto/CommandStatus.html" title="enum in com.netflix.genie.common.dto">CommandStatus</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a></li>
@@ -495,7 +499,8 @@
 <li><a href="com/netflix/genie/web/spring/autoconfigure/properties/converters/PropertyConvertersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.properties.converters">PropertyConvertersAutoConfiguration</a></li>
 <li><a href="com/netflix/genie/common/internal/util/PropertySourceUtils.html" title="class in com.netflix.genie.common.internal.util">PropertySourceUtils</a></li>
 <li><a href="com/netflix/genie/common/internal/configs/ProtoConvertersAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">ProtoConvertersAutoConfiguration</a></li>
-<li><a href="com/netflix/genie/web/services/impl/RandomizedClusterSelectorImpl.html" title="class in com.netflix.genie.web.services.impl">RandomizedClusterSelectorImpl</a></li>
+<li><a href="com/netflix/genie/web/selectors/impl/RandomClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomClusterSelectorImpl</a></li>
+<li><a href="com/netflix/genie/web/selectors/impl/RandomCommandSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomCommandSelectorImpl</a></li>
 <li><a href="com/netflix/genie/test/suppliers/RandomSuppliers.html" title="class in com.netflix.genie.test.suppliers">RandomSuppliers</a></li>
 <li><a href="com/netflix/genie/common/internal/util/RegexRuleSet.html" title="class in com.netflix.genie.common.internal.util">RegexRuleSet</a></li>
 <li><a href="com/netflix/genie/common/internal/util/RegexRuleSet.Builder.html" title="class in com.netflix.genie.common.internal.util">RegexRuleSet.Builder</a></li>
@@ -503,6 +508,9 @@
 <li><a href="com/netflix/genie/common/internal/util/RegexRuleSet.Rule.html" title="class in com.netflix.genie.common.internal.util">RegexRuleSet.Rule</a></li>
 <li><a href="com/netflix/genie/web/agent/inspectors/impl/RejectAllJobsAgentMetadataInspector.html" title="class in com.netflix.genie.web.agent.inspectors.impl">RejectAllJobsAgentMetadataInspector</a></li>
 <li><a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a></li>
+<li><a href="com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></li>
+<li><a href="com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a></li>
+<li><a href="com/netflix/genie/web/dtos/ResourceSelectionResult.Builder.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult.Builder</a></li>
 <li><a href="com/netflix/genie/client/interceptors/ResponseMappingInterceptor.html" title="class in com.netflix.genie.client.interceptors">ResponseMappingInterceptor</a></li>
 <li><a href="com/netflix/genie/web/spring/autoconfigure/RetryAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure">RetryAutoConfiguration</a></li>
 <li><a href="com/netflix/genie/web/properties/RetryProperties.html" title="class in com.netflix.genie.web.properties">RetryProperties</a></li>
@@ -516,7 +524,8 @@
 <li><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolver.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolver</a></li>
 <li><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a></li>
 <li><a href="com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></li>
-<li><a href="com/netflix/genie/web/services/selectors/ScriptClusterSelector.html" title="class in com.netflix.genie.web.services.selectors">ScriptClusterSelector</a></li>
+<li><a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a></li>
+<li><a href="com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptCommandSelectorImpl</a></li>
 <li><a href="com/netflix/genie/web/exceptions/checked/ScriptExecutionException.html" title="class in com.netflix.genie.web.exceptions.checked">ScriptExecutionException</a></li>
 <li><a href="com/netflix/genie/web/exceptions/checked/ScriptLoadingException.html" title="class in com.netflix.genie.web.exceptions.checked">ScriptLoadingException</a></li>
 <li><a href="com/netflix/genie/web/scripts/ScriptManager.html" title="class in com.netflix.genie.web.scripts">ScriptManager</a></li>
@@ -524,6 +533,7 @@
 <li><a href="com/netflix/genie/web/exceptions/checked/ScriptNotConfiguredException.html" title="class in com.netflix.genie.web.exceptions.checked">ScriptNotConfiguredException</a></li>
 <li><a href="com/netflix/genie/web/spring/autoconfigure/scripts/ScriptsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.scripts">ScriptsAutoConfiguration</a></li>
 <li><a href="com/netflix/genie/client/interceptors/SecurityInterceptor.html" title="interface in com.netflix.genie.client.interceptors"><span class="interfaceName">SecurityInterceptor</span></a></li>
+<li><a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.selectors">SelectorsAutoConfiguration</a></li>
 <li><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></li>
 <li><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></li>
 <li><a href="com/netflix/genie/web/data/entities/projections/SetupFileProjection.html" title="interface in com.netflix.genie.web.data.entities.projections"><span class="interfaceName">SetupFileProjection</span></a></li>
