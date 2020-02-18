@@ -15,11 +15,15 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
+import com.google.common.collect.Lists;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ApplicationEntity_;
 import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.CommandEntity_;
 import com.netflix.genie.web.data.entities.TagEntity;
+import com.netflix.genie.web.data.entities.TagEntity_;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -27,6 +31,7 @@ import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -118,6 +123,42 @@ public final class JpaCommandSpecs {
                             .stream()
                             .map(status -> cb.equal(root.get(CommandEntity_.status), status))
                             .toArray(Predicate[]::new)
+                    )
+                );
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    /**
+     * Get the specification for the query which will find the commands which match the given criterion.
+     *
+     * @param criterion The {@link Criterion} to match commands against
+     * @return A {@link Specification} for this query
+     */
+    public static Specification<CommandEntity> findCommandsMatchingCriterion(final Criterion criterion) {
+        return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+            final List<Predicate> predicates = Lists.newArrayList();
+
+            criterion.getId().ifPresent(id -> predicates.add(cb.equal(root.get(CommandEntity_.uniqueId), id)));
+            criterion.getName().ifPresent(name -> predicates.add(cb.equal(root.get(CommandEntity_.name), name)));
+            criterion.getVersion().ifPresent(
+                version -> predicates.add(cb.equal(root.get(CommandEntity_.version), version))
+            );
+            final String status = criterion.getStatus().orElse(CommandStatus.ACTIVE.name());
+            predicates.add(cb.equal(root.get(CommandEntity_.status), status));
+
+            final Set<String> tags = criterion.getTags();
+            if (!tags.isEmpty()) {
+                final Join<CommandEntity, TagEntity> commandTags = root.join(CommandEntity_.tags, JoinType.INNER);
+                predicates.add(commandTags.get(TagEntity_.tag).in(tags));
+
+                cq.groupBy(root.get(CommandEntity_.id));
+                cq.having(
+                    cb.equal(
+                        cb.count(root.get(CommandEntity_.id)),
+                        tags.size()
                     )
                 );
             }
