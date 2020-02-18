@@ -38,6 +38,7 @@ import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,6 +48,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -1179,5 +1181,127 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assert.assertTrue(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID));
         Assert.assertTrue(this.clusterRepository.existsByUniqueId(CLUSTER_2_ID));
         Assert.assertFalse(this.clusterRepository.existsByUniqueId(testClusterId));
+    }
+
+    /**
+     * Test the various permutations of finding clusters with criterion.
+     *
+     * @throws Exception on unexpected error
+     */
+    @Test
+    public void testFindClustersMatchingCriterion() throws Exception {
+        // Create some clusters to test with
+        final Cluster cluster0 = this.createTestCluster(null, null);
+        final Cluster cluster1 = this.createTestCluster(null, null);
+        final Cluster cluster2 = this.createTestCluster(UUID.randomUUID().toString(), null);
+
+        // Create two commands with supersets of cluster1 tags so that we can test that resolution
+        final Set<String> cluster3Tags = Sets.newHashSet(cluster1.getMetadata().getTags());
+        cluster3Tags.add(UUID.randomUUID().toString());
+        cluster3Tags.add(UUID.randomUUID().toString());
+        final Cluster cluster3 = this.createTestCluster(null, cluster3Tags);
+        final Set<String> cluster4Tags = Sets.newHashSet(cluster1.getMetadata().getTags());
+        cluster4Tags.add(UUID.randomUUID().toString());
+        final Cluster cluster4 = this.createTestCluster(null, cluster4Tags);
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(new Criterion.Builder().withId(cluster0.getId()).build())
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(cluster0);
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder().withName(cluster2.getMetadata().getName()).build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(cluster2);
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder().withVersion(cluster1.getMetadata().getVersion()).build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(cluster1);
+
+        // This comes from the init.xml
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder().withStatus(ClusterStatus.OUT_OF_SERVICE.name()).build()
+                )
+            )
+            .isEmpty();
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder().withTags(cluster1.getMetadata().getTags()).build()
+                )
+            )
+            .hasSize(3)
+            .containsExactlyInAnyOrder(cluster1, cluster3, cluster4);
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder().withTags(cluster4.getMetadata().getTags()).build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(cluster4);
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+                )
+            )
+            .isEmpty();
+
+        // Everything
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder()
+                        .withId(cluster3.getId())
+                        .withName(cluster3.getMetadata().getName())
+                        .withVersion(cluster3.getMetadata().getVersion())
+                        .withTags(cluster1.getMetadata().getTags()) // should be subset
+                        .build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(cluster3);
+    }
+
+    private Cluster createTestCluster(
+        @Nullable final String id,
+        @Nullable final Set<String> tags
+    ) throws GenieException {
+        final ClusterRequest.Builder requestBuilder = new ClusterRequest.Builder(
+            new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+            )
+                .withTags(
+                    tags == null ? Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()) : tags
+                )
+                .build()
+        );
+
+        if (id != null) {
+            requestBuilder.withRequestedId(id);
+        }
+
+        final String clusterId = this.service.createCluster(requestBuilder.build());
+        return this.service.getCluster(clusterId);
     }
 }

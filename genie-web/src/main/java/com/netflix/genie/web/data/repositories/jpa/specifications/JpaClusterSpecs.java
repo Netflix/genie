@@ -15,6 +15,8 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity_;
 import com.netflix.genie.web.data.entities.CommandEntity;
@@ -27,6 +29,7 @@ import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.Instant;
@@ -131,5 +134,28 @@ public final class JpaClusterSpecs {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    /**
+     * Get the specification for the query which will find the clusters which match the given criterion.
+     *
+     * @param criterion The {@link Criterion} to match clusters against
+     * @return A {@link Specification} for this query
+     */
+    public static Specification<ClusterEntity> findClustersMatchingCriterion(final Criterion criterion) {
+        return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) ->
+            JpaSpecificationUtils.createCriterionPredicate(
+                root,
+                cq,
+                cb,
+                ClusterEntity_.uniqueId,
+                ClusterEntity_.name,
+                ClusterEntity_.version,
+                ClusterEntity_.status,
+                ClusterStatus.UP.name(),
+                () -> root.join(ClusterEntity_.tags, JoinType.INNER),
+                ClusterEntity_.id,
+                criterion
+            );
     }
 }
