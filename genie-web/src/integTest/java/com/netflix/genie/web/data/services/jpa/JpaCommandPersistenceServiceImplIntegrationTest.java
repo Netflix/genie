@@ -43,6 +43,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.time.Instant;
@@ -938,5 +939,131 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         this.service.setClusterCriteriaForCommand(id, clusterCriteria);
         Assertions.assertThat(this.service.getClusterCriteriaForCommand(id)).isEqualTo(clusterCriteria);
+    }
+
+    /**
+     * Test the various permutations of finding commands with criterion.
+     *
+     * @throws Exception on unexpected error
+     */
+    @Test
+    public void testFindCommandsMatchingCriterion() throws Exception {
+        // Create some commands to test with
+        final Command command0 = this.createTestCommand(null, null);
+        final Command command1 = this.createTestCommand(null, null);
+        final Command command2 = this.createTestCommand(UUID.randomUUID().toString(), null);
+
+        // Create two commands with supersets of command1 tags so that we can test that resolution
+        final Set<String> command3Tags = Sets.newHashSet(command1.getMetadata().getTags());
+        command3Tags.add(UUID.randomUUID().toString());
+        command3Tags.add(UUID.randomUUID().toString());
+        final Command command3 = this.createTestCommand(null, command3Tags);
+        final Set<String> command4Tags = Sets.newHashSet(command1.getMetadata().getTags());
+        command4Tags.add(UUID.randomUUID().toString());
+        final Command command4 = this.createTestCommand(null, command4Tags);
+
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(new Criterion.Builder().withId(command0.getId()).build())
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(command0);
+
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder().withName(command2.getMetadata().getName()).build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(command2);
+
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder().withVersion(command1.getMetadata().getVersion()).build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(command1);
+
+        // This comes from the init.xml
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder().withStatus(CommandStatus.INACTIVE.name()).build()
+                )
+            )
+            .hasSize(1)
+            .extracting(Command::getId)
+            .element(0)
+            .isEqualTo("command2");
+
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder().withTags(command1.getMetadata().getTags()).build()
+                )
+            )
+            .hasSize(3)
+            .containsExactlyInAnyOrder(command1, command3, command4);
+
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder().withTags(command4.getMetadata().getTags()).build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(command4);
+
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+                )
+            )
+            .isEmpty();
+
+        // Everything
+        Assertions
+            .assertThat(
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder()
+                        .withId(command3.getId())
+                        .withName(command3.getMetadata().getName())
+                        .withVersion(command3.getMetadata().getVersion())
+                        .withTags(command1.getMetadata().getTags()) // should be subset
+                        .build()
+                )
+            )
+            .hasSize(1)
+            .containsExactlyInAnyOrder(command3);
+    }
+
+    private Command createTestCommand(
+        @Nullable final String id,
+        @Nullable final Set<String> tags
+    ) throws GenieException {
+        final CommandRequest.Builder requestBuilder = new CommandRequest.Builder(
+            new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.ACTIVE
+            )
+                .withTags(
+                    tags == null ? Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()) : tags
+                )
+                .build(),
+            Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        );
+
+        if (id != null) {
+            requestBuilder.withRequestedId(id);
+        }
+
+        final String commandId = this.service.createCommand(requestBuilder.build());
+        return this.service.getCommand(commandId);
     }
 }

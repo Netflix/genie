@@ -651,6 +651,20 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Command> findCommandsMatchingCriterion(@Valid final Criterion criterion) {
+        log.debug("[findCommandsMatchingCriterion] Called to find commands matching {}", criterion);
+        return this.getCommandRepository()
+            .findAll(JpaCommandSpecs.findCommandsMatchingCriterion(criterion))
+            .stream()
+            .map(EntityDtoConverters::toV4CommandDto)
+            .collect(Collectors.toSet());
+    }
+
+    /**
      * Helper method to find a command entity.
      *
      * @param id The id of the command to find

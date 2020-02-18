@@ -465,4 +465,12 @@ public interface CommandPersistenceService {
      * @throws GenieNotFoundException If no command with {@literal id} exists
      */
     void removeAllClusterCriteriaForCommand(String id) throws GenieNotFoundException;
+
+    /**
+     * Find all the {@link Command}'s that match the given {@link Criterion}.
+     *
+     * @param criterion The {@link Criterion} supplied that each command needs to completely match to be returned
+     * @return All the {@link Command}'s which matched the {@link Criterion}
+     */
+    Set<Command> findCommandsMatchingCriterion(@Valid Criterion criterion);
 }
