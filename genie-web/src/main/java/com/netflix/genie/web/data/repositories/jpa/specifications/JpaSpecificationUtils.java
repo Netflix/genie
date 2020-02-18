@@ -17,14 +17,26 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
+import com.google.common.collect.Lists;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.web.data.entities.BaseEntity;
+import com.netflix.genie.web.data.entities.IdEntity;
 import com.netflix.genie.web.data.entities.TagEntity;
+import com.netflix.genie.web.data.entities.TagEntity_;
+import com.netflix.genie.web.data.entities.UniqueIdEntity;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Utility methods for the specification classes.
@@ -98,5 +110,45 @@ public final class JpaSpecificationUtils {
                     .append(TAG_DELIMITER)
             );
         return builder.append(PERCENT).toString();
+    }
+
+    static <E extends BaseEntity> Predicate createCriterionPredicate(
+        final Root<E> root,
+        final CriteriaQuery<?> cq,
+        final CriteriaBuilder cb,
+        final SingularAttribute<UniqueIdEntity, String> uniqueIdAttribute,
+        final SingularAttribute<BaseEntity, String> nameAttribute,
+        final SingularAttribute<BaseEntity, String> versionAttribute,
+        final SingularAttribute<BaseEntity, String> statusAttribute,
+        final String defaultStatus,
+        final Supplier<Join<E, TagEntity>> tagJoinSupplier,
+        final SingularAttribute<IdEntity, Long> idAttribute,
+        final Criterion criterion
+    ) {
+        final List<Predicate> predicates = Lists.newArrayList();
+
+        criterion.getId().ifPresent(id -> predicates.add(cb.equal(root.get(uniqueIdAttribute), id)));
+        criterion.getName().ifPresent(name -> predicates.add(cb.equal(root.get(nameAttribute), name)));
+        criterion.getVersion().ifPresent(
+            version -> predicates.add(cb.equal(root.get(versionAttribute), version))
+        );
+        final String status = criterion.getStatus().orElse(defaultStatus);
+        predicates.add(cb.equal(root.get(statusAttribute), status));
+
+        final Set<String> tags = criterion.getTags();
+        if (!tags.isEmpty()) {
+            final Join<E, TagEntity> tagJoin = tagJoinSupplier.get();
+            predicates.add(tagJoin.get(TagEntity_.tag).in(tags));
+
+            cq.groupBy(root.get(idAttribute));
+            cq.having(
+                cb.equal(
+                    cb.count(root.get(idAttribute)),
+                    tags.size()
+                )
+            );
+        }
+
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }
