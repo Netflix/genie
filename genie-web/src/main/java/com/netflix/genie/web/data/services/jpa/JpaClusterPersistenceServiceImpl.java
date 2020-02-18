@@ -574,6 +574,20 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Cluster> findClustersMatchingCriterion(@Valid final Criterion criterion) {
+        log.debug("[findClustersMatchingCriterion] Called to find clusters matching {}", criterion);
+        return this.getClusterRepository()
+            .findAll(JpaClusterSpecs.findClustersMatchingCriterion(criterion))
+            .stream()
+            .map(EntityDtoConverters::toV4ClusterDto)
+            .collect(Collectors.toSet());
+    }
+
     private ClusterEntity createClusterEntity(final ClusterRequest request) {
         final ExecutionEnvironment resources = request.getResources();
         final ClusterMetadata metadata = request.getMetadata();

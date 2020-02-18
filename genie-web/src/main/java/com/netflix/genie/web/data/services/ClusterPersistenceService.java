@@ -409,4 +409,12 @@ public interface ClusterPersistenceService {
      * @return The number of clusters deleted
      */
     long deleteTerminatedClusters();
+
+    /**
+     * Find all the {@link Cluster}'s that match the given {@link Criterion}.
+     *
+     * @param criterion The {@link Criterion} supplied that each cluster needs to completely match to be returned
+     * @return All the {@link Cluster}'s which matched the {@link Criterion}
+     */
+    Set<Cluster> findClustersMatchingCriterion(@Valid Criterion criterion);
 }
