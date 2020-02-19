@@ -42,6 +42,7 @@ import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
 import com.netflix.genie.web.selectors.ClusterSelector;
+import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.FileTransferFactory;
@@ -365,7 +366,8 @@ public class ServicesAutoConfiguration {
      * @param clusterPersistenceService     The service to use to manipulate clusters
      * @param commandPersistenceService     The service to use to manipulate commands
      * @param jobPersistenceService         The job persistence service instance to use
-     * @param clusterSelectorImpls          The selector implementations to use
+     * @param clusterSelectors              The {@link ClusterSelector} implementations to use
+     * @param commandSelector               The {@link CommandSelector} implementation to use
      * @param registry                      The metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
      * @return A {@link JobResolverServiceImpl} instance
@@ -377,7 +379,8 @@ public class ServicesAutoConfiguration {
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
         final JobPersistenceService jobPersistenceService,
-        @NotEmpty final List<ClusterSelector> clusterSelectorImpls,
+        @NotEmpty final List<ClusterSelector> clusterSelectors,
+        final CommandSelector commandSelector,
         final MeterRegistry registry,
         final JobsProperties jobsProperties
     ) {
@@ -386,7 +389,8 @@ public class ServicesAutoConfiguration {
             clusterPersistenceService,
             commandPersistenceService,
             jobPersistenceService,
-            clusterSelectorImpls,
+            clusterSelectors,
+            commandSelector,
             registry,
             jobsProperties
         );

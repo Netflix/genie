@@ -42,8 +42,10 @@ import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.selectors.ClusterSelector;
+import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -58,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.File;
@@ -72,7 +75,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the JobResolverService APIs.
+ * Implementation of the {@link JobResolverService} APIs.
  *
  * @author tgianos
  * @since 4.0.0
@@ -91,6 +94,28 @@ public class JobResolverServiceImpl implements JobResolverService {
      */
     private static final String CLUSTER_COMMAND_QUERY_TIMER_NAME
         = "genie.services.jobResolver.clusterCommandQuery.timer";
+
+    /**
+     * How long it takes to resolve a cluster for a job given the resolved command and the request criteria.
+     */
+    private static final String RESOLVE_CLUSTER_TIMER_NAME = "genie.services.jobResolver.resolveCluster.timer";
+
+    /**
+     * The number of criteria combinations attempted while resolving a cluster.
+     */
+    private static final String RESOLVE_CLUSTER_CRITERIA_COMBINATION_COUNTER
+        = "genie.services.jobResolver.resolveCluster.criteriaCombination.count";
+
+    /**
+     * The number of criteria combinations attempted while resolving a cluster.
+     */
+    private static final String RESOLVE_CLUSTER_QUERY_COUNTER
+        = "genie.services.jobResolver.resolveCluster.query.count";
+
+    /**
+     * How long it takes to resolve a command for a job given the supplied command criterion.
+     */
+    private static final String RESOLVE_COMMAND_TIMER_NAME = "genie.services.jobResolver.resolveCommand.timer";
 
     /**
      * How long it takes to select a cluster from the set of clusters returned by database query.
@@ -112,9 +137,16 @@ public class JobResolverServiceImpl implements JobResolverService {
      */
     private static final String CLUSTER_SELECTOR_COUNTER_NAME = "genie.services.jobResolver.clusterSelector.counter";
 
+    private static final String NO_RATIONALE = "No rationale provided";
     private static final String NO_ID_FOUND = "No id found";
+    private static final String VERSION_4 = "4";
     private static final Tag SAVED_TAG = Tag.of("saved", "true");
     private static final Tag NOT_SAVED_TAG = Tag.of("saved", "false");
+
+    private static final String ID_FIELD = "id";
+    private static final String NAME_FIELD = "name";
+    private static final String STATUS_FIELD = "status";
+    private static final String VERSION_FIELD = "version";
 
     private static final String CLUSTER_SELECTOR_STATUS_SUCCESS = "success";
     private static final String CLUSTER_SELECTOR_STATUS_NO_PREFERENCE = "no preference";
@@ -125,7 +157,8 @@ public class JobResolverServiceImpl implements JobResolverService {
     private final ClusterPersistenceService clusterPersistenceService;
     private final CommandPersistenceService commandPersistenceService;
     private final JobPersistenceService jobPersistenceService;
-    private final List<ClusterSelector> clusterSelectorImpls;
+    private final List<ClusterSelector> clusterSelectors;
+    private final CommandSelector commandSelector;
     private final MeterRegistry registry;
     private final int defaultMemory;
     // TODO: Switch to path
@@ -142,7 +175,8 @@ public class JobResolverServiceImpl implements JobResolverService {
      * @param clusterPersistenceService     The {@link ClusterPersistenceService} to use to manipulate clusters
      * @param commandPersistenceService     The {@link CommandPersistenceService} to use to manipulate commands
      * @param jobPersistenceService         The {@link JobPersistenceService} instance to use
-     * @param clusterSelectorImpls          The {@link ClusterSelector} implementations to use
+     * @param clusterSelectors              The {@link ClusterSelector} implementations to use
+     * @param commandSelector               The {@link CommandSelector} implementation to use
      * @param registry                      The {@link MeterRegistry }metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
      */
@@ -151,7 +185,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         final ClusterPersistenceService clusterPersistenceService,
         final CommandPersistenceService commandPersistenceService,
         final JobPersistenceService jobPersistenceService,
-        @NotEmpty final List<ClusterSelector> clusterSelectorImpls,
+        @NotEmpty final List<ClusterSelector> clusterSelectors,
+        final CommandSelector commandSelector, // TODO: For now this is a single value but maybe support List
         final MeterRegistry registry,
         final JobsProperties jobsProperties
     ) {
@@ -159,7 +194,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.clusterPersistenceService = clusterPersistenceService;
         this.commandPersistenceService = commandPersistenceService;
         this.jobPersistenceService = jobPersistenceService;
-        this.clusterSelectorImpls = clusterSelectorImpls;
+        this.clusterSelectors = clusterSelectors;
+        this.commandSelector = commandSelector;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
 
         final URI jobDirProperty = jobsProperties.getLocations().getJobs();
@@ -254,14 +290,23 @@ public class JobResolverServiceImpl implements JobResolverService {
         final JobRequest jobRequest,
         final boolean apiJob
     ) throws GenieJobResolutionException {
-        final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
-            jobRequest.getCriteria().getClusterCriteria(),
-            jobRequest.getCriteria().getCommandCriterion()
-        );
-        // Resolve the cluster for the job request based on the tags specified
-        final Cluster cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
-        // Resolve the command for the job request based on command tags and cluster chosen
-        final Command command = this.getCommand(clustersAndCommandsForJob.get(cluster), id);
+        final Cluster cluster;
+        final Command command;
+
+        if (this.useV4ResourceSelection()) {
+            command = this.resolveCommand(jobRequest);
+            cluster = this.resolveCluster(command, jobRequest, id);
+        } else {
+            final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
+                jobRequest.getCriteria().getClusterCriteria(),
+                jobRequest.getCriteria().getCommandCriterion()
+            );
+            // Resolve the cluster for the job request based on the tags specified
+            cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
+            // Resolve the command for the job request based on command tags and cluster chosen
+            command = this.getCommand(clustersAndCommandsForJob.get(cluster), id);
+        }
+
         // Resolve the applications to use based on the command that was selected
         final List<JobSpecification.ExecutionResource> applicationResources = Lists.newArrayList();
         for (final Application application : this.getApplications(id, jobRequest, command)) {
@@ -272,8 +317,13 @@ public class JobResolverServiceImpl implements JobResolverService {
 
         final int jobMemory = this.resolveJobMemory(jobRequest, command);
 
-        final Map<String, String> environmentVariables
-            = this.generateEnvironmentVariables(id, jobRequest, cluster, command, jobMemory);
+        final Map<String, String> environmentVariables = this.generateEnvironmentVariables(
+            id,
+            jobRequest,
+            cluster,
+            command,
+            jobMemory
+        );
 
         final Integer timeout;
         if (jobRequest.getRequestedAgentConfig().getTimeoutRequested().isPresent()) {
@@ -363,15 +413,24 @@ public class JobResolverServiceImpl implements JobResolverService {
                     .findFirst()
                     .orElseThrow(() -> new GenieServerException("Couldn't get cluster when size was one"));
             } else {
-                cluster = this.selectClusterSelector(counterTags, clusters, id, jobRequest);
+                cluster = this.selectClusterUsingClusterSelectors(counterTags, clusters, id, jobRequest);
             }
 
-            log.info("Selected cluster {} for job {}", cluster.getId(), id);
+            if (cluster == null) {
+                this.noClusterSelectedCounter.increment();
+                throw new GenieJobResolutionException("No cluster found matching given criteria");
+            }
+
+            log.debug("Selected cluster {} for job {}", cluster.getId(), id);
             MetricsUtils.addSuccessTags(timerTags);
             return cluster;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(timerTags, t);
-            throw new GenieJobResolutionException(t);
+            if (t instanceof GenieJobResolutionException) {
+                throw (GenieJobResolutionException) t;
+            } else {
+                throw new GenieJobResolutionException(t);
+            }
         } finally {
             this.registry
                 .timer(SELECT_CLUSTER_TIMER_NAME, timerTags)
@@ -442,14 +501,15 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private Cluster selectClusterSelector(
+    @Nullable
+    private Cluster selectClusterUsingClusterSelectors(
         final Set<Tag> counterTags,
         final Set<Cluster> clusters,
         final String id,
         final JobRequest jobRequest
-    ) throws GeniePreconditionException {
+    ) {
         Cluster cluster = null;
-        for (final ClusterSelector clusterSelector : this.clusterSelectorImpls) {
+        for (final ClusterSelector clusterSelector : this.clusterSelectors) {
             // TODO: We might want to get rid of this and use the result returned from the selector
             //       Keeping for now in interest of dev time
             final String clusterSelectorClass;
@@ -510,14 +570,6 @@ public class JobResolverServiceImpl implements JobResolverService {
             }
         }
 
-        // Make sure we selected a cluster
-        if (cluster == null) {
-            this.noClusterSelectedCounter.increment();
-            throw new GeniePreconditionException(
-                "Unable to select a cluster from using any of the available selectors."
-            );
-        }
-
         return cluster;
     }
 
@@ -529,7 +581,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final int memory
     ) {
         final ImmutableMap.Builder<String, String> envVariables = ImmutableMap.builder();
-        envVariables.put("GENIE_VERSION", "4");
+        envVariables.put(JobConstants.GENIE_VERSION_ENV_VAR, VERSION_4);
         envVariables.put(JobConstants.GENIE_CLUSTER_ID_ENV_VAR, cluster.getId());
         envVariables.put(JobConstants.GENIE_CLUSTER_NAME_ENV_VAR, cluster.getMetadata().getName());
         envVariables.put(JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR, this.tagsToString(cluster.getMetadata().getTags()));
@@ -671,5 +723,215 @@ public class JobResolverServiceImpl implements JobResolverService {
             .getRequestedJobEnvironment()
             .getRequestedJobMemory()
             .orElse(command.getMemory().orElse(this.defaultMemory));
+    }
+
+    private boolean useV4ResourceSelection() {
+        // TODO: Flesh this out with dynamic behavior to aid migration between V3 and V4
+        return false;
+    }
+
+    private Command resolveCommand(final JobRequest jobRequest) throws GenieJobResolutionException {
+        final long start = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        try {
+            final Criterion criterion = jobRequest.getCriteria().getCommandCriterion();
+            final Set<Command> commands = this.commandPersistenceService.findCommandsMatchingCriterion(criterion);
+            final Command command;
+            if (commands.isEmpty()) {
+                throw new GenieJobResolutionException("No command matching command criterion found");
+            } else if (commands.size() == 1) {
+                command = commands
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new GenieJobResolutionException("No command matching criterion found."));
+                log.debug("Found single command {} matching criterion {}", command.getId(), criterion);
+            } else {
+                try {
+                    final ResourceSelectionResult<Command> result
+                        = this.commandSelector.selectCommand(commands, jobRequest);
+                    command = result
+                        .getSelectedResource()
+                        .orElseThrow(
+                            () -> new GenieJobResolutionException(
+                                "Expected a command but "
+                                    + result.getSelectorClass().getSimpleName()
+                                    + " didn't select anything. Rationale: "
+                                    + result.getSelectionRationale().orElse(NO_RATIONALE)
+                            )
+                        );
+                    log.debug(
+                        "Selected command {} for criterion {} using {} due to {}",
+                        command.getId(),
+                        criterion,
+                        result.getSelectorClass().getName(),
+                        result.getSelectionRationale().orElse(NO_RATIONALE)
+                    );
+                } catch (final ResourceSelectionException selectionException) {
+                    // TODO: Improve error handling?
+                    throw new GenieJobResolutionException(selectionException);
+                }
+            }
+
+            MetricsUtils.addSuccessTags(tags);
+            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, command.getId()));
+            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, command.getMetadata().getName()));
+            return command;
+        } catch (final Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            if (t instanceof GenieJobResolutionException) {
+                throw t;
+            } else {
+                throw new GenieJobResolutionException(t);
+            }
+        } finally {
+            this.registry
+                .timer(RESOLVE_COMMAND_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private Cluster resolveCluster(
+        final Command command,
+        final JobRequest jobRequest,
+        final String jobId
+    ) throws GenieJobResolutionException {
+        final long start = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        int queryCount = 0;
+        int criteriaCombinationCount = 0;
+        try {
+            Cluster cluster = null;
+
+            // This makes it so that if the command has no Cluster Criteria no cluster will possibly
+            // be found. We'd have to change if we'd rather have it so that if there are no command cluster criteria
+            // We just bypass this loop and only consider the job cluster criteria
+            for (final Criterion commandClusterCriterion : command.getClusterCriteria()) {
+                for (final Criterion jobClusterCriterion : jobRequest.getCriteria().getClusterCriteria()) {
+                    criteriaCombinationCount++;
+                    final Criterion mergedCriterion;
+                    try {
+                        // Failing to merge the criteria is equivalent to a round-trip DB query that returns
+                        // zero results. This is an in memory optimization which also solves the need to implement
+                        // the db query as a join with a subquery.
+                        mergedCriterion = this.mergeCriteria(commandClusterCriterion, jobClusterCriterion);
+                    } catch (final IllegalArgumentException e) {
+                        log.debug(
+                            "Unable to merge command cluster criterion {} and job cluster criterion {}. Skipping.",
+                            commandClusterCriterion,
+                            jobClusterCriterion,
+                            e
+                        );
+                        // Skip and move to the next combination
+                        continue;
+                    }
+
+                    queryCount++;
+                    final Set<Cluster> clusters
+                        = this.clusterPersistenceService.findClustersMatchingCriterion(mergedCriterion);
+                    if (clusters.isEmpty()) {
+                        log.debug("No clusters found for {}", mergedCriterion);
+                        this.noClusterFoundCounter.increment();
+                    } else if (clusters.size() == 1) {
+                        log.debug("Found single cluster for {}", mergedCriterion);
+                        cluster = clusters.stream().findFirst().orElse(null);
+                    } else {
+                        log.debug("Found {} clusters for {}", clusters.size(), mergedCriterion);
+                        cluster = this.selectClusterUsingClusterSelectors(
+                            Sets.newHashSet(),
+                            clusters,
+                            jobId,
+                            jobRequest
+                        );
+                    }
+                }
+
+                if (cluster != null) {
+                    break;
+                }
+            }
+
+            if (cluster == null) {
+                this.noClusterSelectedCounter.increment();
+                throw new GenieJobResolutionException("No cluster selected given criteria for job " + jobId);
+            }
+
+            log.debug("Selected cluster {} for job {}", cluster.getId(), jobId);
+
+            MetricsUtils.addSuccessTags(tags);
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()));
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName()));
+            return cluster;
+        } catch (final Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            if (t instanceof GenieJobResolutionException) {
+                throw (GenieJobResolutionException) t;
+            } else {
+                throw new GenieJobResolutionException(t);
+            }
+        } finally {
+            this.registry
+                .counter(RESOLVE_CLUSTER_CRITERIA_COMBINATION_COUNTER, tags)
+                .increment(criteriaCombinationCount);
+            this.registry
+                .counter(RESOLVE_CLUSTER_QUERY_COUNTER, tags)
+                .increment(queryCount);
+            this.registry
+                .timer(RESOLVE_CLUSTER_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    /**
+     * Helper method for merging two criterion.
+     * <p>
+     * This method makes several assumptions:
+     * - If any of these fields: {@literal id, name, version, status} are in both criterion their values must match
+     * or this criterion combination of criteria can't possibly be matched so an {@link IllegalArgumentException}
+     * is thrown
+     * - If only one criterion has any of these fields {@literal id, name, version, status} then that value is present
+     * in the resulting criterion
+     * - Any {@literal tags} present in either criterion are merged into the super set of both sets of tags
+     *
+     * @param one The first {@link Criterion}
+     * @param two The second {@link Criterion}
+     * @return A merged {@link Criterion} that can be used to search the database
+     * @throws IllegalArgumentException If the criteria can't be merged due to the described assumptions
+     */
+    private Criterion mergeCriteria(final Criterion one, final Criterion two) throws IllegalArgumentException {
+        final Criterion.Builder builder = new Criterion.Builder();
+        builder.withId(
+            this.mergeCriteriaStrings(one.getId().orElse(null), two.getId().orElse(null), ID_FIELD)
+        );
+        builder.withName(
+            this.mergeCriteriaStrings(one.getName().orElse(null), two.getName().orElse(null), NAME_FIELD)
+        );
+        builder.withStatus(
+            this.mergeCriteriaStrings(one.getStatus().orElse(null), two.getStatus().orElse(null), STATUS_FIELD)
+        );
+        builder.withVersion(
+            this.mergeCriteriaStrings(one.getVersion().orElse(null), two.getVersion().orElse(null), VERSION_FIELD)
+        );
+        final Set<String> tags = Sets.newHashSet(one.getTags());
+        tags.addAll(two.getTags());
+        builder.withTags(tags);
+        return builder.build();
+    }
+
+    private String mergeCriteriaStrings(
+        @Nullable final String one,
+        @Nullable final String two,
+        final String fieldName
+    ) throws IllegalArgumentException {
+        if (StringUtils.equals(one, two)) {
+            // This handles null == null for us
+            return one;
+        } else if (one == null) {
+            return two;
+        } else if (two == null) {
+            return one;
+        } else {
+            // Both have values but aren't equal
+            throw new IllegalArgumentException(fieldName + "'s were both present but not equal");
+        }
     }
 }
