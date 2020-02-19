@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl
 
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest
@@ -35,6 +36,7 @@ import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.external.util.GenieObjectMapper
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.web.data.services.ApplicationPersistenceService
 import com.netflix.genie.web.data.services.ClusterPersistenceService
@@ -42,13 +44,13 @@ import com.netflix.genie.web.data.services.CommandPersistenceService
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.dtos.ResourceSelectionResult
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.selectors.ClusterSelector
-import io.micrometer.core.instrument.MeterRegistry
+import com.netflix.genie.web.selectors.CommandSelector
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
-import wiremock.com.google.common.collect.ImmutableMap
 
 import javax.annotation.Nullable
 import java.time.Instant
@@ -58,7 +60,38 @@ import java.time.Instant
  *
  * @author tgianos
  */
+@SuppressWarnings("GroovyAccessibility")
 class JobResolverServiceImplSpec extends Specification {
+
+    ClusterPersistenceService clusterService
+    CommandPersistenceService commandService
+    ApplicationPersistenceService applicationService
+    JobPersistenceService jobService
+    ClusterSelector clusterSelector
+    CommandSelector commandSelector
+    JobsProperties jobsProperties
+
+    JobResolverServiceImpl service
+
+    def setup() {
+        this.clusterService = Mock(ClusterPersistenceService)
+        this.clusterSelector = Mock(ClusterSelector)
+        this.commandSelector = Mock(CommandSelector)
+        this.applicationService = Mock(ApplicationPersistenceService)
+        this.commandService = Mock(CommandPersistenceService)
+        this.jobService = Mock(JobPersistenceService)
+        this.jobsProperties = JobsProperties.getJobsPropertiesDefaults()
+        this.service = new JobResolverServiceImpl(
+            this.applicationService,
+            this.clusterService,
+            this.commandService,
+            this.jobService,
+            Lists.newArrayList(this.clusterSelector),
+            this.commandSelector,
+            new SimpleMeterRegistry(),
+            this.jobsProperties
+        )
+    }
 
     def "Can resolve a job"() {
         def cluster1Id = UUID.randomUUID().toString()
@@ -91,40 +124,24 @@ class JobResolverServiceImplSpec extends Specification {
         def requestedMemory = 6_323
         def savedJobRequest = createJobRequest(arguments, null, requestedMemory, null)
 
-        def clusterService = Mock(ClusterPersistenceService)
-        def clusterSelector = Mock(ClusterSelector)
-        def applicationService = Mock(ApplicationPersistenceService)
-        def commandService = Mock(CommandPersistenceService)
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        def service = new JobResolverServiceImpl(
-            applicationService,
-            clusterService,
-            commandService,
-            jobPersistenceService,
-            Lists.newArrayList(clusterSelector),
-            new SimpleMeterRegistry(),
-            jobsProperties
-        )
-
         when:
         def resolvedJob = service.resolveJob(jobId, jobRequest, true)
         def jobSpec = resolvedJob.getJobSpecification()
         def jobEnvironment = resolvedJob.getJobEnvironment()
 
         then:
-        0 * jobPersistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
-        1 * clusterService.findClustersAndCommandsForCriteria(
+        0 * this.jobService.saveResolvedJob(_ as String, _ as ResolvedJob)
+        1 * this.clusterService.findClustersAndCommandsForCriteria(
             jobRequest.getCriteria().getClusterCriteria(),
             jobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * clusterSelector.selectCluster(
+        1 * this.clusterSelector.selectCluster(
             clusters,
             _ as com.netflix.genie.common.dto.JobRequest
         ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
-        1 * commandService.getCommand(commandId) >> command
-        1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
+        1 * this.commandService.getCommand(commandId) >> command
+        1 * this.commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
         jobSpec.getExecutableArgs() == expectedCommandArgs
         jobSpec.getJobArgs() == expectedJobArgs
         jobSpec.getJob().getId() == jobId
@@ -135,7 +152,7 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpec.getEnvironmentVariables().size() == 19
         jobSpec.getArchiveLocation() == Optional.of(requestedArchiveLocationPrefix + File.separator + jobId)
         jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
-        jobEnvironment.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
+        jobEnvironment.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
         jobEnvironment.getCpu() == 1
         !jobEnvironment.getExt().isPresent()
         jobSpec.getTimeout().orElse(null) == com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION
@@ -146,18 +163,18 @@ class JobResolverServiceImplSpec extends Specification {
         def jobEnvironmentNoArchivalData = resolvedJobNoArchivalData.getJobEnvironment()
 
         then:
-        0 * jobPersistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
-        1 * clusterService.findClustersAndCommandsForCriteria(
+        0 * this.jobService.saveResolvedJob(_ as String, _ as ResolvedJob)
+        1 * this.clusterService.findClustersAndCommandsForCriteria(
             jobRequestNoArchivalData.getCriteria().getClusterCriteria(),
             jobRequestNoArchivalData.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * clusterSelector.selectCluster(
+        1 * this.clusterSelector.selectCluster(
             clusters,
             _ as com.netflix.genie.common.dto.JobRequest
         ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
-        1 * commandService.getCommand(commandId) >> command
-        1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
+        1 * this.commandService.getCommand(commandId) >> command
+        1 * this.commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
         jobSpecNoArchivalData.getExecutableArgs() == expectedCommandArgs
         jobSpecNoArchivalData.getJobArgs() == expectedJobArgs
         jobSpecNoArchivalData.getJob().getId() == jobId
@@ -168,12 +185,12 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecNoArchivalData.getEnvironmentVariables().size() == 19
         jobSpecNoArchivalData.getArchiveLocation() ==
             Optional.of(
-                StringUtils.endsWith(jobsProperties.getLocations().getArchives().toString(), File.separator)
-                    ? jobsProperties.getLocations().getArchives().toString() + jobId
-                    : jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
+                StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
+                    ? this.jobsProperties.getLocations().getArchives().toString() + jobId
+                    : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
         jobEnvironmentNoArchivalData.getEnvironmentVariables() == jobSpecNoArchivalData.getEnvironmentVariables()
-        jobEnvironmentNoArchivalData.getMemory() == jobsProperties.getMemory().getDefaultJobMemory()
+        jobEnvironmentNoArchivalData.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
         jobEnvironmentNoArchivalData.getCpu() == 1
         !jobEnvironmentNoArchivalData.getExt().isPresent()
         jobSpecNoArchivalData.getTimeout().orElse(null) == 5_002
@@ -184,21 +201,21 @@ class JobResolverServiceImplSpec extends Specification {
         def jobEnvironmentSavedData = resolvedSavedJobData.getJobEnvironment()
 
         then: "the resolution is saved"
-        1 * jobPersistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
-        1 * jobPersistenceService.isApiJob(jobId) >> false
-        1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(savedJobRequest)
-        1 * clusterService.findClustersAndCommandsForCriteria(
+        1 * this.jobService.getJobStatus(jobId) >> JobStatus.RESERVED
+        1 * this.jobService.isApiJob(jobId) >> false
+        1 * this.jobService.getJobRequest(jobId) >> Optional.of(savedJobRequest)
+        1 * this.clusterService.findClustersAndCommandsForCriteria(
             savedJobRequest.getCriteria().getClusterCriteria(),
             savedJobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * clusterSelector.selectCluster(
+        1 * this.clusterSelector.selectCluster(
             clusters,
             _ as com.netflix.genie.common.dto.JobRequest
         ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
-        1 * commandService.getCommand(commandId) >> command
-        1 * commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
-        1 * jobPersistenceService.saveResolvedJob(jobId, _ as ResolvedJob)
+        1 * this.commandService.getCommand(commandId) >> command
+        1 * this.commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
+        1 * this.jobService.saveResolvedJob(jobId, _ as ResolvedJob)
         jobSpecSavedData.getExecutableArgs() == expectedCommandArgs
         jobSpecSavedData.getJobArgs() == expectedJobArgs
         jobSpecSavedData.getJob().getId() == jobId
@@ -209,9 +226,9 @@ class JobResolverServiceImplSpec extends Specification {
         jobSpecSavedData.getEnvironmentVariables().size() == 19
         jobSpecSavedData.getArchiveLocation() ==
             Optional.of(
-                StringUtils.endsWith(jobsProperties.getLocations().getArchives().toString(), File.separator)
-                    ? jobsProperties.getLocations().getArchives().toString() + jobId
-                    : jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
+                StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
+                    ? this.jobsProperties.getLocations().getArchives().toString() + jobId
+                    : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
         jobEnvironmentSavedData.getEnvironmentVariables() == jobSpecSavedData.getEnvironmentVariables()
         jobEnvironmentSavedData.getMemory() == requestedMemory
@@ -220,19 +237,9 @@ class JobResolverServiceImplSpec extends Specification {
         !jobSpecSavedData.getTimeout().isPresent()
     }
 
-    def "Can convert tags to string"() {
-        def service = new JobResolverServiceImpl(
-            Mock(ApplicationPersistenceService),
-            Mock(ClusterPersistenceService),
-            Mock(CommandPersistenceService),
-            Mock(JobPersistenceService),
-            Lists.newArrayList(),
-            Mock(MeterRegistry),
-            JobsProperties.getJobsPropertiesDefaults()
-        )
-
+    def "Can convert tags to string"(Set<String> input, String output) {
         expect:
-        service.tagsToString(input) == output
+        this.service.tagsToString(input) == output
 
         where:
         input                                                       | output
@@ -248,16 +255,6 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "Can generate correct environment variables"() {
-        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        def service = new JobResolverServiceImpl(
-            Mock(ApplicationPersistenceService),
-            Mock(ClusterPersistenceService),
-            Mock(CommandPersistenceService),
-            Mock(JobPersistenceService),
-            Lists.newArrayList(),
-            Mock(MeterRegistry),
-            jobsProperties
-        )
         def user = UUID.randomUUID().toString()
         def jobId = UUID.randomUUID().toString()
         def jobName = UUID.randomUUID().toString()
@@ -325,30 +322,30 @@ class JobResolverServiceImplSpec extends Specification {
         )
 
         when:
-        def envVariables = service.generateEnvironmentVariables(
+        def envVariables = this.service.generateEnvironmentVariables(
             jobId,
             jobRequest,
             cluster,
             command,
-            jobsProperties.getMemory().getDefaultJobMemory()
+            this.jobsProperties.getMemory().getDefaultJobMemory()
         )
 
         then:
         envVariables.get("GENIE_VERSION") == "4"
         envVariables.get(JobConstants.GENIE_CLUSTER_ID_ENV_VAR) == clusterId
         envVariables.get(JobConstants.GENIE_CLUSTER_NAME_ENV_VAR) == clusterName
-        envVariables.get(JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR) == service.tagsToString(clusterTags)
+        envVariables.get(JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR) == this.service.tagsToString(clusterTags)
         envVariables.get(JobConstants.GENIE_COMMAND_ID_ENV_VAR) == commandId
         envVariables.get(JobConstants.GENIE_COMMAND_NAME_ENV_VAR) == commandName
-        envVariables.get(JobConstants.GENIE_COMMAND_TAGS_ENV_VAR) == service.tagsToString(commandTags)
+        envVariables.get(JobConstants.GENIE_COMMAND_TAGS_ENV_VAR) == this.service.tagsToString(commandTags)
         envVariables.get(JobConstants.GENIE_JOB_ID_ENV_VAR) == jobId
         envVariables.get(JobConstants.GENIE_JOB_NAME_ENV_VAR) == jobName
-        envVariables.get(JobConstants.GENIE_JOB_MEMORY_ENV_VAR) == String.valueOf(jobsProperties.getMemory().getDefaultJobMemory())
-        envVariables.get(JobConstants.GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR) == service.tagsToString(commandCriterion.getTags())
-        envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_0") == service.tagsToString(clusterCriteria.get(0).getTags())
-        envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_1") == service.tagsToString(clusterCriteria.get(1).getTags())
-        envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR) == "[[" + service.tagsToString(clusterCriteria.get(0).getTags()) + "],[" + service.tagsToString(clusterCriteria.get(1).getTags()) + "]]"
-        envVariables.get(JobConstants.GENIE_JOB_TAGS_ENV_VAR) == service.tagsToString(jobRequest.getMetadata().getTags())
+        envVariables.get(JobConstants.GENIE_JOB_MEMORY_ENV_VAR) == String.valueOf(this.jobsProperties.getMemory().getDefaultJobMemory())
+        envVariables.get(JobConstants.GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR) == this.service.tagsToString(commandCriterion.getTags())
+        envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_0") == this.service.tagsToString(clusterCriteria.get(0).getTags())
+        envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_1") == this.service.tagsToString(clusterCriteria.get(1).getTags())
+        envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR) == "[[" + this.service.tagsToString(clusterCriteria.get(0).getTags()) + "],[" + this.service.tagsToString(clusterCriteria.get(1).getTags()) + "]]"
+        envVariables.get(JobConstants.GENIE_JOB_TAGS_ENV_VAR) == this.service.tagsToString(jobRequest.getMetadata().getTags())
         envVariables.get(JobConstants.GENIE_JOB_GROUPING_ENV_VAR) == grouping
         envVariables.get(JobConstants.GENIE_JOB_GROUPING_INSTANCE_ENV_VAR) == groupingInstance
         envVariables.get(JobConstants.GENIE_USER_ENV_VAR) == user
@@ -356,23 +353,13 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "Can convert V4 Criterion to V3 tags"() {
-        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        def service = new JobResolverServiceImpl(
-            Mock(ApplicationPersistenceService),
-            Mock(ClusterPersistenceService),
-            Mock(CommandPersistenceService),
-            Mock(JobPersistenceService),
-            Lists.newArrayList(),
-            Mock(MeterRegistry),
-            jobsProperties
-        )
         def id = UUID.randomUUID().toString()
         def name = UUID.randomUUID().toString()
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<String> v3Tags
 
         when:
-        v3Tags = service.toV3Tags(new Criterion.Builder().withId(id).withName(name).withTags(tags).build())
+        v3Tags = this.service.toV3Tags(new Criterion.Builder().withId(id).withName(name).withTags(tags).build())
 
         then:
         v3Tags.size() == 4
@@ -381,7 +368,7 @@ class JobResolverServiceImplSpec extends Specification {
         v3Tags.containsAll(tags)
 
         when:
-        v3Tags = service.toV3Tags(new Criterion.Builder().withId(id).withTags(tags).build())
+        v3Tags = this.service.toV3Tags(new Criterion.Builder().withId(id).withTags(tags).build())
 
         then:
         v3Tags.size() == 3
@@ -389,7 +376,7 @@ class JobResolverServiceImplSpec extends Specification {
         v3Tags.containsAll(tags)
 
         when:
-        v3Tags = service.toV3Tags(new Criterion.Builder().withName(name).withTags(tags).build())
+        v3Tags = this.service.toV3Tags(new Criterion.Builder().withName(name).withTags(tags).build())
 
         then:
         v3Tags.size() == 3
@@ -397,7 +384,7 @@ class JobResolverServiceImplSpec extends Specification {
         v3Tags.containsAll(tags)
 
         when:
-        v3Tags = service.toV3Tags(new Criterion.Builder().withTags(tags).build())
+        v3Tags = this.service.toV3Tags(new Criterion.Builder().withTags(tags).build())
 
         then:
         v3Tags.size() == 2
@@ -436,17 +423,6 @@ class JobResolverServiceImplSpec extends Specification {
         def setupFile = UUID.randomUUID().toString()
         def timeout = 10835
 
-        def jobsProperties = JobsProperties.getJobsPropertiesDefaults()
-        def service = new JobResolverServiceImpl(
-            Mock(ApplicationPersistenceService),
-            Mock(ClusterPersistenceService),
-            Mock(CommandPersistenceService),
-            Mock(JobPersistenceService),
-            Lists.newArrayList(),
-            Mock(MeterRegistry),
-            jobsProperties
-        )
-
         def jobRequest = new JobRequest(
             null,
             new ExecutionEnvironment(configs, dependencies, setupFile),
@@ -474,7 +450,7 @@ class JobResolverServiceImplSpec extends Specification {
         )
 
         when:
-        def v3JobRequest = service.toV3JobRequest(id, jobRequest)
+        def v3JobRequest = this.service.toV3JobRequest(id, jobRequest)
 
         then:
         v3JobRequest.getId().orElse(UUID.randomUUID().toString()) == id
@@ -499,7 +475,271 @@ class JobResolverServiceImplSpec extends Specification {
         v3JobRequest.getCommandCriteria() == commandCriterion.getTags()
         v3JobRequest.getClusterCriterias().size() == 2
         v3JobRequest.getClusterCriterias().get(0).getTags() == clusterCriteria.get(0).getTags()
-        v3JobRequest.getClusterCriterias().get(1).getTags() == service.toV3Tags(clusterCriteria.get(1))
+        v3JobRequest.getClusterCriterias().get(1).getTags() == this.service.toV3Tags(clusterCriteria.get(1))
+    }
+
+    def "can merge criterion strings: #one #two with expected result #expected"() {
+        expect:
+        expected == this.service.mergeCriteriaStrings(one, two, UUID.randomUUID().toString())
+
+        where:
+        one   | two   | expected
+        "one" | "one" | "one"
+        "one" | null  | "one"
+        null  | "two" | "two"
+        null  | null  | null
+    }
+
+    def "different non-null strings throw expected exception for criterion merge"() {
+        when:
+        this.service.mergeCriteriaStrings(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        )
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "can merge criteria"() {
+        def criterion0 = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        def criterion1 = new Criterion.Builder().withName(UUID.randomUUID().toString()).build()
+        def criterion2 = new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build()
+        def criterion3 = new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build()
+        def criterion4 = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        def criterion5 = new Criterion.Builder().withTags(
+            Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        ).build()
+        def criterion6 = new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+
+        when:
+        def mergedCriterion = this.service.mergeCriteria(criterion0, criterion1)
+
+        then:
+        mergedCriterion.getId() == criterion0.getId()
+        mergedCriterion.getName() == criterion1.getName()
+        !mergedCriterion.getStatus().isPresent()
+        !mergedCriterion.getVersion().isPresent()
+        mergedCriterion.getTags().isEmpty()
+
+        when:
+        mergedCriterion = this.service.mergeCriteria(mergedCriterion, criterion2)
+
+        then:
+        mergedCriterion.getId() == criterion0.getId()
+        mergedCriterion.getName() == criterion1.getName()
+        mergedCriterion.getStatus() == criterion2.getStatus()
+        !mergedCriterion.getVersion().isPresent()
+        mergedCriterion.getTags().isEmpty()
+
+        when:
+        mergedCriterion = this.service.mergeCriteria(mergedCriterion, criterion3)
+
+        then:
+        mergedCriterion.getId() == criterion0.getId()
+        mergedCriterion.getName() == criterion1.getName()
+        mergedCriterion.getStatus() == criterion2.getStatus()
+        mergedCriterion.getVersion() == criterion3.getVersion()
+        mergedCriterion.getTags().isEmpty()
+
+        when:
+        mergedCriterion = this.service.mergeCriteria(mergedCriterion, criterion4)
+
+        then:
+        mergedCriterion.getId() == criterion0.getId()
+        mergedCriterion.getName() == criterion1.getName()
+        mergedCriterion.getStatus() == criterion2.getStatus()
+        mergedCriterion.getVersion() == criterion3.getVersion()
+        mergedCriterion.getTags() == criterion4.getTags()
+
+        when:
+        mergedCriterion = this.service.mergeCriteria(mergedCriterion, criterion5)
+
+        then:
+        mergedCriterion.getId() == criterion0.getId()
+        mergedCriterion.getName() == criterion1.getName()
+        mergedCriterion.getStatus() == criterion2.getStatus()
+        mergedCriterion.getVersion() == criterion3.getVersion()
+        mergedCriterion.getTags().containsAll(criterion4.getTags())
+        mergedCriterion.getTags().containsAll(criterion5.getTags())
+
+        when:
+        def mergedCriterion2 = this.service.mergeCriteria(mergedCriterion, mergedCriterion)
+
+        then:
+        mergedCriterion2 == mergedCriterion
+
+        when:
+        this.service.mergeCriteria(criterion0, criterion6)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "can resolve command"() {
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def command0 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command1 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command2 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def allCommands = Sets.newHashSet(command0, command1, command2)
+        def commandCriterion = jobRequest.getCriteria().getCommandCriterion()
+        ResourceSelectionResult<Command> selectionResult = Mock(ResourceSelectionResult)
+
+        when: "No commands are found in the database which match the users criterion"
+        this.service.resolveCommand(jobRequest)
+
+        then: "An exception is thrown"
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> Sets.newHashSet()
+        0 * this.commandSelector.selectCommand(_ as Set<Command>, _ as JobRequest)
+        thrown(GenieJobResolutionException)
+
+        when: "Only a single command is found which matches the criterion"
+        def resolvedCommand = this.service.resolveCommand(jobRequest)
+
+        then: "It is immediately returned and no selectors are invoked"
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> Sets.newHashSet(command1)
+        0 * this.commandSelector.selectCommand(_ as Set<Command>, _ as JobRequest)
+        resolvedCommand == command1
+
+        when: "Many commands are found which match the criterion but nothing is selected by the selectors"
+        this.service.resolveCommand(jobRequest)
+
+        then: "An exception is thrown"
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> allCommands
+        1 * this.commandSelector.selectCommand(allCommands, jobRequest) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.empty()
+        1 * selectionResult.getSelectorClass() >> this.getClass()
+        1 * selectionResult.getSelectionRationale() >> Optional.empty()
+        thrown(GenieJobResolutionException)
+
+        when: "The selectors throw an exception"
+        this.service.resolveCommand(jobRequest)
+
+        then: "It is propagated"
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> allCommands
+        1 * this.commandSelector.selectCommand(allCommands, jobRequest) >> { throw new ResourceSelectionException() }
+        thrown(GenieJobResolutionException)
+
+        when: "The selectors select a command"
+        resolvedCommand = this.service.resolveCommand(jobRequest)
+
+        then: "It is returned"
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> allCommands
+        1 * this.commandSelector.selectCommand(allCommands, jobRequest) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.of(command0)
+        1 * selectionResult.getSelectorClass() >> this.getClass()
+        1 * selectionResult.getSelectionRationale() >> Optional.of("Selected command 0")
+        resolvedCommand == command0
+    }
+
+    def "Can resolve cluster"() {
+        def command = Mock(Command)
+        def cluster0 = createCluster(UUID.randomUUID().toString())
+        def cluster1 = createCluster(UUID.randomUUID().toString())
+        def cluster2 = createCluster(UUID.randomUUID().toString())
+        def allClusters = Sets.newHashSet(cluster0, cluster1, cluster2)
+        def jobId = UUID.randomUUID().toString()
+        def jobRequestTemplate = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def commandClusterCriteria = [
+            new Criterion.Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build(),
+            new Criterion.Builder()
+                .withId(cluster0.getId())
+                .build()
+        ]
+        def jobClusterCriteria = [
+            new Criterion.Builder()
+                .withId(cluster1.getId())
+                .build(),
+            new Criterion.Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
+        ]
+        // Note: commandClusterCriteria[1] and jobClusterCriteria[0] throws exception
+        def mergedCriterion0 = this.service.mergeCriteria(commandClusterCriteria[0], jobClusterCriteria[0])
+        def mergedCriterion1 = this.service.mergeCriteria(commandClusterCriteria[0], jobClusterCriteria[1])
+        def mergedCriterion2 = this.service.mergeCriteria(commandClusterCriteria[1], jobClusterCriteria[1])
+        def jobRequest = new JobRequest(
+            jobId,
+            jobRequestTemplate.getResources(),
+            jobRequestTemplate.getCommandArgs(),
+            jobRequestTemplate.getMetadata(),
+            new ExecutionResourceCriteria(
+                jobClusterCriteria,
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+                null
+            ),
+            jobRequestTemplate.getRequestedJobEnvironment(),
+            jobRequestTemplate.getRequestedAgentConfig(),
+            jobRequestTemplate.getRequestedJobArchivalData()
+        )
+        ResourceSelectionResult<Cluster> selectionResult = Mock(ResourceSelectionResult)
+
+        when: "A command with no cluster criteria was resolved"
+        this.service.resolveCluster(command, jobRequest, jobId)
+
+        then: "An exception is thrown cause nothing can be selected"
+        1 * command.getClusterCriteria() >> []
+        0 * this.clusterService.findClustersMatchingCriterion(_ as Criterion)
+        thrown(GenieJobResolutionException)
+
+        when: "No clusters are found which match the criterion"
+        this.service.resolveCluster(command, jobRequest, jobId)
+
+        then: "An exception is thrown"
+        1 * command.getClusterCriteria() >> commandClusterCriteria
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> Sets.newHashSet()
+        thrown(GenieJobResolutionException)
+
+        when: "Only a single cluster is found"
+        def resolvedCluster = this.service.resolveCluster(command, jobRequest, jobId)
+
+        then: "It is returned"
+        1 * command.getClusterCriteria() >> commandClusterCriteria
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet(cluster2)
+        0 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2)
+        resolvedCluster == cluster2
+
+        when: "Multiple clusters are found matching the criterion and the selectors don't select anything"
+        this.service.resolveCluster(command, jobRequest, jobId)
+
+        then: "An exception is thrown"
+        1 * command.getClusterCriteria() >> commandClusterCriteria
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> allClusters
+        1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.empty()
+        thrown(GenieJobResolutionException)
+
+        when: "Multiple clusters are found matching the criterion and the selectors throw exception"
+        this.service.resolveCluster(command, jobRequest, jobId)
+
+        then: "An exception is thrown"
+        1 * command.getClusterCriteria() >> commandClusterCriteria
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> allClusters
+        1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> { throw new ResourceSelectionException() }
+        0 * selectionResult.getSelectedResource()
+        thrown(GenieJobResolutionException)
+
+        when: "Multiple clusters are found matching the criterion and the selectors select a cluster"
+        resolvedCluster = this.service.resolveCluster(command, jobRequest, jobId)
+
+        then: "That cluster is returned to the caller"
+        1 * command.getClusterCriteria() >> commandClusterCriteria
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> allClusters
+        1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.of(cluster2)
+        resolvedCluster == cluster2
     }
 
     private static Cluster createCluster(String id) {

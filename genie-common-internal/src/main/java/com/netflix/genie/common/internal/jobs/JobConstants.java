@@ -66,6 +66,7 @@ public final class JobConstants {
      * Unix Pkill command.
      */
     public static final String UNIX_PKILL_COMMAND = "pkill";
+
     /**
      * Bash export command.
      **/
@@ -291,6 +292,11 @@ public final class JobConstants {
      * Environment variable for the Genie cluster criteria tags in the job request.
      */
     public static final String GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR = "GENIE_REQUESTED_CLUSTER_TAGS";
+
+    /**
+     * Environment variable for Genie version.
+     */
+    public static final String GENIE_VERSION_ENV_VAR = "GENIE_VERSION";
 
     /**
      * Environment variable for the Genie username the job request.
