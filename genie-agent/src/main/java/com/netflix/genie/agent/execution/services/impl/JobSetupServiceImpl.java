@@ -382,8 +382,9 @@ class JobSetupServiceImpl implements JobSetupService {
 
         private final String jobId;
         private final List<Pair<String, String>> setupFileReferences;
-        private final List<Pair<String, String>> environmentVariables = Lists.newArrayList();
         private final String commandLine;
+        private final List<Pair<String, String>> localEnvironmentVariables;
+        private final List<Pair<String, String>> serverEnvironmentVariables;
 
         JobScriptComposer(final JobSpecification jobSpecification, final File jobDirectory) {
 
@@ -420,18 +421,21 @@ class JobSetupServiceImpl implements JobSetupService {
             final String commandDirReference = this.getPathAsReference(commandDirPath, jobDirectoryPath);
 
             // Set environment variables generated here
-            this.addEnvVariable(JobConstants.GENIE_JOB_DIR_ENV_VAR, jobDirectoryPath.toString());
-            this.addEnvVariable(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR, applicationsDirReference);
-            this.addEnvVariable(JobConstants.GENIE_COMMAND_DIR_ENV_VAR, commandDirReference);
-            this.addEnvVariable(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR, clusterDirReference);
-
-            this.addEnvVariable(SETUP_LOG_ENV_VAR, jobSetupLogReference);
-            this.addEnvVariable(ENVIRONMENT_LOG_ENV_VAR, jobEnvironmentLogReference);
+            this.localEnvironmentVariables = ImmutableList.<Pair<String, String>>builder()
+                .add(ImmutablePair.of(JobConstants.GENIE_JOB_DIR_ENV_VAR, jobDirectoryPath.toString()))
+                .add(ImmutablePair.of(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR, applicationsDirReference))
+                .add(ImmutablePair.of(JobConstants.GENIE_COMMAND_DIR_ENV_VAR, commandDirReference))
+                .add(ImmutablePair.of(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR, clusterDirReference))
+                .add(ImmutablePair.of(SETUP_LOG_ENV_VAR, jobSetupLogReference))
+                .add(ImmutablePair.of(ENVIRONMENT_LOG_ENV_VAR, jobEnvironmentLogReference))
+                .build();
 
             // And add the rest which come down from the server. (Sorted for determinism)
-            ImmutableSortedMap.copyOf(jobSpecification.getEnvironmentVariables()).forEach(
-                this::addEnvVariable
-            );
+            this.serverEnvironmentVariables = ImmutableSortedMap.copyOf(jobSpecification.getEnvironmentVariables())
+                .entrySet()
+                .stream()
+                .map(entry -> ImmutablePair.of(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
 
             // Compose list of execution resources
             final List<Triple<String, JobSpecification.ExecutionResource, Path>> executionResources =
@@ -496,10 +500,6 @@ class JobSetupServiceImpl implements JobSetupService {
             return "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}/" + relativePath;
         }
 
-        private void addEnvVariable(final String variableName, final String variableValue) {
-            this.environmentVariables.add(ImmutablePair.of(variableName, variableValue));
-        }
-
         String composeScript() {
 
             // Assemble the content of the script
@@ -530,7 +530,28 @@ class JobSetupServiceImpl implements JobSetupService {
 
             // Script Environment Section
 
-            this.environmentVariables.forEach(
+            sb.append("# Locally-generated environment variables").append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            this.localEnvironmentVariables.forEach(
+                envVar -> sb
+                    .append("export ")
+                    .append(envVar.getKey())
+                    .append("=\"")
+                    .append(envVar.getValue())
+                    .append("\"")
+                    .append(NEWLINE)
+                    .append(NEWLINE)
+            );
+
+            sb.append(NEWLINE);
+
+            sb.append("# Server-provided environment variables").append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            this.serverEnvironmentVariables.forEach(
                 envVar -> sb
                     .append("export ")
                     .append(envVar.getKey())

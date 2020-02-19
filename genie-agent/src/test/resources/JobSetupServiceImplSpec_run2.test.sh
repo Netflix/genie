@@ -12,6 +12,8 @@ set -o pipefail
 set -o nounset
 
 
+# Locally-generated environment variables
+
 export GENIE_JOB_DIR="<JOB_DIR_PLACEHOLDER>"
 
 export GENIE_APPLICATION_DIR="${GENIE_JOB_DIR}/genie/applications"
@@ -23,6 +25,9 @@ export GENIE_CLUSTER_DIR="${GENIE_JOB_DIR}/genie/cluster/<CLUSTER_ID_PLACEHOLDER
 export __GENIE_SETUP_LOG_FILE="${GENIE_JOB_DIR}/genie/logs/setup.log"
 
 export __GENIE_ENVIRONMENT_DUMP_FILE="${GENIE_JOB_DIR}/genie/logs/env.log"
+
+
+# Server-provided environment variables
 
 export SERVER_ENVIRONMENT_X="VALUE_X"
 
