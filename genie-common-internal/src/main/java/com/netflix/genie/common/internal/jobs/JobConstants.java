@@ -43,11 +43,6 @@ public final class JobConstants {
     public static final String JOB_EXECUTION_ENV_KEY = "jee";
 
     /**
-     * Key used for look up of File Transfer object in a Context Map for workflows.
-     **/
-    public static final String FILE_TRANSFER_SERVICE_KEY = "fts";
-
-    /**
      * Key used for look up of Job Execution DTO in a Context Map for workflows.
      **/
     public static final String JOB_EXECUTION_DTO_KEY = "jexecdto";
@@ -86,11 +81,6 @@ public final class JobConstants {
      * Bash source command.
      **/
     public static final String SOURCE = "source ";
-
-    /**
-     * Semicolon symbol.
-     **/
-    public static final String SEMICOLON_SYMBOL = ";";
 
     /**
      * String containing a whitespace.
