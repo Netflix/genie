@@ -10,6 +10,9 @@ set -o errexit
 set -o pipefail
 # Error out if unknown variable is used
 set -o nounset
+# Save original stdout and stderr in fd 6 and 7
+exec 6>&1
+exec 7>&2
 
 
 # Locally-generated environment variables
@@ -27,6 +30,12 @@ export __GENIE_SETUP_LOG_FILE="${GENIE_JOB_DIR}/genie/logs/setup.log"
 export __GENIE_ENVIRONMENT_DUMP_FILE="${GENIE_JOB_DIR}/genie/logs/env.log"
 
 
+# During setup, redirect stdout and stderr of this script to a log file
+exec > ${__GENIE_SETUP_LOG_FILE}
+exec 2>&1
+
+echo "Setup start: $(date '+%Y-%m-%d %H:%M:%S')"
+
 # Server-provided environment variables
 
 export SERVER_ENVIRONMENT_X="VALUE_X"
@@ -36,19 +45,22 @@ export SERVER_ENVIRONMENT_Y="VALUE_Y"
 export SERVER_ENVIRONMENT_Z="VALUE_Z"
 
 
-echo Setup begins: `date '+%Y-%m-%d %H:%M:%S'` >> ${__GENIE_SETUP_LOG_FILE}
+echo "No setup script for application <APPLICATION_1_PLACEHOLDER>"
 
-echo "No setup script for application <APPLICATION_1_PLACEHOLDER>" >> ${__GENIE_SETUP_LOG_FILE}
+echo "No setup script for application <APPLICATION_2_PLACEHOLDER>"
 
-echo "No setup script for application <APPLICATION_2_PLACEHOLDER>" >> ${__GENIE_SETUP_LOG_FILE}
+echo "No setup script for cluster <CLUSTER_ID_PLACEHOLDER>"
 
-echo "No setup script for cluster <CLUSTER_ID_PLACEHOLDER>" >> ${__GENIE_SETUP_LOG_FILE}
+echo "No setup script for command <COMMAND_ID_PLACEHOLDER>"
 
-echo "No setup script for command <COMMAND_ID_PLACEHOLDER>" >> ${__GENIE_SETUP_LOG_FILE}
+echo "No setup script for job <JOB_ID_PLACEHOLDER>"
 
-echo "No setup script for job <JOB_ID_PLACEHOLDER>" >> ${__GENIE_SETUP_LOG_FILE}
 
-echo Setup end: `date '+%Y-%m-%d %H:%M:%S'` >> ${__GENIE_SETUP_LOG_FILE}
+echo "Setup end: $(date '+%Y-%m-%d %H:%M:%S')"
+
+# Restore the original stdout and stderr. Close fd 6 and 7
+exec 1>&6 6>&-
+exec 2>&7 7>&-
 
 # Dump environment post-setup
 env | sort > ${__GENIE_ENVIRONMENT_DUMP_FILE}
