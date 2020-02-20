@@ -110,6 +110,12 @@ public final class JobStatusMessages {
         "Job initialization failed, further details available in the job output directory";
 
     /**
+     * Job failed in in the setup portion of the run script (setting environment or running resources setup scripts).
+     */
+    public static final String JOB_SETUP_FAILED =
+        "Job script failed during setup. See setup log for details";
+
+    /**
      * Private constructor, this class is not meant to be instantiated.
      */
     private JobStatusMessages() {

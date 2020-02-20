@@ -434,6 +434,11 @@ public final class JobConstants {
     public static final String GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME = "genie_setup.sh";
 
     /**
+     * The name of the file left behind if the runfile fails during setup (sourcing entities setup scripts).
+     */
+    public static final String GENIE_SETUP_ERROR_FILE_NAME = "setup_failed.txt";
+
+    /**
      * Protected constructor for utility class.
      */
     protected JobConstants() {

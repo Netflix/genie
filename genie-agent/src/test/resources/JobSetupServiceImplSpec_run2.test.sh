@@ -29,6 +29,11 @@ export __GENIE_SETUP_LOG_FILE="${GENIE_JOB_DIR}/genie/logs/setup.log"
 
 export __GENIE_ENVIRONMENT_DUMP_FILE="${GENIE_JOB_DIR}/genie/logs/env.log"
 
+export __GENIE_SETUP_ERROR_MARKER_FILE="${GENIE_JOB_DIR}/genie/setup_failed.txt"
+
+
+# Mark the beginnig of the setup by creating a marker file
+echo "The job script failed during setup. See ${__GENIE_SETUP_LOG_FILE} for details" > ${__GENIE_SETUP_ERROR_MARKER_FILE}
 
 # During setup, redirect stdout and stderr of this script to a log file
 exec > ${__GENIE_SETUP_LOG_FILE}
@@ -57,6 +62,9 @@ echo "No setup script for job <JOB_ID_PLACEHOLDER>"
 
 
 echo "Setup end: $(date '+%Y-%m-%d %H:%M:%S')"
+
+# Setup completed successfully, delete marker file
+rm ${__GENIE_SETUP_ERROR_MARKER_FILE}
 
 # Restore the original stdout and stderr. Close fd 6 and 7
 exec 1>&6 6>&-

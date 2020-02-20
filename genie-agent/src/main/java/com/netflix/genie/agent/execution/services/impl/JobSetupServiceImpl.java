@@ -379,6 +379,7 @@ class JobSetupServiceImpl implements JobSetupService {
     private static class JobScriptComposer {
         private static final String SETUP_LOG_ENV_VAR = "__GENIE_SETUP_LOG_FILE";
         private static final String ENVIRONMENT_LOG_ENV_VAR = "__GENIE_ENVIRONMENT_DUMP_FILE";
+        private static final String SETUP_ERROR_FILE_ENV_VAR = "__GENIE_SETUP_ERROR_MARKER_FILE";
 
         private final String jobId;
         private final List<Pair<String, String>> setupFileReferences;
@@ -420,6 +421,11 @@ class JobSetupServiceImpl implements JobSetupService {
             final Path commandDirPath = PathUtils.jobCommandDirectoryPath(jobDirectory, commandId);
             final String commandDirReference = this.getPathAsReference(commandDirPath, jobDirectoryPath);
 
+            final String setupErrorFileReference = this.getPathAsReference(
+                PathUtils.jobSetupErrorMarkerFilePath(jobDirectory),
+                jobDirectoryPath
+            );
+
             // Set environment variables generated here
             this.localEnvironmentVariables = ImmutableList.<Pair<String, String>>builder()
                 .add(ImmutablePair.of(JobConstants.GENIE_JOB_DIR_ENV_VAR, jobDirectoryPath.toString()))
@@ -428,6 +434,7 @@ class JobSetupServiceImpl implements JobSetupService {
                 .add(ImmutablePair.of(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR, clusterDirReference))
                 .add(ImmutablePair.of(SETUP_LOG_ENV_VAR, jobSetupLogReference))
                 .add(ImmutablePair.of(ENVIRONMENT_LOG_ENV_VAR, jobEnvironmentLogReference))
+                .add(ImmutablePair.of(SETUP_ERROR_FILE_ENV_VAR, setupErrorFileReference))
                 .build();
 
             // And add the rest which come down from the server. (Sorted for determinism)
@@ -551,6 +558,15 @@ class JobSetupServiceImpl implements JobSetupService {
             sb.append(NEWLINE);
 
             sb
+                .append("# Mark the beginnig of the setup by creating a marker file").append(NEWLINE)
+                .append("echo \"The job script failed during setup. ")
+                .append("See ${").append(SETUP_LOG_ENV_VAR).append("} for details\" ")
+                .append("> ${").append(SETUP_ERROR_FILE_ENV_VAR).append("}")
+                .append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            sb
                 .append("# During setup, redirect stdout and stderr of this script to a log file").append(NEWLINE)
                 .append("exec > ${__GENIE_SETUP_LOG_FILE}").append(NEWLINE)
                 .append("exec 2>&1").append(NEWLINE);
@@ -613,6 +629,12 @@ class JobSetupServiceImpl implements JobSetupService {
             sb
                 .append("echo \"Setup end: $(date '+%Y-%m-%d %H:%M:%S')\"")
                 .append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            sb
+                .append("# Setup completed successfully, delete marker file").append(NEWLINE)
+                .append("rm ${").append(SETUP_ERROR_FILE_ENV_VAR).append("}").append(NEWLINE);
 
             sb.append(NEWLINE);
 

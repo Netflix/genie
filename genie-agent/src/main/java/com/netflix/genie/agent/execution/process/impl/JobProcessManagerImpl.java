@@ -53,6 +53,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
     private final AtomicBoolean killed = new AtomicBoolean(false);
     private final AtomicReference<KillService.KillSource> killSource = new AtomicReference<>();
     private final AtomicReference<ScheduledFuture> timeoutKillThread = new AtomicReference<>();
+    private final AtomicReference<File> initFailedFileRef = new AtomicReference<>();
 
     private final TaskScheduler taskScheduler;
 
@@ -100,6 +101,8 @@ public class JobProcessManagerImpl implements JobProcessManager {
         } else if (!jobScript.canExecute()) {
             throw new JobLaunchException("Job script is not executable");
         }
+
+        this.initFailedFileRef.set(PathUtils.jobSetupErrorMarkerFilePath(jobDirectory).toFile());
 
         log.info(
             "Executing job script: {} (working directory: {})",
@@ -223,7 +226,13 @@ public class JobProcessManagerImpl implements JobProcessManager {
                 exitCode
             ).build();
         } else {
-            return new JobProcessResult.Builder(JobStatus.FAILED, JobStatusMessages.JOB_FAILED, exitCode).build();
+
+            final File initFailedFilex = initFailedFileRef.get();
+            final String statusMessage = (initFailedFilex != null && initFailedFilex.exists())
+                ? JobStatusMessages.JOB_SETUP_FAILED
+                : JobStatusMessages.JOB_FAILED;
+
+            return new JobProcessResult.Builder(JobStatus.FAILED, statusMessage, exitCode).build();
         }
     }
 
