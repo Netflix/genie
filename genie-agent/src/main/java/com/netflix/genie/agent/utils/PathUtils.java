@@ -273,4 +273,18 @@ public final class PathUtils {
             JobConstants.GENIE_JOB_LAUNCHER_SCRIPT
         );
     }
+
+    /**
+     * Compose the path to the marker file left behind if the script fails during setup.
+     *
+     * @param jobDirectory the job directory
+     * @return a Path
+     */
+    public static Path jobSetupErrorMarkerFilePath(final File jobDirectory) {
+        return composePath(
+            jobDirectory,
+            JobConstants.GENIE_PATH_VAR,
+            JobConstants.GENIE_SETUP_ERROR_FILE_NAME
+        );
+    }
 }

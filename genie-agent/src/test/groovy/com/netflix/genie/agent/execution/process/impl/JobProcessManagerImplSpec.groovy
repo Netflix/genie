@@ -24,6 +24,7 @@ import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.jobs.JobConstants
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.scheduling.TaskScheduler
@@ -168,6 +169,41 @@ class JobProcessManagerImplSpec extends Specification {
         this.stdErr.exists()
         this.stdOut.exists()
         this.stdErr.getText(StandardCharsets.UTF_8.toString()).contains("No such file or directory")
+    }
+
+    def "LaunchProcess script setup error"() {
+        File nonExistentFile = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString())
+
+        File jobScript = new File(this.temporaryFolder.getRoot(), "run")
+        jobScript.write("source " + nonExistentFile + "\n");
+        File setupFailedFile = PathUtils.jobSetupErrorMarkerFilePath(this.temporaryFolder.getRoot()).toFile()
+        Files.createDirectories(setupFailedFile.getParentFile().toPath())
+        setupFailedFile.write("See setup log for details")
+        jobScript.setExecutable(true)
+
+        when:
+        this.manager.launchProcess(
+            this.temporaryFolder.getRoot(),
+            jobScript,
+            false,
+            null,
+            false
+        )
+
+        then:
+        noExceptionThrown()
+        0 * this.scheduler.schedule(_ as Runnable, _ as Instant)
+
+        when:
+        def result = this.manager.waitFor()
+
+        then:
+        result.getFinalStatus() == JobStatus.FAILED
+        result.getFinalStatusMessage() == JobStatusMessages.JOB_SETUP_FAILED
+        result.getExitCode() != 0
+        this.stdErr.exists()
+        this.stdOut.exists()
+        !this.stdErr.getText(StandardCharsets.UTF_8.toString()).isEmpty()
     }
 
     def "Job directory null"() {
