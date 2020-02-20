@@ -10,6 +10,9 @@ set -o errexit
 set -o pipefail
 # Error out if unknown variable is used
 set -o nounset
+# Save original stdout and stderr in fd 6 and 7
+exec 6>&1
+exec 7>&2
 
 
 # Locally-generated environment variables
@@ -26,6 +29,12 @@ export __GENIE_SETUP_LOG_FILE="${GENIE_JOB_DIR}/genie/logs/setup.log"
 
 export __GENIE_ENVIRONMENT_DUMP_FILE="${GENIE_JOB_DIR}/genie/logs/env.log"
 
+
+# During setup, redirect stdout and stderr of this script to a log file
+exec > ${__GENIE_SETUP_LOG_FILE}
+exec 2>&1
+
+echo "Setup start: $(date '+%Y-%m-%d %H:%M:%S')"
 
 # Server-provided environment variables
 
@@ -66,24 +75,27 @@ export GENIE_USER_GROUP=""
 export GENIE_VERSION="4"
 
 
-echo Setup begins: `date '+%Y-%m-%d %H:%M:%S'` >> ${__GENIE_SETUP_LOG_FILE}
+echo "Sourcing setup script for application app1"
+source ${GENIE_JOB_DIR}/genie/applications/app1/genie_setup.sh
 
-echo "Sourcing setup script for application app1" >> ${__GENIE_SETUP_LOG_FILE}
-source ${GENIE_JOB_DIR}/genie/applications/app1/genie_setup.sh 2>&1 >> ${__GENIE_SETUP_LOG_FILE}
+echo "Sourcing setup script for application app2"
+source ${GENIE_JOB_DIR}/genie/applications/app2/genie_setup.sh
 
-echo "Sourcing setup script for application app2" >> ${__GENIE_SETUP_LOG_FILE}
-source ${GENIE_JOB_DIR}/genie/applications/app2/genie_setup.sh 2>&1 >> ${__GENIE_SETUP_LOG_FILE}
+echo "Sourcing setup script for cluster cluster1"
+source ${GENIE_JOB_DIR}/genie/cluster/cluster1/genie_setup.sh
 
-echo "Sourcing setup script for cluster cluster1" >> ${__GENIE_SETUP_LOG_FILE}
-source ${GENIE_JOB_DIR}/genie/cluster/cluster1/genie_setup.sh 2>&1 >> ${__GENIE_SETUP_LOG_FILE}
+echo "Sourcing setup script for command cmd1"
+source ${GENIE_JOB_DIR}/genie/command/cmd1/genie_setup.sh
 
-echo "Sourcing setup script for command cmd1" >> ${__GENIE_SETUP_LOG_FILE}
-source ${GENIE_JOB_DIR}/genie/command/cmd1/genie_setup.sh 2>&1 >> ${__GENIE_SETUP_LOG_FILE}
+echo "Sourcing setup script for job JOB_ID_PLACEHOLDER"
+source ${GENIE_JOB_DIR}/genie_setup.sh
 
-echo "Sourcing setup script for job JOB_ID_PLACEHOLDER" >> ${__GENIE_SETUP_LOG_FILE}
-source ${GENIE_JOB_DIR}/genie_setup.sh 2>&1 >> ${__GENIE_SETUP_LOG_FILE}
 
-echo Setup end: `date '+%Y-%m-%d %H:%M:%S'` >> ${__GENIE_SETUP_LOG_FILE}
+echo "Setup end: $(date '+%Y-%m-%d %H:%M:%S')"
+
+# Restore the original stdout and stderr. Close fd 6 and 7
+exec 1>&6 6>&-
+exec 2>&7 7>&-
 
 # Dump environment post-setup
 env | sort > ${__GENIE_ENVIRONMENT_DUMP_FILE}

@@ -524,11 +524,14 @@ class JobSetupServiceImpl implements JobSetupService {
                 .append("set -o pipefail").append(NEWLINE)
                 .append("# Error out if unknown variable is used").append(NEWLINE)
                 .append("set -o nounset").append(NEWLINE)
+                .append("# Save original stdout and stderr in fd 6 and 7").append(NEWLINE)
+                .append("exec 6>&1").append(NEWLINE)
+                .append("exec 7>&2").append(NEWLINE)
                 .append(NEWLINE);
 
             sb.append(NEWLINE);
 
-            // Script Environment Section
+            // Script Local environment Section
 
             sb.append("# Locally-generated environment variables").append(NEWLINE);
 
@@ -544,6 +547,21 @@ class JobSetupServiceImpl implements JobSetupService {
                     .append(NEWLINE)
                     .append(NEWLINE)
             );
+
+            sb.append(NEWLINE);
+
+            sb
+                .append("# During setup, redirect stdout and stderr of this script to a log file").append(NEWLINE)
+                .append("exec > ${__GENIE_SETUP_LOG_FILE}").append(NEWLINE)
+                .append("exec 2>&1").append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            // Script Setup Section
+
+            sb
+                .append("echo \"Setup start: $(date '+%Y-%m-%d %H:%M:%S')\"")
+                .append(NEWLINE);
 
             sb.append(NEWLINE);
 
@@ -564,17 +582,6 @@ class JobSetupServiceImpl implements JobSetupService {
 
             sb.append(NEWLINE);
 
-            // Script Setup Section
-
-            final String setupFileRedirect = " >> ${" + SETUP_LOG_ENV_VAR + "}";
-
-            sb
-                .append("echo Setup begins: `date '+%Y-%m-%d %H:%M:%S'`")
-                .append(setupFileRedirect)
-                .append(NEWLINE);
-
-            sb.append(NEWLINE);
-
             this.setupFileReferences.forEach(
                 pair -> {
                     final String resourceDescription = pair.getLeft();
@@ -585,19 +592,15 @@ class JobSetupServiceImpl implements JobSetupService {
                             .append("echo \"Sourcing setup script for ")
                             .append(resourceDescription)
                             .append("\"")
-                            .append(setupFileRedirect)
                             .append(NEWLINE)
                             .append("source ")
                             .append(setupFileReference)
-                            .append(" 2>&1")
-                            .append(setupFileRedirect)
                             .append(NEWLINE);
                     } else {
                         sb
                             .append("echo \"No setup script for ")
                             .append(resourceDescription)
                             .append("\"")
-                            .append(setupFileRedirect)
                             .append(NEWLINE);
                     }
 
@@ -605,10 +608,18 @@ class JobSetupServiceImpl implements JobSetupService {
                 }
             );
 
+            sb.append(NEWLINE);
+
             sb
-                .append("echo Setup end: `date '+%Y-%m-%d %H:%M:%S'`")
-                .append(setupFileRedirect)
+                .append("echo \"Setup end: $(date '+%Y-%m-%d %H:%M:%S')\"")
                 .append(NEWLINE);
+
+            sb.append(NEWLINE);
+
+            sb
+                .append("# Restore the original stdout and stderr. Close fd 6 and 7").append(NEWLINE)
+                .append("exec 1>&6 6>&-").append(NEWLINE)
+                .append("exec 2>&7 7>&-").append(NEWLINE);
 
             sb.append(NEWLINE);
 
