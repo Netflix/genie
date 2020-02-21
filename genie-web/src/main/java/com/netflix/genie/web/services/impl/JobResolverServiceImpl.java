@@ -92,13 +92,12 @@ public class JobResolverServiceImpl implements JobResolverService {
     /**
      * How long it takes to query the database for cluster command combinations matching supplied criteria.
      */
-    private static final String CLUSTER_COMMAND_QUERY_TIMER_NAME
-        = "genie.services.jobResolver.clusterCommandQuery.timer";
+    private static final String CLUSTER_COMMAND_QUERY_TIMER = "genie.services.jobResolver.clusterCommandQuery.timer";
 
     /**
      * How long it takes to resolve a cluster for a job given the resolved command and the request criteria.
      */
-    private static final String RESOLVE_CLUSTER_TIMER_NAME = "genie.services.jobResolver.resolveCluster.timer";
+    private static final String RESOLVE_CLUSTER_TIMER = "genie.services.jobResolver.resolveCluster.timer";
 
     /**
      * The number of criteria combinations attempted while resolving a cluster.
@@ -109,33 +108,32 @@ public class JobResolverServiceImpl implements JobResolverService {
     /**
      * The number of criteria combinations attempted while resolving a cluster.
      */
-    private static final String RESOLVE_CLUSTER_QUERY_COUNTER
-        = "genie.services.jobResolver.resolveCluster.query.count";
+    private static final String RESOLVE_CLUSTER_QUERY_COUNTER = "genie.services.jobResolver.resolveCluster.query.count";
 
     /**
      * How long it takes to resolve a command for a job given the supplied command criterion.
      */
-    private static final String RESOLVE_COMMAND_TIMER_NAME = "genie.services.jobResolver.resolveCommand.timer";
+    private static final String RESOLVE_COMMAND_TIMER = "genie.services.jobResolver.resolveCommand.timer";
 
     /**
      * How long it takes to select a cluster from the set of clusters returned by database query.
      */
-    private static final String SELECT_CLUSTER_TIMER_NAME = "genie.services.jobResolver.selectCluster.timer";
+    private static final String SELECT_CLUSTER_TIMER = "genie.services.jobResolver.selectCluster.timer";
 
     /**
      * How long it takes to select a command for a given cluster.
      */
-    private static final String SELECT_COMMAND_TIMER_NAME = "genie.services.jobResolver.selectCommand.timer";
+    private static final String SELECT_COMMAND_TIMER = "genie.services.jobResolver.selectCommand.timer";
 
     /**
      * How long it takes to select the applications for a given command.
      */
-    private static final String SELECT_APPLICATIONS_TIMER_NAME = "genie.services.jobResolver.selectApplications.timer";
+    private static final String SELECT_APPLICATIONS_TIMER = "genie.services.jobResolver.selectApplications.timer";
 
     /**
      * How many times a cluster selector is invoked.
      */
-    private static final String CLUSTER_SELECTOR_COUNTER_NAME = "genie.services.jobResolver.clusterSelector.counter";
+    private static final String CLUSTER_SELECTOR_COUNTER = "genie.services.jobResolver.clusterSelector.counter";
 
     private static final String NO_RATIONALE = "No rationale provided";
     private static final String NO_ID_FOUND = "No id found";
@@ -147,6 +145,9 @@ public class JobResolverServiceImpl implements JobResolverService {
     private static final String NAME_FIELD = "name";
     private static final String STATUS_FIELD = "status";
     private static final String VERSION_FIELD = "version";
+
+    private static final String RESOLVE_CLUSTER_CRITERIA_COMBINATION_TAG = "criteriaCombinationCount";
+    private static final String RESOLVE_CLUSTER_QUERY_TAG = "queryCount";
 
     private static final String CLUSTER_SELECTOR_STATUS_SUCCESS = "success";
     private static final String CLUSTER_SELECTOR_STATUS_NO_PREFERENCE = "no preference";
@@ -387,7 +388,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             throw new GenieJobResolutionException(t);
         } finally {
             this.registry
-                .timer(CLUSTER_COMMAND_QUERY_TIMER_NAME, tags)
+                .timer(CLUSTER_COMMAND_QUERY_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
@@ -433,7 +434,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             }
         } finally {
             this.registry
-                .timer(SELECT_CLUSTER_TIMER_NAME, timerTags)
+                .timer(SELECT_CLUSTER_TIMER, timerTags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
 
@@ -456,7 +457,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             throw new GenieJobResolutionException(t);
         } finally {
             this.registry
-                .timer(SELECT_COMMAND_TIMER_NAME, tags)
+                .timer(SELECT_COMMAND_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
@@ -496,7 +497,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             throw new GenieJobResolutionException(t);
         } finally {
             this.registry
-                .timer(SELECT_APPLICATIONS_TIMER_NAME, tags)
+                .timer(SELECT_APPLICATIONS_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
@@ -566,7 +567,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 log.error("Cluster selector {} evaluation threw exception:", clusterSelector, e);
                 counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_EXCEPTION));
             } finally {
-                this.registry.counter(CLUSTER_SELECTOR_COUNTER_NAME, counterTags).increment();
+                this.registry.counter(CLUSTER_SELECTOR_COUNTER, counterTags).increment();
             }
         }
 
@@ -785,7 +786,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             }
         } finally {
             this.registry
-                .timer(RESOLVE_COMMAND_TIMER_NAME, tags)
+                .timer(RESOLVE_COMMAND_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
@@ -870,13 +871,15 @@ public class JobResolverServiceImpl implements JobResolverService {
             }
         } finally {
             this.registry
-                .counter(RESOLVE_CLUSTER_CRITERIA_COMBINATION_COUNTER, tags)
+                .counter(RESOLVE_CLUSTER_CRITERIA_COMBINATION_COUNTER)
                 .increment(criteriaCombinationCount);
             this.registry
-                .counter(RESOLVE_CLUSTER_QUERY_COUNTER, tags)
+                .counter(RESOLVE_CLUSTER_QUERY_COUNTER)
                 .increment(queryCount);
+            tags.add(Tag.of(RESOLVE_CLUSTER_CRITERIA_COMBINATION_TAG, String.valueOf(criteriaCombinationCount)));
+            tags.add(Tag.of(RESOLVE_CLUSTER_QUERY_TAG, String.valueOf(queryCount)));
             this.registry
-                .timer(RESOLVE_CLUSTER_TIMER_NAME, tags)
+                .timer(RESOLVE_CLUSTER_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
