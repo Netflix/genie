@@ -2608,6 +2608,10 @@
 <dd>
 <div class="block">Create the root of the job directory for the given job.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/JobSetupService.html#createJobScript-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.io.File-">createJobScript(JobSpecification, File)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services">JobSetupService</a></dt>
+<dd>
+<div class="block">Creates the executable script that executes setup and runs the job (a.k.a.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#createRelative-java.lang.String-">createRelative(String)</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaTagPersistenceServiceImpl.html#createTagIfNotExists-java.lang.String-">createTagIfNotExists(String)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaTagPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaTagPersistenceServiceImpl</a></dt>
 <dd>
@@ -3206,18 +3210,6 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#environmentVariables">environmentVariables</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/agent/utils/EnvUtils.html" title="class in com.netflix.genie.agent.utils"><span class="typeNameLink">EnvUtils</span></a> - Class in <a href="com/netflix/genie/agent/utils/package-summary.html">com.netflix.genie.agent.utils</a></dt>
-<dd>
-<div class="block">Utilities for job environment variables.</div>
-</dd>
-<dt><a href="com/netflix/genie/agent/utils/EnvUtils.ParseException.html" title="class in com.netflix.genie.agent.utils"><span class="typeNameLink">EnvUtils.ParseException</span></a> - Exception in <a href="com/netflix/genie/agent/utils/package-summary.html">com.netflix.genie.agent.utils</a></dt>
-<dd>
-<div class="block">Exception for parsing errors.</div>
-</dd>
-<dt><a href="com/netflix/genie/agent/utils/EnvUtils.VariableSubstitutionException.html" title="class in com.netflix.genie.agent.utils"><span class="typeNameLink">EnvUtils.VariableSubstitutionException</span></a> - Exception in <a href="com/netflix/genie/agent/utils/package-summary.html">com.netflix.genie.agent.utils</a></dt>
-<dd>
-<div class="block">Exception for failed variable expansion due to missing value.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/ApplicationEntity.html#equals-java.lang.Object-">equals(Object)</a></span> - Method in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.entities">ApplicationEntity</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/AuditEntity.html#equals-java.lang.Object-">equals(Object)</a></span> - Method in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/AuditEntity.html" title="class in com.netflix.genie.web.data.entities">AuditEntity</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/BaseEntity.html#equals-java.lang.Object-">equals(Object)</a></span> - Method in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/BaseEntity.html" title="class in com.netflix.genie.web.data.entities">BaseEntity</a></dt>
@@ -3417,10 +3409,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#exitCode">exitCode</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/EnvUtils.html#expandShellVariables-java.lang.String-java.util.Map-">expandShellVariables(String, Map&lt;String, String&gt;)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/EnvUtils.html" title="class in com.netflix.genie.agent.utils">EnvUtils</a></dt>
-<dd>
-<div class="block">Performs shell environment variables expansion on the given string.</div>
-</dd>
 <dt><a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">ExponentialBackOffTrigger</span></a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
 <dd>
 <div class="block">Trigger implementation whose scheduling delay grows exponentially based on a given factor.</div>
@@ -3757,6 +3745,10 @@
 </a>
 <h2 class="title">G</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_AGENT_ENV_FILE_NAME">GENIE_AGENT_ENV_FILE_NAME</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
+<dd>
+<div class="block">Filename for environment variables dumped after setup.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_AGENT_ENV_SCRIPT_LOG_FILE_NAME">GENIE_AGENT_ENV_SCRIPT_LOG_FILE_NAME</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
 <div class="block">Filename for logfile generated by master setup script.</div>
@@ -3816,6 +3808,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_DONE_FILE_NAME">GENIE_DONE_FILE_NAME</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
 <div class="block">Done filename generated by Genie after running a job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME">GENIE_ENTITY_SETUP_SCRIPT_FILE_NAME</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
+<dd>
+<div class="block">The name of the setup file (for entities that have one) when downloaded in the job directory.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_ENV_PATH">GENIE_ENV_PATH</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
@@ -3888,6 +3884,14 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR">GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
 <div class="block">Environment variable for the Genie command tags in the job request.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_SETUP_ERROR_FILE_NAME">GENIE_SETUP_ERROR_FILE_NAME</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
+<dd>
+<div class="block">The name of the file left behind if the runfile fails during setup (sourcing entities setup scripts).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_SETUP_LOG_FILE_NAME">GENIE_SETUP_LOG_FILE_NAME</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
+<dd>
+<div class="block">Filename for logfile generated during setup (sourcing of entities setup files).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_TEMPORARY_DONE_FILE_NAME">GENIE_TEMPORARY_DONE_FILE_NAME</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
@@ -5815,10 +5819,6 @@
 <dd>
 <div class="block">Get the job directory location the agent should use.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionContext.html#getJobEnvironment--">getJobEnvironment()</a></span> - Method in interface com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionContext.html" title="interface in com.netflix.genie.agent.execution">ExecutionContext</a></dt>
-<dd>
-<div class="block">Get the environment variables map for the job process.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#getJobExecution-java.lang.String-">getJobExecution(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
 <dd>
 <div class="block">Method to get the execution information for a job.</div>
@@ -5930,6 +5930,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/JobClient.html#getJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-">getJobs(String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, String, String, String, Long, Long, Long, Long, String, String)</a></span> - Method in class com.netflix.genie.client.<a href="com/netflix/genie/client/JobClient.html" title="class in com.netflix.genie.client">JobClient</a></dt>
 <dd>
 <div class="block">Method to get a list of all the jobs from Genie for the query parameters specified.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionContext.html#getJobScript--">getJobScript()</a></span> - Method in interface com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionContext.html" title="interface in com.netflix.genie.agent.execution">ExecutionContext</a></dt>
+<dd>
+<div class="block">Get the job script (a.k.a.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobSetup--">getJobSetup()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
@@ -7723,6 +7727,10 @@
 <dd>
 <div class="block">The status message while a job is actively running.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_SETUP_FAILED">JOB_SETUP_FAILED</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
+<dd>
+<div class="block">Job failed in in the setup portion of the run script (setting environment or running resources setup scripts).</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE">JOB_SUBMISSION_DISABLED_DEFAULT_MESSAGE</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
 <div class="block">The default message to send back to users when the jobs are disabled if there was none other set.</div>
@@ -7998,6 +8006,10 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/PathUtils.html#jobEntitySetupFilePath-java.nio.file.Path-">jobEntitySetupFilePath(Path)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/PathUtils.html" title="class in com.netflix.genie.agent.utils">PathUtils</a></dt>
+<dd>
+<div class="block">Compose the path to the setup file for a given entity.</div>
+</dd>
 <dt><a href="com/netflix/genie/common/external/dtos/v4/JobEnvironment.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">JobEnvironment</span></a> - Class in <a href="com/netflix/genie/common/external/dtos/v4/package-summary.html">com.netflix.genie.common.external.dtos.v4</a></dt>
 <dd>
 <div class="block">Final values for settings of the Genie job execution environment.</div>
@@ -8005,6 +8017,10 @@
 <dt><a href="com/netflix/genie/common/external/dtos/v4/JobEnvironment.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">JobEnvironment.Builder</span></a> - Class in <a href="com/netflix/genie/common/external/dtos/v4/package-summary.html">com.netflix.genie.common.external.dtos.v4</a></dt>
 <dd>
 <div class="block">Builder to create an immutable <a href="com/netflix/genie/common/external/dtos/v4/JobEnvironment.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobEnvironment</code></a> instance.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/PathUtils.html#jobEnvironmentLogFilePath-java.io.File-">jobEnvironmentLogFilePath(File)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/PathUtils.html" title="class in com.netflix.genie.agent.utils">PathUtils</a></dt>
+<dd>
+<div class="block">Compose the path to the file where environment variables are dumped after running setup.</div>
 </dd>
 <dt><a href="com/netflix/genie/common/external/dtos/v4/JobEnvironmentRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">JobEnvironmentRequest</span></a> - Class in <a href="com/netflix/genie/common/external/dtos/v4/package-summary.html">com.netflix.genie.common.external.dtos.v4</a></dt>
 <dd>
@@ -8568,6 +8584,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/JobsCleanupProperties.html#JobsCleanupProperties--">JobsCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/JobsCleanupProperties.html" title="class in com.netflix.genie.web.properties">JobsCleanupProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/PathUtils.html#jobScriptPath-java.io.File-">jobScriptPath(File)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/PathUtils.html" title="class in com.netflix.genie.agent.utils">PathUtils</a></dt>
+<dd>
+<div class="block">Compose the path to the job script (a.k.a.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/test/web/configs/IntegrationTestingConfiguration.html#jobsDir--">jobsDir()</a></span> - Method in class com.netflix.genie.test.web.configs.<a href="com/netflix/genie/test/web/configs/IntegrationTestingConfiguration.html" title="class in com.netflix.genie.test.web.configs">IntegrationTestingConfiguration</a></dt>
 <dd>
 <div class="block">Returns a temporary directory as the jobs resource.</div>
@@ -8634,6 +8654,14 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#jobServiceProtoErrorComposer--">jobServiceProtoErrorComposer()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Bean for converting errors in the job service to gRPC messages.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/PathUtils.html#jobSetupErrorMarkerFilePath-java.io.File-">jobSetupErrorMarkerFilePath(File)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/PathUtils.html" title="class in com.netflix.genie.agent.utils">PathUtils</a></dt>
+<dd>
+<div class="block">Compose the path to the marker file left behind if the script fails during setup.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/PathUtils.html#jobSetupLogFilePath-java.io.File-">jobSetupLogFilePath(File)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/PathUtils.html" title="class in com.netflix.genie.agent.utils">PathUtils</a></dt>
+<dd>
+<div class="block">Compose the path to the setup log file for a job (sourcing of entities setup files).</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html#jobSetupService-com.netflix.genie.agent.execution.services.DownloadService-">jobSetupService(DownloadService)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.<a href="com/netflix/genie/agent/execution/services/impl/ServicesAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.services.impl">ServicesAutoConfiguration</a></dt>
 <dd>
@@ -9067,11 +9095,11 @@
 <dd>
 <div class="block">Provide a lazy <code>LaunchJobAction</code> bean.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html#launchProcess-java.io.File-java.util.Map-java.util.List-java.util.List-boolean-java.lang.Integer-boolean-">launchProcess(File, Map&lt;String, String&gt;, List&lt;String&gt;, List&lt;String&gt;, boolean, Integer, boolean)</a></span> - Method in class com.netflix.genie.agent.execution.process.impl.<a href="com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html" title="class in com.netflix.genie.agent.execution.process.impl">JobProcessManagerImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html#launchProcess-java.io.File-java.io.File-boolean-java.lang.Integer-boolean-">launchProcess(File, File, boolean, Integer, boolean)</a></span> - Method in class com.netflix.genie.agent.execution.process.impl.<a href="com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html" title="class in com.netflix.genie.agent.execution.process.impl">JobProcessManagerImpl</a></dt>
 <dd>
 <div class="block">Launch the job process (unless launch was aborted by previous a <code>kill</code> call).</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/process/JobProcessManager.html#launchProcess-java.io.File-java.util.Map-java.util.List-java.util.List-boolean-java.lang.Integer-boolean-">launchProcess(File, Map&lt;String, String&gt;, List&lt;String&gt;, List&lt;String&gt;, boolean, Integer, boolean)</a></span> - Method in interface com.netflix.genie.agent.execution.process.<a href="com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/process/JobProcessManager.html#launchProcess-java.io.File-java.io.File-boolean-java.lang.Integer-boolean-">launchProcess(File, File, boolean, Integer, boolean)</a></span> - Method in interface com.netflix.genie.agent.execution.process.<a href="com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process">JobProcessManager</a></dt>
 <dd>
 <div class="block">Launch the job process (unless launch was aborted by previous a <code>kill</code> call).</div>
 </dd>
@@ -9524,14 +9552,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatus.html#parse-java.lang.String-">parse(String)</a></span> - Static method in enum com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a></dt>
 <dd>
 <div class="block">Parse job status.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/EnvUtils.html#parseEnvFile-java.io.File-">parseEnvFile(File)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/EnvUtils.html" title="class in com.netflix.genie.agent.utils">EnvUtils</a></dt>
-<dd>
-<div class="block">Parse a file containing shell variable declarations.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/utils/EnvUtils.html#parseEnvStream-java.io.InputStream-">parseEnvStream(InputStream)</a></span> - Static method in class com.netflix.genie.agent.utils.<a href="com/netflix/genie/agent/utils/EnvUtils.html" title="class in com.netflix.genie.agent.utils">EnvUtils</a></dt>
-<dd>
-<div class="block">Parse a file containing shell variable declarations.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/ApplicationService.html#patchApplication-java.lang.String-com.github.fge.jsonpatch.JsonPatch-">patchApplication(String, JsonPatch)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/ApplicationService.html" title="interface in com.netflix.genie.client.apis">ApplicationService</a></dt>
 <dd>
@@ -11170,10 +11190,6 @@
 <dd>
 <div class="block">Set the job directory.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionContext.html#setJobEnvironment-java.util.Map-">setJobEnvironment(Map&lt;String, String&gt;)</a></span> - Method in interface com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionContext.html" title="interface in com.netflix.genie.agent.execution">ExecutionContext</a></dt>
-<dd>
-<div class="block">Set the job environment variables map.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/JobPersistenceService.html#setJobRunningInformation-java.lang.String-int-long-java.time.Instant-">setJobRunningInformation(String, int, long, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a></dt>
 <dd>
 <div class="block">Update the job with information for the running job process.</div>
@@ -11181,6 +11197,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html#setJobRunningInformation-java.lang.String-int-long-java.time.Instant-">setJobRunningInformation(String, int, long, Instant)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaJobPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Update the job with information for the running job process.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionContext.html#setJobScript-java.io.File-">setJobScript(File)</a></span> - Method in interface com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionContext.html" title="interface in com.netflix.genie.agent.execution">ExecutionContext</a></dt>
+<dd>
+<div class="block">Set the job script (a.k.a.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionContext.html#setJobSpecification-com.netflix.genie.common.external.dtos.v4.JobSpecification-">setJobSpecification(JobSpecification)</a></span> - Method in interface com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionContext.html" title="interface in com.netflix.genie.agent.execution">ExecutionContext</a></dt>
 <dd>
@@ -11279,11 +11299,6 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/actions/StateMachineActionsAutoConfiguration.html#setUpJobAction-com.netflix.genie.agent.execution.ExecutionContext-com.netflix.genie.agent.execution.services.JobSetupService-com.netflix.genie.agent.execution.services.AgentJobService-com.netflix.genie.agent.execution.services.AgentHeartBeatService-com.netflix.genie.agent.execution.services.AgentJobKillService-com.netflix.genie.agent.execution.services.AgentFileStreamService-">setUpJobAction(ExecutionContext, JobSetupService, AgentJobService, AgentHeartBeatService, AgentJobKillService, AgentFileStreamService)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.actions.<a href="com/netflix/genie/agent/execution/statemachine/actions/StateMachineActionsAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.statemachine.actions">StateMachineActionsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy <code>SetUpJobAction</code> bean.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/JobSetupService.html#setupJobEnvironment-java.io.File-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.util.List-">setupJobEnvironment(File, JobSpecification, List&lt;File&gt;)</a></span> - Method in interface com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/JobSetupService.html" title="interface in com.netflix.genie.agent.execution.services">JobSetupService</a></dt>
-<dd>
-<div class="block">Execute setup scripts for various entities which may alter the layout of the job directory (example: expand
- archive dependencies) and/or alter the environment.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions"><span class="typeNameLink">SetUpJobException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/exceptions/package-summary.html">com.netflix.genie.agent.execution.exceptions</a></dt>
 <dd>
@@ -11963,10 +11978,6 @@
 <div class="block">Convert a set of V3 criterion tags to a V4 criterion object.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#toV4JobRequest-com.netflix.genie.common.dto.JobRequest-">toV4JobRequest(JobRequest)</a></span> - Static method in class com.netflix.genie.common.internal.dtos.v4.converters.<a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">DtoConverters</a></dt>
-<dd>
-<div class="block">Convert a V3 Job Request to a V4 Job Request.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#toV4JobRequest-com.netflix.genie.common.dto.JobRequest-boolean-">toV4JobRequest(JobRequest, boolean)</a></span> - Static method in class com.netflix.genie.common.internal.dtos.v4.converters.<a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters">DtoConverters</a></dt>
 <dd>
 <div class="block">Convert a V3 Job Request to a V4 Job Request.</div>
 </dd>

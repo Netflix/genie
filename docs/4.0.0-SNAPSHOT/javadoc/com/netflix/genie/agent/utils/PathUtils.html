@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -47,7 +47,7 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../com/netflix/genie/agent/utils/EnvUtils.VariableSubstitutionException.html" title="class in com.netflix.genie.agent.utils"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li>Prev&nbsp;Class</li>
 <li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
@@ -193,23 +193,53 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>static java.nio.file.Path</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobEntitySetupFilePath-java.nio.file.Path-">jobEntitySetupFilePath</a></span>(java.nio.file.Path&nbsp;entityDirectory)</code>
+<div class="block">Compose the path to the setup file for a given entity.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>static java.nio.file.Path</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobEnvironmentLogFilePath-java.io.File-">jobEnvironmentLogFilePath</a></span>(java.io.File&nbsp;jobDirectory)</code>
+<div class="block">Compose the path to the file where environment variables are dumped after running setup.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>static java.nio.file.Path</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobGenieDirectoryPath-java.io.File-">jobGenieDirectoryPath</a></span>(java.io.File&nbsp;jobDirectory)</code>
 <div class="block">Compose the path to the genie directory inside a job directory.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>static java.nio.file.Path</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobGenieLogsDirectoryPath-java.io.File-">jobGenieLogsDirectoryPath</a></span>(java.io.File&nbsp;jobDirectory)</code>
 <div class="block">Compose the path to the genie logs directory inside a job directory.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>static java.nio.file.Path</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobScriptPath-java.io.File-">jobScriptPath</a></span>(java.io.File&nbsp;jobDirectory)</code>
+<div class="block">Compose the path to the job script (a.k.a.</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>static java.nio.file.Path</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobSetupErrorMarkerFilePath-java.io.File-">jobSetupErrorMarkerFilePath</a></span>(java.io.File&nbsp;jobDirectory)</code>
+<div class="block">Compose the path to the marker file left behind if the script fails during setup.</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
+<td class="colFirst"><code>static java.nio.file.Path</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobSetupLogFilePath-java.io.File-">jobSetupLogFilePath</a></span>(java.io.File&nbsp;jobDirectory)</code>
+<div class="block">Compose the path to the setup log file for a job (sourcing of entities setup files).</div>
+</td>
+</tr>
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>static java.nio.file.Path</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobStdErrPath-java.io.File-">jobStdErrPath</a></span>(java.io.File&nbsp;jobDirectory)</code>
 <div class="block">Compose the path to the standard error log file for a job.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>static java.nio.file.Path</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/utils/PathUtils.html#jobStdOutPath-java.io.File-">jobStdOutPath</a></span>(java.io.File&nbsp;jobDirectory)</code>
 <div class="block">Compose the path to the standard output log file for a job.</div>
@@ -407,6 +437,22 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
+<a name="jobEntitySetupFilePath-java.nio.file.Path-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>jobEntitySetupFilePath</h4>
+<pre>public static&nbsp;java.nio.file.Path&nbsp;jobEntitySetupFilePath(java.nio.file.Path&nbsp;entityDirectory)</pre>
+<div class="block">Compose the path to the setup file for a given entity.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>entityDirectory</code> - the entity base directory</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a Path</dd>
+</dl>
+</li>
+</ul>
 <a name="jobStdOutPath-java.io.File-">
 <!--   -->
 </a>
@@ -442,11 +488,75 @@ extends java.lang.Object</pre>
 <a name="jobAgentLogFilePath-java.io.File-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>jobAgentLogFilePath</h4>
 <pre>public static&nbsp;java.nio.file.Path&nbsp;jobAgentLogFilePath(java.io.File&nbsp;jobDirectory)</pre>
 <div class="block">Compose the path to the agent log file for a job (after it has been relocated inside the job directory).</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobDirectory</code> - the job directory</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a Path</dd>
+</dl>
+</li>
+</ul>
+<a name="jobSetupLogFilePath-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>jobSetupLogFilePath</h4>
+<pre>public static&nbsp;java.nio.file.Path&nbsp;jobSetupLogFilePath(java.io.File&nbsp;jobDirectory)</pre>
+<div class="block">Compose the path to the setup log file for a job (sourcing of entities setup files).</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobDirectory</code> - the job directory</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a Path</dd>
+</dl>
+</li>
+</ul>
+<a name="jobEnvironmentLogFilePath-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>jobEnvironmentLogFilePath</h4>
+<pre>public static&nbsp;java.nio.file.Path&nbsp;jobEnvironmentLogFilePath(java.io.File&nbsp;jobDirectory)</pre>
+<div class="block">Compose the path to the file where environment variables are dumped after running setup.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobDirectory</code> - the job directory</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a Path</dd>
+</dl>
+</li>
+</ul>
+<a name="jobScriptPath-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>jobScriptPath</h4>
+<pre>public static&nbsp;java.nio.file.Path&nbsp;jobScriptPath(java.io.File&nbsp;jobDirectory)</pre>
+<div class="block">Compose the path to the job script (a.k.a. run file).</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobDirectory</code> - the job directory</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a Path</dd>
+</dl>
+</li>
+</ul>
+<a name="jobSetupErrorMarkerFilePath-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>jobSetupErrorMarkerFilePath</h4>
+<pre>public static&nbsp;java.nio.file.Path&nbsp;jobSetupErrorMarkerFilePath(java.io.File&nbsp;jobDirectory)</pre>
+<div class="block">Compose the path to the marker file left behind if the script fails during setup.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobDirectory</code> - the job directory</dd>
@@ -482,7 +592,7 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../com/netflix/genie/agent/utils/EnvUtils.VariableSubstitutionException.html" title="class in com.netflix.genie.agent.utils"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li>Prev&nbsp;Class</li>
 <li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">

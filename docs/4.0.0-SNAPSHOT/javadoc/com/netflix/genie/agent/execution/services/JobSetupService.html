@@ -142,19 +142,17 @@ var activeTableTab = "activeTableTab";
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;java.io.File&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html#downloadJobResources-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.io.File-">downloadJobResources</a></span>(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
-                    java.io.File&nbsp;jobDirectory)</code>
-<div class="block">Downloads and stages all the job files (dependencies, configurations, ...) into the job directory.</div>
+<td class="colFirst"><code>java.io.File</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html#createJobScript-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.io.File-">createJobScript</a></span>(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
+               java.io.File&nbsp;jobDirectory)</code>
+<div class="block">Creates the executable script that executes setup and runs the job (a.k.a.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html#setupJobEnvironment-java.io.File-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.util.List-">setupJobEnvironment</a></span>(java.io.File&nbsp;jobDirectory,
-                   <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
-                   java.util.List&lt;java.io.File&gt;&nbsp;setupFiles)</code>
-<div class="block">Execute setup scripts for various entities which may alter the layout of the job directory (example: expand
- archive dependencies) and/or alter the environment.</div>
+<td class="colFirst"><code>java.util.Set&lt;java.io.File&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/JobSetupService.html#downloadJobResources-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.io.File-">downloadJobResources</a></span>(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
+                    java.io.File&nbsp;jobDirectory)</code>
+<div class="block">Downloads and stages all the job files (dependencies, configurations, ...) into the job directory.</div>
 </td>
 </tr>
 </table>
@@ -198,9 +196,9 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <h4>downloadJobResources</h4>
-<pre>java.util.List&lt;java.io.File&gt;&nbsp;downloadJobResources(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
-                                                  java.io.File&nbsp;jobDirectory)
-                                           throws <a href="../../../../../../com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions">SetUpJobException</a></pre>
+<pre>java.util.Set&lt;java.io.File&gt;&nbsp;downloadJobResources(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
+                                                 java.io.File&nbsp;jobDirectory)
+                                          throws <a href="../../../../../../com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions">SetUpJobException</a></pre>
 <div class="block">Downloads and stages all the job files (dependencies, configurations, ...) into the job directory.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -213,27 +211,24 @@ var activeTableTab = "activeTableTab";
 </dl>
 </li>
 </ul>
-<a name="setupJobEnvironment-java.io.File-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.util.List-">
+<a name="createJobScript-com.netflix.genie.common.external.dtos.v4.JobSpecification-java.io.File-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setupJobEnvironment</h4>
-<pre>java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;setupJobEnvironment(java.io.File&nbsp;jobDirectory,
-                                                                     <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
-                                                                     java.util.List&lt;java.io.File&gt;&nbsp;setupFiles)
-                                                              throws <a href="../../../../../../com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions">SetUpJobException</a></pre>
-<div class="block">Execute setup scripts for various entities which may alter the layout of the job directory (example: expand
- archive dependencies) and/or alter the environment.</div>
+<h4>createJobScript</h4>
+<pre>java.io.File&nbsp;createJobScript(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a>&nbsp;jobSpecification,
+                             java.io.File&nbsp;jobDirectory)
+                      throws <a href="../../../../../../com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions">SetUpJobException</a></pre>
+<div class="block">Creates the executable script that executes setup and runs the job (a.k.a. run file).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobDirectory</code> - the job directory</dd>
 <dd><code>jobSpecification</code> - the job specification</dd>
-<dd><code>setupFiles</code> - the list of setup files to evaluate</dd>
+<dd><code>jobDirectory</code> - the job directory</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>a snapshot of environment variables and their values after setup is complete</dd>
+<dd>the generated executable script file</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions">SetUpJobException</a></code> - TODO</dd>
+<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions">SetUpJobException</a></code> - if the file cannot be created</dd>
 </dl>
 </li>
 </ul>

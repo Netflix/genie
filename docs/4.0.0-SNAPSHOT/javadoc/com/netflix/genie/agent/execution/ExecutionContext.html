@@ -169,9 +169,9 @@ public interface <span class="typeNameLabel">ExecutionContext</span></pre>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code>java.util.Optional&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/execution/ExecutionContext.html#getJobEnvironment--">getJobEnvironment</a></span>()</code>
-<div class="block">Get the environment variables map for the job process.</div>
+<td class="colFirst"><code>java.util.Optional&lt;java.io.File&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/execution/ExecutionContext.html#getJobScript--">getJobScript</a></span>()</code>
+<div class="block">Get the job script (a.k.a.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
@@ -218,8 +218,8 @@ public interface <span class="typeNameLabel">ExecutionContext</span></pre>
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/execution/ExecutionContext.html#setJobEnvironment-java.util.Map-">setJobEnvironment</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;jobEnvironment)</code>
-<div class="block">Set the job environment variables map.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/execution/ExecutionContext.html#setJobScript-java.io.File-">setJobScript</a></span>(java.io.File&nbsp;jobScript)</code>
+<div class="block">Set the job script (a.k.a.</div>
 </td>
 </tr>
 <tr id="i16" class="altColor">
@@ -296,34 +296,6 @@ public interface <span class="typeNameLabel">ExecutionContext</span></pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobSpecification</code> - the job specification</dd>
-</dl>
-</li>
-</ul>
-<a name="getJobEnvironment--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getJobEnvironment</h4>
-<pre>java.util.Optional&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;getJobEnvironment()</pre>
-<div class="block">Get the environment variables map for the job process.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a map of environment variables and values if one was set, or empty</dd>
-</dl>
-</li>
-</ul>
-<a name="setJobEnvironment-java.util.Map-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setJobEnvironment</h4>
-<pre>void&nbsp;setJobEnvironment(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;jobEnvironment)</pre>
-<div class="block">Set the job environment variables map.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobEnvironment</code> - a map of environment variables and their value to be passed to the job process at launch</dd>
 </dl>
 </li>
 </ul>
@@ -475,7 +447,7 @@ public interface <span class="typeNameLabel">ExecutionContext</span></pre>
 <a name="setClaimedJobId-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>setClaimedJobId</h4>
 <pre>void&nbsp;setClaimedJobId(@NotBlank
@@ -484,6 +456,34 @@ public interface <span class="typeNameLabel">ExecutionContext</span></pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - the job id</dd>
+</dl>
+</li>
+</ul>
+<a name="setJobScript-java.io.File-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setJobScript</h4>
+<pre>void&nbsp;setJobScript(java.io.File&nbsp;jobScript)</pre>
+<div class="block">Set the job script (a.k.a. run file).</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobScript</code> - the job script file</dd>
+</dl>
+</li>
+</ul>
+<a name="getJobScript--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getJobScript</h4>
+<pre>java.util.Optional&lt;java.io.File&gt;&nbsp;getJobScript()</pre>
+<div class="block">Get the job script (a.k.a. run file) if one was generated.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a file handle to the script or empty</dd>
 </dl>
 </li>
 </ul>

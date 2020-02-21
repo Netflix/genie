@@ -188,35 +188,41 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_SETUP_FAILED">JOB_SETUP_FAILED</a></span></code>
+<div class="block">Job failed in in the setup portion of the run script (setting environment or running resources setup scripts).</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#PROCESS_DETECTED_TO_BE_COMPLETE">PROCESS_DETECTED_TO_BE_COMPLETE</a></span></code>
 <div class="block">Job PID terminated, exist status is yet to be verified.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#SUBMIT_INIT_FAILURE">SUBMIT_INIT_FAILURE</a></span></code>
 <div class="block">Job failed with unexpected exception during initialization.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#SUBMIT_PRECONDITION_FAILURE">SUBMIT_PRECONDITION_FAILURE</a></span></code>
 <div class="block">Job precondition was not satisfied during initialization.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#SYSTEM_CRASHED_WHILE_JOB_STARTING">SYSTEM_CRASHED_WHILE_JOB_STARTING</a></span></code>
 <div class="block">Job is undefined intermediate state caused by a crash during setup.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#UNABLE_TO_RE_ATTACH_ON_STARTUP">UNABLE_TO_RE_ATTACH_ON_STARTUP</a></span></code>
 <div class="block">Job was launched before Genie stopped, and it cannot be re-attached after restart.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#USER_REQUESTED_JOB_BE_KILLED_DURING_INITIALIZATION">USER_REQUESTED_JOB_BE_KILLED_DURING_INITIALIZATION</a></span></code>
 <div class="block">Job was killed by user before even starting.</div>
@@ -465,7 +471,7 @@ extends java.lang.Object</pre>
 <a name="SUBMIT_INIT_FAILURE">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>SUBMIT_INIT_FAILURE</h4>
 <pre>public static final&nbsp;java.lang.String SUBMIT_INIT_FAILURE</pre>
@@ -473,6 +479,20 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.SUBMIT_INIT_FAILURE">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="JOB_SETUP_FAILED">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>JOB_SETUP_FAILED</h4>
+<pre>public static final&nbsp;java.lang.String JOB_SETUP_FAILED</pre>
+<div class="block">Job failed in in the setup portion of the run script (setting environment or running resources setup scripts).</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.JOB_SETUP_FAILED">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>

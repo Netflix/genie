@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9,"i28":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -318,19 +318,12 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i26" class="altColor">
-<td class="colFirst"><code>static <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#toV4JobRequest-com.netflix.genie.common.dto.JobRequest-boolean-">toV4JobRequest</a></span>(<a href="../../../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;v3JobRequest,
-              boolean&nbsp;tokenizeArgumentsString)</code>
-<div class="block">Convert a V3 Job Request to a V4 Job Request.</div>
-</td>
-</tr>
-<tr id="i27" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#toV4JobStatus-com.netflix.genie.common.dto.JobStatus-">toV4JobStatus</a></span>(<a href="../../../../../../../../com/netflix/genie/common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a>&nbsp;v3Status)</code>
 <div class="block">Convert a V3 <a href="../../../../../../../../com/netflix/genie/common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto"><code>JobStatus</code></a> to a V4 <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>JobStatus</code></a>.</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html#toV4JobStatus-java.lang.String-">toV4JobStatus</a></span>(java.lang.String&nbsp;status)</code>
 <div class="block">Attempt to convert a Job status string into a known enumeration value from <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>JobStatus</code></a>.</div>
@@ -576,29 +569,6 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>v3JobRequest</code> - The v3 request to convert</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The V4 version of the information contained in the V3 request</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GeniePreconditionException.html" title="class in com.netflix.genie.common.exceptions">GeniePreconditionException</a></code> - When the criteria is invalid</dd>
-</dl>
-</li>
-</ul>
-<a name="toV4JobRequest-com.netflix.genie.common.dto.JobRequest-boolean-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toV4JobRequest</h4>
-<pre>public static&nbsp;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;toV4JobRequest(<a href="../../../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;v3JobRequest,
-                                        boolean&nbsp;tokenizeArgumentsString)
-                                 throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GeniePreconditionException.html" title="class in com.netflix.genie.common.exceptions">GeniePreconditionException</a></pre>
-<div class="block">Convert a V3 Job Request to a V4 Job Request.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>v3JobRequest</code> - The v3 request to convert</dd>
-<dd><code>tokenizeArgumentsString</code> - Whether to perform splitting of the command arguments string into separate
-                                arguments. This is necessary to execute a request that came through the V3 API
-                                using V4 execution code.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The V4 version of the information contained in the V3 request</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
