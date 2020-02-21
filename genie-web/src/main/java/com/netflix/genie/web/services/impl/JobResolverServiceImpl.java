@@ -735,7 +735,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final Criterion criterion = jobRequest.getCriteria().getCommandCriterion();
-            final Set<Command> commands = this.commandPersistenceService.findCommandsMatchingCriterion(criterion);
+            final Set<Command> commands = this.commandPersistenceService.findCommandsMatchingCriterion(criterion, true);
             final Command command;
             if (commands.isEmpty()) {
                 throw new GenieJobResolutionException("No command matching command criterion found");
@@ -827,7 +827,7 @@ public class JobResolverServiceImpl implements JobResolverService {
 
                     queryCount++;
                     final Set<Cluster> clusters
-                        = this.clusterPersistenceService.findClustersMatchingCriterion(mergedCriterion);
+                        = this.clusterPersistenceService.findClustersMatchingCriterion(mergedCriterion, true);
                     if (clusters.isEmpty()) {
                         log.debug("No clusters found for {}", mergedCriterion);
                         this.noClusterFoundCounter.increment();

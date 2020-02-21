@@ -56,6 +56,20 @@ public class Criterion implements Serializable {
         @NotEmpty(message = "A tag can't be an empty string")
         @Size(max = 255, message = "A tag can't be longer than 255 characters") String> tags;
 
+    /**
+     * Copy the contents of the given {@link Criterion} but use the supplied status.
+     *
+     * @param criterion The {@link Criterion} to copy
+     * @param status    The status to use
+     */
+    public Criterion(final Criterion criterion, final String status) {
+        this.id = criterion.id;
+        this.name = criterion.name;
+        this.version = criterion.version;
+        this.status = status;
+        this.tags = ImmutableSet.copyOf(criterion.getTags());
+    }
+
     private Criterion(final Builder builder) throws IllegalArgumentException {
         this.id = builder.bId;
         this.name = builder.bName;

@@ -579,10 +579,19 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<Cluster> findClustersMatchingCriterion(@Valid final Criterion criterion) {
-        log.debug("[findClustersMatchingCriterion] Called to find clusters matching {}", criterion);
+    public Set<Cluster> findClustersMatchingCriterion(
+        @Valid final Criterion criterion,
+        final boolean addDefaultStatus
+    ) {
+        final Criterion finalCriterion;
+        if (addDefaultStatus && !criterion.getStatus().isPresent()) {
+            finalCriterion = new Criterion(criterion, ClusterStatus.UP.name());
+        } else {
+            finalCriterion = criterion;
+        }
+        log.debug("[findClustersMatchingCriterion] Called to find clusters matching {}", finalCriterion);
         return this.getClusterRepository()
-            .findAll(JpaClusterSpecs.findClustersMatchingCriterion(criterion))
+            .findAll(JpaClusterSpecs.findClustersMatchingCriterion(finalCriterion))
             .stream()
             .map(EntityDtoConverters::toV4ClusterDto)
             .collect(Collectors.toSet());

@@ -1206,7 +1206,9 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         Assertions
             .assertThat(
-                this.service.findClustersMatchingCriterion(new Criterion.Builder().withId(cluster0.getId()).build())
+                this.service.findClustersMatchingCriterion(
+                    new Criterion.Builder().withId(cluster0.getId()).build(), true
+                )
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(cluster0);
@@ -1214,7 +1216,8 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findClustersMatchingCriterion(
-                    new Criterion.Builder().withName(cluster2.getMetadata().getName()).build()
+                    new Criterion.Builder().withName(cluster2.getMetadata().getName()).build(),
+                    true
                 )
             )
             .hasSize(1)
@@ -1223,7 +1226,8 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findClustersMatchingCriterion(
-                    new Criterion.Builder().withVersion(cluster1.getMetadata().getVersion()).build()
+                    new Criterion.Builder().withVersion(cluster1.getMetadata().getVersion()).build(),
+                    true
                 )
             )
             .hasSize(1)
@@ -1233,7 +1237,8 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findClustersMatchingCriterion(
-                    new Criterion.Builder().withStatus(ClusterStatus.OUT_OF_SERVICE.name()).build()
+                    new Criterion.Builder().withStatus(ClusterStatus.OUT_OF_SERVICE.name()).build(),
+                    false
                 )
             )
             .isEmpty();
@@ -1241,7 +1246,8 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findClustersMatchingCriterion(
-                    new Criterion.Builder().withTags(cluster1.getMetadata().getTags()).build()
+                    new Criterion.Builder().withTags(cluster1.getMetadata().getTags()).build(),
+                    true
                 )
             )
             .hasSize(3)
@@ -1250,7 +1256,8 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findClustersMatchingCriterion(
-                    new Criterion.Builder().withTags(cluster4.getMetadata().getTags()).build()
+                    new Criterion.Builder().withTags(cluster4.getMetadata().getTags()).build(),
+                    true
                 )
             )
             .hasSize(1)
@@ -1259,7 +1266,8 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findClustersMatchingCriterion(
-                    new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+                    new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build(),
+                    true
                 )
             )
             .isEmpty();
@@ -1273,7 +1281,8 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                         .withName(cluster3.getMetadata().getName())
                         .withVersion(cluster3.getMetadata().getVersion())
                         .withTags(cluster1.getMetadata().getTags()) // should be subset
-                        .build()
+                        .build(),
+                    true
                 )
             )
             .hasSize(1)
