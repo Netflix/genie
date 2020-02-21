@@ -6,7 +6,7 @@ Search the clusters that the given command is linked to.
 
 ==== Endpoint
 
-`GET /api/v3/applications/{id}/commands`
+`GET /api/v3/commands/{id}/clusters`
 
 :snippet-base: {snippets}/command-rest-controller-integration-test/can-get-clusters-for-command/8
 :id-base: get-clusters-for-command
