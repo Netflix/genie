@@ -36,6 +36,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAss
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
+import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,7 @@ import java.util.stream.Collectors;
 public class CommandRestController {
 
     private final CommandPersistenceService commandPersistenceService;
+    private final ClusterPersistenceService clusterPersistenceService;
     private final CommandModelAssembler commandModelAssembler;
     private final ApplicationModelAssembler applicationModelAssembler;
     private final ClusterModelAssembler clusterModelAssembler;
@@ -98,14 +100,17 @@ public class CommandRestController {
      * Constructor.
      *
      * @param commandPersistenceService The command configuration service to use.
+     * @param clusterPersistenceService The {@link ClusterPersistenceService} implementation to use
      * @param entityModelAssemblers     The encapsulation of all available V3 resource assemblers
      */
     @Autowired
     public CommandRestController(
         final CommandPersistenceService commandPersistenceService,
+        final ClusterPersistenceService clusterPersistenceService,
         final EntityModelAssemblers entityModelAssemblers
     ) {
         this.commandPersistenceService = commandPersistenceService;
+        this.clusterPersistenceService = clusterPersistenceService;
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
@@ -787,5 +792,43 @@ public class CommandRestController {
     ) throws GenieNotFoundException {
         log.info("Called to remove the criterion from command {} with priority {}", id, priority);
         this.commandPersistenceService.removeClusterCriterionForCommand(id, priority);
+    }
+
+    /**
+     * For a given {@link Command} retrieve the {@link Criterion} identified by {@literal priority} and attempt to
+     * resolve all the {@link Cluster}'s this {@link Criterion} would currently match within the database.
+     *
+     * @param id               The id of the command to get the criterion from
+     * @param priority         The priority ({@literal 0} indexed). Must be
+     *                         {@literal 0 <= priority < clusterCriteria.length}
+     * @param addDefaultStatus Whether the system should add the default {@link ClusterStatus} to the {@link Criterion}
+     *                         if no status currently is within the {@link Criterion}. The default value is
+     *                         {@literal true} which will currently add the status {@link ClusterStatus#UP}
+     * @return The set of {@link Cluster}'s which matched the {@link Criterion} if any. Each {@link Cluster} is
+     * represented as an {@link EntityModel} with HAL links
+     * @throws GenieNotFoundException If no command with {@literal id} is found or if no {Criterion} with
+     *                                {@literal priority} exists within the command
+     */
+    @GetMapping(value = "/{id}/clusterCriteria/{priority}/clusters", produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Set<EntityModel<Cluster>> resolveClustersForCommandClusterCriterion(
+        @PathVariable("id") final String id,
+        @PathVariable("priority") @Min(0) final int priority,
+        @RequestParam(value = "addDefaultStatus", defaultValue = "true") final Boolean addDefaultStatus
+    ) throws GenieNotFoundException {
+        log.info("Called to get clusters for command {} cluster criterion {}", id, priority);
+
+        // TODO: Improvement here to add API which only retrieves the single criterion but in the end the DB
+        //       query likely will fetch entire collection without a lot of work and may not be worth the hassle
+        final List<Criterion> criteria = this.commandPersistenceService.getClusterCriteriaForCommand(id);
+        if (priority >= criteria.size()) {
+            throw new GenieNotFoundException("No criterion with priority " + priority + " exists for command " + id);
+        }
+
+        return this.clusterPersistenceService.findClustersMatchingCriterion(criteria.get(priority), addDefaultStatus)
+            .stream()
+            .map(DtoConverters::toV3Cluster)
+            .map(this.clusterModelAssembler::toModel)
+            .collect(Collectors.toSet());
     }
 }

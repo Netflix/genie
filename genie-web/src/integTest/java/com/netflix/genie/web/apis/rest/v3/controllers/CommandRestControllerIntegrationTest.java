@@ -1989,6 +1989,138 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
+    /**
+     * Test to make sure we can resolve clusters for a command given a criterion.
+     *
+     * @throws Exception on unexpected error
+     */
+    @Test
+    public void testResolveClustersForCommandClusterCriterion() throws Exception {
+        final Cluster cluster0 = new Cluster.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
+        )
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build();
+        final Cluster cluster1 = new Cluster.Builder(
+            cluster0.getName(),
+            cluster0.getUser(),
+            cluster0.getVersion(),
+            ClusterStatus.OUT_OF_SERVICE
+        )
+            .withTags(cluster0.getTags())
+            .build();
+        final Cluster cluster2 = new Cluster.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
+        )
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build();
+        final String cluster0Id = this.createConfigResource(cluster0, null);
+        final String cluster1Id = this.createConfigResource(cluster1, null);
+        final String cluster2Id = this.createConfigResource(cluster2, null);
+
+        final Command command = new Command
+            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            .withClusterCriteria(
+                Lists.newArrayList(
+                    new Criterion.Builder().withId(cluster0Id).build(),
+                    new Criterion.Builder().withName(cluster1.getName()).build(),
+                    new Criterion.Builder().withVersion(cluster2.getVersion()).build(),
+                    new Criterion.Builder().withStatus(ClusterStatus.TERMINATED.name()).build(),
+                    new Criterion.Builder().withTags(cluster2.getTags()).build()
+                )
+            )
+            .build();
+        final String commandId = this.createConfigResource(command, null);
+
+        final RestDocumentationFilter resolveFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            // Path parameters
+            Snippets
+                .ID_PATH_PARAM
+                .and(
+                    RequestDocumentation
+                        .parameterWithName("priority")
+                        .description("Priority of the criterion to insert")
+                ),
+            // Request parameters
+            RequestDocumentation.requestParameters(
+                RequestDocumentation
+                    .parameterWithName("addDefaultStatus")
+                    .description(
+                        "Whether the system should add the default cluster status to the criterion. Default: true"
+                    )
+                    .optional()
+            ),
+            // Response Content Type
+            Snippets.HAL_CONTENT_TYPE_HEADER,
+            // Response Fields
+            Snippets.resolveClustersForCommandClusterCriterionResponsePayload()
+        );
+
+        List<String> clusterIds = RestAssured
+            .given(this.getRequestSpecification())
+            .filter(resolveFilter)
+            .param("addDefaultStatus", "false")
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusterCriteria/{priority}/clusters", commandId, 1)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+            .extract()
+            .jsonPath()
+            .getList("id", String.class);
+
+        Assertions.assertThat(clusterIds).hasSize(2).containsExactlyInAnyOrder(cluster0Id, cluster1Id);
+
+        clusterIds = RestAssured
+            .given(this.getRequestSpecification())
+            .filter(resolveFilter)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusterCriteria/{priority}/clusters", commandId, 1)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+            .extract()
+            .jsonPath()
+            .getList("id", String.class);
+
+        Assertions.assertThat(clusterIds).hasSize(1).containsExactlyInAnyOrder(cluster0Id);
+
+        clusterIds = RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusterCriteria/{priority}/clusters", commandId, 3)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+            .extract()
+            .jsonPath()
+            .getList("id", String.class);
+        Assertions.assertThat(clusterIds).isEmpty();
+
+        clusterIds = RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusterCriteria/{priority}/clusters", commandId, 4)
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .contentType(Matchers.containsString(MediaTypes.HAL_JSON_VALUE))
+            .extract()
+            .jsonPath()
+            .getList("id", String.class);
+        Assertions.assertThat(clusterIds).containsExactlyInAnyOrder(cluster2Id);
+    }
+
     private String createCommandWithDefaultClusterCriteria() throws Exception {
         return this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)

@@ -1,15 +1,16 @@
-=== Get the Clusters that Have Command Available
+=== Resolve Clusters for Command Criterion
 
 ==== Description
 
-Search the clusters that the given command is linked to.
+For a given `Command` retrieve the `Criterion` identified by `priority` and attempt to
+resolve all the `Cluster's` this `Criterion` would currently match within the database.
 
 ==== Endpoint
 
-`GET /api/v3/commands/{id}/clusterss`
+`GET /api/v3/commands/{id}/clusterCriteria/{priority}`
 
-:snippet-base: {snippets}/command-rest-controller-integration-test/can-get-clusters-for-command/8
-:id-base: get-clusters-for-command
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-resolve-clusters-for-command-cluster-criterion/5
+:id-base: resolve-clusters-for-command-cluster-criterion
 :!request-headers:
 :request-path-params: {snippet-base}/path-parameters.adoc
 :request-query-params: {snippet-base}/request-parameters.adoc
