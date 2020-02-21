@@ -115,7 +115,7 @@ var activeTableTab = "activeTableTab";
 public class <span class="typeNameLabel">JobResolverServiceImpl</span>
 extends java.lang.Object
 implements <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a></pre>
-<div class="block">Implementation of the JobResolverService APIs.</div>
+<div class="block">Implementation of the <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> APIs.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
@@ -138,11 +138,12 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">JobResolverServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a>&nbsp;applicationPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">JobResolverServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a>&nbsp;applicationPersistenceService,
                       <a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
                       <a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
                       <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
-                      @NotEmpty java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>&gt;&nbsp;clusterSelectorImpls,
+                      @NotEmpty java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>&gt;&nbsp;clusterSelectors,
+                      <a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>&nbsp;commandSelector,
                       io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                       <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</code>
 <div class="block">Constructor.</div>
@@ -200,7 +201,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobResolverServiceImpl-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">
+<a name="JobResolverServiceImpl-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -211,7 +212,8 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
                               <a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
                               <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
                               @NotEmpty
-                              @NotEmpty java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>&gt;&nbsp;clusterSelectorImpls,
+                              @NotEmpty java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>&gt;&nbsp;clusterSelectors,
+                              <a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>&nbsp;commandSelector,
                               io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                               <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties)</pre>
 <div class="block">Constructor.</div>
@@ -221,7 +223,8 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobResolver
 <dd><code>clusterPersistenceService</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>ClusterPersistenceService</code></a> to use to manipulate clusters</dd>
 <dd><code>commandPersistenceService</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>CommandPersistenceService</code></a> to use to manipulate commands</dd>
 <dd><code>jobPersistenceService</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>JobPersistenceService</code></a> instance to use</dd>
-<dd><code>clusterSelectorImpls</code> - The <a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors"><code>ClusterSelector</code></a> implementations to use</dd>
+<dd><code>clusterSelectors</code> - The <a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors"><code>ClusterSelector</code></a> implementations to use</dd>
+<dd><code>commandSelector</code> - The <a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors"><code>CommandSelector</code></a> implementation to use</dd>
 <dd><code>registry</code> - The <code>MeterRegistry</code>metrics repository to use</dd>
 <dd><code>jobsProperties</code> - The properties for running a job set by the user</dd>
 </dl>

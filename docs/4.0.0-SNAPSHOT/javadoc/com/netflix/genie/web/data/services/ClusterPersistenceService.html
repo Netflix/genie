@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -191,12 +191,19 @@ public interface <span class="typeNameLabel">ClusterPersistenceService</span></p
 </td>
 </tr>
 <tr id="i10" class="altColor">
+<td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findClustersMatchingCriterion</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+                             boolean&nbsp;addDefaultStatus)</code>
+<div class="block">Find all the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#getCluster-java.lang.String-">getCluster</a></span>(@NotBlank(message="No id entered. Unable to get.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the cluster configuration by id.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#getClusters-java.lang.String-java.util.Set-java.util.Set-java.time.Instant-java.time.Instant-org.springframework.data.domain.Pageable-">getClusters</a></span>(java.lang.String&nbsp;name,
            java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses,
@@ -207,86 +214,86 @@ public interface <span class="typeNameLabel">ClusterPersistenceService</span></p
 <div class="block">Get cluster info for various parameters.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#getCommandsForCluster-java.lang.String-java.util.Set-">getCommandsForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to get commands.") java.lang.String&nbsp;id,
                      java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses)</code>
 <div class="block">Get the set of commands associated with the cluster with given id.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#getConfigsForCluster-java.lang.String-">getConfigsForCluster</a></span>(@NotBlank(message="No cluster id sent. Cannot retrieve configurations.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of configuration files associated with the cluster with given
  id.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#getDependenciesForCluster-java.lang.String-">getDependenciesForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to get dependencies.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of dependency files associated with the cluster with given id.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#getTagsForCluster-java.lang.String-">getTagsForCluster</a></span>(@NotBlank(message="No cluster id sent. Cannot retrieve tags.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of tags associated with the cluster with given
  id.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#patchCluster-java.lang.String-com.github.fge.jsonpatch.JsonPatch-">patchCluster</a></span>(@NotBlank java.lang.String&nbsp;id,
             @NotNull com.github.fge.jsonpatch.JsonPatch&nbsp;patch)</code>
 <div class="block">Patch a cluster with the given json patch.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#removeAllCommandsForCluster-java.lang.String-">removeAllCommandsForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to remove commands.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all commands from the cluster.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#removeAllConfigsForCluster-java.lang.String-">removeAllConfigsForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to remove configs.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all configuration files from the cluster.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#removeAllDependenciesForCluster-java.lang.String-">removeAllDependenciesForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to remove dependencies.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all dependency files from the cluster.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#removeAllTagsForCluster-java.lang.String-">removeAllTagsForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to remove tags.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all tags from the cluster.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#removeCommandForCluster-java.lang.String-java.lang.String-">removeCommandForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to remove command.") java.lang.String&nbsp;id,
                        @NotBlank(message="No command id entered. Unable to remove command.") java.lang.String&nbsp;cmdId)</code>
 <div class="block">Remove a command from the cluster.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#removeDependencyForCluster-java.lang.String-java.lang.String-">removeDependencyForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to remove dependency.") java.lang.String&nbsp;id,
                           @NotBlank(message="No dependency entered. Unable to remove dependency.") java.lang.String&nbsp;dependency)</code>
 <div class="block">Remove a dependency file from the cluster.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#removeTagForCluster-java.lang.String-java.lang.String-">removeTagForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to remove tag.") java.lang.String&nbsp;id,
                    @NotBlank(message="No tag entered. Unable to remove.") java.lang.String&nbsp;tag)</code>
 <div class="block">Remove a tag from the cluster.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#setCommandsForCluster-java.lang.String-java.util.List-">setCommandsForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to update commands.") java.lang.String&nbsp;id,
                      @NotNull(message="No command ids entered. Unable to update commands.") java.util.List&lt;java.lang.String&gt;&nbsp;commandIds)</code>
@@ -294,14 +301,14 @@ public interface <span class="typeNameLabel">ClusterPersistenceService</span></p
  given id.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#updateCluster-java.lang.String-com.netflix.genie.common.external.dtos.v4.Cluster-">updateCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to update.") java.lang.String&nbsp;id,
              @NotNull(message="No cluster information entered. Unable to update.") @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;updateCluster)</code>
 <div class="block">Update a cluster.</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#updateConfigsForCluster-java.lang.String-java.util.Set-">updateConfigsForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to update configurations.") java.lang.String&nbsp;id,
                        @NotEmpty(message="No configs entered. Unable to update.") java.util.Set&lt;java.lang.String&gt;&nbsp;configs)</code>
@@ -309,7 +316,7 @@ public interface <span class="typeNameLabel">ClusterPersistenceService</span></p
  given id.</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#updateDependenciesForCluster-java.lang.String-java.util.Set-">updateDependenciesForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to update dependencies.") java.lang.String&nbsp;id,
                             @NotNull(message="No dependencies entered. Unable to update.") java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies)</code>
@@ -317,7 +324,7 @@ public interface <span class="typeNameLabel">ClusterPersistenceService</span></p
  id.</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#updateTagsForCluster-java.lang.String-java.util.Set-">updateTagsForCluster</a></span>(@NotBlank(message="No cluster id entered. Unable to update tags.") java.lang.String&nbsp;id,
                     @NotEmpty(message="No tags entered. Unable to update.") java.util.Set&lt;java.lang.String&gt;&nbsp;tags)</code>
@@ -947,7 +954,7 @@ public interface <span class="typeNameLabel">ClusterPersistenceService</span></p
 <a name="deleteTerminatedClusters--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>deleteTerminatedClusters</h4>
 <pre>long&nbsp;deleteTerminatedClusters()</pre>
@@ -955,6 +962,26 @@ public interface <span class="typeNameLabel">ClusterPersistenceService</span></p
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of clusters deleted</dd>
+</dl>
+</li>
+</ul>
+<a name="findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>findClustersMatchingCriterion</h4>
+<pre>java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;findClustersMatchingCriterion(@Valid
+                                                     @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
+                                                     boolean&nbsp;addDefaultStatus)</pre>
+<div class="block">Find all the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>criterion</code> - The <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> supplied that each cluster needs to completely match to be returned</dd>
+<dd><code>addDefaultStatus</code> - true if the a default status should be added to the supplied
+                         <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> if the supplied criterion doesn't already have a status</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>All the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s which matched the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a></dd>
 </dl>
 </li>
 </ul>

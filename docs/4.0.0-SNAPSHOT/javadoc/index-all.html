@@ -2644,6 +2644,10 @@
 <dd>
 <div class="block">Representation of various criterion options available.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/Criterion.html#Criterion-com.netflix.genie.common.external.dtos.v4.Criterion-java.lang.String-">Criterion(Criterion, String)</a></span> - Constructor for class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a></dt>
+<dd>
+<div class="block">Copy the contents of the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> but use the supplied status.</div>
+</dd>
 <dt><a href="com/netflix/genie/common/external/dtos/v4/Criterion.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">Criterion.Builder</span></a> - Class in <a href="com/netflix/genie/common/external/dtos/v4/package-summary.html">com.netflix.genie.common.external.dtos.v4</a></dt>
 <dd>
 <div class="block">Builder for creating a Criterion instance.</div>
@@ -3482,10 +3486,6 @@
 <dd>
 <div class="block">Constant allowing developers to reference the precedence in their own configuration files.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#FILE_TRANSFER_SERVICE_KEY">FILE_TRANSFER_SERVICE_KEY</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
-<dd>
-<div class="block">Key used for look up of File Transfer object in a Context Map for workflows.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/properties/FileCacheProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">FileCacheProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
 <div class="block">Properties related to the Genie file cache.</div>
@@ -3645,9 +3645,33 @@
 <dd>
 <div class="block">Get all the clusters given the specified parameters.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaClusterSpecs.html#findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-">findClustersMatchingCriterion(Criterion)</a></span> - Static method in class com.netflix.genie.web.data.repositories.jpa.specifications.<a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaClusterSpecs.html" title="class in com.netflix.genie.web.data.repositories.jpa.specifications">JpaClusterSpecs</a></dt>
+<dd>
+<div class="block">Get the specification for the query which will find the clusters which match the given criterion.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/ClusterPersistenceService.html#findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findClustersMatchingCriterion(Criterion, boolean)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a></dt>
+<dd>
+<div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html#findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findClustersMatchingCriterion(Criterion, boolean)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaClusterPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaCommandSpecs.html#findCommandsForApplication-java.lang.String-java.util.Set-">findCommandsForApplication(String, Set&lt;String&gt;)</a></span> - Static method in class com.netflix.genie.web.data.repositories.jpa.specifications.<a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaCommandSpecs.html" title="class in com.netflix.genie.web.data.repositories.jpa.specifications">JpaCommandSpecs</a></dt>
 <dd>
 <div class="block">Get all the clusters given the specified parameters.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaCommandSpecs.html#findCommandsMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-">findCommandsMatchingCriterion(Criterion)</a></span> - Static method in class com.netflix.genie.web.data.repositories.jpa.specifications.<a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaCommandSpecs.html" title="class in com.netflix.genie.web.data.repositories.jpa.specifications">JpaCommandSpecs</a></dt>
+<dd>
+<div class="block">Get the specification for the query which will find the commands which match the given criterion.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/CommandPersistenceService.html#findCommandsMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findCommandsMatchingCriterion(Criterion, boolean)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a></dt>
+<dd>
+<div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaCommandPersistenceServiceImpl.html#findCommandsMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findCommandsMatchingCriterion(Criterion, boolean)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaCommandPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaCommandPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findDistinctByStatusInAndV4IsFalse-java.util.Set-">findDistinctByStatusInAndV4IsFalse(Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a></dt>
 <dd>
@@ -3879,6 +3903,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_USER_GROUP_ENV_VAR">GENIE_USER_GROUP_ENV_VAR</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
 <div class="block">Environment variable for the Genie user group the job request.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#GENIE_VERSION_ENV_VAR">GENIE_VERSION_ENV_VAR</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
+<dd>
+<div class="block">Environment variable for Genie version.</div>
 </dd>
 <dt><a href="com/netflix/genie/GenieAgentApplication.html" title="class in com.netflix.genie"><span class="typeNameLink">GenieAgentApplication</span></a> - Class in <a href="com/netflix/genie/package-summary.html">com.netflix.genie</a></dt>
 <dd>
@@ -8482,15 +8510,15 @@
 <div class="block">Service API for taking inputs from a user and resolving them to concrete information that the Genie system will use
  to execute the users job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobResolverService-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">jobResolverService(ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, JobPersistenceService, List&lt;ClusterSelector&gt;, MeterRegistry, JobsProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobResolverService-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">jobResolverService(ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, JobPersistenceService, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an implementation of <a href="com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> if one hasn't already been defined.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">JobResolverServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
 <dd>
-<div class="block">Implementation of the JobResolverService APIs.</div>
+<div class="block">Implementation of the <a href="com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> APIs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">JobResolverServiceImpl(ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, JobPersistenceService, List&lt;ClusterSelector&gt;, MeterRegistry, JobsProperties)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobResolverServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-">JobResolverServiceImpl(ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, JobPersistenceService, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobResolverServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -10926,10 +10954,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#SelectorsAutoConfiguration--">SelectorsAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.selectors.<a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.selectors">SelectorsAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#SEMICOLON_SYMBOL">SEMICOLON_SYMBOL</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
-<dd>
-<div class="block">Semicolon symbol.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/DefaultMailServiceImpl.html#sendEmail-java.lang.String-java.lang.String-java.lang.String-">sendEmail(String, String, String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/DefaultMailServiceImpl.html" title="class in com.netflix.genie.web.services.impl">DefaultMailServiceImpl</a></dt>
 <dd>
 <div class="block">Method to send emails.</div>
