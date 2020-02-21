@@ -964,7 +964,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         Assertions
             .assertThat(
-                this.service.findCommandsMatchingCriterion(new Criterion.Builder().withId(command0.getId()).build())
+                this.service.findCommandsMatchingCriterion(
+                    new Criterion.Builder().withId(command0.getId()).build(), true
+                )
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(command0);
@@ -972,7 +974,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withName(command2.getMetadata().getName()).build()
+                    new Criterion.Builder().withName(command2.getMetadata().getName()).build(),
+                    true
                 )
             )
             .hasSize(1)
@@ -981,7 +984,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withVersion(command1.getMetadata().getVersion()).build()
+                    new Criterion.Builder().withVersion(command1.getMetadata().getVersion()).build(),
+                    true
                 )
             )
             .hasSize(1)
@@ -991,7 +995,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withStatus(CommandStatus.INACTIVE.name()).build()
+                    new Criterion.Builder().withStatus(CommandStatus.INACTIVE.name()).build(),
+                    false
                 )
             )
             .hasSize(1)
@@ -1002,7 +1007,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withTags(command1.getMetadata().getTags()).build()
+                    new Criterion.Builder().withTags(command1.getMetadata().getTags()).build(),
+                    true
                 )
             )
             .hasSize(3)
@@ -1011,7 +1017,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withTags(command4.getMetadata().getTags()).build()
+                    new Criterion.Builder().withTags(command4.getMetadata().getTags()).build(),
+                    true
                 )
             )
             .hasSize(1)
@@ -1020,7 +1027,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+                    new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build(),
+                    true
                 )
             )
             .isEmpty();
@@ -1034,7 +1042,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
                         .withName(command3.getMetadata().getName())
                         .withVersion(command3.getMetadata().getVersion())
                         .withTags(command1.getMetadata().getTags()) // should be subset
-                        .build()
+                        .build(),
+                    true
                 )
             )
             .hasSize(1)

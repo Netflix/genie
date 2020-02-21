@@ -413,8 +413,10 @@ public interface ClusterPersistenceService {
     /**
      * Find all the {@link Cluster}'s that match the given {@link Criterion}.
      *
-     * @param criterion The {@link Criterion} supplied that each cluster needs to completely match to be returned
+     * @param criterion        The {@link Criterion} supplied that each cluster needs to completely match to be returned
+     * @param addDefaultStatus {@literal true} if the a default status should be added to the supplied
+     *                         {@link Criterion} if the supplied criterion doesn't already have a status
      * @return All the {@link Cluster}'s which matched the {@link Criterion}
      */
-    Set<Cluster> findClustersMatchingCriterion(@Valid Criterion criterion);
+    Set<Cluster> findClustersMatchingCriterion(@Valid Criterion criterion, boolean addDefaultStatus);
 }

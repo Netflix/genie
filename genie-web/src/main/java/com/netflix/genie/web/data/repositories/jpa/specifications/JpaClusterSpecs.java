@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
-import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity_;
@@ -152,7 +151,6 @@ public final class JpaClusterSpecs {
                 ClusterEntity_.name,
                 ClusterEntity_.version,
                 ClusterEntity_.status,
-                ClusterStatus.UP.name(),
                 () -> root.join(ClusterEntity_.tags, JoinType.INNER),
                 ClusterEntity_.id,
                 criterion

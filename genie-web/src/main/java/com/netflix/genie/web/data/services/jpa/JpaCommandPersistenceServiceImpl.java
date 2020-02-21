@@ -655,10 +655,19 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<Command> findCommandsMatchingCriterion(@Valid final Criterion criterion) {
-        log.debug("[findCommandsMatchingCriterion] Called to find commands matching {}", criterion);
+    public Set<Command> findCommandsMatchingCriterion(
+        @Valid final Criterion criterion,
+        final boolean addDefaultStatus
+    ) {
+        final Criterion finalCriterion;
+        if (addDefaultStatus && !criterion.getStatus().isPresent()) {
+            finalCriterion = new Criterion(criterion, CommandStatus.ACTIVE.name());
+        } else {
+            finalCriterion = criterion;
+        }
+        log.debug("[findCommandsMatchingCriterion] Called to find commands matching {}", finalCriterion);
         return this.getCommandRepository()
-            .findAll(JpaCommandSpecs.findCommandsMatchingCriterion(criterion))
+            .findAll(JpaCommandSpecs.findCommandsMatchingCriterion(finalCriterion))
             .stream()
             .map(EntityDtoConverters::toV4CommandDto)
             .collect(Collectors.toSet());

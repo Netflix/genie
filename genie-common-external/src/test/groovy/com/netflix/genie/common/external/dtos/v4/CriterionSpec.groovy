@@ -339,6 +339,21 @@ class CriterionSpec extends Specification {
         one.toString() == two.toString()
     }
 
+    def "can copy criterion"() {
+        def sourceCriterion = this.createCriterion()
+        def newStatus = UUID.randomUUID().toString()
+
+        when:
+        def copyCriterion = new Criterion(sourceCriterion, newStatus)
+
+        then:
+        newStatus != sourceCriterion.getStatus().orElseThrow({ -> new IllegalArgumentException() })
+        copyCriterion.getId() == sourceCriterion.getId()
+        copyCriterion.getName() == sourceCriterion.getName()
+        copyCriterion.getVersion() == sourceCriterion.getVersion()
+        copyCriterion.getStatus().orElseThrow({ -> new IllegalArgumentException() }) == newStatus
+    }
+
     Criterion createCriterion() {
         return new Criterion.Builder()
             .withName(UUID.randomUUID().toString())

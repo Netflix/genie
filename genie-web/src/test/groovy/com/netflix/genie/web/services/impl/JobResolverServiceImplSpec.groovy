@@ -590,7 +590,7 @@ class JobResolverServiceImplSpec extends Specification {
         this.service.resolveCommand(jobRequest)
 
         then: "An exception is thrown"
-        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> Sets.newHashSet()
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet()
         0 * this.commandSelector.selectCommand(_ as Set<Command>, _ as JobRequest)
         thrown(GenieJobResolutionException)
 
@@ -598,7 +598,7 @@ class JobResolverServiceImplSpec extends Specification {
         def resolvedCommand = this.service.resolveCommand(jobRequest)
 
         then: "It is immediately returned and no selectors are invoked"
-        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> Sets.newHashSet(command1)
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet(command1)
         0 * this.commandSelector.selectCommand(_ as Set<Command>, _ as JobRequest)
         resolvedCommand == command1
 
@@ -606,7 +606,7 @@ class JobResolverServiceImplSpec extends Specification {
         this.service.resolveCommand(jobRequest)
 
         then: "An exception is thrown"
-        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> allCommands
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
         1 * this.commandSelector.selectCommand(allCommands, jobRequest) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.empty()
         1 * selectionResult.getSelectorClass() >> this.getClass()
@@ -617,7 +617,7 @@ class JobResolverServiceImplSpec extends Specification {
         this.service.resolveCommand(jobRequest)
 
         then: "It is propagated"
-        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> allCommands
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
         1 * this.commandSelector.selectCommand(allCommands, jobRequest) >> { throw new ResourceSelectionException() }
         thrown(GenieJobResolutionException)
 
@@ -625,7 +625,7 @@ class JobResolverServiceImplSpec extends Specification {
         resolvedCommand = this.service.resolveCommand(jobRequest)
 
         then: "It is returned"
-        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion) >> allCommands
+        1 * this.commandService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
         1 * this.commandSelector.selectCommand(allCommands, jobRequest) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.of(command0)
         1 * selectionResult.getSelectorClass() >> this.getClass()
@@ -682,7 +682,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "An exception is thrown cause nothing can be selected"
         1 * command.getClusterCriteria() >> []
-        0 * this.clusterService.findClustersMatchingCriterion(_ as Criterion)
+        0 * this.clusterService.findClustersMatchingCriterion(_ as Criterion, true)
         thrown(GenieJobResolutionException)
 
         when: "No clusters are found which match the criterion"
@@ -690,9 +690,9 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "An exception is thrown"
         1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true) >> Sets.newHashSet()
         thrown(GenieJobResolutionException)
 
         when: "Only a single cluster is found"
@@ -700,9 +700,9 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "It is returned"
         1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet(cluster2)
-        0 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2)
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet(cluster2)
+        0 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true)
         resolvedCluster == cluster2
 
         when: "Multiple clusters are found matching the criterion and the selectors don't select anything"
@@ -710,9 +710,9 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "An exception is thrown"
         1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> allClusters
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
         1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.empty()
         thrown(GenieJobResolutionException)
@@ -722,9 +722,9 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "An exception is thrown"
         1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> allClusters
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
         1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> { throw new ResourceSelectionException() }
         0 * selectionResult.getSelectedResource()
         thrown(GenieJobResolutionException)
@@ -734,9 +734,9 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "That cluster is returned to the caller"
         1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1) >> Sets.newHashSet()
-        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2) >> allClusters
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
+        1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
         1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.of(cluster2)
         resolvedCluster == cluster2

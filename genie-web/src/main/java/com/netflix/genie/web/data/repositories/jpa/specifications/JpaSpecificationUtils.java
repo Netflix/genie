@@ -120,7 +120,6 @@ public final class JpaSpecificationUtils {
         final SingularAttribute<BaseEntity, String> nameAttribute,
         final SingularAttribute<BaseEntity, String> versionAttribute,
         final SingularAttribute<BaseEntity, String> statusAttribute,
-        final String defaultStatus,
         final Supplier<Join<E, TagEntity>> tagJoinSupplier,
         final SingularAttribute<IdEntity, Long> idAttribute,
         final Criterion criterion
@@ -129,11 +128,8 @@ public final class JpaSpecificationUtils {
 
         criterion.getId().ifPresent(id -> predicates.add(cb.equal(root.get(uniqueIdAttribute), id)));
         criterion.getName().ifPresent(name -> predicates.add(cb.equal(root.get(nameAttribute), name)));
-        criterion.getVersion().ifPresent(
-            version -> predicates.add(cb.equal(root.get(versionAttribute), version))
-        );
-        final String status = criterion.getStatus().orElse(defaultStatus);
-        predicates.add(cb.equal(root.get(statusAttribute), status));
+        criterion.getVersion().ifPresent(version -> predicates.add(cb.equal(root.get(versionAttribute), version)));
+        criterion.getStatus().ifPresent(status -> predicates.add(cb.equal(root.get(statusAttribute), status)));
 
         final Set<String> tags = criterion.getTags();
         if (!tags.isEmpty()) {

@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.web.data.repositories.jpa.specifications;
 
-import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.ApplicationEntity_;
@@ -145,7 +144,6 @@ public final class JpaCommandSpecs {
                 CommandEntity_.name,
                 CommandEntity_.version,
                 CommandEntity_.status,
-                CommandStatus.ACTIVE.name(),
                 () -> root.join(CommandEntity_.tags, JoinType.INNER),
                 CommandEntity_.id,
                 criterion

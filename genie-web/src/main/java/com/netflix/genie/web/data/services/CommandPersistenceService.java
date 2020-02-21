@@ -469,8 +469,10 @@ public interface CommandPersistenceService {
     /**
      * Find all the {@link Command}'s that match the given {@link Criterion}.
      *
-     * @param criterion The {@link Criterion} supplied that each command needs to completely match to be returned
+     * @param criterion        The {@link Criterion} supplied that each command needs to completely match to be returned
+     * @param addDefaultStatus {@literal true} if a default status should be added to the supplied criterion if a
+     *                         status isn't already present
      * @return All the {@link Command}'s which matched the {@link Criterion}
      */
-    Set<Command> findCommandsMatchingCriterion(@Valid Criterion criterion);
+    Set<Command> findCommandsMatchingCriterion(@Valid Criterion criterion, boolean addDefaultStatus);
 }
