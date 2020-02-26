@@ -80,14 +80,14 @@ export GENIE_USER_GROUP=""
 export GENIE_VERSION="4"
 
 
+echo "Sourcing setup script for cluster cluster1"
+source ${GENIE_JOB_DIR}/genie/cluster/cluster1/genie_setup.sh
+
 echo "Sourcing setup script for application app1"
 source ${GENIE_JOB_DIR}/genie/applications/app1/genie_setup.sh
 
 echo "Sourcing setup script for application app2"
 source ${GENIE_JOB_DIR}/genie/applications/app2/genie_setup.sh
-
-echo "Sourcing setup script for cluster cluster1"
-source ${GENIE_JOB_DIR}/genie/cluster/cluster1/genie_setup.sh
 
 echo "Sourcing setup script for command cmd1"
 source ${GENIE_JOB_DIR}/genie/command/cmd1/genie_setup.sh

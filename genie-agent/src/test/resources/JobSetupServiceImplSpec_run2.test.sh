@@ -50,11 +50,11 @@ export SERVER_ENVIRONMENT_Y="VALUE_Y"
 export SERVER_ENVIRONMENT_Z="VALUE_Z"
 
 
+echo "No setup script for cluster <CLUSTER_ID_PLACEHOLDER>"
+
 echo "No setup script for application <APPLICATION_1_PLACEHOLDER>"
 
 echo "No setup script for application <APPLICATION_2_PLACEHOLDER>"
-
-echo "No setup script for cluster <CLUSTER_ID_PLACEHOLDER>"
 
 echo "No setup script for command <COMMAND_ID_PLACEHOLDER>"
 
