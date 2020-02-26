@@ -80,6 +80,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.retry.support.RetryTemplate;
@@ -370,6 +371,7 @@ public class ServicesAutoConfiguration {
      * @param commandSelector               The {@link CommandSelector} implementation to use
      * @param registry                      The metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
+     * @param environment                   The Spring application {@link Environment} for dynamic property resolution
      * @return A {@link JobResolverServiceImpl} instance
      */
     @Bean
@@ -382,7 +384,8 @@ public class ServicesAutoConfiguration {
         @NotEmpty final List<ClusterSelector> clusterSelectors,
         final CommandSelector commandSelector,
         final MeterRegistry registry,
-        final JobsProperties jobsProperties
+        final JobsProperties jobsProperties,
+        final Environment environment
     ) {
         return new JobResolverServiceImpl(
             applicationPersistenceService,
@@ -392,7 +395,8 @@ public class ServicesAutoConfiguration {
             clusterSelectors,
             commandSelector,
             registry,
-            jobsProperties
+            jobsProperties,
+            environment
         );
     }
 

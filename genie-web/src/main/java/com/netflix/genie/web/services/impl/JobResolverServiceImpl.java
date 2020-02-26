@@ -18,6 +18,7 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
@@ -56,6 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.TargetClassAware;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -70,6 +72,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -83,6 +86,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Validated
 public class JobResolverServiceImpl implements JobResolverService {
+
+    /**
+     * The probability that a job should run with the V4 resolution algorithm instead of the V3 algorithm.
+     */
+    private static final String V4_PROBABILITY_PROPERTY_KEY = "genie.services.job-resolver.v4-probability";
 
     /**
      * How long it takes to completely resolve a job given inputs.
@@ -154,6 +162,15 @@ public class JobResolverServiceImpl implements JobResolverService {
     private static final String CLUSTER_SELECTOR_STATUS_EXCEPTION = "exception";
     private static final String CLUSTER_SELECTOR_STATUS_INVALID = "invalid";
 
+    // TODO: Remove all these after migration to V4 algorithm is complete
+    private static final double DEFAULT_V4_PROBABILITY = 0.0;
+    private static final double MIN_V4_PROBABILITY = 0.0;
+    private static final double MAX_V4_PROBABILITY = 1.0;
+    private static final String ALGORITHM_COUNTER = "genie.services.jobResolver.resolutionAlgorithm.counter";
+    private static final String ALGORITHM_TAG = "algorithm";
+    private static final Set<Tag> V3_ALGORITHM_TAGS = ImmutableSet.of(Tag.of(ALGORITHM_TAG, "v3"));
+    private static final Set<Tag> V4_ALGORITHM_TAGS = ImmutableSet.of(Tag.of(ALGORITHM_TAG, "v4"));
+
     private final ApplicationPersistenceService applicationPersistenceService;
     private final ClusterPersistenceService clusterPersistenceService;
     private final CommandPersistenceService commandPersistenceService;
@@ -169,6 +186,9 @@ public class JobResolverServiceImpl implements JobResolverService {
     private final Counter noClusterSelectedCounter;
     private final Counter noClusterFoundCounter;
 
+    private final Environment environment;
+    private final Random random;
+
     /**
      * Constructor.
      *
@@ -180,6 +200,7 @@ public class JobResolverServiceImpl implements JobResolverService {
      * @param commandSelector               The {@link CommandSelector} implementation to use
      * @param registry                      The {@link MeterRegistry }metrics repository to use
      * @param jobsProperties                The properties for running a job set by the user
+     * @param environment                   The Spring application {@link Environment} for dynamic property resolution
      */
     public JobResolverServiceImpl(
         final ApplicationPersistenceService applicationPersistenceService,
@@ -189,7 +210,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         @NotEmpty final List<ClusterSelector> clusterSelectors,
         final CommandSelector commandSelector, // TODO: For now this is a single value but maybe support List
         final MeterRegistry registry,
-        final JobsProperties jobsProperties
+        final JobsProperties jobsProperties,
+        final Environment environment
     ) {
         this.applicationPersistenceService = applicationPersistenceService;
         this.clusterPersistenceService = clusterPersistenceService;
@@ -198,6 +220,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         this.clusterSelectors = clusterSelectors;
         this.commandSelector = commandSelector;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
+        this.environment = environment;
+        this.random = new Random();
 
         final URI jobDirProperty = jobsProperties.getLocations().getJobs();
         this.defaultJobDirectory = Paths.get(jobDirProperty).toFile();
@@ -728,9 +752,47 @@ public class JobResolverServiceImpl implements JobResolverService {
             .orElse(command.getMemory().orElse(this.defaultMemory));
     }
 
+    /*
+     * This API will only exist during migration between V3 and V4 resource resolution logic which hopefully will be
+     * short.
+     */
     private boolean useV4ResourceSelection() {
-        // TODO: Flesh this out with dynamic behavior to aid migration between V3 and V4
-        return false;
+        double v4Probability;
+        try {
+            v4Probability = this.environment.getProperty(
+                V4_PROBABILITY_PROPERTY_KEY,
+                Double.class,
+                DEFAULT_V4_PROBABILITY
+            );
+        } catch (final IllegalStateException e) {
+            log.error("Invalid V4 probability. Expected a number between 0.0 and 1.0 inclusive.", e);
+            v4Probability = MIN_V4_PROBABILITY;
+        }
+        // Check for validity
+        if (v4Probability < MIN_V4_PROBABILITY) {
+            log.warn(
+                "Invalid V4 resolution probability {}. Must be >= 0.0. Resetting to {}",
+                v4Probability,
+                MIN_V4_PROBABILITY
+            );
+            v4Probability = MIN_V4_PROBABILITY;
+        }
+        if (v4Probability > MAX_V4_PROBABILITY) {
+            log.warn(
+                "Invalid V4 resolution probability {}. Must be <= 1.0. Resetting to {}",
+                v4Probability,
+                MAX_V4_PROBABILITY
+            );
+            v4Probability = MAX_V4_PROBABILITY;
+        }
+
+        if (this.random.nextDouble() < v4Probability) {
+            this.registry.counter(ALGORITHM_COUNTER, V4_ALGORITHM_TAGS).increment();
+            return true;
+        } else {
+            this.registry.counter(ALGORITHM_COUNTER, V3_ALGORITHM_TAGS).increment();
+            return false;
+        }
     }
 
     private Command resolveCommand(final JobRequest jobRequest) throws GenieJobResolutionException {
@@ -845,6 +907,10 @@ public class JobResolverServiceImpl implements JobResolverService {
                             jobId,
                             jobRequest
                         );
+                    }
+
+                    if (cluster != null) {
+                        break;
                     }
                 }
 

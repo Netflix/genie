@@ -31,6 +31,7 @@ import org.springframework.test.context.TestPropertySource;
     properties = {
         JobExecutionModeSelector.DEFAULT_EXECUTE_WITH_AGENT_PROPERTY + "=true",
         LocalAgentLauncherProperties.PROPERTY_PREFIX + ".run-as-user=false",
+        "genie.services.job-resolver.v4-probability=1.0",
     }
 )
 public class JobRestControllerAgentExecutionIntegrationTest extends JobRestControllerIntegrationTest {
