@@ -60,7 +60,7 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
     @VisibleForTesting
     static final String GET_METADATA_NUM_RETRY_PROPERTY_NAME = "genie.retry.archived-job-get-metadata.noOfRetries";
     private static final String GET_METADATA_INITIAL_DELAY_PROPERTY_NAME
-        = "genie.retry.archived-job-get-metadata.noOfRetries";
+        = "genie.retry.archived-job-get-metadata.initialDelay";
     private static final String GET_METADATA_MULTIPLIER_PROPERTY_NAME
         = "genie.retry.archived-job-get-metadata.multiplier";
 
