@@ -31,7 +31,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.properties.JobsLocationsProperties;
@@ -1122,12 +1122,11 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
-                Matchers.containsString(GeniePreconditionException.class.getCanonicalName())
-            )
-            .body(
-                EXCEPTION_MESSAGE_PATH,
-                Matchers.containsString(
-                    "No cluster/command combination found for the given criteria. Unable to continue"
+                Matchers.anyOf(
+                    Matchers.containsString(
+                        "No cluster/command combination found for the given criteria. Unable to continue"
+                    ),
+                    Matchers.containsString("No cluster selected given criteria for job")
                 )
             )
             .body("stackTrace", Matchers.nullValue());
@@ -1893,6 +1892,11 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .withConfigs(configs)
             .withDependencies(commandDependencies)
             .withTags(tags)
+            .withClusterCriteria(
+                Lists.newArrayList(
+                    new Criterion.Builder().withTags(Sets.newHashSet(LOCALHOST_CLUSTER_TAG)).build()
+                )
+            )
             .build();
 
         RestAssured
