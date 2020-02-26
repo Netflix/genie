@@ -448,6 +448,10 @@ class JobSetupServiceImpl implements JobSetupService {
             final List<Triple<String, JobSpecification.ExecutionResource, Path>> executionResources =
                 Lists.newArrayList();
 
+            executionResources.add(
+                ImmutableTriple.of("cluster", cluster, PathUtils.jobClusterDirectoryPath(jobDirectory, clusterId))
+            );
+
             jobSpecification.getApplications().forEach(
                 application -> executionResources.add(
                     ImmutableTriple.of(
@@ -459,11 +463,9 @@ class JobSetupServiceImpl implements JobSetupService {
             );
 
             executionResources.add(
-                ImmutableTriple.of("cluster", cluster, PathUtils.jobClusterDirectoryPath(jobDirectory, clusterId))
-            );
-            executionResources.add(
                 ImmutableTriple.of("command", command, PathUtils.jobCommandDirectoryPath(jobDirectory, commandId))
             );
+
             executionResources.add(
                 ImmutableTriple.of("job", jobSpecification.getJob(), jobDirectoryPath)
             );

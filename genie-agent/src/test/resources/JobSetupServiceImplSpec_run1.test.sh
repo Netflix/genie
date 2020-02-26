@@ -50,14 +50,14 @@ export SERVER_ENVIRONMENT_Y="VALUE_Y"
 export SERVER_ENVIRONMENT_Z="VALUE_Z"
 
 
+echo "Sourcing setup script for cluster <CLUSTER_ID_PLACEHOLDER>"
+source ${GENIE_JOB_DIR}/genie/cluster/<CLUSTER_ID_PLACEHOLDER>/genie_setup.sh
+
 echo "Sourcing setup script for application <APPLICATION_1_PLACEHOLDER>"
 source ${GENIE_JOB_DIR}/genie/applications/<APPLICATION_1_PLACEHOLDER>/genie_setup.sh
 
 echo "Sourcing setup script for application <APPLICATION_2_PLACEHOLDER>"
 source ${GENIE_JOB_DIR}/genie/applications/<APPLICATION_2_PLACEHOLDER>/genie_setup.sh
-
-echo "Sourcing setup script for cluster <CLUSTER_ID_PLACEHOLDER>"
-source ${GENIE_JOB_DIR}/genie/cluster/<CLUSTER_ID_PLACEHOLDER>/genie_setup.sh
 
 echo "Sourcing setup script for command <COMMAND_ID_PLACEHOLDER>"
 source ${GENIE_JOB_DIR}/genie/command/<COMMAND_ID_PLACEHOLDER>/genie_setup.sh
