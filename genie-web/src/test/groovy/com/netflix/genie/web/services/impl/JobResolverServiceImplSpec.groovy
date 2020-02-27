@@ -139,6 +139,8 @@ class JobResolverServiceImplSpec extends Specification {
             Double.class,
             JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
         ) >> 0.0d
+        1 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
+        0 * this.commandService.findCommandsMatchingCriterion(_ as Criterion, _ as boolean)
         0 * this.jobService.saveResolvedJob(_ as String, _ as ResolvedJob)
         1 * this.clusterService.findClustersAndCommandsForCriteria(
             jobRequest.getCriteria().getClusterCriteria(),
@@ -178,6 +180,11 @@ class JobResolverServiceImplSpec extends Specification {
             Double.class,
             JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
         ) >> 0.0d
+        1 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> true
+        1 * this.commandService.findCommandsMatchingCriterion(
+            jobRequestNoArchivalData.getCriteria().getCommandCriterion(),
+            true
+        ) >> Sets.newHashSet(createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())))
         1 * this.clusterService.findClustersAndCommandsForCriteria(
             jobRequestNoArchivalData.getCriteria().getClusterCriteria(),
             jobRequestNoArchivalData.getCriteria().getCommandCriterion()
@@ -220,6 +227,8 @@ class JobResolverServiceImplSpec extends Specification {
             Double.class,
             JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
         ) >> 0.0d
+        1 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> true
+        1 * this.commandService.findCommandsMatchingCriterion(savedJobRequest.getCriteria().getCommandCriterion(), true) >> Sets.newHashSet(command)
         1 * this.jobService.getJobStatus(jobId) >> JobStatus.RESERVED
         1 * this.jobService.isApiJob(jobId) >> false
         1 * this.jobService.getJobRequest(jobId) >> Optional.of(savedJobRequest)
@@ -304,6 +313,7 @@ class JobResolverServiceImplSpec extends Specification {
             Double.class,
             JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
         ) >> 1.0d
+        0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         0 * this.jobService.saveResolvedJob(_ as String, _ as ResolvedJob)
         1 * this.commandService.findCommandsMatchingCriterion(jobRequest.getCriteria().getCommandCriterion(), true) >> commands
         1 * this.commandSelector.selectCommand(commands, jobRequest) >> commandSelectionResult
@@ -339,6 +349,7 @@ class JobResolverServiceImplSpec extends Specification {
             Double.class,
             JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
         ) >> 1.0d
+        0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         1 * this.commandService.findCommandsMatchingCriterion(jobRequestNoArchivalData.getCriteria().getCommandCriterion(), true) >> commands
         1 * this.commandSelector.selectCommand(commands, jobRequestNoArchivalData) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command0)
@@ -377,6 +388,7 @@ class JobResolverServiceImplSpec extends Specification {
             Double.class,
             JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
         ) >> 1.0d
+        0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         1 * this.jobService.getJobStatus(jobId) >> JobStatus.RESERVED
         1 * this.jobService.isApiJob(jobId) >> false
         1 * this.jobService.getJobRequest(jobId) >> Optional.of(savedJobRequest)

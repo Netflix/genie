@@ -86,12 +86,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Validated
 public class JobResolverServiceImpl implements JobResolverService {
-
-    /**
-     * The probability that a job should run with the V4 resolution algorithm instead of the V3 algorithm.
-     */
-    private static final String V4_PROBABILITY_PROPERTY_KEY = "genie.services.job-resolver.v4-probability";
-
     /**
      * How long it takes to completely resolve a job given inputs.
      */
@@ -163,6 +157,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private static final String CLUSTER_SELECTOR_STATUS_INVALID = "invalid";
 
     // TODO: Remove all these after migration to V4 algorithm is complete
+    private static final String V4_PROBABILITY_PROPERTY_KEY = "genie.services.job-resolver.v4-probability";
     private static final double DEFAULT_V4_PROBABILITY = 0.0;
     private static final double MIN_V4_PROBABILITY = 0.0;
     private static final double MAX_V4_PROBABILITY = 1.0;
@@ -170,6 +165,14 @@ public class JobResolverServiceImpl implements JobResolverService {
     private static final String ALGORITHM_TAG = "algorithm";
     private static final Set<Tag> V3_ALGORITHM_TAGS = ImmutableSet.of(Tag.of(ALGORITHM_TAG, "v3"));
     private static final Set<Tag> V4_ALGORITHM_TAGS = ImmutableSet.of(Tag.of(ALGORITHM_TAG, "v4"));
+    private static final String V3_COMMAND_TAG = "v3Command";
+    private static final String V4_COMMAND_TAG = "v4Command";
+    private static final String MATCHED_TAG = "matched";
+    private static final Tag MATCHED_TAG_FALSE = Tag.of(MATCHED_TAG, "false");
+    private static final Tag MATCHED_TAG_TRUE = Tag.of(MATCHED_TAG, "true");
+    private static final String DUAL_RESOLVE_PROPERTY_KEY = "genie.services.job-resolver.dual-mode.enabled";
+    private static final String DUAL_RESOLVE_TIMER = "genie.services.jobResolver.v4DualResolve.timer";
+    // END REMOVE
 
     private final ApplicationPersistenceService applicationPersistenceService;
     private final ClusterPersistenceService clusterPersistenceService;
@@ -330,6 +333,41 @@ public class JobResolverServiceImpl implements JobResolverService {
             cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
             // Resolve the command for the job request based on command tags and cluster chosen
             command = this.getCommand(clustersAndCommandsForJob.get(cluster), id);
+
+            // For help during migration. Requested by compute team.
+            if (this.environment.getProperty(DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false)) {
+                final long dualStart = System.nanoTime();
+                final String v3CommandId = command.getId();
+                final Set<Tag> dualModeTags = Sets.newHashSet(Tag.of(V3_COMMAND_TAG, v3CommandId));
+                try {
+                    final Command v4Command = this.resolveCommand(jobRequest);
+                    final String v4CommandId = v4Command.getId();
+                    dualModeTags.add(Tag.of(V4_COMMAND_TAG, v4CommandId));
+
+                    if (v4CommandId.equals(v3CommandId)) {
+                        dualModeTags.add(MATCHED_TAG_TRUE);
+                        log.info("V4 resource resolution match for job {} command {}", id, v3CommandId);
+                    } else {
+                        dualModeTags.add(MATCHED_TAG_FALSE);
+                        log.info(
+                            "V4 resource resolution mismatch for job {} V3 command {} V4 command {}",
+                            id,
+                            v3CommandId,
+                            v4CommandId
+                        );
+                    }
+                    MetricsUtils.addSuccessTags(dualModeTags);
+                } catch (final Exception e) {
+                    // Swallow but capture it as a failure and a mismatch
+                    MetricsUtils.addFailureTagsWithException(dualModeTags, e);
+                    dualModeTags.add(MATCHED_TAG_FALSE);
+                    log.info("V4 resource resolution mismatch for job {} due to exception {}", id, e.getMessage(), e);
+                } finally {
+                    this.registry
+                        .timer(DUAL_RESOLVE_TIMER, dualModeTags)
+                        .record(System.nanoTime() - dualStart, TimeUnit.NANOSECONDS);
+                }
+            }
         }
 
         // Resolve the applications to use based on the command that was selected
