@@ -1,0 +1,26 @@
+=== Resolve Clusters for Command Cluster Criteria
+
+==== Description
+
+For a given `Command` resolve the `Clusters` which each of the `Commands` `clusterCriteria` would resolve
+if they were evaluated against the current contents of the database.
+
+==== Endpoint
+
+`GET /api/v3/commands/{id}/resolvedClusters`
+
+:snippet-base: {snippets}/command-rest-controller-integration-test/test-resolve-clusters-for-command-cluster-criteria/5
+:id-base: resolve-clusters-for-command-cluster-criteria
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:request-query-params: {snippet-base}/request-parameters.adoc
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

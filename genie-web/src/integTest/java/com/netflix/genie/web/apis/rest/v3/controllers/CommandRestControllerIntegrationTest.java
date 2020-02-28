@@ -30,6 +30,7 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.ResolvedResources;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -52,6 +53,7 @@ import org.springframework.restdocs.snippet.Attributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -1987,6 +1989,132 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .delete(COMMANDS_API + "/{id}/clusterCriteria/{priority}", id, 1)
             .then()
             .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    /**
+     * Test to make sure we can resolve clusters for a commands cluster criteria.
+     *
+     * @throws Exception on unexpected error
+     */
+    @Test
+    public void testResolveClustersForCommandClusterCriteria() throws Exception {
+        final Cluster cluster0 = new Cluster.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
+        )
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build();
+        final Cluster cluster1 = new Cluster.Builder(
+            cluster0.getName(),
+            cluster0.getUser(),
+            cluster0.getVersion(),
+            ClusterStatus.UP
+        )
+            .withTags(cluster0.getTags())
+            .build();
+        final Cluster cluster2 = new Cluster.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.UP
+        )
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build();
+        final String cluster0Id = this.createConfigResource(cluster0, null);
+        final String cluster1Id = this.createConfigResource(cluster1, null);
+        final String cluster2Id = this.createConfigResource(cluster2, null);
+
+        final Command command = new Command
+            .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
+            .withClusterCriteria(
+                Lists.newArrayList(
+                    new Criterion.Builder().withId(cluster0Id).build(),
+                    new Criterion.Builder().withName(cluster1.getName()).build(),
+                    new Criterion.Builder().withVersion(cluster2.getVersion()).build(),
+                    new Criterion.Builder().withStatus(ClusterStatus.TERMINATED.name()).build(),
+                    new Criterion.Builder().withTags(cluster2.getTags()).build()
+                )
+            )
+            .build();
+        final String commandId = this.createConfigResource(command, null);
+
+        final RestDocumentationFilter resolveFilter = RestAssuredRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            // Path parameters
+            Snippets.ID_PATH_PARAM,
+            // Request parameters
+            RequestDocumentation.requestParameters(
+                RequestDocumentation
+                    .parameterWithName("addDefaultStatus")
+                    .description(
+                        "Whether the system should add the default cluster status to the criteria. Default: true"
+                    )
+                    .optional()
+            ),
+            // Response Content Type
+            Snippets.JSON_CONTENT_TYPE_HEADER,
+            // Response Fields
+            Snippets.resolveClustersForCommandClusterCriteriaResponsePayload()
+        );
+
+        final List<ResolvedResources<Cluster>> resolvedClusters = GenieObjectMapper.getMapper().readValue(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .filter(resolveFilter)
+                .when()
+                .port(this.port)
+                .get(COMMANDS_API + "/{id}/resolvedClusters", commandId)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
+                .extract()
+                .asString(),
+            new TypeReference<List<ResolvedResources<Cluster>>>() {
+            }
+        );
+
+        Assertions.assertThat(resolvedClusters).hasSize(5);
+        ResolvedResources<Cluster> resolvedResources = resolvedClusters.get(0);
+        Assertions.assertThat(resolvedResources.getCriterion()).isEqualTo(command.getClusterCriteria().get(0));
+        Assertions
+            .assertThat(resolvedResources.getResources())
+            .extracting(Cluster::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactlyInAnyOrder(cluster0Id);
+
+        resolvedResources = resolvedClusters.get(1);
+        Assertions.assertThat(resolvedResources.getCriterion()).isEqualTo(command.getClusterCriteria().get(1));
+        Assertions
+            .assertThat(resolvedResources.getResources())
+            .extracting(Cluster::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactlyInAnyOrder(cluster0Id, cluster1Id);
+
+        resolvedResources = resolvedClusters.get(2);
+        Assertions.assertThat(resolvedResources.getCriterion()).isEqualTo(command.getClusterCriteria().get(2));
+        Assertions
+            .assertThat(resolvedResources.getResources())
+            .extracting(Cluster::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactlyInAnyOrder(cluster2Id);
+
+        resolvedResources = resolvedClusters.get(3);
+        Assertions.assertThat(resolvedResources.getCriterion()).isEqualTo(command.getClusterCriteria().get(3));
+        Assertions.assertThat(resolvedResources.getResources()).isEmpty();
+
+        resolvedResources = resolvedClusters.get(4);
+        Assertions.assertThat(resolvedResources.getCriterion()).isEqualTo(command.getClusterCriteria().get(4));
+        Assertions
+            .assertThat(resolvedResources.getResources())
+            .extracting(Cluster::getId)
+            .filteredOn(Optional::isPresent)
+            .extracting(Optional::get)
+            .containsExactlyInAnyOrder(cluster2Id);
     }
 
     private String createCommandWithDefaultClusterCriteria() throws Exception {
