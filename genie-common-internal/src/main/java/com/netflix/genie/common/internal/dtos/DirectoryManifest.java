@@ -46,6 +46,7 @@ import java.nio.file.FileSystemLoopException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
@@ -384,6 +385,9 @@ public class DirectoryManifest {
                 return FileVisitResult.SKIP_SUBTREE;
             } else if (ioe instanceof AccessDeniedException) {
                 log.warn("Access denied for file {}. Skipping", file);
+                return FileVisitResult.SKIP_SUBTREE;
+            } else if (ioe instanceof NoSuchFileException) {
+                log.warn("File or directory disappeared while visiting {}. Skipping", file);
                 return FileVisitResult.SKIP_SUBTREE;
             } else {
                 log.error("Got unknown error {} while visiting {}. Terminating visitor", ioe.getMessage(), file, ioe);
