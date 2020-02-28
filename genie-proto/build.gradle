@@ -12,6 +12,7 @@ dependencies {
      *******************************/
 
     api("com.google.protobuf:protobuf-java")
+    api("com.google.protobuf:protobuf-java-util")
     api("io.grpc:grpc-stub")
     api("io.grpc:grpc-protobuf")
 
