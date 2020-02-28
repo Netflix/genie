@@ -2339,7 +2339,7 @@
 <dd>
 <div class="block">REST end-point for supporting commands.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">CommandRestController(CommandPersistenceService, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">CommandRestController</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">CommandRestController(CommandPersistenceService, ClusterPersistenceService, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">CommandRestController</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -6489,6 +6489,10 @@
 <dd>
 <div class="block">Get the resources the user requested for the job during execution if any.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a></dt>
+<dd>
+<div class="block">Get the resources that were resolved.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html#getRoleARN--">getRoleARN()</a></span> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html" title="class in com.netflix.genie.common.internal.aws.s3">BucketProperties</a></dt>
 <dd>
 <div class="block">Get the ARN of the role to assume from this instance when working with the given bucket.</div>
@@ -10462,6 +10466,11 @@
 <div class="block">Given a cluster and command criterion attempt to resolve the cluster and highest priority command that match
  said criteria.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#resolveClustersForCommandClusterCriteria-java.lang.String-java.lang.Boolean-">resolveClustersForCommandClusterCriteria(String, Boolean)</a></span> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">CommandRestController</a></dt>
+<dd>
+<div class="block">For a given <a href="com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> retrieve the <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> and attempt to resolve all the <a href="com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s the
+ criteria would currently match within the database.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#resolved">resolved</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#RESOLVED">RESOLVED</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
@@ -10472,6 +10481,14 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/dtos/ResolvedJob.html#ResolvedJob--">ResolvedJob()</a></span> - Constructor for class com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">ResolvedResources</span></a>&lt;<a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="type parameter in ResolvedResources">R</a>&gt; - Class in <a href="com/netflix/genie/common/external/dtos/v4/package-summary.html">com.netflix.genie.common.external.dtos.v4</a></dt>
+<dd>
+<div class="block">Representing the result of resolving resources of type R from a <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html#ResolvedResources-com.netflix.genie.common.external.dtos.v4.Criterion-java.util.Set-">ResolvedResources(Criterion, Set&lt;R&gt;)</a></span> - Constructor for class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#resolveJob-java.lang.String-">resolveJob(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobResolverServiceImpl</a></dt>
 <dd>
 <div class="block">Given the id of a job that was successfully submitted to the system this API will attempt to resolve all the

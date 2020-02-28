@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -134,7 +134,8 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">CommandRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">CommandRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
+                     <a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
                      <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</code>
 <div class="block">Constructor.</div>
 </td>
@@ -328,41 +329,49 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i26" class="altColor">
+<td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a>&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#resolveClustersForCommandClusterCriteria-java.lang.String-java.lang.Boolean-">resolveClustersForCommandClusterCriteria</a></span>(java.lang.String&nbsp;id,
+                                        java.lang.Boolean&nbsp;addDefaultStatus)</code>
+<div class="block">For a given <a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> retrieve the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> and attempt to resolve all the <a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s the
+ criteria would currently match within the database.</div>
+</td>
+</tr>
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#setApplicationsForCommand-java.lang.String-java.util.List-">setApplicationsForCommand</a></span>(java.lang.String&nbsp;id,
                          java.util.List&lt;java.lang.String&gt;&nbsp;applicationIds)</code>
 <div class="block">Set the applications for the given command.</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#setClusterCriteriaForCommand-java.lang.String-java.util.List-">setClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id,
                             @Valid java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code>
 <div class="block">Set all new cluster criteria for the given command.</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#updateCommand-java.lang.String-com.netflix.genie.common.dto.Command-">updateCommand</a></span>(java.lang.String&nbsp;id,
              <a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a>&nbsp;updateCommand)</code>
 <div class="block">Update command configuration.</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#updateConfigsForCommand-java.lang.String-java.util.Set-">updateConfigsForCommand</a></span>(java.lang.String&nbsp;id,
                        java.util.Set&lt;java.lang.String&gt;&nbsp;configs)</code>
 <div class="block">Update the configuration files for a given command.</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#updateDependenciesForCommand-java.lang.String-java.util.Set-">updateDependenciesForCommand</a></span>(java.lang.String&nbsp;id,
                             java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies)</code>
 <div class="block">Update the dependency files for a given command.</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#updateTagsForCommand-java.lang.String-java.util.Set-">updateTagsForCommand</a></span>(java.lang.String&nbsp;id,
                     java.util.Set&lt;java.lang.String&gt;&nbsp;tags)</code>
@@ -391,7 +400,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">
+<a name="CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -399,11 +408,13 @@ extends java.lang.Object</pre>
 <h4>CommandRestController</h4>
 <pre>@Autowired
 public&nbsp;CommandRestController(<a href="../../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
+                                        <a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
                                         <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>commandPersistenceService</code> - The command configuration service to use.</dd>
+<dd><code>clusterPersistenceService</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>ClusterPersistenceService</code></a> implementation to use</dd>
 <dd><code>entityModelAssemblers</code> - The encapsulation of all available V3 resource assemblers</dd>
 </dl>
 </li>
@@ -1161,7 +1172,7 @@ public&nbsp;void&nbsp;insertClusterCriterionForCommand(@PathVariable(value="id")
 <a name="removeClusterCriterionFromCommand-java.lang.String-int-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>removeClusterCriterionFromCommand</h4>
 <pre>@DeleteMapping(value="/{id}/clusterCriteria/{priority}")
@@ -1178,6 +1189,35 @@ public&nbsp;void&nbsp;removeClusterCriterionFromCommand(@PathVariable(value="id"
 <dd><code>priority</code> - The priority (min 0, max number of existing criteria minus one) of the criterion to remove</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieNotFoundException.html" title="class in com.netflix.genie.common.exceptions">GenieNotFoundException</a></code> - If no command with id exists</dd>
+</dl>
+</li>
+</ul>
+<a name="resolveClustersForCommandClusterCriteria-java.lang.String-java.lang.Boolean-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>resolveClustersForCommandClusterCriteria</h4>
+<pre>@GetMapping(value="/{id}/resolvedClusters",
+            produces="application/json")
+ @ResponseStatus(value=OK)
+public&nbsp;java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a>&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&gt;&nbsp;resolveClustersForCommandClusterCriteria(@PathVariable(value="id")
+                                                                                                                                                                                                           java.lang.String&nbsp;id,
+                                                                                                                                                                                                           @RequestParam(value="addDefaultStatus",defaultValue="true")
+                                                                                                                                                                                                           java.lang.Boolean&nbsp;addDefaultStatus)
+                                                                                                                                                                                                    throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieNotFoundException.html" title="class in com.netflix.genie.common.exceptions">GenieNotFoundException</a></pre>
+<div class="block">For a given <a href="../../../../../../../../com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto"><code>Command</code></a> retrieve the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> and attempt to resolve all the <a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s the
+ criteria would currently match within the database.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the command to get the criterion from</dd>
+<dd><code>addDefaultStatus</code> - Whether the system should add the default <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>ClusterStatus</code></a> to the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>
+                         if no status currently is within the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>. The default value is
+                         true which will currently add the status <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html#UP"><code>ClusterStatus.UP</code></a></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A list <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>ResolvedResources</code></a> of each criterion to the <a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto"><code>Cluster</code></a>'s it resolved to</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieNotFoundException.html" title="class in com.netflix.genie.common.exceptions">GenieNotFoundException</a></code> - If no command with id is found</dd>
 </dl>
 </li>
 </ul>
