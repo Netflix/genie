@@ -717,6 +717,33 @@ final class Snippets {
             .andWithPrefix("[].", getCriterionFieldDescriptors());
     }
 
+    static ResponseFieldsSnippet resolveClustersForCommandClusterCriteriaResponsePayload() {
+        return PayloadDocumentation
+            .responseFields(
+                PayloadDocumentation
+                    .fieldWithPath("[]")
+                    .attributes(EMPTY_CONSTRAINTS)
+                    .description("The list of criterion and associated resolved clusters")
+                    .type(JsonFieldType.ARRAY)
+                    .optional()
+            )
+            .andWithPrefix(
+                "[].",
+                PayloadDocumentation
+                    .fieldWithPath("criterion")
+                    .attributes(EMPTY_CONSTRAINTS)
+                    .description("The criterion that was evaluated to yield the resources")
+                    .type(JsonFieldType.OBJECT),
+                PayloadDocumentation
+                    .fieldWithPath("resources")
+                    .attributes(EMPTY_CONSTRAINTS)
+                    .description("The resources that were resolved by evaluating the criterion")
+                    .type(JsonFieldType.ARRAY)
+            )
+            .andWithPrefix("[].criterion.", getCriterionFieldDescriptors())
+            .andWithPrefix("[].resources[].", getClusterFieldDescriptors());
+    }
+
     private static FieldDescriptor[] getApplicationFieldDescriptors() {
         return ArrayUtils.addAll(
             getConfigFieldDescriptors(APPLICATION_CONSTRAINTS),
