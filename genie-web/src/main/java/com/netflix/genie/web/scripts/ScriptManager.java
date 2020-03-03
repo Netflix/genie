@@ -37,9 +37,11 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.script.SimpleScriptContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -165,7 +167,7 @@ public class ScriptManager {
         final CompiledScript compiledScript;
 
         try {
-            compiledScript = getCompiledScript(scriptUri);
+            compiledScript = this.getCompiledScript(scriptUri);
         } catch (ScriptNotConfiguredException e) {
             final long durationNano = System.nanoTime() - start;
             MetricsUtils.addFailureTagsWithException(tags, e);
@@ -176,7 +178,9 @@ public class ScriptManager {
             throw e;
         }
 
-        final Future<Object> taskFuture = executorService.submit(() -> compiledScript.eval(bindings));
+        final ScriptContext scriptContext = new SimpleScriptContext();
+        scriptContext.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+        final Future<Object> taskFuture = this.executorService.submit(() -> compiledScript.eval(scriptContext));
 
         try {
             final Object evaluationResult = taskFuture.get(timeout, TimeUnit.MILLISECONDS);
