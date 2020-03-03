@@ -17,10 +17,7 @@
  */
 package com.netflix.genie.web.scripts
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.ImmutableMap
-import com.netflix.genie.web.exceptions.checked.ScriptExecutionException
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
@@ -29,27 +26,23 @@ import javax.script.Bindings
 
 class ManagedScriptSpec extends Specification {
     ScriptManager scriptManager
-    ObjectMapper objectMapper
     MeterRegistry registry
     TestProperties properties
     TestScript script
 
-    void setup() {
+    def setup() {
         this.scriptManager = Mock(ScriptManager)
-        this.objectMapper = Mock(ObjectMapper)
         this.registry = Mock(MeterRegistry)
         this.properties = new TestProperties()
         this.script = new TestScript(
-            scriptManager,
-            properties,
-            objectMapper,
-            registry
+            this.scriptManager,
+            this.properties,
+            this.registry
         )
     }
 
-    def "LoadPostConstruct"() {
-        setup:
-        URI uri = new URI("file:///myscript.js")
+    def "Load Post Construct"() {
+        def uri = new URI("file:///myscript.js")
 
         when:
         this.script.warmUp()
@@ -66,15 +59,15 @@ class ManagedScriptSpec extends Specification {
     }
 
 
-    def "EvaluateScript"() {
+    def "Evaluate Script"() {
         def param1 = new ArrayList()
         def param2 = new Object()
-        Map<String, Object> parameters = ImmutableMap.of(
+        def parameters = ImmutableMap.of(
             "x", param1,
             "y", param2
         )
         def result = new Double(123.456)
-        URI uri = new URI("file:///foo.js")
+        def uri = new URI("file:///foo.js")
 
         when: "Attempt execution without script configured"
         this.script.evaluateScript(parameters)
@@ -87,32 +80,21 @@ class ManagedScriptSpec extends Specification {
         def returned = this.script.evaluateScript(parameters)
 
         then:
-        1 * objectMapper.writeValueAsString(param1) >> "{}"
-        1 * objectMapper.writeValueAsString(param2) >> "{}"
-        1 * scriptManager.evaluateScript(uri, { (it as Bindings).size() == 2 }, {
-            it == this.properties.getTimeout()
-        }) >> result
+        1 * this.scriptManager.evaluateScript(
+            uri,
+            { (it as Bindings).size() == 2 },
+            { it == this.properties.getTimeout() }
+        ) >> result
         returned == result
-
-        when: "JSON serialization error"
-        this.script.evaluateScript(parameters)
-
-        then:
-        1 * objectMapper.writeValueAsString(param1) >> "{}"
-        1 * objectMapper.writeValueAsString(param2) >> { throw new JsonProcessingException("...") }
-        ScriptExecutionException e = thrown(ScriptExecutionException)
-        e.getMessage().contains("Failed to convert parameter: y")
-        e.getCause().getClass() == JsonProcessingException.class
     }
 
     private class TestScript extends ManagedScript {
         TestScript(
             final ScriptManager scriptManager,
             final TestProperties properties,
-            final ObjectMapper mapper,
             final MeterRegistry registry
         ) {
-            super(scriptManager, properties, mapper, registry)
+            super(scriptManager, properties, registry)
         }
     }
 

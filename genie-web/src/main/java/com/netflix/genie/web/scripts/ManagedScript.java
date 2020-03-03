@@ -17,13 +17,10 @@
  */
 package com.netflix.genie.web.scripts;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,8 +38,6 @@ import java.util.Map;
  */
 @Slf4j
 public abstract class ManagedScript {
-    @Getter(AccessLevel.PROTECTED)
-    private final ObjectMapper mapper;
     private final ScriptManager scriptManager;
     @Getter
     private final ManagedScriptBaseProperties properties;
@@ -51,12 +46,10 @@ public abstract class ManagedScript {
     protected ManagedScript(
         final ScriptManager scriptManager,
         final ManagedScriptBaseProperties properties,
-        final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
         this.scriptManager = scriptManager;
         this.properties = properties;
-        this.mapper = mapper;
         this.registry = registry;
     }
 
@@ -81,18 +74,11 @@ public abstract class ManagedScript {
             throw new ScriptNotConfiguredException("Script source URI not set");
         }
 
+        // NOTE: Avoid the constructor that directly takes the map as it uses it directly as the underlying
+        //       implementation and if it's immutable it could cause unexpected side effects not expected by
+        //       some implementation.
         final Bindings bindings = new SimpleBindings();
-
-        for (final Map.Entry<String, Object> parameterEntry : scriptParameters.entrySet()) {
-            final String parameterName = parameterEntry.getKey();
-            final String parameterValue;
-            try {
-                parameterValue = this.mapper.writeValueAsString(parameterEntry.getValue());
-            } catch (JsonProcessingException e) {
-                throw new ScriptExecutionException("Failed to convert parameter: " + parameterName, e);
-            }
-            bindings.put(parameterName, parameterValue);
-        }
+        bindings.putAll(scriptParameters);
 
         return this.scriptManager.evaluateScript(scriptUri, bindings, this.properties.getTimeout());
     }

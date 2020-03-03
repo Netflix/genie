@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.scripts;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.dto.JobRequest;
@@ -46,6 +47,8 @@ import java.util.Optional;
 public class ExecutionModeFilterScript extends ManagedScript {
     private static final String JOB_REQUEST_BINDING = "jobRequest";
 
+    private final ObjectMapper objectMapper;
+
     /**
      * Constructor.
      *
@@ -60,7 +63,8 @@ public class ExecutionModeFilterScript extends ManagedScript {
         final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
-        super(scriptManager, properties, mapper, registry);
+        super(scriptManager, properties, registry);
+        this.objectMapper = mapper;
     }
 
     /**
@@ -70,13 +74,19 @@ public class ExecutionModeFilterScript extends ManagedScript {
      *
      * @param jobRequest the job request
      * @return An optional boolean value
-     * @throws ScriptNotConfiguredException if the script is notyet successfully loaded and compiled
+     * @throws ScriptNotConfiguredException if the script is not yet successfully loaded and compiled
      * @throws ScriptExecutionException     if the script evaluation produces an error
      */
     public Optional<Boolean> forceAgentExecution(
         final JobRequest jobRequest
     ) throws ScriptNotConfiguredException, ScriptExecutionException {
-        final Map<String, Object> scriptParameters = ImmutableMap.of(JOB_REQUEST_BINDING, jobRequest);
+        final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+        try {
+            builder.put(JOB_REQUEST_BINDING, this.objectMapper.writeValueAsString(jobRequest));
+        } catch (final JsonProcessingException e) {
+            throw new ScriptExecutionException("Failed to convert parameter: " + JOB_REQUEST_BINDING, e);
+        }
+        final Map<String, Object> scriptParameters = builder.build();
 
         final Object scriptOutput = this.evaluateScript(scriptParameters);
         log.debug("Execution mode selector returned: {} for job request: {}", scriptOutput, jobRequest);
