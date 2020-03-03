@@ -144,33 +144,33 @@ class CommandSelectorManagedScriptIntegrationTest {
             this.scriptProperties
         );
 
-        CommandSelectorManagedScript.CommandSelectionResult result;
+        ResourceSelectorScriptResult<Command> result;
 
-        result = this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_0);
-        Assertions.assertThat(result.getCommand()).isPresent().contains(COMMAND_0);
+        result = this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_0);
+        Assertions.assertThat(result.getResource()).isPresent().contains(COMMAND_0);
         Assertions.assertThat(result.getRationale()).isPresent().contains("selected 0");
 
-        result = this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_1);
-        Assertions.assertThat(result.getCommand()).isNotPresent();
+        result = this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_1);
+        Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isPresent().contains("Couldn't find anything");
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_2))
+            .isThrownBy(() -> this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_2))
             .withNoCause();
 
-        result = this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_3);
-        Assertions.assertThat(result.getCommand()).isNotPresent();
+        result = this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_3);
+        Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isNotPresent();
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_4))
+            .isThrownBy(() -> this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_4))
             .withCauseInstanceOf(ScriptExecutionException.class);
 
         // Invalid return type from script
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_5));
+            .isThrownBy(() -> this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_5));
     }
 }

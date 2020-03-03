@@ -17,8 +17,6 @@
  */
 package com.netflix.genie.web.scripts;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
@@ -27,12 +25,8 @@ import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -43,7 +37,7 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Slf4j
-public class CommandSelectorManagedScript extends ManagedScript {
+public class CommandSelectorManagedScript extends ManagedScript implements ResourceSelectorScript<Command> {
 
     static final String JOB_REQUEST_BINDING = "jobRequestParameter";
     static final String COMMANDS_BINDING = "commandsParameter";
@@ -64,135 +58,42 @@ public class CommandSelectorManagedScript extends ManagedScript {
     }
 
     /**
-     * Given the {@link JobRequest} and an associated set of {@link Command}'s which matched the request criteria
-     * invoke the configured script to see if a preferred command is selected based on the current logic.
-     *
-     * @param commands   The set of {@link Command}'s which should be selected from
-     * @param jobRequest The {@link JobRequest} that the commands will be running
-     * @return A {@link CommandSelectionResult} instance
-     * @throws ResourceSelectionException If an unexpected error occurs during selection
+     * {@inheritDoc}
      */
-    public CommandSelectionResult selectCommand(
-        final Set<Command> commands,
+    @Override
+    public ResourceSelectorScriptResult<Command> selectResource(
+        final Set<Command> resources,
         final JobRequest jobRequest
     ) throws ResourceSelectionException {
-        log.debug("Called to attempt to select a command from {} for job {}", commands, jobRequest);
+        log.debug("Called to attempt to select a command from {} for job {}", resources, jobRequest);
 
         try {
             final Object evaluationResult = this.evaluateScript(
                 ImmutableMap.of(
                     JOB_REQUEST_BINDING, jobRequest,
-                    COMMANDS_BINDING, commands
+                    COMMANDS_BINDING, resources
                 )
             );
-            if (!(evaluationResult instanceof ScriptResult)) {
+            if (!(evaluationResult instanceof ResourceSelectorScriptResult)) {
                 throw new ResourceSelectionException(
                     "Command selector evaluation returned invalid type: " + evaluationResult.getClass().getName()
                 );
             }
-            final ScriptResult result = (ScriptResult) evaluationResult;
+            @SuppressWarnings("unchecked") final ResourceSelectorScriptResult<Command> result
+                = (ResourceSelectorScriptResult<Command>) evaluationResult;
 
-            final String selectedId = result.getId().orElse(null);
-            final String selectionRationale = result.getRationale().orElse(null);
-            if (StringUtils.isNotBlank(selectedId)) {
-                return new CommandSelectionResult(
-                    commands
-                        .stream()
-                        .filter(command -> command.getId().equals(selectedId))
-                        .findFirst()
-                        .orElseThrow(
-                            () -> new ResourceSelectionException(
-                                "Command with id " + selectedId + " selected but no such command exists in set"
-                            )
-                        ),
-                    selectionRationale
-                );
-            } else {
-                return new CommandSelectionResult(null, selectionRationale);
+            // Validate that the selected resource is actually in the original set
+            if (result.getResource().isPresent() && !resources.contains(result.getResource().get())) {
+                throw new ResourceSelectionException(result.getResource().get() + " is not in original set");
             }
+
+            return result;
         } catch (
             final ScriptExecutionException
                 | ScriptNotConfiguredException
                 | RuntimeException e
         ) {
             throw new ResourceSelectionException(e);
-        }
-    }
-
-    /**
-     * Class to represent a generic response from a script which selects a resource from a set of resources.
-     *
-     * @author tgianos
-     * @since 4.0.0
-     */
-    @Getter
-    public static class ScriptResult {
-        private final String id;
-        private final String rationale;
-
-        /**
-         * Constructor.
-         *
-         * @param id        The {@literal id} of the selected resource if any
-         * @param rationale The rationale, if any, for why the given {@literal id} was selected
-         */
-        @JsonCreator
-        public ScriptResult(
-            @JsonProperty(value = "id") @Nullable final String id,
-            @JsonProperty(value = "rationale") @Nullable final String rationale
-        ) {
-            this.id = id;
-            this.rationale = rationale;
-        }
-
-        /**
-         * Get the selected resource id if there was one.
-         *
-         * @return The id wrapped in an {@link Optional} or {@link Optional#empty()}
-         */
-        public Optional<String> getId() {
-            return Optional.ofNullable(this.id);
-        }
-
-        /**
-         * Get the rationale for the selection decision.
-         *
-         * @return The rationale wrapped in an {@link Optional} or {@link Optional#empty()}
-         */
-        public Optional<String> getRationale() {
-            return Optional.ofNullable(this.rationale);
-        }
-    }
-
-    public static class CommandSelectionResult {
-
-        private final Command command;
-        private final String rationale;
-
-        CommandSelectionResult(
-            @Nullable final Command command,
-            @Nullable final String rationale
-        ) {
-            this.command = command;
-            this.rationale = rationale;
-        }
-
-        /**
-         * Get the {@link Command} this script selected if any.
-         *
-         * @return The {@link Command} or {@link Optional#empty()}
-         */
-        public Optional<Command> getCommand() {
-            return Optional.ofNullable(this.command);
-        }
-
-        /**
-         * Get the rationale for the selection of the given command if any.
-         *
-         * @return The rationale or {@link Optional#empty()}
-         */
-        public Optional<String> getRationale() {
-            return Optional.ofNullable(this.rationale);
         }
     }
 }

@@ -23,6 +23,7 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
+import com.netflix.genie.web.scripts.ResourceSelectorScriptResult;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -80,11 +81,11 @@ public class ScriptCommandSelectorImpl implements CommandSelector {
         final ResourceSelectionResult.Builder<Command> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
-            final CommandSelectorManagedScript.CommandSelectionResult result
-                = this.commandSelectorManagedScript.selectCommand(commands, jobRequest);
+            final ResourceSelectorScriptResult<Command> result
+                = this.commandSelectorManagedScript.selectResource(commands, jobRequest);
             MetricsUtils.addSuccessTags(tags);
 
-            final Optional<Command> commandOptional = result.getCommand();
+            final Optional<Command> commandOptional = result.getResource();
             if (!commandOptional.isPresent()) {
                 final String rationale = result.getRationale().orElse(NULL_RATIONALE);
                 log.debug("No command selected due to: {}", rationale);

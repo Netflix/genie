@@ -18,7 +18,11 @@
 package com.netflix.genie.web.scripts
 
 import com.netflix.genie.common.external.dtos.v4.Command
+import com.netflix.genie.common.external.dtos.v4.CommandMetadata
+import com.netflix.genie.common.external.dtos.v4.CommandStatus
 import com.netflix.genie.common.external.dtos.v4.JobRequest
+
+import java.time.Instant
 
 if (!(jobRequestParameter instanceof JobRequest)) {
     throw new IllegalArgumentException("jobRequestParameter argument not instance of " + JobRequest.class.getName())
@@ -35,20 +39,36 @@ if (commandsParameter.isEmpty() || !(commandsParameter.iterator().next() instanc
 }
 final Set<Command> commands = (Set<Command>) commandsParameter
 
-String commandId = null
+Command selectedCommand = null
 String rationale = null
 
 def requestedJobId = jobRequest.getRequestedId().orElse(UUID.randomUUID().toString())
 switch (requestedJobId) {
     case "0":
-        commandId = "0"
+        selectedCommand = commands.find({ it -> (it.getId() == "0") })
         rationale = "selected 0"
         break
     case "1":
         rationale = "Couldn't find anything"
         break
     case "2":
-        commandId = UUID.randomUUID().toString()
+        // Pretend for some reason the script returns something not in the original set
+        selectedCommand = new Command(
+            UUID.randomUUID().toString(),
+            Instant.now(),
+            Instant.now(),
+            null,
+            new CommandMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                CommandStatus.DEPRECATED
+            ).build(),
+            [UUID.randomUUID().toString()],
+            null,
+            1234L,
+            null
+        )
         break
     case "3":
         break
@@ -58,4 +78,7 @@ switch (requestedJobId) {
         throw new Exception("uh oh")
 }
 
-return new CommandSelectorManagedScript.ScriptResult(commandId, rationale)
+return new ResourceSelectorScriptResult.Builder<Command>()
+    .withResource(selectedCommand)
+    .withRationale(rationale)
+    .build()
