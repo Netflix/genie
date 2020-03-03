@@ -127,7 +127,13 @@ public class ScriptManager {
         );
         if (newKey.get()) {
             this.taskScheduler.scheduleAtFixedRate(
-                new LoadScriptTask(scriptUri, compiledScriptReference),
+                new LoadScriptTask(
+                    scriptUri,
+                    compiledScriptReference,
+                    this.scriptEngineManager,
+                    this.resourceLoader,
+                    this.meterRegistry
+                ),
                 Instant.now(),
                 Duration.ofMillis(this.properties.getRefreshInterval())
             );
@@ -216,16 +222,26 @@ public class ScriptManager {
         }
     }
 
-    private class LoadScriptTask implements Runnable {
+    @Slf4j
+    private static class LoadScriptTask implements Runnable {
         private final URI scriptUri;
         private final AtomicReference<CompiledScript> compiledScriptReference;
+        private final ScriptEngineManager scriptEngineManager;
+        private final ResourceLoader resourceLoader;
+        private final MeterRegistry registry;
 
         LoadScriptTask(
             final URI scriptUri,
-            final AtomicReference<CompiledScript> compiledScriptReference
+            final AtomicReference<CompiledScript> compiledScriptReference,
+            final ScriptEngineManager scriptEngineManager,
+            final ResourceLoader resourceLoader,
+            final MeterRegistry registry
         ) {
             this.scriptUri = scriptUri;
             this.compiledScriptReference = compiledScriptReference;
+            this.scriptEngineManager = scriptEngineManager;
+            this.resourceLoader = resourceLoader;
+            this.registry = registry;
         }
 
         /**
@@ -235,9 +251,8 @@ public class ScriptManager {
          */
         @Override
         public void run() {
-
             final Set<Tag> tags = Sets.newHashSet();
-            tags.add(Tag.of(MetricsConstants.TagKeys.SCRIPT_URI, scriptUri.toString()));
+            tags.add(Tag.of(MetricsConstants.TagKeys.SCRIPT_URI, this.scriptUri.toString()));
 
             final long start = System.nanoTime();
 
@@ -253,7 +268,7 @@ public class ScriptManager {
                 MetricsUtils.addFailureTagsWithException(tags, e);
             } finally {
                 final long durationNano = System.nanoTime() - start;
-                meterRegistry.timer(
+                this.registry.timer(
                     SCRIPT_LOAD_TIMER_NAME,
                     tags
                 ).record(durationNano, TimeUnit.NANOSECONDS);
@@ -270,13 +285,13 @@ public class ScriptManager {
                 throw new ScriptLoadingException("Failed to determine file extension: " + scriptUriString);
             }
 
-            final Resource scriptResource = resourceLoader.getResource(scriptUriString);
+            final Resource scriptResource = this.resourceLoader.getResource(scriptUriString);
 
             if (!scriptResource.exists()) {
                 throw new ScriptLoadingException("Script not found: " + scriptUriString);
             }
 
-            final ScriptEngine engine = scriptEngineManager.getEngineByExtension(scriptExtension);
+            final ScriptEngine engine = this.scriptEngineManager.getEngineByExtension(scriptExtension);
 
             if (engine == null) {
                 throw new ScriptLoadingException(
