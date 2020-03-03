@@ -24,6 +24,7 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript
+import com.netflix.genie.web.scripts.ResourceSelectorScriptResult
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.MeterRegistry
@@ -57,7 +58,7 @@ class ScriptCommandSelectorImplSpec extends Specification {
         def command1Metadata = Mock(CommandMetadata)
         def jobRequest = Mock(JobRequest)
         def selectionException = new ResourceSelectionException("some error")
-        def scriptResult = Mock(CommandSelectorManagedScript.CommandSelectionResult)
+        def scriptResult = Mock(ResourceSelectorScriptResult)
 
         ResourceSelectionResult<Command> result
         Set<Tag> expectedTags
@@ -68,8 +69,8 @@ class ScriptCommandSelectorImplSpec extends Specification {
         result = this.commandSelector.selectCommand(commands, jobRequest)
 
         then:
-        1 * this.script.selectCommand(commands, jobRequest) >> scriptResult
-        1 * scriptResult.getCommand() >> Optional.empty()
+        1 * this.script.selectResource(commands, jobRequest) >> scriptResult
+        1 * scriptResult.getResource() >> Optional.empty()
         1 * scriptResult.getRationale() >> Optional.empty()
         1 * this.registry.timer(
             ScriptCommandSelectorImpl.SELECT_TIMER_NAME,
@@ -87,7 +88,7 @@ class ScriptCommandSelectorImplSpec extends Specification {
         this.commandSelector.selectCommand(commands, jobRequest)
 
         then:
-        1 * this.script.selectCommand(commands, jobRequest) >> { throw selectionException }
+        1 * this.script.selectResource(commands, jobRequest) >> { throw selectionException }
         1 * this.registry.timer(
             ScriptCommandSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
@@ -102,8 +103,8 @@ class ScriptCommandSelectorImplSpec extends Specification {
         result = this.commandSelector.selectCommand(commands, jobRequest)
 
         then:
-        1 * this.script.selectCommand(commands, jobRequest) >> scriptResult
-        1 * scriptResult.getCommand() >> Optional.of(command1)
+        1 * this.script.selectResource(commands, jobRequest) >> scriptResult
+        1 * scriptResult.getResource() >> Optional.of(command1)
         1 * scriptResult.getRationale() >> Optional.of("Good to go!")
         1 * command1.getId() >> "command 1 id"
         1 * command1.getMetadata() >> command1Metadata
