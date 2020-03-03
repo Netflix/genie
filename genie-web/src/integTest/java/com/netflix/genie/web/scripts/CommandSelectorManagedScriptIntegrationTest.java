@@ -27,7 +27,6 @@ import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
-import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
@@ -70,6 +69,7 @@ class CommandSelectorManagedScriptIntegrationTest {
     private static final JobRequest JOB_REQUEST_2 = createTestJobRequest("2");
     private static final JobRequest JOB_REQUEST_3 = createTestJobRequest("3");
     private static final JobRequest JOB_REQUEST_4 = createTestJobRequest("4");
+    private static final JobRequest JOB_REQUEST_5 = createTestJobRequest("5");
 
     private static final Set<Command> COMMANDS = Sets.newHashSet(COMMAND_0, COMMAND_1, COMMAND_2);
 
@@ -126,7 +126,6 @@ class CommandSelectorManagedScriptIntegrationTest {
         this.commandSelectorManagedScript = new CommandSelectorManagedScript(
             scriptManager,
             this.scriptProperties,
-            GenieObjectMapper.getMapper(),
             this.meterRegistry
         );
     }
@@ -168,5 +167,10 @@ class CommandSelectorManagedScriptIntegrationTest {
             .assertThatExceptionOfType(ResourceSelectionException.class)
             .isThrownBy(() -> this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_4))
             .withCauseInstanceOf(ScriptExecutionException.class);
+
+        // Invalid return type from script
+        Assertions
+            .assertThatExceptionOfType(ResourceSelectionException.class)
+            .isThrownBy(() -> this.commandSelectorManagedScript.selectCommand(COMMANDS, JOB_REQUEST_5));
     }
 }

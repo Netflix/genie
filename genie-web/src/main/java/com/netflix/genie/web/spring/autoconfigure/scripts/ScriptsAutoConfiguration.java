@@ -141,7 +141,6 @@ public class ScriptsAutoConfiguration {
         return new CommandSelectorManagedScript(
             scriptManager,
             commandSelectorManagedScriptProperties,
-            GenieObjectMapper.getMapper(),
             meterRegistry
         );
     }
