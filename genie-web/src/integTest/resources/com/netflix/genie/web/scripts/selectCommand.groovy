@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2017 Netflix, Inc.
+ *  Copyright 2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,31 +15,47 @@
  *     limitations under the License.
  *
  */
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
+package com.netflix.genie.web.scripts
 
-def jsonSlurper = new JsonSlurper()
-def result = [:]
+import com.netflix.genie.common.external.dtos.v4.Command
+import com.netflix.genie.common.external.dtos.v4.JobRequest
 
-def cJson = jsonSlurper.parseText(commands)
-def jJson = jsonSlurper.parseText(jobRequest)
+if (!(jobRequestParameter instanceof JobRequest)) {
+    throw new IllegalArgumentException("jobRequestParameter argument not instance of " + JobRequest.class.getName())
+}
+final JobRequest jobRequest = (JobRequest) jobRequestParameter
 
-def requestedJobId = jJson["requestedId"]
+if (!(commandsParameter instanceof Set)) {
+    throw new IllegalArgumentException(
+        "Expected commandsParameter to be instance of Set. Got " + commandsParameter.getClass().getName()
+    )
+}
+if (commandsParameter.isEmpty() || !(commandsParameter.iterator().next() instanceof Command)) {
+    throw new IllegalArgumentException("Expected commandsParameter to be non-empty set of " + Command.class.getName())
+}
+final Set<Command> commands = (Set<Command>) commandsParameter
+
+String commandId = null
+String rationale = null
+
+def requestedJobId = jobRequest.getRequestedId().orElse(UUID.randomUUID().toString())
 switch (requestedJobId) {
     case "0":
-        result["commandId"] = "0"
-        result["rationale"] = "selected 0"
+        commandId = "0"
+        rationale = "selected 0"
         break
     case "1":
-        result["rationale"] = "Couldn't find anything"
+        rationale = "Couldn't find anything"
         break
     case "2":
-        result["commandId"] = UUID.randomUUID().toString()
+        commandId = UUID.randomUUID().toString()
         break
     case "3":
         break
+    case "5":
+        return "This is not the correct return type"
     default:
         throw new Exception("uh oh")
 }
 
-return JsonOutput.toJson(result)
+return new CommandSelectorManagedScript.ScriptResult(commandId, rationale)

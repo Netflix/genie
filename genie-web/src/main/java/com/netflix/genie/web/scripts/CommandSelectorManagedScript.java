@@ -19,8 +19,6 @@ package com.netflix.genie.web.scripts;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
@@ -29,7 +27,6 @@ import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -48,27 +45,22 @@ import java.util.Set;
 @Slf4j
 public class CommandSelectorManagedScript extends ManagedScript {
 
-    static final String JOB_REQUEST_BINDING = "jobRequest";
-    static final String COMMANDS_BINDING = "commands";
-
-    private final ObjectMapper objectMapper;
+    static final String JOB_REQUEST_BINDING = "jobRequestParameter";
+    static final String COMMANDS_BINDING = "commandsParameter";
 
     /**
      * Constructor.
      *
      * @param scriptManager The {@link ScriptManager} instance to use
      * @param properties    The {@link CommandSelectorManagedScriptProperties} instance to use
-     * @param mapper        The {@link ObjectMapper} instance to use
      * @param registry      The {@link MeterRegistry} instance to use
      */
     public CommandSelectorManagedScript(
         final ScriptManager scriptManager,
         final CommandSelectorManagedScriptProperties properties,
-        final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
         super(scriptManager, properties, registry);
-        this.objectMapper = mapper;
     }
 
     /**
@@ -87,54 +79,88 @@ public class CommandSelectorManagedScript extends ManagedScript {
         log.debug("Called to attempt to select a command from {} for job {}", commands, jobRequest);
 
         try {
-            final ScriptResult result = this.objectMapper
-                .readValue(
-                    (String) this.evaluateScript(
-                        ImmutableMap.of(
-                            JOB_REQUEST_BINDING, this.objectMapper.writeValueAsString(jobRequest),
-                            COMMANDS_BINDING, this.objectMapper.writeValueAsString(commands)
-                        )
-                    ),
-                    ScriptResult.class
+            final Object evaluationResult = this.evaluateScript(
+                ImmutableMap.of(
+                    JOB_REQUEST_BINDING, jobRequest,
+                    COMMANDS_BINDING, commands
+                )
+            );
+            if (!(evaluationResult instanceof ScriptResult)) {
+                throw new ResourceSelectionException(
+                    "Command selector evaluation returned invalid type: " + evaluationResult.getClass().getName()
                 );
-            if (StringUtils.isNotBlank(result.commandId)) {
+            }
+            final ScriptResult result = (ScriptResult) evaluationResult;
+
+            final String selectedId = result.getId().orElse(null);
+            final String selectionRationale = result.getRationale().orElse(null);
+            if (StringUtils.isNotBlank(selectedId)) {
                 return new CommandSelectionResult(
                     commands
                         .stream()
-                        .filter(command -> command.getId().equals(result.commandId))
+                        .filter(command -> command.getId().equals(selectedId))
                         .findFirst()
                         .orElseThrow(
                             () -> new ResourceSelectionException(
-                                "Command with id " + result.commandId + " selected but no such command exists in set"
+                                "Command with id " + selectedId + " selected but no such command exists in set"
                             )
                         ),
-                    result.rationale
+                    selectionRationale
                 );
             } else {
-                return new CommandSelectionResult(null, result.rationale);
+                return new CommandSelectionResult(null, selectionRationale);
             }
         } catch (
             final ScriptExecutionException
                 | ScriptNotConfiguredException
-                | JsonProcessingException
                 | RuntimeException e
         ) {
             throw new ResourceSelectionException(e);
         }
     }
 
-    @Getter(AccessLevel.PACKAGE)
-    static class ScriptResult {
-        private final String commandId;
+    /**
+     * Class to represent a generic response from a script which selects a resource from a set of resources.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    @Getter
+    public static class ScriptResult {
+        private final String id;
         private final String rationale;
 
+        /**
+         * Constructor.
+         *
+         * @param id        The {@literal id} of the selected resource if any
+         * @param rationale The rationale, if any, for why the given {@literal id} was selected
+         */
         @JsonCreator
-        ScriptResult(
-            @JsonProperty(value = "commandId") @Nullable final String commandId,
+        public ScriptResult(
+            @JsonProperty(value = "id") @Nullable final String id,
             @JsonProperty(value = "rationale") @Nullable final String rationale
         ) {
-            this.commandId = commandId;
+            this.id = id;
             this.rationale = rationale;
+        }
+
+        /**
+         * Get the selected resource id if there was one.
+         *
+         * @return The id wrapped in an {@link Optional} or {@link Optional#empty()}
+         */
+        public Optional<String> getId() {
+            return Optional.ofNullable(this.id);
+        }
+
+        /**
+         * Get the rationale for the selection decision.
+         *
+         * @return The rationale wrapped in an {@link Optional} or {@link Optional#empty()}
+         */
+        public Optional<String> getRationale() {
+            return Optional.ofNullable(this.rationale);
         }
     }
 
