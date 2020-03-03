@@ -51,6 +51,8 @@ public class CommandSelectorManagedScript extends ManagedScript {
     static final String JOB_REQUEST_BINDING = "jobRequest";
     static final String COMMANDS_BINDING = "commands";
 
+    private final ObjectMapper objectMapper;
+
     /**
      * Constructor.
      *
@@ -65,7 +67,8 @@ public class CommandSelectorManagedScript extends ManagedScript {
         final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
-        super(scriptManager, properties, mapper, registry);
+        super(scriptManager, properties, registry);
+        this.objectMapper = mapper;
     }
 
     /**
@@ -84,12 +87,12 @@ public class CommandSelectorManagedScript extends ManagedScript {
         log.debug("Called to attempt to select a command from {} for job {}", commands, jobRequest);
 
         try {
-            final ScriptResult result = this.getMapper()
+            final ScriptResult result = this.objectMapper
                 .readValue(
                     (String) this.evaluateScript(
                         ImmutableMap.of(
-                            JOB_REQUEST_BINDING, jobRequest,
-                            COMMANDS_BINDING, commands
+                            JOB_REQUEST_BINDING, this.objectMapper.writeValueAsString(jobRequest),
+                            COMMANDS_BINDING, this.objectMapper.writeValueAsString(commands)
                         )
                     ),
                     ScriptResult.class

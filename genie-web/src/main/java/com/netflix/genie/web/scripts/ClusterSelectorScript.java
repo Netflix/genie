@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.scripts;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.dto.JobRequest;
@@ -51,6 +52,8 @@ public class ClusterSelectorScript extends ManagedScript {
     private static final String CLUSTERS_BINDING = "clusters";
     private static final String JOB_REQUEST_BINDING = "jobRequest";
 
+    private final ObjectMapper mapper;
+
     /**
      * Constructor.
      *
@@ -65,7 +68,8 @@ public class ClusterSelectorScript extends ManagedScript {
         final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
-        super(scriptManager, properties, mapper, registry);
+        super(scriptManager, properties, registry);
+        this.mapper = mapper;
     }
 
     /**
@@ -83,7 +87,6 @@ public class ClusterSelectorScript extends ManagedScript {
         final JobRequest jobRequest,
         final Set<Cluster> clusters
     ) throws ScriptNotConfiguredException, ScriptExecutionException, GenieClusterNotFoundException {
-
         // TODO: For now for backwards compatibility with selector scripts continue writing Clusters out in
         //       V3 format. Change to V4 once stabilize a bit more
         final Set<com.netflix.genie.common.dto.Cluster> v3Clusters = clusters
@@ -91,12 +94,18 @@ public class ClusterSelectorScript extends ManagedScript {
             .map(DtoConverters::toV3Cluster)
             .collect(Collectors.toSet());
 
-        final Map<String, Object> scriptParameters = ImmutableMap.of(
-            CLUSTERS_BINDING,
-            v3Clusters,
-            JOB_REQUEST_BINDING,
-            jobRequest
-        );
+        final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+        try {
+            builder.put(CLUSTERS_BINDING, this.mapper.writeValueAsString(v3Clusters));
+        } catch (final JsonProcessingException e) {
+            throw new ScriptExecutionException("Failed to convert: " + CLUSTERS_BINDING, e);
+        }
+        try {
+            builder.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
+        } catch (final JsonProcessingException e) {
+            throw new ScriptExecutionException("Failed to convert: " + JOB_REQUEST_BINDING, e);
+        }
+        final Map<String, Object> scriptParameters = builder.build();
 
         final String selectedClusterId = (String) this.evaluateScript(scriptParameters);
         if (StringUtils.isBlank(selectedClusterId)) {

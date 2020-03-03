@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.scripts;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
@@ -39,14 +40,17 @@ import javax.script.ScriptEngineManager;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 class ManagedScriptIntegrationTest {
 
     private TestScriptProperties scriptProperties;
     private TestScript script;
+    private ObjectMapper objectMapper;
 
     static void loadScript(
         final String scriptFilename,
@@ -81,7 +85,7 @@ class ManagedScriptIntegrationTest {
         final ExecutorService executorService = Executors.newCachedThreadPool();
         final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
         final ResourceLoader resourceLoader = new DefaultResourceLoader();
-        final ObjectMapper objectMapper = GenieObjectMapper.getMapper();
+        this.objectMapper = GenieObjectMapper.getMapper();
         final ScriptManager scriptManager = new ScriptManager(
             scriptManagerProperties,
             taskScheduler,
@@ -93,8 +97,7 @@ class ManagedScriptIntegrationTest {
         this.scriptProperties = new TestScriptProperties();
         this.script = new TestScript(
             scriptManager,
-            scriptProperties,
-            objectMapper,
+            this.scriptProperties,
             meterRegistry
         );
     }
@@ -104,7 +107,7 @@ class ManagedScriptIntegrationTest {
     void evaluateSuccessfully(
         final String scriptFilename
     ) throws Exception {
-        ManagedScriptIntegrationTest.loadScript(scriptFilename, script, scriptProperties);
+        ManagedScriptIntegrationTest.loadScript(scriptFilename, this.script, this.scriptProperties);
         this.script.evaluate();
     }
 
@@ -113,12 +116,12 @@ class ManagedScriptIntegrationTest {
     void scriptEvaluationTimeoutTest(
         final String scriptFilename
     ) throws Exception {
-        ManagedScriptIntegrationTest.loadScript(scriptFilename, script, scriptProperties);
+        ManagedScriptIntegrationTest.loadScript(scriptFilename, this.script, this.scriptProperties);
 
         this.scriptProperties.setTimeout(1);
 
         Assertions
-            .assertThatThrownBy(() -> script.evaluate())
+            .assertThatThrownBy(() -> this.script.evaluate())
             .isInstanceOf(ScriptExecutionException.class)
             .hasCauseInstanceOf(TimeoutException.class);
     }
@@ -126,32 +129,47 @@ class ManagedScriptIntegrationTest {
     @Test
     void evaluateScriptNotLoadedTest() {
         Assertions
-            .assertThatThrownBy(() -> script.evaluate())
+            .assertThatThrownBy(() -> this.script.evaluate())
             .isInstanceOf(ScriptNotConfiguredException.class);
     }
 
     @Test
     void validateArgsGroovyScriptTest() throws Exception {
-        ManagedScriptIntegrationTest.loadScript("validate-args.groovy", script, scriptProperties);
+        ManagedScriptIntegrationTest.loadScript("validate-args.groovy", this.script, this.scriptProperties);
 
-        final ImmutableMap<String, Object> arguments = ImmutableMap.of(
+        final ImmutableMap<String, Object> expectedResult = ImmutableMap.of(
             "booleanArg", Boolean.TRUE,
             "stringArg", "Foo",
-            "integerArg", Integer.valueOf(678)
+            "integerArg", 678
         );
+        final Map<String, Object> arguments = expectedResult
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> {
+                        try {
+                            return this.objectMapper.writeValueAsString(e.getValue());
+                        } catch (final JsonProcessingException jpe) {
+                            throw new RuntimeException(jpe);
+                        }
+                    }
+                )
+            );
 
         Assertions
-            .assertThat(script.evaluateScript(arguments))
-            .isEqualTo(arguments);
+            .assertThat(this.script.evaluateScript(arguments))
+            .isEqualTo(expectedResult);
     }
 
     private static class TestScript extends ManagedScript {
         TestScript(
             final ScriptManager scriptManager,
             final ManagedScriptBaseProperties properties,
-            final ObjectMapper mapper, final MeterRegistry registry
+            final MeterRegistry registry
         ) {
-            super(scriptManager, properties, mapper, registry);
+            super(scriptManager, properties, registry);
         }
 
         void evaluate() throws ScriptNotConfiguredException, ScriptExecutionException {
