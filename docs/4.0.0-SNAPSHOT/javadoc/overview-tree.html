@@ -296,7 +296,6 @@
 <li type="circle">com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.<a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/CommandModelAssembler.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers"><span class="typeNameLink">CommandModelAssembler</span></a> (implements org.springframework.hateoas.server.RepresentationModelAssembler&lt;T,D&gt;)</li>
 <li type="circle">com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">CommandRequest</span></a></li>
 <li type="circle">com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers"><span class="typeNameLink">CommandRestController</span></a></li>
-<li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.CommandSelectionResult.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">CommandSelectorManagedScript.CommandSelectionResult</span></a></li>
 <li type="circle">com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/CommonMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">CommonMetadata</span></a> (implements java.io.Serializable)
 <ul>
 <li type="circle">com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ApplicationMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">ApplicationMetadata</span></a></li>
@@ -612,7 +611,7 @@
 <li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">ManagedScript</span></a>
 <ul>
 <li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">ClusterSelectorScript</span></a></li>
-<li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">CommandSelectorManagedScript</span></a></li>
+<li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">CommandSelectorManagedScript</span></a> (implements com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="interface in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;R&gt;)</li>
 <li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ExecutionModeFilterScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">ExecutionModeFilterScript</span></a></li>
 </ul>
 </li>
@@ -653,6 +652,8 @@
 <li type="circle">com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">ResolvedResources</span></a>&lt;R&gt;</li>
 <li type="circle">com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">ResourceSelectionResult</span></a>&lt;R&gt;</li>
 <li type="circle">com.netflix.genie.web.dtos.<a href="com/netflix/genie/web/dtos/ResourceSelectionResult.Builder.html" title="class in com.netflix.genie.web.dtos"><span class="typeNameLink">ResourceSelectionResult.Builder</span></a>&lt;R&gt;</li>
+<li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">ResourceSelectorScriptResult</span></a>&lt;R&gt;</li>
+<li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScriptResult.Builder.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">ResourceSelectorScriptResult.Builder</span></a>&lt;R&gt;</li>
 <li type="circle">com.netflix.genie.client.interceptors.<a href="com/netflix/genie/client/interceptors/ResponseMappingInterceptor.html" title="class in com.netflix.genie.client.interceptors"><span class="typeNameLink">ResponseMappingInterceptor</span></a> (implements okhttp3.Interceptor)</li>
 <li type="circle">com.netflix.genie.web.spring.autoconfigure.<a href="com/netflix/genie/web/spring/autoconfigure/RetryAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure"><span class="typeNameLink">RetryAutoConfiguration</span></a></li>
 <li type="circle">com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/RetryProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">RetryProperties</span></a></li>
@@ -1119,6 +1120,7 @@
 </li>
 </ul>
 </li>
+<li type="circle">com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="interface in com.netflix.genie.web.scripts"><span class="typeNameLink">ResourceSelectorScript</span></a>&lt;R&gt;</li>
 <li type="circle">com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/SetupFileProjection.html" title="interface in com.netflix.genie.web.data.entities.projections"><span class="typeNameLink">SetupFileProjection</span></a>
 <ul>
 <li type="circle">com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.entities.projections"><span class="typeNameLink">JobRequestProjection</span></a> (also extends com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/JobCommonFieldsProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">JobCommonFieldsProjection</a>)</li>
