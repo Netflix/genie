@@ -26,12 +26,14 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
 import com.netflix.genie.common.external.dtos.v4.CommandRequest;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
@@ -95,6 +97,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
     @Autowired
     private ApplicationPersistenceService appService;
+
+    @Autowired
+    private JpaCriterionRepository criterionRepository;
 
     /**
      * Test the get command method.
@@ -342,7 +347,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     }
 
     /**
-     * Test to update an command.
+     * Test to update a command.
      *
      * @throws GenieException For any problem
      */
@@ -385,6 +390,64 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(updated.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.INACTIVE);
         Assertions.assertThat(updated.getMetadata().getTags().size()).isEqualTo(5);
         Assertions.assertThat(updated.getMemory()).isPresent().contains(memory);
+    }
+
+    /**
+     * Test to make sure when a command with criterion is updated everything is valid.
+     *
+     * @throws Exception on error
+     */
+    @Test
+    public void testUpdateCommandWithClusterCriteria() throws Exception {
+        Assertions.assertThat(this.criterionRepository.count()).isEqualTo(0L);
+        final List<Criterion> criteria0 = Lists.newArrayList(
+            new Criterion.Builder()
+                .withStatus(ClusterStatus.UP.name())
+                .build(),
+            new Criterion.Builder()
+                .withId(UUID.randomUUID().toString())
+                .build(),
+            new Criterion.Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .build()
+        );
+        final List<Criterion> criteria1 = Lists.newArrayList(
+            new Criterion.Builder()
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build(),
+            new Criterion.Builder()
+                .withName(ClusterStatus.UP.name())
+                .build(),
+            new Criterion.Builder()
+                .withVersion(UUID.randomUUID().toString())
+                .build(),
+            new Criterion.Builder()
+                .withId(UUID.randomUUID().toString())
+                .withVersion(UUID.randomUUID().toString())
+                .build()
+        );
+
+        Command command = this.createTestCommand(null, null, criteria0);
+        Assertions.assertThat(command.getClusterCriteria()).isEqualTo(criteria0);
+        Assertions.assertThat(this.criterionRepository.count()).isEqualTo(3L);
+
+        Command updateCommand = this.copyCommandWithNewClusterCriteria(command, null);
+        this.service.updateCommand(command.getId(), updateCommand);
+        command = this.service.getCommand(command.getId());
+        Assertions.assertThat(command.getClusterCriteria()).isEmpty();
+        Assertions.assertThat(this.criterionRepository.count()).isEqualTo(0L);
+
+        updateCommand = this.copyCommandWithNewClusterCriteria(command, criteria1);
+        this.service.updateCommand(command.getId(), updateCommand);
+        command = this.service.getCommand(command.getId());
+        Assertions.assertThat(command.getClusterCriteria()).isEqualTo(criteria1);
+        Assertions.assertThat(this.criterionRepository.count()).isEqualTo(4L);
+
+        updateCommand = this.copyCommandWithNewClusterCriteria(command, criteria0);
+        this.service.updateCommand(command.getId(), updateCommand);
+        command = this.service.getCommand(command.getId());
+        Assertions.assertThat(command.getClusterCriteria()).isEqualTo(criteria0);
+        Assertions.assertThat(this.criterionRepository.count()).isEqualTo(3L);
     }
 
     /**
@@ -949,18 +1012,18 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Test
     public void testFindCommandsMatchingCriterion() throws Exception {
         // Create some commands to test with
-        final Command command0 = this.createTestCommand(null, null);
-        final Command command1 = this.createTestCommand(null, null);
-        final Command command2 = this.createTestCommand(UUID.randomUUID().toString(), null);
+        final Command command0 = this.createTestCommand(null, null, null);
+        final Command command1 = this.createTestCommand(null, null, null);
+        final Command command2 = this.createTestCommand(UUID.randomUUID().toString(), null, null);
 
         // Create two commands with supersets of command1 tags so that we can test that resolution
         final Set<String> command3Tags = Sets.newHashSet(command1.getMetadata().getTags());
         command3Tags.add(UUID.randomUUID().toString());
         command3Tags.add(UUID.randomUUID().toString());
-        final Command command3 = this.createTestCommand(null, command3Tags);
+        final Command command3 = this.createTestCommand(null, command3Tags, null);
         final Set<String> command4Tags = Sets.newHashSet(command1.getMetadata().getTags());
         command4Tags.add(UUID.randomUUID().toString());
-        final Command command4 = this.createTestCommand(null, command4Tags);
+        final Command command4 = this.createTestCommand(null, command4Tags, null);
 
         Assertions
             .assertThat(
@@ -1052,7 +1115,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
 
     private Command createTestCommand(
         @Nullable final String id,
-        @Nullable final Set<String> tags
+        @Nullable final Set<String> tags,
+        @Nullable final List<Criterion> clusterCriteria
     ) throws GenieException {
         final CommandRequest.Builder requestBuilder = new CommandRequest.Builder(
             new CommandMetadata.Builder(
@@ -1072,7 +1136,37 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             requestBuilder.withRequestedId(id);
         }
 
+        if (clusterCriteria != null) {
+            requestBuilder.withClusterCriteria(clusterCriteria);
+        }
+
         final String commandId = this.service.createCommand(requestBuilder.build());
         return this.service.getCommand(commandId);
+    }
+
+    private Command copyCommandWithNewClusterCriteria(
+        final Command command,
+        @Nullable final List<Criterion> clusterCriteria
+    ) {
+        return new Command(
+            command.getId(),
+            command.getCreated(),
+            command.getUpdated(),
+            command.getResources(),
+            new CommandMetadata.Builder(
+                command.getMetadata().getName(),
+                command.getMetadata().getUser(),
+                command.getMetadata().getVersion(),
+                command.getMetadata().getStatus()
+            )
+                .withMetadata(command.getMetadata().getMetadata().orElse(null))
+                .withDescription(command.getMetadata().getDescription().orElse(null))
+                .withTags(command.getMetadata().getTags())
+                .build(),
+            command.getExecutable(),
+            command.getMemory().orElse(null),
+            command.getCheckDelay(),
+            clusterCriteria
+        );
     }
 }
