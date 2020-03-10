@@ -601,15 +601,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
             id
         );
         final CommandEntity commandEntity = this.findCommand(id);
-        // First remove all the old criteria
-        this.deleteAllClusterCriteria(commandEntity);
-        // Set the new criteria
-        commandEntity.setClusterCriteria(
-            clusterCriteria
-                .stream()
-                .map(this::toCriterionEntity)
-                .collect(Collectors.toList())
-        );
+        this.updateClusterCriteria(commandEntity, clusterCriteria);
     }
 
     /**
@@ -715,6 +707,8 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         entity.setCheckDelay(dto.getCheckDelay());
         entity.setExecutable(dto.getExecutable());
         entity.setMemory(dto.getMemory().orElse(null));
+
+        this.updateClusterCriteria(entity, dto.getClusterCriteria());
     }
 
     // TODO: Try to reuse code here once big bang changes are done
@@ -727,6 +721,18 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         entity.setDescription(metadata.getDescription().orElse(null));
         entity.setStatus(metadata.getStatus().name());
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
+    }
+
+    private void updateClusterCriteria(final CommandEntity commandEntity, final List<Criterion> clusterCriteria) {
+        // First remove all the old criteria
+        this.deleteAllClusterCriteria(commandEntity);
+        // Set the new criteria
+        commandEntity.setClusterCriteria(
+            clusterCriteria
+                .stream()
+                .map(this::toCriterionEntity)
+                .collect(Collectors.toList())
+        );
     }
 
     private void deleteAllClusterCriteria(final CommandEntity commandEntity) {
