@@ -41,7 +41,7 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Slf4j
-public class AgentJobCleanupTask extends LeadershipTask {
+public class AgentJobCleanupTask extends LeaderTask {
     private static final String STATUS_MESSAGE = "Agent AWOL for too long";
     private static final String TERMINATED_COUNTER_METRIC_NAME = "genie.jobs.agentDisconnected.terminated.counter";
     private static final String DISCONNECTED_GAUGE_METRIC_NAME = "genie.jobs.agentDisconnected.gauge";

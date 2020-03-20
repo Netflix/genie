@@ -63,7 +63,7 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Slf4j
-public class ClusterCheckerTask extends LeadershipTask {
+public class ClusterCheckerTask extends LeaderTask {
     private static final String UNHEALTHY_HOSTS_GAUGE_METRIC_NAME = "genie.tasks.clusterChecker.unhealthyHosts.gauge";
     private static final String BAD_HEALTH_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.failedHealthcheck.counter";
     private static final String BAD_RESPONSE_COUNT_METRIC_NAME = "genie.tasks.clusterChecker.invalidResponse.counter";

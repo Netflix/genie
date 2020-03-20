@@ -39,9 +39,9 @@ import java.util.concurrent.ScheduledFuture;
  * @since 3.0.0
  */
 @Slf4j
-public class LeadershipTasksCoordinator {
+public class LeaderTasksCoordinator {
 
-    private final Set<LeadershipTask> tasks;
+    private final Set<LeaderTask> tasks;
     private final Set<ScheduledFuture<?>> futures;
     private final TaskScheduler taskScheduler;
     private boolean isRunning;
@@ -52,7 +52,7 @@ public class LeadershipTasksCoordinator {
      * @param taskScheduler The task executor to use.
      * @param tasks         The leadership tasks to run
      */
-    public LeadershipTasksCoordinator(final TaskScheduler taskScheduler, final Collection<LeadershipTask> tasks) {
+    public LeaderTasksCoordinator(final TaskScheduler taskScheduler, final Collection<LeaderTask> tasks) {
         this.futures = Sets.newHashSet();
         this.taskScheduler = taskScheduler;
         this.isRunning = false;
@@ -146,6 +146,6 @@ public class LeadershipTasksCoordinator {
 
         // Clear out the tasks
         this.futures.clear();
-        this.tasks.forEach(LeadershipTask::cleanup);
+        this.tasks.forEach(LeaderTask::cleanup);
     }
 }
