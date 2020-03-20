@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * A task which will clean up the database of old jobs if desired.
+ * A task which will clean up the database of old records if desired.
  *
  * @author tgianos
  * @since 3.0.0
@@ -124,58 +124,14 @@ public class DatabaseCleanupTask extends LeaderTask {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
-            // Delete jobs that are older than the retention threshold and are complete
-            if (this.cleanupProperties.isSkipJobsCleanup()) {
-                log.debug("Skipping job cleanup");
-                this.numDeletedJobs.set(0);
-            } else {
-                final long countDeletedJobs = this.deleteJobs();
-                log.info(
-                    "Deleted {} jobs",
-                    countDeletedJobs
-                );
-                this.numDeletedJobs.set(countDeletedJobs);
-            }
-
-            // Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted
-            if (this.cleanupProperties.isSkipClustersCleanup()) {
-                log.debug("Skipping clusters cleanup");
-                this.numDeletedClusters.set(0);
-            } else {
-                final long countDeletedClusters = this.clusterPersistenceService.deleteTerminatedClusters();
-                log.info(
-                    "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
-                    countDeletedClusters
-                );
-                this.numDeletedClusters.set(countDeletedClusters);
-            }
+            this.deleteJobs();
+            this.deleteClusters();
 
             // Get now - 1 hour to avoid deleting references that were created as part of new resources recently
             final Instant creationThreshold = Instant.now().minus(1L, ChronoUnit.HOURS);
 
-            if (this.cleanupProperties.isSkipFilesCleanup()) {
-                log.debug("Skipping files cleanup");
-                this.numDeletedFiles.set(0);
-            } else {
-                final long countDeletedFiles = this.filePersistenceService.deleteUnusedFiles(creationThreshold);
-                log.info(
-                    "Deleted {} files that were unused by any resource and created over an hour ago",
-                    countDeletedFiles
-                );
-                this.numDeletedFiles.set(countDeletedFiles);
-            }
-
-            if (this.cleanupProperties.isSkipTagsCleanup()) {
-                log.debug("Skipping tags cleanup");
-                this.numDeletedTags.set(0);
-            } else {
-                final long countDeletedTags = this.tagPersistenceService.deleteUnusedTags(creationThreshold);
-                log.info(
-                    "Deleted {} tags that were unused by any resource and created over an hour ago",
-                    countDeletedTags
-                );
-                this.numDeletedTags.set(countDeletedTags);
-            }
+            this.deleteFiles(creationThreshold);
+            this.deleteTags(creationThreshold);
 
             MetricsUtils.addSuccessTags(tags);
         } catch (final Throwable t) {
@@ -199,29 +155,86 @@ public class DatabaseCleanupTask extends LeaderTask {
         this.numDeletedFiles.set(0L);
     }
 
-    private long deleteJobs() {
-        final Instant midnightUTC = TaskUtils.getMidnightUTC();
-        final Instant retentionLimit = midnightUTC.minus(this.cleanupProperties.getRetention(), ChronoUnit.DAYS);
-        final int batchSize = this.cleanupProperties.getMaxDeletedPerTransaction();
-        final int pageSize = this.cleanupProperties.getPageSize();
+    /*
+     * Delete jobs that are older than the retention threshold and are complete
+     */
+    private void deleteJobs() {
+        if (this.cleanupProperties.isSkipJobsCleanup()) {
+            log.info("Skipping job cleanup");
+            this.numDeletedJobs.set(0);
+        } else {
+            final Instant midnightUTC = TaskUtils.getMidnightUTC();
+            final Instant retentionLimit = midnightUTC.minus(this.cleanupProperties.getRetention(), ChronoUnit.DAYS);
+            final int batchSize = this.cleanupProperties.getMaxDeletedPerTransaction();
+            final int pageSize = this.cleanupProperties.getPageSize();
 
-        log.info(
-            "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
-            retentionLimit,
-            batchSize
-        );
-        long totalDeletedJobs = 0;
-        while (true) {
-            final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+            log.info(
+                "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
                 retentionLimit,
-                batchSize,
-                pageSize
+                batchSize
             );
-            totalDeletedJobs += numberDeletedJobs;
-            if (numberDeletedJobs == 0) {
-                break;
+            long totalDeletedJobs = 0;
+            while (true) {
+                final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                    retentionLimit,
+                    batchSize,
+                    pageSize
+                );
+                totalDeletedJobs += numberDeletedJobs;
+                if (numberDeletedJobs == 0) {
+                    break;
+                }
             }
+            log.info(
+                "Deleted {} jobs",
+                totalDeletedJobs
+            );
+            this.numDeletedJobs.set(totalDeletedJobs);
         }
-        return totalDeletedJobs;
+    }
+
+    /*
+     * Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted.
+     */
+    private void deleteClusters() {
+        if (this.cleanupProperties.isSkipClustersCleanup()) {
+            log.info("Skipping clusters cleanup");
+            this.numDeletedClusters.set(0);
+        } else {
+            final long countDeletedClusters = this.clusterPersistenceService.deleteTerminatedClusters();
+            log.info(
+                "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
+                countDeletedClusters
+            );
+            this.numDeletedClusters.set(countDeletedClusters);
+        }
+    }
+
+    private void deleteFiles(final Instant creationThreshold) {
+        if (this.cleanupProperties.isSkipFilesCleanup()) {
+            log.info("Skipping files cleanup");
+            this.numDeletedFiles.set(0);
+        } else {
+            final long countDeletedFiles = this.filePersistenceService.deleteUnusedFiles(creationThreshold);
+            log.info(
+                "Deleted {} files that were unused by any resource and created over an hour ago",
+                countDeletedFiles
+            );
+            this.numDeletedFiles.set(countDeletedFiles);
+        }
+    }
+
+    private void deleteTags(final Instant creationThreshold) {
+        if (this.cleanupProperties.isSkipTagsCleanup()) {
+            log.info("Skipping tags cleanup");
+            this.numDeletedTags.set(0);
+        } else {
+            final long countDeletedTags = this.tagPersistenceService.deleteUnusedTags(creationThreshold);
+            log.info(
+                "Deleted {} tags that were unused by any resource and created over an hour ago",
+                countDeletedTags
+            );
+            this.numDeletedTags.set(countDeletedTags);
+        }
     }
 }
