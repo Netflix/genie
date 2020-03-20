@@ -33,7 +33,7 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcPingServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.DataServices;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -104,7 +104,7 @@ public class AgentRpcEndpointsAutoConfiguration {
      *
      * @param agentRoutingService The {@link AgentRoutingService} implementation to use
      * @param taskScheduler       The {@link TaskScheduler} instance to use
-     * @param registry      The meter registry
+     * @param registry            The meter registry
      * @return A {@link GRpcHeartBeatServiceImpl} instance
      */
     @Bean
@@ -121,13 +121,13 @@ public class AgentRpcEndpointsAutoConfiguration {
      * Provide an implementation of {@link com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase}
      * if no other is provided.
      *
-     * @param jobSearchService The {@link JobSearchService} instance to use
+     * @param dataServices The {@link DataServices} instance to use
      * @return A {@link GRpcJobKillServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(JobKillServiceGrpc.JobKillServiceImplBase.class)
-    public GRpcJobKillServiceImpl gRpcJobKillService(final JobSearchService jobSearchService) {
-        return new GRpcJobKillServiceImpl(jobSearchService);
+    public GRpcJobKillServiceImpl gRpcJobKillService(final DataServices dataServices) {
+        return new GRpcJobKillServiceImpl(dataServices);
     }
 
     /**

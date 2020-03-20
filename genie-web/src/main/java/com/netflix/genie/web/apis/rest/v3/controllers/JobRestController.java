@@ -51,6 +51,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobMetadataModelAss
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.dtos.JobSubmission;
@@ -169,7 +170,7 @@ public class JobRestController {
      * Constructor.
      *
      * @param jobLaunchService          The {@link JobLaunchService} implementation to use
-     * @param jobSearchService          The search service to use
+     * @param dataServices              The {@link DataServices} instance to use
      * @param jobCoordinatorService     The job coordinator service to use.
      * @param entityModelAssemblers     The encapsulation of all the V3 resource assemblers
      * @param genieHostInfo             Information about the host that the Genie process is running on
@@ -177,7 +178,6 @@ public class JobRestController {
      * @param jobDirectoryServerService The service to handle serving back job directory resources
      * @param jobsProperties            All the properties associated with jobs
      * @param registry                  The metrics registry to use
-     * @param jobPersistenceService     Job persistence service
      * @param agentRoutingService       Agent routing service
      * @param environment               The application environment to pull dynamic properties from
      * @param attachmentService         The attachment service to use to save attachments.
@@ -187,7 +187,7 @@ public class JobRestController {
     @SuppressWarnings("checkstyle:parameternumber")
     public JobRestController(
         final JobLaunchService jobLaunchService,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final JobCoordinatorService jobCoordinatorService,
         final EntityModelAssemblers entityModelAssemblers,
         final GenieHostInfo genieHostInfo,
@@ -195,14 +195,13 @@ public class JobRestController {
         final JobDirectoryServerService jobDirectoryServerService,
         final JobsProperties jobsProperties,
         final MeterRegistry registry,
-        final JobPersistenceService jobPersistenceService,
         final AgentRoutingService agentRoutingService,
         final Environment environment,
         final AttachmentService attachmentService,
         final JobExecutionModeSelector jobExecutionModeSelector
     ) {
         this.jobLaunchService = jobLaunchService;
-        this.jobSearchService = jobSearchService;
+        this.jobSearchService = dataServices.getJobSearchService();
         this.jobCoordinatorService = jobCoordinatorService;
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
@@ -217,7 +216,7 @@ public class JobRestController {
         this.jobDirectoryServerService = jobDirectoryServerService;
         this.jobsProperties = jobsProperties;
         this.agentRoutingService = agentRoutingService;
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.environment = environment;
 
         // TODO: V3 Only. Remove.

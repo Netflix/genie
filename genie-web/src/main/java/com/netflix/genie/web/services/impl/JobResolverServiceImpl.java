@@ -40,6 +40,7 @@ import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
@@ -195,31 +196,25 @@ public class JobResolverServiceImpl implements JobResolverService {
     /**
      * Constructor.
      *
-     * @param applicationPersistenceService The {@link ApplicationPersistenceService} to use to manipulate applications
-     * @param clusterPersistenceService     The {@link ClusterPersistenceService} to use to manipulate clusters
-     * @param commandPersistenceService     The {@link CommandPersistenceService} to use to manipulate commands
-     * @param jobPersistenceService         The {@link JobPersistenceService} instance to use
-     * @param clusterSelectors              The {@link ClusterSelector} implementations to use
-     * @param commandSelector               The {@link CommandSelector} implementation to use
-     * @param registry                      The {@link MeterRegistry }metrics repository to use
-     * @param jobsProperties                The properties for running a job set by the user
-     * @param environment                   The Spring application {@link Environment} for dynamic property resolution
+     * @param dataServices     The {@link DataServices} encapsulation instance to use
+     * @param clusterSelectors The {@link ClusterSelector} implementations to use
+     * @param commandSelector  The {@link CommandSelector} implementation to use
+     * @param registry         The {@link MeterRegistry }metrics repository to use
+     * @param jobsProperties   The properties for running a job set by the user
+     * @param environment      The Spring application {@link Environment} for dynamic property resolution
      */
     public JobResolverServiceImpl(
-        final ApplicationPersistenceService applicationPersistenceService,
-        final ClusterPersistenceService clusterPersistenceService,
-        final CommandPersistenceService commandPersistenceService,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         @NotEmpty final List<ClusterSelector> clusterSelectors,
         final CommandSelector commandSelector, // TODO: For now this is a single value but maybe support List
         final MeterRegistry registry,
         final JobsProperties jobsProperties,
         final Environment environment
     ) {
-        this.applicationPersistenceService = applicationPersistenceService;
-        this.clusterPersistenceService = clusterPersistenceService;
-        this.commandPersistenceService = commandPersistenceService;
-        this.jobPersistenceService = jobPersistenceService;
+        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
+        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
+        this.commandPersistenceService = dataServices.getCommandPersistenceService();
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.clusterSelectors = clusterSelectors;
         this.commandSelector = commandSelector;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();

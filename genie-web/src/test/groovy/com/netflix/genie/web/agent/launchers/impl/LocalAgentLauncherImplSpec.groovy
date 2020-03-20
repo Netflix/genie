@@ -20,6 +20,7 @@ package com.netflix.genie.web.agent.launchers.impl
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.introspection.GenieWebHostInfo
@@ -58,6 +59,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     LocalAgentLauncherProperties launchProperties
     ExecutorFactory executorFactory
     MeterRegistry meterRegistry
+    DataServices dataServices
 
     LocalAgentLauncherImpl launcher
     String hostname
@@ -89,6 +91,9 @@ class LocalAgentLauncherImplSpec extends Specification {
         this.job = Mock(JobSpecification.ExecutionResource)
         this.executor = Mock(Executor)
         this.additionalEnvironment = [foo: "bar"]
+        this.dataServices = Mock(DataServices) {
+            getJobSearchService() >> this.jobSearchService
+        }
     }
 
     @Unroll
@@ -100,12 +105,12 @@ class LocalAgentLauncherImplSpec extends Specification {
 
         when:
         this.launcher = new LocalAgentLauncherImpl(
-            hostInfo,
-            rpcInfo,
-            jobSearchService,
-            launchProperties,
-            executorFactory,
-            meterRegistry
+            this.hostInfo,
+            this.rpcInfo,
+            this.dataServices,
+            this.launchProperties,
+            this.executorFactory,
+            this.meterRegistry
         )
 
         then:

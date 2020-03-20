@@ -22,9 +22,9 @@ import com.netflix.genie.common.dto.Job
 import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
-import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.data.services.AgentConnectionPersistenceService
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.properties.ClusterCheckerProperties
@@ -39,6 +39,7 @@ import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
+@SuppressWarnings("GroovyAccessibility")
 class ClusterCheckerTaskSpec extends Specification {
 
     ClusterCheckerTask task
@@ -51,7 +52,6 @@ class ClusterCheckerTaskSpec extends Specification {
     MeterRegistry meterRegistry
 
     void setup() {
-
         this.hostname = UUID.randomUUID().toString()
         this.properties = Mock(ClusterCheckerProperties) {
             _ * getPort() >> 8080
@@ -71,12 +71,16 @@ class ClusterCheckerTaskSpec extends Specification {
             _ * getBasePath() >> "/actuator"
         }
 
+        def dataServices = Mock(DataServices) {
+            getJobSearchService() >> this.jobSearchService
+            getJobPersistenceService() >> this.jobPersistenceService
+            getAgentConnectionPersistenceService() >> this.agentConnectionPersistenceService
+        }
+
         this.task = new ClusterCheckerTask(
             genieHostInfo,
             this.properties,
-            this.jobSearchService,
-            this.jobPersistenceService,
-            this.agentConnectionPersistenceService,
+            dataServices,
             this.restTemplate,
             serverProperties,
             meterRegistry

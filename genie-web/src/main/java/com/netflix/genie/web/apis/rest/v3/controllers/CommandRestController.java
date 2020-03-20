@@ -39,6 +39,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembl
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -100,18 +101,13 @@ public class CommandRestController {
     /**
      * Constructor.
      *
-     * @param commandPersistenceService The command configuration service to use.
-     * @param clusterPersistenceService The {@link ClusterPersistenceService} implementation to use
-     * @param entityModelAssemblers     The encapsulation of all available V3 resource assemblers
+     * @param dataServices          The {@link DataServices} encapsulation instance to use
+     * @param entityModelAssemblers The encapsulation of all available V3 resource assemblers
      */
     @Autowired
-    public CommandRestController(
-        final CommandPersistenceService commandPersistenceService,
-        final ClusterPersistenceService clusterPersistenceService,
-        final EntityModelAssemblers entityModelAssemblers
-    ) {
-        this.commandPersistenceService = commandPersistenceService;
-        this.clusterPersistenceService = clusterPersistenceService;
+    public CommandRestController(final DataServices dataServices, final EntityModelAssemblers entityModelAssemblers) {
+        this.commandPersistenceService = dataServices.getCommandPersistenceService();
+        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();

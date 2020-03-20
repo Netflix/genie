@@ -27,6 +27,7 @@ import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -83,20 +84,20 @@ public class LocalJobRunner implements JobSubmitterService {
     /**
      * Constructor create the object.
      *
-     * @param jobPersistenceService Implementation of the job persistence service
-     * @param genieEventBus         The event bus implementation to use
-     * @param workflowTasks         List of all the workflow tasks to be executed
-     * @param genieWorkingDir       Working directory for genie where it creates jobs directories
-     * @param registry              The metrics registry to use
+     * @param dataServices    The {@link DataServices} instance to use
+     * @param genieEventBus   The event bus implementation to use
+     * @param workflowTasks   List of all the workflow tasks to be executed
+     * @param genieWorkingDir Working directory for genie where it creates jobs directories
+     * @param registry        The metrics registry to use
      */
     public LocalJobRunner(
-        @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final DataServices dataServices,
         @NonNull final GenieEventBus genieEventBus,
         @NotNull final List<WorkflowTask> workflowTasks,
         @NotNull final Resource genieWorkingDir,
         @NotNull final MeterRegistry registry
     ) {
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.genieEventBus = genieEventBus;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;

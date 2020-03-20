@@ -22,6 +22,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException
@@ -51,7 +52,10 @@ class ArchivedJobServiceImplSpec extends Specification {
         this.jobPersistenceService = Mock(JobPersistenceService)
         this.resourceLoader = Mock(ResourceLoader)
         this.meterRegistry = new SimpleMeterRegistry()
-        this.service = new ArchivedJobServiceImpl(this.jobPersistenceService, this.resourceLoader, this.meterRegistry)
+        def dataServices = Mock(DataServices) {
+            getJobPersistenceService() >> this.jobPersistenceService
+        }
+        this.service = new ArchivedJobServiceImpl(dataServices, this.resourceLoader, this.meterRegistry)
     }
 
     def "expected exceptions are thrown when conditions exist"() {

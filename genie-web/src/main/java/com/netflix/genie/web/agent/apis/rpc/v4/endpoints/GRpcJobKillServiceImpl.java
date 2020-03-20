@@ -23,6 +23,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import io.grpc.stub.StreamObserver;
@@ -50,10 +51,10 @@ public class GRpcJobKillServiceImpl
     /**
      * Constructor.
      *
-     * @param jobSearchService Job search service
+     * @param dataServices The {@link DataServices} instance to use
      */
-    public GRpcJobKillServiceImpl(final JobSearchService jobSearchService) {
-        this.jobSearchService = jobSearchService;
+    public GRpcJobKillServiceImpl(final DataServices dataServices) {
+        this.jobSearchService = dataServices.getJobSearchService();
     }
 
     /**

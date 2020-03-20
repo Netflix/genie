@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
@@ -53,19 +54,17 @@ public class AgentJobCleanupTask extends LeadershipTask {
     /**
      * Constructor.
      *
-     * @param jobSearchService      the job search service
-     * @param jobPersistenceService the job persistence service
-     * @param properties            the task properties
-     * @param registry              the metrics registry
+     * @param dataServices The {@link DataServices} encapsulation instance to use
+     * @param properties   the task properties
+     * @param registry     the metrics registry
      */
     public AgentJobCleanupTask(
-        final JobSearchService jobSearchService,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final AgentCleanupProperties properties,
         final MeterRegistry registry
     ) {
-        this.jobSearchService = jobSearchService;
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobSearchService = dataServices.getJobSearchService();
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.properties = properties;
         this.registry = registry;
         this.awolJobDeadlines = Maps.newConcurrentMap();

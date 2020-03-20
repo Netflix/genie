@@ -33,6 +33,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAss
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -89,15 +90,15 @@ public class ApplicationRestController {
     /**
      * Constructor.
      *
-     * @param applicationPersistenceService The application configuration service to use.
-     * @param entityModelAssemblers         The encapsulation of all the available V3 resource assemblers
+     * @param dataServices          The {@link DataServices} encapsulation instance to use
+     * @param entityModelAssemblers The encapsulation of all the available V3 resource assemblers
      */
     @Autowired
     public ApplicationRestController(
-        final ApplicationPersistenceService applicationPersistenceService,
+        final DataServices dataServices,
         final EntityModelAssemblers entityModelAssemblers
     ) {
-        this.applicationPersistenceService = applicationPersistenceService;
+        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
     }

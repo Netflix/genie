@@ -24,6 +24,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -68,6 +69,7 @@ public class JobKillServiceV3Test {
     private FileSystemResource genieWorkingDir;
     private ProcessChecker.Factory processCheckerFactory;
     private ProcessChecker processChecker;
+    private DataServices dataServices;
 
     /**
      * Setup for the tests.
@@ -85,9 +87,11 @@ public class JobKillServiceV3Test {
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
         this.processCheckerFactory = Mockito.mock(ProcessChecker.Factory.class);
         this.processChecker = Mockito.mock(ProcessChecker.class);
+        this.dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
         this.service = new JobKillServiceV3(
             HOSTNAME,
-            this.jobSearchService,
+            this.dataServices,
             this.executor,
             false,
             this.genieEventBus,
@@ -240,7 +244,7 @@ public class JobKillServiceV3Test {
     public void canKillJobRunningAsUser() throws GenieException, IOException {
         this.service = new JobKillServiceV3(
             HOSTNAME,
-            this.jobSearchService,
+            this.dataServices,
             this.executor,
             true,
             this.genieEventBus,

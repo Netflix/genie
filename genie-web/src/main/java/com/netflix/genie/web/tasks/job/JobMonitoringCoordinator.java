@@ -25,6 +25,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -76,7 +77,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
      * Constructor.
      *
      * @param genieHostInfo         Information about the host the Genie process is currently running on
-     * @param jobSearchService      The search service to use to find jobs
+     * @param dataServices          The {@link DataServices} instance to use
      * @param genieEventBus         The Genie event bus to use for publishing events
      * @param scheduler             The task scheduler to use to register scheduling of job checkers
      * @param registry              The metrics registry
@@ -89,7 +90,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
     @Autowired
     public JobMonitoringCoordinator(
         final GenieHostInfo genieHostInfo,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final GenieEventBus genieEventBus,
         @Qualifier("genieTaskScheduler") final TaskScheduler scheduler,
         final MeterRegistry registry,
@@ -100,7 +101,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
     ) throws IOException {
         super(jobSubmitterService, scheduler, genieEventBus, registry);
         this.hostname = genieHostInfo.getHostname();
-        this.jobSearchService = jobSearchService;
+        this.jobSearchService = dataServices.getJobSearchService();
         this.jobsDir = jobsDir.getFile();
         this.jobsProperties = jobsProperties;
         this.processCheckerFactory = processCheckerFactory;

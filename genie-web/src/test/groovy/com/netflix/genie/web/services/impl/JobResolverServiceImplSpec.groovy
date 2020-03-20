@@ -41,6 +41,7 @@ import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.web.data.services.ApplicationPersistenceService
 import com.netflix.genie.web.data.services.ClusterPersistenceService
 import com.netflix.genie.web.data.services.CommandPersistenceService
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.dtos.ResourceSelectionResult
@@ -84,11 +85,14 @@ class JobResolverServiceImplSpec extends Specification {
         this.jobService = Mock(JobPersistenceService)
         this.jobsProperties = JobsProperties.getJobsPropertiesDefaults()
         this.environment = Mock(Environment)
+        def dataServices = Mock(DataServices) {
+            getApplicationPersistenceService() >> this.applicationService
+            getClusterPersistenceService() >> this.clusterService
+            getCommandPersistenceService() >> this.commandService
+            getJobPersistenceService() >> this.jobService
+        }
         this.service = new JobResolverServiceImpl(
-            this.applicationService,
-            this.clusterService,
-            this.commandService,
-            this.jobService,
+            dataServices,
             Lists.newArrayList(this.clusterSelector),
             this.commandSelector,
             new SimpleMeterRegistry(),

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.tasks.node;
 
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.node.DiskCleanupTask;
@@ -51,13 +51,13 @@ public class NodeAutoConfiguration {
     /**
      * If required get a {@link DiskCleanupTask} instance for use.
      *
-     * @param properties       The disk cleanup properties to use.
-     * @param scheduler        The scheduler to use to schedule the cron trigger.
-     * @param jobsDir          The resource representing the location of the job directory
-     * @param jobSearchService The service to find jobs with
-     * @param jobsProperties   The jobs properties to use
-     * @param processExecutor  The process executor to use to delete directories
-     * @param registry         The metrics registry
+     * @param properties      The disk cleanup properties to use.
+     * @param scheduler       The scheduler to use to schedule the cron trigger.
+     * @param jobsDir         The resource representing the location of the job directory
+     * @param dataServices    The {@link DataServices} instance to use
+     * @param jobsProperties  The jobs properties to use
+     * @param processExecutor The process executor to use to delete directories
+     * @param registry        The metrics registry
      * @return The {@link DiskCleanupTask} instance
      * @throws IOException When it is unable to open a file reference to the job directory
      */
@@ -68,7 +68,7 @@ public class NodeAutoConfiguration {
         final DiskCleanupProperties properties,
         @Qualifier("genieTaskScheduler") final TaskScheduler scheduler,
         @Qualifier("jobsDir") final Resource jobsDir,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final JobsProperties jobsProperties,
         final Executor processExecutor,
         final MeterRegistry registry
@@ -77,7 +77,7 @@ public class NodeAutoConfiguration {
             properties,
             scheduler,
             jobsDir,
-            jobSearchService,
+            dataServices,
             jobsProperties,
             processExecutor,
             registry

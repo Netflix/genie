@@ -18,6 +18,7 @@
 package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
@@ -43,19 +44,18 @@ public class JobKillServiceImpl implements JobKillService {
     /**
      * Constructor.
      *
-     * @param jobKillServiceV3      Service to kill V3 jobs.
-     * @param jobKillServiceV4      Service to kill V4 jobs.
-     * @param jobPersistenceService Job persistence service
+     * @param jobKillServiceV3 Service to kill V3 jobs.
+     * @param jobKillServiceV4 Service to kill V4 jobs.
+     * @param dataServices     The {@link DataServices} instance to use
      */
     public JobKillServiceImpl(
         final JobKillServiceV3 jobKillServiceV3,
         final JobKillServiceV4 jobKillServiceV4,
-        final JobPersistenceService jobPersistenceService
-
+        final DataServices dataServices
     ) {
         this.jobKillServiceV3 = jobKillServiceV3;
         this.jobKillServiceV4 = jobKillServiceV4;
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
     }
 
     /**

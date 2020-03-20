@@ -18,12 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.tasks.leader;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.FilePersistenceService;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
-import com.netflix.genie.web.data.services.TagPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
@@ -146,14 +141,12 @@ public class LeaderAutoConfiguration {
     /**
      * Create a {@link ClusterCheckerTask} if one hasn't been supplied.
      *
-     * @param genieHostInfo                     Information about the host this Genie process is running on
-     * @param properties                        The properties to use to configure the task
-     * @param jobSearchService                  The job search service to use
-     * @param jobPersistenceService             The job persistence service to use
-     * @param agentConnectionPersistenceService The agent connection persistence service
-     * @param restTemplate                      The rest template for http calls
-     * @param webEndpointProperties             The properties where Spring actuator is running
-     * @param registry                          The spectator registry for getting metrics
+     * @param genieHostInfo         Information about the host this Genie process is running on
+     * @param properties            The properties to use to configure the task
+     * @param dataServices          The {@link DataServices} instance to use
+     * @param restTemplate          The rest template for http calls
+     * @param webEndpointProperties The properties where Spring actuator is running
+     * @param registry              The spectator registry for getting metrics
      * @return The {@link ClusterCheckerTask} instance
      */
     @Bean
@@ -161,9 +154,7 @@ public class LeaderAutoConfiguration {
     public ClusterCheckerTask clusterCheckerTask(
         final GenieHostInfo genieHostInfo,
         final ClusterCheckerProperties properties,
-        final JobSearchService jobSearchService,
-        final JobPersistenceService jobPersistenceService,
-        final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        final DataServices dataServices,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final WebEndpointProperties webEndpointProperties,
         final MeterRegistry registry
@@ -171,9 +162,7 @@ public class LeaderAutoConfiguration {
         return new ClusterCheckerTask(
             genieHostInfo,
             properties,
-            jobSearchService,
-            jobPersistenceService,
-            agentConnectionPersistenceService,
+            dataServices,
             restTemplate,
             webEndpointProperties,
             registry
@@ -183,12 +172,9 @@ public class LeaderAutoConfiguration {
     /**
      * Create a {@link DatabaseCleanupTask} if one is required.
      *
-     * @param cleanupProperties         The properties to use to configure this task
-     * @param jobPersistenceService     The persistence service to use to cleanup the data store
-     * @param clusterPersistenceService The cluster service to use to delete terminated clusters
-     * @param filePersistenceService    The file service to use to delete unused file references
-     * @param tagPersistenceService     The tag service to use to delete unused tag references
-     * @param registry                  The metrics registry
+     * @param cleanupProperties The properties to use to configure this task
+     * @param dataServices      The {@link DataServices} encapsulation instance to use
+     * @param registry          The metrics registry
      * @return The {@link DatabaseCleanupTask} instance to use if the conditions match
      */
     @Bean
@@ -196,18 +182,12 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(DatabaseCleanupTask.class)
     public DatabaseCleanupTask databaseCleanupTask(
         final DatabaseCleanupProperties cleanupProperties,
-        final JobPersistenceService jobPersistenceService,
-        final ClusterPersistenceService clusterPersistenceService,
-        final FilePersistenceService filePersistenceService,
-        final TagPersistenceService tagPersistenceService,
+        final DataServices dataServices,
         final MeterRegistry registry
     ) {
         return new DatabaseCleanupTask(
             cleanupProperties,
-            jobPersistenceService,
-            clusterPersistenceService,
-            filePersistenceService,
-            tagPersistenceService,
+            dataServices,
             registry
         );
     }
@@ -216,7 +196,7 @@ public class LeaderAutoConfiguration {
      * If required get a {@link UserMetricsTask} instance for use.
      *
      * @param registry              The metrics registry
-     * @param jobSearchService      The job search service
+     * @param dataServices          The {@link DataServices} instance to use
      * @param userMetricsProperties The properties
      * @return The {@link UserMetricsTask} instance
      */
@@ -225,12 +205,12 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(UserMetricsTask.class)
     public UserMetricsTask userMetricsTask(
         final MeterRegistry registry,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final UserMetricsProperties userMetricsProperties
     ) {
         return new UserMetricsTask(
             registry,
-            jobSearchService,
+            dataServices,
             userMetricsProperties
         );
     }
@@ -238,8 +218,7 @@ public class LeaderAutoConfiguration {
     /**
      * If required, get a {@link AgentJobCleanupTask} instance for use.
      *
-     * @param jobSearchService       The job search service
-     * @param jobPersistenceService  the job persistence service
+     * @param dataServices           The {@link DataServices} encapsulation instance to use
      * @param agentCleanupProperties the agent cleanup properties
      * @param registry               the metrics registry
      * @return a {@link AgentJobCleanupTask}
@@ -248,14 +227,12 @@ public class LeaderAutoConfiguration {
     @ConditionalOnProperty(value = AgentCleanupProperties.ENABLED_PROPERTY, havingValue = "true")
     @ConditionalOnMissingBean(AgentJobCleanupTask.class)
     public AgentJobCleanupTask agentJobCleanupTask(
-        final JobSearchService jobSearchService,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final AgentCleanupProperties agentCleanupProperties,
         final MeterRegistry registry
     ) {
         return new AgentJobCleanupTask(
-            jobSearchService,
-            jobPersistenceService,
+            dataServices,
             agentCleanupProperties,
             registry
         );

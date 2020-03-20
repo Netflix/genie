@@ -38,11 +38,15 @@ import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
+import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.FilePersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.TagPersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobKillService;
@@ -142,15 +146,22 @@ public class JobCoordinatorServiceImplTest {
             )
             .thenReturn(this.setJobEnvironmentTimer);
 
-        this.jobCoordinatorService = new JobCoordinatorServiceImpl(
+        final DataServices dataServices = new DataServices(
+            Mockito.mock(AgentConnectionPersistenceService.class),
+            this.applicationPersistenceService,
+            this.clusterPersistenceService,
+            this.commandPersistenceService,
+            Mockito.mock(FilePersistenceService.class),
             this.jobPersistenceService,
+            this.jobSearchService,
+            Mockito.mock(TagPersistenceService.class)
+        );
+
+        this.jobCoordinatorService = new JobCoordinatorServiceImpl(
+            dataServices,
             this.jobKillService,
             this.jobStateService,
             this.jobsProperties,
-            this.applicationPersistenceService,
-            this.jobSearchService,
-            this.clusterPersistenceService,
-            this.commandPersistenceService,
             this.specificationService,
             this.registry,
             HOST_NAME

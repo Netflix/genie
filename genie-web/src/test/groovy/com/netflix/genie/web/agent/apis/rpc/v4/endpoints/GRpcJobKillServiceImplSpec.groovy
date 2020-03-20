@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobSearchService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
@@ -43,7 +44,10 @@ class GRpcJobKillServiceImplSpec extends Specification {
         jobId = UUID.randomUUID().toString()
         request = JobKillRegistrationRequest.newBuilder().setJobId(jobId).build()
         response = JobKillRegistrationResponse.newBuilder().build()
-        service = new GRpcJobKillServiceImpl(jobSearchService)
+        def dataServices = Mock(DataServices) {
+            getJobSearchService() >> this.jobSearchService
+        }
+        service = new GRpcJobKillServiceImpl(dataServices)
     }
 
     def "Can kill unfinished jobs and clean up response observer"() {

@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.leader;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.FilePersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.TagPersistenceService;
@@ -65,27 +66,21 @@ public class DatabaseCleanupTask extends LeadershipTask {
     /**
      * Constructor.
      *
-     * @param cleanupProperties         The properties to use to configure this task
-     * @param jobPersistenceService     The persistence service to use to cleanup the data store
-     * @param clusterPersistenceService The cluster service to use to delete terminated clusters
-     * @param filePersistenceService    The file service to use to delete unused file references
-     * @param tagPersistenceService     The tag service to use to delete unused tag references
-     * @param registry                  The metrics registry
+     * @param cleanupProperties The properties to use to configure this task
+     * @param dataServices      The {@link DataServices} encapsulation instance to use
+     * @param registry          The metrics registry
      */
     public DatabaseCleanupTask(
         @NotNull final DatabaseCleanupProperties cleanupProperties,
-        @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final ClusterPersistenceService clusterPersistenceService,
-        @NotNull final FilePersistenceService filePersistenceService,
-        @NotNull final TagPersistenceService tagPersistenceService,
+        @NotNull final DataServices dataServices,
         @NotNull final MeterRegistry registry
     ) {
         this.registry = registry;
         this.cleanupProperties = cleanupProperties;
-        this.jobPersistenceService = jobPersistenceService;
-        this.clusterPersistenceService = clusterPersistenceService;
-        this.filePersistenceService = filePersistenceService;
-        this.tagPersistenceService = tagPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
+        this.filePersistenceService = dataServices.getFilePersistenceService();
+        this.tagPersistenceService = dataServices.getTagPersistenceService();
 
         this.numDeletedJobs = this.registry.gauge(
             "genie.tasks.databaseCleanup.numDeletedJobs.gauge",

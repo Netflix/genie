@@ -20,7 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure.health;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
 import com.netflix.genie.web.health.GenieMemoryHealthIndicator;
 import com.netflix.genie.web.health.LocalAgentLauncherHealthIndicator;
@@ -80,7 +80,7 @@ public class HealthAutoConfiguration {
     /**
      * Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.
      *
-     * @param jobSearchService   The {@link JobSearchService} implementation to use
+     * @param dataServices       The {@link DataServices} instance to use
      * @param launcherProperties The properties related to launching agent jobs locally
      * @param genieHostInfo      The {@link GenieHostInfo} to use
      * @return A {@link LocalAgentLauncherHealthIndicator} instance
@@ -94,10 +94,10 @@ public class HealthAutoConfiguration {
         }
     )
     public LocalAgentLauncherHealthIndicator localAgentLauncherHealthIndicator(
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final LocalAgentLauncherProperties launcherProperties,
         final GenieHostInfo genieHostInfo
     ) {
-        return new LocalAgentLauncherHealthIndicator(jobSearchService, launcherProperties, genieHostInfo);
+        return new LocalAgentLauncherHealthIndicator(dataServices, launcherProperties, genieHostInfo);
     }
 }

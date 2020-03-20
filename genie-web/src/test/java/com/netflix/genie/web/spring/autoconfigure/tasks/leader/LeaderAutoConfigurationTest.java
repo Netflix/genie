@@ -19,7 +19,10 @@ package com.netflix.genie.web.spring.autoconfigure.tasks.leader;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
+import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.FilePersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
@@ -286,6 +289,62 @@ class LeaderAutoConfigurationTest {
         @Bean
         AgentConnectionPersistenceService agentConnectionPersistenceService() {
             return Mockito.mock(AgentConnectionPersistenceService.class);
+        }
+
+        /**
+         * Mocked bean.
+         *
+         * @return Mocked bean instance
+         */
+        @Bean
+        ApplicationPersistenceService applicationPersistenceService() {
+            return Mockito.mock(ApplicationPersistenceService.class);
+        }
+
+        /**
+         * Mocked bean.
+         *
+         * @return Mocked bean instance
+         */
+        @Bean
+        CommandPersistenceService commandPersistenceService() {
+            return Mockito.mock(CommandPersistenceService.class);
+        }
+
+        /**
+         * Encapsulation containing mocked instances.
+         *
+         * @param agentConnectionPersistenceService Mocked
+         * @param applicationPersistenceService     Mocked
+         * @param clusterPersistenceService         Mocked
+         * @param commandPersistenceService         Mocked
+         * @param filePersistenceService            Mocked
+         * @param jobPersistenceService             Mocked
+         * @param jobSearchService                  Mocked
+         * @param tagPersistenceService             Mocked
+         * @return {@link DataServices} instance
+         */
+        @Bean
+        DataServices genieDataServices(
+            final AgentConnectionPersistenceService agentConnectionPersistenceService,
+            final ApplicationPersistenceService applicationPersistenceService,
+            final ClusterPersistenceService clusterPersistenceService,
+            final CommandPersistenceService commandPersistenceService,
+            final FilePersistenceService filePersistenceService,
+            final JobPersistenceService jobPersistenceService,
+            final JobSearchService jobSearchService,
+            final TagPersistenceService tagPersistenceService
+        ) {
+            return new DataServices(
+                agentConnectionPersistenceService,
+                applicationPersistenceService,
+                clusterPersistenceService,
+                commandPersistenceService,
+                filePersistenceService,
+                jobPersistenceService,
+                jobSearchService,
+                tagPersistenceService
+            );
         }
     }
 

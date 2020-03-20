@@ -26,6 +26,7 @@ import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
 import com.netflix.genie.web.agent.services.AgentFileStreamService
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException
@@ -49,6 +50,7 @@ import java.nio.file.Paths
 /**
  * Specifications for {@link JobDirectoryServerServiceImpl}.
  */
+@SuppressWarnings("GroovyAccessibility")
 class JobDirectoryServerServiceImplSpec extends Specification {
     static final String JOB_ID = "123456"
     static final String REL_PATH = "bar/foo.txt"
@@ -82,9 +84,12 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.handler = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler)
         this.jobDirectoryManifestService = Mock(JobDirectoryManifestCreatorService)
         this.archivedJobService = Mock(ArchivedJobService)
+        def dataServices = Mock(DataServices) {
+            getJobPersistenceService() >> this.jobPersistenceService
+        }
         this.service = new JobDirectoryServerServiceImpl(
             this.resourceLoader,
-            this.jobPersistenceService,
+            dataServices,
             this.agentFileStreamService,
             this.archivedJobService,
             this.handlerFactory,

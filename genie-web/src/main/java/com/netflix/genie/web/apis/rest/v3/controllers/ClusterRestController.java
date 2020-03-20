@@ -33,6 +33,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembl
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -91,15 +92,12 @@ public class ClusterRestController {
     /**
      * Constructor.
      *
-     * @param clusterPersistenceService The cluster configuration service to use.
-     * @param entityModelAssemblers     The encapsulation of all available V3 resource assemblers
+     * @param dataServices          The {@link DataServices} encapsulation instance to use.
+     * @param entityModelAssemblers The encapsulation of all available V3 resource assemblers
      */
     @Autowired
-    public ClusterRestController(
-        final ClusterPersistenceService clusterPersistenceService,
-        final EntityModelAssemblers entityModelAssemblers
-    ) {
-        this.clusterPersistenceService = clusterPersistenceService;
+    public ClusterRestController(final DataServices dataServices, final EntityModelAssemblers entityModelAssemblers) {
+        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
     }

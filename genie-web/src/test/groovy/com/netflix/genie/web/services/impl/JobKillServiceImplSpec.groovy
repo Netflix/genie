@@ -19,6 +19,7 @@ package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.services.JobKillServiceV4
 import spock.lang.Specification
@@ -26,7 +27,7 @@ import spock.lang.Specification
 /**
  * Tests for JobKillServiceImpl
  *
- * @author standon* @since 4.0.0
+ * @author standon
  */
 class JobKillServiceImplSpec extends Specification {
     JobKillServiceV3 jobKillServiceV3
@@ -36,11 +37,14 @@ class JobKillServiceImplSpec extends Specification {
     String jobId
 
     void setup() {
-        jobPersistenceService = Mock()
-        jobKillServiceV4 = Mock()
-        jobKillServiceV3 = Mock()
-        jobId = UUID.randomUUID().toString()
-        service = new JobKillServiceImpl(jobKillServiceV3, jobKillServiceV4, jobPersistenceService)
+        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.jobKillServiceV4 = Mock(JobKillServiceV4)
+        this.jobKillServiceV3 = Mock(JobKillServiceV3)
+        this.jobId = UUID.randomUUID().toString()
+        def dataServices = Mock(DataServices) {
+            getJobPersistenceService() >> this.jobPersistenceService
+        }
+        this.service = new JobKillServiceImpl(this.jobKillServiceV3, this.jobKillServiceV4, dataServices)
     }
 
     def "Invoke JobKillServiceV3 for a v3 job"() {

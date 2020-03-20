@@ -36,6 +36,7 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -145,9 +146,13 @@ class JobRestControllerTest {
         final Counter counter = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
 
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
+        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(this.jobPersistenceService);
+
         this.controller = new JobRestController(
             Mockito.mock(JobLaunchService.class),
-            this.jobSearchService,
+            dataServices,
             Mockito.mock(JobCoordinatorService.class),
             this.createMockResourceAssembler(),
             new GenieHostInfo(this.hostname),
@@ -155,7 +160,6 @@ class JobRestControllerTest {
             this.jobDirectoryServerService,
             this.jobsProperties,
             registry,
-            this.jobPersistenceService,
             this.agentRoutingService,
             this.environment,
             Mockito.mock(AttachmentService.class),
@@ -860,9 +864,13 @@ class JobRestControllerTest {
         final Counter counter = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
 
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
+        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(this.jobPersistenceService);
+
         final JobRestController jobController = new JobRestController(
             Mockito.mock(JobLaunchService.class),
-            this.jobSearchService,
+            dataServices,
             Mockito.mock(JobCoordinatorService.class),
             this.createMockResourceAssembler(),
             new GenieHostInfo(this.hostname),
@@ -870,7 +878,6 @@ class JobRestControllerTest {
             this.jobDirectoryServerService,
             this.jobsProperties,
             registry,
-            this.jobPersistenceService,
             this.agentRoutingService,
             this.environment,
             Mockito.mock(AttachmentService.class),

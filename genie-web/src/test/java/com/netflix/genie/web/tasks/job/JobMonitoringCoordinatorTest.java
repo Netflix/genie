@@ -29,6 +29,7 @@ import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -109,9 +110,12 @@ public class JobMonitoringCoordinatorTest {
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.getFile()).thenReturn(jobsFile);
 
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
+
         this.coordinator = new JobMonitoringCoordinator(
             new GenieHostInfo(HOSTNAME),
-            this.jobSearchService,
+            dataServices,
             this.genieEventBus,
             this.scheduler,
             new SimpleMeterRegistry(),
