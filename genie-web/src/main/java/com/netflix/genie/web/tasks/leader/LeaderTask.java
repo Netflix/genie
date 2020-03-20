@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 3.0.0
  */
 @Slf4j
-public abstract class LeadershipTask extends GenieTask {
+public abstract class LeaderTask extends GenieTask {
 
     /**
      * Any cleanup that needs to be performed when this task is stopped due to leadership being revoked.

@@ -38,13 +38,13 @@ import java.util.concurrent.ScheduledFuture;
  * @author tgianos
  * @since 3.0.0
  */
-class LeadershipTasksCoordinatorTest {
+class LeaderTasksCoordinatorTest {
 
-    private LeadershipTasksCoordinator coordinator;
+    private LeaderTasksCoordinator coordinator;
     private TaskScheduler scheduler;
-    private LeadershipTask task1;
-    private LeadershipTask task2;
-    private LeadershipTask task3;
+    private LeaderTask task1;
+    private LeaderTask task2;
+    private LeaderTask task3;
 
     /**
      * Setup for the tests.
@@ -52,11 +52,11 @@ class LeadershipTasksCoordinatorTest {
     @BeforeEach
     void setup() {
         this.scheduler = Mockito.mock(TaskScheduler.class);
-        this.task1 = Mockito.mock(LeadershipTask.class);
-        this.task2 = Mockito.mock(LeadershipTask.class);
-        this.task3 = Mockito.mock(LeadershipTask.class);
-        final Set<LeadershipTask> tasks = Sets.newHashSet(this.task1, this.task2, this.task3);
-        this.coordinator = new LeadershipTasksCoordinator(this.scheduler, tasks);
+        this.task1 = Mockito.mock(LeaderTask.class);
+        this.task2 = Mockito.mock(LeaderTask.class);
+        this.task3 = Mockito.mock(LeaderTask.class);
+        final Set<LeaderTask> tasks = Sets.newHashSet(this.task1, this.task2, this.task3);
+        this.coordinator = new LeaderTasksCoordinator(this.scheduler, tasks);
     }
 
     /**

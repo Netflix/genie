@@ -28,11 +28,11 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 3.1.0
  */
-@ConfigurationProperties(prefix = ZookeeperLeadershipProperties.PROPERTY_PREFIX)
+@ConfigurationProperties(prefix = ZookeeperLeaderProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
-public class ZookeeperLeadershipProperties {
+public class ZookeeperLeaderProperties {
 
     /**
      * The property prefix for this group.

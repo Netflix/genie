@@ -40,7 +40,7 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Slf4j
-public class UserMetricsTask extends LeadershipTask {
+public class UserMetricsTask extends LeaderTask {
 
     private static final String USER_ACTIVE_JOBS_METRIC_NAME = "genie.user.active-jobs.gauge";
     private static final String USER_ACTIVE_MEMORY_METRIC_NAME = "genie.user.active-memory.gauge";

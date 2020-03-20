@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 3.0.0
  */
 @Slf4j
-public class DatabaseCleanupTask extends LeadershipTask {
+public class DatabaseCleanupTask extends LeaderTask {
 
     private static final String DATABASE_CLEANUP_DURATION_TIMER_NAME = "genie.tasks.databaseCleanup.duration.timer";
     private final DatabaseCleanupProperties cleanupProperties;

@@ -25,13 +25,13 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
-import com.netflix.genie.web.properties.ZookeeperLeadershipProperties;
+import com.netflix.genie.web.properties.ZookeeperLeaderProperties;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
 import com.netflix.genie.web.tasks.leader.DatabaseCleanupTask;
-import com.netflix.genie.web.tasks.leader.LeadershipTask;
-import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;
+import com.netflix.genie.web.tasks.leader.LeaderTask;
+import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
 import com.netflix.genie.web.tasks.leader.UserMetricsTask;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -66,7 +66,7 @@ import java.util.Set;
         DatabaseCleanupProperties.class,
         LeadershipProperties.class,
         UserMetricsProperties.class,
-        ZookeeperLeadershipProperties.class
+        ZookeeperLeaderProperties.class
     }
 )
 @AutoConfigureAfter(
@@ -86,12 +86,12 @@ public class LeaderAutoConfiguration {
      * @return The leader coordinator
      */
     @Bean
-    @ConditionalOnMissingBean(LeadershipTasksCoordinator.class)
-    public LeadershipTasksCoordinator leadershipTasksCoordinator(
+    @ConditionalOnMissingBean(LeaderTasksCoordinator.class)
+    public LeaderTasksCoordinator leaderTasksCoordinator(
         @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
-        final Set<LeadershipTask> tasks
+        final Set<LeaderTask> tasks
     ) {
-        return new LeadershipTasksCoordinator(taskScheduler, tasks);
+        return new LeaderTasksCoordinator(taskScheduler, tasks);
     }
 
     /**
@@ -99,7 +99,7 @@ public class LeaderAutoConfiguration {
      * process within this node for the cluster if Zookeeper is configured.
      *
      * @param client                        The curator framework client to use
-     * @param zookeeperLeadershipProperties The Zookeeper properties to use
+     * @param zookeeperLeaderProperties The Zookeeper properties to use
      * @return The factory bean
      */
     @Bean
@@ -107,11 +107,11 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(LeaderInitiatorFactoryBean.class)
     public LeaderInitiatorFactoryBean leaderInitiatorFactory(
         final CuratorFramework client,
-        final ZookeeperLeadershipProperties zookeeperLeadershipProperties
+        final ZookeeperLeaderProperties zookeeperLeaderProperties
     ) {
         final LeaderInitiatorFactoryBean factoryBean = new LeaderInitiatorFactoryBean();
         factoryBean.setClient(client);
-        factoryBean.setPath(zookeeperLeadershipProperties.getPath());
+        factoryBean.setPath(zookeeperLeaderProperties.getPath());
         factoryBean.setRole("cluster");
         return factoryBean;
     }
