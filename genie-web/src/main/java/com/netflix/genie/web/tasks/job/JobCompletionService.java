@@ -32,6 +32,7 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.services.JobArchiveService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -98,19 +99,17 @@ public class JobCompletionService {
     /**
      * Constructor.
      *
-     * @param jobSearchService      An implementation of the job search service.
-     * @param jobPersistenceService An implementation of the job persistence service.
-     * @param jobArchiveService     An implementation of {@link JobArchiveService}
-     * @param genieWorkingDir       The working directory where all job directories are created.
-     * @param mailServiceImpl       An implementation of the mail service.
-     * @param registry              The metrics registry to use
-     * @param jobsProperties        The properties relating to running jobs
-     * @param retryTemplate         Retry template for retrying remote calls
+     * @param dataServices      The {@link DataServices} instance to use
+     * @param jobArchiveService An implementation of {@link JobArchiveService}
+     * @param genieWorkingDir   The working directory where all job directories are created.
+     * @param mailServiceImpl   An implementation of the mail service.
+     * @param registry          The metrics registry to use
+     * @param jobsProperties    The properties relating to running jobs
+     * @param retryTemplate     Retry template for retrying remote calls
      * @throws GenieException if there is a problem
      */
     public JobCompletionService(
-        final JobPersistenceService jobPersistenceService,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final JobArchiveService jobArchiveService,
         final Resource genieWorkingDir,
         final MailService mailServiceImpl,
@@ -118,8 +117,8 @@ public class JobCompletionService {
         final JobsProperties jobsProperties,
         @NotNull final RetryTemplate retryTemplate
     ) throws GenieException {
-        this.jobPersistenceService = jobPersistenceService;
-        this.jobSearchService = jobSearchService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.jobSearchService = dataServices.getJobSearchService();
         this.jobArchiveService = jobArchiveService;
         this.mailServiceImpl = mailServiceImpl;
         this.deleteDependencies = jobsProperties.getCleanup().isDeleteDependencies();

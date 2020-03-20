@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.leader
 
 import com.netflix.genie.common.dto.UserResourcesSummary
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.properties.UserMetricsProperties
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
@@ -30,18 +31,23 @@ import spock.lang.Specification
 
 import java.util.function.ToDoubleFunction
 
+@SuppressWarnings("GroovyAccessibility")
 class UserMetricsTaskSpec extends Specification {
     MeterRegistry registry
     JobSearchService jobSearchService
     UserMetricsProperties userMetricProperties
     UserMetricsTask task
     Map<String, Closure<Double>> gaugesFunctions
+    DataServices dataServices
 
     void setup() {
         this.registry = Mock(MeterRegistry)
         this.jobSearchService = Mock(JobSearchService)
         this.userMetricProperties = Mock(UserMetricsProperties)
         this.gaugesFunctions = Maps.newHashMap()
+        this.dataServices = Mock(DataServices) {
+            getJobSearchService() >> this.jobSearchService
+        }
     }
 
     def "Run"() {
@@ -59,7 +65,7 @@ class UserMetricsTaskSpec extends Specification {
         Map<String, UserResourcesSummary> emptySummariesMap = Maps.newHashMap()
 
         when:
-        this.task = new UserMetricsTask(registry, jobSearchService, userMetricProperties)
+        this.task = new UserMetricsTask(this.registry, this.dataServices, this.userMetricProperties)
 
         then:
         1 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
@@ -185,5 +191,4 @@ class UserMetricsTaskSpec extends Specification {
         String gaugeKey = UserMetricsTask.USER_ACTIVE_MEMORY_METRIC_NAME + "-" + user
         return gaugesFunctions.get(gaugeKey).call()
     }
-
 }

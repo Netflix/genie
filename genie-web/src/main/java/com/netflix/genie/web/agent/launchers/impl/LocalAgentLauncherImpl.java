@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
@@ -74,7 +75,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
      *
      * @param hostInfo           The {@link GenieWebHostInfo} instance
      * @param rpcInfo            The {@link GenieWebRpcInfo} instance
-     * @param jobSearchService   The {@link JobSearchService} used to get metrics about the jobs on this node
+     * @param dataServices       The {@link DataServices} encapsulation instance to use
      * @param launcherProperties The properties from the configuration that control agent behavior
      * @param executorFactory    A {@link ExecutorFactory} to create {@link org.apache.commons.exec.Executor}
      *                           instances
@@ -83,14 +84,14 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     public LocalAgentLauncherImpl(
         final GenieWebHostInfo hostInfo,
         final GenieWebRpcInfo rpcInfo,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final LocalAgentLauncherProperties launcherProperties,
         final ExecutorFactory executorFactory,
         final MeterRegistry registry
     ) {
         this.hostname = hostInfo.getHostname();
         this.rpcPort = rpcInfo.getRpcPort();
-        this.jobSearchService = jobSearchService;
+        this.jobSearchService = dataServices.getJobSearchService();
         this.launcherProperties = launcherProperties;
         this.executorFactory = executorFactory;
         this.registry = registry;

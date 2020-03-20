@@ -26,6 +26,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
@@ -86,30 +87,26 @@ public class ClusterCheckerTask extends LeadershipTask {
     /**
      * Constructor.
      *
-     * @param genieHostInfo                     Information about the host this Genie process is running on
-     * @param properties                        The properties to use to configure the task
-     * @param jobSearchService                  The job search service to use
-     * @param jobPersistenceService             The job persistence service to use
-     * @param agentConnectionPersistenceService The agent connections persistence service
-     * @param restTemplate                      The rest template for http calls
-     * @param webEndpointProperties             The properties where Spring actuator is running
-     * @param registry                          The spectator registry for getting metrics
+     * @param genieHostInfo         Information about the host this Genie process is running on
+     * @param properties            The properties to use to configure the task
+     * @param dataServices          The {@link DataServices} encapsulation instance to use
+     * @param restTemplate          The rest template for http calls
+     * @param webEndpointProperties The properties where Spring actuator is running
+     * @param registry              The spectator registry for getting metrics
      */
     public ClusterCheckerTask(
         @NotNull final GenieHostInfo genieHostInfo,
         @NotNull final ClusterCheckerProperties properties,
-        @NotNull final JobSearchService jobSearchService,
-        @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        @NotNull final DataServices dataServices,
         @NotNull final RestTemplate restTemplate,
         @NotNull final WebEndpointProperties webEndpointProperties,
         @NotNull final MeterRegistry registry
     ) {
         this.hostname = genieHostInfo.getHostname();
         this.properties = properties;
-        this.jobSearchService = jobSearchService;
-        this.jobPersistenceService = jobPersistenceService;
-        this.agentConnectionPersistenceService = agentConnectionPersistenceService;
+        this.jobSearchService = dataServices.getJobSearchService();
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.agentConnectionPersistenceService = dataServices.getAgentConnectionPersistenceService();
         this.restTemplate = restTemplate;
         this.registry = registry;
         this.scheme = this.properties.getScheme() + "://";

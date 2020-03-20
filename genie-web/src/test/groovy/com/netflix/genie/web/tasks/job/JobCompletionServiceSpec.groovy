@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.services.JobArchiveService
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.events.JobFinishedEvent
@@ -51,8 +52,9 @@ import java.util.concurrent.TimeUnit
 /**
  * Unit tests for JobCompletionHandler
  *
- * @author amajumdar* @since 3.0.0
+ * @author amajumdar
  */
+@SuppressWarnings("GroovyAccessibility")
 class JobCompletionServiceSpec extends Specification {
     private static final String NAME = UUID.randomUUID().toString()
     private static final String USER = UUID.randomUUID().toString()
@@ -96,9 +98,12 @@ class JobCompletionServiceSpec extends Specification {
         }
         jobsProperties.cleanup.deleteDependencies = false
         jobsProperties.users.runAsUserEnabled = false
+        def dataServices = Mock(DataServices) {
+            getJobSearchService() >> this.jobSearchService
+            getJobPersistenceService() >> this.jobPersistenceService
+        }
         jobCompletionService = new JobCompletionService(
-            jobPersistenceService,
-            jobSearchService,
+            dataServices,
             jobArchiveService,
             new FileSystemResource("/tmp"),
             mailService,

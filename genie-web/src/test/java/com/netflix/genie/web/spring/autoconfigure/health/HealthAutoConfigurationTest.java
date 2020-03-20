@@ -20,6 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure.health;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
 import com.netflix.genie.web.health.GenieMemoryHealthIndicator;
@@ -134,6 +135,13 @@ class HealthAutoConfigurationTest {
         @Bean
         GenieHostInfo genieHostInfo() {
             return Mockito.mock(GenieHostInfo.class);
+        }
+
+        @Bean
+        DataServices genieDataServices(final JobSearchService jobSearchService) {
+            final DataServices dataServices = Mockito.mock(DataServices.class);
+            Mockito.when(dataServices.getJobSearchService()).thenReturn(jobSearchService);
+            return dataServices;
         }
     }
 }

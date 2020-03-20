@@ -27,6 +27,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundEx
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import com.netflix.genie.web.agent.services.AgentFilterService
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.dtos.ResolvedJob
@@ -39,10 +40,11 @@ import io.micrometer.core.instrument.Tag
 import spock.lang.Specification
 
 /**
- * Specifications for the {@link com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl} class.
+ * Specifications for the {@link AgentJobServiceImpl} class.
  *
  * @author tgianos
  */
+@SuppressWarnings("GroovyAccessibility")
 class AgentJobServiceImplSpec extends Specification {
 
     public static final String version = "1.2.3"
@@ -61,11 +63,14 @@ class AgentJobServiceImplSpec extends Specification {
         this.agentFilterService = Mock(AgentFilterService)
         this.meterRegistry = Mock(MeterRegistry)
         this.counter = Mock(Counter)
+        def dataServices = Mock(DataServices) {
+            getJobPersistenceService() >> this.jobPersistenceService
+        }
         this.service = new AgentJobServiceImpl(
-            jobPersistenceService,
-            jobSpecificationService,
-            agentFilterService,
-            meterRegistry
+            dataServices,
+            this.jobSpecificationService,
+            this.agentFilterService,
+            this.meterRegistry
         )
     }
 

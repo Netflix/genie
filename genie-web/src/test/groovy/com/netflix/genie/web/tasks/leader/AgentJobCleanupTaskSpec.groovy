@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.leader
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieException
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.properties.AgentCleanupProperties
@@ -29,6 +30,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 
+@SuppressWarnings("GroovyAccessibility")
 class AgentJobCleanupTaskSpec extends Specification {
 
     AgentJobCleanupTask task
@@ -41,14 +43,17 @@ class AgentJobCleanupTaskSpec extends Specification {
     void setup() {
         this.jobSearchService = Mock(JobSearchService)
         this.jobPersistenceService = Mock(JobPersistenceService)
+        def dataServices = Mock(DataServices) {
+            getJobSearchService() >> this.jobSearchService
+            getJobPersistenceService() >> this.jobPersistenceService
+        }
         this.taskProperties = Mock(AgentCleanupProperties)
         this.registry = Mock(MeterRegistry)
         this.counter = Mock(Counter)
         this.task = new AgentJobCleanupTask(
-            jobSearchService,
-            jobPersistenceService,
-            taskProperties,
-            registry
+            dataServices,
+            this.taskProperties,
+            this.registry
         )
     }
 

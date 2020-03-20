@@ -32,6 +32,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeExcept
 import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
@@ -73,18 +74,18 @@ public class AgentJobServiceImpl implements AgentJobService {
     /**
      * Constructor.
      *
-     * @param jobPersistenceService The persistence service to use
-     * @param jobResolverService    The specification service to use
-     * @param agentFilterService    The agent filter service to use
-     * @param meterRegistry         The metrics registry to use
+     * @param dataServices       The {@link DataServices} instance to use
+     * @param jobResolverService The specification service to use
+     * @param agentFilterService The agent filter service to use
+     * @param meterRegistry      The metrics registry to use
      */
     public AgentJobServiceImpl(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentFilterService agentFilterService,
         final MeterRegistry meterRegistry
     ) {
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.jobResolverService = jobResolverService;
         this.agentFilterService = agentFilterService;
         this.meterRegistry = meterRegistry;

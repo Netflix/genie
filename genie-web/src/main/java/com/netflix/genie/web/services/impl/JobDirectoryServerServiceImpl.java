@@ -30,6 +30,7 @@ import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;
@@ -86,7 +87,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
      * Constructor.
      *
      * @param resourceLoader                     The application resource loader used to get references to resources
-     * @param jobPersistenceService              The job persistence service used to get information about a job
+     * @param dataServices                       The {@link DataServices} instance to use
      * @param agentFileStreamService             The service providing file manifest for active agent jobs
      * @param archivedJobService                 The {@link ArchivedJobService} implementation to use to get archived
      *                                           job data
@@ -96,7 +97,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
      */
     public JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final AgentFileStreamService agentFileStreamService,
         final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
@@ -105,7 +106,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     ) {
         this(
             resourceLoader,
-            jobPersistenceService,
+            dataServices,
             agentFileStreamService,
             archivedJobService,
             new GenieResourceHandler.Factory(),
@@ -121,7 +122,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     @VisibleForTesting
     JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final AgentFileStreamService agentFileStreamService,
         final ArchivedJobService archivedJobService,
         final GenieResourceHandler.Factory genieResourceHandlerFactory,
@@ -130,7 +131,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
     ) {
         this.resourceLoader = resourceLoader;
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.jobFileService = jobFileService;
         this.agentFileStreamService = agentFileStreamService;
         this.meterRegistry = meterRegistry;

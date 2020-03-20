@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.services.JobMetricsService;
 
@@ -37,11 +38,11 @@ public class JobMetricsServiceImpl implements JobMetricsService {
     /**
      * Constructor.
      *
-     * @param jobSearchService The job search service to use.
-     * @param hostname         The name of this host
+     * @param dataServices The {@link DataServices} instance to use.
+     * @param hostname     The name of this host
      */
-    public JobMetricsServiceImpl(@NotNull final JobSearchService jobSearchService, @NotNull final String hostname) {
-        this.jobSearchService = jobSearchService;
+    public JobMetricsServiceImpl(@NotNull final DataServices dataServices, @NotNull final String hostname) {
+        this.jobSearchService = dataServices.getJobSearchService();
         this.hostname = hostname;
     }
 

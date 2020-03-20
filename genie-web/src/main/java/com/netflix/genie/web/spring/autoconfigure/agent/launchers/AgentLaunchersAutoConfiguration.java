@@ -19,7 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.agent.launchers;
 
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
@@ -61,7 +61,7 @@ public class AgentLaunchersAutoConfiguration {
      *
      * @param genieWebHostInfo   The {@link GenieWebHostInfo} of this instance
      * @param genieWebRpcInfo    The {@link GenieWebRpcInfo} of this instance
-     * @param jobSearchService   The {@link JobSearchService} instance to use
+     * @param dataServices       The {@link DataServices} instance to use
      * @param launcherProperties The properties related to launching an agent locally
      * @param executorFactory    The {@link ExecutorFactory} to use to launch agent processes
      * @param registry           The {@link MeterRegistry} to register metrics
@@ -72,7 +72,7 @@ public class AgentLaunchersAutoConfiguration {
     public LocalAgentLauncherImpl localAgentLauncher(
         final GenieWebHostInfo genieWebHostInfo,
         final GenieWebRpcInfo genieWebRpcInfo,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final LocalAgentLauncherProperties launcherProperties,
         final ExecutorFactory executorFactory,
         final MeterRegistry registry
@@ -80,7 +80,7 @@ public class AgentLaunchersAutoConfiguration {
         return new LocalAgentLauncherImpl(
             genieWebHostInfo,
             genieWebRpcInfo,
-            jobSearchService,
+            dataServices,
             launcherProperties,
             executorFactory,
             registry

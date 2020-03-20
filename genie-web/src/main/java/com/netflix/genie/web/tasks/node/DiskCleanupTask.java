@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.node;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -67,20 +68,20 @@ public class DiskCleanupTask implements Runnable {
     /**
      * Constructor. Schedules this task to be run by the task scheduler.
      *
-     * @param properties       The disk cleanup properties to use.
-     * @param scheduler        The scheduler to use to schedule the cron trigger.
-     * @param jobsDir          The resource representing the location of the job directory
-     * @param jobSearchService The service to find jobs with
-     * @param jobsProperties   The jobs properties to use
-     * @param processExecutor  The process executor to use to delete directories
-     * @param registry         The metrics registry
+     * @param properties      The disk cleanup properties to use.
+     * @param scheduler       The scheduler to use to schedule the cron trigger.
+     * @param jobsDir         The resource representing the location of the job directory
+     * @param dataServices    The {@link DataServices} instance to use
+     * @param jobsProperties  The jobs properties to use
+     * @param processExecutor The process executor to use to delete directories
+     * @param registry        The metrics registry
      * @throws IOException When it is unable to open a file reference to the job directory
      */
     public DiskCleanupTask(
         @NotNull final DiskCleanupProperties properties,
         @NotNull final TaskScheduler scheduler,
         @NotNull final Resource jobsDir,
-        @NotNull final JobSearchService jobSearchService,
+        @NotNull final DataServices dataServices,
         @NotNull final JobsProperties jobsProperties,
         @NotNull final Executor processExecutor,
         @NotNull final MeterRegistry registry
@@ -92,7 +93,7 @@ public class DiskCleanupTask implements Runnable {
 
         this.properties = properties;
         this.jobsDir = jobsDir.getFile();
-        this.jobSearchService = jobSearchService;
+        this.jobSearchService = dataServices.getJobSearchService();
         this.runAsUser = jobsProperties.getUsers().isRunAsUserEnabled();
         this.processExecutor = processExecutor;
 

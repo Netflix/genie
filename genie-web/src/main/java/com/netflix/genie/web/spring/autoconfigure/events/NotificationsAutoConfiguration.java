@@ -21,7 +21,7 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserver;
 import com.netflix.genie.web.data.observers.PersistedJobStatusObserverImpl;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedSNSPublisher;
 import com.netflix.genie.web.events.JobNotificationMetricPublisher;
@@ -104,10 +104,10 @@ public class NotificationsAutoConfiguration {
     /**
      * Create a {@link JobFinishedSNSPublisher} unless one exists in the context already.
      *
-     * @param properties            configuration properties
-     * @param registry              the metrics registry
-     * @param snsClient             the Amazon SNS client
-     * @param jobPersistenceService the job persistence service
+     * @param properties   configuration properties
+     * @param registry     the metrics registry
+     * @param snsClient    the Amazon SNS client
+     * @param dataServices The {@link DataServices} instance to use
      * @return a {@link JobFinishedSNSPublisher}
      */
     @Bean
@@ -117,12 +117,12 @@ public class NotificationsAutoConfiguration {
         final SNSNotificationsProperties properties,
         final MeterRegistry registry,
         final AmazonSNS snsClient,
-        final JobPersistenceService jobPersistenceService
+        final DataServices dataServices
     ) {
         return new JobFinishedSNSPublisher(
             snsClient,
             properties,
-            jobPersistenceService,
+            dataServices,
             registry,
             GenieObjectMapper.getMapper()
         );

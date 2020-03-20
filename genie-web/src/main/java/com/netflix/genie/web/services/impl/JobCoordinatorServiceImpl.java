@@ -40,6 +40,7 @@ import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
@@ -95,39 +96,31 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     /**
      * Constructor.
      *
-     * @param jobPersistenceService         implementation of job persistence service interface
-     * @param jobKillService                The job kill service to use
-     * @param jobStateService               The service where we report the job state and keep track of
-     *                                      various metrics about jobs currently running
-     * @param jobsProperties                The jobs properties to use
-     * @param applicationPersistenceService Implementation of application service interface
-     * @param jobSearchService              Implementation of job search service
-     * @param clusterPersistenceService     Implementation of cluster service interface
-     * @param commandPersistenceService     Implementation of command service interface
-     * @param jobResolverService            The job specification service to use
-     * @param registry                      The registry
-     * @param hostname                      The name of the host this Genie instance is running on
+     * @param dataServices       The {@link DataServices} encapsulation to use
+     * @param jobKillService     The job kill service to use
+     * @param jobStateService    The service where we report the job state and keep track of
+     *                           various metrics about jobs currently running
+     * @param jobsProperties     The jobs properties to use
+     * @param jobResolverService The job specification service to use
+     * @param registry           The registry
+     * @param hostname           The name of the host this Genie instance is running on
      */
     public JobCoordinatorServiceImpl(
-        @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final DataServices dataServices,
         @NotNull final JobKillService jobKillService,
         @NotNull final JobStateService jobStateService,
         @NotNull final JobsProperties jobsProperties,
-        @NotNull final ApplicationPersistenceService applicationPersistenceService,
-        @NotNull final JobSearchService jobSearchService,
-        @NotNull final ClusterPersistenceService clusterPersistenceService,
-        @NotNull final CommandPersistenceService commandPersistenceService,
         @NotNull final JobResolverService jobResolverService,
         @NotNull final MeterRegistry registry,
         @NotBlank final String hostname
     ) {
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.jobKillService = jobKillService;
         this.jobStateService = jobStateService;
-        this.applicationPersistenceService = applicationPersistenceService;
-        this.jobSearchService = jobSearchService;
-        this.clusterPersistenceService = clusterPersistenceService;
-        this.commandPersistenceService = commandPersistenceService;
+        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
+        this.jobSearchService = dataServices.getJobSearchService();
+        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
+        this.commandPersistenceService = dataServices.getCommandPersistenceService();
         this.jobResolverService = jobResolverService;
         this.jobsProperties = jobsProperties;
         this.hostname = hostname;

@@ -24,6 +24,7 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;
@@ -75,16 +76,16 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
     /**
      * Constructor.
      *
-     * @param jobPersistenceService The {@link JobPersistenceService} implementation to use
-     * @param resourceLoader        The {@link ResourceLoader} used to get resources
-     * @param meterRegistry         The {@link MeterRegistry} used to collect metrics
+     * @param dataServices   The {@link DataServices} instance to use
+     * @param resourceLoader The {@link ResourceLoader} used to get resources
+     * @param meterRegistry  The {@link MeterRegistry} used to collect metrics
      */
     public ArchivedJobServiceImpl(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final ResourceLoader resourceLoader,
         final MeterRegistry meterRegistry
     ) {
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.resourceLoader = resourceLoader;
         this.meterRegistry = meterRegistry;
     }

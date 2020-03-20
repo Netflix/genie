@@ -20,9 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure.services;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
@@ -110,10 +108,12 @@ public class ServicesAutoConfigurationTest {
      */
     @Test
     public void canGetJobKillServiceV3Bean() {
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
         Assert.assertNotNull(
             this.servicesAutoConfiguration.jobKillServiceV3(
                 new GenieHostInfo("localhost"),
-                Mockito.mock(JobSearchService.class),
+                dataServices,
                 Mockito.mock(Executor.class),
                 JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(GenieEventBus.class),
@@ -129,11 +129,13 @@ public class ServicesAutoConfigurationTest {
      */
     @Test
     public void canGetJobKillServiceBean() {
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(Mockito.mock(JobPersistenceService.class));
         Assert.assertNotNull(
             this.servicesAutoConfiguration.jobKillService(
                 Mockito.mock(JobKillServiceV3.class),
                 Mockito.mock(JobKillServiceV4.class),
-                Mockito.mock(JobPersistenceService.class)
+                dataServices
             )
         );
     }
@@ -174,13 +176,15 @@ public class ServicesAutoConfigurationTest {
     @Test
     public void canGetJobSubmitterServiceBean() {
         final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(jobPersistenceService);
         final GenieEventBus genieEventBus = Mockito.mock(GenieEventBus.class);
         final Resource resource = Mockito.mock(Resource.class);
         final List<WorkflowTask> workflowTasks = new ArrayList<>();
 
         Assert.assertNotNull(
             this.servicesAutoConfiguration.jobSubmitterService(
-                jobPersistenceService,
+                dataServices,
                 genieEventBus,
                 workflowTasks,
                 resource,
@@ -196,14 +200,10 @@ public class ServicesAutoConfigurationTest {
     public void canGetJobCoordinatorServiceBean() {
         Assert.assertNotNull(
             this.servicesAutoConfiguration.jobCoordinatorService(
-                Mockito.mock(JobPersistenceService.class),
+                Mockito.mock(DataServices.class),
                 Mockito.mock(JobKillService.class),
                 Mockito.mock(JobStateService.class),
-                Mockito.mock(JobSearchService.class),
                 JobsProperties.getJobsPropertiesDefaults(),
-                Mockito.mock(ApplicationPersistenceService.class),
-                Mockito.mock(ClusterPersistenceService.class),
-                Mockito.mock(CommandPersistenceService.class),
                 Mockito.mock(JobResolverService.class),
                 Mockito.mock(MeterRegistry.class),
                 new GenieHostInfo(UUID.randomUUID().toString())

@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.netflix.genie.common.dto.UserResourcesSummary;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
@@ -56,16 +57,16 @@ public class UserMetricsTask extends LeadershipTask {
      * Constructor.
      *
      * @param registry              the metrics registry
-     * @param jobSearchService      the job search service
+     * @param dataServices          The {@link DataServices} instance to use
      * @param userMetricsProperties the properties that configure this task
      */
     public UserMetricsTask(
         final MeterRegistry registry,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final UserMetricsProperties userMetricsProperties
     ) {
         this.registry = registry;
-        this.jobSearchService = jobSearchService;
+        this.jobSearchService = dataServices.getJobSearchService();
         this.userMetricsProperties = userMetricsProperties;
         this.activeUsersCount = new AtomicDouble(Double.NaN);
 

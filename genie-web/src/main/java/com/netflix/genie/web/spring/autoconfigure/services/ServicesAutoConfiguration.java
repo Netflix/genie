@@ -24,11 +24,7 @@ import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorSer
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
@@ -152,7 +148,7 @@ public class ServicesAutoConfiguration {
      * Get an local implementation of the JobKillService.
      *
      * @param genieHostInfo         Information about the host the Genie process is running on
-     * @param jobSearchService      The job search service to use to locate job information.
+     * @param dataServices          The {@link DataServices} instance to use
      * @param executor              The executor to use to run system processes.
      * @param jobsProperties        The jobs properties to use
      * @param genieEventBus         The application event bus to use to publish system wide events
@@ -165,7 +161,7 @@ public class ServicesAutoConfiguration {
     @ConditionalOnMissingBean(JobKillServiceV3.class)
     public JobKillServiceV3 jobKillServiceV3(
         final GenieHostInfo genieHostInfo,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final Executor executor,
         final JobsProperties jobsProperties,
         final GenieEventBus genieEventBus,
@@ -175,7 +171,7 @@ public class ServicesAutoConfiguration {
     ) {
         return new JobKillServiceV3(
             genieHostInfo.getHostname(),
-            jobSearchService,
+            dataServices,
             executor,
             jobsProperties.getUsers().isRunAsUserEnabled(),
             genieEventBus,
@@ -188,9 +184,9 @@ public class ServicesAutoConfiguration {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param jobKillServiceV3      Service to kill V3 jobs.
-     * @param jobKillServiceV4      Service to kill V4 jobs.
-     * @param jobPersistenceService Job persistence service
+     * @param jobKillServiceV3 Service to kill V3 jobs.
+     * @param jobKillServiceV4 Service to kill V4 jobs.
+     * @param dataServices     The {@link DataServices} instance to use
      * @return A job kill service instance.
      */
     @Bean
@@ -198,12 +194,12 @@ public class ServicesAutoConfiguration {
     public JobKillServiceImpl jobKillService(
         final JobKillServiceV3 jobKillServiceV3,
         final JobKillServiceV4 jobKillServiceV4,
-        final JobPersistenceService jobPersistenceService
+        final DataServices dataServices
     ) {
         return new JobKillServiceImpl(
             jobKillServiceV3,
             jobKillServiceV4,
-            jobPersistenceService
+            dataServices
         );
     }
 
@@ -251,24 +247,24 @@ public class ServicesAutoConfiguration {
     /**
      * Get a implementation of the JobSubmitterService that runs jobs locally.
      *
-     * @param jobPersistenceService Implementation of the job persistence service.
-     * @param genieEventBus         The genie event bus implementation to use
-     * @param workflowTasks         List of all the workflow tasks to be executed.
-     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
-     * @param registry              The metrics registry to use
+     * @param dataServices    The {@link DataServices} instance to use
+     * @param genieEventBus   The genie event bus implementation to use
+     * @param workflowTasks   List of all the workflow tasks to be executed.
+     * @param genieWorkingDir Working directory for genie where it creates jobs directories.
+     * @param registry        The metrics registry to use
      * @return An instance of the JobSubmitterService.
      */
     @Bean
     @ConditionalOnMissingBean(JobSubmitterService.class)
     public JobSubmitterService jobSubmitterService(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final GenieEventBus genieEventBus,
         final List<WorkflowTask> workflowTasks,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
         final MeterRegistry registry
     ) {
         return new LocalJobRunner(
-            jobPersistenceService,
+            dataServices,
             genieEventBus,
             workflowTasks,
             genieWorkingDir,
@@ -279,43 +275,31 @@ public class ServicesAutoConfiguration {
     /**
      * Get an instance of the JobCoordinatorService.
      *
-     * @param jobPersistenceService         implementation of job persistence service interface
-     * @param jobKillService                The job kill service to use
-     * @param jobStateService               The running job metrics service to use
-     * @param jobSearchService              Implementation of job search service interface
-     * @param jobsProperties                The jobs properties to use
-     * @param applicationPersistenceService Implementation of application service interface
-     * @param clusterPersistenceService     Implementation of cluster service interface
-     * @param commandPersistenceService     Implementation of command service interface
-     * @param jobResolverService            The job specification service to use
-     * @param registry                      The metrics registry to use
-     * @param genieHostInfo                 Information about the host the Genie process is running on
+     * @param dataServices       The {@link DataServices} encapsulation instance to use
+     * @param jobKillService     The job kill service to use
+     * @param jobStateService    The running job metrics service to use
+     * @param jobsProperties     The jobs properties to use
+     * @param jobResolverService The job specification service to use
+     * @param registry           The metrics registry to use
+     * @param genieHostInfo      Information about the host the Genie process is running on
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
     @ConditionalOnMissingBean(JobCoordinatorService.class)
     public JobCoordinatorService jobCoordinatorService(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final JobKillService jobKillService,
         @Qualifier("jobMonitoringCoordinator") final JobStateService jobStateService,
-        final JobSearchService jobSearchService,
         final JobsProperties jobsProperties,
-        final ApplicationPersistenceService applicationPersistenceService,
-        final ClusterPersistenceService clusterPersistenceService,
-        final CommandPersistenceService commandPersistenceService,
         final JobResolverService jobResolverService,
         final MeterRegistry registry,
         final GenieHostInfo genieHostInfo
     ) {
         return new JobCoordinatorServiceImpl(
-            jobPersistenceService,
+            dataServices,
             jobKillService,
             jobStateService,
             jobsProperties,
-            applicationPersistenceService,
-            jobSearchService,
-            clusterPersistenceService,
-            commandPersistenceService,
             jobResolverService,
             registry,
             genieHostInfo.getHostname()
@@ -363,24 +347,18 @@ public class ServicesAutoConfiguration {
     /**
      * Get an implementation of {@link JobResolverService} if one hasn't already been defined.
      *
-     * @param applicationPersistenceService The service to use to manipulate applications
-     * @param clusterPersistenceService     The service to use to manipulate clusters
-     * @param commandPersistenceService     The service to use to manipulate commands
-     * @param jobPersistenceService         The job persistence service instance to use
-     * @param clusterSelectors              The {@link ClusterSelector} implementations to use
-     * @param commandSelector               The {@link CommandSelector} implementation to use
-     * @param registry                      The metrics repository to use
-     * @param jobsProperties                The properties for running a job set by the user
-     * @param environment                   The Spring application {@link Environment} for dynamic property resolution
+     * @param dataServices     The {@link DataServices} encapsulation instance to use
+     * @param clusterSelectors The {@link ClusterSelector} implementations to use
+     * @param commandSelector  The {@link CommandSelector} implementation to use
+     * @param registry         The metrics repository to use
+     * @param jobsProperties   The properties for running a job set by the user
+     * @param environment      The Spring application {@link Environment} for dynamic property resolution
      * @return A {@link JobResolverServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(JobResolverService.class)
     public JobResolverServiceImpl jobResolverService(
-        final ApplicationPersistenceService applicationPersistenceService,
-        final ClusterPersistenceService clusterPersistenceService,
-        final CommandPersistenceService commandPersistenceService,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         @NotEmpty final List<ClusterSelector> clusterSelectors,
         final CommandSelector commandSelector,
         final MeterRegistry registry,
@@ -388,10 +366,7 @@ public class ServicesAutoConfiguration {
         final Environment environment
     ) {
         return new JobResolverServiceImpl(
-            applicationPersistenceService,
-            clusterPersistenceService,
-            commandPersistenceService,
-            jobPersistenceService,
+            dataServices,
             clusterSelectors,
             commandSelector,
             registry,
@@ -403,22 +378,20 @@ public class ServicesAutoConfiguration {
     /**
      * Get an implementation of {@link JobCompletionService} if one hasn't already been defined.
      *
-     * @param jobPersistenceService The job persistence service to use
-     * @param jobSearchService      The job search service to use
-     * @param jobArchiveService     The {@link JobArchiveService} implementation to use
-     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
-     * @param mailService           The mail service
-     * @param registry              Registry
-     * @param jobsProperties        The jobs properties to use
-     * @param retryTemplate         The retry template
+     * @param dataServices      The {@link DataServices} instance to use
+     * @param jobArchiveService The {@link JobArchiveService} implementation to use
+     * @param genieWorkingDir   Working directory for genie where it creates jobs directories.
+     * @param mailService       The mail service
+     * @param registry          Registry
+     * @param jobsProperties    The jobs properties to use
+     * @param retryTemplate     The retry template
      * @return an instance of {@link JobCompletionService}
      * @throws GenieException if the bean fails during construction
      */
     @Bean
     @ConditionalOnMissingBean(JobCompletionService.class)
     public JobCompletionService jobCompletionService(
-        final JobPersistenceService jobPersistenceService,
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final JobArchiveService jobArchiveService,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
         final MailService mailService,
@@ -427,8 +400,7 @@ public class ServicesAutoConfiguration {
         @Qualifier("genieRetryTemplate") final RetryTemplate retryTemplate
     ) throws GenieException {
         return new JobCompletionService(
-            jobPersistenceService,
-            jobSearchService,
+            dataServices,
             jobArchiveService,
             genieWorkingDir,
             mailService,
@@ -442,7 +414,7 @@ public class ServicesAutoConfiguration {
      * Provide the default implementation of {@link JobDirectoryServerService} for serving job directory resources.
      *
      * @param resourceLoader                     The application resource loader used to get references to resources
-     * @param jobPersistenceService              The job persistence service used to get information about a job
+     * @param dataServices                       The {@link DataServices} instance to use
      * @param agentFileStreamService             The service to request a file from an agent running a job
      * @param archivedJobService                 The {@link ArchivedJobService} implementation to use to get archived
      *                                           job data
@@ -456,7 +428,7 @@ public class ServicesAutoConfiguration {
     @ConditionalOnMissingBean(JobDirectoryServerService.class)
     public JobDirectoryServerServiceImpl jobDirectoryServerService(
         final ResourceLoader resourceLoader,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final AgentFileStreamService agentFileStreamService,
         final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
@@ -465,7 +437,7 @@ public class ServicesAutoConfiguration {
     ) {
         return new JobDirectoryServerServiceImpl(
             resourceLoader,
-            jobPersistenceService,
+            dataServices,
             agentFileStreamService,
             archivedJobService,
             meterRegistry,
@@ -477,38 +449,38 @@ public class ServicesAutoConfiguration {
     /**
      * Provide a {@link JobLaunchService} implementation if one isn't available.
      *
-     * @param jobPersistenceService The {@link JobPersistenceService} implementation to use
-     * @param jobResolverService    The {@link JobResolverService} implementation to use
-     * @param agentLauncher         The {@link AgentLauncher} implementation to use
-     * @param registry              The metrics registry to use
+     * @param dataServices       The {@link DataServices} instance to use
+     * @param jobResolverService The {@link JobResolverService} implementation to use
+     * @param agentLauncher      The {@link AgentLauncher} implementation to use
+     * @param registry           The metrics registry to use
      * @return A {@link JobLaunchServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(JobLaunchService.class)
     public JobLaunchServiceImpl jobLaunchService(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentLauncher agentLauncher,
         final MeterRegistry registry
     ) {
-        return new JobLaunchServiceImpl(jobPersistenceService, jobResolverService, agentLauncher, registry);
+        return new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncher, registry);
     }
 
     /**
      * Provide a {@link ArchivedJobService} implementation if one hasn't been provided already.
      *
-     * @param jobPersistenceService The {@link JobPersistenceService} implementation to use
-     * @param resourceLoader        The {@link ResourceLoader} to use
-     * @param meterRegistry         The {@link MeterRegistry} implementation to use
+     * @param dataServices   The {@link DataServices} instance to use
+     * @param resourceLoader The {@link ResourceLoader} to use
+     * @param meterRegistry  The {@link MeterRegistry} implementation to use
      * @return A {@link ArchivedJobServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(ArchivedJobService.class)
     public ArchivedJobServiceImpl archivedJobService(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final ResourceLoader resourceLoader,
         final MeterRegistry meterRegistry
     ) {
-        return new ArchivedJobServiceImpl(jobPersistenceService, resourceLoader, meterRegistry);
+        return new ArchivedJobServiceImpl(dataServices, resourceLoader, meterRegistry);
     }
 }

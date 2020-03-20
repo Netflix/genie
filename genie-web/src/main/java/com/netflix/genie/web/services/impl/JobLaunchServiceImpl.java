@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
@@ -58,18 +59,18 @@ public class JobLaunchServiceImpl implements JobLaunchService {
     /**
      * Constructor.
      *
-     * @param jobPersistenceService {@link JobPersistenceService} implementation to save job data
-     * @param jobResolverService    {@link JobResolverService} implementation used to resolve job details
-     * @param agentLauncher         {@link AgentLauncher} implementation to launch agents
-     * @param registry              {@link MeterRegistry} metrics repository
+     * @param dataServices       The {@link DataServices} instance to use
+     * @param jobResolverService {@link JobResolverService} implementation used to resolve job details
+     * @param agentLauncher      {@link AgentLauncher} implementation to launch agents
+     * @param registry           {@link MeterRegistry} metrics repository
      */
     public JobLaunchServiceImpl(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentLauncher agentLauncher,
         final MeterRegistry registry
     ) {
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.jobResolverService = jobResolverService;
         this.agentLauncher = agentLauncher;
         this.registry = registry;

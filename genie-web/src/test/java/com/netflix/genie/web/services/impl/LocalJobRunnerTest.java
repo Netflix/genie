@@ -32,6 +32,7 @@ import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
@@ -107,8 +108,11 @@ public class LocalJobRunnerTest {
         final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
 
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(Mockito.mock(JobPersistenceService.class));
+
         this.jobSubmitterService = new LocalJobRunner(
-            Mockito.mock(JobPersistenceService.class),
+            dataServices,
             genieEventBus,
             jobWorkflowTasks,
             baseWorkingDirResource,

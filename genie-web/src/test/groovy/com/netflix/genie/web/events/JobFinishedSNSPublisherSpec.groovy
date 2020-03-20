@@ -33,6 +33,7 @@ import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.properties.SNSNotificationsProperties
 import io.micrometer.core.instrument.Counter
@@ -42,6 +43,7 @@ import spock.lang.Specification
 
 import java.time.Instant
 
+@SuppressWarnings("GroovyAccessibility")
 class JobFinishedSNSPublisherSpec extends Specification {
     Map<String, String> extraKeysMap
     String jobId
@@ -66,12 +68,15 @@ class JobFinishedSNSPublisherSpec extends Specification {
         this.counter = Mock(Counter)
         this.mapper = GenieObjectMapper.getMapper()
         this.event = Mock(JobStateChangeEvent)
+        def dataServices = Mock(DataServices) {
+            getJobPersistenceService() >> this.jobPersistenceService
+        }
         this.publisher = new JobFinishedSNSPublisher(
-            snsClient,
-            snsProperties,
-            jobPersistenceService,
-            registry,
-            mapper
+            this.snsClient,
+            this.snsProperties,
+            dataServices,
+            this.registry,
+            this.mapper
         )
     }
 

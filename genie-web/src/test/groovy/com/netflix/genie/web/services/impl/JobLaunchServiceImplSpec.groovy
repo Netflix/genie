@@ -20,6 +20,7 @@ package com.netflix.genie.web.services.impl
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.web.agent.launchers.AgentLauncher
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.dtos.ResolvedJob
@@ -42,7 +43,10 @@ class JobLaunchServiceImplSpec extends Specification {
         def jobResolverService = Mock(JobResolverService)
         def agentLauncher = Mock(AgentLauncher)
         def registry = new SimpleMeterRegistry()
-        def service = new JobLaunchServiceImpl(jobPersistenceService, jobResolverService, agentLauncher, registry)
+        def dataServices = Mock(DataServices) {
+            getJobPersistenceService() >> jobPersistenceService
+        }
+        def service = new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncher, registry)
 
         def jobId = UUID.randomUUID().toString()
         def resolvedJob = Mock(ResolvedJob)
@@ -64,7 +68,10 @@ class JobLaunchServiceImplSpec extends Specification {
         def jobResolverService = Mock(JobResolverService)
         def agentLauncher = Mock(AgentLauncher)
         def registry = new SimpleMeterRegistry()
-        def service = new JobLaunchServiceImpl(jobPersistenceService, jobResolverService, agentLauncher, registry)
+        def dataServices = Mock(DataServices) {
+            getJobPersistenceService() >> jobPersistenceService
+        }
+        def service = new JobLaunchServiceImpl(dataServices, jobResolverService, agentLauncher, registry)
 
         def jobId = UUID.randomUUID().toString()
         def resolvedJob = Mock(ResolvedJob)

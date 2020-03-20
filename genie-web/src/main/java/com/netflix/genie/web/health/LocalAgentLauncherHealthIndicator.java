@@ -19,6 +19,7 @@ package com.netflix.genie.web.health;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import org.springframework.boot.actuate.health.Health;
@@ -51,16 +52,16 @@ public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
     /**
      * Constructor.
      *
-     * @param jobSearchService   The {@link JobSearchService} implementation to use
+     * @param dataServices       The {@link DataServices} instance to use
      * @param launcherProperties The properties related to local agent launch
      * @param genieHostInfo      The {@link GenieHostInfo} object containing metadata about the current Genie host
      */
     public LocalAgentLauncherHealthIndicator(
-        final JobSearchService jobSearchService,
+        final DataServices dataServices,
         final LocalAgentLauncherProperties launcherProperties,
         final GenieHostInfo genieHostInfo
     ) {
-        this.jobSearchService = jobSearchService;
+        this.jobSearchService = dataServices.getJobSearchService();
         this.launcherProperties = launcherProperties;
         this.hostname = genieHostInfo.getHostname();
     }

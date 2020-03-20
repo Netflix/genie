@@ -29,6 +29,7 @@ import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.FilePersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
@@ -249,5 +250,42 @@ public class DataAutoConfiguration {
         final JpaAgentConnectionRepository jpaAgentConnectionRepository
     ) {
         return new JpaAgentConnectionPersistenceServiceImpl(jpaAgentConnectionRepository);
+    }
+
+    /**
+     * Provide a {@link DataServices} instance if one isn't already in the context.
+     *
+     * @param agentConnectionPersistenceService The {@link AgentConnectionPersistenceService} implementation to use
+     * @param applicationPersistenceService     The {@link ApplicationPersistenceService} implementation to use
+     * @param clusterPersistenceService         The {@link ClusterPersistenceService} implementation to use
+     * @param commandPersistenceService         The {@link CommandPersistenceService} implementation to use
+     * @param filePersistenceService            The {@link FilePersistenceService} implementation to use
+     * @param jobPersistenceService             The {@link JobPersistenceService} implementation to use
+     * @param jobSearchService                  The {@link JobSearchService} implementation to use
+     * @param tagPersistenceService             The {@link TagPersistenceService} implementation to use
+     * @return A {@link DataServices} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(DataServices.class)
+    public DataServices genieDataServices(
+        final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        final ApplicationPersistenceService applicationPersistenceService,
+        final ClusterPersistenceService clusterPersistenceService,
+        final CommandPersistenceService commandPersistenceService,
+        final FilePersistenceService filePersistenceService,
+        final JobPersistenceService jobPersistenceService,
+        final JobSearchService jobSearchService,
+        final TagPersistenceService tagPersistenceService
+    ) {
+        return new DataServices(
+            agentConnectionPersistenceService,
+            applicationPersistenceService,
+            clusterPersistenceService,
+            commandPersistenceService,
+            filePersistenceService,
+            jobPersistenceService,
+            jobSearchService,
+            tagPersistenceService
+        );
     }
 }

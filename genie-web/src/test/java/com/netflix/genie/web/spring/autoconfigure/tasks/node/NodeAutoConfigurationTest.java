@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.tasks.node;
 
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -152,6 +153,13 @@ class NodeAutoConfigurationTest {
         @Bean
         Executor executor() {
             return Mockito.mock(Executor.class);
+        }
+
+        @Bean
+        DataServices genieDataServices(final JobSearchService jobSearchService) {
+            final DataServices dataServices = Mockito.mock(DataServices.class);
+            Mockito.when(dataServices.getJobSearchService()).thenReturn(jobSearchService);
+            return dataServices;
         }
     }
 }

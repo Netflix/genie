@@ -26,6 +26,7 @@ import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -100,21 +101,21 @@ public class JobFinishedSNSPublisher
     /**
      * Constructor.
      *
-     * @param snsClient             Amazon SNS client
-     * @param properties            configuration properties
-     * @param jobPersistenceService job persistence service
-     * @param registry              metrics registry
-     * @param mapper                object mapper
+     * @param snsClient    Amazon SNS client
+     * @param properties   configuration properties
+     * @param dataServices the {@link DataServices} instance to use
+     * @param registry     metrics registry
+     * @param mapper       object mapper
      */
     public JobFinishedSNSPublisher(
         final AmazonSNS snsClient,
         final SNSNotificationsProperties properties,
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final MeterRegistry registry,
         final ObjectMapper mapper
     ) {
         super(properties, registry, snsClient, mapper);
-        this.jobPersistenceService = jobPersistenceService;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
     }
 
     /**

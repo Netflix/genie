@@ -18,6 +18,7 @@
 package com.netflix.genie.web.health
 
 import com.netflix.genie.common.internal.util.GenieHostInfo
+import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobSearchService
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties
 import org.springframework.boot.actuate.health.Status
@@ -36,6 +37,9 @@ class LocalAgentLauncherHealthIndicatorSpec extends Specification {
             getHostname() >> hostname
         }
         def jobSearchService = Mock(JobSearchService)
+        def dataServices = Mock(DataServices) {
+            getJobSearchService() >> jobSearchService
+        }
         def maxTotalJobMemory = 100_003L
         def maxJobMemory = 10_000
         def properties = Mock(LocalAgentLauncherProperties) {
@@ -44,7 +48,7 @@ class LocalAgentLauncherHealthIndicatorSpec extends Specification {
         }
 
         def healthIndicator = new LocalAgentLauncherHealthIndicator(
-            jobSearchService,
+            dataServices,
             properties,
             genieHostInfo
         )

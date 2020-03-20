@@ -31,6 +31,7 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcPingServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.assertj.core.api.Assertions;
@@ -39,7 +40,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 
 /**
@@ -154,7 +154,6 @@ class AgentRpcEndpointsAutoConfigurationTest {
     /**
      * Mocking needed required beans provided by other configurations.
      */
-    @Configuration
     static class RequiredBeans {
         @Bean
         TaskScheduler genieTaskScheduler() {
@@ -185,12 +184,18 @@ class AgentRpcEndpointsAutoConfigurationTest {
         MeterRegistry meterRegistry() {
             return Mockito.mock(MeterRegistry.class);
         }
+
+        @Bean
+        DataServices genieDataServices(final JobSearchService jobSearchService) {
+            final DataServices dataServices = Mockito.mock(DataServices.class);
+            Mockito.when(dataServices.getJobSearchService()).thenReturn(jobSearchService);
+            return dataServices;
+        }
     }
 
     /**
      * Dummy user configuration.
      */
-    @Configuration
     static class UserConfig {
 
         @Bean(name = "heartBeatServiceTaskScheduler")

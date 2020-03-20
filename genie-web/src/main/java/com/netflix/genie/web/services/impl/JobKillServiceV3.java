@@ -25,6 +25,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -69,7 +70,7 @@ public class JobKillServiceV3 {
      * Constructor.
      *
      * @param hostname              The name of the host this Genie node is running on
-     * @param jobSearchService      The job search service to use to locate job information
+     * @param dataServices          The {@link DataServices} instance to use
      * @param executor              The executor to use to run system processes
      * @param runAsUser             True if jobs are run as the user who submitted the job
      * @param genieEventBus         The system event bus to use
@@ -79,7 +80,7 @@ public class JobKillServiceV3 {
      */
     public JobKillServiceV3(
         @NotBlank final String hostname,
-        @NotNull final JobSearchService jobSearchService,
+        @NotNull final DataServices dataServices,
         @NotNull final Executor executor,
         final boolean runAsUser,
         @NotNull final GenieEventBus genieEventBus,
@@ -88,7 +89,7 @@ public class JobKillServiceV3 {
         @NotNull final ProcessChecker.Factory processCheckerFactory
     ) {
         this.hostname = hostname;
-        this.jobSearchService = jobSearchService;
+        this.jobSearchService = dataServices.getJobSearchService();
         this.executor = executor;
         this.runAsUser = runAsUser;
         this.genieEventBus = genieEventBus;

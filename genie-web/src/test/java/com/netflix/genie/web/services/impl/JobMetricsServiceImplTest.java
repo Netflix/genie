@@ -19,6 +19,7 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +46,9 @@ class JobMetricsServiceImplTest {
     @BeforeEach
     void setup() {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
-        this.jobMetricsService = new JobMetricsServiceImpl(this.jobSearchService, this.hostName);
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
+        this.jobMetricsService = new JobMetricsServiceImpl(dataServices, this.hostName);
     }
 
     /**

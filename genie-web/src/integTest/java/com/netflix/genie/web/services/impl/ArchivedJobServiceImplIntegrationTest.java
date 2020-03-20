@@ -21,6 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;
@@ -32,20 +33,19 @@ import com.netflix.genie.web.spring.autoconfigure.RetryAutoConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.net.URI;
@@ -58,7 +58,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 4.0.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
     classes = {
         ArchivedJobServiceImplIntegrationTest.ArchivedJobServiceConfig.class,
@@ -74,7 +74,7 @@ import java.util.UUID;
             + ArchivedJobServiceImplIntegrationTest.NUM_GET_RETRIES
     }
 )
-public class ArchivedJobServiceImplIntegrationTest {
+class ArchivedJobServiceImplIntegrationTest {
 
     @VisibleForTesting
     static final int NUM_GET_RETRIES = 2;
@@ -93,7 +93,7 @@ public class ArchivedJobServiceImplIntegrationTest {
      * @throws Exception On unexpected error
      */
     @Test
-    public void testRetryOnMissingManifest() throws Exception {
+    void testRetryOnMissingManifest() throws Exception {
         Mockito
             .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.of(ARCHIVE_LOCATION));
@@ -113,7 +113,7 @@ public class ArchivedJobServiceImplIntegrationTest {
      * @throws Exception On unexpected error
      */
     @Test
-    public void testNoRetryOnJobNotFound() throws Exception {
+    void testNoRetryOnJobNotFound() throws Exception {
         Mockito
             .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
             .thenThrow(new GenieNotFoundException("blah"));
@@ -133,7 +133,7 @@ public class ArchivedJobServiceImplIntegrationTest {
      * @throws GenieNotFoundException If this happens something really bizarre happened
      */
     @Test
-    public void testNoRetryOnUnexpectedException() throws GenieNotFoundException {
+    void testNoRetryOnUnexpectedException() throws GenieNotFoundException {
         Mockito
             .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.of("Not a valid URI"));
@@ -153,7 +153,7 @@ public class ArchivedJobServiceImplIntegrationTest {
      * @throws Exception On unexpected error
      */
     @Test
-    public void testNoRetryOnJobNotArchived() throws Exception {
+    void testNoRetryOnJobNotArchived() throws Exception {
         Mockito
             .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.empty());
@@ -173,7 +173,7 @@ public class ArchivedJobServiceImplIntegrationTest {
      * @throws Exception On unexpected error
      */
     @Test
-    public void canSuccessfullyGetArchivedJobMetadata() throws Exception {
+    void canSuccessfullyGetArchivedJobMetadata() throws Exception {
         final String archiveLocation = new ClassPathResource("archivedJobServiceImpl", this.getClass())
             .getURI()
             .toString();
@@ -204,27 +204,33 @@ public class ArchivedJobServiceImplIntegrationTest {
             .getJobArchiveLocation(JOB_ID);
     }
 
-    @Configuration
     static class ArchivedJobServiceConfig {
 
         @Bean
-        public CacheManager cacheManager() {
+        CacheManager cacheManager() {
             // provide a cache manager to test caching
             return new CaffeineCacheManager();
         }
 
         @Bean
-        public ArchivedJobServiceImpl archivedJobService(
-            final JobPersistenceService jobPersistenceService,
+        ArchivedJobServiceImpl archivedJobService(
+            final DataServices dataServices,
             final ResourceLoader resourceLoader,
             final MeterRegistry meterRegistry
         ) {
-            return new ArchivedJobServiceImpl(jobPersistenceService, resourceLoader, meterRegistry);
+            return new ArchivedJobServiceImpl(dataServices, resourceLoader, meterRegistry);
         }
 
         @Bean
-        public MeterRegistry meterRegistry() {
+        MeterRegistry meterRegistry() {
             return new SimpleMeterRegistry();
+        }
+
+        @Bean
+        DataServices dataServices(final JobPersistenceService jobPersistenceService) {
+            final DataServices dataServices = Mockito.mock(DataServices.class);
+            Mockito.when(dataServices.getJobPersistenceService()).thenReturn(jobPersistenceService);
+            return dataServices;
         }
     }
 }

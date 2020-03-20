@@ -19,6 +19,7 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.FilePersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.TagPersistenceService;
@@ -60,12 +61,14 @@ class DatabaseCleanupTaskTest {
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
         this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
         this.tagPersistenceService = Mockito.mock(TagPersistenceService.class);
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getClusterPersistenceService()).thenReturn(this.clusterPersistenceService);
+        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(this.jobPersistenceService);
+        Mockito.when(dataServices.getFilePersistenceService()).thenReturn(this.filePersistenceService);
+        Mockito.when(dataServices.getTagPersistenceService()).thenReturn(this.tagPersistenceService);
         this.task = new DatabaseCleanupTask(
             this.cleanupProperties,
-            this.jobPersistenceService,
-            this.clusterPersistenceService,
-            this.filePersistenceService,
-            this.tagPersistenceService,
+            dataServices,
             new SimpleMeterRegistry()
         );
     }

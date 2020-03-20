@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -71,12 +72,14 @@ public class DiskCleanupTaskTest {
         properties.getUsers().setRunAsUserEnabled(false);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(false);
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
         Assert.assertNotNull(
             new DiskCleanupTask(
                 new DiskCleanupProperties(),
                 Mockito.mock(TaskScheduler.class),
                 jobsDir,
-                Mockito.mock(JobSearchService.class),
+                dataServices,
                 properties,
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
@@ -95,12 +98,14 @@ public class DiskCleanupTaskTest {
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(true);
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
         Assert.assertNotNull(
             new DiskCleanupTask(
                 new DiskCleanupProperties(),
                 scheduler,
                 jobsDir,
-                Mockito.mock(JobSearchService.class),
+                dataServices,
                 JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
@@ -120,12 +125,14 @@ public class DiskCleanupTaskTest {
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(true);
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
         Assert.assertNotNull(
             new DiskCleanupTask(
                 new DiskCleanupProperties(),
                 scheduler,
                 jobsDir,
-                Mockito.mock(JobSearchService.class),
+                dataServices,
                 JobsProperties.getJobsPropertiesDefaults(),
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
@@ -147,12 +154,14 @@ public class DiskCleanupTaskTest {
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(true);
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
         Assert.assertNotNull(
             new DiskCleanupTask(
                 new DiskCleanupProperties(),
                 scheduler,
                 jobsDir,
-                Mockito.mock(JobSearchService.class),
+                dataServices,
                 properties,
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
@@ -212,11 +221,14 @@ public class DiskCleanupTaskTest {
         Mockito.when(jobSearchService.getJob(job4Id)).thenReturn(job4);
         Mockito.when(jobSearchService.getJob(job5Id)).thenThrow(new GenieServerException("blah"));
 
+        final DataServices dataServices = Mockito.mock(DataServices.class);
+        Mockito.when(dataServices.getJobSearchService()).thenReturn(jobSearchService);
+
         final DiskCleanupTask task = new DiskCleanupTask(
             properties,
             scheduler,
             jobDir,
-            jobSearchService,
+            dataServices,
             jobsProperties,
             Mockito.mock(Executor.class),
             new SimpleMeterRegistry()

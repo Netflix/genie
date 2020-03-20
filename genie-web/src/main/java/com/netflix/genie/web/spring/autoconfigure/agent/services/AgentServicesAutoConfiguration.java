@@ -28,7 +28,7 @@ import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentMetricsServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -48,22 +48,22 @@ public class AgentServicesAutoConfiguration {
     /**
      * Get a {@link AgentJobService} instance if there isn't already one.
      *
-     * @param jobPersistenceService The persistence service to use
-     * @param jobResolverService    The specification service to use
-     * @param agentFilterService    The agent filter service to use
-     * @param meterRegistry         The metrics registry to use
+     * @param dataServices       The {@link DataServices} instance to use
+     * @param jobResolverService The specification service to use
+     * @param agentFilterService The agent filter service to use
+     * @param meterRegistry      The metrics registry to use
      * @return An {@link AgentJobServiceImpl} instance.
      */
     @Bean
     @ConditionalOnMissingBean(AgentJobService.class)
     public AgentJobServiceImpl agentJobService(
-        final JobPersistenceService jobPersistenceService,
+        final DataServices dataServices,
         final JobResolverService jobResolverService,
         final AgentFilterService agentFilterService,
         final MeterRegistry meterRegistry
     ) {
         return new AgentJobServiceImpl(
-            jobPersistenceService,
+            dataServices,
             jobResolverService,
             agentFilterService,
             meterRegistry
