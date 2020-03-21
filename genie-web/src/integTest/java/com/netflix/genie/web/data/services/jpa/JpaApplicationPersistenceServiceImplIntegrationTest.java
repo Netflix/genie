@@ -29,12 +29,9 @@ import com.netflix.genie.common.external.dtos.v4.ApplicationRequest;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.test.suppliers.RandomSuppliers;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,20 +40,18 @@ import org.springframework.data.domain.Sort;
 
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for the JpaApplicationPersistenceServiceImpl.
+ * Integration tests for {@link JpaApplicationPersistenceServiceImpl}.
  *
  * @author tgianos
  * @since 2.0.0
  */
-@DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaApplicationPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
+class JpaApplicationPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";
@@ -83,215 +78,186 @@ public class JpaApplicationPersistenceServiceImplIntegrationTest extends DBInteg
     private static final Pageable PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
-    private ApplicationPersistenceService appService;
+    private JpaApplicationPersistenceServiceImpl appService;
 
     @Autowired
     private CommandPersistenceService commandPersistenceService;
 
-    /**
-     * Test the get application method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplication() throws GenieException {
         final Application app = this.appService.getApplication(APP_1_ID);
-        Assert.assertEquals(APP_1_ID, app.getId());
-        Assert.assertEquals(APP_1_NAME, app.getMetadata().getName());
-        Assert.assertEquals(APP_1_USER, app.getMetadata().getUser());
-        Assert.assertEquals(APP_1_VERSION, app.getMetadata().getVersion());
-        Assert.assertEquals(APP_1_STATUS, app.getMetadata().getStatus());
-        Assert.assertFalse(app.getMetadata().getType().isPresent());
-        Assert.assertEquals(1, app.getMetadata().getTags().size());
-        Assert.assertEquals(2, app.getResources().getConfigs().size());
-        Assert.assertEquals(2, app.getResources().getDependencies().size());
+        Assertions.assertThat(app.getId()).isEqualTo(APP_1_ID);
+        final ApplicationMetadata appMetadata = app.getMetadata();
+        Assertions.assertThat(appMetadata.getName()).isEqualTo(APP_1_NAME);
+        Assertions.assertThat(appMetadata.getUser()).isEqualTo(APP_1_USER);
+        Assertions.assertThat(appMetadata.getVersion()).isEqualTo(APP_1_VERSION);
+        Assertions.assertThat(appMetadata.getStatus()).isEqualByComparingTo(APP_1_STATUS);
+        Assertions.assertThat(appMetadata.getType()).isNotPresent();
+        Assertions.assertThat(appMetadata.getTags()).hasSize(1);
+        Assertions.assertThat(app.getResources().getConfigs()).hasSize(2);
+        Assertions.assertThat(app.getResources().getDependencies()).hasSize(2);
 
         final Application app2 = this.appService.getApplication(APP_2_ID);
-        Assert.assertEquals(APP_2_ID, app2.getId());
-        Assert.assertEquals(APP_2_NAME, app2.getMetadata().getName());
-        Assert.assertEquals(APP_2_USER, app2.getMetadata().getUser());
-        Assert.assertEquals(APP_2_VERSION, app2.getMetadata().getVersion());
-        Assert.assertEquals(APP_2_STATUS, app2.getMetadata().getStatus());
-        Assert.assertThat(app2.getMetadata().getType().orElseGet(RandomSuppliers.STRING), Matchers.is(APP_2_TYPE));
-        Assert.assertEquals(2, app2.getMetadata().getTags().size());
-        Assert.assertEquals(2, app2.getResources().getConfigs().size());
-        Assert.assertEquals(1, app2.getResources().getDependencies().size());
+        Assertions.assertThat(app2.getId()).isEqualTo(APP_2_ID);
+        final ApplicationMetadata app2Metadata = app2.getMetadata();
+        Assertions.assertThat(app2Metadata.getName()).isEqualTo(APP_2_NAME);
+        Assertions.assertThat(app2Metadata.getUser()).isEqualTo(APP_2_USER);
+        Assertions.assertThat(app2Metadata.getVersion()).isEqualTo(APP_2_VERSION);
+        Assertions.assertThat(app2Metadata.getStatus()).isEqualByComparingTo(APP_2_STATUS);
+        Assertions.assertThat(app2Metadata.getType()).isPresent().contains(APP_2_TYPE);
+        Assertions.assertThat(app2Metadata.getTags()).hasSize(2);
+        Assertions.assertThat(app2.getResources().getConfigs()).hasSize(2);
+        Assertions.assertThat(app2.getResources().getDependencies()).hasSize(1);
 
         final Application app3 = this.appService.getApplication(APP_3_ID);
-        Assert.assertEquals(APP_3_ID, app3.getId());
-        Assert.assertEquals(APP_3_NAME, app3.getMetadata().getName());
-        Assert.assertEquals(APP_3_USER, app3.getMetadata().getUser());
-        Assert.assertEquals(APP_3_VERSION, app3.getMetadata().getVersion());
-        Assert.assertEquals(APP_3_STATUS, app3.getMetadata().getStatus());
-        Assert.assertThat(app3.getMetadata().getType().orElseGet(RandomSuppliers.STRING), Matchers.is(APP_3_TYPE));
-        Assert.assertEquals(1, app3.getMetadata().getTags().size());
-        Assert.assertEquals(1, app3.getResources().getConfigs().size());
-        Assert.assertEquals(2, app3.getResources().getDependencies().size());
+        Assertions.assertThat(app3.getId()).isEqualTo(APP_3_ID);
+        final ApplicationMetadata app3Metadata = app3.getMetadata();
+        Assertions.assertThat(app3Metadata.getName()).isEqualTo(APP_3_NAME);
+        Assertions.assertThat(app3Metadata.getUser()).isEqualTo(APP_3_USER);
+        Assertions.assertThat(app3Metadata.getVersion()).isEqualTo(APP_3_VERSION);
+        Assertions.assertThat(app3Metadata.getStatus()).isEqualByComparingTo(APP_3_STATUS);
+        Assertions.assertThat(app3Metadata.getType()).isPresent().contains(APP_3_TYPE);
+        Assertions.assertThat(app3Metadata.getTags()).hasSize(1);
+        Assertions.assertThat(app3.getResources().getConfigs()).hasSize(1);
+        Assertions.assertThat(app3.getResources().getDependencies()).hasSize(2);
     }
 
-    /**
-     * Test the get application method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetApplicationEmpty() throws GenieException {
-        this.appService.getApplication("");
-    }
-
-    /**
-     * Test the get applications method.
-     */
     @Test
-    public void testGetApplicationsByName() {
+    void testGetApplicationEmpty() {
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.appService.getApplication(""));
+    }
+
+    @Test
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsByName() {
         final Page<Application> apps = this.appService.getApplications(APP_2_NAME, null, null, null, null, PAGEABLE);
-        Assert.assertEquals(1, apps.getNumberOfElements());
-        Assert.assertThat(apps.getContent().get(0).getId(), Matchers.is(APP_2_ID));
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_2_ID);
     }
 
-    /**
-     * Test the get applications method.
-     */
     @Test
-    public void testGetApplicationsByUser() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsByUser() {
         final Page<Application> apps = this.appService.getApplications(null, APP_1_USER, null, null, null, PAGEABLE);
-        Assert.assertEquals(2, apps.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId());
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_3_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_1_ID);
     }
 
-    /**
-     * Test the get applications method.
-     */
     @Test
-    public void testGetApplicationsByStatuses() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsByStatuses() {
         final Set<ApplicationStatus> statuses = Sets.newHashSet(ApplicationStatus.ACTIVE, ApplicationStatus.INACTIVE);
         final Page<Application> apps = this.appService.getApplications(null, null, statuses, null, null, PAGEABLE);
-        Assert.assertEquals(2, apps.getNumberOfElements());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId());
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_2_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_1_ID);
     }
 
-    /**
-     * Test the get applications method.
-     */
     @Test
-    public void testGetApplicationsByTags() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsByTags() {
         final Set<String> tags = Sets.newHashSet("prod");
         Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
-        Assert.assertEquals(3, apps.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId());
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_3_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_2_ID);
+        Assertions.assertThat(apps.getContent().get(2).getId()).isEqualTo(APP_1_ID);
 
         tags.add("yarn");
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
-        Assert.assertEquals(1, apps.getNumberOfElements());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_2_ID);
 
         tags.add("somethingThatWouldNeverReallyExist");
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
-        Assert.assertThat(apps.getNumberOfElements(), Matchers.is(0));
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(0);
 
         tags.clear();
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
-        Assert.assertEquals(3, apps.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId());
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_3_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_2_ID);
+        Assertions.assertThat(apps.getContent().get(2).getId()).isEqualTo(APP_1_ID);
     }
 
-    /**
-     * Test the get applications method when a tag doesn't exist in the database.
-     */
     @Test
-    public void testGetApplicationsByTagsWhenOneDoesntExist() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsByTagsWhenOneDoesntExist() {
         final Set<String> tags = Sets.newHashSet("prod", UUID.randomUUID().toString());
         final Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
-        Assert.assertEquals(0, apps.getNumberOfElements());
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(0);
     }
 
-    /**
-     * Test the get applications method.
-     */
     @Test
-    public void testGetApplicationsByType() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsByType() {
         final Page<Application> apps = this.appService.getApplications(null, null, null, null, APP_2_TYPE, PAGEABLE);
-        Assert.assertEquals(1, apps.getNumberOfElements());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_2_ID);
     }
 
-    /**
-     * Test the get applications method with descending sort.
-     */
     @Test
-    public void testGetApplicationsDescending() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsDescending() {
         //Default to order by Updated
-        final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
-        Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(2).getId());
+        final Page<Application> apps = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_3_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_2_ID);
+        Assertions.assertThat(apps.getContent().get(2).getId()).isEqualTo(APP_1_ID);
     }
 
-    /**
-     * Test the get applications method with ascending sort.
-     */
     @Test
-    public void testGetApplicationsAscending() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsAscending() {
         //Default to order by Updated
         final Pageable ascendingPage = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
-        final Page<Application> applications
-            = this.appService.getApplications(null, null, null, null, null, ascendingPage);
-        Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(2).getId());
+        final Page<Application> apps = this.appService.getApplications(null, null, null, null, null, ascendingPage);
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_1_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_2_ID);
+        Assertions.assertThat(apps.getContent().get(2).getId()).isEqualTo(APP_3_ID);
     }
 
-    /**
-     * Test the get applications method default order by.
-     */
     @Test
-    public void testGetApplicationsOrderBysDefault() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsOrderBysDefault() {
         //Default to order by Updated
-        final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
-        Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(2).getId());
+        final Page<Application> apps = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_3_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_2_ID);
+        Assertions.assertThat(apps.getContent().get(2).getId()).isEqualTo(APP_1_ID);
     }
 
-    /**
-     * Test the get applications method order by name.
-     */
     @Test
-    public void testGetApplicationsOrderBysName() {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsOrderBysName() {
         final Pageable orderByNamePage = PageRequest.of(0, 10, Sort.Direction.DESC, "name");
-        final Page<Application> applications
-            = this.appService.getApplications(null, null, null, null, null, orderByNamePage);
-        Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(2).getId());
+        final Page<Application> apps = this.appService.getApplications(null, null, null, null, null, orderByNamePage);
+        Assertions.assertThat(apps.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(apps.getContent().get(0).getId()).isEqualTo(APP_1_ID);
+        Assertions.assertThat(apps.getContent().get(1).getId()).isEqualTo(APP_3_ID);
+        Assertions.assertThat(apps.getContent().get(2).getId()).isEqualTo(APP_2_ID);
     }
 
     /**
      * Test the get applications method order by an invalid field should return the order by default value (updated).
      */
-    @Test(expected = RuntimeException.class)
-    public void testGetApplicationsOrderBysInvalidField() {
+    @Test
+    void testGetApplicationsOrderBysInvalidField() {
         final Pageable orderByInvalidPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
-        this.appService.getApplications(null, null, null, null, null, orderByInvalidPage);
+        Assertions
+            .assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> this.appService.getApplications(null, null, null, null, null, orderByInvalidPage));
     }
 
-    /**
-     * Test the create method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testCreateApplication() throws GenieException {
+    void testCreateApplication() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final ApplicationRequest app = new ApplicationRequest.Builder(
             new ApplicationMetadata.Builder(
@@ -305,32 +271,21 @@ public class JpaApplicationPersistenceServiceImplIntegrationTest extends DBInteg
             .withRequestedId(id)
             .build();
         final String createdId = this.appService.createApplication(app);
-        Assert.assertThat(createdId, Matchers.is(id));
+        Assertions.assertThat(createdId).isEqualTo(id);
         final Application created = this.appService.getApplication(id);
-        Assert.assertNotNull(created);
-        Assert.assertEquals(id, created.getId());
-        Assert.assertEquals(APP_1_NAME, created.getMetadata().getName());
-        Assert.assertEquals(APP_1_USER, created.getMetadata().getUser());
-        Assert.assertEquals(ApplicationStatus.ACTIVE, created.getMetadata().getStatus());
+        Assertions.assertThat(created.getId()).isEqualTo(createdId);
+        final ApplicationMetadata appMetadata = created.getMetadata();
+        Assertions.assertThat(appMetadata.getName()).isEqualTo(APP_1_NAME);
+        Assertions.assertThat(appMetadata.getUser()).isEqualTo(APP_1_USER);
+        Assertions.assertThat(appMetadata.getStatus()).isEqualByComparingTo(ApplicationStatus.ACTIVE);
         this.appService.deleteApplication(id);
-        try {
-            this.appService.getApplication(id);
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                HttpURLConnection.HTTP_NOT_FOUND,
-                ge.getErrorCode()
-            );
-        }
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.appService.getApplication(id));
     }
 
-    /**
-     * Test the create method when no id is entered.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testCreateApplicationNoId() throws GenieException {
+    void testCreateApplicationNoId() throws GenieException {
         final ApplicationRequest app = new ApplicationRequest.Builder(
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
@@ -343,33 +298,23 @@ public class JpaApplicationPersistenceServiceImplIntegrationTest extends DBInteg
             .build();
         final String id = this.appService.createApplication(app);
         final Application created = this.appService.getApplication(id);
-        Assert.assertNotNull(created);
-        Assert.assertEquals(APP_1_NAME, created.getMetadata().getName());
-        Assert.assertEquals(APP_1_USER, created.getMetadata().getUser());
-        Assert.assertEquals(ApplicationStatus.ACTIVE, created.getMetadata().getStatus());
-        this.appService.deleteApplication(created.getId());
-        try {
-            this.appService.getApplication(created.getId());
-            Assert.fail();
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                HttpURLConnection.HTTP_NOT_FOUND,
-                ge.getErrorCode()
-            );
-        }
+        final ApplicationMetadata appMetadata = created.getMetadata();
+        Assertions.assertThat(appMetadata.getName()).isEqualTo(APP_1_NAME);
+        Assertions.assertThat(appMetadata.getUser()).isEqualTo(APP_1_USER);
+        Assertions.assertThat(appMetadata.getStatus()).isEqualByComparingTo(ApplicationStatus.ACTIVE);
+        this.appService.deleteApplication(id);
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.appService.getApplication(id));
     }
 
-    /**
-     * Test to update an application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateApplication() throws GenieException {
         final Application getApp = this.appService.getApplication(APP_1_ID);
-        Assert.assertEquals(APP_1_USER, getApp.getMetadata().getUser());
-        Assert.assertEquals(ApplicationStatus.INACTIVE, getApp.getMetadata().getStatus());
-        Assert.assertEquals(1, getApp.getMetadata().getTags().size());
+        Assertions.assertThat(getApp.getMetadata().getUser()).isEqualTo(APP_1_USER);
+        Assertions.assertThat(getApp.getMetadata().getStatus()).isEqualByComparingTo(ApplicationStatus.INACTIVE);
+        Assertions.assertThat(getApp.getMetadata().getTags().size()).isEqualTo(1);
         final Instant updateTime = getApp.getUpdated();
 
         final Set<String> tags = Sets.newHashSet("prod", "tez", "yarn", "hadoop");
@@ -394,19 +339,15 @@ public class JpaApplicationPersistenceServiceImplIntegrationTest extends DBInteg
         this.appService.updateApplication(APP_1_ID, updateApp);
 
         final Application updated = this.appService.getApplication(APP_1_ID);
-        Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
-        Assert.assertEquals(APP_2_USER, updated.getMetadata().getUser());
-        Assert.assertEquals(ApplicationStatus.ACTIVE, updated.getMetadata().getStatus());
-        Assert.assertEquals(tags, updated.getMetadata().getTags());
+        Assertions.assertThat(updated.getUpdated()).isNotEqualTo(updateTime);
+        Assertions.assertThat(updated.getMetadata().getUser()).isEqualTo(APP_2_USER);
+        Assertions.assertThat(updated.getMetadata().getStatus()).isEqualByComparingTo(ApplicationStatus.ACTIVE);
+        Assertions.assertThat(updated.getMetadata().getTags()).isEqualTo(tags);
     }
 
-    /**
-     * Test to make sure setting the created and updated outside the system control doesn't change record in database.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateCreateAndUpdate() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateCreateAndUpdate() throws GenieException {
         final Application init = this.appService.getApplication(APP_1_ID);
         final Instant created = init.getCreated();
         final Instant updated = init.getUpdated();
@@ -414,21 +355,15 @@ public class JpaApplicationPersistenceServiceImplIntegrationTest extends DBInteg
         this.appService.updateApplication(APP_1_ID, init);
 
         final Application updatedApp = this.appService.getApplication(APP_1_ID);
-        Assert.assertEquals(created, updatedApp.getCreated());
-        Assert.assertThat(updatedApp.getUpdated(), Matchers.not(updated));
-        Assert.assertNotEquals(Instant.EPOCH, updatedApp.getUpdated());
+        Assertions.assertThat(updatedApp.getCreated()).isEqualTo(created);
+        Assertions.assertThat(updatedApp.getUpdated()).isNotEqualTo(updated).isNotEqualTo(Instant.EPOCH);
     }
 
-    /**
-     * Test to patch an application.
-     *
-     * @throws GenieException For any problem
-     * @throws IOException    For Json serialization problem
-     */
     @Test
-    public void testPatchApplication() throws GenieException, IOException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testPatchApplication() throws GenieException, IOException {
         final Application getApp = this.appService.getApplication(APP_1_ID);
-        Assert.assertEquals(APP_1_USER, getApp.getMetadata().getUser());
+        Assertions.assertThat(getApp.getMetadata().getUser()).isEqualTo(APP_1_USER);
         final Instant updateTime = getApp.getUpdated();
 
         final String patchString
@@ -438,304 +373,209 @@ public class JpaApplicationPersistenceServiceImplIntegrationTest extends DBInteg
         this.appService.patchApplication(APP_1_ID, patch);
 
         final Application updated = this.appService.getApplication(APP_1_ID);
-        Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
-        Assert.assertEquals(APP_2_USER, updated.getMetadata().getUser());
+        Assertions.assertThat(updated.getUpdated()).isNotEqualTo(updateTime);
+        Assertions.assertThat(updated.getMetadata().getUser()).isEqualTo(APP_2_USER);
     }
 
-    /**
-     * Test delete all.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testDeleteAll() throws GenieException {
-        Assert.assertEquals(
-            3,
-            this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements()
-        );
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testDeleteAll() throws GenieException {
+        Assertions
+            .assertThat(this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements())
+            .isEqualTo(3);
         // To solve referential integrity problem
         this.commandPersistenceService.deleteCommand(COMMAND_1_ID);
         this.appService.deleteAllApplications();
-        Assert.assertTrue(
-            this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements() == 0
-        );
+        Assertions
+            .assertThat(this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements())
+            .isEqualTo(0);
     }
 
-    /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testDelete() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testDelete() throws GenieException {
         this.appService.deleteApplication(APP_3_ID);
-        try {
-            this.appService.getApplication(APP_3_ID);
-            Assert.fail();
-        } catch (final GenieNotFoundException gnfe) {
-            Assert.assertTrue(true);
-        }
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.appService.getApplication(APP_3_ID));
     }
 
-    /**
-     * Test add configurations to application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddConfigsToApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddConfigsToApplication() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
         final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
-        Assert.assertEquals(2, this.appService.getConfigsForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getConfigsForApplication(APP_1_ID)).hasSize(2);
         this.appService.addConfigsToApplication(APP_1_ID, newConfigs);
         final Set<String> finalConfigs = this.appService.getConfigsForApplication(APP_1_ID);
-        Assert.assertEquals(5, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
+        Assertions.assertThat(finalConfigs).hasSize(5).containsAll(newConfigs);
     }
 
-    /**
-     * Test update configurations for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateConfigsForApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateConfigsForApplication() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
         final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
-        Assert.assertEquals(2, this.appService.getConfigsForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getConfigsForApplication(APP_1_ID)).hasSize(2);
         this.appService.updateConfigsForApplication(APP_1_ID, newConfigs);
         final Set<String> finalConfigs = this.appService.getConfigsForApplication(APP_1_ID);
-        Assert.assertEquals(3, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
+        Assertions.assertThat(finalConfigs).hasSize(3).containsAll(newConfigs);
     }
 
-    /**
-     * Test get configurations for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetConfigsForApplication() throws GenieException {
-        Assert.assertEquals(2, this.appService.getConfigsForApplication(APP_1_ID).size());
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetConfigsForApplication() throws GenieException {
+        Assertions.assertThat(this.appService.getConfigsForApplication(APP_1_ID)).hasSize(2);
     }
 
-    /**
-     * Test remove all configurations for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllConfigsForApplication() throws GenieException {
-        Assert.assertEquals(2, this.appService.getConfigsForApplication(APP_1_ID).size());
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllConfigsForApplication() throws GenieException {
+        Assertions.assertThat(this.appService.getConfigsForApplication(APP_1_ID)).hasSize(2);
         this.appService.removeAllConfigsForApplication(APP_1_ID);
-        Assert.assertEquals(0, this.appService.getConfigsForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getConfigsForApplication(APP_1_ID)).isEmpty();
     }
 
-    /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveConfigForApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveConfigForApplication() throws GenieException {
         final Set<String> configs = this.appService.getConfigsForApplication(APP_1_ID);
-        Assert.assertEquals(2, configs.size());
+        Assertions.assertThat(configs).hasSize(2);
         final String removedConfig = configs.iterator().next();
         this.appService.removeConfigForApplication(APP_1_ID, removedConfig);
-        Assert.assertFalse(this.appService.getConfigsForApplication(APP_1_ID).contains(removedConfig));
+        Assertions.assertThat(this.appService.getConfigsForApplication(APP_1_ID)).doesNotContain(removedConfig);
     }
 
-    /**
-     * Test add dependencies to application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddDependenciesToApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddDependenciesToApplication() throws GenieException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
 
         final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
 
-        Assert.assertEquals(2, this.appService.getDependenciesForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getDependenciesForApplication(APP_1_ID)).hasSize(2);
         this.appService.addDependenciesForApplication(APP_1_ID, newDependencies);
         final Set<String> finalDependencies = this.appService.getDependenciesForApplication(APP_1_ID);
-        Assert.assertEquals(5, finalDependencies.size());
-        Assert.assertTrue(finalDependencies.contains(newDependency1));
-        Assert.assertTrue(finalDependencies.contains(newDependency2));
-        Assert.assertTrue(finalDependencies.contains(newDependency3));
+        Assertions.assertThat(finalDependencies).hasSize(5).containsAll(newDependencies);
     }
 
-    /**
-     * Test update dependencies for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateDependenciesForApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateDependenciesForApplication() throws GenieException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
 
         final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
 
-        Assert.assertEquals(2, this.appService.getDependenciesForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getDependenciesForApplication(APP_1_ID)).hasSize(2);
         this.appService.updateDependenciesForApplication(APP_1_ID, newDependencies);
         final Set<String> finalDependencies = this.appService.getDependenciesForApplication(APP_1_ID);
-        Assert.assertEquals(3, finalDependencies.size());
-        Assert.assertTrue(finalDependencies.contains(newDependency1));
-        Assert.assertTrue(finalDependencies.contains(newDependency2));
-        Assert.assertTrue(finalDependencies.contains(newDependency3));
+        Assertions.assertThat(finalDependencies).hasSize(3).containsAll(newDependencies);
     }
 
-    /**
-     * Test get dependencies for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetDependenciesForApplication() throws GenieException {
-        Assert.assertEquals(2,
-            this.appService.getDependenciesForApplication(APP_1_ID).size());
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetDependenciesForApplication() throws GenieException {
+        Assertions.assertThat(this.appService.getDependenciesForApplication(APP_1_ID)).hasSize(2);
     }
 
-    /**
-     * Test remove all dependencies for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllDependenciesForApplication() throws GenieException {
-        Assert.assertEquals(2, this.appService.getDependenciesForApplication(APP_1_ID).size());
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllDependenciesForApplication() throws GenieException {
+        Assertions.assertThat(this.appService.getDependenciesForApplication(APP_1_ID)).hasSize(2);
         this.appService.removeAllDependenciesForApplication(APP_1_ID);
-        Assert.assertEquals(0, this.appService.getDependenciesForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getDependenciesForApplication(APP_1_ID)).isEmpty();
     }
 
-    /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveDependencyForApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveDependencyForApplication() throws GenieException {
         final Set<String> dependencies = this.appService.getDependenciesForApplication(APP_1_ID);
-        Assert.assertEquals(2, dependencies.size());
+        Assertions.assertThat(dependencies).hasSize(2);
         final String removedDependency = dependencies.iterator().next();
         this.appService.removeDependencyForApplication(APP_1_ID, removedDependency);
-        Assert.assertFalse(this.appService.getDependenciesForApplication(APP_1_ID).contains(removedDependency));
+        Assertions
+            .assertThat(this.appService.getDependenciesForApplication(APP_1_ID))
+            .doesNotContain(removedDependency);
     }
 
-    /**
-     * Test add tags to application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddTagsToApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddTagsToApplication() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(1, this.appService.getTagsForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getTagsForApplication(APP_1_ID)).hasSize(1);
         this.appService.addTagsForApplication(APP_1_ID, newTags);
         final Set<String> finalTags = this.appService.getTagsForApplication(APP_1_ID);
-        Assert.assertEquals(4, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
+        Assertions.assertThat(finalTags).hasSize(4).containsAll(newTags);
     }
 
-    /**
-     * Test update tags for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateTagsForApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateTagsForApplication() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(1, this.appService.getTagsForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getTagsForApplication(APP_1_ID)).hasSize(1);
         this.appService.updateTagsForApplication(APP_1_ID, newTags);
         final Set<String> finalTags = this.appService.getTagsForApplication(APP_1_ID);
-        Assert.assertEquals(3, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
+        Assertions.assertThat(finalTags).hasSize(3).containsAll(newTags);
     }
 
-    /**
-     * Test get tags for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetTagsForApplication() throws GenieException {
-        Assert.assertEquals(1, this.appService.getTagsForApplication(APP_1_ID).size());
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetTagsForApplication() throws GenieException {
+        Assertions.assertThat(this.appService.getTagsForApplication(APP_1_ID)).hasSize(1);
     }
 
-    /**
-     * Test remove all tags for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllTagsForApplication() throws GenieException {
-        Assert.assertEquals(1, this.appService.getTagsForApplication(APP_1_ID).size());
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllTagsForApplication() throws GenieException {
+        Assertions.assertThat(this.appService.getTagsForApplication(APP_1_ID)).hasSize(1);
         this.appService.removeAllTagsForApplication(APP_1_ID);
-        Assert.assertEquals(0, this.appService.getTagsForApplication(APP_1_ID).size());
+        Assertions.assertThat(this.appService.getTagsForApplication(APP_1_ID)).isEmpty();
     }
 
-    /**
-     * Test remove tag for application.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveTagForApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveTagForApplication() throws GenieException {
         final Set<String> tags = this.appService.getTagsForApplication(APP_1_ID);
-        Assert.assertEquals(1, tags.size());
+        Assertions.assertThat(tags).contains("prod");
         this.appService.removeTagForApplication(APP_1_ID, "prod");
-        Assert.assertFalse(this.appService.getTagsForApplication(APP_1_ID).contains("prod"));
+        Assertions.assertThat(this.appService.getTagsForApplication(APP_1_ID)).doesNotContain("prod");
     }
 
-    /**
-     * Test the Get commands for application method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetCommandsForApplication() throws GenieException {
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsForApplication() throws GenieException {
         final Set<Command> commands = this.appService.getCommandsForApplication(APP_1_ID, null);
-        Assert.assertEquals(1, commands.size());
-        Assert.assertEquals(COMMAND_1_ID, commands.iterator().next().getId());
+        Assertions
+            .assertThat(commands).hasSize(1)
+            .hasOnlyOneElementSatisfying(command -> Assertions.assertThat(command.getId()).isEqualTo(COMMAND_1_ID));
     }
 
-    /**
-     * Test the Get commands for application method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetCommandsForApplicationNoId() throws GenieException {
-        this.appService.getCommandsForApplication("", null);
+    @Test
+    void testGetCommandsForApplicationNoId() {
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.appService.getCommandsForApplication("", null));
     }
 }

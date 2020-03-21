@@ -26,28 +26,26 @@ import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for the JpaFilePersistenceServiceImpl class.
+ * Integration tests for the {@link JpaFilePersistenceServiceImpl} class.
  *
  * @author tgianos
  * @since 3.3.0
  */
 @DatabaseTearDown("cleanup.xml")
-public class JpaFilePersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
+class JpaFilePersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private JpaFilePersistenceService filePersistenceService;
+    private JpaFilePersistenceServiceImpl filePersistenceService;
 
     @Autowired
     private ApplicationPersistenceService applicationPersistenceService;
@@ -57,39 +55,36 @@ public class JpaFilePersistenceServiceImplIntegrationTest extends DBIntegrationT
      * just does nothing.
      */
     @Test
-    public void canCreateFileIfNotExists() {
-        Assert.assertThat(this.fileRepository.count(), Matchers.is(0L));
+    void canCreateFileIfNotExists() {
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(0L);
         final String file = UUID.randomUUID().toString();
-        Assert.assertFalse(this.filePersistenceService.getFile(file).isPresent());
+        Assertions.assertThat(this.filePersistenceService.getFile(file)).isNotPresent();
         this.filePersistenceService.createFileIfNotExists(file);
-        Assert.assertThat(this.fileRepository.count(), Matchers.is(1L));
-        Assert.assertTrue(this.fileRepository.existsByFile(file));
-        final Optional<FileEntity> fileEntityOptional = this.filePersistenceService.getFile(file);
-        Assert.assertTrue(fileEntityOptional.isPresent());
-        final FileEntity fileEntity = fileEntityOptional.get();
-        Assert.assertThat(fileEntity.getFile(), Matchers.is(file));
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(1L);
+        Assertions.assertThat(this.fileRepository.existsByFile(file)).isTrue();
+        Assertions
+            .assertThat(this.filePersistenceService.getFile(file))
+            .isPresent()
+            .get()
+            .extracting(FileEntity::getFile)
+            .isEqualTo(file);
 
         // Try again with the same file
         this.filePersistenceService.createFileIfNotExists(file);
-        Assert.assertThat(this.fileRepository.count(), Matchers.is(1L));
-        Assert.assertTrue(this.fileRepository.existsByFile(file));
-        final Optional<FileEntity> fileEntityOptional2 = this.filePersistenceService.getFile(file);
-        Assert.assertTrue(fileEntityOptional2.isPresent());
-        final FileEntity fileEntity2 = fileEntityOptional2.get();
-        Assert.assertThat(fileEntity2.getFile(), Matchers.is(file));
-
-        // Make sure the ids are still equal
-        Assert.assertThat(fileEntity2.getId(), Matchers.is(fileEntity.getId()));
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(1L);
+        Assertions.assertThat(this.fileRepository.existsByFile(file)).isTrue();
+        Assertions
+            .assertThat(this.filePersistenceService.getFile(file))
+            .isPresent()
+            .get()
+            .extracting(FileEntity::getFile)
+            .isEqualTo(file);
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Make sure we can delete files that aren't attached to other resources.
-     *
-     * @throws GenieException on error
-     */
     @Test
-    public void canDeleteUnusedFiles() throws GenieException {
-        Assert.assertThat(this.fileRepository.count(), Matchers.is(0L));
+    void canDeleteUnusedFiles() throws GenieException {
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(0L);
         final String file1 = UUID.randomUUID().toString();
         final String file2 = UUID.randomUUID().toString();
         final String file3 = UUID.randomUUID().toString();
@@ -117,29 +112,26 @@ public class JpaFilePersistenceServiceImplIntegrationTest extends DBIntegrationT
 
         final String appId = this.applicationPersistenceService.createApplication(app);
 
-        Assert.assertTrue(this.fileRepository.existsByFile(file1));
-        Assert.assertTrue(this.fileRepository.existsByFile(file2));
-        Assert.assertTrue(this.fileRepository.existsByFile(file3));
-        Assert.assertTrue(this.fileRepository.existsByFile(file4));
-        Assert.assertTrue(this.fileRepository.existsByFile(file5));
+        Assertions.assertThat(this.fileRepository.existsByFile(file1)).isTrue();
+        Assertions.assertThat(this.fileRepository.existsByFile(file2)).isTrue();
+        Assertions.assertThat(this.fileRepository.existsByFile(file3)).isTrue();
+        Assertions.assertThat(this.fileRepository.existsByFile(file4)).isTrue();
+        Assertions.assertThat(this.fileRepository.existsByFile(file5)).isTrue();
 
-        Assert.assertThat(this.filePersistenceService.deleteUnusedFiles(Instant.now()), Matchers.is(2L));
+        Assertions.assertThat(this.filePersistenceService.deleteUnusedFiles(Instant.now())).isEqualTo(2L);
 
-        Assert.assertFalse(this.fileRepository.existsByFile(file1));
-        Assert.assertTrue(this.fileRepository.existsByFile(file2));
-        Assert.assertTrue(this.fileRepository.existsByFile(file3));
-        Assert.assertFalse(this.fileRepository.existsByFile(file4));
-        Assert.assertTrue(this.fileRepository.existsByFile(file5));
+        Assertions.assertThat(this.fileRepository.existsByFile(file1)).isFalse();
+        Assertions.assertThat(this.fileRepository.existsByFile(file2)).isTrue();
+        Assertions.assertThat(this.fileRepository.existsByFile(file3)).isTrue();
+        Assertions.assertThat(this.fileRepository.existsByFile(file4)).isFalse();
+        Assertions.assertThat(this.fileRepository.existsByFile(file5)).isTrue();
 
         this.applicationPersistenceService.deleteApplication(appId);
     }
 
-    /**
-     * Make sure we can find files.
-     */
     @Test
-    public void canFindFiles() {
-        Assert.assertThat(this.fileRepository.count(), Matchers.is(0L));
+    void canFindFiles() {
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(0L);
         final String file1 = UUID.randomUUID().toString();
         final String file2 = UUID.randomUUID().toString();
         this.filePersistenceService.createFileIfNotExists(file1);
@@ -150,15 +142,12 @@ public class JpaFilePersistenceServiceImplIntegrationTest extends DBIntegrationT
             = this.filePersistenceService.getFile(file2).orElseThrow(IllegalArgumentException::new);
 
         Set<FileEntity> files = this.filePersistenceService.getFiles(Sets.newHashSet(file1, file2));
-        Assert.assertThat(files.size(), Matchers.is(2));
-        Assert.assertThat(files, Matchers.hasItems(fileEntity1, fileEntity2));
+        Assertions.assertThat(files).hasSize(2).contains(fileEntity1, fileEntity2);
 
         files = this.filePersistenceService.getFiles(Sets.newHashSet(file1, file2, UUID.randomUUID().toString()));
-        Assert.assertThat(files.size(), Matchers.is(2));
-        Assert.assertThat(files, Matchers.hasItems(fileEntity1, fileEntity2));
+        Assertions.assertThat(files).hasSize(2).contains(fileEntity1, fileEntity2);
 
         files = this.filePersistenceService.getFiles(Sets.newHashSet(file1, UUID.randomUUID().toString()));
-        Assert.assertThat(files.size(), Matchers.is(1));
-        Assert.assertThat(files, Matchers.hasItem(fileEntity1));
+        Assertions.assertThat(files).hasSize(1).contains(fileEntity1);
     }
 }

@@ -25,28 +25,26 @@ import com.netflix.genie.common.external.dtos.v4.ApplicationRequest;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import com.netflix.genie.web.data.entities.TagEntity;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for the JpaTagPersistenceServiceImpl class.
+ * Integration tests for the {@link JpaTagPersistenceServiceImpl} class.
  *
  * @author tgianos
  * @since 3.3.0
  */
 @DatabaseTearDown("cleanup.xml")
-public class JpaTagPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
+class JpaTagPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private JpaTagPersistenceService tagPersistenceService;
+    private JpaTagPersistenceServiceImpl tagPersistenceService;
 
     @Autowired
     private ApplicationPersistenceService applicationPersistenceService;
@@ -56,39 +54,37 @@ public class JpaTagPersistenceServiceImplIntegrationTest extends DBIntegrationTe
      * just does nothing.
      */
     @Test
-    public void canCreateTagIfNotExists() {
-        Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
+    void canCreateTagIfNotExists() {
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(0L);
         final String tag = UUID.randomUUID().toString();
-        Assert.assertFalse(this.tagPersistenceService.getTag(tag).isPresent());
+        Assertions.assertThat(this.tagPersistenceService.getTag(tag)).isNotPresent();
         this.tagPersistenceService.createTagIfNotExists(tag);
-        Assert.assertThat(this.tagRepository.count(), Matchers.is(1L));
-        Assert.assertTrue(this.tagRepository.existsByTag(tag));
-        final Optional<TagEntity> tagEntityOptional = this.tagPersistenceService.getTag(tag);
-        Assert.assertTrue(tagEntityOptional.isPresent());
-        final TagEntity tagEntity = tagEntityOptional.get();
-        Assert.assertThat(tagEntity.getTag(), Matchers.is(tag));
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(1L);
+        Assertions.assertThat(this.tagRepository.existsByTag(tag)).isTrue();
+        Assertions
+            .assertThat(this.tagPersistenceService.getTag(tag))
+            .isPresent()
+            .get()
+            .extracting(TagEntity::getTag)
+            .isEqualTo(tag);
 
         // Try again with the same tag
         this.tagPersistenceService.createTagIfNotExists(tag);
-        Assert.assertThat(this.tagRepository.count(), Matchers.is(1L));
-        Assert.assertTrue(this.tagRepository.existsByTag(tag));
-        final Optional<TagEntity> tagEntityOptional2 = this.tagPersistenceService.getTag(tag);
-        Assert.assertTrue(tagEntityOptional2.isPresent());
-        final TagEntity tagEntity2 = tagEntityOptional2.get();
-        Assert.assertThat(tagEntity2.getTag(), Matchers.is(tag));
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(1L);
+        Assertions.assertThat(this.tagRepository.existsByTag(tag)).isTrue();
+        Assertions
+            .assertThat(this.tagPersistenceService.getTag(tag))
+            .isPresent()
+            .get()
+            .extracting(TagEntity::getTag)
+            .isEqualTo(tag);
 
-        // Make sure the ids are still equal
-        Assert.assertThat(tagEntity2.getId(), Matchers.is(tagEntity.getId()));
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(1L);
     }
 
-    /**
-     * Make sure we can delete tags that aren't attached to other resources.
-     *
-     * @throws GenieException on error
-     */
     @Test
-    public void canDeleteUnusedTags() throws GenieException {
-        Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
+    void canDeleteUnusedTags() throws GenieException {
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(0L);
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
         this.tagPersistenceService.createTagIfNotExists(tag1);
@@ -106,21 +102,18 @@ public class JpaTagPersistenceServiceImplIntegrationTest extends DBIntegrationTe
 
         this.applicationPersistenceService.createApplication(app);
 
-        Assert.assertTrue(this.tagRepository.existsByTag(tag1));
-        Assert.assertTrue(this.tagRepository.existsByTag(tag2));
+        Assertions.assertThat(this.tagRepository.existsByTag(tag1)).isTrue();
+        Assertions.assertThat(this.tagRepository.existsByTag(tag2)).isTrue();
 
-        Assert.assertThat(this.tagPersistenceService.deleteUnusedTags(Instant.now()), Matchers.is(1L));
+        Assertions.assertThat(this.tagPersistenceService.deleteUnusedTags(Instant.now())).isEqualTo(1L);
 
-        Assert.assertFalse(this.tagRepository.existsByTag(tag1));
-        Assert.assertTrue(this.tagRepository.existsByTag(tag2));
+        Assertions.assertThat(this.tagRepository.existsByTag(tag1)).isFalse();
+        Assertions.assertThat(this.tagRepository.existsByTag(tag2)).isTrue();
     }
 
-    /**
-     * Make sure we can find tags.
-     */
     @Test
-    public void canFindTags() {
-        Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
+    void canFindTags() {
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(0L);
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
         this.tagPersistenceService.createTagIfNotExists(tag1);
@@ -129,15 +122,12 @@ public class JpaTagPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final TagEntity tagEntity2 = this.tagPersistenceService.getTag(tag2).orElseThrow(IllegalArgumentException::new);
 
         Set<TagEntity> tags = this.tagPersistenceService.getTags(Sets.newHashSet(tag1, tag2));
-        Assert.assertThat(tags.size(), Matchers.is(2));
-        Assert.assertThat(tags, Matchers.hasItems(tagEntity1, tagEntity2));
+        Assertions.assertThat(tags).hasSize(2).contains(tagEntity1, tagEntity2);
 
         tags = this.tagPersistenceService.getTags(Sets.newHashSet(tag1, tag2, UUID.randomUUID().toString()));
-        Assert.assertThat(tags.size(), Matchers.is(2));
-        Assert.assertThat(tags, Matchers.hasItems(tagEntity1, tagEntity2));
+        Assertions.assertThat(tags).hasSize(2).contains(tagEntity1, tagEntity2);
 
         tags = this.tagPersistenceService.getTags(Sets.newHashSet(tag1, UUID.randomUUID().toString()));
-        Assert.assertThat(tags.size(), Matchers.is(1));
-        Assert.assertThat(tags, Matchers.hasItem(tagEntity1));
+        Assertions.assertThat(tags).hasSize(1).contains(tagEntity1);
     }
 }
