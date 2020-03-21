@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
@@ -36,12 +37,9 @@ import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,12 +49,10 @@ import org.springframework.data.domain.Sort;
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -64,14 +60,13 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for the CommandServiceJPAImpl.
+ * Integration tests for {@link JpaClusterPersistenceServiceImpl}.
  *
  * @author tgianos
  * @since 2.0.0
  */
-@DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
+class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
@@ -93,167 +88,142 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
     private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
-    private ClusterPersistenceService service;
+    private JpaClusterPersistenceServiceImpl service;
 
     @Autowired
     private CommandPersistenceService commandPersistenceService;
 
-    /**
-     * Test the get cluster method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCluster() throws GenieException {
         final Cluster cluster1 = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_ID, cluster1.getId());
-        Assert.assertEquals(CLUSTER_1_NAME, cluster1.getMetadata().getName());
-        Assert.assertEquals(CLUSTER_1_USER, cluster1.getMetadata().getUser());
-        Assert.assertEquals(CLUSTER_1_VERSION, cluster1.getMetadata().getVersion());
-        Assert.assertEquals(CLUSTER_1_STATUS, cluster1.getMetadata().getStatus());
-        Assert.assertEquals(3, cluster1.getMetadata().getTags().size());
-        Assert.assertEquals(1, cluster1.getResources().getConfigs().size());
-        Assert.assertEquals(2, cluster1.getResources().getDependencies().size());
+        Assertions.assertThat(cluster1.getId()).isEqualTo(CLUSTER_1_ID);
+        final ClusterMetadata cluster1Metadata = cluster1.getMetadata();
+        Assertions.assertThat(cluster1Metadata.getName()).isEqualTo(CLUSTER_1_NAME);
+        Assertions.assertThat(cluster1Metadata.getUser()).isEqualTo(CLUSTER_1_USER);
+        Assertions.assertThat(cluster1Metadata.getVersion()).isEqualTo(CLUSTER_1_VERSION);
+        Assertions.assertThat(cluster1Metadata.getStatus()).isEqualByComparingTo(CLUSTER_1_STATUS);
+        Assertions.assertThat(cluster1Metadata.getTags()).hasSize(3);
+        Assertions.assertThat(cluster1.getResources().getConfigs()).hasSize(1);
+        Assertions.assertThat(cluster1.getResources().getDependencies()).hasSize(2);
 
         final Cluster cluster2 = this.service.getCluster(CLUSTER_2_ID);
-        Assert.assertEquals(CLUSTER_2_ID, cluster2.getId());
-        Assert.assertEquals(CLUSTER_2_NAME, cluster2.getMetadata().getName());
-        Assert.assertEquals(CLUSTER_2_USER, cluster2.getMetadata().getUser());
-        Assert.assertEquals(CLUSTER_2_VERSION, cluster2.getMetadata().getVersion());
-        Assert.assertEquals(CLUSTER_2_STATUS, cluster2.getMetadata().getStatus());
-        Assert.assertEquals(3, cluster2.getMetadata().getTags().size());
-        Assert.assertEquals(2, cluster2.getResources().getConfigs().size());
-        Assert.assertEquals(0, cluster2.getResources().getDependencies().size());
+        Assertions.assertThat(cluster2.getId()).isEqualTo(CLUSTER_2_ID);
+        final ClusterMetadata cluster2Metadata = cluster2.getMetadata();
+        Assertions.assertThat(cluster2Metadata.getName()).isEqualTo(CLUSTER_2_NAME);
+        Assertions.assertThat(cluster2Metadata.getUser()).isEqualTo(CLUSTER_2_USER);
+        Assertions.assertThat(cluster2Metadata.getVersion()).isEqualTo(CLUSTER_2_VERSION);
+        Assertions.assertThat(cluster2Metadata.getStatus()).isEqualByComparingTo(CLUSTER_2_STATUS);
+        Assertions.assertThat(cluster2Metadata.getTags()).hasSize(3);
+        Assertions.assertThat(cluster2.getResources().getConfigs()).hasSize(2);
+        Assertions.assertThat(cluster2.getResources().getDependencies()).isEmpty();
     }
 
-    /**
-     * Test the get clusters method.
-     */
     @Test
-    public void testGetClustersByName() {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersByName() {
         final Page<Cluster> clusters = this.service.getClusters(CLUSTER_2_NAME, null, null, null, null, PAGE);
-        Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_2_ID);
     }
 
-    /**
-     * Test the get clusters method.
-     */
     @Test
-    public void testGetClustersByStatuses() {
-        final Set<ClusterStatus> statuses = EnumSet.noneOf(ClusterStatus.class);
-        statuses.add(ClusterStatus.UP);
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersByStatuses() {
+        final Set<ClusterStatus> statuses = EnumSet.of(ClusterStatus.UP);
         final Page<Cluster> clusters = this.service.getClusters(null, statuses, null, null, null, PAGE);
-        Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_2_ID);
+        Assertions.assertThat(clusters.getContent().get(1).getId()).isEqualTo(CLUSTER_1_ID);
     }
 
-    /**
-     * Test the get clusters method.
-     */
     @Test
-    public void testGetClustersByTags() {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersByTags() {
         final Set<String> tags = Sets.newHashSet("prod");
         Page<Cluster> clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
-        Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_1_ID);
 
         tags.clear();
         tags.add("hive");
         clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
-        Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_2_ID);
+        Assertions.assertThat(clusters.getContent().get(1).getId()).isEqualTo(CLUSTER_1_ID);
 
         tags.add("somethingThatWouldNeverReallyExist");
         clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
-        Assert.assertTrue(clusters.getContent().isEmpty());
+        Assertions.assertThat(clusters.getContent()).isEmpty();
 
         tags.clear();
         clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
-        Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_2_ID);
+        Assertions.assertThat(clusters.getContent().get(1).getId()).isEqualTo(CLUSTER_1_ID);
     }
 
-    /**
-     * Test the get clusters method.
-     */
     @Test
-    public void testGetClustersByMinUpdateTime() {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersByMinUpdateTime() {
         final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 9, 2, 58, 59, 0, ZoneId.of("UTC"));
-        final Page<Cluster> clusters
-            = this.service.getClusters(null, null, null, time.toInstant(), null, PAGE);
-        Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
+        final Page<Cluster> clusters = this.service.getClusters(null, null, null, time.toInstant(), null, PAGE);
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_2_ID);
     }
 
-    /**
-     * Test the get clusters method.
-     */
     @Test
-    public void testGetClustersByMaxUpdateTime() {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersByMaxUpdateTime() {
         final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 8, 3, 0, 0, 0, ZoneId.of("UTC"));
         final Page<Cluster> clusters
             = this.service.getClusters(null, null, null, null, time.toInstant(), PAGE);
-        Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_1_ID);
     }
 
-    /**
-     * Test the get clusters method with descending sort.
-     */
     @Test
-    public void testGetClustersDescending() {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersDescending() {
         //Default to order by Updated
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, PAGE);
-        Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_2_ID);
+        Assertions.assertThat(clusters.getContent().get(1).getId()).isEqualTo(CLUSTER_1_ID);
     }
 
-    /**
-     * Test the get clusters method with ascending sort.
-     */
     @Test
-    public void testGetClustersAscending() {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersAscending() {
         final Pageable ascendingPage = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, ascendingPage);
-        Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(1).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_1_ID);
+        Assertions.assertThat(clusters.getContent().get(1).getId()).isEqualTo(CLUSTER_2_ID);
     }
 
-    /**
-     * Test the get clusters method order by name.
-     */
     @Test
-    public void testGetClustersOrderBysUser() {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersOrderBysUser() {
         final Pageable userPage = PageRequest.of(0, 10, Sort.Direction.DESC, "user");
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, userPage);
-        Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
-        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(1).getId());
+        Assertions.assertThat(clusters.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(clusters.getContent().get(0).getId()).isEqualTo(CLUSTER_1_ID);
+        Assertions.assertThat(clusters.getContent().get(1).getId()).isEqualTo(CLUSTER_2_ID);
     }
 
-    /**
-     * Test the get clusters method order by an invalid field should return the order by default value (updated).
-     */
-    @Test(expected = RuntimeException.class)
-    public void testGetClustersOrderBysInvalidField() {
-        final Pageable badPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
-        this.service.getClusters(null, null, null, null, null, badPage);
-    }
-
-    /**
-     * Test the choseClusterForJobRequest function.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testChooseClusterForJob() throws GenieException {
+    void testGetClustersOrderBysInvalidField() {
+        final Pageable badPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
+        Assertions
+            .assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> this.service.getClusters(null, null, null, null, null, badPage));
+    }
+
+    @Test
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testChooseClusterForJob() throws GenieException {
         final JobRequest one = new JobRequest.Builder(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -290,22 +260,18 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
             Sets.newHashSet("pig")
         ).build();
 
-        Assert.assertThat(this.service.findClustersAndCommandsForJob(one).size(), Matchers.is(1));
-        Assert.assertThat(this.service.findClustersAndCommandsForJob(two).size(), Matchers.is(0));
-        Assert.assertThat(this.service.findClustersAndCommandsForJob(three).size(), Matchers.is(0));
-        Assert.assertThat(this.service.findClustersAndCommandsForJob(four).size(), Matchers.is(2));
-        Assert.assertThat(this.service.findClustersAndCommandsForJob(five).size(), Matchers.is(2));
+        Assertions.assertThat(this.service.findClustersAndCommandsForJob(one)).hasSize(1);
+        Assertions.assertThat(this.service.findClustersAndCommandsForJob(two)).isEmpty();
+        Assertions.assertThat(this.service.findClustersAndCommandsForJob(three)).isEmpty();
+        Assertions.assertThat(this.service.findClustersAndCommandsForJob(four)).hasSize(2);
+        Assertions.assertThat(this.service.findClustersAndCommandsForJob(five)).hasSize(2);
     }
 
-    /**
-     * Test the choseClusterForJobRequest function.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
     @SuppressWarnings("checkstyle:methodlength")
     // TODO: This would be much easier with a spock data test
-    public void testChooseClusterAndCommandForCriteria() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testChooseClusterAndCommandForCriteria() throws GenieException {
         Map<Cluster, String> clustersAndCommands;
 
         // All Good
@@ -321,15 +287,12 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withTags(Sets.newHashSet("pig"))
                 .build()
         );
-        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
-        Assert.assertThat(
-            clustersAndCommands
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().getId().equals(CLUSTER_1_ID))
-                .count(),
-            Matchers.is(1L));
-        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_1_ID));
+        Assertions
+            .assertThat(clustersAndCommands)
+            .hasSize(1)
+            .containsValue(COMMAND_1_ID)
+            .extractingFromEntries(e -> e.getKey().getId())
+            .containsOnly(CLUSTER_1_ID);
 
         // Cluster id won't be found
         clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
@@ -344,9 +307,9 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withTags(Sets.newHashSet("pig"))
                 .build()
         );
-        Assert.assertTrue(clustersAndCommands.isEmpty());
+        Assertions.assertThat(clustersAndCommands).isEmpty();
 
-        // Cluster is UP so this should fail even though the id matches
+        // Cluster is not UP so this should fail even though the id matches
         clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
             Lists.newArrayList(
                 new Criterion
@@ -360,7 +323,7 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withTags(Sets.newHashSet("pig"))
                 .build()
         );
-        Assert.assertTrue(clustersAndCommands.isEmpty());
+        Assertions.assertThat(clustersAndCommands).isEmpty();
 
         // Second cluster criterion should match Cluster 2
         clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
@@ -381,15 +344,12 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withTags(Sets.newHashSet("pig"))
                 .build()
         );
-        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
-        Assert.assertThat(
-            clustersAndCommands
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().getId().equals(CLUSTER_2_ID))
-                .count(),
-            Matchers.is(1L));
-        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_1_ID));
+        Assertions
+            .assertThat(clustersAndCommands)
+            .hasSize(1)
+            .containsValue(COMMAND_1_ID)
+            .extractingFromEntries(e -> e.getKey().getId())
+            .containsOnly(CLUSTER_2_ID);
 
         // Matches both clusters and the deprecated pig command
         clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
@@ -405,19 +365,14 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withTags(Sets.newHashSet("pig"))
                 .build()
         );
-        Assert.assertThat(clustersAndCommands.size(), Matchers.is(2));
-        Assert.assertThat(
-            clustersAndCommands
-                .entrySet()
-                .stream()
-                .filter(
-                    entry -> entry.getKey().getId().equals(CLUSTER_2_ID) || entry.getKey().getId().equals(CLUSTER_1_ID)
-                )
-                .count(),
-            Matchers.is(2L));
-        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_3_ID));
-        Assert.assertFalse(clustersAndCommands.containsValue(COMMAND_1_ID));
-        Assert.assertFalse(clustersAndCommands.containsValue(COMMAND_2_ID));
+        Assertions
+            .assertThat(clustersAndCommands)
+            .hasSize(2)
+            .containsValue(COMMAND_3_ID)
+            .doesNotContainValue(COMMAND_1_ID)
+            .doesNotContainValue(COMMAND_2_ID)
+            .extractingFromEntries(e -> e.getKey().getId())
+            .containsExactlyInAnyOrder(CLUSTER_1_ID, CLUSTER_2_ID);
 
         // By name
         clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
@@ -433,15 +388,12 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withStatus(CommandStatus.INACTIVE.toString())
                 .build()
         );
-        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
-        Assert.assertThat(
-            clustersAndCommands
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().getId().equals(CLUSTER_2_ID))
-                .count(),
-            Matchers.is(1L));
-        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_2_ID));
+        Assertions
+            .assertThat(clustersAndCommands)
+            .hasSize(1)
+            .containsValue(COMMAND_2_ID)
+            .extractingFromEntries(e -> e.getKey().getId())
+            .containsOnly(CLUSTER_2_ID);
 
         // In this case we're testing the priority ordering. The two clusters have the same pig command only cluster 2
         // has a different pig command in the highest priority order so the result set should be different for both
@@ -457,18 +409,18 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withTags(Sets.newHashSet("pig"))
                 .build()
         );
-        Assert.assertThat(clustersAndCommands.size(), Matchers.is(2));
+        Assertions.assertThat(clustersAndCommands).hasSize(2);
         clustersAndCommands.forEach(
             (key, value) -> {
                 switch (key.getId()) {
                     case CLUSTER_1_ID:
-                        Assert.assertThat(value, Matchers.is(COMMAND_1_ID));
+                        Assertions.assertThat(value).isEqualTo(COMMAND_1_ID);
                         break;
                     case CLUSTER_2_ID:
-                        Assert.assertThat(value, Matchers.is(COMMAND_4_ID));
+                        Assertions.assertThat(value).isEqualTo(COMMAND_4_ID);
                         break;
                     default:
-                        Assert.fail();
+                        Assertions.fail("Unknown cluster id " + key.getId());
                         break;
                 }
             }
@@ -488,7 +440,7 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withTags(Sets.newHashSet("pig"))
                 .build()
         );
-        Assert.assertThat(clustersAndCommands.size(), Matchers.is(0));
+        Assertions.assertThat(clustersAndCommands).isEmpty();
 
         // Versions match so it'll match like the very first case
         clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
@@ -506,24 +458,16 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withStatus(CommandStatus.DEPRECATED.toString())
                 .build()
         );
-        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
-        Assert.assertThat(
-            clustersAndCommands
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().getId().equals(CLUSTER_1_ID))
-                .count(),
-            Matchers.is(1L));
-        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_3_ID));
+        Assertions
+            .assertThat(clustersAndCommands)
+            .hasSize(1)
+            .containsValue(COMMAND_3_ID)
+            .extractingFromEntries(e -> e.getKey().getId())
+            .containsOnly(CLUSTER_1_ID);
     }
 
-    /**
-     * Test the create method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testCreateCluster() throws GenieException {
+    void testCreateCluster() throws GenieException {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Set<String> dependencies = Sets.newHashSet("a dependency");
         final String id = UUID.randomUUID().toString();
@@ -541,32 +485,21 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
             .build();
         this.service.createCluster(cluster);
         final Cluster created = this.service.getCluster(id);
-        Assert.assertNotNull(created);
-        Assert.assertEquals(id, created.getId());
-        Assert.assertEquals(CLUSTER_1_NAME, created.getMetadata().getName());
-        Assert.assertEquals(CLUSTER_1_USER, created.getMetadata().getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getMetadata().getStatus());
-        Assert.assertEquals(3, created.getResources().getConfigs().size());
-        Assert.assertEquals(1, created.getResources().getDependencies().size());
+        Assertions.assertThat(created.getId()).isEqualTo(id);
+        final ClusterMetadata createdMetadata = created.getMetadata();
+        Assertions.assertThat(createdMetadata.getName()).isEqualTo(CLUSTER_1_NAME);
+        Assertions.assertThat(createdMetadata.getUser()).isEqualTo(CLUSTER_1_USER);
+        Assertions.assertThat(createdMetadata.getStatus()).isEqualByComparingTo(ClusterStatus.OUT_OF_SERVICE);
+        Assertions.assertThat(created.getResources().getConfigs()).isEqualTo(configs);
+        Assertions.assertThat(created.getResources().getDependencies()).isEqualTo(dependencies);
         this.service.deleteCluster(id);
-        try {
-            this.service.getCluster(id);
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                HttpURLConnection.HTTP_NOT_FOUND,
-                ge.getErrorCode()
-            );
-        }
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.service.getCluster(id));
     }
 
-    /**
-     * Test the create method when no id is entered.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testCreateClusterNoId() throws GenieException {
+    void testCreateClusterNoId() throws GenieException {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Set<String> dependencies = Sets.newHashSet("a dependency");
         final ClusterRequest cluster = new ClusterRequest.Builder(
@@ -582,34 +515,25 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
             .build();
         final String id = this.service.createCluster(cluster);
         final Cluster created = this.service.getCluster(id);
-        Assert.assertEquals(CLUSTER_1_NAME, created.getMetadata().getName());
-        Assert.assertEquals(CLUSTER_1_USER, created.getMetadata().getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getMetadata().getStatus());
-        Assert.assertEquals(3, created.getResources().getConfigs().size());
-        Assert.assertEquals(1, created.getResources().getDependencies().size());
-        this.service.deleteCluster(created.getId());
-        try {
-            this.service.getCluster(created.getId());
-            Assert.fail("Should have thrown exception");
-        } catch (final GenieException ge) {
-            Assert.assertEquals(
-                HttpURLConnection.HTTP_NOT_FOUND,
-                ge.getErrorCode()
-            );
-        }
+        final ClusterMetadata createdMetadata = created.getMetadata();
+        Assertions.assertThat(createdMetadata.getName()).isEqualTo(CLUSTER_1_NAME);
+        Assertions.assertThat(createdMetadata.getUser()).isEqualTo(CLUSTER_1_USER);
+        Assertions.assertThat(createdMetadata.getStatus()).isEqualByComparingTo(ClusterStatus.OUT_OF_SERVICE);
+        Assertions.assertThat(created.getResources().getConfigs()).isEqualTo(configs);
+        Assertions.assertThat(created.getResources().getDependencies()).isEqualTo(dependencies);
+        this.service.deleteCluster(id);
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.service.getCluster(id));
     }
 
-    /**
-     * Test to update a cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateClusterNoId() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateClusterNoId() throws GenieException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_USER, getCluster.getMetadata().getUser());
-        Assert.assertEquals(ClusterStatus.UP, getCluster.getMetadata().getStatus());
-        Assert.assertEquals(3, getCluster.getMetadata().getTags().size());
+        Assertions.assertThat(getCluster.getMetadata().getUser()).isEqualTo(CLUSTER_1_USER);
+        Assertions.assertThat(getCluster.getMetadata().getStatus()).isEqualByComparingTo(ClusterStatus.UP);
+        Assertions.assertThat(getCluster.getMetadata().getTags()).hasSize(3);
 
         final Set<String> tags = Sets.newHashSet("tez", "yarn", "hadoop");
         tags.addAll(getCluster.getMetadata().getTags());
@@ -637,22 +561,18 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         this.service.updateCluster(CLUSTER_1_ID, updateCluster);
 
         final Cluster updated = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_2_USER, updated.getMetadata().getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getMetadata().getStatus());
-        Assert.assertEquals(6, updated.getMetadata().getTags().size());
+        Assertions.assertThat(updated.getMetadata().getUser()).isEqualTo(CLUSTER_2_USER);
+        Assertions.assertThat(updated.getMetadata().getStatus()).isEqualByComparingTo(ClusterStatus.OUT_OF_SERVICE);
+        Assertions.assertThat(updated.getMetadata().getTags()).hasSize(6);
     }
 
-    /**
-     * Test to update a cluster with invalid content. Should throw ConstraintViolationException from JPA layer.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateClusterWithInvalidCluster() throws GenieException {
+    @Test
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateClusterWithInvalidCluster() throws GenieException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_USER, getCluster.getMetadata().getUser());
-        Assert.assertEquals(ClusterStatus.UP, getCluster.getMetadata().getStatus());
-        Assert.assertEquals(3, getCluster.getMetadata().getTags().size());
+        Assertions.assertThat(getCluster.getMetadata().getUser()).isEqualTo(CLUSTER_1_USER);
+        Assertions.assertThat(getCluster.getMetadata().getStatus()).isEqualByComparingTo(ClusterStatus.UP);
+        Assertions.assertThat(getCluster.getMetadata().getTags()).hasSize(3);
 
         final Cluster updateCluster = new Cluster(
             getCluster.getId(),
@@ -674,16 +594,14 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .build()
         );
 
-        this.service.updateCluster(CLUSTER_1_ID, updateCluster);
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.service.updateCluster(CLUSTER_1_ID, updateCluster));
     }
 
-    /**
-     * Test to make sure setting the created and updated outside the system control doesn't change record in database.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateCreateAndUpdate() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateCreateAndUpdate() throws GenieException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
         final Instant created = getCluster.getCreated();
         final Instant updated = getCluster.getUpdated();
@@ -710,27 +628,22 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
 
         this.service.updateCluster(CLUSTER_1_ID, updateCluster);
         final Cluster updatedCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(created, updatedCluster.getCreated());
-        Assert.assertNotEquals(updated, updatedCluster.getUpdated());
-        Assert.assertNotEquals(Instant.EPOCH, updatedCluster.getUpdated());
-        Assert.assertEquals(getCluster.getMetadata().getTags(), updatedCluster.getMetadata().getTags());
-        Assert.assertEquals(getCluster.getResources().getConfigs(), updatedCluster.getResources().getConfigs());
-        Assert.assertEquals(
-            getCluster.getResources().getDependencies(),
-            updatedCluster.getResources().getDependencies()
-        );
+        Assertions.assertThat(updatedCluster.getCreated()).isEqualTo(created);
+        Assertions.assertThat(updatedCluster.getUpdated()).isNotEqualTo(updated).isNotEqualTo(Instant.EPOCH);
+        Assertions.assertThat(updatedCluster.getMetadata().getTags()).isEqualTo(getCluster.getMetadata().getTags());
+        Assertions
+            .assertThat(updatedCluster.getResources().getConfigs())
+            .isEqualTo(getCluster.getResources().getConfigs());
+        Assertions
+            .assertThat(updatedCluster.getResources().getDependencies())
+            .isEqualTo(getCluster.getResources().getDependencies());
     }
 
-    /**
-     * Test to patch a cluster.
-     *
-     * @throws GenieException For any problem
-     * @throws IOException    For Json serialization problem
-     */
     @Test
-    public void testPatchCluster() throws GenieException, IOException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testPatchCluster() throws GenieException, IOException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertThat(getCluster.getMetadata().getName(), Matchers.is(CLUSTER_1_NAME));
+        Assertions.assertThat(getCluster.getMetadata().getName()).isEqualTo(CLUSTER_1_NAME);
         final Instant updateTime = getCluster.getUpdated();
 
         final String patchString
@@ -740,175 +653,119 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         this.service.patchCluster(CLUSTER_1_ID, patch);
 
         final Cluster updated = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
-        Assert.assertThat(updated.getMetadata().getName(), Matchers.is(CLUSTER_2_NAME));
+        Assertions.assertThat(updated.getUpdated()).isNotEqualTo(updateTime);
+        Assertions.assertThat(updated.getMetadata().getName()).isEqualTo(CLUSTER_2_NAME);
     }
 
-    /**
-     * Test delete all.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testDeleteAll() throws GenieException {
-        Assert.assertEquals(2, this.service.getClusters(null, null, null, null, null, PAGE).getNumberOfElements());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testDeleteAll() throws GenieException {
+        Assertions
+            .assertThat(this.service.getClusters(null, null, null, null, null, PAGE).getNumberOfElements())
+            .isEqualTo(2);
         this.service.deleteAllClusters();
-        Assert.assertTrue(this.service.getClusters(null, null, null, null, null, PAGE).getContent().isEmpty());
+        Assertions
+            .assertThat(this.service.getClusters(null, null, null, null, null, PAGE).getContent())
+            .isEmpty();
     }
 
-    /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testDelete() throws GenieException {
-        Assert.assertEquals(2, this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null).size());
-        Assert.assertEquals(2, this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null).size());
-        Assert.assertEquals(2, this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null).size());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testDelete() throws GenieException {
+        Assertions.assertThat(this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null)).hasSize(2);
+        Assertions.assertThat(this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null)).hasSize(2);
+        Assertions.assertThat(this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null)).hasSize(2);
 
         this.service.deleteCluster(CLUSTER_1_ID);
 
-        Assert.assertEquals(1, this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null).size());
-        Assert.assertEquals(1,
-            this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null)
-                .stream()
-                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
-                .count()
-        );
-        Assert.assertEquals(1, this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null).size());
-        Assert.assertEquals(1,
-            this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null)
-                .stream()
-                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
-                .count()
-        );
-        Assert.assertEquals(1, this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null).size());
-        Assert.assertEquals(1,
-            this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null)
-                .stream()
-                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
-                .count()
-        );
+        Assertions
+            .assertThat(this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null))
+            .hasSize(1)
+            .extracting(Cluster::getId)
+            .containsOnly(CLUSTER_2_ID);
+        Assertions
+            .assertThat(this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null))
+            .hasSize(1)
+            .extracting(Cluster::getId)
+            .containsOnly(CLUSTER_2_ID);
+        Assertions
+            .assertThat(this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null))
+            .hasSize(1)
+            .extracting(Cluster::getId)
+            .containsOnly(CLUSTER_2_ID);
     }
 
-    /**
-     * Test add configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddConfigsToCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddConfigsToCluster() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
         final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
-        Assert.assertEquals(1, this.service.getConfigsForCluster(CLUSTER_1_ID).size());
+        Assertions.assertThat(this.service.getConfigsForCluster(CLUSTER_1_ID)).hasSize(1);
         this.service.addConfigsForCluster(CLUSTER_1_ID, newConfigs);
-        final Set<String> finalConfigs = this.service.getConfigsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(4, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
+        Assertions.assertThat(this.service.getConfigsForCluster(CLUSTER_1_ID)).hasSize(4).containsAll(newConfigs);
     }
 
-    /**
-     * Test update dependencies for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateConfigsForCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateConfigsForCluster() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
         final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
-        Assert.assertEquals(1, this.service.getConfigsForCluster(CLUSTER_1_ID).size());
+        Assertions.assertThat(this.service.getConfigsForCluster(CLUSTER_1_ID)).hasSize(1);
         this.service.updateConfigsForCluster(CLUSTER_1_ID, newConfigs);
-        final Set<String> finalConfigs = this.service.getConfigsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(3, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newConfig1));
-        Assert.assertTrue(finalConfigs.contains(newConfig2));
-        Assert.assertTrue(finalConfigs.contains(newConfig3));
+        Assertions.assertThat(this.service.getConfigsForCluster(CLUSTER_1_ID)).hasSize(3).containsAll(newConfigs);
     }
 
-    /**
-     * Test get configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetConfigsForCluster() throws GenieException {
-        Assert.assertEquals(1,
-            this.service.getConfigsForCluster(CLUSTER_1_ID).size());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetConfigsForCluster() throws GenieException {
+        Assertions.assertThat(this.service.getConfigsForCluster(CLUSTER_1_ID)).hasSize(1);
     }
 
-    /**
-     * Test add dependencies to cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddDependenciesToCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddDependenciesToCluster() throws GenieException {
         final String newDep1 = UUID.randomUUID().toString();
         final String newDep2 = UUID.randomUUID().toString();
         final String newDep3 = UUID.randomUUID().toString();
 
         final Set<String> newDeps = Sets.newHashSet(newDep1, newDep2, newDep3);
 
-        Assert.assertEquals(2, this.service.getDependenciesForCluster(CLUSTER_1_ID).size());
+        Assertions.assertThat(this.service.getDependenciesForCluster(CLUSTER_1_ID)).hasSize(2);
         this.service.addDependenciesForCluster(CLUSTER_1_ID, newDeps);
-        final Set<String> finalDeps = this.service.getDependenciesForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(5, finalDeps.size());
-        Assert.assertTrue(finalDeps.contains(newDep1));
-        Assert.assertTrue(finalDeps.contains(newDep2));
-        Assert.assertTrue(finalDeps.contains(newDep3));
+        Assertions.assertThat(this.service.getDependenciesForCluster(CLUSTER_1_ID)).hasSize(5).containsAll(newDeps);
     }
 
-    /**
-     * Test update configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateDependenciesForCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateDependenciesForCluster() throws GenieException {
         final String newDep1 = UUID.randomUUID().toString();
         final String newDep2 = UUID.randomUUID().toString();
         final String newDep3 = UUID.randomUUID().toString();
 
-        final Set<String> newDependencies = Sets.newHashSet(newDep1, newDep2, newDep3);
+        final Set<String> newDeps = Sets.newHashSet(newDep1, newDep2, newDep3);
 
-        Assert.assertEquals(2, this.service.getDependenciesForCluster(CLUSTER_1_ID).size());
-        this.service.updateDependenciesForCluster(CLUSTER_1_ID, newDependencies);
-        final Set<String> finalConfigs = this.service.getDependenciesForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(3, finalConfigs.size());
-        Assert.assertTrue(finalConfigs.contains(newDep1));
-        Assert.assertTrue(finalConfigs.contains(newDep2));
-        Assert.assertTrue(finalConfigs.contains(newDep3));
+        Assertions.assertThat(this.service.getDependenciesForCluster(CLUSTER_1_ID)).hasSize(2);
+        this.service.updateDependenciesForCluster(CLUSTER_1_ID, newDeps);
+        Assertions.assertThat(this.service.getDependenciesForCluster(CLUSTER_1_ID)).hasSize(3).containsAll(newDeps);
     }
 
-    /**
-     * Test get configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetDependenciesForCluster() throws GenieException {
-        Assert.assertEquals(2,
-            this.service.getDependenciesForCluster(CLUSTER_1_ID).size());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetDependenciesForCluster() throws GenieException {
+        Assertions.assertThat(this.service.getDependenciesForCluster(CLUSTER_1_ID)).hasSize(2);
     }
 
-    /**
-     * Test adding commands to the cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddCommandsForCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddCommandsForCluster() throws GenieException {
         final String command1Id = this.commandPersistenceService.createCommand(
             new CommandRequest.Builder(
                 new CommandMetadata.Builder(
@@ -937,49 +794,35 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withCheckDelay(8023423L)
                 .build()
         );
-        final List<String> newCommandIds = new ArrayList<>();
-        newCommandIds.add(command1Id);
-        newCommandIds.add(command2Id);
-        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        final List<String> newCommandIds = Lists.newArrayList(command1Id, command2Id);
+        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
         this.service.addCommandsForCluster(CLUSTER_1_ID, newCommandIds);
         final List<Command> commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assert.assertEquals(5, commands.size());
-        Assert.assertEquals(command1Id, commands.get(3).getId());
-        Assert.assertEquals(command2Id, commands.get(4).getId());
+        Assertions.assertThat(commands).hasSize(5);
+        Assertions.assertThat(commands.get(3).getId()).isEqualTo(command1Id);
+        Assertions.assertThat(commands.get(4).getId()).isEqualTo(command2Id);
     }
 
-    /**
-     * Test the Get commands for cluster function.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetCommandsForCluster() throws GenieException {
-        final List<Command> commands
-            = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assert.assertEquals(3, commands.size());
-        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
-        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsForCluster() throws GenieException {
+        Assertions
+            .assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null))
+            .hasSize(3)
+            .extracting(Command::getId)
+            .containsExactly(COMMAND_1_ID, COMMAND_3_ID, COMMAND_2_ID);
     }
 
-    /**
-     * Test the Get clusters for cluster function.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetCommandsForClusterNoId() throws GenieException {
-        this.service.getCommandsForCluster("", null);
-    }
-
-    /**
-     * Test updating commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateCommandsForCluster() throws GenieException {
+    void testGetCommandsForClusterNoId() {
+        Assertions
+            .assertThatExceptionOfType(ConstraintViolationException.class)
+            .isThrownBy(() -> this.service.getCommandsForCluster("", null));
+    }
+
+    @Test
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateCommandsForCluster() throws GenieException {
         final String command1Id = this.commandPersistenceService.createCommand(
             new CommandRequest.Builder(
                 new CommandMetadata.Builder(
@@ -1008,105 +851,82 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
                 .withCheckDelay(23423L)
                 .build()
         );
-        final List<String> newCommandIds = new ArrayList<>();
-        newCommandIds.add(command1Id);
-        newCommandIds.add(command2Id);
-        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        final List<String> newCommandIds = Lists.newArrayList(command1Id, command2Id);
+        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
         this.service.setCommandsForCluster(CLUSTER_1_ID, newCommandIds);
-        final List<Command> commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
-        Assert.assertEquals(2, commands.size());
-        Assert.assertEquals(command1Id, commands.get(0).getId());
-        Assert.assertEquals(command2Id, commands.get(1).getId());
+        Assertions
+            .assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null))
+            .hasSize(2)
+            .extracting(Command::getId)
+            .containsExactly(command1Id, command2Id);
     }
 
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllCommandsForCluster() throws GenieException {
-        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllCommandsForCluster() throws GenieException {
+        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
         this.service.removeAllCommandsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(0, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).isEmpty();
     }
 
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveCommandForCluster() throws GenieException {
-        Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveCommandForCluster() throws GenieException {
+        Assertions.assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null)).hasSize(3);
         this.service.removeCommandForCluster(CLUSTER_1_ID, COMMAND_1_ID);
-        Assert.assertEquals(2, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
+        Assertions
+            .assertThat(this.service.getCommandsForCluster(CLUSTER_1_ID, null))
+            .hasSize(2)
+            .extracting(Command::getId)
+            .doesNotContain(COMMAND_1_ID);
     }
 
-    /**
-     * Test add tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddTagsToCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddTagsToCluster() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCluster(CLUSTER_1_ID)).hasSize(3);
         this.service.addTagsForCluster(CLUSTER_1_ID, newTags);
-        final Set<String> finalTags = this.service.getTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(6, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
+        Assertions
+            .assertThat(this.service.getTagsForCluster(CLUSTER_1_ID))
+            .hasSize(6)
+            .containsAll(newTags);
     }
 
-    /**
-     * Test update tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateTagsForCluster() throws GenieException {
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateTagsForCluster() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCluster(CLUSTER_1_ID)).hasSize(3);
         this.service.updateTagsForCluster(CLUSTER_1_ID, newTags);
-        final Set<String> finalTags = this.service.getTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(3, finalTags.size());
-        Assert.assertTrue(finalTags.contains(newTag1));
-        Assert.assertTrue(finalTags.contains(newTag2));
-        Assert.assertTrue(finalTags.contains(newTag3));
+        Assertions
+            .assertThat(this.service.getTagsForCluster(CLUSTER_1_ID))
+            .hasSize(3)
+            .containsAll(newTags);
     }
 
-    /**
-     * Test get tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetTagsForCluster() throws GenieException {
-        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetTagsForCluster() throws GenieException {
+        Assertions.assertThat(this.service.getTagsForCluster(CLUSTER_1_ID)).hasSize(3);
     }
 
-    /**
-     * Test remove all tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllTagsForCluster() throws GenieException {
-        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllTagsForCluster() throws GenieException {
+        Assertions.assertThat(this.service.getTagsForCluster(CLUSTER_1_ID)).hasSize(3);
         this.service.removeAllTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(0, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assertions.assertThat(this.service.getTagsForCluster(CLUSTER_1_ID)).isEmpty();
     }
 
     /**
@@ -1115,21 +935,17 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
      * @throws GenieException For any problem
      */
     @Test
-    public void testRemoveTagForCluster() throws GenieException {
-        Assert.assertTrue(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveTagForCluster() throws GenieException {
+        Assertions.assertThat(this.service.getTagsForCluster(CLUSTER_1_ID)).contains("prod");
         this.service.removeTagForCluster(CLUSTER_1_ID, "prod");
-        Assert.assertFalse(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
+        Assertions.assertThat(this.service.getTagsForCluster(CLUSTER_1_ID)).doesNotContain("prod");
     }
 
-    /**
-     * Test the API for deleting all terminated clusters that aren't attached to jobs.
-     *
-     * @throws GenieException On Error
-     * @throws IOException    On JSON patch error
-     */
     @Test
-    public void testDeleteTerminatedClusters() throws GenieException, IOException {
-        Assert.assertThat(this.clusterRepository.count(), Matchers.is(2L));
+    @DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTest/init.xml")
+    void testDeleteTerminatedClusters() throws GenieException, IOException {
+        Assertions.assertThat(this.clusterRepository.count()).isEqualTo(2L);
         final String testClusterId = UUID.randomUUID().toString();
         final ClusterRequest testCluster = new ClusterRequest.Builder(
             new ClusterMetadata.Builder(
@@ -1151,45 +967,38 @@ public class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrati
         this.service.createCluster(testCluster);
 
         // Shouldn't delete any clusters as all are UP or OOS
-        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0L));
+        Assertions.assertThat(this.service.deleteTerminatedClusters()).isEqualTo(0L);
 
         // Change status to UP
         String patchString = "[{ \"op\": \"replace\", \"path\": \"/metadata/status\", \"value\": \"UP\" }]";
         JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
         this.service.patchCluster(testClusterId, patch);
-        Assert.assertThat(
-            this.service.getCluster(testClusterId).getMetadata().getStatus(),
-            Matchers.is(ClusterStatus.UP)
-        );
+        Assertions
+            .assertThat(this.service.getCluster(testClusterId).getMetadata().getStatus())
+            .isEqualTo(ClusterStatus.UP);
 
         // All clusters are UP/OOS or attached to jobs
-        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0L));
+        Assertions.assertThat(this.service.deleteTerminatedClusters()).isEqualTo(0L);
 
         // Change status to terminated
         patchString = "[{ \"op\": \"replace\", \"path\": \"/metadata/status\", \"value\": \"TERMINATED\" }]";
         patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
         this.service.patchCluster(testClusterId, patch);
-        Assert.assertThat(
-            this.service.getCluster(testClusterId).getMetadata().getStatus(),
-            Matchers.is(ClusterStatus.TERMINATED)
-        );
+        Assertions
+            .assertThat(this.service.getCluster(testClusterId).getMetadata().getStatus())
+            .isEqualTo(ClusterStatus.TERMINATED);
 
         // All clusters are UP/OOS or attached to jobs
-        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(1L));
+        Assertions.assertThat(this.service.deleteTerminatedClusters()).isEqualTo(1L);
 
         // Make sure it didn't delete any of the clusters we wanted
-        Assert.assertTrue(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID));
-        Assert.assertTrue(this.clusterRepository.existsByUniqueId(CLUSTER_2_ID));
-        Assert.assertFalse(this.clusterRepository.existsByUniqueId(testClusterId));
+        Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID)).isTrue();
+        Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_2_ID)).isTrue();
+        Assertions.assertThat(this.clusterRepository.existsByUniqueId(testClusterId)).isFalse();
     }
 
-    /**
-     * Test the various permutations of finding clusters with criterion.
-     *
-     * @throws Exception on unexpected error
-     */
     @Test
-    public void testFindClustersMatchingCriterion() throws Exception {
+    void testFindClustersMatchingCriterion() throws Exception {
         // Create some clusters to test with
         final Cluster cluster0 = this.createTestCluster(null, null);
         final Cluster cluster1 = this.createTestCluster(null, null);

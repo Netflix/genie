@@ -18,14 +18,10 @@
 package com.netflix.genie.web.data.services.jpa;
 
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import org.apache.commons.lang3.tuple.Pair;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Optional;
 
 /**
  * Integration tests for the {@link JpaAgentConnectionPersistenceServiceImpl} class.
@@ -34,7 +30,7 @@ import java.util.Optional;
  * @since 4.0.0
  */
 @DatabaseTearDown("cleanup.xml")
-public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
+class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     private static final String JOB1 = "job1";
     private static final String HOST1 = "host1";
@@ -45,161 +41,97 @@ public class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends DBI
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private AgentConnectionPersistenceService agentConnectionPersistenceService;
+    private JpaAgentConnectionPersistenceServiceImpl agentConnectionPersistenceService;
 
     /**
      * Perform assorted operations on persisted connections.
      */
     @Test
-    public void createUpdateDelete() {
+    void createUpdateDelete() {
         // Check empty
-        verifyExpectedConnections();
-        Assert.assertThat(this.agentConnectionRepository.count(), Matchers.is(0L));
+        this.verifyExpectedConnections();
+        Assertions.assertThat(this.agentConnectionRepository.count()).isEqualTo(0L);
 
         // Create two connections for two jobs on different servers
         this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.saveAgentConnection(JOB2, HOST2);
-        verifyExpectedConnections(
-            Pair.of(JOB1, HOST1),
-            Pair.of(JOB2, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
-            Matchers.is(1L)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
-            Matchers.is(1L)
-        );
+        this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
+        this.verifyAgentConnectionsOnServer(HOST1, 1L);
+        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Migrate a connection, with delete before update
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST2);
-        verifyExpectedConnections(
-            Pair.of(JOB1, HOST2),
-            Pair.of(JOB2, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
-            Matchers.is(0L)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
-            Matchers.is(2L)
-        );
+        this.verifyExpectedConnections(Pair.of(JOB1, HOST2), Pair.of(JOB2, HOST2));
+        this.verifyAgentConnectionsOnServer(HOST1, 0L);
+        this.verifyAgentConnectionsOnServer(HOST2, 2L);
 
         // Migrate a connection with update before delete
         this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST2);
-        verifyExpectedConnections(
-            Pair.of(JOB1, HOST1),
-            Pair.of(JOB2, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
-            Matchers.is(1L)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
-            Matchers.is(1L)
-        );
+        this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
+        this.verifyAgentConnectionsOnServer(HOST1, 1L);
+        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Migrate a connection, landing on the same server with deletion
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST1);
-        verifyExpectedConnections(
-            Pair.of(JOB1, HOST1),
-            Pair.of(JOB2, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
-            Matchers.is(1L)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
-            Matchers.is(1L)
-        );
+        this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
+        this.verifyAgentConnectionsOnServer(HOST1, 1L);
+        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Migrate a connection, landing on the same server without deletion (unexpected in practice)
         this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST1);
-        verifyExpectedConnections(
-            Pair.of(JOB1, HOST1),
-            Pair.of(JOB2, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
-            Matchers.is(1L)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
-            Matchers.is(1L)
-        );
+        this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
+        this.verifyAgentConnectionsOnServer(HOST1, 1L);
+        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Delete all
         this.agentConnectionPersistenceService.removeAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.removeAgentConnection(JOB2, HOST2);
-        verifyExpectedConnections();
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST1),
-            Matchers.is(0L)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(HOST2),
-            Matchers.is(0L)
-        );
+        this.verifyExpectedConnections();
+        this.verifyAgentConnectionsOnServer(HOST1, 0L);
+        this.verifyAgentConnectionsOnServer(HOST2, 0L);
 
         // Create new connections
         this.agentConnectionPersistenceService.saveAgentConnection(JOB1, HOST1);
         this.agentConnectionPersistenceService.saveAgentConnection(JOB2, HOST1);
         this.agentConnectionPersistenceService.saveAgentConnection(JOB3, HOST2);
-        verifyExpectedConnections(
-            Pair.of(JOB1, HOST1),
-            Pair.of(JOB2, HOST1),
-            Pair.of(JOB3, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST3),
-            Matchers.is(0)
-        );
-        verifyExpectedConnections(
-            Pair.of(JOB1, HOST1),
-            Pair.of(JOB2, HOST1),
-            Pair.of(JOB3, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST1),
-            Matchers.is(2)
-        );
-        verifyExpectedConnections(
-            Pair.of(JOB3, HOST2)
-        );
-        Assert.assertThat(
-            this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST2),
-            Matchers.is(1)
-        );
-        verifyExpectedConnections();
+        this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST1), Pair.of(JOB3, HOST2));
+        Assertions
+            .assertThat(this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST3))
+            .isEqualTo(0L);
+        this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST1), Pair.of(JOB3, HOST2));
+        Assertions
+            .assertThat(this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST1))
+            .isEqualTo(2L);
+        this.verifyExpectedConnections(Pair.of(JOB3, HOST2));
+        Assertions
+            .assertThat(this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(HOST2))
+            .isEqualTo(1L);
+        this.verifyExpectedConnections();
     }
 
     @SafeVarargs
     private final void verifyExpectedConnections(final Pair<String, String>... expectedConnections) {
-        Assert.assertThat(this.agentConnectionRepository.count(), Matchers.is((long) expectedConnections.length));
+        Assertions.assertThat(this.agentConnectionRepository.count()).isEqualTo(expectedConnections.length);
 
         for (final Pair<String, String> expectedConnection : expectedConnections) {
-
             // Verify a connection exists for this job id
             final String jobId = expectedConnection.getLeft();
             final String hostname = expectedConnection.getRight();
 
-            final Optional<String> serverOptional =
-                agentConnectionPersistenceService.lookupAgentConnectionServer(jobId);
-            Assert.assertTrue(serverOptional.isPresent());
-
-            Assert.assertThat(
-                serverOptional.get(),
-                Matchers.is(hostname)
-            );
-
+            Assertions
+                .assertThat(this.agentConnectionPersistenceService.lookupAgentConnectionServer(jobId))
+                .isPresent()
+                .contains(hostname);
         }
+    }
+
+    private void verifyAgentConnectionsOnServer(final String hostname, final long expectedNumConnections) {
+        Assertions
+            .assertThat(this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(hostname))
+            .isEqualTo(expectedNumConnections);
     }
 }

@@ -36,9 +36,8 @@ import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,9 +57,8 @@ import java.util.UUID;
  *
  * @author tgianos
  */
-@DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
+class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String CLUSTER_1_ID = "cluster1";
@@ -90,7 +88,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
-    private CommandPersistenceService service;
+    private JpaCommandPersistenceServiceImpl service;
 
     @Autowired
     private ClusterPersistenceService clusterPersistenceService;
@@ -101,13 +99,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
     @Autowired
     private JpaCriterionRepository criterionRepository;
 
-    /**
-     * Test the get command method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommand() throws GenieException {
         final Command command1 = this.service.getCommand(COMMAND_1_ID);
         Assertions.assertThat(command1.getId()).isEqualTo(COMMAND_1_ID);
         Assertions.assertThat(command1.getMetadata().getName()).isEqualTo(COMMAND_1_NAME);
@@ -142,32 +136,26 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(command3.getResources().getDependencies().size()).isEqualTo(2);
     }
 
-    /**
-     * Test the get commands method.
-     */
     @Test
-    public void testGetCommandsByName() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsByName() {
         final Page<Command> commands = this.service.getCommands(COMMAND_2_NAME, null, null, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(1);
         Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_2_ID);
     }
 
-    /**
-     * Test the get commands method.
-     */
     @Test
-    public void testGetCommandsByUserName() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsByUserName() {
         final Page<Command> commands = this.service.getCommands(null, COMMAND_1_USER, null, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
         Assertions.assertThat(commands.getContent().get(0).getId()).isEqualTo(COMMAND_3_ID);
         Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_1_ID);
     }
 
-    /**
-     * Test the get commands method.
-     */
     @Test
-    public void testGetCommandsByStatuses() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsByStatuses() {
         final Set<CommandStatus> statuses = Sets.newHashSet(CommandStatus.INACTIVE, CommandStatus.DEPRECATED);
         final Page<Command> commands = this.service.getCommands(null, null, statuses, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(2);
@@ -175,11 +163,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(commands.getContent().get(1).getId()).isEqualTo(COMMAND_3_ID);
     }
 
-    /**
-     * Test the get commands method.
-     */
     @Test
-    public void testGetCommandsByTags() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsByTags() {
         final Set<String> tags = Sets.newHashSet("prod");
         Page<Command> commands = this.service.getCommands(null, null, null, tags, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
@@ -211,11 +197,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_1_ID);
     }
 
-    /**
-     * Test the get commands method with descending sort.
-     */
     @Test
-    public void testGetCommandsDescending() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsDescending() {
         //Default to order by Updated
         final Page<Command> commands = this.service.getCommands(null, null, null, null, PAGE);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
@@ -228,7 +212,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      * Test the get commands method with ascending sort.
      */
     @Test
-    public void testGetCommandsAscending() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsAscending() {
         final Pageable ascending = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
         final Page<Command> commands = this.service.getCommands(null, null, null, null, ascending);
@@ -238,11 +223,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_2_ID);
     }
 
-    /**
-     * Test the get commands method order by name.
-     */
     @Test
-    public void testGetCommandsOrderBysName() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsOrderBysName() {
         final Pageable name = PageRequest.of(0, 10, Sort.Direction.DESC, "name");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, name);
         Assertions.assertThat(commands.getNumberOfElements()).isEqualTo(3);
@@ -251,24 +234,17 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(commands.getContent().get(2).getId()).isEqualTo(COMMAND_2_ID);
     }
 
-    /**
-     * Test the get commands method order by an invalid field should return the order by default value (updated).
-     */
     @Test
-    public void testGetCommandsOrderBysInvalidField() {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetCommandsOrderBysInvalidField() {
         final Pageable invalid = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         Assertions
             .assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> this.service.getCommands(null, null, null, null, invalid));
     }
 
-    /**
-     * Test the create method.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testCreateCommand() throws GenieException {
+    void testCreateCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final CommandRequest command = new CommandRequest.Builder(
             new CommandMetadata.Builder(
@@ -307,7 +283,7 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
      * @throws GenieException For any problem
      */
     @Test
-    public void testCreateCommandNoId() throws GenieException {
+    void testCreateCommandNoId() throws GenieException {
         final List<Criterion> clusterCriteria = Lists.newArrayList(
             new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
             new Criterion
@@ -346,13 +322,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             .isThrownBy(() -> this.service.getCommand(id));
     }
 
-    /**
-     * Test to update a command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateCommand() throws GenieException {
         final Command command = this.service.getCommand(COMMAND_1_ID);
         Assertions.assertThat(command.getMetadata().getUser()).isEqualTo(COMMAND_1_USER);
         Assertions.assertThat(command.getMetadata().getStatus()).isEqualByComparingTo(CommandStatus.ACTIVE);
@@ -392,13 +364,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(updated.getMemory()).isPresent().contains(memory);
     }
 
-    /**
-     * Test to make sure when a command with criterion is updated everything is valid.
-     *
-     * @throws Exception on error
-     */
     @Test
-    public void testUpdateCommandWithClusterCriteria() throws Exception {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateCommandWithClusterCriteria() throws Exception {
         Assertions.assertThat(this.criterionRepository.count()).isEqualTo(0L);
         final List<Criterion> criteria0 = Lists.newArrayList(
             new Criterion.Builder()
@@ -450,13 +418,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(this.criterionRepository.count()).isEqualTo(3L);
     }
 
-    /**
-     * Test to update a command with invalid content. Should throw ConstraintViolationException from JPA layer.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateCommandWithInvalidCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateCommandWithInvalidCommand() throws GenieException {
         final Command command = this.service.getCommand(COMMAND_1_ID);
 
         final Command updateCommand = new Command(
@@ -485,13 +449,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             .isThrownBy(() -> this.service.updateCommand(COMMAND_1_ID, updateCommand));
     }
 
-    /**
-     * Test to make sure setting the created and updated outside the system control doesn't change record in database.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateCreateAndUpdate() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateCreateAndUpdate() throws GenieException {
         final Command init = this.service.getCommand(COMMAND_1_ID);
         final Instant created = init.getCreated();
         final Instant updated = init.getUpdated();
@@ -515,14 +475,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(updatedCommand.getUpdated()).isNotEqualTo(Instant.EPOCH);
     }
 
-    /**
-     * Test to patch a command.
-     *
-     * @throws GenieException For any problem
-     * @throws IOException    For Json serialization problem
-     */
     @Test
-    public void testPatchCommand() throws GenieException, IOException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testPatchCommand() throws GenieException, IOException {
         final Command getCommand = this.service.getCommand(COMMAND_1_ID);
         Assertions.assertThat(getCommand.getMetadata().getName()).isEqualTo(COMMAND_1_NAME);
         final Instant updateTime = getCommand.getUpdated();
@@ -538,13 +493,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(updated.getMetadata().getName()).isEqualTo(COMMAND_2_NAME);
     }
 
-    /**
-     * Test delete all.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testDeleteAll() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testDeleteAll() throws GenieException {
         Assertions
             .assertThat(this.service.getCommands(null, null, null, null, PAGE).getNumberOfElements())
             .isEqualTo(3);
@@ -552,13 +503,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(this.service.getCommands(null, null, null, null, PAGE).getContent()).isEmpty();
     }
 
-    /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testDelete() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testDelete() throws GenieException {
         List<Command> commands = this.clusterPersistenceService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assertions.assertThat(commands).hasSize(3);
         boolean found = false;
@@ -602,13 +549,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         this.service.deleteCommand(COMMAND_3_ID);
     }
 
-    /**
-     * Test add configurations to command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddConfigsToCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddConfigsToCommand() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -621,13 +564,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(finalConfigs).hasSize(5).contains(newConfig1, newConfig2, newConfig3);
     }
 
-    /**
-     * Test update configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateConfigsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateConfigsForCommand() throws GenieException {
         final String newConfig1 = UUID.randomUUID().toString();
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
@@ -640,35 +579,23 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(finalConfigs).hasSize(3).contains(newConfig1, newConfig2, newConfig3);
     }
 
-    /**
-     * Test get configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetConfigsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetConfigsForCommand() throws GenieException {
         Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).hasSize(2);
     }
 
-    /**
-     * Test remove all configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllConfigsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllConfigsForCommand() throws GenieException {
         Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).hasSize(2);
         this.service.removeAllConfigsForCommand(COMMAND_1_ID);
         Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
-    /**
-     * Test remove configuration for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveConfigForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveConfigForCommand() throws GenieException {
         final Set<String> configs = this.service.getConfigsForCommand(COMMAND_1_ID);
         Assertions.assertThat(configs).hasSize(2);
         final String removedConfig = configs.iterator().next();
@@ -676,13 +603,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(this.service.getConfigsForCommand(COMMAND_1_ID)).doesNotContain(removedConfig);
     }
 
-    /**
-     * Test add dependencies to command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddDependenciesToCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddDependenciesToCommand() throws GenieException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
@@ -695,13 +618,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(finalDependencies).hasSize(5).contains(newDependency1, newDependency2, newDependency3);
     }
 
-    /**
-     * Test update dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateDependenciesForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateDependenciesForCommand() throws GenieException {
         final String newDependency1 = UUID.randomUUID().toString();
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
@@ -714,35 +633,23 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(finalDependencies).hasSize(3).contains(newDependency1, newDependency2, newDependency3);
     }
 
-    /**
-     * Test get dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetDependenciesForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetDependenciesForCommand() throws GenieException {
         Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_2_ID)).hasSize(1);
     }
 
-    /**
-     * Test remove all dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllDependenciesForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllDependenciesForCommand() throws GenieException {
         Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_3_ID)).hasSize(2);
         this.service.removeAllDependenciesForCommand(COMMAND_3_ID);
         Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_3_ID)).isEmpty();
     }
 
-    /**
-     * Test remove dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveDependencyForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveDependencyForCommand() throws GenieException {
         final Set<String> dependencies = this.service.getDependenciesForCommand(COMMAND_3_ID);
         Assertions.assertThat(dependencies).hasSize(2);
         final String removedDependency = dependencies.iterator().next();
@@ -750,13 +657,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(this.service.getDependenciesForCommand(COMMAND_3_ID)).doesNotContain(removedDependency);
     }
 
-    /**
-     * Test setting the applications for a given command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddApplicationsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddApplicationsForCommand() throws GenieException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
         final List<String> appIds = Lists.newArrayList(APP_1_ID);
@@ -777,13 +680,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             .isEqualTo(APP_1_ID);
     }
 
-    /**
-     * Test setting the applications for a given command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testSetApplicationsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testSetApplicationsForCommand() throws GenieException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID)).isEmpty();
 
         final List<String> appIds = Lists.newArrayList(APP_1_ID);
@@ -802,49 +701,33 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             .hasOnlyOneElementSatisfying(application -> Assertions.assertThat(application.getId()).isEqualTo(APP_1_ID));
     }
 
-    /**
-     * Test get applications for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetApplicationsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetApplicationsForCommand() throws GenieException {
         Assertions
             .assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID))
             .hasOnlyOneElementSatisfying(application -> Assertions.assertThat(application.getId()).isEqualTo(APP_1_ID));
     }
 
-    /**
-     * Test remove applications for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveApplicationsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveApplicationsForCommand() throws GenieException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).hasSize(1);
         this.service.removeApplicationsForCommand(COMMAND_1_ID);
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
-    /**
-     * Test remove application for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveApplicationForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveApplicationForCommand() throws GenieException {
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).hasSize(1);
         this.service.removeApplicationForCommand(COMMAND_1_ID, APP_1_ID);
         Assertions.assertThat(this.service.getApplicationsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
-    /**
-     * Test add tags to command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testAddTagsToCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testAddTagsToCommand() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -857,13 +740,9 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(finalTags).hasSize(6).contains(newTag1, newTag2, newTag3);
     }
 
-    /**
-     * Test update tags for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testUpdateTagsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testUpdateTagsForCommand() throws GenieException {
         final String newTag1 = UUID.randomUUID().toString();
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
@@ -876,47 +755,31 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(finalTags).hasSize(3).contains(newTag1, newTag2, newTag3);
     }
 
-    /**
-     * Test get tags for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetTagsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetTagsForCommand() throws GenieException {
         Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).hasSize(3);
     }
 
-    /**
-     * Test remove all tags for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveAllTagsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveAllTagsForCommand() throws GenieException {
         Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).hasSize(3);
         this.service.removeAllTagsForCommand(COMMAND_1_ID);
         Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).isEmpty();
     }
 
-    /**
-     * Test remove tag for command.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testRemoveTagForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testRemoveTagForCommand() throws GenieException {
         Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).contains("tez");
         this.service.removeTagForCommand(COMMAND_1_ID, "tez");
         Assertions.assertThat(this.service.getTagsForCommand(COMMAND_1_ID)).doesNotContain("tez");
     }
 
-    /**
-     * Test the Get clusters for command function.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
-    public void testGetCommandsForCommand() throws GenieException {
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/init.xml")
+    void testGetClustersForCommand() throws GenieException {
         final Set<Cluster> clusters = this.service.getClustersForCommand(COMMAND_1_ID, null);
         Assertions
             .assertThat(clusters)
@@ -924,23 +787,15 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             .hasOnlyOneElementSatisfying(cluster -> Assertions.assertThat(cluster.getId()).isEqualTo(CLUSTER_1_ID));
     }
 
-    /**
-     * Test the Get clusters for command function.
-     */
     @Test
-    public void testGetClustersForCommandNoId() {
+    void testGetClustersForCommandNoId() {
         Assertions
             .assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> this.service.getClustersForCommand("", null));
     }
 
-    /**
-     * Test to validate how cluster criteria can be manipulated for a command.
-     *
-     * @throws GenieException On unexpected error
-     */
     @Test
-    public void testClusterCriteriaManipulation() throws GenieException {
+    void testClusterCriteriaManipulation() throws GenieException {
         final Criterion criterion0 = new Criterion.Builder().withId(UUID.randomUUID().toString()).build();
         final Criterion criterion1 = new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build();
         final Criterion criterion2 = new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build();
@@ -1004,13 +859,8 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
         Assertions.assertThat(this.service.getClusterCriteriaForCommand(id)).isEqualTo(clusterCriteria);
     }
 
-    /**
-     * Test the various permutations of finding commands with criterion.
-     *
-     * @throws Exception on unexpected error
-     */
     @Test
-    public void testFindCommandsMatchingCriterion() throws Exception {
+    void testFindCommandsMatchingCriterion() throws Exception {
         // Create some commands to test with
         final Command command0 = this.createTestCommand(null, null, null);
         final Command command1 = this.createTestCommand(null, null, null);
@@ -1053,19 +903,6 @@ public class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrati
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(command1);
-
-        // This comes from the init.xml
-        Assertions
-            .assertThat(
-                this.service.findCommandsMatchingCriterion(
-                    new Criterion.Builder().withStatus(CommandStatus.INACTIVE.name()).build(),
-                    false
-                )
-            )
-            .hasSize(1)
-            .extracting(Command::getId)
-            .element(0)
-            .isEqualTo("command2");
 
         Assertions
             .assertThat(

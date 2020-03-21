@@ -29,7 +29,6 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
 import com.netflix.genie.common.external.dtos.v4.ApiClientMetadata;
@@ -56,19 +55,15 @@ import com.netflix.genie.web.data.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.CommandPersistenceService;
-import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -89,7 +84,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -100,9 +94,8 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.0.0
  */
-@DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
+class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";
@@ -159,7 +152,6 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     private static final String ARCHIVE_LOCATION = UUID.randomUUID().toString();
     private static final Instant FINISHED = Instant.now();
     private static final Instant STARTED = Instant.now();
-    private static final JobStatus STATUS = JobStatus.RUNNING;
     private static final String STATUS_MSG = UUID.randomUUID().toString();
 
     // Job Execution fields
@@ -169,14 +161,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     private static final Instant TIMEOUT = STARTED.plus(50L, ChronoUnit.SECONDS);
     private static final int MEMORY = 2048;
 
-    /**
-     * Creates a temporary folder to use for these tests that is cleaned up after tests are run.
-     */
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-
     @Autowired
-    private JobPersistenceService jobPersistenceService;
+    private JpaJobPersistenceServiceImpl jobPersistenceService;
     @Autowired
     private JobSearchService jobSearchService;
     @Autowired
@@ -186,87 +172,71 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
     @Autowired
     private ApplicationPersistenceService applicationPersistenceService;
 
-    /**
-     * Setup.
-     */
-    @Before
-    public void setup() {
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(3L));
+    @BeforeEach
+    void setup() {
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(3L);
     }
 
-    /**
-     * Make sure we can delete jobs that were created before a given date.
-     */
     @Test
-    public void canDeleteJobsCreatedBeforeDateWithMinTransactionAndPageSize() {
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canDeleteJobsCreatedBeforeDateWithMinTransactionAndPageSize() {
         final Instant cal = ZonedDateTime
             .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
             .toInstant();
 
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 1, 1);
 
-        Assert.assertThat(deleted, Matchers.is(1L));
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(2L));
-        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+        Assertions.assertThat(deleted).isEqualTo(1L);
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(2L);
+        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
     }
 
-    /**
-     * Make sure we can delete jobs that were created before a given date.
-     */
     @Test
-    public void canDeleteJobsCreatedBeforeDateWithPageLargerThanMax() {
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canDeleteJobsCreatedBeforeDateWithPageLargerThanMax() {
         final Instant cal = ZonedDateTime
             .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
             .toInstant();
 
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 1, 10);
 
-        Assert.assertThat(deleted, Matchers.is(2L));
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+        Assertions.assertThat(deleted).isEqualTo(2L);
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
+        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
     }
 
-    /**
-     * Make sure we can delete jobs that were created before a given date.
-     */
     @Test
-    public void canDeleteJobsCreatedBeforeDateWithMaxLargerThanPage() {
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canDeleteJobsCreatedBeforeDateWithMaxLargerThanPage() {
         final Instant cal = ZonedDateTime
             .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
             .toInstant();
 
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 10, 1);
 
-        Assert.assertThat(deleted, Matchers.is(2L));
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+        Assertions.assertThat(deleted).isEqualTo(2L);
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
+        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
     }
 
-    /**
-     * Make sure we can delete jobs that were created before a given date.
-     */
     @Test
-    public void canDeleteJobsCreatedBeforeDateWithLargeTransactionAndPageSize() {
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canDeleteJobsCreatedBeforeDateWithLargeTransactionAndPageSize() {
         final Instant cal = ZonedDateTime
             .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
             .toInstant();
 
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 10_000, 1);
 
-        Assert.assertThat(deleted, Matchers.is(2L));
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
+        Assertions.assertThat(deleted).isEqualTo(2L);
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
+        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
     }
 
-    /**
-     * Make sure a job can be saved AND criterion are saved properly.
-     *
-     * @throws GenieException on error
-     */
     @Test
-    public void canPersistAndGetAJob() throws GenieException {
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canPersistAndGetAJob() throws GenieException {
         // Set up some fields for comparison
-
         final com.netflix.genie.common.dto.JobRequest jobRequest = new com.netflix.genie.common.dto.JobRequest.Builder(
             NAME, USER, VERSION, CLUSTER_CRITERIA, COMMAND_CRITERION
         )
@@ -321,40 +291,35 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             .withProcessId(PROCESS_ID)
             .build();
 
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(3L));
-        Assert.assertThat(this.tagRepository.count(), Matchers.is(17L));
-        Assert.assertThat(this.fileRepository.count(), Matchers.is(11L));
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(3L);
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(17L);
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(11L);
         this.jobPersistenceService.createJob(jobRequest, jobMetadata, job, jobExecution);
-        Assert.assertThat(this.jobRepository.count(), Matchers.is(4L));
-        Assert.assertThat(this.tagRepository.count(), Matchers.is(25L));
-        Assert.assertThat(this.fileRepository.count(), Matchers.is(15L));
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(4L);
+        Assertions.assertThat(this.tagRepository.count()).isEqualTo(25L);
+        Assertions.assertThat(this.fileRepository.count()).isEqualTo(15L);
 
-        Assert.assertFalse(
-            this.jobRepository.findByUniqueId(UNIQUE_ID).orElseThrow(IllegalArgumentException::new).isV4()
-        );
+        Assertions
+            .assertThat(this.jobRepository.findByUniqueId(UNIQUE_ID))
+            .isPresent()
+            .get()
+            .extracting(JobEntity::isV4)
+            .isEqualTo(false);
 
         this.validateJobRequest(this.jobSearchService.getJobRequest(UNIQUE_ID));
         this.validateJob(this.jobSearchService.getJob(UNIQUE_ID));
         this.validateJobExecution(this.jobSearchService.getJobExecution(UNIQUE_ID));
 
-        final Optional<JobMetadataProjection> metadataProjection
-            = this.jobRepository.findByUniqueId(UNIQUE_ID, JobMetadataProjection.class);
-        Assert.assertTrue(metadataProjection.isPresent());
-        this.validateJobMetadata(metadataProjection.get());
+        Assertions
+            .assertThat(this.jobRepository.findByUniqueId(UNIQUE_ID, JobMetadataProjection.class))
+            .isPresent()
+            .get()
+            .satisfies(this::validateJobMetadata);
     }
 
-    /**
-     * Test the V4 {@link JobPersistenceService#saveJobSubmission(JobSubmission)} method.
-     *
-     * @throws GeniePreconditionException On error creating a job request
-     * @throws IdAlreadyExistsException   on error saving to database on id conflict
-     * @throws SaveAttachmentException    When the attachment can't be saved to the implementation of AttachmentService
-     * @throws IOException                on filesystem error
-     * @throws GenieException             On any other error
-     */
     @Test
-    public void canSaveAndVerifyJobSubmissionWithoutAttachments() throws
-        GeniePreconditionException,
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canSaveAndVerifyJobSubmissionWithoutAttachments() throws
         IdAlreadyExistsException,
         SaveAttachmentException,
         IOException,
@@ -374,52 +339,42 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         String id = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(jobRequest0, jobRequestMetadata).build()
         );
-        Assert.assertThat(id, Matchers.is(job0Id));
+        Assertions.assertThat(id).isEqualTo(job0Id);
         this.validateSavedJobSubmission(id, jobRequest0, jobRequestMetadata);
 
         id = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(jobRequest1, jobRequestMetadata).build()
         );
-        Assert.assertThat(id, Matchers.notNullValue());
+        Assertions.assertThat(id).isNotBlank();
         this.validateSavedJobSubmission(id, jobRequest1, jobRequestMetadata);
 
-        try {
-            this.jobPersistenceService.saveJobSubmission(
-                new JobSubmission.Builder(jobRequest2, jobRequestMetadata).build()
+        Assertions
+            .assertThatExceptionOfType(IdAlreadyExistsException.class)
+            .isThrownBy(
+                () -> this.jobPersistenceService.saveJobSubmission(
+                    new JobSubmission.Builder(jobRequest2, jobRequestMetadata).build()
+                )
             );
-            Assert.fail();
-        } catch (final IdAlreadyExistsException e) {
-            // Expected
-        }
 
         id = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(jobRequest3, jobRequestMetadata).build()
         );
-        Assert.assertThat(id, Matchers.is(job3Id));
+        Assertions.assertThat(id).isEqualTo(job3Id);
         this.validateSavedJobSubmission(id, jobRequest3, jobRequestMetadata);
     }
 
-    /**
-     * Test the V4 {@link JobPersistenceService#saveJobSubmission(JobSubmission)} method with attachments.
-     *
-     * @throws GeniePreconditionException On error creating a job request
-     * @throws IdAlreadyExistsException   on error saving to database on id conflict
-     * @throws SaveAttachmentException    When the attachment can't be saved to the implementation of AttachmentService
-     * @throws IOException                on filesystem error
-     */
     @Test
-    public void canSaveAndVerifyJobSubmissionWithAttachments() throws
-        GeniePreconditionException,
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canSaveAndVerifyJobSubmissionWithAttachments(@TempDir final Path tempDir) throws
         IdAlreadyExistsException,
         SaveAttachmentException,
         IOException {
         final JobRequest jobRequest = this.createJobRequest(null, null);
-        final Path attachmentSource = this.folder.newFolder().toPath();
         final int numAttachments = 6;
         long totalAttachmentSize = 0L;
         final Set<Resource> attachments = Sets.newHashSet();
         for (int i = 0; i < numAttachments; i++) {
-            final Path attachment = attachmentSource.resolve(UUID.randomUUID().toString());
+            final Path attachment = tempDir.resolve(UUID.randomUUID().toString());
             Files.write(attachment, ("Select * FROM my_table where id = " + i + ";").getBytes(StandardCharsets.UTF_8));
             attachments.add(new FileSystemResource(attachment));
             totalAttachmentSize += Files.size(attachment);
@@ -483,7 +438,8 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
      * @throws SaveAttachmentException  If the attachments can't be saved. God I hate checked exceptions.
      */
     @Test
-    public void canSaveAndRetrieveJobSpecification() throws
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canSaveAndRetrieveJobSpecification() throws
         GenieException,
         IdAlreadyExistsException,
         SaveAttachmentException,
@@ -513,10 +469,10 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         );
 
         this.jobPersistenceService.saveResolvedJob(jobId, resolvedJob);
-        Assert.assertThat(
-            this.jobPersistenceService.getJobSpecification(jobId).orElse(null),
-            Matchers.is(jobSpecification)
-        );
+        Assertions
+            .assertThat(this.jobPersistenceService.getJobSpecification(jobId))
+            .isPresent()
+            .contains(jobSpecification);
 
         final String jobId2 = this.jobPersistenceService.saveJobSubmission(
             new JobSubmission.Builder(
@@ -542,22 +498,15 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
             jobRequest2.getMetadata()
         );
         this.jobPersistenceService.saveResolvedJob(jobId2, resolvedJob1);
-        Assert.assertThat(
-            this.jobPersistenceService.getJobSpecification(jobId2).orElse(null),
-            Matchers.is(jobSpecification2)
-        );
+        Assertions
+            .assertThat(this.jobPersistenceService.getJobSpecification(jobId2))
+            .isPresent()
+            .contains(jobSpecification2);
     }
 
-    /**
-     * Make sure {@link JpaJobPersistenceServiceImpl#claimJob(String, AgentClientMetadata)} works as expected.
-     *
-     * @throws GenieException           on error
-     * @throws IOException              on json error
-     * @throws IdAlreadyExistsException If the job ID is already taken
-     * @throws SaveAttachmentException  If the attachments can't be saved.
-     */
     @Test
-    public void canClaimJobAndUpdateStatus() throws
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canClaimJobAndUpdateStatus() throws
         GenieException,
         IdAlreadyExistsException,
         SaveAttachmentException,
@@ -618,16 +567,9 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         Assertions.assertThat(postClaimedJob.getAgentPid()).isPresent().contains(agentPid);
     }
 
-    /**
-     * Test the {@link JpaJobPersistenceServiceImpl#updateJobStatus(String, JobStatus, JobStatus, String)} method.
-     *
-     * @throws GenieException           on error
-     * @throws IOException              on error
-     * @throws IdAlreadyExistsException If the job ID is already taken
-     * @throws SaveAttachmentException  If the attachments can't be saved
-     */
     @Test
-    public void canUpdateJobStatus() throws
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canUpdateJobStatus() throws
         GenieException,
         IdAlreadyExistsException,
         SaveAttachmentException,
@@ -720,270 +662,157 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         Assertions.assertThat(jobEntity.getFinished()).isPresent();
     }
 
-    /**
-     * Test {@link JpaJobPersistenceServiceImpl#getJobStatus(String)}.
-     *
-     * @throws GenieNotFoundException when the job doesn't exist but should
-     */
     @Test
-    public void canGetJobStatus() throws GenieNotFoundException {
-        try {
-            this.jobPersistenceService.getJobStatus(UUID.randomUUID().toString());
-            Assert.fail("Should have thrown GenieNotFoundException");
-        } catch (final GenieNotFoundException e) {
-            // expected
-        }
-        Assert.assertThat(this.jobPersistenceService.getJobStatus(JOB_1_ID), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(this.jobPersistenceService.getJobStatus(JOB_2_ID), Matchers.is(JobStatus.RUNNING));
-        Assert.assertThat(this.jobPersistenceService.getJobStatus(JOB_3_ID), Matchers.is(JobStatus.RUNNING));
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canGetJobStatus() throws GenieNotFoundException {
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.jobPersistenceService.getJobStatus(UUID.randomUUID().toString()));
+        Assertions.assertThat(this.jobPersistenceService.getJobStatus(JOB_1_ID)).isEqualTo(JobStatus.SUCCEEDED);
+        Assertions.assertThat(this.jobPersistenceService.getJobStatus(JOB_2_ID)).isEqualTo(JobStatus.RUNNING);
+        Assertions.assertThat(this.jobPersistenceService.getJobStatus(JOB_3_ID)).isEqualTo(JobStatus.RUNNING);
     }
 
-    /**
-     * Test {@link JpaJobPersistenceServiceImpl#getJobArchiveLocation(String)}.
-     *
-     * @throws GenieNotFoundException if the test is broken
-     */
     @Test
-    public void canGetJobArchiveLocation() throws GenieNotFoundException {
-        try {
-            this.jobPersistenceService.getJobArchiveLocation(UUID.randomUUID().toString());
-            Assert.fail();
-        } catch (final GenieNotFoundException gnfe) {
-            // expected
-        }
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canGetJobArchiveLocation() throws GenieNotFoundException {
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.jobPersistenceService.getJobArchiveLocation(UUID.randomUUID().toString()));
 
-        Assert.assertFalse(this.jobPersistenceService.getJobArchiveLocation(JOB_3_ID).isPresent());
-        Assert.assertThat(
-            this.jobPersistenceService.getJobArchiveLocation(JOB_1_ID).orElseThrow(IllegalStateException::new),
-            Matchers.is("s3://somebucket/genie/logs/1/")
-        );
+        Assertions.assertThat(this.jobPersistenceService.getJobArchiveLocation(JOB_3_ID)).isNotPresent();
+        Assertions
+            .assertThat(this.jobPersistenceService.getJobArchiveLocation(JOB_1_ID))
+            .isPresent()
+            .contains("s3://somebucket/genie/logs/1/");
     }
 
-    /**
-     * Test {@link JpaJobPersistenceServiceImpl#getFinishedJob(String)}.
-     *
-     * @throws GenieNotFoundException if the test works
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void canGetFinishedJobNonExistent() throws GenieNotFoundException {
-        this.jobPersistenceService.getFinishedJob(UUID.randomUUID().toString());
-        Assert.fail();
-    }
-
-    /**
-     * Test {@link JpaJobPersistenceServiceImpl#getFinishedJob(String)}.
-     *
-     * @throws GenieNotFoundException if the test is broken
-     */
-    @Test(expected = GenieInvalidStatusException.class)
-    public void canGetFinishedJobNotFinished() throws GenieNotFoundException {
-        this.jobPersistenceService.getFinishedJob(JOB_3_ID);
-        Assert.fail();
-    }
-
-    /**
-     * Test {@link JpaJobPersistenceServiceImpl#getFinishedJob(String)}.
-     *
-     * @throws GenieNotFoundException if the test is broken
-     */
     @Test
-    public void canGetFinishedJob() throws GenieNotFoundException {
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canGetFinishedJobNonExistent() {
+        Assertions
+            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .isThrownBy(() -> this.jobPersistenceService.getFinishedJob(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canGetFinishedJobNotFinished() {
+        Assertions
+            .assertThatExceptionOfType(GenieInvalidStatusException.class)
+            .isThrownBy(() -> this.jobPersistenceService.getFinishedJob(JOB_3_ID));
+    }
+
+    @Test
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canGetFinishedJob() throws GenieNotFoundException {
         final FinishedJob finishedJob = this.jobPersistenceService.getFinishedJob(JOB_1_ID);
-        Assert.assertNotNull(finishedJob);
+        Assertions.assertThat(finishedJob).isNotNull();
 
-        Assert.assertThat(finishedJob.getUniqueId(), Matchers.is(JOB_1_ID));
-        Assert.assertThat(finishedJob.getUser(), Matchers.is("tgianos"));
-        Assert.assertThat(finishedJob.getName(), Matchers.is("testSparkJob"));
-        Assert.assertThat(finishedJob.getVersion(), Matchers.is("2.4"));
-        Assert.assertNotNull(finishedJob.getCreated());
-        Assert.assertThat(finishedJob.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(finishedJob.getCommandArgs().size(), Matchers.is(2));
-        Assert.assertNotNull(finishedJob.getCommandCriterion());
-        Assert.assertThat(finishedJob.getClusterCriteria().size(), Matchers.is(2));
-        Assert.assertFalse(finishedJob.getStarted().isPresent());
-        Assert.assertFalse(finishedJob.getFinished().isPresent());
-        Assert.assertFalse(finishedJob.getGrouping().isPresent());
-        Assert.assertFalse(finishedJob.getGroupingInstance().isPresent());
-        Assert.assertFalse(finishedJob.getStatusMessage().isPresent());
-        Assert.assertThat(finishedJob.getRequestedMemory().orElse(0), Matchers.is(1560));
-        Assert.assertFalse(finishedJob.getRequestApiClientHostname().isPresent());
-        Assert.assertFalse(finishedJob.getRequestApiClientUserAgent().isPresent());
-        Assert.assertFalse(finishedJob.getRequestAgentClientHostname().isPresent());
-        Assert.assertFalse(finishedJob.getRequestAgentClientVersion().isPresent());
-        Assert.assertThat(finishedJob.getNumAttachments().orElse(0), Matchers.is(2));
-        Assert.assertThat(finishedJob.getExitCode().orElse(-1), Matchers.is(0));
-        Assert.assertThat(finishedJob.getArchiveLocation().orElse(""), Matchers.is("s3://somebucket/genie/logs/1/"));
-        Assert.assertFalse(finishedJob.getMemoryUsed().isPresent());
+        Assertions.assertThat(finishedJob.getUniqueId()).isEqualTo(JOB_1_ID);
+        Assertions.assertThat(finishedJob.getUser()).isEqualTo("tgianos");
+        Assertions.assertThat(finishedJob.getName()).isEqualTo("testSparkJob");
+        Assertions.assertThat(finishedJob.getVersion()).isEqualTo("2.4");
+        Assertions.assertThat(finishedJob.getCreated()).isNotNull();
+        Assertions.assertThat(finishedJob.getStatus()).isEqualTo(JobStatus.SUCCEEDED);
+        Assertions.assertThat(finishedJob.getCommandArgs().size()).isEqualTo(2);
+        Assertions.assertThat(finishedJob.getCommandCriterion()).isNotNull();
+        Assertions.assertThat(finishedJob.getClusterCriteria()).hasSize(2);
+        Assertions.assertThat(finishedJob.getStarted()).isNotPresent();
+        Assertions.assertThat(finishedJob.getFinished()).isNotPresent();
+        Assertions.assertThat(finishedJob.getGrouping()).isNotPresent();
+        Assertions.assertThat(finishedJob.getGroupingInstance()).isNotPresent();
+        Assertions.assertThat(finishedJob.getStatusMessage()).isNotPresent();
+        Assertions.assertThat(finishedJob.getRequestedMemory()).isPresent().contains(1560);
+        Assertions.assertThat(finishedJob.getRequestApiClientHostname()).isNotPresent();
+        Assertions.assertThat(finishedJob.getRequestApiClientUserAgent()).isNotPresent();
+        Assertions.assertThat(finishedJob.getRequestAgentClientHostname()).isNotPresent();
+        Assertions.assertThat(finishedJob.getRequestAgentClientVersion()).isNotPresent();
+        Assertions.assertThat(finishedJob.getNumAttachments()).isPresent().contains(2);
+        Assertions.assertThat(finishedJob.getExitCode()).isPresent().contains(0);
+        Assertions.assertThat(finishedJob.getArchiveLocation()).isPresent().contains("s3://somebucket/genie/logs/1/");
+        Assertions.assertThat(finishedJob.getMemoryUsed()).isNotPresent();
 
         final Command command = finishedJob.getCommand().orElse(null);
         final Cluster cluster = finishedJob.getCluster().orElse(null);
         final List<Application> applications = finishedJob.getApplications();
 
-        Assert.assertNotNull(command);
-        Assert.assertNotNull(cluster);
-        Assert.assertNotNull(applications);
-        Assert.assertThat(command.getMetadata().getName(), Matchers.is("spark"));
-        Assert.assertThat(cluster.getMetadata().getName(), Matchers.is("h2query"));
-        Assert.assertThat(applications.size(), Matchers.is(2));
-        Assert.assertThat(applications.get(0).getMetadata().getName(), Matchers.is("hadoop"));
-        Assert.assertThat(applications.get(1).getMetadata().getName(), Matchers.is("spark"));
+        Assertions.assertThat(command).isNotNull();
+        Assertions.assertThat(cluster).isNotNull();
+        Assertions.assertThat(applications).isNotNull();
+        Assertions.assertThat(command.getMetadata().getName()).isEqualTo("spark");
+        Assertions.assertThat(cluster.getMetadata().getName()).isEqualTo("h2query");
+        Assertions.assertThat(applications.size()).isEqualTo(2);
+        Assertions.assertThat(applications.get(0).getMetadata().getName()).isEqualTo("hadoop");
+        Assertions.assertThat(applications.get(1).getMetadata().getName()).isEqualTo("spark");
     }
 
-    /**
-     * Make sure the {@link JpaJobPersistenceServiceImpl#isApiJob(String)} API behaves as expected against existing
-     * data.
-     *
-     * @throws GenieNotFoundException If a job with the given ID doesn't exist
-     */
     @Test
-    public void canDetermineIfIsApiJob() throws GenieNotFoundException {
+    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
+    void canDetermineIfIsApiJob() throws GenieNotFoundException {
         Assertions.assertThat(this.jobPersistenceService.isApiJob(JOB_1_ID)).isFalse();
         Assertions.assertThat(this.jobPersistenceService.isApiJob(JOB_2_ID)).isTrue();
         Assertions.assertThat(this.jobPersistenceService.isApiJob(JOB_3_ID)).isTrue();
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
-        Assert.assertThat(
-            savedJobRequest.getId().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(UNIQUE_ID)
-        );
-        Assert.assertThat(savedJobRequest.getName(), Matchers.is(NAME));
-        Assert.assertThat(savedJobRequest.getUser(), Matchers.is(USER));
-        Assert.assertThat(savedJobRequest.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(
-            savedJobRequest.getDescription().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(DESCRIPTION)
-        );
-        Assert.assertThat(
-            savedJobRequest.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS.get(0))
-        );
-        Assert.assertThat(
-            savedJobRequest.getGroup().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(GROUP)
-        );
-        Assert.assertThat(
-            savedJobRequest.getSetupFile().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(SETUP_FILE)
-        );
-        Assert.assertThat(savedJobRequest.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIA));
-        Assert.assertThat(savedJobRequest.getCommandCriteria(), Matchers.is(COMMAND_CRITERION));
-        Assert.assertThat(savedJobRequest.getConfigs(), Matchers.is(CONFIGS));
-        Assert.assertThat(savedJobRequest.getDependencies(), Matchers.is(DEPENDENCIES));
-        Assert.assertTrue(savedJobRequest.isDisableLogArchival());
-        Assert.assertThat(
-            savedJobRequest.getEmail().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(EMAIL));
-        Assert.assertThat(savedJobRequest.getTags(), Matchers.is(TAGS));
-        Assert.assertThat(
-            savedJobRequest.getCpu().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(CPU_REQUESTED)
-        );
-        Assert.assertThat(
-            savedJobRequest.getMemory().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(MEMORY_REQUESTED)
-        );
-        Assert.assertThat(savedJobRequest.getApplications(), Matchers.is(APPLICATIONS_REQUESTED));
-        Assert.assertThat(
-            savedJobRequest.getTimeout().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(TIMEOUT_REQUESTED)
-        );
-        Assert.assertThat(
-            savedJobRequest.getGrouping().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(GROUPING)
-        );
-        Assert.assertThat(
-            savedJobRequest.getGroupingInstance().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(GROUPING_INSTANCE)
-        );
+        Assertions.assertThat(savedJobRequest.getId()).isPresent().contains(UNIQUE_ID);
+        Assertions.assertThat(savedJobRequest.getName()).isEqualTo(NAME);
+        Assertions.assertThat(savedJobRequest.getUser()).isEqualTo(USER);
+        Assertions.assertThat(savedJobRequest.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(savedJobRequest.getDescription()).isPresent().contains(DESCRIPTION);
+        Assertions.assertThat(savedJobRequest.getCommandArgs()).isPresent().contains(COMMAND_ARGS.get(0));
+        Assertions.assertThat(savedJobRequest.getGroup()).isPresent().contains(GROUP);
+        Assertions.assertThat(savedJobRequest.getSetupFile()).isPresent().contains(SETUP_FILE);
+        Assertions.assertThat(savedJobRequest.getClusterCriterias()).isEqualTo(CLUSTER_CRITERIA);
+        Assertions.assertThat(savedJobRequest.getCommandCriteria()).isEqualTo(COMMAND_CRITERION);
+        Assertions.assertThat(savedJobRequest.getConfigs()).isEqualTo(CONFIGS);
+        Assertions.assertThat(savedJobRequest.getDependencies()).isEqualTo(DEPENDENCIES);
+        Assertions.assertThat(savedJobRequest.isDisableLogArchival()).isTrue();
+        Assertions.assertThat(savedJobRequest.getEmail()).isPresent().contains(EMAIL);
+        Assertions.assertThat(savedJobRequest.getTags()).isEqualTo(TAGS);
+        Assertions.assertThat(savedJobRequest.getCpu()).isPresent().contains(CPU_REQUESTED);
+        Assertions.assertThat(savedJobRequest.getMemory()).isPresent().contains(MEMORY_REQUESTED);
+        Assertions.assertThat(savedJobRequest.getApplications()).isEqualTo(APPLICATIONS_REQUESTED);
+        Assertions.assertThat(savedJobRequest.getTimeout()).isPresent().contains(TIMEOUT_REQUESTED);
+        Assertions.assertThat(savedJobRequest.getGrouping()).isPresent().contains(GROUPING);
+        Assertions.assertThat(savedJobRequest.getGroupingInstance()).isPresent().contains(GROUPING_INSTANCE);
     }
 
     private void validateJob(final Job savedJob) {
-        Assert.assertThat(savedJob.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(UNIQUE_ID));
-        Assert.assertThat(savedJob.getName(), Matchers.is(NAME));
-        Assert.assertThat(savedJob.getUser(), Matchers.is(USER));
-        Assert.assertThat(savedJob.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(
-            savedJob.getDescription().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(DESCRIPTION)
-        );
-        Assert.assertThat(
-            savedJob.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS.get(0))
-        );
-        Assert.assertThat(savedJob.getTags(), Matchers.is(TAGS));
-        Assert.assertThat(
-            savedJob.getArchiveLocation().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(ARCHIVE_LOCATION)
-        );
-        Assert.assertThat(
-            savedJob.getStarted().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(STARTED)
-        );
-        Assert.assertThat(
-            savedJob.getFinished().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(FINISHED)
-        );
-        Assert.assertThat(savedJob.getStatus(), Matchers.is(com.netflix.genie.common.dto.JobStatus.RUNNING));
-        Assert.assertThat(
-            savedJob.getStatusMsg().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(STATUS_MSG)
-        );
-        Assert.assertThat(
-            savedJob.getGrouping().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(GROUPING)
-        );
-        Assert.assertThat(
-            savedJob.getGroupingInstance().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(GROUPING_INSTANCE)
-        );
+        Assertions.assertThat(savedJob.getId()).isPresent().contains(UNIQUE_ID);
+        Assertions.assertThat(savedJob.getName()).isEqualTo(NAME);
+        Assertions.assertThat(savedJob.getUser()).isEqualTo(USER);
+        Assertions.assertThat(savedJob.getVersion()).isEqualTo(VERSION);
+        Assertions.assertThat(savedJob.getDescription()).isPresent().contains(DESCRIPTION);
+        Assertions.assertThat(savedJob.getCommandArgs()).isPresent().contains(COMMAND_ARGS.get(0));
+        Assertions.assertThat(savedJob.getTags()).isEqualTo(TAGS);
+        Assertions.assertThat(savedJob.getArchiveLocation()).isPresent().contains(ARCHIVE_LOCATION);
+        Assertions.assertThat(savedJob.getStarted()).isPresent().contains(STARTED);
+        Assertions.assertThat(savedJob.getFinished()).isPresent().contains(FINISHED);
+        Assertions
+            .assertThat(savedJob.getStatus())
+            .isEqualByComparingTo(com.netflix.genie.common.dto.JobStatus.RUNNING);
+        Assertions.assertThat(savedJob.getStatusMsg()).isPresent().contains(STATUS_MSG);
+        Assertions.assertThat(savedJob.getGrouping()).isPresent().contains(GROUPING);
+        Assertions.assertThat(savedJob.getGroupingInstance()).isPresent().contains(GROUPING_INSTANCE);
     }
 
     private void validateJobExecution(final JobExecution savedJobExecution) {
-        Assert.assertThat(savedJobExecution.getHostName(), Matchers.is(HOSTNAME));
-        Assert.assertThat(
-            savedJobExecution.getProcessId().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(PROCESS_ID)
-        );
-        Assert.assertThat(
-            savedJobExecution.getCheckDelay().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(CHECK_DELAY)
-        );
-        Assert.assertThat(
-            savedJobExecution.getTimeout().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(TIMEOUT)
-        );
-        Assert.assertThat(
-            savedJobExecution.getMemory().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(MEMORY)
-        );
+        Assertions.assertThat(savedJobExecution.getHostName()).isEqualTo(HOSTNAME);
+        Assertions.assertThat(savedJobExecution.getProcessId()).isPresent().contains(PROCESS_ID);
+        Assertions.assertThat(savedJobExecution.getCheckDelay()).contains(CHECK_DELAY);
+        Assertions.assertThat(savedJobExecution.getTimeout()).contains(TIMEOUT);
+        Assertions.assertThat(savedJobExecution.getMemory()).contains(MEMORY);
     }
 
     private void validateJobMetadata(final JobMetadataProjection savedMetadata) {
-        Assert.assertThat(
-            savedMetadata.getRequestApiClientHostname().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(CLIENT_HOST)
-        );
-        Assert.assertThat(
-            savedMetadata.getRequestApiClientUserAgent().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(USER_AGENT)
-        );
-        Assert.assertThat(
-            savedMetadata.getNumAttachments().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(NUM_ATTACHMENTS)
-        );
-        Assert.assertThat(
-            savedMetadata.getTotalSizeOfAttachments().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(TOTAL_SIZE_ATTACHMENTS)
-        );
-        Assert.assertThat(
-            savedMetadata.getStdErrSize().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(STD_ERR_SIZE)
-        );
-        Assert.assertThat(
-            savedMetadata.getStdOutSize().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(STD_OUT_SIZE)
-        );
+        Assertions.assertThat(savedMetadata.getRequestApiClientHostname()).contains(CLIENT_HOST);
+        Assertions.assertThat(savedMetadata.getRequestApiClientUserAgent()).contains(USER_AGENT);
+        Assertions.assertThat(savedMetadata.getNumAttachments()).contains(NUM_ATTACHMENTS);
+        Assertions.assertThat(savedMetadata.getTotalSizeOfAttachments()).contains(TOTAL_SIZE_ATTACHMENTS);
+        Assertions.assertThat(savedMetadata.getStdErrSize()).contains(STD_ERR_SIZE);
+        Assertions.assertThat(savedMetadata.getStdOutSize()).contains(STD_OUT_SIZE);
     }
 
     private void validateSavedJobSubmission(
@@ -991,70 +820,49 @@ public class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTe
         final JobRequest jobRequest,
         final JobRequestMetadata jobRequestMetadata
     ) throws GenieException {
-        Assert.assertThat(
-            this.jobPersistenceService
-                .getJobRequest(id)
-                .orElseThrow(() -> new GenieNotFoundException("No job request with id " + id + " exists.")),
-            Matchers.is(jobRequest)
-        );
+        Assertions.assertThat(this.jobPersistenceService.getJobRequest(id)).contains(jobRequest);
         // TODO: Switch to compare results of a get once implemented to avoid collection transaction problem
         final JobEntity jobEntity = this.jobRepository
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " found when one was expected"));
 
-        Assert.assertFalse(jobEntity.isResolved());
-        Assert.assertTrue(jobEntity.isV4());
+        Assertions.assertThat(jobEntity.isResolved()).isFalse();
+        Assertions.assertThat(jobEntity.isV4()).isTrue();
 
         // Job Request Metadata Fields
         jobRequestMetadata.getApiClientMetadata().ifPresent(
             apiClientMetadata -> {
                 apiClientMetadata.getHostname().ifPresent(
-                    hostname -> Assert.assertThat(
-                        jobEntity.getRequestApiClientHostname().orElse(UUID.randomUUID().toString()),
-                        Matchers.is(hostname)
-                    )
+                    hostname -> Assertions.assertThat(jobEntity.getRequestApiClientHostname()).contains(hostname)
                 );
                 apiClientMetadata.getUserAgent().ifPresent(
-                    userAgent -> Assert.assertThat(
-                        jobEntity.getRequestApiClientUserAgent().orElse(UUID.randomUUID().toString()),
-                        Matchers.is(userAgent)
-                    )
+                    userAgent -> Assertions.assertThat(jobEntity.getRequestApiClientUserAgent()).contains(userAgent)
                 );
             }
         );
         jobRequestMetadata.getAgentClientMetadata().ifPresent(
             apiClientMetadata -> {
                 apiClientMetadata.getHostname().ifPresent(
-                    hostname -> Assert.assertThat(
-                        jobEntity.getRequestAgentClientHostname().orElse(UUID.randomUUID().toString()),
-                        Matchers.is(hostname)
-                    )
+                    hostname -> Assertions.assertThat(jobEntity.getRequestAgentClientHostname()).contains(hostname)
                 );
                 apiClientMetadata.getVersion().ifPresent(
-                    version -> Assert.assertThat(
-                        jobEntity.getRequestAgentClientVersion().orElse(UUID.randomUUID().toString()),
-                        Matchers.is(version)
-                    )
+                    version -> Assertions.assertThat(jobEntity.getRequestAgentClientVersion()).contains(version)
                 );
                 apiClientMetadata.getPid().ifPresent(
-                    pid -> Assert.assertThat(jobEntity.getRequestAgentClientPid().orElse(-1), Matchers.is(pid))
+                    pid -> Assertions.assertThat(jobEntity.getRequestAgentClientPid()).contains(pid)
                 );
             }
         );
-        Assert.assertThat(
-            jobEntity.getNumAttachments().orElse(-1),
-            Matchers.is(jobRequestMetadata.getNumAttachments())
-        );
-        Assert.assertThat(
-            jobEntity.getTotalSizeOfAttachments().orElse(-1L),
-            Matchers.is(jobRequestMetadata.getTotalSizeOfAttachments())
-        );
+        Assertions.assertThat(jobEntity.getNumAttachments()).contains(jobRequestMetadata.getNumAttachments());
+        Assertions
+            .assertThat(jobEntity.getTotalSizeOfAttachments())
+            .contains(jobRequestMetadata.getTotalSizeOfAttachments());
     }
 
     private JobRequest createJobRequest(
         @Nullable final String requestedId,
         @Nullable final String requestedArchivalLocationPrefix
-    ) throws GeniePreconditionException, IOException {
+    ) throws IOException {
         final String metadata = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
         final JobMetadata jobMetadata = new JobMetadata
             .Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
