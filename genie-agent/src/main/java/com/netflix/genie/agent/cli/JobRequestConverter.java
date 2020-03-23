@@ -157,12 +157,12 @@ public class JobRequestConverter {
     /**
      * Exception thrown in case of conversion error due to resulting object failing validation.
      */
-    public static final class ConversionException extends Exception {
+    public static class ConversionException extends Exception {
 
         @Getter
         private final Set<ConstraintViolation<AgentJobRequest>> violations;
 
-        private ConversionException(@NotEmpty final Set<ConstraintViolation<AgentJobRequest>> violations) {
+        ConversionException(@NotEmpty final Set<ConstraintViolation<AgentJobRequest>> violations) {
             super(
                 String.format(
                     "Job request failed validation: %s (%d total violations)",
