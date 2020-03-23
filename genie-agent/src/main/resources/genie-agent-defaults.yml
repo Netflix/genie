@@ -38,3 +38,8 @@ spring:
   main:
     web-application-type: none
     banner-mode: log
+
+logging:
+  level:
+    root: INFO
+    org.springframework.statemachine: ERROR
