@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2020 Netflix, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<dataset>
+    <applications
+        id="0"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:50:00"
+        entity_version="0"
+        unique_id="app1"
+        genie_user="tgianos"
+        name="tez"
+        version="1.2.3"
+        status="ACTIVE"
+    />
+
+    <applications
+        id="2"
+        created="2014-08-10 01:45:00"
+        updated="2014-08-10 01:50:00"
+        entity_version="0"
+        unique_id="app3"
+        genie_user="tgianos"
+        name="storm"
+        version="7.8.9"
+        status="ACTIVE"
+        type="storm"
+    />
+
+    <applications
+        id="3"
+        created="2020-03-10 01:45:00"
+        updated="2020-03-10 01:50:00"
+        entity_version="0"
+        unique_id="app4"
+        genie_user="tgianos"
+        name="sparksql"
+        version="4.0.0"
+        status="ACTIVE"
+        type="spark"
+    />
+
+    <applications
+        id="4"
+        created="2020-03-10 02:45:00"
+        updated="2020-03-10 02:50:00"
+        entity_version="0"
+        unique_id="app5"
+        genie_user="tgianos"
+        name="sparksql"
+        version="4.0.0"
+        status="ACTIVE"
+        type="spark"
+    />
+
+    <applications
+        id="5"
+        created="2020-03-10 02:45:00"
+        updated="2020-03-10 02:50:00"
+        entity_version="0"
+        unique_id="app6"
+        genie_user="tgianos"
+        name="sparksql"
+        version="4.0.0"
+        status="ACTIVE"
+        type="spark"
+    />
+
+    <commands
+        id="0"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        unique_id="command1"
+        genie_user="tgianos"
+        name="sparksql"
+        version="1.2.3"
+        check_delay="10000"
+        status="ACTIVE"
+    />
+
+    <commands_applications command_id="0" application_id="0" application_order="0"/>
+    <commands_applications command_id="0" application_id="2" application_order="1"/>
+
+    <command_executable_arguments
+        command_id="0"
+        argument="sparksql"
+        argument_order="0"
+    />
+
+    <criteria
+        id="0"
+    />
+    <jobs
+        id="0"
+        created="2016-02-24 01:48:00"
+        updated="2016-02-24 02:59:00"
+        entity_version="1"
+        unique_id="job3"
+        genie_user="tgianos"
+        name="testSparkJob2"
+        version="2.4"
+        command_criterion="0"
+        requested_cpu="2"
+        requested_memory="2048"
+        archiving_disabled="true"
+        requested_timeout="608400"
+        num_attachments="1"
+        total_size_of_attachments="382"
+        status="RUNNING"
+        command_id="0"
+        agent_hostname="b.netflix.com"
+        exit_code="-1"
+        process_id="319"
+        check_delay="12000"
+        timeout_used="608400"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/3"
+        resolved="true"
+        api="true"
+    />
+
+    <jobs_applications job_id="0" application_id="0" application_order="0"/>
+    <jobs_applications job_id="0" application_id="2" application_order="1"/>
+    <jobs_applications job_id="0" application_id="3" application_order="2"/>
+</dataset>

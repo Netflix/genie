@@ -61,6 +61,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -440,6 +441,15 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
             .stream()
             .map(EntityDtoConverters::toV4CommandDto)
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int deleteUnusedApplicationsCreatedBefore(final Instant createdThreshold) {
+        log.info("Attempting to delete unused applications created before {}", createdThreshold);
+        return this.getApplicationRepository().deleteUnusedApplications(createdThreshold);
     }
 
     /**

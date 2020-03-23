@@ -578,4 +578,24 @@ class JpaApplicationPersistenceServiceImplIntegrationTest extends DBIntegrationT
             .assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> this.appService.getCommandsForApplication("", null));
     }
+
+    @Test
+    @DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTest/deleteUnusedApplications/before.xml")
+        /*
+         * Unfortunately this doesn't seem to work due to how we have an after each that deletes the records out of
+         * database before this check can happen. I don't want to break all the other tests but leaving for now as
+         * might be a nice way to do it without so many java assertions
+         */
+//    @ExpectedDatabase(
+//        value = "JpaApplicationPersistenceServiceImplIntegrationTest/deleteUnusedApplications/after.xml",
+//        assertionMode = DatabaseAssertionMode.NON_STRICT
+//    )
+    void testDeleteUnusedApplications() {
+        Assertions.assertThat(this.applicationRepository.existsByUniqueId("app2")).isTrue();
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(6);
+        final Instant createdThreshold = Instant.parse("2020-03-10T02:44:00.000Z");
+        Assertions.assertThat(this.appService.deleteUnusedApplicationsCreatedBefore(createdThreshold)).isEqualTo(1);
+        Assertions.assertThat(this.applicationRepository.count()).isEqualTo(5);
+        Assertions.assertThat(this.applicationRepository.existsByUniqueId("app2")).isFalse();
+    }
 }

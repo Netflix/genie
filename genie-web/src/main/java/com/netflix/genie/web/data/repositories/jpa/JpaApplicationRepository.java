@@ -16,6 +16,11 @@
 package com.netflix.genie.web.data.repositories.jpa;
 
 import com.netflix.genie.web.data.entities.ApplicationEntity;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.Instant;
 
 /**
  * Application repository.
@@ -23,4 +28,26 @@ import com.netflix.genie.web.data.entities.ApplicationEntity;
  * @author tgianos
  */
 public interface JpaApplicationRepository extends JpaBaseRepository<ApplicationEntity> {
+
+    /**
+     * Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+     * created before the given time.
+     */
+    String DELETE_APPLICATIONS_QUERY =
+        "DELETE FROM applications"
+            + " WHERE created < :createdThreshold"
+            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications)"
+            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications);";
+
+
+    /**
+     * Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+     * created before the given time.
+     *
+     * @param createdThreshold The instant in time before which records should be considered for deletion. Exclusive.O
+     * @return The number of applications deleted
+     */
+    @Query(value = DELETE_APPLICATIONS_QUERY, nativeQuery = true)
+    @Modifying
+    int deleteUnusedApplications(@Param("createdThreshold") Instant createdThreshold);
 }
