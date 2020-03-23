@@ -33,6 +33,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.Set;
 
 /**
@@ -336,4 +337,16 @@ public interface ApplicationPersistenceService {
         @NotBlank(message = "No application id entered. Unable to get commands.") String id,
         @Nullable Set<CommandStatus> statuses
     ) throws GenieException;
+
+    /**
+     * Delete any unused applications that were created before the given time.
+     * Unused means they aren't linked to any other resources in the Genie system like jobs or commands and therefore
+     * referential integrity is maintained.
+     *
+     * @param createdThreshold The instant in time that any applications had to be created before (exclusive) to be
+     *                         considered for deletion. Presents ability to filter out newly created applications if
+     *                         desired.
+     * @return The number of successfully deleted applications
+     */
+    int deleteUnusedApplicationsCreatedBefore(Instant createdThreshold);
 }
