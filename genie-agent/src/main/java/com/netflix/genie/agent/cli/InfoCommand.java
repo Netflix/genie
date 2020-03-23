@@ -19,14 +19,24 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.collect.Sets;
 import com.netflix.genie.agent.AgentMetadata;
+import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
+import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineImpl;
+import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySources;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.state.State;
 
+import javax.validation.constraints.Min;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,6 +49,7 @@ import java.util.Set;
 @Slf4j
 class InfoCommand implements AgentCommand {
 
+    private static final String NEWLINE = System.lineSeparator();
     private final InfoCommandArguments infoCommandArguments;
     private final ConfigurableApplicationContext applicationContext;
     private final AgentMetadata agentMetadata;
@@ -60,44 +71,44 @@ class InfoCommand implements AgentCommand {
 
         messageBuilder
             .append("Agent info:")
-            .append(System.lineSeparator())
+            .append(NEWLINE)
             .append("  version:")
             .append(agentMetadata.getAgentVersion())
-            .append(System.lineSeparator())
+            .append(NEWLINE)
             .append("  host:")
             .append(agentMetadata.getAgentHostName())
-            .append(System.lineSeparator())
+            .append(NEWLINE)
             .append("  pid:")
             .append(agentMetadata.getAgentPid())
-            .append(System.lineSeparator());
+            .append(NEWLINE);
 
         messageBuilder
             .append("Active profiles:")
-            .append(System.lineSeparator());
+            .append(NEWLINE);
 
         for (String profileName : applicationContext.getEnvironment().getActiveProfiles()) {
             messageBuilder
                 .append("  - ")
                 .append(profileName)
-                .append(System.lineSeparator());
+                .append(NEWLINE);
         }
 
         messageBuilder
             .append("Default profiles:")
-            .append(System.lineSeparator());
+            .append(NEWLINE);
 
         for (String profileName : applicationContext.getEnvironment().getDefaultProfiles()) {
             messageBuilder
                 .append("  - ")
                 .append(profileName)
-                .append(System.lineSeparator());
+                .append(NEWLINE);
         }
 
         if (infoCommandArguments.getIncludeBeans()) {
             messageBuilder
                 .append("Beans in context: ")
                 .append(applicationContext.getBeanDefinitionCount())
-                .append(System.lineSeparator());
+                .append(NEWLINE);
 
             final String[] beanNames = applicationContext.getBeanDefinitionNames();
             for (String beanName : beanNames) {
@@ -120,7 +131,7 @@ class InfoCommand implements AgentCommand {
                             description
                         )
                     )
-                    .append(System.lineSeparator());
+                    .append(NEWLINE);
             }
         }
 
@@ -132,7 +143,7 @@ class InfoCommand implements AgentCommand {
             messageBuilder
                 .append("Environment variables: ")
                 .append(envEntries.size())
-                .append(System.lineSeparator());
+                .append(NEWLINE);
 
             for (Map.Entry<String, Object> envEntry : envEntries) {
                 messageBuilder
@@ -143,11 +154,11 @@ class InfoCommand implements AgentCommand {
                             envEntry.getValue()
                         )
                     )
-                    .append(System.lineSeparator());
+                    .append(NEWLINE);
             }
         }
 
-        if (infoCommandArguments.isIncludeProperties()) {
+        if (infoCommandArguments.getIncludeProperties()) {
 
             final Set<Map.Entry<String, Object>> properties =
                 applicationContext.getEnvironment().getSystemProperties().entrySet();
@@ -155,7 +166,7 @@ class InfoCommand implements AgentCommand {
             messageBuilder
                 .append("Properties: ")
                 .append(properties.size())
-                .append(System.lineSeparator());
+                .append(NEWLINE);
             for (Map.Entry<String, Object> property : properties) {
                 messageBuilder
                     .append(
@@ -165,13 +176,13 @@ class InfoCommand implements AgentCommand {
                             property.getValue()
                         )
                     )
-                    .append(System.lineSeparator());
+                    .append(NEWLINE);
             }
 
             final PropertySources propertySources = applicationContext.getEnvironment().getPropertySources();
             messageBuilder
                 .append("Property sources: ")
-                .append(System.lineSeparator());
+                .append(NEWLINE);
             for (PropertySource<?> propertySource : propertySources) {
                 messageBuilder
                     .append(
@@ -181,13 +192,157 @@ class InfoCommand implements AgentCommand {
                             propertySource.getClass().getSimpleName()
                         )
                     )
-                    .append(System.lineSeparator());
+                    .append(NEWLINE);
             }
+        }
+
+        if (infoCommandArguments.getIncludeStateMachine()) {
+            messageBuilder
+                .append("Job execution state machine: ")
+                .append(NEWLINE)
+                .append("// ------------------------------------------------------------------------")
+                .append(NEWLINE);
+
+            final JobExecutionStateMachineImpl jobExecutionStateMachine
+                = applicationContext.getBean(JobExecutionStateMachineImpl.class);
+
+            final StateMachine<States, Events> stateMachine = jobExecutionStateMachine.getStateMachine();
+            final List<ExecutionStage> stages = jobExecutionStateMachine.getExecutionStages();
+
+            createStateMachineDotGraph(stages, stateMachine, messageBuilder);
         }
 
         System.out.println(messageBuilder.toString());
 
         return ExitCode.SUCCESS;
+    }
+
+    private void createStateMachineDotGraph(
+        final List<ExecutionStage> stages,
+        final StateMachine<States, Events> stateMachine,
+        final StringBuilder messageBuilder
+    ) {
+        final State<States, Events> initialState = stateMachine.getInitialState();
+
+        final HashSet<State<States, Events>> terminalStates = Sets.newHashSet(stateMachine.getStates());
+        stateMachine.getTransitions().forEach(
+            transition ->
+                terminalStates.remove(transition.getSource())
+        );
+
+        messageBuilder
+            .append("digraph state_machine {")
+            .append(NEWLINE);
+
+        messageBuilder
+            .append("  // States")
+            .append(NEWLINE);
+
+
+        stateMachine.getStates().forEach(
+            state -> {
+                final String shape;
+                if (state == initialState) {
+                    shape = "shape=diamond";
+                } else if (terminalStates.contains(state)) {
+                    shape = "shape=rectangle";
+                } else {
+                    shape = "";
+                }
+
+                final String edgeTickness;
+                if (state.getId().isCriticalState()) {
+                    edgeTickness = "penwidth=3.0";
+                } else {
+                    edgeTickness = "";
+                }
+
+                messageBuilder
+                    .append("  ")
+                    .append(state.getId())
+                    .append(" [label=")
+                    .append(state.getId())
+                    .append(" ")
+                    .append(shape)
+                    .append(" ")
+                    .append(edgeTickness)
+                    .append("]")
+                    .append(NEWLINE);
+            }
+        );
+
+        messageBuilder
+            .append("  // Transitions")
+            .append(NEWLINE);
+
+        stateMachine.getTransitions().forEach(
+            transition ->
+                messageBuilder
+                    .append("  ")
+                    .append(transition.getSource().getId())
+                    .append(" -> ")
+                    .append(transition.getTarget().getId())
+                    .append(" [label=\"")
+                    .append(transition.getTrigger().getEvent())
+                    .append("\"]")
+                    .append(NEWLINE)
+        );
+
+        messageBuilder
+            .append("  // Skip transitions")
+            .append(NEWLINE);
+
+        // Draw an edge from a state whose next state is skippable to the next non-skippable state.
+        for (int i = 0; i < stages.size() - 2; i++) {
+            final ExecutionStage stage = stages.get(i);
+            final States state = stage.getState();
+            final boolean skipNext = stages.get(i + 1).getState().isSkippedDuringAbortedExecution();
+            if (skipNext) {
+                // Find the next non-skipped stage
+                for (int j = i + 1; j < stages.size() - 1; j++) {
+                    final ExecutionStage nextStage = stages.get(j);
+                    final States nextState = nextStage.getState();
+                    if (!nextState.isSkippedDuringAbortedExecution()) {
+                        messageBuilder
+                            .append("  ")
+                            .append(state)
+                            .append(" -> ")
+                            .append(nextState)
+                            .append(" [style=dotted]")
+                            .append(NEWLINE);
+                        break;
+                    }
+                }
+            }
+        }
+
+        messageBuilder
+            .append("  // Retry transitions")
+            .append(NEWLINE);
+
+        stages.forEach(
+            stage -> {
+                final States state = stage.getState();
+                final @Min(0) int retries = state.getTransitionRetries();
+                if (retries > 0) {
+                    messageBuilder
+                        .append("  ")
+                        .append(state)
+                        .append(" -> ")
+                        .append(state)
+                        .append(" [style=dashed label=\"")
+                        .append(retries)
+                        .append(" retries\"]")
+                        .append(NEWLINE);
+                }
+            }
+        );
+
+        messageBuilder
+            .append("}")
+            .append(NEWLINE)
+            .append("// ------------------------------------------------------------------------")
+            .append(NEWLINE);
     }
 
     @Parameters(commandNames = CommandNames.INFO, commandDescription = "Print agent and environment information")
@@ -198,7 +353,9 @@ class InfoCommand implements AgentCommand {
         @Parameter(names = {"--env"}, description = "Print environment variables")
         private Boolean includeEnvironment = true;
         @Parameter(names = {"--properties"}, description = "Print properties")
-        private boolean includeProperties = true;
+        private Boolean includeProperties = true;
+        @Parameter(names = {"--state-machine"}, description = "Print job execution state machine in (.dot notation)")
+        private Boolean includeStateMachine = false;
 
         @Override
         public Class<? extends AgentCommand> getConsumerClass() {

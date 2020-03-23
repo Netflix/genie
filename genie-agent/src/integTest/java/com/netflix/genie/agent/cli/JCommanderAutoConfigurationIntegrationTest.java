@@ -22,8 +22,6 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.agent.execution.ExecutionAutoConfiguration;
 import com.netflix.genie.agent.execution.services.impl.ServicesAutoConfiguration;
 import com.netflix.genie.agent.execution.services.impl.grpc.GRpcServicesAutoConfiguration;
-import com.netflix.genie.agent.execution.statemachine.StateMachineAutoConfiguration;
-import com.netflix.genie.agent.execution.statemachine.actions.StateMachineActionsAutoConfiguration;
 import com.netflix.genie.agent.rpc.GRpcAutoConfiguration;
 import com.netflix.genie.agent.spring.autoconfigure.AgentAutoConfiguration;
 import com.netflix.genie.agent.spring.autoconfigure.ProcessAutoConfiguration;
@@ -52,8 +50,6 @@ import java.util.stream.Collectors;
     classes = {
         JCommanderAutoConfiguration.class,
         CliAutoConfiguration.class,
-        StateMachineAutoConfiguration.class,
-        StateMachineActionsAutoConfiguration.class,
         ExecutionAutoConfiguration.class,
         GRpcServicesAutoConfiguration.class,
         GRpcAutoConfiguration.class,

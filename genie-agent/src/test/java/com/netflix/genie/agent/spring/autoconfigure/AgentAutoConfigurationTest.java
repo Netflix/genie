@@ -23,7 +23,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -50,8 +49,6 @@ public class AgentAutoConfigurationTest {
             context -> {
                 Assertions.assertThat(context).hasSingleBean(AgentMetadataImpl.class);
                 Assertions.assertThat(context).hasSingleBean(FileLockFactory.class);
-                Assertions.assertThat(context).hasSingleBean(AsyncTaskExecutor.class);
-                Assertions.assertThat(context).hasBean("sharedAgentTaskExecutor");
                 Assertions
                     .assertThat(context)
                     .getBean("sharedAgentTaskExecutor")

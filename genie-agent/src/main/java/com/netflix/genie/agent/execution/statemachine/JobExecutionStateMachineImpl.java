@@ -18,10 +18,12 @@
 package com.netflix.genie.agent.execution.statemachine;
 
 import com.netflix.genie.agent.execution.services.KillService;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -31,14 +33,35 @@ import java.util.concurrent.CountDownLatch;
  * @since 4.0.0
  */
 @Slf4j
-class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
+public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
 
+    @Getter
     private final StateMachine<States, Events> stateMachine;
     private final StateMachineListenerAdapter<States, Events> executionCompletionListener;
     private final CountDownLatch completionLatch = new CountDownLatch(1);
+    private final ExecutionContext executionContext;
+    @Getter
+    private final List<ExecutionStage> executionStages;
 
-    JobExecutionStateMachineImpl(final StateMachine<States, Events> stateMachine) {
+    /**
+     * Constructor.
+     *
+     * @param stateMachine     the state machine
+     * @param executionContext the execution context
+     * @param executionStages  the execution stages
+     */
+    public JobExecutionStateMachineImpl(
+        final StateMachine<States, Events> stateMachine,
+        final ExecutionContext executionContext,
+        final List<ExecutionStage> executionStages
+    ) {
         this.stateMachine = stateMachine;
+        this.executionStages = executionStages;
+        this.executionContext = executionContext;
+        this.stateMachine
+            .getExtendedState()
+            .getVariables()
+            .put(ExecutionStage.EXECUTION_CONTEXT_CONTEXT_KEY, executionContext);
         this.executionCompletionListener = new StateMachineListenerAdapter<States, Events>() {
             @Override
             public void stateMachineStopped(final StateMachine<States, Events> sm) {
@@ -75,13 +98,14 @@ class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stop() {
         log.info("Stopping state machine (in state: {})", stateMachine.getState().getId());
-        // This event is processed iff the state machine has not reached the state where the job is launched.
-        stateMachine.sendEvent(Events.CANCEL_JOB_LAUNCH);
-        // If the job is already running, then the machine can do nothing but wait for it to complete
-        // (killing the child process is handled elsewhere).
+        // Mark the job as killed and wait for the state machine to do its job
+        this.executionContext.setJobKilled(true);
     }
 
     /**

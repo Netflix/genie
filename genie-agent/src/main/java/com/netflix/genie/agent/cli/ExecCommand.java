@@ -20,15 +20,14 @@ package com.netflix.genie.agent.cli;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.annotations.VisibleForTesting;
-import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.services.KillService;
-import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
+import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
 import com.netflix.genie.agent.execution.statemachine.States;
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
+import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Triple;
-import org.springframework.statemachine.action.Action;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,33 +80,22 @@ class ExecCommand implements AgentCommand {
             throw new RuntimeException("Job execution error", e);
         }
 
-        if (!States.END.equals(finalState)) {
+        if (!States.DONE.equals(finalState)) {
             throw new RuntimeException("Job execution failed (final state: " + finalState + ")");
         }
 
-        if (executionContext.hasStateActionError()) {
-            final List<Triple<States, Class<? extends Action>, Exception>> actionErrors
-                = executionContext.getStateActionErrors();
-            actionErrors.forEach(
-                triple -> log.error(
-                    "Action {} in state {} failed with {}: {}",
-                    triple.getMiddle().getSimpleName(),
-                    triple.getLeft(),
-                    triple.getRight().getClass().getSimpleName(),
-                    triple.getRight().getMessage()
-                ));
+        final JobStatus finalJobStatus = executionContext.getCurrentJobStatus();
+        final boolean jobLaunched = executionContext.isJobLaunched();
 
-            final Exception firstActionErrorException = actionErrors.get(0).getRight();
+        final FatalTransitionException fatalException = executionContext.getExecutionAbortedFatalException();
 
-            throw new RuntimeException("Job execution error", firstActionErrorException);
-        }
-
-        final JobStatus finalJobStatus = executionContext.getFinalJobStatus().get();
-
-        if (finalJobStatus == null) {
-            throw new RuntimeException("Unknown final job status");
-        } else if (!finalJobStatus.isFinished()) {
-            throw new RuntimeException("Non-final job status post-execution: " + finalJobStatus.name());
+        if (fatalException != null) {
+            UserConsole.getLogger().error(
+                "Job execution fatal error in state {}: {} {}",
+                fatalException.getSourceState(),
+                fatalException.getCause().getClass().getSimpleName(),
+                fatalException.getCause().getMessage()
+            );
         }
 
         final ExitCode exitCode;
@@ -122,8 +110,17 @@ class ExecCommand implements AgentCommand {
                 exitCode = ExitCode.EXEC_ABORTED;
                 break;
             case FAILED:
-                log.info("Job execution failed");
-                exitCode = ExitCode.EXEC_FAIL;
+                if (jobLaunched) {
+                    log.info("Job execution failed");
+                    exitCode = ExitCode.EXEC_FAIL;
+                } else {
+                    log.info("Job setup failed");
+                    exitCode = ExitCode.COMMAND_INIT_FAIL;
+                }
+                break;
+            case INVALID:
+                log.info("Job execution initialization failed");
+                exitCode = ExitCode.INIT_FAIL;
                 break;
             default:
                 throw new RuntimeException("Unexpected final job status: " + finalJobStatus.name());
@@ -134,10 +131,7 @@ class ExecCommand implements AgentCommand {
 
     @VisibleForTesting
     void handleTerminationSignal() {
-        UserConsole.getLogger().info(
-            "Intercepted a signal, terminating job (status: {})",
-            executionContext.getCurrentJobStatus().orElse(null)
-        );
+        UserConsole.getLogger().info("Kill requested, terminating job");
         killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
     }
 

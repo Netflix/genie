@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.services.KillService;
 import org.springframework.context.ApplicationListener;
 
 /**
- * Interface JobExecutionStateMachine.
+ * Interface JobExecutionStateMachine hides the actual state machine details.
  *
  * @author mprimi
  * @since 4.0.0
@@ -34,7 +34,7 @@ public interface JobExecutionStateMachine extends ApplicationListener<KillServic
     void start();
 
     /**
-     * Waits for the state machine to stop executing.
+     * Waits for the state machine to stop executing (i.e. reach a terminal state).
      *
      * @return the final state in which the machine stopped
      * @throws InterruptedException if the waiting thread is interrupted
@@ -42,12 +42,14 @@ public interface JobExecutionStateMachine extends ApplicationListener<KillServic
     States waitForStop() throws InterruptedException;
 
     /**
-     * Force an early termination of the state machine, in response to user submitting a kill via API or ctrl-c.
+     * Request early termination of the state machine, for example in response to user submitting a kill via API or
+     * ctrl-c.
+     * <p>
      * Notice:
-     * - State actions are not interrupted. Only after the one currently executing is completed the stop
-     * signal is processed (TODO: make long-running actions, such as setup, interruptable).
-     * - Some actions are still performed before the program exits. For example publish the updated job status
-     * server-side. Refer to the {@link StateMachineAutoConfiguration} for details.
+     * - Transition actions are not interrupted. Shutdown procedure will start after the currently executing transition
+     *   action has completed
+     * - Some transition actions are still performed before the program exits. For example publish the updated final job
+     *   status server-side, or archiving logs.
      */
     void stop();
 }

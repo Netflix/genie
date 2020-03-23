@@ -18,11 +18,11 @@
 package com.netflix.genie.agent.cli;
 
 import com.netflix.genie.agent.AgentMetadata;
-import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.proto.PingServiceGrpc;
 import org.springframework.context.ConfigurableApplicationContext;
