@@ -63,55 +63,8 @@ public class GenieAgentApplicationSmokeTest {
         runner.run("help");
         Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
 
-        // Test Download
-        runner.run("download", "--destinationDirectory", this.temporaryFolder.newFolder().getAbsolutePath());
-        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
-
-        // Test exec
-        runner.run(
-            "exec",
-            "--cluster-criterion",
-            "TAGS=type:presto",
-            "--command-criterion",
-            "TAGS=type:presto",
-            "--job-name",
-            "Dummy Job",
-            "--server-host",
-            "www.genie.com",
-            "--server-port",
-            "9090",
-            "--interactive"
-        );
-        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.EXEC_FAIL.getCode()));
-
-        // Test heartbeat
-        runner.run(
-            "heartbeat",
-            "--duration",
-            "1",
-            "--server-host",
-            "www.genie.com",
-            "--server-port",
-            "9090"
-        );
-        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
-
         // Test info
         runner.run("info");
         Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
-
-        // Test ping
-        runner.run(
-            "ping",
-            "--server-host",
-            "www.genie.com",
-            "--server-port",
-            "9090"
-        );
-        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.EXEC_FAIL.getCode()));
-
-        // Test resolve
-        runner.run("resolve");
-        Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.EXEC_FAIL.getCode()));
     }
 }
