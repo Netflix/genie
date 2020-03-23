@@ -47,4 +47,9 @@ public enum CleanupStrategy {
         + "The default cleanup behavior is to delete downloaded dependencies after job execution completed\n"
         + "(whether or not it was successful). A different strategy (no cleanup, full cleanup, ...) can be\n"
         + "selected via command-line flags";
+
+    /**
+     * The default strategy.
+     */
+    public static final CleanupStrategy DEFAULT_STRATEGY = DEPENDENCIES_CLEANUP;
 }

@@ -56,7 +56,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void stateEntered(final State<States, Events> state) {
-        log.info(
+        log.debug(
             "Entered state: {} ({}/{}/{} entry/state/exit actions)",
             getStateNameString(state),
             state.getEntryActions() == null ? 0 : state.getEntryActions().size(),
@@ -70,7 +70,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void stateExited(final State<States, Events> state) {
-        log.info(
+        log.debug(
             "Exited state: {}",
             getStateNameString(state)
         );
@@ -81,7 +81,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void eventNotAccepted(final Message<Events> event) {
-        log.info(
+        log.warn(
             "Event not accepted: {}",
             event.getPayload()
         );
@@ -92,17 +92,12 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void transition(final Transition<States, Events> transition) {
-        log.info(
-            "Transitioning from: {} to: {}",
-            getStateNameString(transition.getSource()),
-            getStateNameString(transition.getTarget())
-        );
         log.debug(
-            "Triggered {} transition from {} to {} ({} actions)",
-            transition.getKind(),
+            "Transitioning from: {} to: {} ({} actions, {})",
             getStateNameString(transition.getSource()),
             getStateNameString(transition.getTarget()),
-            transition.getActions() != null ? transition.getActions().size() : 0
+            transition.getActions() != null ? transition.getActions().size() : 0,
+            getTriggerString(transition)
         );
     }
 
@@ -111,7 +106,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void transitionStarted(final Transition<States, Events> transition) {
-        log.info(
+        log.debug(
             "Starting {} transition: {} -> {} ({} actions) ({})",
             transition.getKind().toString(),
             getStateNameString(transition.getSource()),
@@ -126,7 +121,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void transitionEnded(final Transition<States, Events> transition) {
-        log.info(
+        log.debug(
             "Ended {} transition: {} -> {}",
             transition.getKind().toString(),
             getStateNameString(transition.getSource()),
@@ -160,7 +155,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void stateMachineError(final StateMachine<States, Events> stateMachine, final Exception exception) {
-        log.info(
+        log.warn(
             "State machine error: {} - {}",
             exception.getClass().getSimpleName(),
             exception.getMessage()
@@ -172,7 +167,7 @@ public class LoggingListener implements JobExecutionListener {
      */
     @Override
     public void extendedStateChanged(final Object key, final Object value) {
-        log.info(
+        log.debug(
             "Extended state change: '{}' = '{}'",
             key,
             value
@@ -195,7 +190,7 @@ public class LoggingListener implements JobExecutionListener {
         final Action<States, Events> action,
         final long duration
     ) {
-        log.info(
+        log.debug(
             "Executed action: {} in {} ms (current state: {})",
             action.getClass().getSimpleName(),
             duration,

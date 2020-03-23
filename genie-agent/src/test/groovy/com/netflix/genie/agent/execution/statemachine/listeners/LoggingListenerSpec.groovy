@@ -35,7 +35,7 @@ class LoggingListenerSpec extends Specification {
     StateMachine<States, Events> stateMachine
     State<States, Events> state
     State<States, Events> nullState
-    Message<Events> event
+    Events event
     Transition<States, Events> transition
     Trigger<States, Events> trigger
     Exception exception
@@ -46,7 +46,7 @@ class LoggingListenerSpec extends Specification {
         this.listener = new LoggingListener()
         this.state = Mock(State)
         this.nullState = null
-        this.event = Mock(Message)
+        this.event = Events.PROCEED
         this.transition = Mock(Transition)
         this.trigger = Mock(Trigger)
         this.stateMachine = Mock(StateMachine)
@@ -63,7 +63,7 @@ class LoggingListenerSpec extends Specification {
         listener.stateChanged(state, state)
 
         then:
-        2 * state.getId() >> States.INITIALIZE
+        2 * state.getId() >> States.HANDSHAKE
     }
 
     def "StateChangedFromNull"() {
@@ -71,7 +71,7 @@ class LoggingListenerSpec extends Specification {
         listener.stateChanged(nullState, state)
 
         then:
-        1 * state.getId() >> States.INITIALIZE
+        1 * state.getId() >> States.HANDSHAKE
     }
 
     def "StateEntered"() {
@@ -79,7 +79,7 @@ class LoggingListenerSpec extends Specification {
         listener.stateEntered(state)
 
         then:
-        1 * state.getId() >> States.INITIALIZE
+        1 * state.getId() >> States.HANDSHAKE
         2 * state.getEntryActions() >> Lists.newArrayList()
         2 * state.getExitActions() >> Lists.newArrayList()
     }
@@ -89,7 +89,7 @@ class LoggingListenerSpec extends Specification {
         listener.stateEntered(state)
 
         then:
-        1 * state.getId() >> States.INITIALIZE
+        1 * state.getId() >> States.HANDSHAKE
         1 * state.getEntryActions() >> null
         1 * state.getExitActions() >> null
     }
@@ -99,15 +99,17 @@ class LoggingListenerSpec extends Specification {
         listener.stateExited(state)
 
         then:
-        1 * state.getId() >> States.INITIALIZE
+        1 * state.getId() >> States.HANDSHAKE
     }
 
     def "EventNotAccepted"() {
+        Message<Events> message = Mock(Message)
+
         when:
-        listener.eventNotAccepted(event)
+        listener.eventNotAccepted(message)
 
         then:
-        1 * event.getPayload() >> Events.SETUP_JOB_COMPLETE
+        1 * message.getPayload() >> event
     }
 
     def "Transition"() {
@@ -115,11 +117,12 @@ class LoggingListenerSpec extends Specification {
         listener.transition(transition)
 
         then:
-        1 * transition.getKind() >> TransitionKind.EXTERNAL
-        2 * transition.getSource() >> state
-        2 * transition.getTarget() >> state
-        4 * state.getId() >> States.CONFIGURE_AGENT
+        1 * transition.getSource() >> state
+        1 * transition.getTarget() >> state
+        2 * state.getId() >> States.HANDSHAKE
         2 * transition.getActions() >> Lists.newArrayList()
+        1 * transition.getTrigger() >> trigger
+        1 * trigger.getEvent() >> event
     }
 
     def "TransitionWithActionsFromNullState"() {
@@ -127,11 +130,11 @@ class LoggingListenerSpec extends Specification {
         listener.transition(transition)
 
         then:
-        1 * transition.getKind() >> TransitionKind.EXTERNAL
-        2 * transition.getSource() >> nullState
-        2 * transition.getTarget() >> state
-        2 * state.getId() >> States.CONFIGURE_AGENT
+        1 * transition.getSource() >> nullState
+        1 * transition.getTarget() >> state
+        1 * state.getId() >> States.HANDSHAKE
         1 * transition.getActions() >> null
+        1 * transition.getTrigger() >> null
     }
 
     def "TransitionStarted"() {
@@ -142,7 +145,7 @@ class LoggingListenerSpec extends Specification {
         1 * transition.getKind() >> TransitionKind.EXTERNAL
         1 * transition.getSource() >> state
         1 * transition.getTarget() >> state
-        2 * state.getId() >> States.CONFIGURE_AGENT
+        2 * state.getId() >> States.HANDSHAKE
         2 * transition.getActions() >> Lists.newArrayList()
         1 * transition.getTrigger() >> trigger
         1 * trigger.getEvent() >> Events.START
@@ -157,7 +160,7 @@ class LoggingListenerSpec extends Specification {
         1 * transition.getKind() >> TransitionKind.EXTERNAL
         1 * transition.getSource() >> state
         1 * transition.getTarget() >> state
-        2 * state.getId() >> States.CONFIGURE_AGENT
+        2 * state.getId() >> States.HANDSHAKE
         2 * transition.getActions() >> Lists.newArrayList()
         1 * transition.getTrigger() >> trigger
         1 * trigger.getEvent() >> null
@@ -172,7 +175,7 @@ class LoggingListenerSpec extends Specification {
         1 * transition.getKind() >> TransitionKind.EXTERNAL
         1 * transition.getSource() >> state
         1 * transition.getTarget() >> state
-        2 * state.getId() >> States.CONFIGURE_AGENT
+        2 * state.getId() >> States.HANDSHAKE
     }
 
     def "StateMachineStarted"() {
@@ -189,7 +192,7 @@ class LoggingListenerSpec extends Specification {
 
         then:
         1 * stateMachine.getState() >> state
-        1 * state.getId() >> States.END
+        1 * state.getId() >> States.DONE
     }
 
     def "StateMachineError"() {
@@ -222,6 +225,6 @@ class LoggingListenerSpec extends Specification {
 
         then:
         1 * stateMachine.getState() >> state
-        1 * state.getId() >> States.CONFIGURE_AGENT
+        1 * state.getId() >> States.HANDSHAKE
     }
 }

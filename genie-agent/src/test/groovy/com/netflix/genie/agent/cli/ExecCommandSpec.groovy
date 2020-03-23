@@ -17,16 +17,15 @@
  */
 package com.netflix.genie.agent.cli
 
-import com.google.common.collect.Lists
-import com.netflix.genie.agent.execution.ExecutionContext
+
 import com.netflix.genie.agent.execution.services.KillService
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext
+import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
-import com.netflix.genie.agent.execution.statemachine.actions.BaseStateAction
 import com.netflix.genie.common.external.dtos.v4.JobStatus
-import org.apache.commons.lang3.tuple.Triple
-import org.springframework.statemachine.action.Action
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class ExecCommandSpec extends Specification {
     ExecCommand.ExecCommandArguments args
@@ -53,8 +52,8 @@ class ExecCommandSpec extends Specification {
 
         then:
         1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.SUCCEEDED)
+        1 * stateMachine.waitForStop() >> States.DONE
+        1 * execContext.getCurrentJobStatus() >> JobStatus.SUCCEEDED
         exitCode == ExitCode.SUCCESS
     }
 
@@ -67,8 +66,8 @@ class ExecCommandSpec extends Specification {
 
         then:
         1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> Optional.empty()
+        1 * stateMachine.waitForStop() >> States.DONE
+        1 * execContext.getCurrentJobStatus() >> null
 
         thrown(RuntimeException.class)
     }
@@ -87,11 +86,8 @@ class ExecCommandSpec extends Specification {
         thrown(RuntimeException.class)
     }
 
-    def "Exec error"() {
+    def "Wait exception"() {
         setup:
-        List<Triple<States, Class<? extends Action>, Exception>> actionErrors = Lists.newArrayList(
-            Triple.of(States.SETUP_JOB, BaseStateAction.class, new RuntimeException())
-        )
         def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
         when:
@@ -99,14 +95,12 @@ class ExecCommandSpec extends Specification {
 
         then:
         1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.hasStateActionError() >> true
-        1 * execContext.getStateActionErrors() >> actionErrors
-
+        1 * stateMachine.waitForStop() >> { throw new InterruptedException("...") }
         thrown(RuntimeException.class)
     }
 
-    def "Exec fail"() {
+    @Unroll
+    def "Exec fail (launched: #launched)"() {
         setup:
         def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
 
@@ -115,9 +109,18 @@ class ExecCommandSpec extends Specification {
 
         then:
         1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.FAILED)
-        exitCode == ExitCode.EXEC_FAIL
+        1 * stateMachine.waitForStop() >> States.DONE
+        1 * execContext.getCurrentJobStatus() >> JobStatus.FAILED
+        1 * execContext.isJobLaunched() >> launched
+        1 * execContext.getExecutionAbortedFatalException() >> new FatalTransitionException(States.CREATE_JOB_DIRECTORY, "...", new IOException())
+
+        exitCode == expectedExitCode
+
+        where:
+        launched | expectedExitCode
+        true     | ExitCode.EXEC_FAIL
+        false    | ExitCode.COMMAND_INIT_FAIL
+
     }
 
     def "Kill"() {
@@ -129,9 +132,23 @@ class ExecCommandSpec extends Specification {
 
         then:
         1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.KILLED)
+        1 * stateMachine.waitForStop() >> States.DONE
+        1 * execContext.getCurrentJobStatus() >> JobStatus.KILLED
         exitCode == ExitCode.EXEC_ABORTED
+    }
+
+    def "Early setup failure"() {
+        setup:
+        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
+
+        when:
+        ExitCode exitCode = execCommand.run()
+
+        then:
+        1 * stateMachine.start()
+        1 * stateMachine.waitForStop() >> States.DONE
+        1 * execContext.getCurrentJobStatus() >> JobStatus.INVALID
+        exitCode == ExitCode.INIT_FAIL
     }
 
     def "Run with invalid final job status"() {
@@ -143,39 +160,10 @@ class ExecCommandSpec extends Specification {
 
         then:
         1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.INVALID)
+        1 * stateMachine.waitForStop() >> States.DONE
+        1 * execContext.getCurrentJobStatus() >> JobStatus.RUNNING
 
         thrown(RuntimeException)
-    }
-
-    def "Run with non-terminal final job status"() {
-        setup:
-        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
-
-        when:
-        execCommand.run()
-
-        then:
-        1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> States.END
-        1 * execContext.getFinalJobStatus() >> Optional.of(JobStatus.CLAIMED)
-
-        thrown(RuntimeException.class)
-    }
-
-    def "Run interrupted"() {
-        setup:
-        def execCommand = new ExecCommand(args, stateMachine, execContext, killService)
-
-        when:
-        execCommand.run()
-
-        then:
-        1 * stateMachine.start()
-        1 * stateMachine.waitForStop() >> { throw new InterruptedException() }
-
-        thrown(RuntimeException.class)
     }
 
     def "Handle ctrl-c"() {
@@ -186,7 +174,6 @@ class ExecCommandSpec extends Specification {
         execCommand.handleTerminationSignal()
 
         then:
-        1 * execContext.getCurrentJobStatus() >> Optional.empty()
         1 * killService.kill(KillService.KillSource.SYSTEM_SIGNAL)
     }
 }

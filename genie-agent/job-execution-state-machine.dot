@@ -15,54 +15,93 @@
  *     limitations under the License.
  *
  */
-
-digraph JobExecution {
-
-  /* States */
-  ready [label="READY", shape=box];
-  init  [label="INITIALIZE"];
-  conf_ag [label="CONFIGURE_AGENT"];
-  conf_job [label="RESOLVE_JOB_SPECIFICATION"];
-  setup [label="SETUP_JOB"];
-  launch [label="LAUNCH_JOB"];
-  monitor [label="MONITOR_JOB"];
-  cleanup [label="CLEANUP_JOB"];
-  shutdown [label="SHUTDOWN"];
-  end [label="END", penwidth=3];
-  error [label="HANDLE_ERROR"];
-
-  /* Transitions */
-  subgraph regular_execution_transitions {
-    ready -> init  [penwidth=1.5,label="<START>"];
-    init -> conf_ag [penwidth=1.5,label="<INITIALIZE_COMPLETE>"];
-    conf_ag-> conf_job [penwidth=1.5,label="<CONFIGURE_AGENT_COMPLETE>"];
-    conf_job -> setup [penwidth=1.5,label="<RESOLVE_JOB_SPECIFICATION_COMPLETE>"];
-    setup -> launch [penwidth=1.5,label="<SETUP_JOB_COMPLETE>"];
-    launch -> monitor [penwidth=1.5,label="<LAUNCH_JOB_COMPLETE>"];
-    monitor -> cleanup [penwidth=1.5,label="<MONITOR_JOB_COMPLETE>"];
-    cleanup -> shutdown [penwidth=1.5,label="<CLEANUP_JOB_COMPLETE>"];
-    shutdown -> end [penwidth=1.5,label="<SHUTDOWN_COMPLETE>"];
-  }
-
-  /* Error transitions */
-  subgraph error_transitions {
-    init -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    conf_ag -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    conf_job -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    setup -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    launch -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    monitor -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    cleanup -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    shutdown -> error [color=red,penwidth=0.5,label="<ERROR>"];
-    error -> end [label="<HANDLE_ERROR_COMPLETE>"];
-  }
-
-  /* Job cancellation transitions */
-  subgraph cancelled_execution_transitions {
-    ready -> cleanup [color=blue,penwidth=0.5,label="<CANCEL_JOB_LAUNCH>"];
-    init -> cleanup [color=blue,penwidth=0.5,label="<CANCEL_JOB_LAUNCH>"];
-    conf_ag -> cleanup [color=blue,penwidth=0.5,label="<CANCEL_JOB_LAUNCH>"];
-    conf_job -> cleanup [color=blue,penwidth=0.5,label="<CANCEL_JOB_LAUNCH>"];
-    setup -> cleanup [color=blue,penwidth=0.5,label="<CANCEL_JOB_LAUNCH>"];
-  }
+//
+// Generated with genie-agent.jar info --state-machine
+//
+digraph state_machine {
+  // States
+  HANDSHAKE [label=HANDSHAKE  penwidth=3.0]
+  CREATE_JOB_DIRECTORY [label=CREATE_JOB_DIRECTORY  penwidth=3.0]
+  LOG_EXECUTION_ERRORS [label=LOG_EXECUTION_ERRORS  ]
+  OBTAIN_JOB_SPECIFICATION [label=OBTAIN_JOB_SPECIFICATION  penwidth=3.0]
+  DETERMINE_FINAL_STATUS [label=DETERMINE_FINAL_STATUS  penwidth=3.0]
+  LAUNCH_JOB [label=LAUNCH_JOB  penwidth=3.0]
+  DOWNLOAD_DEPENDENCIES [label=DOWNLOAD_DEPENDENCIES  penwidth=3.0]
+  CONFIGURE_EXECUTION [label=CONFIGURE_EXECUTION  penwidth=3.0]
+  START_FILE_STREAM_SERVICE [label=START_FILE_STREAM_SERVICE  penwidth=3.0]
+  SET_STATUS_RUNNING [label=SET_STATUS_RUNNING  penwidth=3.0]
+  SET_STATUS_INIT [label=SET_STATUS_INIT  penwidth=3.0]
+  DONE [label=DONE shape=rectangle ]
+  WAIT_JOB_COMPLETION [label=WAIT_JOB_COMPLETION  penwidth=3.0]
+  CLAIM_JOB [label=CLAIM_JOB  penwidth=3.0]
+  CLEAN [label=CLEAN  ]
+  ARCHIVE [label=ARCHIVE  ]
+  READY [label=READY shape=diamond ]
+  SET_STATUS_FINAL [label=SET_STATUS_FINAL  penwidth=3.0]
+  CREATE_JOB_SCRIPT [label=CREATE_JOB_SCRIPT  penwidth=3.0]
+  RELOCATE_LOG [label=RELOCATE_LOG  ]
+  STOP_KILL_SERVICE [label=STOP_KILL_SERVICE  ]
+  FORCE_FILE_MANIFEST_REFRESH [label=FORCE_FILE_MANIFEST_REFRESH  ]
+  SHUTDOWN [label=SHUTDOWN  ]
+  STOP_HEARTBEAT_SERVICE [label=STOP_HEARTBEAT_SERVICE  ]
+  START_HEARTBEAT_SERVICE [label=START_HEARTBEAT_SERVICE  penwidth=3.0]
+  RESERVE_JOB_ID [label=RESERVE_JOB_ID  penwidth=3.0]
+  START_KILL_SERVICE [label=START_KILL_SERVICE  penwidth=3.0]
+  STOP_FILES_STREAM_SERVICE [label=STOP_FILES_STREAM_SERVICE  ]
+  INITIALIZE_AGENT [label=INITIALIZE_AGENT  penwidth=3.0]
+  // Transitions
+  READY -> INITIALIZE_AGENT [label="START"]
+  SHUTDOWN -> DONE [label="PROCEED"]
+  INITIALIZE_AGENT -> HANDSHAKE [label="PROCEED"]
+  HANDSHAKE -> CONFIGURE_EXECUTION [label="PROCEED"]
+  CONFIGURE_EXECUTION -> RESERVE_JOB_ID [label="PROCEED"]
+  RESERVE_JOB_ID -> OBTAIN_JOB_SPECIFICATION [label="PROCEED"]
+  OBTAIN_JOB_SPECIFICATION -> CREATE_JOB_DIRECTORY [label="PROCEED"]
+  CREATE_JOB_DIRECTORY -> RELOCATE_LOG [label="PROCEED"]
+  RELOCATE_LOG -> CLAIM_JOB [label="PROCEED"]
+  CLAIM_JOB -> START_HEARTBEAT_SERVICE [label="PROCEED"]
+  START_HEARTBEAT_SERVICE -> START_KILL_SERVICE [label="PROCEED"]
+  START_KILL_SERVICE -> START_FILE_STREAM_SERVICE [label="PROCEED"]
+  START_FILE_STREAM_SERVICE -> SET_STATUS_INIT [label="PROCEED"]
+  SET_STATUS_INIT -> CREATE_JOB_SCRIPT [label="PROCEED"]
+  CREATE_JOB_SCRIPT -> DOWNLOAD_DEPENDENCIES [label="PROCEED"]
+  DOWNLOAD_DEPENDENCIES -> LAUNCH_JOB [label="PROCEED"]
+  LAUNCH_JOB -> FORCE_FILE_MANIFEST_REFRESH [label="PROCEED"]
+  FORCE_FILE_MANIFEST_REFRESH -> SET_STATUS_RUNNING [label="PROCEED"]
+  SET_STATUS_RUNNING -> WAIT_JOB_COMPLETION [label="PROCEED"]
+  WAIT_JOB_COMPLETION -> DETERMINE_FINAL_STATUS [label="PROCEED"]
+  DETERMINE_FINAL_STATUS -> SET_STATUS_FINAL [label="PROCEED"]
+  SET_STATUS_FINAL -> STOP_KILL_SERVICE [label="PROCEED"]
+  STOP_KILL_SERVICE -> LOG_EXECUTION_ERRORS [label="PROCEED"]
+  LOG_EXECUTION_ERRORS -> ARCHIVE [label="PROCEED"]
+  ARCHIVE -> STOP_HEARTBEAT_SERVICE [label="PROCEED"]
+  STOP_HEARTBEAT_SERVICE -> STOP_FILES_STREAM_SERVICE [label="PROCEED"]
+  STOP_FILES_STREAM_SERVICE -> CLEAN [label="PROCEED"]
+  CLEAN -> SHUTDOWN [label="PROCEED"]
+  // Skip transitions
+  INITIALIZE_AGENT -> WAIT_JOB_COMPLETION [style=dotted]
+  HANDSHAKE -> WAIT_JOB_COMPLETION [style=dotted]
+  CONFIGURE_EXECUTION -> WAIT_JOB_COMPLETION [style=dotted]
+  RESERVE_JOB_ID -> WAIT_JOB_COMPLETION [style=dotted]
+  OBTAIN_JOB_SPECIFICATION -> WAIT_JOB_COMPLETION [style=dotted]
+  CREATE_JOB_DIRECTORY -> WAIT_JOB_COMPLETION [style=dotted]
+  RELOCATE_LOG -> WAIT_JOB_COMPLETION [style=dotted]
+  CLAIM_JOB -> WAIT_JOB_COMPLETION [style=dotted]
+  START_HEARTBEAT_SERVICE -> WAIT_JOB_COMPLETION [style=dotted]
+  START_KILL_SERVICE -> WAIT_JOB_COMPLETION [style=dotted]
+  START_FILE_STREAM_SERVICE -> WAIT_JOB_COMPLETION [style=dotted]
+  SET_STATUS_INIT -> WAIT_JOB_COMPLETION [style=dotted]
+  CREATE_JOB_SCRIPT -> WAIT_JOB_COMPLETION [style=dotted]
+  DOWNLOAD_DEPENDENCIES -> WAIT_JOB_COMPLETION [style=dotted]
+  LAUNCH_JOB -> WAIT_JOB_COMPLETION [style=dotted]
+  FORCE_FILE_MANIFEST_REFRESH -> WAIT_JOB_COMPLETION [style=dotted]
+  // Retry transitions
+  HANDSHAKE -> HANDSHAKE [style=dashed label="3 retries"]
+  RESERVE_JOB_ID -> RESERVE_JOB_ID [style=dashed label="3 retries"]
+  OBTAIN_JOB_SPECIFICATION -> OBTAIN_JOB_SPECIFICATION [style=dashed label="3 retries"]
+  CLAIM_JOB -> CLAIM_JOB [style=dashed label="3 retries"]
+  SET_STATUS_INIT -> SET_STATUS_INIT [style=dashed label="3 retries"]
+  SET_STATUS_RUNNING -> SET_STATUS_RUNNING [style=dashed label="3 retries"]
+  SET_STATUS_FINAL -> SET_STATUS_FINAL [style=dashed label="3 retries"]
 }
+

@@ -18,86 +18,59 @@
 package com.netflix.genie.agent.execution.statemachine
 
 import com.netflix.genie.agent.execution.services.KillService
+import org.springframework.statemachine.ExtendedState
 import org.springframework.statemachine.StateMachine
-import org.springframework.statemachine.config.StateMachineBuilder
 import org.springframework.statemachine.listener.StateMachineListener
 import org.springframework.statemachine.state.State
 import spock.lang.Specification
 
 class JobExecutionStateMachineImplSpec extends Specification {
+
     def "RunAndWaitForStop"() {
-        setup:
-        def builder = new StateMachineBuilder.Builder<States, Events>()
-
-        builder.configureStates()
-            .withStates()
-            .initial(States.READY)
-            .end(States.END)
-            .states(EnumSet.allOf(States.class))
-
-        builder.configureTransitions()
-            .withExternal()
-            .source(States.READY)
-            .target(States.INITIALIZE)
-            .event(Events.START)
-            .and()
-            .withExternal()
-            .source(States.INITIALIZE)
-            .target(States.END)
-
-        def stateMachine = new JobExecutionStateMachineImpl(builder.build())
+        StateMachine<States, Events> stateMachine = Mock(StateMachine)
+        ExecutionContext executionContext = Mock(ExecutionContext)
+        ExtendedState extendedState = Mock(ExtendedState)
+        Map<Object, Object> extendedStateVariables = Mock(Map)
+        KillService.KillEvent killEvent = new KillService.KillEvent(KillService.KillSource.API_KILL_REQUEST)
+        State<States, Events> state = Mock()
+        StateMachineListener listener
+        List<ExecutionStage> executionStages = Mock()
 
         when:
-        stateMachine.start()
-        def finalState = stateMachine.waitForStop()
+        JobExecutionStateMachineImpl jobstateMachine = new JobExecutionStateMachineImpl(stateMachine, executionContext, executionStages)
 
         then:
-        finalState == States.END
-    }
-
-    def "Start and stop"() {
-        setup:
-        StateMachine<States, Events> mockStateMachine = Mock(StateMachine)
-        def monitorState = Mock(State)
-        def stateMachine = new JobExecutionStateMachineImpl(mockStateMachine)
+        1 * stateMachine.getExtendedState() >> extendedState
+        1 * extendedState.getVariables() >> extendedStateVariables
+        1 * extendedStateVariables.put(ExecutionStage.EXECUTION_CONTEXT_CONTEXT_KEY, executionContext)
 
         when:
-        stateMachine.start()
+        jobstateMachine.start()
 
         then:
-        1 * mockStateMachine.addStateListener(_ as StateMachineListener)
-        1 * mockStateMachine.start()
-        1 * mockStateMachine.sendEvent(Events.START)
+        1 * stateMachine.addStateListener(_ as StateMachineListener) >> {
+            args ->
+                listener = args[0] as StateMachineListener
+
+        }
+        listener != null
+        1 * stateMachine.start()
+        1 * stateMachine.sendEvent(Events.START)
 
         when:
-        stateMachine.stop()
+        jobstateMachine.onApplicationEvent(killEvent)
 
         then:
-        1 * mockStateMachine.getState() >> monitorState
-        1 * monitorState.getId() >> States.MONITOR_JOB
-        1 * mockStateMachine.sendEvent(Events.CANCEL_JOB_LAUNCH)
-    }
-
-    def "Start and stop via event"() {
-        setup:
-        StateMachine<States, Events> mockStateMachine = Mock(StateMachine)
-        def monitorState = Mock(State)
-        def stateMachine = new JobExecutionStateMachineImpl(mockStateMachine)
+        1 * executionContext.setJobKilled(true)
+        1 * stateMachine.getState() >> state
+        1 * state.getId() >> States.CREATE_JOB_DIRECTORY
 
         when:
-        stateMachine.start()
+        listener.stateMachineStopped(stateMachine)
+        jobstateMachine.waitForStop()
 
         then:
-        1 * mockStateMachine.addStateListener(_ as StateMachineListener)
-        1 * mockStateMachine.start()
-        1 * mockStateMachine.sendEvent(Events.START)
-
-        when:
-        stateMachine.onApplicationEvent(new KillService.KillEvent(KillService.KillSource.API_KILL_REQUEST))
-
-        then:
-        1 * mockStateMachine.getState() >> monitorState
-        1 * monitorState.getId() >> States.MONITOR_JOB
-        1 * mockStateMachine.sendEvent(Events.CANCEL_JOB_LAUNCH)
+        1 * stateMachine.getState() >> state
+        1 * state.getId() >> States.DONE
     }
 }

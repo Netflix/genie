@@ -69,7 +69,7 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
     }
 
     private void internalRun(final String[] args) {
-        log.info("Parsing arguments...");
+        log.info("Parsing arguments: {}", Arrays.toString(args));
 
         exitCode = ExitCode.INVALID_ARGS;
 

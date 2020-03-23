@@ -19,11 +19,12 @@ package com.netflix.genie.agent.execution.services.impl
 
 import com.google.common.collect.Sets
 import com.netflix.genie.agent.execution.CleanupStrategy
-import com.netflix.genie.agent.execution.ExecutionContext
+
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
 import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.services.JobSetupService
+import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
