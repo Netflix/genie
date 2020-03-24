@@ -44,13 +44,90 @@ public class DatabaseCleanupProperties {
      */
     public static final String ENABLED_PROPERTY = PROPERTY_PREFIX + ".enabled";
 
+    /**
+     * The cron expression for when the cleanup task should occur.
+     */
+    public static final String EXPRESSION_PROPERTY = PROPERTY_PREFIX + ".expression";
+
+    /**
+     * The number of days to retain jobs in the database.
+     */
+    public static final String JOB_RETENTION_PROPERTY = PROPERTY_PREFIX + ".retention";
+
+    /**
+     * The number of job records to delete from the database in a single transaction.
+     * Genie will loop and perform multiple transactions until all jobs older than the retention time are deleted.
+     */
+    public static final String MAX_DELETED_PER_TRANSACTION_PROPERTY = PROPERTY_PREFIX + ".maxDeletedPerTransaction";
+
+    /**
+     * The page size used within each cleanup transaction to iterate through the job records.
+     */
+    public static final String PAGE_SIZE_PROPERTY = PROPERTY_PREFIX + ".pageSize";
+
+    /**
+     * Skip the Jobs table when performing database cleanup.
+     */
+    public static final String SKIP_JOBS_PROPERTY = PROPERTY_PREFIX + ".skipJobsCleanup";
+
+    /**
+     * Skip the Clusters table when performing database cleanup.
+     */
+    public static final String SKIP_CLUSTERS_PROPERTY = PROPERTY_PREFIX + ".skipClustersCleanup";
+
+    /**
+     * Skip the Tags table when performing database cleanup.
+     */
+    public static final String SKIP_TAGS_PROPERTY = PROPERTY_PREFIX + ".skipTagsCleanup";
+
+    /**
+     * Skip the Files table when performing database cleanup.
+     */
+    public static final String SKIP_FILES_PROPERTY = PROPERTY_PREFIX + ".skipFilesCleanup";
+
+    /**
+     * The property key for whether this feature is enabled or not.
+     */
     private boolean enabled;
+
+    /**
+     * The cron expression for when the cleanup task should occur.
+     */
     private String expression = "0 0 0 * * *";
+
+    /**
+     * The number of days to retain jobs in the database.
+     */
     private int retention = 90;
+
+    /**
+     * The number of job records to delete from the database in a single transaction.
+     * Genie will loop and perform multiple transactions until all jobs older than the retention time are deleted.
+     */
     private int maxDeletedPerTransaction = 1_000;
+
+    /**
+     * The page size used within each cleanup transaction to iterate through the job records.
+     */
     private int pageSize = 1_000;
+
+    /**
+     * Skip the Jobs table when performing database cleanup.
+     */
     private boolean skipJobsCleanup;
+
+    /**
+     * Skip the Clusters table when performing database cleanup.
+     */
     private boolean skipClustersCleanup;
+
+    /**
+     * Skip the Tags table when performing database cleanup.
+     */
     private boolean skipTagsCleanup;
+
+    /**
+     * Skip the Files table when performing database cleanup.
+     */
     private boolean skipFilesCleanup;
 }

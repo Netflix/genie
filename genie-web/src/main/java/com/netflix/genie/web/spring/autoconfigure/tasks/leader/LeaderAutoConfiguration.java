@@ -46,6 +46,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.zookeeper.ZookeeperAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.integration.zookeeper.config.LeaderInitiatorFactoryBean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.client.RestTemplate;
@@ -98,7 +99,7 @@ public class LeaderAutoConfiguration {
      * The leadership initialization factory bean which will create a LeaderInitiator to kick off the leader election
      * process within this node for the cluster if Zookeeper is configured.
      *
-     * @param client                        The curator framework client to use
+     * @param client                    The curator framework client to use
      * @param zookeeperLeaderProperties The Zookeeper properties to use
      * @return The factory bean
      */
@@ -173,6 +174,7 @@ public class LeaderAutoConfiguration {
      * Create a {@link DatabaseCleanupTask} if one is required.
      *
      * @param cleanupProperties The properties to use to configure this task
+     * @param environment       The application {@link Environment} to pull properties from
      * @param dataServices      The {@link DataServices} encapsulation instance to use
      * @param registry          The metrics registry
      * @return The {@link DatabaseCleanupTask} instance to use if the conditions match
@@ -182,11 +184,13 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(DatabaseCleanupTask.class)
     public DatabaseCleanupTask databaseCleanupTask(
         final DatabaseCleanupProperties cleanupProperties,
+        final Environment environment,
         final DataServices dataServices,
         final MeterRegistry registry
     ) {
         return new DatabaseCleanupTask(
             cleanupProperties,
+            environment,
             dataServices,
             registry
         );

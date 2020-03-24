@@ -31,6 +31,7 @@ import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.CronTrigger;
 
@@ -52,6 +53,7 @@ public class DatabaseCleanupTask extends LeaderTask {
 
     private static final String DATABASE_CLEANUP_DURATION_TIMER_NAME = "genie.tasks.databaseCleanup.duration.timer";
     private final DatabaseCleanupProperties cleanupProperties;
+    private final Environment environment;
     private final JobPersistenceService jobPersistenceService;
     private final ClusterPersistenceService clusterPersistenceService;
     private final FilePersistenceService filePersistenceService;
@@ -67,16 +69,19 @@ public class DatabaseCleanupTask extends LeaderTask {
      * Constructor.
      *
      * @param cleanupProperties The properties to use to configure this task
+     * @param environment       The application environment to pull properties from
      * @param dataServices      The {@link DataServices} encapsulation instance to use
      * @param registry          The metrics registry
      */
     public DatabaseCleanupTask(
         @NotNull final DatabaseCleanupProperties cleanupProperties,
+        @NotNull final Environment environment,
         @NotNull final DataServices dataServices,
         @NotNull final MeterRegistry registry
     ) {
         this.registry = registry;
         this.cleanupProperties = cleanupProperties;
+        this.environment = environment;
         this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.clusterPersistenceService = dataServices.getClusterPersistenceService();
         this.filePersistenceService = dataServices.getFilePersistenceService();
@@ -113,7 +118,12 @@ public class DatabaseCleanupTask extends LeaderTask {
      */
     @Override
     public Trigger getTrigger() {
-        return new CronTrigger(this.cleanupProperties.getExpression(), JobConstants.UTC);
+        final String expression = this.environment.getProperty(
+            DatabaseCleanupProperties.EXPRESSION_PROPERTY,
+            String.class,
+            this.cleanupProperties.getExpression()
+        );
+        return new CronTrigger(expression, JobConstants.UTC);
     }
 
     /**
@@ -159,14 +169,34 @@ public class DatabaseCleanupTask extends LeaderTask {
      * Delete jobs that are older than the retention threshold and are complete
      */
     private void deleteJobs() {
-        if (this.cleanupProperties.isSkipJobsCleanup()) {
+        final boolean skipJobs = this.environment.getProperty(
+            DatabaseCleanupProperties.SKIP_JOBS_PROPERTY,
+            Boolean.class,
+            this.cleanupProperties.isSkipJobsCleanup()
+        );
+        if (skipJobs) {
             log.info("Skipping job cleanup");
             this.numDeletedJobs.set(0);
         } else {
             final Instant midnightUTC = TaskUtils.getMidnightUTC();
-            final Instant retentionLimit = midnightUTC.minus(this.cleanupProperties.getRetention(), ChronoUnit.DAYS);
-            final int batchSize = this.cleanupProperties.getMaxDeletedPerTransaction();
-            final int pageSize = this.cleanupProperties.getPageSize();
+            final Instant retentionLimit = midnightUTC.minus(
+                this.environment.getProperty(
+                    DatabaseCleanupProperties.JOB_RETENTION_PROPERTY,
+                    Integer.class,
+                    this.cleanupProperties.getRetention()
+                ),
+                ChronoUnit.DAYS
+            );
+            final int batchSize = this.environment.getProperty(
+                DatabaseCleanupProperties.MAX_DELETED_PER_TRANSACTION_PROPERTY,
+                Integer.class,
+                this.cleanupProperties.getMaxDeletedPerTransaction()
+            );
+            final int pageSize = this.environment.getProperty(
+                DatabaseCleanupProperties.PAGE_SIZE_PROPERTY,
+                Integer.class,
+                this.cleanupProperties.getPageSize()
+            );
 
             log.info(
                 "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
@@ -197,7 +227,12 @@ public class DatabaseCleanupTask extends LeaderTask {
      * Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted.
      */
     private void deleteClusters() {
-        if (this.cleanupProperties.isSkipClustersCleanup()) {
+        final boolean skipClusters = this.environment.getProperty(
+            DatabaseCleanupProperties.SKIP_CLUSTERS_PROPERTY,
+            Boolean.class,
+            this.cleanupProperties.isSkipClustersCleanup()
+        );
+        if (skipClusters) {
             log.info("Skipping clusters cleanup");
             this.numDeletedClusters.set(0);
         } else {
@@ -211,7 +246,12 @@ public class DatabaseCleanupTask extends LeaderTask {
     }
 
     private void deleteFiles(final Instant creationThreshold) {
-        if (this.cleanupProperties.isSkipFilesCleanup()) {
+        final boolean skipFiles = this.environment.getProperty(
+            DatabaseCleanupProperties.SKIP_FILES_PROPERTY,
+            Boolean.class,
+            this.cleanupProperties.isSkipFilesCleanup()
+        );
+        if (skipFiles) {
             log.info("Skipping files cleanup");
             this.numDeletedFiles.set(0);
         } else {
@@ -225,7 +265,12 @@ public class DatabaseCleanupTask extends LeaderTask {
     }
 
     private void deleteTags(final Instant creationThreshold) {
-        if (this.cleanupProperties.isSkipTagsCleanup()) {
+        final boolean skipTags = this.environment.getProperty(
+            DatabaseCleanupProperties.SKIP_TAGS_PROPERTY,
+            Boolean.class,
+            this.cleanupProperties.isSkipTagsCleanup()
+        );
+        if (skipTags) {
             log.info("Skipping tags cleanup");
             this.numDeletedTags.set(0);
         } else {
