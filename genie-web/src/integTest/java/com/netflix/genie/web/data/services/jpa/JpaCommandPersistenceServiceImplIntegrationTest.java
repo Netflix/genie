@@ -48,6 +48,8 @@ import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -948,6 +950,60 @@ class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(command3);
+    }
+
+    @Test
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/updateStatusForUnusedCommands/before.xml")
+    void testUpdateStatusForUnusedCommands() throws Exception {
+        final Instant present = Instant.parse("2020-03-24T00:00:00.000Z");
+        final Instant jobThreshold = present.minus(30, ChronoUnit.DAYS);
+        final Instant commandThreshold = present.minus(60, ChronoUnit.DAYS);
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(6);
+        Assertions
+            .assertThat(this.service.getCommand("command0").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.DEPRECATED);
+        Assertions
+            .assertThat(this.service.getCommand("command1").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions
+            .assertThat(this.service.getCommand("command2").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions
+            .assertThat(this.service.getCommand("command3").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.DEPRECATED);
+        Assertions
+            .assertThat(this.service.getCommand("command4").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions
+            .assertThat(this.service.getCommand("command5").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.DEPRECATED);
+        Assertions
+            .assertThat(
+                this.service.updateStatusForUnusedCommands(
+                    CommandStatus.INACTIVE,
+                    commandThreshold,
+                    EnumSet.of(CommandStatus.ACTIVE, CommandStatus.DEPRECATED),
+                    jobThreshold)
+            )
+            .isEqualTo(3);
+        Assertions
+            .assertThat(this.service.getCommand("command0").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.DEPRECATED);
+        Assertions
+            .assertThat(this.service.getCommand("command1").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.ACTIVE);
+        Assertions
+            .assertThat(this.service.getCommand("command2").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.INACTIVE);
+        Assertions
+            .assertThat(this.service.getCommand("command3").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.DEPRECATED);
+        Assertions
+            .assertThat(this.service.getCommand("command4").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.INACTIVE);
+        Assertions
+            .assertThat(this.service.getCommand("command5").getMetadata().getStatus())
+            .isEqualByComparingTo(CommandStatus.INACTIVE);
     }
 
     private Command createTestCommand(

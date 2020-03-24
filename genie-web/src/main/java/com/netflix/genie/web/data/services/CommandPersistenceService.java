@@ -37,6 +37,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -475,4 +476,24 @@ public interface CommandPersistenceService {
      * @return All the {@link Command}'s which matched the {@link Criterion}
      */
     Set<Command> findCommandsMatchingCriterion(@Valid Criterion criterion, boolean addDefaultStatus);
+
+    /**
+     * Update the status of a command to the {@literal desiredStatus} if its status is in {@literal currentStatuses},
+     * it was created before {@literal commandCreatedThreshold} and it hasn't been used in any job that was created
+     * in the Genie system after {@literal jobCreatedThreshold}.
+     *
+     * @param desiredStatus           The new status the matching commands should have
+     * @param commandCreatedThreshold The instant in time which a command must have been created before to be
+     *                                considered for update. Exclusive
+     * @param currentStatuses         The set of current statuses a command must have to be considered for update
+     * @param jobCreatedThreshold     The instant in time after which a command must not have been used in a Genie job
+     *                                for it to be considered for update. Inclusive.
+     * @return The number of commands whose statuses were updated to {@literal desiredStatus}
+     */
+    int updateStatusForUnusedCommands(
+        CommandStatus desiredStatus,
+        Instant commandCreatedThreshold,
+        Set<CommandStatus> currentStatuses,
+        Instant jobCreatedThreshold
+    );
 }
