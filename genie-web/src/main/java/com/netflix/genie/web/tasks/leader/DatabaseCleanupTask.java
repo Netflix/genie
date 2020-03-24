@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * A task which will clean up the database of old records if desired.
+ * A {@link LeaderTask} which will clean up the database of old records if desired.
  *
  * @author tgianos
  * @since 3.0.0
@@ -52,6 +52,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DatabaseCleanupTask extends LeaderTask {
 
     private static final String DATABASE_CLEANUP_DURATION_TIMER_NAME = "genie.tasks.databaseCleanup.duration.timer";
+    private static final String CLUSTER_DELETION_TIMER = "genie.tasks.databaseCleanup.clusterDeletion.timer";
+    private static final String FILE_DELETION_TIMER = "genie.tasks.databaseCleanup.fileDeletion.timer";
+    private static final String TAG_DELETION_TIMER = "genie.tasks.databaseCleanup.tagDeletion.timer";
+
     private final DatabaseCleanupProperties cleanupProperties;
     private final Environment environment;
     private final JobPersistenceService jobPersistenceService;
@@ -227,59 +231,92 @@ public class DatabaseCleanupTask extends LeaderTask {
      * Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted.
      */
     private void deleteClusters() {
-        final boolean skipClusters = this.environment.getProperty(
-            DatabaseCleanupProperties.SKIP_CLUSTERS_PROPERTY,
-            Boolean.class,
-            this.cleanupProperties.isSkipClustersCleanup()
-        );
-        if (skipClusters) {
-            log.info("Skipping clusters cleanup");
-            this.numDeletedClusters.set(0);
-        } else {
-            final long countDeletedClusters = this.clusterPersistenceService.deleteTerminatedClusters();
-            log.info(
-                "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
-                countDeletedClusters
+        final long startTime = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        try {
+            final boolean skipClusters = this.environment.getProperty(
+                DatabaseCleanupProperties.SKIP_CLUSTERS_PROPERTY,
+                Boolean.class,
+                this.cleanupProperties.isSkipClustersCleanup()
             );
-            this.numDeletedClusters.set(countDeletedClusters);
+            if (skipClusters) {
+                log.info("Skipping clusters cleanup");
+                this.numDeletedClusters.set(0);
+            } else {
+                final long countDeletedClusters = this.clusterPersistenceService.deleteTerminatedClusters();
+                log.info(
+                    "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
+                    countDeletedClusters
+                );
+                this.numDeletedClusters.set(countDeletedClusters);
+            }
+        } catch (final Exception e) {
+            log.error("Unable to delete clusters from database", e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } finally {
+            this.registry
+                .timer(CLUSTER_DELETION_TIMER, tags)
+                .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         }
     }
 
     private void deleteFiles(final Instant creationThreshold) {
-        final boolean skipFiles = this.environment.getProperty(
-            DatabaseCleanupProperties.SKIP_FILES_PROPERTY,
-            Boolean.class,
-            this.cleanupProperties.isSkipFilesCleanup()
-        );
-        if (skipFiles) {
-            log.info("Skipping files cleanup");
-            this.numDeletedFiles.set(0);
-        } else {
-            final long countDeletedFiles = this.filePersistenceService.deleteUnusedFiles(creationThreshold);
-            log.info(
-                "Deleted {} files that were unused by any resource and created over an hour ago",
-                countDeletedFiles
+        final long startTime = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        try {
+            final boolean skipFiles = this.environment.getProperty(
+                DatabaseCleanupProperties.SKIP_FILES_PROPERTY,
+                Boolean.class,
+                this.cleanupProperties.isSkipFilesCleanup()
             );
-            this.numDeletedFiles.set(countDeletedFiles);
+            if (skipFiles) {
+                log.info("Skipping files cleanup");
+                this.numDeletedFiles.set(0);
+            } else {
+                final long countDeletedFiles = this.filePersistenceService.deleteUnusedFiles(creationThreshold);
+                log.info(
+                    "Deleted {} files that were unused by any resource and created over an hour ago",
+                    countDeletedFiles
+                );
+                this.numDeletedFiles.set(countDeletedFiles);
+            }
+        } catch (final Exception e) {
+            log.error("Unable to delete files from database", e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } finally {
+            this.registry
+                .timer(FILE_DELETION_TIMER, tags)
+                .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         }
     }
 
     private void deleteTags(final Instant creationThreshold) {
-        final boolean skipTags = this.environment.getProperty(
-            DatabaseCleanupProperties.SKIP_TAGS_PROPERTY,
-            Boolean.class,
-            this.cleanupProperties.isSkipTagsCleanup()
-        );
-        if (skipTags) {
-            log.info("Skipping tags cleanup");
-            this.numDeletedTags.set(0);
-        } else {
-            final long countDeletedTags = this.tagPersistenceService.deleteUnusedTags(creationThreshold);
-            log.info(
-                "Deleted {} tags that were unused by any resource and created over an hour ago",
-                countDeletedTags
+        final long startTime = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        try {
+            final boolean skipTags = this.environment.getProperty(
+                DatabaseCleanupProperties.SKIP_TAGS_PROPERTY,
+                Boolean.class,
+                this.cleanupProperties.isSkipTagsCleanup()
             );
-            this.numDeletedTags.set(countDeletedTags);
+            if (skipTags) {
+                log.info("Skipping tags cleanup");
+                this.numDeletedTags.set(0);
+            } else {
+                final long countDeletedTags = this.tagPersistenceService.deleteUnusedTags(creationThreshold);
+                log.info(
+                    "Deleted {} tags that were unused by any resource and created over an hour ago",
+                    countDeletedTags
+                );
+                this.numDeletedTags.set(countDeletedTags);
+            }
+        } catch (final Exception e) {
+            log.error("Unable to delete tags from database", e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } finally {
+            this.registry
+                .timer(TAG_DELETION_TIMER, tags)
+                .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         }
     }
 }
