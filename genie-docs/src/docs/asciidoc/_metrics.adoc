@@ -482,6 +482,25 @@ had a status different than UP
 |ClusterCheckerTask
 |host
 
+|genie.tasks.databaseCleanup.clusterDeletion.timer
+|Time taken to delete cluster records from the database
+|nanoseconds
+|DatabaseCleanupTask
+|status, exceptionClass
+
+
+|genie.tasks.databaseCleanup.fileDeletion.timer
+|Time taken to delete file records from the database
+|nanoseconds
+|DatabaseCleanupTask
+|status, exceptionClass
+
+|genie.tasks.databaseCleanup.tagDeletion.timer
+|Time taken to delete tag records from the database
+|nanoseconds
+|DatabaseCleanupTask
+|status, exceptionClass
+
 |genie.tasks.databaseCleanup.duration.timer
 |Time taken to cleanup database records for jobs that executed over a given amount of time in the past
 |nanoseconds
