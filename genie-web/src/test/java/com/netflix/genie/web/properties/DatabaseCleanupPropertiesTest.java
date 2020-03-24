@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 /**
- * Unit tests for DatabaseCleanupProperties.
+ * Unit tests for {@link DatabaseCleanupProperties}.
  *
  * @author tgianos
  * @since 3.0.0

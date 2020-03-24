@@ -31,6 +31,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.mock.env.MockEnvironment;
+import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.CronTrigger;
 
 import java.time.Instant;
@@ -45,6 +47,7 @@ import java.util.Calendar;
 class DatabaseCleanupTaskTest {
 
     private DatabaseCleanupProperties cleanupProperties;
+    private MockEnvironment environment;
     private JobPersistenceService jobPersistenceService;
     private ClusterPersistenceService clusterPersistenceService;
     private FilePersistenceService filePersistenceService;
@@ -57,6 +60,7 @@ class DatabaseCleanupTaskTest {
     @BeforeEach
     void setup() {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
+        this.environment = new MockEnvironment();
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
         this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
@@ -68,6 +72,7 @@ class DatabaseCleanupTaskTest {
         Mockito.when(dataServices.getTagPersistenceService()).thenReturn(this.tagPersistenceService);
         this.task = new DatabaseCleanupTask(
             this.cleanupProperties,
+            this.environment,
             dataServices,
             new SimpleMeterRegistry()
         );
@@ -86,8 +91,16 @@ class DatabaseCleanupTaskTest {
      */
     @Test
     void canGetTrigger() {
+        final String expression = "0 0 1 * * *";
+        this.environment.setProperty(DatabaseCleanupProperties.EXPRESSION_PROPERTY, expression);
         Mockito.when(this.cleanupProperties.getExpression()).thenReturn("0 0 0 * * *");
-        Assertions.assertThat(this.task.getTrigger() instanceof CronTrigger).isTrue();
+        final Trigger trigger = this.task.getTrigger();
+        if (trigger instanceof CronTrigger) {
+            final CronTrigger cronTrigger = (CronTrigger) trigger;
+            Assertions.assertThat(cronTrigger.getExpression()).isEqualTo(expression);
+        } else {
+            Assertions.fail("Trigger was not of expected type: " + CronTrigger.class.getName());
+        }
     }
 
     /**
@@ -186,11 +199,14 @@ class DatabaseCleanupTaskTest {
      */
     @Test
     void skipAll() {
-
-        Mockito.when(this.cleanupProperties.isSkipJobsCleanup()).thenReturn(true);
-        Mockito.when(this.cleanupProperties.isSkipClustersCleanup()).thenReturn(true);
-        Mockito.when(this.cleanupProperties.isSkipTagsCleanup()).thenReturn(true);
-        Mockito.when(this.cleanupProperties.isSkipFilesCleanup()).thenReturn(true);
+        this.environment.setProperty(DatabaseCleanupProperties.SKIP_JOBS_PROPERTY, "true");
+        this.environment.setProperty(DatabaseCleanupProperties.SKIP_CLUSTERS_PROPERTY, "true");
+        this.environment.setProperty(DatabaseCleanupProperties.SKIP_TAGS_PROPERTY, "true");
+        this.environment.setProperty(DatabaseCleanupProperties.SKIP_FILES_PROPERTY, "true");
+        Mockito.when(this.cleanupProperties.isSkipJobsCleanup()).thenReturn(false);
+        Mockito.when(this.cleanupProperties.isSkipClustersCleanup()).thenReturn(false);
+        Mockito.when(this.cleanupProperties.isSkipTagsCleanup()).thenReturn(false);
+        Mockito.when(this.cleanupProperties.isSkipFilesCleanup()).thenReturn(false);
 
         this.task.run();
 
