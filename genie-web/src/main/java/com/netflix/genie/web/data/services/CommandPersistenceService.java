@@ -496,4 +496,15 @@ public interface CommandPersistenceService {
         Set<CommandStatus> currentStatuses,
         Instant jobCreatedThreshold
     );
+
+    /**
+     * Bulk delete commands from the database where their status is in {@literal deleteStatuses} they were created
+     * before {@literal commandCreatedThreshold} and they aren't attached to any jobs still in the database.
+     *
+     * @param deleteStatuses          The set of statuses a command must be in in order to be considered for deletion
+     * @param commandCreatedThreshold The instant in time a command must have been created before to be considered for
+     *                                deletion. Exclusive.
+     * @return The number of commands that were deleted
+     */
+    int deleteUnusedCommands(Set<CommandStatus> deleteStatuses, Instant commandCreatedThreshold);
 }

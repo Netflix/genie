@@ -693,6 +693,22 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int deleteUnusedCommands(final Set<CommandStatus> deleteStatuses, final Instant commandCreatedThreshold) {
+        log.info(
+            "Deleting commands with statuses {} that were created before {}",
+            deleteStatuses,
+            commandCreatedThreshold
+        );
+        return this.getCommandRepository().deleteUnused(
+            deleteStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
+            commandCreatedThreshold
+        );
+    }
+
+    /**
      * Helper method to find a command entity.
      *
      * @param id The id of the command to find

@@ -1006,6 +1006,34 @@ class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
             .isEqualByComparingTo(CommandStatus.INACTIVE);
     }
 
+    @Test
+    @DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTest/deleteUnusedCommands/before.xml")
+    void testDeleteUnusedCommands() {
+        final Instant present = Instant.parse("2020-03-24T00:00:00.000Z");
+        final Instant createdThreshold = present.minus(1, ChronoUnit.DAYS);
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(7);
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command0")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command1")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command2")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command3")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command4")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isTrue();
+        Assertions.assertThat(
+            this.service.deleteUnusedCommands(
+                EnumSet.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED),
+                createdThreshold
+            )
+        ).isEqualTo(2);
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command0")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command1")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command2")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command3")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command4")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isFalse();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isFalse();
+    }
+
     private Command createTestCommand(
         @Nullable final String id,
         @Nullable final Set<String> tags,

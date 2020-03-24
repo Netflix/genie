@@ -46,6 +46,20 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
             + ");";
 
     /**
+     * The query used to delete commands.
+     */
+    String DELETE_COMMANDS_IN_STATUSES_QUERY =
+        "DELETE"
+            + " FROM commands"
+            + " WHERE status IN (:deleteStatuses)"
+            + " AND created < :commandCreatedThreshold"
+            + " AND id NOT IN ("
+            + "SELECT DISTINCT(command_id)"
+            + " FROM jobs"
+            + " WHERE command_id IS NOT NULL"
+            + ");";
+
+    /**
      * Bulk set the status of commands which match the given inputs. Considers whether a command was used in some
      * period of time till now.
      *
@@ -64,5 +78,21 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
         @Param("commandCreatedThreshold") Instant commandCreatedThreshold,
         @Param("currentStatuses") Set<String> currentStatuses,
         @Param("jobCreatedThreshold") Instant jobCreatedThreshold
+    );
+
+    /**
+     * Bulk delete commands from the database where their status is in {@literal deleteStatuses} they were created
+     * before {@literal commandCreatedThreshold} and they aren't attached to any jobs still in the database.
+     *
+     * @param deleteStatuses          The set of statuses a command must be in in order to be considered for deletion
+     * @param commandCreatedThreshold The instant in time a command must have been created before to be considered for
+     *                                deletion. Exclusive.
+     * @return The number of commands that were deleted
+     */
+    @Query(value = DELETE_COMMANDS_IN_STATUSES_QUERY, nativeQuery = true)
+    @Modifying
+    int deleteUnused(
+        @Param("deleteStatuses") Set<String> deleteStatuses,
+        @Param("commandCreatedThreshold") Instant commandCreatedThreshold
     );
 }
