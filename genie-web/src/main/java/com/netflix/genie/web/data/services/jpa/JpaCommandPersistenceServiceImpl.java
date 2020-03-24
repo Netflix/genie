@@ -68,6 +68,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -663,6 +664,32 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
             .stream()
             .map(EntityDtoConverters::toV4CommandDto)
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int updateStatusForUnusedCommands(
+        final CommandStatus desiredStatus,
+        final Instant commandCreatedThreshold,
+        final Set<CommandStatus> currentStatuses,
+        final Instant jobCreatedThreshold
+    ) {
+        log.info(
+            "Updating any commands with statuses {} "
+                + "that were created before {} and haven't been used in jobs created after {} to new status {}",
+            currentStatuses,
+            commandCreatedThreshold,
+            jobCreatedThreshold,
+            desiredStatus
+        );
+        return this.getCommandRepository().setUnusedStatus(
+            desiredStatus.name(),
+            commandCreatedThreshold,
+            currentStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
+            jobCreatedThreshold
+        );
     }
 
     /**
