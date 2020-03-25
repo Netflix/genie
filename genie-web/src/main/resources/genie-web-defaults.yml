@@ -93,7 +93,8 @@ genie:
     database-cleanup:
       enabled: true
       expression: 0 0 0 * * *
-      retention: 90
+      job-cleanup:
+        retention: 90
     disk-cleanup:
       enabled: true
       expression: 0 0 0 * * *

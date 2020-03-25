@@ -22,6 +22,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * Properties controlling the behavior of the database cleanup leadership task.
  *
@@ -66,26 +69,6 @@ public class DatabaseCleanupProperties {
     public static final String PAGE_SIZE_PROPERTY = PROPERTY_PREFIX + ".pageSize";
 
     /**
-     * Skip the Jobs table when performing database cleanup.
-     */
-    public static final String SKIP_JOBS_PROPERTY = PROPERTY_PREFIX + ".skipJobsCleanup";
-
-    /**
-     * Skip the Clusters table when performing database cleanup.
-     */
-    public static final String SKIP_CLUSTERS_PROPERTY = PROPERTY_PREFIX + ".skipClustersCleanup";
-
-    /**
-     * Skip the Tags table when performing database cleanup.
-     */
-    public static final String SKIP_TAGS_PROPERTY = PROPERTY_PREFIX + ".skipTagsCleanup";
-
-    /**
-     * Skip the Files table when performing database cleanup.
-     */
-    public static final String SKIP_FILES_PROPERTY = PROPERTY_PREFIX + ".skipFilesCleanup";
-
-    /**
      * The property key for whether this feature is enabled or not.
      */
     private boolean enabled;
@@ -93,7 +76,33 @@ public class DatabaseCleanupProperties {
     /**
      * The cron expression for when the cleanup task should occur.
      */
+    @NotBlank
     private String expression = "0 0 0 * * *";
+
+    /**
+     * Properties related to cleaning up cluster records from the database.
+     */
+    @NotNull
+    private ClusterDatabaseCleanupProperties clusterCleanup = new ClusterDatabaseCleanupProperties();
+
+    /**
+     * Properties related to cleaning up file records from the database.
+     */
+    @NotNull
+    private FileDatabaseCleanupProperties fileCleanup = new FileDatabaseCleanupProperties();
+
+    /**
+     * Properties related to cleaning up job records from the database.
+     */
+    @NotNull
+    private JobDatabaseCleanupProperties jobCleanup = new JobDatabaseCleanupProperties();
+
+    /**
+     * Properties related to cleaning up tag records from the database.
+     */
+    @NotNull
+    private TagDatabaseCleanupProperties tagCleanup = new TagDatabaseCleanupProperties();
+
 
     /**
      * The number of days to retain jobs in the database.
@@ -107,24 +116,145 @@ public class DatabaseCleanupProperties {
     private int maxDeletedPerTransaction = 1_000;
 
     /**
-     * The page size used within each cleanup transaction to iterate through the job records.
+     * Properties related to cleaning up cluster records from the database.
+     *
+     * @author tgianos
+     * @since 4.0.0
      */
-    private int pageSize = 1_000;
+    @Getter
+    @Setter
+    public static class ClusterDatabaseCleanupProperties {
+
+        /**
+         * The prefix for all properties related to cleaning up cluster records from the database.
+         */
+        public static final String CLUSTER_CLEANUP_PROPERTY_PREFIX
+            = DatabaseCleanupProperties.PROPERTY_PREFIX + ".cluster-cleanup";
+
+        /**
+         * Skip the Clusters table when performing database cleanup.
+         */
+        public static final String SKIP_PROPERTY = CLUSTER_CLEANUP_PROPERTY_PREFIX + ".skip";
+
+        /**
+         * Skip the Clusters table when performing database cleanup.
+         */
+        private boolean skip;
+    }
 
     /**
-     * Skip the Jobs table when performing database cleanup.
+     * Properties related to cleaning up file records from the database.
+     *
+     * @author tgianos
+     * @since 4.0.0
      */
-    private boolean skipJobsCleanup;
+    @Getter
+    @Setter
+    public static class FileDatabaseCleanupProperties {
+
+        /**
+         * The prefix for all properties related to cleaning up file records from the database.
+         */
+        public static final String FILE_CLEANUP_PROPERTY_PREFIX
+            = DatabaseCleanupProperties.PROPERTY_PREFIX + ".file-cleanup";
+
+        /**
+         * Skip the Files table when performing database cleanup.
+         */
+        public static final String SKIP_PROPERTY = FILE_CLEANUP_PROPERTY_PREFIX + ".skip";
+
+        /**
+         * Skip the Files table when performing database cleanup.
+         */
+        private boolean skip;
+    }
 
     /**
-     * Skip the Clusters table when performing database cleanup.
+     * Properties related to cleaning up job records from the database.
+     *
+     * @author tgianos
+     * @since 4.0.0
      */
-    private boolean skipClustersCleanup;
+    @Getter
+    @Setter
+    public static class JobDatabaseCleanupProperties {
+
+        /**
+         * The prefix for all properties related to cleaning up job records from the database.
+         */
+        public static final String JOB_CLEANUP_PROPERTY_PREFIX
+            = DatabaseCleanupProperties.PROPERTY_PREFIX + ".job-cleanup";
+
+        /**
+         * Skip the Jobs table when performing database cleanup.
+         */
+        public static final String SKIP_PROPERTY = JOB_CLEANUP_PROPERTY_PREFIX + ".skip";
+
+        /**
+         * The number of days to retain jobs in the database.
+         */
+        public static final String JOB_RETENTION_PROPERTY = JOB_CLEANUP_PROPERTY_PREFIX + ".retention";
+
+        /**
+         * The number of job records to delete from the database in a single transaction.
+         * Genie will loop and perform multiple transactions until all jobs older than the retention time are deleted.
+         */
+        public static final String MAX_DELETED_PER_TRANSACTION_PROPERTY
+            = JOB_CLEANUP_PROPERTY_PREFIX + ".maxDeletedPerTransaction";
+
+        /**
+         * The page size used within each cleanup transaction to iterate through the job records.
+         */
+        public static final String PAGE_SIZE_PROPERTY = JOB_CLEANUP_PROPERTY_PREFIX + ".pageSize";
+
+        /**
+         * Skip the Jobs table when performing database cleanup.
+         */
+        private boolean skip;
+
+        /**
+         * The number of days to retain jobs in the database.
+         */
+        private int retention = 90;
+
+        /**
+         * The number of job records to delete from the database in a single transaction.
+         * Genie will loop and perform multiple transactions until all jobs older than the retention time are deleted.
+         */
+        private int maxDeletedPerTransaction = 1_000;
+
+        /**
+         * The page size used within each cleanup transaction to iterate through the job records.
+         */
+        private int pageSize = 1_000;
+    }
 
     /**
-     * Skip the Tags table when performing database cleanup.
+     * Properties related to cleaning up tag records from the database.
+     *
+     * @author tgianos
+     * @since 4.0.0
      */
-    private boolean skipTagsCleanup;
+    @Getter
+    @Setter
+    public static class TagDatabaseCleanupProperties {
+
+        /**
+         * The prefix for all properties related to cleaning up tag records from the database.
+         */
+        public static final String TAG_CLEANUP_PROPERTY_PREFIX
+            = DatabaseCleanupProperties.PROPERTY_PREFIX + ".tag-cleanup";
+
+        /**
+         * Skip the Tags table when performing database cleanup.
+         */
+        public static final String SKIP_PROPERTY = TAG_CLEANUP_PROPERTY_PREFIX + ".skip";
+
+        /**
+         * Skip the Tags table when performing database cleanup.
+         */
+        private boolean skip;
+    }
 
     /**
      * Skip the Files table when performing database cleanup.

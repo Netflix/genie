@@ -442,6 +442,11 @@ lost and failed by the Genie leader
 |http
 |no
 
+|genie.tasks.database-cleanup.cluster-cleanup.skip
+|Skip the Clusters table when performing database cleanup
+|false
+|yes
+
 |genie.tasks.database-cleanup.enabled
 |Whether or not to delete old and unused records from the database at a scheduled interval.
 See: `genie.tasks.database-cleanup.expression`
@@ -453,7 +458,17 @@ See: `genie.tasks.database-cleanup.expression`
 |0 0 0 * * *
 |yes
 
-|genie.tasks.database-cleanup.maxDeletedPerTransaction
+|genie.tasks.database-cleanup.file-cleanup.skip
+|Skip the Files table when performing database cleanup
+|false
+|yes
+
+|genie.tasks.database-cleanup.job-cleanup.skip
+|Skip the Jobs table when performing database cleanup
+|false
+|yes
+
+|genie.tasks.database-cleanup.job-cleanup.maxDeletedPerTransaction
 |The number of job records (across multiple tables) to delete from the database
 in a single transaction. Genie will loop and perform multiple transactions until
 all jobs older than the retention time are deleted.
@@ -461,23 +476,18 @@ This is a soft limit, it could be rounded up to the next multiple of page size.
 |1000
 |yes
 
-|genie.tasks.database-cleanup.pageSize
+|genie.tasks.database-cleanup.job-cleanup.pageSize
 |The page size used within each cleanup transaction to iterate through the job records
 |1000
 |yes
 
-|genie.tasks.database-cleanup.retention
+|genie.tasks.database-cleanup.job-cleanup.retention
 |The number of days to retain jobs in the database
 |90
 |yes
 
-|genie.tasks.database-cleanup.skipClustersCleanup
-|Skip the Clusters table when performing database cleanup
-|false
-|yes
-
-|genie.tasks.database-cleanup.skipFilesCleanup
-|Skip the Files table when performing database cleanup
+|genie.tasks.database-cleanup.tag-cleanup.skip
+|Skip the Tags table when performing database cleanup
 |false
 |yes
 

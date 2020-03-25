@@ -47,6 +47,10 @@ import java.util.Calendar;
 class DatabaseCleanupTaskTest {
 
     private DatabaseCleanupProperties cleanupProperties;
+    private DatabaseCleanupProperties.ClusterDatabaseCleanupProperties clusterCleanupProperties;
+    private DatabaseCleanupProperties.FileDatabaseCleanupProperties fileCleanupProperties;
+    private DatabaseCleanupProperties.JobDatabaseCleanupProperties jobCleanupProperties;
+    private DatabaseCleanupProperties.TagDatabaseCleanupProperties tagCleanupProperties;
     private MockEnvironment environment;
     private JobPersistenceService jobPersistenceService;
     private ClusterPersistenceService clusterPersistenceService;
@@ -60,6 +64,14 @@ class DatabaseCleanupTaskTest {
     @BeforeEach
     void setup() {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
+        this.clusterCleanupProperties = Mockito.mock(DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.class);
+        Mockito.when(this.cleanupProperties.getClusterCleanup()).thenReturn(this.clusterCleanupProperties);
+        this.fileCleanupProperties = Mockito.mock(DatabaseCleanupProperties.FileDatabaseCleanupProperties.class);
+        Mockito.when(this.cleanupProperties.getFileCleanup()).thenReturn(this.fileCleanupProperties);
+        this.jobCleanupProperties = Mockito.mock(DatabaseCleanupProperties.JobDatabaseCleanupProperties.class);
+        Mockito.when(this.cleanupProperties.getJobCleanup()).thenReturn(this.jobCleanupProperties);
+        this.tagCleanupProperties = Mockito.mock(DatabaseCleanupProperties.TagDatabaseCleanupProperties.class);
+        Mockito.when(this.cleanupProperties.getTagCleanup()).thenReturn(this.tagCleanupProperties);
         this.environment = new MockEnvironment();
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
@@ -113,9 +125,9 @@ class DatabaseCleanupTaskTest {
         final int pageSize = 10;
         final int maxDeleted = 10_000;
 
-        Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
-        Mockito.when(this.cleanupProperties.getPageSize()).thenReturn(pageSize);
-        Mockito.when(this.cleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
+        Mockito.when(this.jobCleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
+        Mockito.when(this.jobCleanupProperties.getPageSize()).thenReturn(pageSize);
+        Mockito.when(this.jobCleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
         final ArgumentCaptor<Instant> argument = ArgumentCaptor.forClass(Instant.class);
 
         final long deletedCount1 = 6L;
@@ -177,9 +189,9 @@ class DatabaseCleanupTaskTest {
         final int pageSize = 10;
         final int maxDeleted = 10_000;
 
-        Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
-        Mockito.when(this.cleanupProperties.getPageSize()).thenReturn(pageSize);
-        Mockito.when(this.cleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
+        Mockito.when(this.jobCleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
+        Mockito.when(this.jobCleanupProperties.getPageSize()).thenReturn(pageSize);
+        Mockito.when(this.jobCleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
 
         Mockito
             .when(
@@ -199,14 +211,14 @@ class DatabaseCleanupTaskTest {
      */
     @Test
     void skipAll() {
-        this.environment.setProperty(DatabaseCleanupProperties.SKIP_JOBS_PROPERTY, "true");
-        this.environment.setProperty(DatabaseCleanupProperties.SKIP_CLUSTERS_PROPERTY, "true");
-        this.environment.setProperty(DatabaseCleanupProperties.SKIP_TAGS_PROPERTY, "true");
-        this.environment.setProperty(DatabaseCleanupProperties.SKIP_FILES_PROPERTY, "true");
-        Mockito.when(this.cleanupProperties.isSkipJobsCleanup()).thenReturn(false);
-        Mockito.when(this.cleanupProperties.isSkipClustersCleanup()).thenReturn(false);
-        Mockito.when(this.cleanupProperties.isSkipTagsCleanup()).thenReturn(false);
-        Mockito.when(this.cleanupProperties.isSkipFilesCleanup()).thenReturn(false);
+        this.environment.setProperty(DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.SKIP_PROPERTY, "true");
+        this.environment.setProperty(DatabaseCleanupProperties.FileDatabaseCleanupProperties.SKIP_PROPERTY, "true");
+        this.environment.setProperty(DatabaseCleanupProperties.JobDatabaseCleanupProperties.SKIP_PROPERTY, "true");
+        this.environment.setProperty(DatabaseCleanupProperties.TagDatabaseCleanupProperties.SKIP_PROPERTY, "true");
+        Mockito.when(this.clusterCleanupProperties.isSkip()).thenReturn(false);
+        Mockito.when(this.fileCleanupProperties.isSkip()).thenReturn(false);
+        Mockito.when(this.tagCleanupProperties.isSkip()).thenReturn(false);
+        Mockito.when(this.jobCleanupProperties.isSkip()).thenReturn(false);
 
         this.task.run();
 

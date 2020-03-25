@@ -33,42 +33,30 @@ class DatabaseCleanupPropertiesTest {
 
     private DatabaseCleanupProperties properties;
 
-    /**
-     * Setup for tests.
-     */
     @BeforeEach
     void setup() {
         this.properties = new DatabaseCleanupProperties();
     }
 
-    /**
-     * Make sure constructor sets reasonable defaults.
-     */
     @Test
     void canGetDefaultValues() {
         Assertions.assertThat(this.properties.isEnabled()).isFalse();
         Assertions.assertThat(this.properties.getExpression()).isEqualTo("0 0 0 * * *");
-        Assertions.assertThat(this.properties.getRetention()).isEqualTo(90);
-        Assertions.assertThat(this.properties.getMaxDeletedPerTransaction()).isEqualTo(1000);
-        Assertions.assertThat(this.properties.getPageSize()).isEqualTo(1000);
-        Assertions.assertThat(this.properties.isSkipJobsCleanup()).isFalse();
-        Assertions.assertThat(this.properties.isSkipClustersCleanup()).isFalse();
-        Assertions.assertThat(this.properties.isSkipTagsCleanup()).isFalse();
-        Assertions.assertThat(this.properties.isSkipFilesCleanup()).isFalse();
+        Assertions.assertThat(this.properties.getJobCleanup().isSkip()).isFalse();
+        Assertions.assertThat(this.properties.getJobCleanup().getRetention()).isEqualTo(90);
+        Assertions.assertThat(this.properties.getJobCleanup().getMaxDeletedPerTransaction()).isEqualTo(1000);
+        Assertions.assertThat(this.properties.getJobCleanup().getPageSize()).isEqualTo(1000);
+        Assertions.assertThat(this.properties.getClusterCleanup().isSkip()).isFalse();
+        Assertions.assertThat(this.properties.getTagCleanup().isSkip()).isFalse();
+        Assertions.assertThat(this.properties.getFileCleanup().isSkip()).isFalse();
     }
 
-    /**
-     * Make sure can enable.
-     */
     @Test
     void canEnable() {
         this.properties.setEnabled(true);
         Assertions.assertThat(this.properties.isEnabled()).isTrue();
     }
 
-    /**
-     * Make sure can set a new cron expression.
-     */
     @Test
     void canSetExpression() {
         final String expression = UUID.randomUUID().toString();
@@ -76,69 +64,48 @@ class DatabaseCleanupPropertiesTest {
         Assertions.assertThat(this.properties.getExpression()).isEqualTo(expression);
     }
 
-    /**
-     * Make sure can set a new retention time.
-     */
     @Test
-    void canSetRetention() {
+    void canSetJobCleanupRetention() {
         final int retention = 2318;
-        this.properties.setRetention(retention);
-        Assertions.assertThat(this.properties.getRetention()).isEqualTo(retention);
+        this.properties.getJobCleanup().setRetention(retention);
+        Assertions.assertThat(this.properties.getJobCleanup().getRetention()).isEqualTo(retention);
     }
 
-    /**
-     * Make sure can set a max deletion batch size.
-     */
     @Test
-    void canSetMaxDeletedPerTransaction() {
+    void canSetJobCleanupMaxDeletedPerTransaction() {
         final int max = 2318;
-        this.properties.setMaxDeletedPerTransaction(max);
-        Assertions.assertThat(this.properties.getMaxDeletedPerTransaction()).isEqualTo(max);
+        this.properties.getJobCleanup().setMaxDeletedPerTransaction(max);
+        Assertions.assertThat(this.properties.getJobCleanup().getMaxDeletedPerTransaction()).isEqualTo(max);
     }
 
-    /**
-     * Make sure can set a new page size.
-     */
     @Test
-    void canPageSize() {
+    void canSetJobCleanupPageSize() {
         final int size = 2318;
-        this.properties.setPageSize(size);
-        Assertions.assertThat(this.properties.getPageSize()).isEqualTo(size);
+        this.properties.getJobCleanup().setPageSize(size);
+        Assertions.assertThat(this.properties.getJobCleanup().getPageSize()).isEqualTo(size);
     }
 
-    /**
-     * Make sure can enable Jobs entities cleanup.
-     */
     @Test
-    void canEnableJobsCleanup() {
-        this.properties.setSkipJobsCleanup(true);
-        Assertions.assertThat(this.properties.isSkipJobsCleanup()).isTrue();
+    void canSetSkipJobCleanup() {
+        this.properties.getJobCleanup().setSkip(true);
+        Assertions.assertThat(this.properties.getJobCleanup().isSkip()).isTrue();
     }
 
-    /**
-     * Make sure can enable Clusters entities cleanup.
-     */
     @Test
-    void canEnableClustersCleanup() {
-        this.properties.setSkipClustersCleanup(true);
-        Assertions.assertThat(this.properties.isSkipClustersCleanup()).isTrue();
+    void canSetSkipClusterCleanup() {
+        this.properties.getClusterCleanup().setSkip(true);
+        Assertions.assertThat(this.properties.getClusterCleanup().isSkip()).isTrue();
     }
 
-    /**
-     * Make sure can enable Tags entities cleanup.
-     */
     @Test
-    void canEnableTagsCleanup() {
-        this.properties.setSkipTagsCleanup(true);
-        Assertions.assertThat(this.properties.isSkipTagsCleanup()).isTrue();
+    void canSetSkipTagsCleanup() {
+        this.properties.getTagCleanup().setSkip(true);
+        Assertions.assertThat(this.properties.getTagCleanup().isSkip()).isTrue();
     }
 
-    /**
-     * Make sure can enable Files entities cleanup.
-     */
     @Test
-    void canEnableFilesCleanup() {
-        this.properties.setSkipFilesCleanup(true);
-        Assertions.assertThat(this.properties.isSkipFilesCleanup()).isTrue();
+    void caSetSkipFilesCleanup() {
+        this.properties.getFileCleanup().setSkip(true);
+        Assertions.assertThat(this.properties.getFileCleanup().isSkip()).isTrue();
     }
 }
