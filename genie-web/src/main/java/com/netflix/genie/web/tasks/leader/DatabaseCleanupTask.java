@@ -174,9 +174,9 @@ public class DatabaseCleanupTask extends LeaderTask {
      */
     private void deleteJobs() {
         final boolean skipJobs = this.environment.getProperty(
-            DatabaseCleanupProperties.SKIP_JOBS_PROPERTY,
+            DatabaseCleanupProperties.JobDatabaseCleanupProperties.SKIP_PROPERTY,
             Boolean.class,
-            this.cleanupProperties.isSkipJobsCleanup()
+            this.cleanupProperties.getJobCleanup().isSkip()
         );
         if (skipJobs) {
             log.info("Skipping job cleanup");
@@ -185,21 +185,21 @@ public class DatabaseCleanupTask extends LeaderTask {
             final Instant midnightUTC = TaskUtils.getMidnightUTC();
             final Instant retentionLimit = midnightUTC.minus(
                 this.environment.getProperty(
-                    DatabaseCleanupProperties.JOB_RETENTION_PROPERTY,
+                    DatabaseCleanupProperties.JobDatabaseCleanupProperties.JOB_RETENTION_PROPERTY,
                     Integer.class,
-                    this.cleanupProperties.getRetention()
+                    this.cleanupProperties.getJobCleanup().getRetention()
                 ),
                 ChronoUnit.DAYS
             );
             final int batchSize = this.environment.getProperty(
-                DatabaseCleanupProperties.MAX_DELETED_PER_TRANSACTION_PROPERTY,
+                DatabaseCleanupProperties.JobDatabaseCleanupProperties.MAX_DELETED_PER_TRANSACTION_PROPERTY,
                 Integer.class,
-                this.cleanupProperties.getMaxDeletedPerTransaction()
+                this.cleanupProperties.getJobCleanup().getMaxDeletedPerTransaction()
             );
             final int pageSize = this.environment.getProperty(
-                DatabaseCleanupProperties.PAGE_SIZE_PROPERTY,
+                DatabaseCleanupProperties.JobDatabaseCleanupProperties.PAGE_SIZE_PROPERTY,
                 Integer.class,
-                this.cleanupProperties.getPageSize()
+                this.cleanupProperties.getJobCleanup().getPageSize()
             );
 
             log.info(
@@ -235,9 +235,9 @@ public class DatabaseCleanupTask extends LeaderTask {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final boolean skipClusters = this.environment.getProperty(
-                DatabaseCleanupProperties.SKIP_CLUSTERS_PROPERTY,
+                DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.SKIP_PROPERTY,
                 Boolean.class,
-                this.cleanupProperties.isSkipClustersCleanup()
+                this.cleanupProperties.getClusterCleanup().isSkip()
             );
             if (skipClusters) {
                 log.info("Skipping clusters cleanup");
@@ -265,9 +265,9 @@ public class DatabaseCleanupTask extends LeaderTask {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final boolean skipFiles = this.environment.getProperty(
-                DatabaseCleanupProperties.SKIP_FILES_PROPERTY,
+                DatabaseCleanupProperties.FileDatabaseCleanupProperties.SKIP_PROPERTY,
                 Boolean.class,
-                this.cleanupProperties.isSkipFilesCleanup()
+                this.cleanupProperties.getFileCleanup().isSkip()
             );
             if (skipFiles) {
                 log.info("Skipping files cleanup");
@@ -295,9 +295,9 @@ public class DatabaseCleanupTask extends LeaderTask {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final boolean skipTags = this.environment.getProperty(
-                DatabaseCleanupProperties.SKIP_TAGS_PROPERTY,
+                DatabaseCleanupProperties.TagDatabaseCleanupProperties.SKIP_PROPERTY,
                 Boolean.class,
-                this.cleanupProperties.isSkipTagsCleanup()
+                this.cleanupProperties.getTagCleanup().isSkip()
             );
             if (skipTags) {
                 log.info("Skipping tags cleanup");
