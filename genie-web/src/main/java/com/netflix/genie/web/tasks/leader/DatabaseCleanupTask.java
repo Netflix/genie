@@ -18,8 +18,11 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
+import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.FilePersistenceService;
 import com.netflix.genie.web.data.services.JobPersistenceService;
@@ -38,6 +41,7 @@ import org.springframework.scheduling.support.CronTrigger;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,20 +56,36 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DatabaseCleanupTask extends LeaderTask {
 
     private static final String DATABASE_CLEANUP_DURATION_TIMER_NAME = "genie.tasks.databaseCleanup.duration.timer";
+    private static final String APPLICATION_DELETION_TIMER = "genie.tasks.databaseCleanup.applicationDeletion.timer";
     private static final String CLUSTER_DELETION_TIMER = "genie.tasks.databaseCleanup.clusterDeletion.timer";
+    private static final String COMMAND_DEACTIVATION_TIMER = "genie.tasks.databaseCleanup.commandDeactivation.timer";
+    private static final String COMMAND_DELETION_TIMER = "genie.tasks.databaseCleanup.commandDeletion.timer";
     private static final String FILE_DELETION_TIMER = "genie.tasks.databaseCleanup.fileDeletion.timer";
     private static final String TAG_DELETION_TIMER = "genie.tasks.databaseCleanup.tagDeletion.timer";
+
+    // TODO: May want to make this a property
+    private static final Set<CommandStatus> TO_DEACTIVATE_COMMAND_STATUSES = EnumSet.of(
+        CommandStatus.DEPRECATED,
+        CommandStatus.ACTIVE
+    );
+    // TODO: May want to make this a property
+    private static final Set<CommandStatus> TO_DELETE_COMMAND_STATUSES = EnumSet.of(CommandStatus.INACTIVE);
 
     private final DatabaseCleanupProperties cleanupProperties;
     private final Environment environment;
     private final JobPersistenceService jobPersistenceService;
     private final ClusterPersistenceService clusterPersistenceService;
+    private final CommandPersistenceService commandPersistenceService;
+    private final ApplicationPersistenceService applicationPersistenceService;
     private final FilePersistenceService filePersistenceService;
     private final TagPersistenceService tagPersistenceService;
 
     private final MeterRegistry registry;
     private final AtomicLong numDeletedJobs;
     private final AtomicLong numDeletedClusters;
+    private final AtomicLong numDeactivatedCommands;
+    private final AtomicLong numDeletedCommands;
+    private final AtomicLong numDeletedApplications;
     private final AtomicLong numDeletedTags;
     private final AtomicLong numDeletedFiles;
 
@@ -88,6 +108,8 @@ public class DatabaseCleanupTask extends LeaderTask {
         this.environment = environment;
         this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.clusterPersistenceService = dataServices.getClusterPersistenceService();
+        this.commandPersistenceService = dataServices.getCommandPersistenceService();
+        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
         this.filePersistenceService = dataServices.getFilePersistenceService();
         this.tagPersistenceService = dataServices.getTagPersistenceService();
 
@@ -97,6 +119,18 @@ public class DatabaseCleanupTask extends LeaderTask {
         );
         this.numDeletedClusters = this.registry.gauge(
             "genie.tasks.databaseCleanup.numDeletedClusters.gauge",
+            new AtomicLong()
+        );
+        this.numDeactivatedCommands = this.registry.gauge(
+            "genie.tasks.databaseCleanup.numDeactivatedCommands.gauge",
+            new AtomicLong()
+        );
+        this.numDeletedCommands = this.registry.gauge(
+            "genie.tasks.databaseCleanup.numDeletedCommands.gauge",
+            new AtomicLong()
+        );
+        this.numDeletedApplications = this.registry.gauge(
+            "genie.tasks.databaseCleanup.numDeletedApplications.gauge",
             new AtomicLong()
         );
         this.numDeletedTags = this.registry.gauge(
@@ -136,14 +170,19 @@ public class DatabaseCleanupTask extends LeaderTask {
     @Override
     public void run() {
         final long start = System.nanoTime();
+        final Instant runtime = Instant.now();
         final Set<Tag> tags = Sets.newHashSet();
         try {
             this.deleteJobs();
             this.deleteClusters();
 
-            // Get now - 1 hour to avoid deleting references that were created as part of new resources recently
-            final Instant creationThreshold = Instant.now().minus(1L, ChronoUnit.HOURS);
+            this.deactivateCommands(runtime);
 
+            // Get now - 1 hour to avoid deleting references that were created as part of new resources recently
+            final Instant creationThreshold = runtime.minus(1L, ChronoUnit.HOURS);
+
+            this.deleteCommands(creationThreshold);
+            this.deleteApplications(creationThreshold);
             this.deleteFiles(creationThreshold);
             this.deleteTags(creationThreshold);
 
@@ -165,6 +204,9 @@ public class DatabaseCleanupTask extends LeaderTask {
     public void cleanup() {
         this.numDeletedJobs.set(0L);
         this.numDeletedClusters.set(0L);
+        this.numDeactivatedCommands.set(0L);
+        this.numDeletedCommands.set(0L);
+        this.numDeletedApplications.set(0L);
         this.numDeletedTags.set(0L);
         this.numDeletedFiles.set(0L);
     }
@@ -316,6 +358,127 @@ public class DatabaseCleanupTask extends LeaderTask {
         } finally {
             this.registry
                 .timer(TAG_DELETION_TIMER, tags)
+                .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private void deactivateCommands(final Instant runtime) {
+        final long startTime = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        try {
+            final boolean skipDeactivation = this.environment.getProperty(
+                DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.SKIP_PROPERTY,
+                Boolean.class,
+                this.cleanupProperties.getCommandDeactivation().isSkip()
+            );
+            if (skipDeactivation) {
+                log.info("Skipping command deactivation");
+                this.numDeactivatedCommands.set(0);
+            } else {
+                final Instant commandCreationThreshold = runtime.minus(
+                    this.environment.getProperty(
+                        DatabaseCleanupProperties
+                            .CommandDeactivationDatabaseCleanupProperties
+                            .COMMAND_CREATION_THRESHOLD_PROPERTY,
+                        Integer.class,
+                        this.cleanupProperties.getCommandDeactivation().getCommandCreationThreshold()
+                    ),
+                    ChronoUnit.DAYS
+                );
+                final Instant jobCreationThreshold = runtime.minus(
+                    this.environment.getProperty(
+                        DatabaseCleanupProperties
+                            .CommandDeactivationDatabaseCleanupProperties
+                            .JOB_CREATION_THRESHOLD_PROPERTY,
+                        Integer.class,
+                        this.cleanupProperties.getCommandDeactivation().getJobCreationThreshold()
+                    ),
+                    ChronoUnit.DAYS
+                );
+                final int deactivatedCommandCount = this.commandPersistenceService.updateStatusForUnusedCommands(
+                    CommandStatus.INACTIVE,
+                    commandCreationThreshold,
+                    TO_DEACTIVATE_COMMAND_STATUSES,
+                    jobCreationThreshold
+                );
+                log.info(
+                    "Set {} commands to status {} that were previously in one of {}",
+                    deactivatedCommandCount,
+                    CommandStatus.INACTIVE,
+                    TO_DEACTIVATE_COMMAND_STATUSES
+                );
+                this.numDeactivatedCommands.set(deactivatedCommandCount);
+            }
+        } catch (final Exception e) {
+            log.error("Unable to disable commands in database", e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } finally {
+            this.registry
+                .timer(COMMAND_DEACTIVATION_TIMER, tags)
+                .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private void deleteCommands(final Instant creationThreshold) {
+        final long startTime = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        try {
+            final boolean skipCommands = this.environment.getProperty(
+                DatabaseCleanupProperties.CommandDatabaseCleanupProperties.SKIP_PROPERTY,
+                Boolean.class,
+                this.cleanupProperties.getCommandCleanup().isSkip()
+            );
+            if (skipCommands) {
+                log.info("Skipping command cleanup");
+                this.numDeletedCommands.set(0);
+            } else {
+                final int deletedCommandCount = this.commandPersistenceService.deleteUnusedCommands(
+                    TO_DELETE_COMMAND_STATUSES,
+                    creationThreshold
+                );
+                log.info(
+                    "Deleted {} commands that were unused by any resource and created over an hour ago",
+                    deletedCommandCount
+                );
+                this.numDeletedCommands.set(deletedCommandCount);
+            }
+        } catch (final Exception e) {
+            log.error("Unable to delete commands in database", e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } finally {
+            this.registry
+                .timer(COMMAND_DELETION_TIMER, tags)
+                .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private void deleteApplications(final Instant creationThreshold) {
+        final long startTime = System.nanoTime();
+        final Set<Tag> tags = Sets.newHashSet();
+        try {
+            final boolean skipApplications = this.environment.getProperty(
+                DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.SKIP_PROPERTY,
+                Boolean.class,
+                this.cleanupProperties.getApplicationCleanup().isSkip()
+            );
+            if (skipApplications) {
+                log.info("Skipping application cleanup");
+                this.numDeletedCommands.set(0);
+            } else {
+                final int deletedApplicationCount
+                    = this.applicationPersistenceService.deleteUnusedApplicationsCreatedBefore(creationThreshold);
+                log.info(
+                    "Deleted {} applications that were unused by any resource and created over an hour ago",
+                    deletedApplicationCount
+                );
+                this.numDeletedApplications.set(deletedApplicationCount);
+            }
+        } catch (final Exception e) {
+            log.error("Unable to delete applications in database", e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } finally {
+            this.registry
+                .timer(APPLICATION_DELETION_TIMER, tags)
                 .record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         }
     }

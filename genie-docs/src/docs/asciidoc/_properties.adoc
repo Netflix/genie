@@ -442,8 +442,35 @@ lost and failed by the Genie leader
 |http
 |no
 
+|genie.tasks.database-cleanup.application-cleanup.skip
+|Skip the Applications table when performing database cleanup
+|false
+|yes
+
 |genie.tasks.database-cleanup.cluster-cleanup.skip
 |Skip the Clusters table when performing database cleanup
+|false
+|yes
+
+|genie.tasks.database-cleanup.command-cleanup.skip
+|Skip the Commands table when performing database cleanup
+|false
+|yes
+
+|genie.tasks.database-cleanup.command-deactivation.commandCreationThreshold
+|The number of days before the current cleanup run that a command must have been created before in the system to be
+considered for deactivation.
+|false
+|yes
+
+|genie.tasks.database-cleanup.command-deactivation.jobCreationThreshold
+|The number of days before the current cleanup run that command must not have been used in a job for that command to be
+considered for deactivation.
+|false
+|yes
+
+|genie.tasks.database-cleanup.command-deactivation.skip
+|Skip deactivating Commands when performing database cleanup
 |false
 |yes
 
@@ -487,16 +514,6 @@ This is a soft limit, it could be rounded up to the next multiple of page size.
 |yes
 
 |genie.tasks.database-cleanup.tag-cleanup.skip
-|Skip the Tags table when performing database cleanup
-|false
-|yes
-
-|genie.tasks.database-cleanup.skipJobsCleanup
-|Skip the Jobs table when performing database cleanup
-|false
-|yes
-
-|genie.tasks.database-cleanup.skipTagsCleanup
 |Skip the Tags table when performing database cleanup
 |false
 |yes

@@ -42,6 +42,11 @@ class DatabaseCleanupPropertiesTest {
     void canGetDefaultValues() {
         Assertions.assertThat(this.properties.isEnabled()).isFalse();
         Assertions.assertThat(this.properties.getExpression()).isEqualTo("0 0 0 * * *");
+        Assertions.assertThat(this.properties.getApplicationCleanup().isSkip()).isFalse();
+        Assertions.assertThat(this.properties.getCommandCleanup().isSkip()).isFalse();
+        Assertions.assertThat(this.properties.getCommandDeactivation().isSkip()).isFalse();
+        Assertions.assertThat(this.properties.getCommandDeactivation().getCommandCreationThreshold()).isEqualTo(60);
+        Assertions.assertThat(this.properties.getCommandDeactivation().getJobCreationThreshold()).isEqualTo(30);
         Assertions.assertThat(this.properties.getJobCleanup().isSkip()).isFalse();
         Assertions.assertThat(this.properties.getJobCleanup().getRetention()).isEqualTo(90);
         Assertions.assertThat(this.properties.getJobCleanup().getMaxDeletedPerTransaction()).isEqualTo(1000);
@@ -107,5 +112,41 @@ class DatabaseCleanupPropertiesTest {
     void caSetSkipFilesCleanup() {
         this.properties.getFileCleanup().setSkip(true);
         Assertions.assertThat(this.properties.getFileCleanup().isSkip()).isTrue();
+    }
+
+    @Test
+    void canSetSkipApplicationsCleanup() {
+        this.properties.getApplicationCleanup().setSkip(true);
+        Assertions.assertThat(this.properties.getApplicationCleanup().isSkip()).isTrue();
+    }
+
+    @Test
+    void canEnableSkipCommandsCleanup() {
+        this.properties.getCommandCleanup().setSkip(true);
+        Assertions.assertThat(this.properties.getCommandCleanup().isSkip()).isTrue();
+    }
+
+    @Test
+    void canEnableSkipCommandDeactivation() {
+        this.properties.getCommandDeactivation().setSkip(true);
+        Assertions.assertThat(this.properties.getCommandDeactivation().isSkip()).isTrue();
+    }
+
+    @Test
+    void canSetCommandDeactivationCommandCreationThreshold() {
+        final int newThreshold = this.properties.getCommandDeactivation().getCommandCreationThreshold() + 1;
+        this.properties.getCommandDeactivation().setCommandCreationThreshold(newThreshold);
+        Assertions
+            .assertThat(this.properties.getCommandDeactivation().getCommandCreationThreshold())
+            .isEqualTo(newThreshold);
+    }
+
+    @Test
+    void canSetCommandDeactivationJobCreationThreshold() {
+        final int newThreshold = this.properties.getCommandDeactivation().getJobCreationThreshold() + 1;
+        this.properties.getCommandDeactivation().setJobCreationThreshold(newThreshold);
+        Assertions
+            .assertThat(this.properties.getCommandDeactivation().getJobCreationThreshold())
+            .isEqualTo(newThreshold);
     }
 }

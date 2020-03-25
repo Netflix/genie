@@ -22,6 +22,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -53,22 +54,6 @@ public class DatabaseCleanupProperties {
     public static final String EXPRESSION_PROPERTY = PROPERTY_PREFIX + ".expression";
 
     /**
-     * The number of days to retain jobs in the database.
-     */
-    public static final String JOB_RETENTION_PROPERTY = PROPERTY_PREFIX + ".retention";
-
-    /**
-     * The number of job records to delete from the database in a single transaction.
-     * Genie will loop and perform multiple transactions until all jobs older than the retention time are deleted.
-     */
-    public static final String MAX_DELETED_PER_TRANSACTION_PROPERTY = PROPERTY_PREFIX + ".maxDeletedPerTransaction";
-
-    /**
-     * The page size used within each cleanup transaction to iterate through the job records.
-     */
-    public static final String PAGE_SIZE_PROPERTY = PROPERTY_PREFIX + ".pageSize";
-
-    /**
      * The property key for whether this feature is enabled or not.
      */
     private boolean enabled;
@@ -80,10 +65,29 @@ public class DatabaseCleanupProperties {
     private String expression = "0 0 0 * * *";
 
     /**
+     * Properties related to cleaning up application records from the database.
+     */
+    @NotNull
+    private ApplicationDatabaseCleanupProperties applicationCleanup = new ApplicationDatabaseCleanupProperties();
+
+    /**
      * Properties related to cleaning up cluster records from the database.
      */
     @NotNull
     private ClusterDatabaseCleanupProperties clusterCleanup = new ClusterDatabaseCleanupProperties();
+
+    /**
+     * Properties related to cleaning up command records from the database.
+     */
+    @NotNull
+    private CommandDatabaseCleanupProperties commandCleanup = new CommandDatabaseCleanupProperties();
+
+    /**
+     * Properties related to command deactivation.
+     */
+    @NotNull
+    private CommandDeactivationDatabaseCleanupProperties commandDeactivation
+        = new CommandDeactivationDatabaseCleanupProperties();
 
     /**
      * Properties related to cleaning up file records from the database.
@@ -103,17 +107,32 @@ public class DatabaseCleanupProperties {
     @NotNull
     private TagDatabaseCleanupProperties tagCleanup = new TagDatabaseCleanupProperties();
 
-
     /**
-     * The number of days to retain jobs in the database.
+     * Properties related to cleaning up application records from the database.
+     *
+     * @author tgianos
+     * @since 4.0.0
      */
-    private int retention = 90;
+    @Getter
+    @Setter
+    public static class ApplicationDatabaseCleanupProperties {
 
-    /**
-     * The number of job records to delete from the database in a single transaction.
-     * Genie will loop and perform multiple transactions until all jobs older than the retention time are deleted.
-     */
-    private int maxDeletedPerTransaction = 1_000;
+        /**
+         * The prefix for all properties related to cleaning up application records from the database.
+         */
+        public static final String APPLICATION_CLEANUP_PROPERTY_PREFIX
+            = DatabaseCleanupProperties.PROPERTY_PREFIX + ".application-cleanup";
+
+        /**
+         * Skip the Applications table when performing database cleanup.
+         */
+        public static final String SKIP_PROPERTY = APPLICATION_CLEANUP_PROPERTY_PREFIX + ".skip";
+
+        /**
+         * Skip the Applications table when performing database cleanup.
+         */
+        private boolean skip;
+    }
 
     /**
      * Properties related to cleaning up cluster records from the database.
@@ -140,6 +159,86 @@ public class DatabaseCleanupProperties {
          * Skip the Clusters table when performing database cleanup.
          */
         private boolean skip;
+    }
+
+    /**
+     * Properties related to cleaning up command records from the database.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    @Getter
+    @Setter
+    public static class CommandDatabaseCleanupProperties {
+
+        /**
+         * The prefix for all properties related to cleaning up command records from the database.
+         */
+        public static final String COMMAND_CLEANUP_PROPERTY_PREFIX
+            = DatabaseCleanupProperties.PROPERTY_PREFIX + ".command-cleanup";
+
+        /**
+         * Skip the Commands table when performing database cleanup.
+         */
+        public static final String SKIP_PROPERTY = COMMAND_CLEANUP_PROPERTY_PREFIX + ".skip";
+
+        /**
+         * Skip the Commands table when performing database cleanup.
+         */
+        private boolean skip;
+    }
+
+    /**
+     * Properties related to setting Commands to INACTIVE status in the database.
+     */
+    @Getter
+    @Setter
+    @Validated
+    public static class CommandDeactivationDatabaseCleanupProperties {
+
+        /**
+         * The prefix for all properties related to deactivating commands in the database.
+         */
+        public static final String COMMAND_DEACTIVATION_PROPERTY_PREFIX
+            = DatabaseCleanupProperties.PROPERTY_PREFIX + ".command-deactivation";
+
+        /**
+         * Skip deactivating commands when performing database cleanup.
+         */
+        public static final String SKIP_PROPERTY = COMMAND_DEACTIVATION_PROPERTY_PREFIX + ".skip";
+
+        /**
+         * The number of days before the current cleanup run that a command must have been created in the system to
+         * be considered for deactivation.
+         */
+        public static final String COMMAND_CREATION_THRESHOLD_PROPERTY
+            = COMMAND_DEACTIVATION_PROPERTY_PREFIX + ".commandCreationThreshold";
+
+        /**
+         * The number of days before the current cleanup run that command must not have been used in a job for that
+         * command to be considered for deactivation.
+         */
+        public static final String JOB_CREATION_THRESHOLD_PROPERTY
+            = COMMAND_DEACTIVATION_PROPERTY_PREFIX + ".jobCreationThreshold";
+
+        /**
+         * Skip deactivating commands when performing database cleanup.
+         */
+        private boolean skip;
+
+        /**
+         * The number of days before the current cleanup run that a command must have been created in the system to
+         * be considered for deactivation.
+         */
+        @Min(1)
+        private int commandCreationThreshold = 60;
+
+        /**
+         * The number of days before the current cleanup run that command must not have been used in a job for that
+         * command to be considered for deactivation.
+         */
+        @Min(1)
+        private int jobCreationThreshold = 30;
     }
 
     /**
@@ -255,9 +354,4 @@ public class DatabaseCleanupProperties {
          */
         private boolean skip;
     }
-
-    /**
-     * Skip the Files table when performing database cleanup.
-     */
-    private boolean skipFilesCleanup;
 }
