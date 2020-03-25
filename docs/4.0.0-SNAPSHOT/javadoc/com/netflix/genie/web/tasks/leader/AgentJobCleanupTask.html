@@ -101,7 +101,7 @@ var activeTableTab = "activeTableTab";
 <li><a href="../../../../../../com/netflix/genie/web/tasks/GenieTask.html" title="class in com.netflix.genie.web.tasks">com.netflix.genie.web.tasks.GenieTask</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../../../../com/netflix/genie/web/tasks/leader/LeadershipTask.html" title="class in com.netflix.genie.web.tasks.leader">com.netflix.genie.web.tasks.leader.LeadershipTask</a></li>
+<li><a href="../../../../../../com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader">com.netflix.genie.web.tasks.leader.LeaderTask</a></li>
 <li>
 <ul class="inheritance">
 <li>com.netflix.genie.web.tasks.leader.AgentJobCleanupTask</li>
@@ -122,7 +122,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">AgentJobCleanupTask</span>
-extends <a href="../../../../../../com/netflix/genie/web/tasks/leader/LeadershipTask.html" title="class in com.netflix.genie.web.tasks.leader">LeadershipTask</a></pre>
+extends <a href="../../../../../../com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTask</a></pre>
 <div class="block">Leader task that cleans up jobs whose agent crashed or disconnected.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -146,8 +146,7 @@ extends <a href="../../../../../../com/netflix/genie/web/tasks/leader/Leadership
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html#AgentJobCleanupTask-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">AgentJobCleanupTask</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
-                   <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html#AgentJobCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">AgentJobCleanupTask</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                    <a href="../../../../../../com/netflix/genie/web/properties/AgentCleanupProperties.html" title="class in com.netflix.genie.web.properties">AgentCleanupProperties</a>&nbsp;properties,
                    io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Constructor.</div>
@@ -219,21 +218,19 @@ extends <a href="../../../../../../com/netflix/genie/web/tasks/leader/Leadership
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="AgentJobCleanupTask-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">
+<a name="AgentJobCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>AgentJobCleanupTask</h4>
-<pre>public&nbsp;AgentJobCleanupTask(<a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
-                           <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<pre>public&nbsp;AgentJobCleanupTask(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                            <a href="../../../../../../com/netflix/genie/web/properties/AgentCleanupProperties.html" title="class in com.netflix.genie.web.properties">AgentCleanupProperties</a>&nbsp;properties,
                            io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobSearchService</code> - the job search service</dd>
-<dd><code>jobPersistenceService</code> - the job persistence service</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> encapsulation instance to use</dd>
 <dd><code>properties</code> - the task properties</dd>
 <dd><code>registry</code> - the metrics registry</dd>
 </dl>
@@ -266,7 +263,7 @@ extends <a href="../../../../../../com/netflix/genie/web/tasks/leader/Leadership
 <div class="block">Any cleanup that needs to be performed when this task is stopped due to leadership being revoked.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/tasks/leader/LeadershipTask.html#cleanup--">cleanup</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../com/netflix/genie/web/tasks/leader/LeadershipTask.html" title="class in com.netflix.genie.web.tasks.leader">LeadershipTask</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/tasks/leader/LeaderTask.html#cleanup--">cleanup</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTask</a></code></dd>
 </dl>
 </li>
 </ul>

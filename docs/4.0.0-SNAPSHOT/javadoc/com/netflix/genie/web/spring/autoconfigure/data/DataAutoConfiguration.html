@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -198,6 +198,19 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#genieDataServices-com.netflix.genie.web.data.services.AgentConnectionPersistenceService-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.FilePersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.TagPersistenceService-">genieDataServices</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/AgentConnectionPersistenceService.html" title="interface in com.netflix.genie.web.data.services">AgentConnectionPersistenceService</a>&nbsp;agentConnectionPersistenceService,
+                 <a href="../../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a>&nbsp;applicationPersistenceService,
+                 <a href="../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
+                 <a href="../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
+                 <a href="../../../../../../../com/netflix/genie/web/data/services/FilePersistenceService.html" title="interface in com.netflix.genie.web.data.services">FilePersistenceService</a>&nbsp;filePersistenceService,
+                 <a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+                 <a href="../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                 <a href="../../../../../../../com/netflix/genie/web/data/services/TagPersistenceService.html" title="interface in com.netflix.genie.web.data.services">TagPersistenceService</a>&nbsp;tagPersistenceService)</code>
+<div class="block">Provide a <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance if one isn't already in the context.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaJobPersistenceServiceImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#jobPersistenceService-com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService-com.netflix.genie.web.data.services.jpa.JpaFilePersistenceService-com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository-com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository-com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository-com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository-com.netflix.genie.web.data.repositories.jpa.JpaJobRepository-com.netflix.genie.web.services.AttachmentService-">jobPersistenceService</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaTagPersistenceService.html" title="interface in com.netflix.genie.web.data.services.jpa">JpaTagPersistenceService</a>&nbsp;tagPersistenceService,
                      <a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaFilePersistenceService.html" title="interface in com.netflix.genie.web.data.services.jpa">JpaFilePersistenceService</a>&nbsp;filePersistenceService,
@@ -210,7 +223,7 @@ extends java.lang.Object</pre>
 <div class="block">JPA implementation of the <a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>JobPersistenceService</code></a> interface.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaJobSearchServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaJobSearchServiceImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#jobSearchService-com.netflix.genie.web.data.repositories.jpa.JpaJobRepository-com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository-com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository-">jobSearchService</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a>&nbsp;jobRepository,
                 <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a>&nbsp;clusterRepository,
@@ -218,7 +231,7 @@ extends java.lang.Object</pre>
 <div class="block">Get a JPA implementation of the <a href="../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services"><code>JobSearchService</code></a> if one didn't already exist.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaTagPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaTagPersistenceServiceImpl</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#tagPersistenceService-com.netflix.genie.web.data.repositories.jpa.JpaTagRepository-">tagPersistenceService</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaTagRepository</a>&nbsp;tagRepository)</code>
 <div class="block">A JPA implementation of the <a href="../../../../../../../com/netflix/genie/web/data/services/TagPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>TagPersistenceService</code></a> interface.</div>
@@ -443,7 +456,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/data/services/jp
 <a name="agentConnectionPersistenceService-com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>agentConnectionPersistenceService</h4>
 <pre>@Bean
@@ -455,6 +468,38 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/data/services/jp
 <dd><code>jpaAgentConnectionRepository</code> - The repository to use for agent connection entities</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaAgentConnectionPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa"><code>JpaAgentConnectionPersistenceServiceImpl</code></a> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="genieDataServices-com.netflix.genie.web.data.services.AgentConnectionPersistenceService-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.FilePersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.TagPersistenceService-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>genieDataServices</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices.class</a>)
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;genieDataServices(<a href="../../../../../../../com/netflix/genie/web/data/services/AgentConnectionPersistenceService.html" title="interface in com.netflix.genie.web.data.services">AgentConnectionPersistenceService</a>&nbsp;agentConnectionPersistenceService,
+                                                                                                 <a href="../../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a>&nbsp;applicationPersistenceService,
+                                                                                                 <a href="../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
+                                                                                                 <a href="../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
+                                                                                                 <a href="../../../../../../../com/netflix/genie/web/data/services/FilePersistenceService.html" title="interface in com.netflix.genie.web.data.services">FilePersistenceService</a>&nbsp;filePersistenceService,
+                                                                                                 <a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+                                                                                                 <a href="../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                                                                                                 <a href="../../../../../../../com/netflix/genie/web/data/services/TagPersistenceService.html" title="interface in com.netflix.genie.web.data.services">TagPersistenceService</a>&nbsp;tagPersistenceService)</pre>
+<div class="block">Provide a <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance if one isn't already in the context.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>agentConnectionPersistenceService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/AgentConnectionPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>AgentConnectionPersistenceService</code></a> implementation to use</dd>
+<dd><code>applicationPersistenceService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>ApplicationPersistenceService</code></a> implementation to use</dd>
+<dd><code>clusterPersistenceService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>ClusterPersistenceService</code></a> implementation to use</dd>
+<dd><code>commandPersistenceService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>CommandPersistenceService</code></a> implementation to use</dd>
+<dd><code>filePersistenceService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/FilePersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>FilePersistenceService</code></a> implementation to use</dd>
+<dd><code>jobPersistenceService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>JobPersistenceService</code></a> implementation to use</dd>
+<dd><code>jobSearchService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services"><code>JobSearchService</code></a> implementation to use</dd>
+<dd><code>tagPersistenceService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/TagPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>TagPersistenceService</code></a> implementation to use</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance</dd>
 </dl>
 </li>
 </ul>

@@ -137,7 +137,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                     <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                     <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&nbsp;agentLauncher,
                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
@@ -187,20 +187,20 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobLaunchSe
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobLaunchServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">
+<a name="JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JobLaunchServiceImpl</h4>
-<pre>public&nbsp;JobLaunchServiceImpl(<a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<pre>public&nbsp;JobLaunchServiceImpl(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                             <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                             <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher</a>&nbsp;agentLauncher,
                             io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobPersistenceService</code> - <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>JobPersistenceService</code></a> implementation to save job data</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobResolverService</code> - <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> implementation used to resolve job details</dd>
 <dd><code>agentLauncher</code> - <a href="../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation to launch agents</dd>
 <dd><code>registry</code> - <code>MeterRegistry</code> metrics repository</dd>

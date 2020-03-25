@@ -170,7 +170,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcJobKillService-com.netflix.genie.web.data.services.JobSearchService-">gRpcJobKillService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcJobKillService-com.netflix.genie.web.data.services.DataServices-">gRpcJobKillService</a></span>(<a href="../../../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices)</code>
 <div class="block">Provide an implementation of <code>JobKillServiceGrpc.JobKillServiceImplBase</code>
  if no other is provided.</div>
 </td>
@@ -322,7 +322,7 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
 </dl>
 </li>
 </ul>
-<a name="gRpcJobKillService-com.netflix.genie.web.data.services.JobSearchService-">
+<a name="gRpcJobKillService-com.netflix.genie.web.data.services.DataServices-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -330,12 +330,12 @@ public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agen
 <h4>gRpcJobKillService</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value=com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceImplBase.class)
-public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a>&nbsp;gRpcJobKillService(<a href="../../../../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService)</pre>
+public&nbsp;<a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a>&nbsp;gRpcJobKillService(<a href="../../../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices)</pre>
 <div class="block">Provide an implementation of <code>JobKillServiceGrpc.JobKillServiceImplBase</code>
  if no other is provided.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobSearchService</code> - The <a href="../../../../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services"><code>JobSearchService</code></a> instance to use</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../../../../../com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints"><code>GRpcJobKillServiceImpl</code></a> instance</dd>
 </dl>

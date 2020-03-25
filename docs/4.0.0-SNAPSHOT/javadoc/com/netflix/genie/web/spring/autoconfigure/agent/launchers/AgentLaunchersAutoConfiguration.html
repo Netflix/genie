@@ -153,9 +153,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#localAgentLauncher-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">localAgentLauncher</a></span>(<a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebHostInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebHostInfo</a>&nbsp;genieWebHostInfo,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#localAgentLauncher-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">localAgentLauncher</a></span>(<a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebHostInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebHostInfo</a>&nbsp;genieWebHostInfo,
                   <a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebRpcInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebRpcInfo</a>&nbsp;genieWebRpcInfo,
-                  <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                  <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                   <a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
                   <a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util">ExecutorFactory</a>&nbsp;executorFactory,
                   io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
@@ -224,7 +224,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/util/Executor
 </dl>
 </li>
 </ul>
-<a name="localAgentLauncher-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">
+<a name="localAgentLauncher-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -234,7 +234,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/util/Executor
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers">AgentLauncher.class</a>)
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a>&nbsp;localAgentLauncher(<a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebHostInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebHostInfo</a>&nbsp;genieWebHostInfo,
                                                                                                              <a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebRpcInfo.html" title="class in com.netflix.genie.web.introspection">GenieWebRpcInfo</a>&nbsp;genieWebRpcInfo,
-                                                                                                             <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                                                                                                             <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                                                                                              <a href="../../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
                                                                                                              <a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util">ExecutorFactory</a>&nbsp;executorFactory,
                                                                                                              io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
@@ -244,7 +244,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/launche
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>genieWebHostInfo</code> - The <a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebHostInfo.html" title="class in com.netflix.genie.web.introspection"><code>GenieWebHostInfo</code></a> of this instance</dd>
 <dd><code>genieWebRpcInfo</code> - The <a href="../../../../../../../../com/netflix/genie/web/introspection/GenieWebRpcInfo.html" title="class in com.netflix.genie.web.introspection"><code>GenieWebRpcInfo</code></a> of this instance</dd>
-<dd><code>jobSearchService</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services"><code>JobSearchService</code></a> instance to use</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>launcherProperties</code> - The properties related to launching an agent locally</dd>
 <dd><code>executorFactory</code> - The <a href="../../../../../../../../com/netflix/genie/web/util/ExecutorFactory.html" title="class in com.netflix.genie.web.util"><code>ExecutorFactory</code></a> to use to launch agent processes</dd>
 <dd><code>registry</code> - The <code>MeterRegistry</code> to register metrics</dd>

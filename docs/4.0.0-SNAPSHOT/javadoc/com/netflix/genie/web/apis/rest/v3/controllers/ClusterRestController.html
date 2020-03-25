@@ -134,7 +134,7 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#ClusterRestController-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">ClusterRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#ClusterRestController-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">ClusterRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                      <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</code>
 <div class="block">Constructor.</div>
 </td>
@@ -345,19 +345,19 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="ClusterRestController-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">
+<a name="ClusterRestController-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>ClusterRestController</h4>
 <pre>@Autowired
-public&nbsp;ClusterRestController(<a href="../../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
+public&nbsp;ClusterRestController(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                         <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>clusterPersistenceService</code> - The cluster configuration service to use.</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> encapsulation instance to use.</dd>
 <dd><code>entityModelAssemblers</code> - The encapsulation of all available V3 resource assemblers</dd>
 </dl>
 </li>

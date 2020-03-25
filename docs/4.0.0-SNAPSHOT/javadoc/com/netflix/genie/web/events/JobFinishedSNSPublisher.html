@@ -181,9 +181,9 @@ implements org.springframework.context.ApplicationListener&lt;<a href="../../../
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/events/JobFinishedSNSPublisher.html#JobFinishedSNSPublisher-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.properties.SNSNotificationsProperties-com.netflix.genie.web.data.services.JobPersistenceService-io.micrometer.core.instrument.MeterRegistry-com.fasterxml.jackson.databind.ObjectMapper-">JobFinishedSNSPublisher</a></span>(com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/events/JobFinishedSNSPublisher.html#JobFinishedSNSPublisher-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.properties.SNSNotificationsProperties-com.netflix.genie.web.data.services.DataServices-io.micrometer.core.instrument.MeterRegistry-com.fasterxml.jackson.databind.ObjectMapper-">JobFinishedSNSPublisher</a></span>(com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient,
                        <a href="../../../../../com/netflix/genie/web/properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
-                       <a href="../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+                       <a href="../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                        io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                        com.fasterxml.jackson.databind.ObjectMapper&nbsp;mapper)</code>
 <div class="block">Constructor.</div>
@@ -261,7 +261,7 @@ implements org.springframework.context.ApplicationListener&lt;<a href="../../../
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobFinishedSNSPublisher-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.properties.SNSNotificationsProperties-com.netflix.genie.web.data.services.JobPersistenceService-io.micrometer.core.instrument.MeterRegistry-com.fasterxml.jackson.databind.ObjectMapper-">
+<a name="JobFinishedSNSPublisher-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.properties.SNSNotificationsProperties-com.netflix.genie.web.data.services.DataServices-io.micrometer.core.instrument.MeterRegistry-com.fasterxml.jackson.databind.ObjectMapper-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -269,7 +269,7 @@ implements org.springframework.context.ApplicationListener&lt;<a href="../../../
 <h4>JobFinishedSNSPublisher</h4>
 <pre>public&nbsp;JobFinishedSNSPublisher(com.amazonaws.services.sns.AmazonSNS&nbsp;snsClient,
                                <a href="../../../../../com/netflix/genie/web/properties/SNSNotificationsProperties.html" title="class in com.netflix.genie.web.properties">SNSNotificationsProperties</a>&nbsp;properties,
-                               <a href="../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+                               <a href="../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                                com.fasterxml.jackson.databind.ObjectMapper&nbsp;mapper)</pre>
 <div class="block">Constructor.</div>
@@ -277,7 +277,7 @@ implements org.springframework.context.ApplicationListener&lt;<a href="../../../
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>snsClient</code> - Amazon SNS client</dd>
 <dd><code>properties</code> - configuration properties</dd>
-<dd><code>jobPersistenceService</code> - job persistence service</dd>
+<dd><code>dataServices</code> - the <a href="../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>registry</code> - metrics registry</dd>
 <dd><code>mapper</code> - object mapper</dd>
 </dl>

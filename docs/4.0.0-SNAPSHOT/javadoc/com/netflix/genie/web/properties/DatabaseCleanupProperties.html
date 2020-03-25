@@ -42,7 +42,7 @@
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../com/netflix/genie/web/properties/DataServiceRetryProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?com/netflix/genie/web/properties/DatabaseCleanupProperties.html" target="_top">Frames</a></li>
@@ -66,7 +66,7 @@
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#methods.inherited.from.class.java.lang.Object">Method</a></li>
@@ -116,6 +116,63 @@ extends java.lang.Object</pre>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="nested.class.summary">
+<!--   -->
+</a>
+<h3>Nested Class Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Nested Class Summary table, listing nested classes, and an explanation">
+<caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</a></span></code>
+<div class="block">Properties related to cleaning up application records from the database.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ClusterDatabaseCleanupProperties</a></span></code>
+<div class="block">Properties related to cleaning up cluster records from the database.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDatabaseCleanupProperties</a></span></code>
+<div class="block">Properties related to cleaning up command records from the database.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></span></code>
+<div class="block">Properties related to setting Commands to INACTIVE status in the database.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></span></code>
+<div class="block">Properties related to cleaning up file records from the database.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></span></code>
+<div class="block">Properties related to cleaning up job records from the database.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.TagDatabaseCleanupProperties</a></span></code>
+<div class="block">Properties related to cleaning up tag records from the database.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- =========== FIELD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="field.summary">
@@ -135,6 +192,12 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.html#EXPRESSION_PROPERTY">EXPRESSION_PROPERTY</a></span></code>
+<div class="block">The cron expression for when the cleanup task should occur.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span></code>
 <div class="block">The property prefix for Database Cleanup related tasks.</div>
@@ -204,7 +267,7 @@ extends java.lang.Object</pre>
 <a name="ENABLED_PROPERTY">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>ENABLED_PROPERTY</h4>
 <pre>public static final&nbsp;java.lang.String ENABLED_PROPERTY</pre>
@@ -212,6 +275,20 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.DatabaseCleanupProperties.ENABLED_PROPERTY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="EXPRESSION_PROPERTY">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>EXPRESSION_PROPERTY</h4>
+<pre>public static final&nbsp;java.lang.String EXPRESSION_PROPERTY</pre>
+<div class="block">The cron expression for when the cleanup task should occur.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.web.properties.DatabaseCleanupProperties.EXPRESSION_PROPERTY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -260,7 +337,7 @@ extends java.lang.Object</pre>
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../com/netflix/genie/web/properties/CommandSelectorManagedScriptProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../com/netflix/genie/web/properties/DataServiceRetryProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?com/netflix/genie/web/properties/DatabaseCleanupProperties.html" target="_top">Frames</a></li>
@@ -284,7 +361,7 @@ extends java.lang.Object</pre>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#methods.inherited.from.class.java.lang.Object">Method</a></li>

@@ -153,10 +153,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/tasks/node/DiskCleanupTask.html" title="class in com.netflix.genie.web.tasks.node">DiskCleanupTask</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/node/NodeAutoConfiguration.html#diskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">diskCleanupTask</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/DiskCleanupProperties.html" title="class in com.netflix.genie.web.properties">DiskCleanupProperties</a>&nbsp;properties,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/tasks/node/NodeAutoConfiguration.html#diskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">diskCleanupTask</a></span>(<a href="../../../../../../../../com/netflix/genie/web/properties/DiskCleanupProperties.html" title="class in com.netflix.genie.web.properties">DiskCleanupProperties</a>&nbsp;properties,
                org.springframework.scheduling.TaskScheduler&nbsp;scheduler,
                org.springframework.core.io.Resource&nbsp;jobsDir,
-               <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+               <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                <a href="../../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
                org.apache.commons.exec.Executor&nbsp;processExecutor,
                io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
@@ -202,7 +202,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="diskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">
+<a name="diskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -217,7 +217,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/tasks/node/Di
                                                                                                                                                                                                                   org.springframework.scheduling.TaskScheduler&nbsp;scheduler,
                                                                                                                                                                                                                   @Qualifier(value="jobsDir")
                                                                                                                                                                                                                   org.springframework.core.io.Resource&nbsp;jobsDir,
-                                                                                                                                                                                                                  <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                                                                                                                                                                                                                  <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                                                                                                                                                                                                   <a href="../../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
                                                                                                                                                                                                                   org.apache.commons.exec.Executor&nbsp;processExecutor,
                                                                                                                                                                                                                   io.micrometer.core.instrument.MeterRegistry&nbsp;registry)
@@ -228,7 +228,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/tasks/node/Di
 <dd><code>properties</code> - The disk cleanup properties to use.</dd>
 <dd><code>scheduler</code> - The scheduler to use to schedule the cron trigger.</dd>
 <dd><code>jobsDir</code> - The resource representing the location of the job directory</dd>
-<dd><code>jobSearchService</code> - The service to find jobs with</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobsProperties</code> - The jobs properties to use</dd>
 <dd><code>processExecutor</code> - The process executor to use to delete directories</dd>
 <dd><code>registry</code> - The metrics registry</dd>

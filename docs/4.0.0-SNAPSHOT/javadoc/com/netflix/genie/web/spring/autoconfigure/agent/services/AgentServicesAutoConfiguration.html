@@ -159,7 +159,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">agentJobService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">agentJobService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                <a href="../../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services">AgentFilterService</a>&nbsp;agentFilterService,
                io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</code>
@@ -220,7 +220,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="agentJobService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">
+<a name="agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -228,14 +228,14 @@ extends java.lang.Object</pre>
 <h4>agentJobService</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services">AgentJobService.class</a>)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a>&nbsp;agentJobService(<a href="../../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a>&nbsp;agentJobService(<a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                                                                                          <a href="../../../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                                                                                                          <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services">AgentFilterService</a>&nbsp;agentFilterService,
                                                                                                          io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</pre>
 <div class="block">Get a <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a> instance if there isn't already one.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobPersistenceService</code> - The persistence service to use</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobResolverService</code> - The specification service to use</dd>
 <dd><code>agentFilterService</code> - The agent filter service to use</dd>
 <dd><code>meterRegistry</code> - The metrics registry to use</dd>

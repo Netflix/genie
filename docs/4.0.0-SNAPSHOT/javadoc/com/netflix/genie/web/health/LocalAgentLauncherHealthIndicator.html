@@ -138,7 +138,7 @@ implements org.springframework.boot.actuate.health.HealthIndicator</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html#LocalAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">LocalAgentLauncherHealthIndicator</a></span>(<a href="../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html#LocalAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">LocalAgentLauncherHealthIndicator</a></span>(<a href="../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                  <a href="../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
                                  <a href="../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
 <div class="block">Constructor.</div>
@@ -192,19 +192,19 @@ implements org.springframework.boot.actuate.health.HealthIndicator</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="LocalAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">
+<a name="LocalAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>LocalAgentLauncherHealthIndicator</h4>
-<pre>public&nbsp;LocalAgentLauncherHealthIndicator(<a href="../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+<pre>public&nbsp;LocalAgentLauncherHealthIndicator(<a href="../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                          <a href="../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
                                          <a href="../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobSearchService</code> - The <a href="../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services"><code>JobSearchService</code></a> implementation to use</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>launcherProperties</code> - The properties related to local agent launch</dd>
 <dd><code>genieHostInfo</code> - The <a href="../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util"><code>GenieHostInfo</code></a> object containing metadata about the current Genie host</dd>
 </dl>

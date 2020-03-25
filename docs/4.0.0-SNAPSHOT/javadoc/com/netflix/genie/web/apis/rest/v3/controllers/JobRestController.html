@@ -134,8 +134,8 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services">JobLaunchService</a>&nbsp;jobLaunchService,
-                 <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController</a></span>(<a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services">JobLaunchService</a>&nbsp;jobLaunchService,
+                 <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                  <a href="../../../../../../../../com/netflix/genie/web/services/JobCoordinatorService.html" title="interface in com.netflix.genie.web.services">JobCoordinatorService</a>&nbsp;jobCoordinatorService,
                  <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers,
                  <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
@@ -143,7 +143,6 @@ extends java.lang.Object</pre>
                  <a href="../../../../../../../../com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a>&nbsp;jobDirectoryServerService,
                  <a href="../../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
                  io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
-                 <a href="../../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
                  <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
                  org.springframework.core.env.Environment&nbsp;environment,
                  <a href="../../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>&nbsp;attachmentService,
@@ -295,7 +294,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">
+<a name="JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -303,7 +302,7 @@ extends java.lang.Object</pre>
 <h4>JobRestController</h4>
 <pre>@Autowired
 public&nbsp;JobRestController(<a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services">JobLaunchService</a>&nbsp;jobLaunchService,
-                                    <a href="../../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                                    <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                     <a href="../../../../../../../../com/netflix/genie/web/services/JobCoordinatorService.html" title="interface in com.netflix.genie.web.services">JobCoordinatorService</a>&nbsp;jobCoordinatorService,
                                     <a href="../../../../../../../../com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/EntityModelAssemblers.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">EntityModelAssemblers</a>&nbsp;entityModelAssemblers,
                                     <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
@@ -312,7 +311,6 @@ public&nbsp;JobRestController(<a href="../../../../../../../../com/netflix/genie
                                     <a href="../../../../../../../../com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services">JobDirectoryServerService</a>&nbsp;jobDirectoryServerService,
                                     <a href="../../../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
                                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
-                                    <a href="../../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
                                     <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService,
                                     org.springframework.core.env.Environment&nbsp;environment,
                                     <a href="../../../../../../../../com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a>&nbsp;attachmentService,
@@ -321,7 +319,7 @@ public&nbsp;JobRestController(<a href="../../../../../../../../com/netflix/genie
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobLaunchService</code> - The <a href="../../../../../../../../com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a> implementation to use</dd>
-<dd><code>jobSearchService</code> - The search service to use</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobCoordinatorService</code> - The job coordinator service to use.</dd>
 <dd><code>entityModelAssemblers</code> - The encapsulation of all the V3 resource assemblers</dd>
 <dd><code>genieHostInfo</code> - Information about the host that the Genie process is running on</dd>
@@ -329,7 +327,6 @@ public&nbsp;JobRestController(<a href="../../../../../../../../com/netflix/genie
 <dd><code>jobDirectoryServerService</code> - The service to handle serving back job directory resources</dd>
 <dd><code>jobsProperties</code> - All the properties associated with jobs</dd>
 <dd><code>registry</code> - The metrics registry to use</dd>
-<dd><code>jobPersistenceService</code> - Job persistence service</dd>
 <dd><code>agentRoutingService</code> - Agent routing service</dd>
 <dd><code>environment</code> - The application environment to pull dynamic properties from</dd>
 <dd><code>attachmentService</code> - The attachment service to use to save attachments.</dd>

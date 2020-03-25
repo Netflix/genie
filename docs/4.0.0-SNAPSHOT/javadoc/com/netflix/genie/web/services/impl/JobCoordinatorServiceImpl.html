@@ -137,14 +137,10 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobCoordina
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html#JobCoordinatorServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-java.lang.String-">JobCoordinatorServiceImpl</a></span>(@NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html#JobCoordinatorServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-java.lang.String-">JobCoordinatorServiceImpl</a></span>(@NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                          @NotNull <a href="../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a>&nbsp;jobKillService,
                          @NotNull <a href="../../../../../../com/netflix/genie/web/services/JobStateService.html" title="interface in com.netflix.genie.web.services">JobStateService</a>&nbsp;jobStateService,
                          @NotNull <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
-                         @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a>&nbsp;applicationPersistenceService,
-                         @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
-                         @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
-                         @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
                          @NotNull <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                          @NotNull io.micrometer.core.instrument.MeterRegistry&nbsp;registry,
                          @NotBlank java.lang.String&nbsp;hostname)</code>
@@ -202,28 +198,20 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobCoordina
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobCoordinatorServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-java.lang.String-">
+<a name="JobCoordinatorServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JobCoordinatorServiceImpl</h4>
 <pre>public&nbsp;JobCoordinatorServiceImpl(@NotNull
-                                 @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+                                 @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                  @NotNull
                                  @NotNull <a href="../../../../../../com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services">JobKillService</a>&nbsp;jobKillService,
                                  @NotNull
                                  @NotNull <a href="../../../../../../com/netflix/genie/web/services/JobStateService.html" title="interface in com.netflix.genie.web.services">JobStateService</a>&nbsp;jobStateService,
                                  @NotNull
                                  @NotNull <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
-                                 @NotNull
-                                 @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a>&nbsp;applicationPersistenceService,
-                                 @NotNull
-                                 @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
-                                 @NotNull
-                                 @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a>&nbsp;clusterPersistenceService,
-                                 @NotNull
-                                 @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a>&nbsp;commandPersistenceService,
                                  @NotNull
                                  @NotNull <a href="../../../../../../com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services">JobResolverService</a>&nbsp;jobResolverService,
                                  @NotNull
@@ -233,15 +221,11 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobCoordina
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobPersistenceService</code> - implementation of job persistence service interface</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> encapsulation to use</dd>
 <dd><code>jobKillService</code> - The job kill service to use</dd>
 <dd><code>jobStateService</code> - The service where we report the job state and keep track of
-                                      various metrics about jobs currently running</dd>
+                           various metrics about jobs currently running</dd>
 <dd><code>jobsProperties</code> - The jobs properties to use</dd>
-<dd><code>applicationPersistenceService</code> - Implementation of application service interface</dd>
-<dd><code>jobSearchService</code> - Implementation of job search service</dd>
-<dd><code>clusterPersistenceService</code> - Implementation of cluster service interface</dd>
-<dd><code>commandPersistenceService</code> - Implementation of command service interface</dd>
 <dd><code>jobResolverService</code> - The job specification service to use</dd>
 <dd><code>registry</code> - The registry</dd>
 <dd><code>hostname</code> - The name of the host this Genie instance is running on</dd>

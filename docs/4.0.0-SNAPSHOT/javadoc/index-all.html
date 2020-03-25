@@ -527,7 +527,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/inspectors/AgentInspectorsAutoConfiguration.html#AgentInspectorsAutoConfiguration--">AgentInspectorsAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.agent.inspectors.<a href="com/netflix/genie/web/spring/autoconfigure/agent/inspectors/AgentInspectorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.inspectors">AgentInspectorsAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#agentJobCleanupTask-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">agentJobCleanupTask(JobSearchService, JobPersistenceService, AgentCleanupProperties, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#agentJobCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">agentJobCleanupTask(DataServices, AgentCleanupProperties, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>
 <div class="block">If required, get a <a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>AgentJobCleanupTask</code></a> instance for use.</div>
 </dd>
@@ -535,7 +535,7 @@
 <dd>
 <div class="block">Leader task that cleans up jobs whose agent crashed or disconnected.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html#AgentJobCleanupTask-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">AgentJobCleanupTask(JobSearchService, JobPersistenceService, AgentCleanupProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">AgentJobCleanupTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html#AgentJobCleanupTask-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.AgentCleanupProperties-io.micrometer.core.instrument.MeterRegistry-">AgentJobCleanupTask(DataServices, AgentCleanupProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/AgentJobCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">AgentJobCleanupTask</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -572,7 +572,7 @@
 <dd>
 <div class="block">A Service to collect the logic for implementing calls from the Agent when a job is launched via the CLI.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">agentJobService(JobPersistenceService, JobResolverService, AgentFilterService, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentJobService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">agentJobService(DataServices, JobResolverService, AgentFilterService, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.services.<a href="com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.services">AgentServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get a <a href="com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a> instance if there isn't already one.</div>
 </dd>
@@ -580,7 +580,7 @@
 <dd>
 <div class="block">Default implementation of <a href="com/netflix/genie/web/agent/services/AgentJobService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentJobService</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#AgentJobServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">AgentJobServiceImpl(JobPersistenceService, JobResolverService, AgentFilterService, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html#AgentJobServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.services.AgentFilterService-io.micrometer.core.instrument.MeterRegistry-">AgentJobServiceImpl(DataServices, JobResolverService, AgentFilterService, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentJobServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentJobServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -751,6 +751,10 @@
 <dd>
 <div class="block">A builder to create applications.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html#APPLICATION_CLEANUP_PROPERTY_PREFIX">APPLICATION_CLEANUP_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The prefix for all properties related to cleaning up application records from the database.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#APPLICATION_ID">APPLICATION_ID</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>
 <div class="block">Key to tag metrics with application ID.</div>
@@ -781,6 +785,8 @@
 <div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/client/ApplicationClient.html#ApplicationClient-retrofit2.Retrofit-"><code>ApplicationClient.ApplicationClient(Retrofit)</code></a></span></div>
 </div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html#ApplicationDatabaseCleanupProperties--">ApplicationDatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/data/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.entities"><span class="typeNameLink">ApplicationEntity</span></a> - Class in <a href="com/netflix/genie/web/data/entities/package-summary.html">com.netflix.genie.web.data.entities</a></dt>
 <dd>
 <div class="block">Representation of the state of an Application.</div>
@@ -839,7 +845,7 @@
 <dd>
 <div class="block">REST end-point for supporting Applications.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/ApplicationRestController.html#ApplicationRestController-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">ApplicationRestController(ApplicationPersistenceService, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/ApplicationRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ApplicationRestController</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/ApplicationRestController.html#ApplicationRestController-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">ApplicationRestController(DataServices, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/ApplicationRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ApplicationRestController</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -903,7 +909,7 @@
 <dd>
 <div class="block">A Service interface for working with the metadata and data of a job that was archived by the Agent upon completion.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#archivedJobService-com.netflix.genie.web.data.services.JobPersistenceService-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">archivedJobService(JobPersistenceService, ResourceLoader, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#archivedJobService-com.netflix.genie.web.data.services.DataServices-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">archivedJobService(DataServices, ResourceLoader, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services"><code>ArchivedJobService</code></a> implementation if one hasn't been provided already.</div>
 </dd>
@@ -911,7 +917,7 @@
 <dd>
 <div class="block">Default implementation of <a href="com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services"><code>ArchivedJobService</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ArchivedJobServiceImpl.html#ArchivedJobServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">ArchivedJobServiceImpl(JobPersistenceService, ResourceLoader, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ArchivedJobServiceImpl.html" title="class in com.netflix.genie.web.services.impl">ArchivedJobServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ArchivedJobServiceImpl.html#ArchivedJobServiceImpl-com.netflix.genie.web.data.services.DataServices-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">ArchivedJobServiceImpl(DataServices, ResourceLoader, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ArchivedJobServiceImpl.html" title="class in com.netflix.genie.web.services.impl">ArchivedJobServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -1483,7 +1489,7 @@
 <dd>
 <div class="block">Any cleanup that needs to be performed when this task is stopped due to leadership being revoked.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeadershipTask.html#cleanup--">cleanup()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeadershipTask.html" title="class in com.netflix.genie.web.tasks.leader">LeadershipTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeaderTask.html#cleanup--">cleanup()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTask</a></dt>
 <dd>
 <div class="block">Any cleanup that needs to be performed when this task is stopped due to leadership being revoked.</div>
 </dd>
@@ -1564,6 +1570,10 @@
 <dd>
 <div class="block">A builder to create clusters.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html#CLUSTER_CLEANUP_PROPERTY_PREFIX">CLUSTER_CLEANUP_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ClusterDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The prefix for all properties related to cleaning up cluster records from the database.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/CommandEntity_.html#CLUSTER_CRITERIA">CLUSTER_CRITERIA</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.entities">CommandEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#CLUSTER_CRITERIA">CLUSTER_CRITERIA</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
@@ -1596,7 +1606,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ClusterCheckerProperties.html#ClusterCheckerProperties--">ClusterCheckerProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ClusterCheckerProperties.html" title="class in com.netflix.genie.web.properties">ClusterCheckerProperties</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#clusterCheckerTask-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.ClusterCheckerProperties-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.AgentConnectionPersistenceService-org.springframework.web.client.RestTemplate-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties-io.micrometer.core.instrument.MeterRegistry-">clusterCheckerTask(GenieHostInfo, ClusterCheckerProperties, JobSearchService, JobPersistenceService, AgentConnectionPersistenceService, RestTemplate, WebEndpointProperties, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#clusterCheckerTask-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.ClusterCheckerProperties-com.netflix.genie.web.data.services.DataServices-org.springframework.web.client.RestTemplate-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties-io.micrometer.core.instrument.MeterRegistry-">clusterCheckerTask(GenieHostInfo, ClusterCheckerProperties, DataServices, RestTemplate, WebEndpointProperties, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create a <a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>ClusterCheckerTask</code></a> if one hasn't been supplied.</div>
 </dd>
@@ -1604,7 +1614,7 @@
 <dd>
 <div class="block">A task which checks to see if this leader node can communicate with all other nodes in the cluster.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html#ClusterCheckerTask-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.ClusterCheckerProperties-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.AgentConnectionPersistenceService-org.springframework.web.client.RestTemplate-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties-io.micrometer.core.instrument.MeterRegistry-">ClusterCheckerTask(GenieHostInfo, ClusterCheckerProperties, JobSearchService, JobPersistenceService, AgentConnectionPersistenceService, RestTemplate, WebEndpointProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html" title="class in com.netflix.genie.web.tasks.leader">ClusterCheckerTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html#ClusterCheckerTask-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.properties.ClusterCheckerProperties-com.netflix.genie.web.data.services.DataServices-org.springframework.web.client.RestTemplate-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties-io.micrometer.core.instrument.MeterRegistry-">ClusterCheckerTask(GenieHostInfo, ClusterCheckerProperties, DataServices, RestTemplate, WebEndpointProperties, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/ClusterCheckerTask.html" title="class in com.netflix.genie.web.tasks.leader">ClusterCheckerTask</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -1637,6 +1647,8 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/CommandEntity_.html#clusterCriteria">clusterCriteria</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.entities">CommandEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#clusterCriteria">clusterCriteria</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html#ClusterDatabaseCleanupProperties--">ClusterDatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ClusterDatabaseCleanupProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/data/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.entities"><span class="typeNameLink">ClusterEntity</span></a> - Class in <a href="com/netflix/genie/web/data/entities/package-summary.html">com.netflix.genie.web.data.entities</a></dt>
 <dd>
@@ -1695,7 +1707,7 @@
 <dd>
 <div class="block">REST end-point for supporting clusters.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#ClusterRestController-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">ClusterRestController(ClusterPersistenceService, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ClusterRestController</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html#ClusterRestController-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">ClusterRestController(DataServices, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ClusterRestController</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -2246,8 +2258,21 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#COMMAND_ARGS">COMMAND_ARGS</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html#COMMAND_CLEANUP_PROPERTY_PREFIX">COMMAND_CLEANUP_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The prefix for all properties related to cleaning up command records from the database.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#COMMAND_CREATION_THRESHOLD_PROPERTY">COMMAND_CREATION_THRESHOLD_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The number of days before the current cleanup run that a command must have been created in the system to
+ be considered for deactivation.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#COMMAND_CRITERION">COMMAND_CRITERION</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#COMMAND_DEACTIVATION_PROPERTY_PREFIX">COMMAND_DEACTIVATION_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The prefix for all properties related to deactivating commands in the database.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#COMMAND_ID">COMMAND_ID</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>
 <div class="block">Key to tag metrics with command ID.</div>
@@ -2283,6 +2308,10 @@
 </div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#commandCriterion">commandCriterion</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html#CommandDatabaseCleanupProperties--">CommandDatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDatabaseCleanupProperties</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#CommandDeactivationDatabaseCleanupProperties--">CommandDeactivationDatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/data/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.entities"><span class="typeNameLink">CommandEntity</span></a> - Class in <a href="com/netflix/genie/web/data/entities/package-summary.html">com.netflix.genie.web.data.entities</a></dt>
 <dd>
@@ -2345,7 +2374,7 @@
 <dd>
 <div class="block">REST end-point for supporting commands.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">CommandRestController(CommandPersistenceService, ClusterPersistenceService, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">CommandRestController</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html#CommandRestController-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-">CommandRestController(DataServices, EntityModelAssemblers)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">CommandRestController</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -2690,15 +2719,43 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#DatabaseCleanupProperties--">DatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#databaseCleanupTask-com.netflix.genie.web.properties.DatabaseCleanupProperties-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.FilePersistenceService-com.netflix.genie.web.data.services.TagPersistenceService-io.micrometer.core.instrument.MeterRegistry-">databaseCleanupTask(DatabaseCleanupProperties, JobPersistenceService, ClusterPersistenceService, FilePersistenceService, TagPersistenceService, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to cleaning up application records from the database.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">DatabaseCleanupProperties.ClusterDatabaseCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to cleaning up cluster records from the database.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">DatabaseCleanupProperties.CommandDatabaseCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to cleaning up command records from the database.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to setting Commands to INACTIVE status in the database.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">DatabaseCleanupProperties.FileDatabaseCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to cleaning up file records from the database.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">DatabaseCleanupProperties.JobDatabaseCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to cleaning up job records from the database.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">DatabaseCleanupProperties.TagDatabaseCleanupProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dd>
+<div class="block">Properties related to cleaning up tag records from the database.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#databaseCleanupTask-com.netflix.genie.web.properties.DatabaseCleanupProperties-org.springframework.core.env.Environment-com.netflix.genie.web.data.services.DataServices-io.micrometer.core.instrument.MeterRegistry-">databaseCleanupTask(DatabaseCleanupProperties, Environment, DataServices, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create a <a href="com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>DatabaseCleanupTask</code></a> if one is required.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader"><span class="typeNameLink">DatabaseCleanupTask</span></a> - Class in <a href="com/netflix/genie/web/tasks/leader/package-summary.html">com.netflix.genie.web.tasks.leader</a></dt>
 <dd>
-<div class="block">A task which will clean up the database of old jobs if desired.</div>
+<div class="block">A <a href="com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>LeaderTask</code></a> which will clean up the database of old records if desired.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html#DatabaseCleanupTask-com.netflix.genie.web.properties.DatabaseCleanupProperties-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.FilePersistenceService-com.netflix.genie.web.data.services.TagPersistenceService-io.micrometer.core.instrument.MeterRegistry-">DatabaseCleanupTask(DatabaseCleanupProperties, JobPersistenceService, ClusterPersistenceService, FilePersistenceService, TagPersistenceService, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">DatabaseCleanupTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html#DatabaseCleanupTask-com.netflix.genie.web.properties.DatabaseCleanupProperties-org.springframework.core.env.Environment-com.netflix.genie.web.data.services.DataServices-io.micrometer.core.instrument.MeterRegistry-">DatabaseCleanupTask(DatabaseCleanupProperties, Environment, DataServices, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/DatabaseCleanupTask.html" title="class in com.netflix.genie.web.tasks.leader">DatabaseCleanupTask</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -2720,6 +2777,12 @@
 <div class="block">All properties related to data service retry template in Genie.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DataServiceRetryProperties.html#DataServiceRetryProperties--">DataServiceRetryProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DataServiceRetryProperties.html" title="class in com.netflix.genie.web.properties">DataServiceRetryProperties</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><span class="typeNameLink">DataServices</span></a> - Class in <a href="com/netflix/genie/web/data/services/package-summary.html">com.netflix.genie.web.data.services</a></dt>
+<dd>
+<div class="block">Container class for encapsulating all the various data related services in Genie to ease dependency patterns.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/DataServices.html#DataServices--">DataServices()</a></span> - Constructor for class com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/Command.html#DEFAULT_CHECK_DELAY">DEFAULT_CHECK_DELAY</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/Command.html" title="class in com.netflix.genie.common.dto">Command</a></dt>
 <dd>
@@ -2778,6 +2841,15 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html#delete-java.lang.String-">delete(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/FileSystemAttachmentService.html" title="class in com.netflix.genie.web.services.impl">FileSystemAttachmentService</a></dt>
 <dd>
 <div class="block">Delete the attachments for the given job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#DELETE_APPLICATIONS_QUERY">DELETE_APPLICATIONS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a></dt>
+<dd>
+<div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+ created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#DELETE_COMMANDS_IN_STATUSES_QUERY">DELETE_COMMANDS_IN_STATUSES_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">The query used to delete commands.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#deleteAll-java.lang.String-">deleteAll(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
 <dd>
@@ -2963,6 +3035,34 @@
 <dd>
 <div class="block">Delete all clusters that are in a terminated state and aren't attached to any jobs.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#deleteUnused-java.util.Set-java.time.Instant-">deleteUnused(Set&lt;String&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
+ before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#deleteUnusedApplications-java.time.Instant-">deleteUnusedApplications(Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a></dt>
+<dd>
+<div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+ created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/ApplicationPersistenceService.html#deleteUnusedApplicationsCreatedBefore-java.time.Instant-">deleteUnusedApplicationsCreatedBefore(Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a></dt>
+<dd>
+<div class="block">Delete any unused applications that were created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#deleteUnusedApplicationsCreatedBefore-java.time.Instant-">deleteUnusedApplicationsCreatedBefore(Instant)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaApplicationPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Delete any unused applications that were created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/CommandPersistenceService.html#deleteUnusedCommands-java.util.Set-java.time.Instant-">deleteUnusedCommands(Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a></dt>
+<dd>
+<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
+ before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaCommandPersistenceServiceImpl.html#deleteUnusedCommands-java.util.Set-java.time.Instant-">deleteUnusedCommands(Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaCommandPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaCommandPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
+ before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/FilePersistenceService.html#deleteUnusedFiles-java.time.Instant-">deleteUnusedFiles(Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/FilePersistenceService.html" title="interface in com.netflix.genie.web.data.services">FilePersistenceService</a></dt>
 <dd>
 <div class="block">Delete all files from the database that aren't referenced which were created before the supplied created
@@ -3055,7 +3155,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DiskCleanupProperties.html#DiskCleanupProperties--">DiskCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DiskCleanupProperties.html" title="class in com.netflix.genie.web.properties">DiskCleanupProperties</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/node/NodeAutoConfiguration.html#diskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">diskCleanupTask(DiskCleanupProperties, TaskScheduler, Resource, JobSearchService, JobsProperties, Executor, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.node.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/node/NodeAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.node">NodeAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/node/NodeAutoConfiguration.html#diskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">diskCleanupTask(DiskCleanupProperties, TaskScheduler, Resource, DataServices, JobsProperties, Executor, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.node.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/node/NodeAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.node">NodeAutoConfiguration</a></dt>
 <dd>
 <div class="block">If required get a <a href="com/netflix/genie/web/tasks/node/DiskCleanupTask.html" title="class in com.netflix.genie.web.tasks.node"><code>DiskCleanupTask</code></a> instance for use.</div>
 </dd>
@@ -3064,7 +3164,7 @@
 <div class="block">This task runs on every Genie node and is responsible for cleaning up the local disk so that space can be
  recaptured.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/node/DiskCleanupTask.html#DiskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">DiskCleanupTask(DiskCleanupProperties, TaskScheduler, Resource, JobSearchService, JobsProperties, Executor, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.node.<a href="com/netflix/genie/web/tasks/node/DiskCleanupTask.html" title="class in com.netflix.genie.web.tasks.node">DiskCleanupTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/node/DiskCleanupTask.html#DiskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">DiskCleanupTask(DiskCleanupProperties, TaskScheduler, Resource, DataServices, JobsProperties, Executor, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.tasks.node.<a href="com/netflix/genie/web/tasks/node/DiskCleanupTask.html" title="class in com.netflix.genie.web.tasks.node">DiskCleanupTask</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -3435,6 +3535,10 @@
 <dd>
 <div class="block">Bash export command.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#EXPRESSION_PROPERTY">EXPRESSION_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The cron expression for when the cleanup task should occur.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#extendedStateChanged-java.lang.Object-java.lang.Object-">extendedStateChanged(Object, Object)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
 </dl>
 <a name="I:F">
@@ -3470,6 +3574,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/FileEntity_.html#FILE">FILE</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/FileEntity_.html" title="class in com.netflix.genie.web.data.entities">FileEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#FILE_CLEANUP_PROPERTY_PREFIX">FILE_CLEANUP_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The prefix for all properties related to cleaning up file records from the database.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/jobs/JobConstants.html#FILE_PATH_DELIMITER">FILE_PATH_DELIMITER</a></span> - Static variable in class com.netflix.genie.common.internal.jobs.<a href="com/netflix/genie/common/internal/jobs/JobConstants.html" title="class in com.netflix.genie.common.internal.jobs">JobConstants</a></dt>
 <dd>
 <div class="block">Delimiter to be used while creating file paths.</div>
@@ -3483,6 +3591,8 @@
 <div class="block">Properties related to the Genie file cache.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/FileCacheProperties.html#FileCacheProperties--">FileCacheProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/FileCacheProperties.html" title="class in com.netflix.genie.web.properties">FileCacheProperties</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#FileDatabaseCleanupProperties--">FileDatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/data/entities/FileEntity.html" title="class in com.netflix.genie.web.data.entities"><span class="typeNameLink">FileEntity</span></a> - Class in <a href="com/netflix/genie/web/data/entities/package-summary.html">com.netflix.genie.web.data.entities</a></dt>
 <dd>
@@ -4130,6 +4240,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/GenieCpuHealthIndicator.html#GenieCpuHealthIndicator-com.netflix.genie.web.properties.HealthProperties-io.micrometer.core.instrument.MeterRegistry-org.springframework.scheduling.TaskScheduler-">GenieCpuHealthIndicator(HealthProperties, MeterRegistry, TaskScheduler)</a></span> - Constructor for class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/GenieCpuHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieCpuHealthIndicator</a></dt>
 <dd>
 <div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#genieDataServices-com.netflix.genie.web.data.services.AgentConnectionPersistenceService-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.FilePersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.TagPersistenceService-">genieDataServices(AgentConnectionPersistenceService, ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, FilePersistenceService, JobPersistenceService, JobSearchService, TagPersistenceService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a <a href="com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance if one isn't already in the context.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/spring/processors/GenieDefaultPropertiesPostProcessor.html" title="class in com.netflix.genie.agent.spring.processors"><span class="typeNameLink">GenieDefaultPropertiesPostProcessor</span></a> - Class in <a href="com/netflix/genie/agent/spring/processors/package-summary.html">com.netflix.genie.agent.spring.processors</a></dt>
 <dd>
@@ -7075,7 +7189,7 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcJobKillService-com.netflix.genie.web.data.services.JobSearchService-">gRpcJobKillService(JobSearchService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html#gRpcJobKillService-com.netflix.genie.web.data.services.DataServices-">gRpcJobKillService(DataServices)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/endpoints/AgentRpcEndpointsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints">AgentRpcEndpointsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide an implementation of <code>JobKillServiceGrpc.JobKillServiceImplBase</code>
  if no other is provided.</div>
@@ -7084,7 +7198,7 @@
 <dd>
 <div class="block">Service to kill agent jobs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.JobSearchService-">GRpcJobKillServiceImpl(JobSearchService)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html#GRpcJobKillServiceImpl-com.netflix.genie.web.data.services.DataServices-">GRpcJobKillServiceImpl(DataServices)</a></span> - Constructor for class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcJobKillServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcJobKillServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -7679,6 +7793,15 @@
 <dd>
 <div class="block">A builder to create jobs.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#JOB_CLEANUP_PROPERTY_PREFIX">JOB_CLEANUP_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The prefix for all properties related to cleaning up job records from the database.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#JOB_CREATION_THRESHOLD_PROPERTY">JOB_CREATION_THRESHOLD_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The number of days before the current cleanup run that command must not have been used in a job for that
+ command to be considered for deactivation.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#JOB_DIRECTORY_LOCATION">JOB_DIRECTORY_LOCATION</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_EXCEEDED_STDERR_LENGTH">JOB_EXCEEDED_STDERR_LENGTH</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
@@ -7730,6 +7853,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_PROCESS_NOT_FOUND">JOB_PROCESS_NOT_FOUND</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
 <dd>
 <div class="block">Job killed, could not check on the process.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#JOB_RETENTION_PROPERTY">JOB_RETENTION_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The number of days to retain jobs in the database.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#JOB_RUNNING">JOB_RUNNING</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
 <dd>
@@ -7871,7 +7998,7 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobCompletionService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">jobCompletionService(JobPersistenceService, JobSearchService, JobArchiveService, Resource, MailService, MeterRegistry, JobsProperties, RetryTemplate)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobCompletionService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">jobCompletionService(DataServices, JobArchiveService, Resource, MailService, MeterRegistry, JobsProperties, RetryTemplate)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an implementation of <a href="com/netflix/genie/web/tasks/job/JobCompletionService.html" title="class in com.netflix.genie.web.tasks.job"><code>JobCompletionService</code></a> if one hasn't already been defined.</div>
 </dd>
@@ -7879,7 +8006,7 @@
 <dd>
 <div class="block">A class that has the methods to perform various tasks when a job completes.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/job/JobCompletionService.html#JobCompletionService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">JobCompletionService(JobPersistenceService, JobSearchService, JobArchiveService, Resource, MailService, MeterRegistry, JobsProperties, RetryTemplate)</a></span> - Constructor for class com.netflix.genie.web.tasks.job.<a href="com/netflix/genie/web/tasks/job/JobCompletionService.html" title="class in com.netflix.genie.web.tasks.job">JobCompletionService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/job/JobCompletionService.html#JobCompletionService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">JobCompletionService(DataServices, JobArchiveService, Resource, MailService, MeterRegistry, JobsProperties, RetryTemplate)</a></span> - Constructor for class com.netflix.genie.web.tasks.job.<a href="com/netflix/genie/web/tasks/job/JobCompletionService.html" title="class in com.netflix.genie.web.tasks.job">JobCompletionService</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -7895,7 +8022,7 @@
 <dd>
 <div class="block">Job Coordination APIs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobCoordinatorService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.GenieHostInfo-">jobCoordinatorService(JobPersistenceService, JobKillService, JobStateService, JobSearchService, JobsProperties, ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, JobResolverService, MeterRegistry, GenieHostInfo)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobCoordinatorService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.common.internal.util.GenieHostInfo-">jobCoordinatorService(DataServices, JobKillService, JobStateService, JobsProperties, JobResolverService, MeterRegistry, GenieHostInfo)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an instance of the JobCoordinatorService.</div>
 </dd>
@@ -7903,10 +8030,12 @@
 <dd>
 <div class="block">Implementation of the JobCoordinatorService APIs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html#JobCoordinatorServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-java.lang.String-">JobCoordinatorServiceImpl(JobPersistenceService, JobKillService, JobStateService, JobsProperties, ApplicationPersistenceService, JobSearchService, ClusterPersistenceService, CommandPersistenceService, JobResolverService, MeterRegistry, String)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobCoordinatorServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html#JobCoordinatorServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobKillService-com.netflix.genie.web.services.JobStateService-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.services.JobResolverService-io.micrometer.core.instrument.MeterRegistry-java.lang.String-">JobCoordinatorServiceImpl(DataServices, JobKillService, JobStateService, JobsProperties, JobResolverService, MeterRegistry, String)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobCoordinatorServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobCoordinatorServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#JobDatabaseCleanupProperties--">JobDatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#jobDirectoryLocation">jobDirectoryLocation</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html#jobDirectoryManifestCache--">jobDirectoryManifestCache()</a></span> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">CommonServicesAutoConfiguration</a></dt>
@@ -7968,7 +8097,7 @@
 <div class="block">This service abstracts away the details of responding to API requests for the files and directories created during
  the execution of a job in the Genie ecosystem.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobDirectoryServerService-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-">jobDirectoryServerService(ResourceLoader, JobPersistenceService, AgentFileStreamService, ArchivedJobService, MeterRegistry, JobFileService, JobDirectoryManifestCreatorService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobDirectoryServerService-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-">jobDirectoryServerService(ResourceLoader, DataServices, AgentFileStreamService, ArchivedJobService, MeterRegistry, JobFileService, JobDirectoryManifestCreatorService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide the default implementation of <a href="com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services"><code>JobDirectoryServerService</code></a> for serving job directory resources.</div>
 </dd>
@@ -7976,7 +8105,7 @@
 <dd>
 <div class="block">Default implementation of <a href="com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services"><code>JobDirectoryServerService</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-">JobDirectoryServerServiceImpl(ResourceLoader, JobPersistenceService, AgentFileStreamService, ArchivedJobService, MeterRegistry, JobFileService, JobDirectoryManifestCreatorService)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobDirectoryServerServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-">JobDirectoryServerServiceImpl(ResourceLoader, DataServices, AgentFileStreamService, ArchivedJobService, MeterRegistry, JobFileService, JobDirectoryManifestCreatorService)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobDirectoryServerServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8153,11 +8282,11 @@
 <dd>
 <div class="block">Publishes Amazon SNS notifications with detailed information about each completed job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#JobFinishedSNSPublisher-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.properties.SNSNotificationsProperties-com.netflix.genie.web.data.services.JobPersistenceService-io.micrometer.core.instrument.MeterRegistry-com.fasterxml.jackson.databind.ObjectMapper-">JobFinishedSNSPublisher(AmazonSNS, SNSNotificationsProperties, JobPersistenceService, MeterRegistry, ObjectMapper)</a></span> - Constructor for class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html#JobFinishedSNSPublisher-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.properties.SNSNotificationsProperties-com.netflix.genie.web.data.services.DataServices-io.micrometer.core.instrument.MeterRegistry-com.fasterxml.jackson.databind.ObjectMapper-">JobFinishedSNSPublisher(AmazonSNS, SNSNotificationsProperties, DataServices, MeterRegistry, ObjectMapper)</a></span> - Constructor for class com.netflix.genie.web.events.<a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events">JobFinishedSNSPublisher</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html#jobFinishedSNSPublisher-com.netflix.genie.web.properties.SNSNotificationsProperties-io.micrometer.core.instrument.MeterRegistry-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.data.services.JobPersistenceService-">jobFinishedSNSPublisher(SNSNotificationsProperties, MeterRegistry, AmazonSNS, JobPersistenceService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.events.<a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.events">NotificationsAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html#jobFinishedSNSPublisher-com.netflix.genie.web.properties.SNSNotificationsProperties-io.micrometer.core.instrument.MeterRegistry-com.amazonaws.services.sns.AmazonSNS-com.netflix.genie.web.data.services.DataServices-">jobFinishedSNSPublisher(SNSNotificationsProperties, MeterRegistry, AmazonSNS, DataServices)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.events.<a href="com/netflix/genie/web/spring/autoconfigure/events/NotificationsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.events">NotificationsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create a <a href="com/netflix/genie/web/events/JobFinishedSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobFinishedSNSPublisher</code></a> unless one exists in the context already.</div>
 </dd>
@@ -8216,7 +8345,7 @@
 <dd>
 <div class="block">Interface for services to kill jobs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobKillService-com.netflix.genie.web.services.impl.JobKillServiceV3-com.netflix.genie.web.services.JobKillServiceV4-com.netflix.genie.web.data.services.JobPersistenceService-">jobKillService(JobKillServiceV3, JobKillServiceV4, JobPersistenceService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobKillService-com.netflix.genie.web.services.impl.JobKillServiceV3-com.netflix.genie.web.services.JobKillServiceV4-com.netflix.genie.web.data.services.DataServices-">jobKillService(JobKillServiceV3, JobKillServiceV4, DataServices)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an local implementation of the JobKillService.</div>
 </dd>
@@ -8224,7 +8353,7 @@
 <dd>
 <div class="block">Implementation of the JobKillService interface.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobKillServiceImpl.html#JobKillServiceImpl-com.netflix.genie.web.services.impl.JobKillServiceV3-com.netflix.genie.web.services.JobKillServiceV4-com.netflix.genie.web.data.services.JobPersistenceService-">JobKillServiceImpl(JobKillServiceV3, JobKillServiceV4, JobPersistenceService)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobKillServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobKillServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobKillServiceImpl.html#JobKillServiceImpl-com.netflix.genie.web.services.impl.JobKillServiceV3-com.netflix.genie.web.services.JobKillServiceV4-com.netflix.genie.web.data.services.DataServices-">JobKillServiceImpl(JobKillServiceV3, JobKillServiceV4, DataServices)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobKillServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobKillServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8232,11 +8361,11 @@
 <dd>
 <div class="block">A JobKillService that attempts to kill genie 3.0 jobs running on the local node.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobKillServiceV3.html#JobKillServiceV3-java.lang.String-com.netflix.genie.web.data.services.JobSearchService-org.apache.commons.exec.Executor-boolean-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">JobKillServiceV3(String, JobSearchService, Executor, boolean, GenieEventBus, Resource, ObjectMapper, ProcessChecker.Factory)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobKillServiceV3.html" title="class in com.netflix.genie.web.services.impl">JobKillServiceV3</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobKillServiceV3.html#JobKillServiceV3-java.lang.String-com.netflix.genie.web.data.services.DataServices-org.apache.commons.exec.Executor-boolean-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">JobKillServiceV3(String, DataServices, Executor, boolean, GenieEventBus, Resource, ObjectMapper, ProcessChecker.Factory)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobKillServiceV3.html" title="class in com.netflix.genie.web.services.impl">JobKillServiceV3</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobKillServiceV3-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.data.services.JobSearchService-org.apache.commons.exec.Executor-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">jobKillServiceV3(GenieHostInfo, JobSearchService, Executor, JobsProperties, GenieEventBus, Resource, ObjectMapper, ProcessChecker.Factory)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobKillServiceV3-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.data.services.DataServices-org.apache.commons.exec.Executor-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">jobKillServiceV3(GenieHostInfo, DataServices, Executor, JobsProperties, GenieEventBus, Resource, ObjectMapper, ProcessChecker.Factory)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an local implementation of the JobKillService.</div>
 </dd>
@@ -8269,7 +8398,7 @@
 <dd>
 <div class="block">Top level coordination service responsible for taking a job request and running the job if possible.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobLaunchService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">jobLaunchService(JobPersistenceService, JobResolverService, AgentLauncher, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">jobLaunchService(DataServices, JobResolverService, AgentLauncher, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a> implementation if one isn't available.</div>
 </dd>
@@ -8277,7 +8406,7 @@
 <dd>
 <div class="block">Default implementation of the <a href="com/netflix/genie/web/services/JobLaunchService.html" title="interface in com.netflix.genie.web.services"><code>JobLaunchService</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl(JobPersistenceService, JobResolverService, AgentLauncher, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobLaunchServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html#JobLaunchServiceImpl-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobResolverService-com.netflix.genie.web.agent.launchers.AgentLauncher-io.micrometer.core.instrument.MeterRegistry-">JobLaunchServiceImpl(DataServices, JobResolverService, AgentLauncher, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobLaunchServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobLaunchServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8329,7 +8458,7 @@
 <div class="block">A default implementation of the job count service which uses the job search service to find the running jobs on
  the host.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobMetricsServiceImpl.html#JobMetricsServiceImpl-com.netflix.genie.web.data.services.JobSearchService-java.lang.String-">JobMetricsServiceImpl(JobSearchService, String)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobMetricsServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobMetricsServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobMetricsServiceImpl.html#JobMetricsServiceImpl-com.netflix.genie.web.data.services.DataServices-java.lang.String-">JobMetricsServiceImpl(DataServices, String)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobMetricsServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobMetricsServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8347,7 +8476,7 @@
 <dd>
 <div class="block">A Task to monitor running jobs on a Genie node.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/job/JobMonitoringCoordinator.html#JobMonitoringCoordinator-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.events.GenieEventBus-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-org.springframework.core.io.Resource-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.services.JobSubmitterService-com.netflix.genie.web.util.ProcessChecker.Factory-">JobMonitoringCoordinator(GenieHostInfo, JobSearchService, GenieEventBus, TaskScheduler, MeterRegistry, Resource, JobsProperties, JobSubmitterService, ProcessChecker.Factory)</a></span> - Constructor for class com.netflix.genie.web.tasks.job.<a href="com/netflix/genie/web/tasks/job/JobMonitoringCoordinator.html" title="class in com.netflix.genie.web.tasks.job">JobMonitoringCoordinator</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/job/JobMonitoringCoordinator.html#JobMonitoringCoordinator-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.events.GenieEventBus-org.springframework.scheduling.TaskScheduler-io.micrometer.core.instrument.MeterRegistry-org.springframework.core.io.Resource-com.netflix.genie.web.properties.JobsProperties-com.netflix.genie.web.services.JobSubmitterService-com.netflix.genie.web.util.ProcessChecker.Factory-">JobMonitoringCoordinator(GenieHostInfo, DataServices, GenieEventBus, TaskScheduler, MeterRegistry, Resource, JobsProperties, JobSubmitterService, ProcessChecker.Factory)</a></span> - Constructor for class com.netflix.genie.web.tasks.job.<a href="com/netflix/genie/web/tasks/job/JobMonitoringCoordinator.html" title="class in com.netflix.genie.web.tasks.job">JobMonitoringCoordinator</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8534,7 +8663,7 @@
 <div class="block">Service API for taking inputs from a user and resolving them to concrete information that the Genie system will use
  to execute the users job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobResolverService-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">jobResolverService(ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, JobPersistenceService, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobResolverService-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">jobResolverService(DataServices, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get an implementation of <a href="com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> if one hasn't already been defined.</div>
 </dd>
@@ -8542,7 +8671,7 @@
 <dd>
 <div class="block">Implementation of the <a href="com/netflix/genie/web/services/JobResolverService.html" title="interface in com.netflix.genie.web.services"><code>JobResolverService</code></a> APIs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.ApplicationPersistenceService-com.netflix.genie.web.data.services.ClusterPersistenceService-com.netflix.genie.web.data.services.CommandPersistenceService-com.netflix.genie.web.data.services.JobPersistenceService-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">JobResolverServiceImpl(ApplicationPersistenceService, ClusterPersistenceService, CommandPersistenceService, JobPersistenceService, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobResolverServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html#JobResolverServiceImpl-com.netflix.genie.web.data.services.DataServices-java.util.List-com.netflix.genie.web.selectors.CommandSelector-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.core.env.Environment-">JobResolverServiceImpl(DataServices, List&lt;ClusterSelector&gt;, CommandSelector, MeterRegistry, JobsProperties, Environment)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobResolverServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobResolverServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8554,7 +8683,7 @@
 <dd>
 <div class="block">REST end-point for supporting jobs.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController(JobLaunchService, JobSearchService, JobCoordinatorService, EntityModelAssemblers, GenieHostInfo, RestTemplate, JobDirectoryServerService, JobsProperties, MeterRegistry, JobPersistenceService, AgentRoutingService, Environment, AttachmentService, JobExecutionModeSelector)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#JobRestController-com.netflix.genie.web.services.JobLaunchService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.services.JobCoordinatorService-com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers-com.netflix.genie.common.internal.util.GenieHostInfo-org.springframework.web.client.RestTemplate-com.netflix.genie.web.services.JobDirectoryServerService-com.netflix.genie.web.properties.JobsProperties-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.agent.services.AgentRoutingService-org.springframework.core.env.Environment-com.netflix.genie.web.services.AttachmentService-com.netflix.genie.web.util.JobExecutionModeSelector-">JobRestController(JobLaunchService, DataServices, JobCoordinatorService, EntityModelAssemblers, GenieHostInfo, RestTemplate, JobDirectoryServerService, JobsProperties, MeterRegistry, AgentRoutingService, Environment, AttachmentService, JobExecutionModeSelector)</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -8811,7 +8940,7 @@
 <dd>
 <div class="block">Interface to hand off job execution based on different environments.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobSubmitterService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">jobSubmitterService(JobPersistenceService, GenieEventBus, List&lt;WorkflowTask&gt;, Resource, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html#jobSubmitterService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">jobSubmitterService(DataServices, GenieEventBus, List&lt;WorkflowTask&gt;, Resource, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.services.<a href="com/netflix/genie/web/spring/autoconfigure/services/ServicesAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.services">ServicesAutoConfiguration</a></dt>
 <dd>
 <div class="block">Get a implementation of the JobSubmitterService that runs jobs locally.</div>
 </dd>
@@ -9117,7 +9246,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#LeaderAutoConfiguration--">LeaderAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leaderInitiatorFactory-org.apache.curator.framework.CuratorFramework-com.netflix.genie.web.properties.ZookeeperLeadershipProperties-">leaderInitiatorFactory(CuratorFramework, ZookeeperLeadershipProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leaderInitiatorFactory-org.apache.curator.framework.CuratorFramework-com.netflix.genie.web.properties.ZookeeperLeaderProperties-">leaderInitiatorFactory(CuratorFramework, ZookeeperLeaderProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>
 <div class="block">The leadership initialization factory bean which will create a LeaderInitiator to kick off the leader election
  process within this node for the cluster if Zookeeper is configured.</div>
@@ -9128,22 +9257,22 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LeadershipProperties.html#LeadershipProperties--">LeadershipProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LeadershipProperties.html" title="class in com.netflix.genie.web.properties">LeadershipProperties</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/tasks/leader/LeadershipTask.html" title="class in com.netflix.genie.web.tasks.leader"><span class="typeNameLink">LeadershipTask</span></a> - Class in <a href="com/netflix/genie/web/tasks/leader/package-summary.html">com.netflix.genie.web.tasks.leader</a></dt>
+<dt><a href="com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader"><span class="typeNameLink">LeaderTask</span></a> - Class in <a href="com/netflix/genie/web/tasks/leader/package-summary.html">com.netflix.genie.web.tasks.leader</a></dt>
 <dd>
 <div class="block">Interface for any task that a node elected as the leader of a Genie cluster should run.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeadershipTask.html#LeadershipTask--">LeadershipTask()</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeadershipTask.html" title="class in com.netflix.genie.web.tasks.leader">LeadershipTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeaderTask.html#LeaderTask--">LeaderTask()</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeaderTask.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTask</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leadershipTasksCoordinator-org.springframework.scheduling.TaskScheduler-java.util.Set-">leadershipTasksCoordinator(TaskScheduler, Set&lt;LeadershipTask&gt;)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leaderTasksCoordinator-org.springframework.scheduling.TaskScheduler-java.util.Set-">leaderTasksCoordinator(TaskScheduler, Set&lt;LeaderTask&gt;)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create the LeadershipTasksCoordination bean used to start and stop all leadership related tasks based on
  whether leadership is granted or revoked.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/tasks/leader/LeadershipTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader"><span class="typeNameLink">LeadershipTasksCoordinator</span></a> - Class in <a href="com/netflix/genie/web/tasks/leader/package-summary.html">com.netflix.genie.web.tasks.leader</a></dt>
+<dt><a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader"><span class="typeNameLink">LeaderTasksCoordinator</span></a> - Class in <a href="com/netflix/genie/web/tasks/leader/package-summary.html">com.netflix.genie.web.tasks.leader</a></dt>
 <dd>
 <div class="block">Class which handles coordinating leadership related tasks.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeadershipTasksCoordinator.html#LeadershipTasksCoordinator-org.springframework.scheduling.TaskScheduler-java.util.Collection-">LeadershipTasksCoordinator(TaskScheduler, Collection&lt;LeadershipTask&gt;)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeadershipTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeadershipTasksCoordinator</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html#LeaderTasksCoordinator-org.springframework.scheduling.TaskScheduler-java.util.Collection-">LeaderTasksCoordinator(TaskScheduler, Collection&lt;LeaderTask&gt;)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTasksCoordinator</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9156,7 +9285,7 @@
 <dd>
 <div class="block">Load a YAML <code>PropertySource</code> from the given <code>resource</code>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#localAgentLauncher-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">localAgentLauncher(GenieWebHostInfo, GenieWebRpcInfo, JobSearchService, LocalAgentLauncherProperties, ExecutorFactory, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html#localAgentLauncher-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">localAgentLauncher(GenieWebHostInfo, GenieWebRpcInfo, DataServices, LocalAgentLauncherProperties, ExecutorFactory, MeterRegistry)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.launchers.<a href="com/netflix/genie/web/spring/autoconfigure/agent/launchers/AgentLaunchersAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.launchers">AgentLaunchersAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a <a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> implementation which launches local agent processes if no other implementation
  is defined.</div>
@@ -9165,11 +9294,11 @@
 <dd>
 <div class="block">Health indicator based on data related to the health of the systems ability to launch more agent processes locally.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html#LocalAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">LocalAgentLauncherHealthIndicator(JobSearchService, LocalAgentLauncherProperties, GenieHostInfo)</a></span> - Constructor for class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html#LocalAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">LocalAgentLauncherHealthIndicator(DataServices, LocalAgentLauncherProperties, GenieHostInfo)</a></span> - Constructor for class com.netflix.genie.web.health.<a href="com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">localAgentLauncherHealthIndicator(JobSearchService, LocalAgentLauncherProperties, GenieHostInfo)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.health.<a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.health">HealthAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">localAgentLauncherHealthIndicator(DataServices, LocalAgentLauncherProperties, GenieHostInfo)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.health.<a href="com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.health">HealthAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.</div>
 </dd>
@@ -9177,7 +9306,7 @@
 <dd>
 <div class="block">Implementation of <a href="com/netflix/genie/web/agent/launchers/AgentLauncher.html" title="interface in com.netflix.genie.web.agent.launchers"><code>AgentLauncher</code></a> which launched Agent instances on the local Genie hardware.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#LocalAgentLauncherImpl-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">LocalAgentLauncherImpl(GenieWebHostInfo, GenieWebRpcInfo, JobSearchService, LocalAgentLauncherProperties, ExecutorFactory, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html#LocalAgentLauncherImpl-com.netflix.genie.web.introspection.GenieWebHostInfo-com.netflix.genie.web.introspection.GenieWebRpcInfo-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.web.util.ExecutorFactory-io.micrometer.core.instrument.MeterRegistry-">LocalAgentLauncherImpl(GenieWebHostInfo, GenieWebRpcInfo, DataServices, LocalAgentLauncherProperties, ExecutorFactory, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.agent.launchers.impl.<a href="com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9201,7 +9330,7 @@
 <dd>
 <div class="block">Implementation of the Job Submitter service that runs the job locally on the same host.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/LocalJobRunner.html#LocalJobRunner-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">LocalJobRunner(JobPersistenceService, GenieEventBus, List&lt;WorkflowTask&gt;, Resource, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/LocalJobRunner.html" title="class in com.netflix.genie.web.services.impl">LocalJobRunner</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/LocalJobRunner.html#LocalJobRunner-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">LocalJobRunner(DataServices, GenieEventBus, List&lt;WorkflowTask&gt;, Resource, MeterRegistry)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/LocalJobRunner.html" title="class in com.netflix.genie.web.services.impl">LocalJobRunner</a></dt>
 <dd>
 <div class="block">Constructor create the object.</div>
 </dd>
@@ -9368,6 +9497,10 @@
 <dd>
 <div class="block">Convert a Java object to a JSON string.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#MAX_DELETED_PER_TRANSACTION_PROPERTY">MAX_DELETED_PER_TRANSACTION_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The number of job records to delete from the database in a single transaction.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/CommandEntity_.html#memory">memory</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.entities">CommandEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/CommandEntity_.html#MEMORY">MEMORY</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.entities">CommandEntity_</a></dt>
@@ -9523,7 +9656,7 @@
 <dd>
 <div class="block">Listen for job kill events from within the system as opposed to on calls from users directly to killJob.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeadershipTasksCoordinator.html#onLeaderEvent-org.springframework.integration.leader.event.AbstractLeaderEvent-">onLeaderEvent(AbstractLeaderEvent)</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeadershipTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeadershipTasksCoordinator</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html#onLeaderEvent-org.springframework.integration.leader.event.AbstractLeaderEvent-">onLeaderEvent(AbstractLeaderEvent)</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTasksCoordinator</a></dt>
 <dd>
 <div class="block">Leadership event listener.</div>
 </dd>
@@ -9545,6 +9678,10 @@
 </a>
 <h2 class="title">P</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#PAGE_SIZE_PROPERTY">PAGE_SIZE_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The page size used within each cleanup transaction to iterate through the job records.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/ApplicationStatus.html#parse-java.lang.String-">parse(String)</a></span> - Static method in enum com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/ApplicationStatus.html" title="enum in com.netflix.genie.common.dto">ApplicationStatus</a></dt>
 <dd>
 <div class="block">Parse config status.</div>
@@ -9661,7 +9798,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/spring/processors/GenieDefaultPropertiesPostProcessor.html#postProcessEnvironment-org.springframework.core.env.ConfigurableEnvironment-org.springframework.boot.SpringApplication-">postProcessEnvironment(ConfigurableEnvironment, SpringApplication)</a></span> - Method in class com.netflix.genie.agent.spring.processors.<a href="com/netflix/genie/agent/spring/processors/GenieDefaultPropertiesPostProcessor.html" title="class in com.netflix.genie.agent.spring.processors">GenieDefaultPropertiesPostProcessor</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/processors/GenieDefaultPropertiesPostProcessor.html#postProcessEnvironment-org.springframework.core.env.ConfigurableEnvironment-org.springframework.boot.SpringApplication-">postProcessEnvironment(ConfigurableEnvironment, SpringApplication)</a></span> - Method in class com.netflix.genie.web.spring.processors.<a href="com/netflix/genie/web/spring/processors/GenieDefaultPropertiesPostProcessor.html" title="class in com.netflix.genie.web.spring.processors">GenieDefaultPropertiesPostProcessor</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeadershipTasksCoordinator.html#preDestroy--">preDestroy()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeadershipTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeadershipTasksCoordinator</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html#preDestroy--">preDestroy()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTasksCoordinator</a></dt>
 <dd>
 <div class="block">Make sure any threads are taken care of before this object is destroyed.</div>
 </dd>
@@ -9831,7 +9968,7 @@
 <dd>
 <div class="block">The property prefix for all properties in this group.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ZookeeperLeadershipProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ZookeeperLeadershipProperties.html" title="class in com.netflix.genie.web.properties">ZookeeperLeadershipProperties</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ZookeeperLeaderProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ZookeeperLeaderProperties.html" title="class in com.netflix.genie.web.properties">ZookeeperLeaderProperties</a></dt>
 <dd>
 <div class="block">The property prefix for this group.</div>
 </dd>
@@ -11063,6 +11200,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/RetryProperties.ServiceSpecificProperties.html#ServiceSpecificProperties--">ServiceSpecificProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/RetryProperties.ServiceSpecificProperties.html" title="class in com.netflix.genie.web.properties">RetryProperties.ServiceSpecificProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#SET_UNUSED_STATUS_QUERY">SET_UNUSED_STATUS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">The query used to set commands to a given status given input parameters.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html#setApplicationContext-org.springframework.context.ApplicationContext-">setApplicationContext(ApplicationContext)</a></span> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/S3ProtocolResolverRegistrar.html" title="class in com.netflix.genie.common.internal.aws.s3">S3ProtocolResolverRegistrar</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileProtocolResolverRegistrar.html#setApplicationContext-org.springframework.context.ApplicationContext-">setApplicationContext(ApplicationContext)</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileProtocolResolverRegistrar.html" title="class in com.netflix.genie.web.agent.resources">AgentFileProtocolResolverRegistrar</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/CommandEntity.html#setApplications-java.util.List-">setApplications(List&lt;ApplicationEntity&gt;)</a></span> - Method in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.entities">CommandEntity</a></dt>
@@ -11328,6 +11469,10 @@
 <dd>
 <div class="block">Set the unique id this criterion used.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#setUnusedStatus-java.lang.String-java.time.Instant-java.util.Set-java.time.Instant-">setUnusedStatus(String, Instant, Set&lt;String&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Bulk set the status of commands which match the given inputs.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/BaseEntity_.html#SETUP_FILE">SETUP_FILE</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/BaseEntity_.html" title="class in com.netflix.genie.web.data.entities">BaseEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/BaseEntity_.html#setupFile">setupFile</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/BaseEntity_.html" title="class in com.netflix.genie.web.data.entities">BaseEntity_</a></dt>
@@ -11382,6 +11527,34 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/interceptors/AgentRpcInterceptorsAutoConfiguration.html#simpleLoggingInterceptor--">simpleLoggingInterceptor()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.interceptors.<a href="com/netflix/genie/web/spring/autoconfigure/agent/apis/rpc/v4/interceptors/AgentRpcInterceptorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.interceptors">AgentRpcInterceptorsAutoConfiguration</a></dt>
 <dd>
 <div class="block">An interceptor which writes requests to the logs.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">Skip the Applications table when performing database cleanup.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ClusterDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">Skip the Clusters table when performing database cleanup.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">Skip the Commands table when performing database cleanup.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">Skip deactivating commands when performing database cleanup.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">Skip the Files table when performing database cleanup.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">Skip the Jobs table when performing database cleanup.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.TagDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">Skip the Tags table when performing database cleanup.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html#SNS_CLIENT_BEAN_NAME">SNS_CLIENT_BEAN_NAME</a></span> - Static variable in class com.netflix.genie.web.spring.autoconfigure.aws.<a href="com/netflix/genie/web/spring/autoconfigure/aws/AWSAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.aws">AWSAutoConfiguration</a></dt>
 <dd>
@@ -11700,7 +11873,13 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/TagEntity_.html#TAG">TAG</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/TagEntity_.html" title="class in com.netflix.genie.web.data.entities">TagEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#TAG_CLEANUP_PROPERTY_PREFIX">TAG_CLEANUP_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.TagDatabaseCleanupProperties</a></dt>
+<dd>
+<div class="block">The prefix for all properties related to cleaning up tag records from the database.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#TAG_SEARCH_STRING">TAG_SEARCH_STRING</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#TagDatabaseCleanupProperties--">TagDatabaseCleanupProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.TagDatabaseCleanupProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/data/entities/TagEntity.html" title="class in com.netflix.genie.web.data.entities"><span class="typeNameLink">TagEntity</span></a> - Class in <a href="com/netflix/genie/web/data/entities/package-summary.html">com.netflix.genie.web.data.entities</a></dt>
 <dd>
@@ -12351,6 +12530,18 @@
 <dd>
 <div class="block">Update the job with the various resources used to run the job including the cluster, command and applications.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/CommandPersistenceService.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands(CommandStatus, Instant, Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a></dt>
+<dd>
+<div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
+ it was created before commandCreatedThreshold and it hasn't been used in any job that was created
+ in the Genie system after jobCreatedThreshold.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaCommandPersistenceServiceImpl.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands(CommandStatus, Instant, Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaCommandPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaCommandPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
+ it was created before commandCreatedThreshold and it hasn't been used in any job that was created
+ in the Genie system after jobCreatedThreshold.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/ApplicationService.html#updateTagsForApplication-java.lang.String-java.util.Set-">updateTagsForApplication(String, Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/ApplicationService.html" title="interface in com.netflix.genie.client.apis">ApplicationService</a></dt>
 <dd>
 <div class="block">Method to update tags for a application in Genie.</div>
@@ -12465,7 +12656,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/UserMetricsProperties.html#UserMetricsProperties--">UserMetricsProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/UserMetricsProperties.html" title="class in com.netflix.genie.web.properties">UserMetricsProperties</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#userMetricsTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.UserMetricsProperties-">userMetricsTask(MeterRegistry, JobSearchService, UserMetricsProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#userMetricsTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.UserMetricsProperties-">userMetricsTask(MeterRegistry, DataServices, UserMetricsProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>
 <div class="block">If required get a <a href="com/netflix/genie/web/tasks/leader/UserMetricsTask.html" title="class in com.netflix.genie.web.tasks.leader"><code>UserMetricsTask</code></a> instance for use.</div>
 </dd>
@@ -12473,7 +12664,7 @@
 <dd>
 <div class="block">A task which publishes user metrics.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/UserMetricsTask.html#UserMetricsTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.UserMetricsProperties-">UserMetricsTask(MeterRegistry, JobSearchService, UserMetricsProperties)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/UserMetricsTask.html" title="class in com.netflix.genie.web.tasks.leader">UserMetricsTask</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/UserMetricsTask.html#UserMetricsTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.UserMetricsProperties-">UserMetricsTask(MeterRegistry, DataServices, UserMetricsProperties)</a></span> - Constructor for class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/UserMetricsTask.html" title="class in com.netflix.genie.web.tasks.leader">UserMetricsTask</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -13238,11 +13429,11 @@ the order they are declared.</div>
 </a>
 <h2 class="title">Z</h2>
 <dl>
-<dt><a href="com/netflix/genie/web/properties/ZookeeperLeadershipProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">ZookeeperLeadershipProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
+<dt><a href="com/netflix/genie/web/properties/ZookeeperLeaderProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">ZookeeperLeaderProperties</span></a> - Class in <a href="com/netflix/genie/web/properties/package-summary.html">com.netflix.genie.web.properties</a></dt>
 <dd>
 <div class="block">Properties related to Zookeeper.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ZookeeperLeadershipProperties.html#ZookeeperLeadershipProperties--">ZookeeperLeadershipProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ZookeeperLeadershipProperties.html" title="class in com.netflix.genie.web.properties">ZookeeperLeadershipProperties</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ZookeeperLeaderProperties.html#ZookeeperLeaderProperties--">ZookeeperLeaderProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ZookeeperLeaderProperties.html" title="class in com.netflix.genie.web.properties">ZookeeperLeaderProperties</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;</div>

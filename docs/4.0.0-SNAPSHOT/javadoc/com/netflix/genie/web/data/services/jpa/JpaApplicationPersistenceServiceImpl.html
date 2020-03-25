@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -202,12 +202,18 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
 </td>
 </tr>
 <tr id="i6" class="altColor">
+<td class="colFirst"><code>int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#deleteUnusedApplicationsCreatedBefore-java.time.Instant-">deleteUnusedApplicationsCreatedBefore</a></span>(java.time.Instant&nbsp;createdThreshold)</code>
+<div class="block">Delete any unused applications that were created before the given time.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#getApplication-java.lang.String-">getApplication</a></span>(@NotBlank(message="No id entered. Unable to get") java.lang.String&nbsp;id)</code>
 <div class="block">Gets application for given id.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#getApplications-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-org.springframework.data.domain.Pageable-">getApplications</a></span>(java.lang.String&nbsp;name,
                java.lang.String&nbsp;user,
@@ -218,87 +224,87 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
 <div class="block">Get applications for given filter criteria.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#getCommandsForApplication-java.lang.String-java.util.Set-">getCommandsForApplication</a></span>(@NotBlank(message="No application id entered. Unable to get commands.") java.lang.String&nbsp;id,
                          java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;statuses)</code>
 <div class="block">Get all the commands the application with given id is associated with.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#getConfigsForApplication-java.lang.String-">getConfigsForApplication</a></span>(@NotBlank(message="No application id entered. Unable to get configs.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of configuration files associated with the application with
  given id.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#getDependenciesForApplication-java.lang.String-">getDependenciesForApplication</a></span>(@NotBlank(message="No application id entered. Unable to get dependencies.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of dependency files associated with the application with given id.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#getTagsForApplication-java.lang.String-">getTagsForApplication</a></span>(@NotBlank(message="No application id entered. Cannot retrieve tags.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of tags associated with the application with given
  id.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#patchApplication-java.lang.String-com.github.fge.jsonpatch.JsonPatch-">patchApplication</a></span>(@NotBlank java.lang.String&nbsp;id,
                 @NotNull com.github.fge.jsonpatch.JsonPatch&nbsp;patch)</code>
 <div class="block">Patch an application with the given json patch.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#removeAllConfigsForApplication-java.lang.String-">removeAllConfigsForApplication</a></span>(@NotBlank(message="No application id entered. Unable to remove configs.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all configuration files from the application.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#removeAllDependenciesForApplication-java.lang.String-">removeAllDependenciesForApplication</a></span>(@NotBlank(message="No application id entered. Unable to remove dependencies.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all dependency files from the application.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#removeAllTagsForApplication-java.lang.String-">removeAllTagsForApplication</a></span>(@NotBlank(message="No application id entered. Unable to remove tags.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all tags from the application.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#removeConfigForApplication-java.lang.String-java.lang.String-">removeConfigForApplication</a></span>(@NotBlank(message="No application id entered. Unable to remove configuration.") java.lang.String&nbsp;id,
                           @NotBlank(message="No config entered. Unable to remove.") java.lang.String&nbsp;config)</code>
 <div class="block">Remove a configuration file from the application.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#removeDependencyForApplication-java.lang.String-java.lang.String-">removeDependencyForApplication</a></span>(@NotBlank(message="No application id entered. Unable to remove dependency.") java.lang.String&nbsp;id,
                               @NotBlank(message="No dependency entered. Unable to remove dependency.") java.lang.String&nbsp;dependency)</code>
 <div class="block">Remove a dependency file from the application.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#removeTagForApplication-java.lang.String-java.lang.String-">removeTagForApplication</a></span>(@NotBlank(message="No application id entered. Unable to remove tag.") java.lang.String&nbsp;id,
                        @NotBlank(message="No tag entered. Unable to remove.") java.lang.String&nbsp;tag)</code>
 <div class="block">Remove a tag from the application.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#updateApplication-java.lang.String-com.netflix.genie.common.external.dtos.v4.Application-">updateApplication</a></span>(@NotBlank(message="No application id entered. Unable to update.") java.lang.String&nbsp;id,
                  @NotNull(message="No application information entered. Unable to update.") @Valid <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;updateApp)</code>
 <div class="block">Update an application.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#updateConfigsForApplication-java.lang.String-java.util.Set-">updateConfigsForApplication</a></span>(@NotBlank(message="No application id entered. Unable to update configurations.") java.lang.String&nbsp;id,
                            @NotNull(message="No configs entered. Unable to update. If you want, use delete API.") java.util.Set&lt;java.lang.String&gt;&nbsp;configs)</code>
@@ -306,7 +312,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
  with given id.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#updateDependenciesForApplication-java.lang.String-java.util.Set-">updateDependenciesForApplication</a></span>(@NotBlank(message="No application id entered. Unable to update dependencies.") java.lang.String&nbsp;id,
                                 @NotNull(message="No dependencies entered. Unable to update.") java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies)</code>
@@ -314,7 +320,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
  id.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#updateTagsForApplication-java.lang.String-java.util.Set-">updateTagsForApplication</a></span>(@NotBlank(message="No application id entered. Unable to update tags.") java.lang.String&nbsp;id,
                         @NotNull(message="No tags entered unable to update tags.") java.util.Set&lt;java.lang.String&gt;&nbsp;tags)</code>
@@ -900,7 +906,7 @@ public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getTagsForApplication(@No
 <a name="getCommandsForApplication-java.lang.String-java.util.Set-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getCommandsForApplication</h4>
 <pre>@Transactional(readOnly=true)
@@ -920,6 +926,28 @@ public&nbsp;java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/com
 <dd>The commands the application is a part of.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - if there is an error</dd>
+</dl>
+</li>
+</ul>
+<a name="deleteUnusedApplicationsCreatedBefore-java.time.Instant-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>deleteUnusedApplicationsCreatedBefore</h4>
+<pre>public&nbsp;int&nbsp;deleteUnusedApplicationsCreatedBefore(java.time.Instant&nbsp;createdThreshold)</pre>
+<div class="block">Delete any unused applications that were created before the given time.
+ Unused means they aren't linked to any other resources in the Genie system like jobs or commands and therefore
+ referential integrity is maintained.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html#deleteUnusedApplicationsCreatedBefore-java.time.Instant-">deleteUnusedApplicationsCreatedBefore</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>createdThreshold</code> - The instant in time that any applications had to be created before (exclusive) to be
+                         considered for deletion. Presents ability to filter out newly created applications if
+                         desired.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of successfully deleted applications</dd>
 </dl>
 </li>
 </ul>

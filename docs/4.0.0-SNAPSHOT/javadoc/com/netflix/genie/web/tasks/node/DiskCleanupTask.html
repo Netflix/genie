@@ -138,10 +138,10 @@ implements java.lang.Runnable</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/tasks/node/DiskCleanupTask.html#DiskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">DiskCleanupTask</a></span>(@NotNull <a href="../../../../../../com/netflix/genie/web/properties/DiskCleanupProperties.html" title="class in com.netflix.genie.web.properties">DiskCleanupProperties</a>&nbsp;properties,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/tasks/node/DiskCleanupTask.html#DiskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">DiskCleanupTask</a></span>(@NotNull <a href="../../../../../../com/netflix/genie/web/properties/DiskCleanupProperties.html" title="class in com.netflix.genie.web.properties">DiskCleanupProperties</a>&nbsp;properties,
                @NotNull org.springframework.scheduling.TaskScheduler&nbsp;scheduler,
                @NotNull org.springframework.core.io.Resource&nbsp;jobsDir,
-               @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+               @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                @NotNull <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
                @NotNull org.apache.commons.exec.Executor&nbsp;processExecutor,
                @NotNull io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
@@ -191,7 +191,7 @@ implements java.lang.Runnable</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="DiskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">
+<a name="DiskCleanupTask-com.netflix.genie.web.properties.DiskCleanupProperties-org.springframework.scheduling.TaskScheduler-org.springframework.core.io.Resource-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.JobsProperties-org.apache.commons.exec.Executor-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -204,7 +204,7 @@ implements java.lang.Runnable</pre>
                        @NotNull
                        @NotNull org.springframework.core.io.Resource&nbsp;jobsDir,
                        @NotNull
-                       @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                       @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                        @NotNull
                        @NotNull <a href="../../../../../../com/netflix/genie/web/properties/JobsProperties.html" title="class in com.netflix.genie.web.properties">JobsProperties</a>&nbsp;jobsProperties,
                        @NotNull
@@ -218,7 +218,7 @@ implements java.lang.Runnable</pre>
 <dd><code>properties</code> - The disk cleanup properties to use.</dd>
 <dd><code>scheduler</code> - The scheduler to use to schedule the cron trigger.</dd>
 <dd><code>jobsDir</code> - The resource representing the location of the job directory</dd>
-<dd><code>jobSearchService</code> - The service to find jobs with</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobsProperties</code> - The jobs properties to use</dd>
 <dd><code>processExecutor</code> - The process executor to use to delete directories</dd>
 <dd><code>registry</code> - The metrics registry</dd>

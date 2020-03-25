@@ -1837,6 +1837,25 @@
 <ul class="blockList">
 <li class="blockList">
 <table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository.DELETE_APPLICATIONS_QUERY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#DELETE_APPLICATIONS_QUERY">DELETE_APPLICATIONS_QUERY</a></code></td>
+<td class="colLast"><code>"DELETE FROM applications WHERE created &lt; :createdThreshold AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications) AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications);"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
 <caption><span>com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a></span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
@@ -1850,6 +1869,32 @@
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#FIND_TERMINATED_CLUSTERS_SQL">FIND_TERMINATED_CLUSTERS_SQL</a></code></td>
 <td class="colLast"><code>"SELECT id FROM clusters WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) AND status = \'TERMINATED\' FOR UPDATE;"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.DELETE_COMMANDS_IN_STATUSES_QUERY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#DELETE_COMMANDS_IN_STATUSES_QUERY">DELETE_COMMANDS_IN_STATUSES_QUERY</a></code></td>
+<td class="colLast"><code>"DELETE FROM commands WHERE status IN (:deleteStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL);"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.SET_UNUSED_STATUS_QUERY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#SET_UNUSED_STATUS_QUERY">SET_UNUSED_STATUS_QUERY</a></code></td>
+<td class="colLast"><code>"UPDATE commands SET status = :desiredStatus WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold);"</code></td>
 </tr>
 </tbody>
 </table>
@@ -2046,11 +2091,235 @@
 <td class="colLast"><code>"genie.tasks.database-cleanup.enabled"</code></td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.EXPRESSION_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#EXPRESSION_PROPERTY">EXPRESSION_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.expression"</code></td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.PROPERTY_PREFIX">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></code></td>
 <td class="colLast"><code>"genie.tasks.database-cleanup"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.APPLICATION_CLEANUP_PROPERTY_PREFIX">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html#APPLICATION_CLEANUP_PROPERTY_PREFIX">APPLICATION_CLEANUP_PROPERTY_PREFIX</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.application-cleanup"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.SKIP_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ApplicationDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.application-cleanup.skip"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.ClusterDatabaseCleanupProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.CLUSTER_CLEANUP_PROPERTY_PREFIX">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html#CLUSTER_CLEANUP_PROPERTY_PREFIX">CLUSTER_CLEANUP_PROPERTY_PREFIX</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.cluster-cleanup"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.SKIP_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.ClusterDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.cluster-cleanup.skip"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDatabaseCleanupProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDatabaseCleanupProperties.COMMAND_CLEANUP_PROPERTY_PREFIX">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html#COMMAND_CLEANUP_PROPERTY_PREFIX">COMMAND_CLEANUP_PROPERTY_PREFIX</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.command-cleanup"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDatabaseCleanupProperties.SKIP_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.command-cleanup.skip"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.COMMAND_CREATION_THRESHOLD_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#COMMAND_CREATION_THRESHOLD_PROPERTY">COMMAND_CREATION_THRESHOLD_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.command-deactivation.commandCreationThreshold"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.COMMAND_DEACTIVATION_PROPERTY_PREFIX">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#COMMAND_DEACTIVATION_PROPERTY_PREFIX">COMMAND_DEACTIVATION_PROPERTY_PREFIX</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.command-deactivation"</code></td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.JOB_CREATION_THRESHOLD_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#JOB_CREATION_THRESHOLD_PROPERTY">JOB_CREATION_THRESHOLD_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.command-deactivation.jobCreationThreshold"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.SKIP_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.command-deactivation.skip"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.FileDatabaseCleanupProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.FileDatabaseCleanupProperties.FILE_CLEANUP_PROPERTY_PREFIX">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#FILE_CLEANUP_PROPERTY_PREFIX">FILE_CLEANUP_PROPERTY_PREFIX</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.file-cleanup"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.FileDatabaseCleanupProperties.SKIP_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.FileDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.file-cleanup.skip"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.JobDatabaseCleanupProperties.JOB_CLEANUP_PROPERTY_PREFIX">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#JOB_CLEANUP_PROPERTY_PREFIX">JOB_CLEANUP_PROPERTY_PREFIX</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.job-cleanup"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.JobDatabaseCleanupProperties.JOB_RETENTION_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#JOB_RETENTION_PROPERTY">JOB_RETENTION_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.job-cleanup.retention"</code></td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.JobDatabaseCleanupProperties.MAX_DELETED_PER_TRANSACTION_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#MAX_DELETED_PER_TRANSACTION_PROPERTY">MAX_DELETED_PER_TRANSACTION_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.job-cleanup.maxDeletedPerTransaction"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.JobDatabaseCleanupProperties.PAGE_SIZE_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#PAGE_SIZE_PROPERTY">PAGE_SIZE_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.job-cleanup.pageSize"</code></td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.JobDatabaseCleanupProperties.SKIP_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.job-cleanup.skip"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.TagDatabaseCleanupProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.TagDatabaseCleanupProperties.SKIP_PROPERTY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#SKIP_PROPERTY">SKIP_PROPERTY</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.tag-cleanup.skip"</code></td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.DatabaseCleanupProperties.TagDatabaseCleanupProperties.TAG_CLEANUP_PROPERTY_PREFIX">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.TagDatabaseCleanupProperties.html#TAG_CLEANUP_PROPERTY_PREFIX">TAG_CLEANUP_PROPERTY_PREFIX</a></code></td>
+<td class="colLast"><code>"genie.tasks.database-cleanup.tag-cleanup"</code></td>
 </tr>
 </tbody>
 </table>
@@ -2656,7 +2925,7 @@
 </li>
 <li class="blockList">
 <table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
-<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ZookeeperLeadershipProperties.html" title="class in com.netflix.genie.web.properties">ZookeeperLeadershipProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
+<caption><span>com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ZookeeperLeaderProperties.html" title="class in com.netflix.genie.web.properties">ZookeeperLeaderProperties</a></span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th scope="col">Constant Field</th>
@@ -2664,10 +2933,10 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a name="com.netflix.genie.web.properties.ZookeeperLeadershipProperties.PROPERTY_PREFIX">
+<td class="colFirst"><a name="com.netflix.genie.web.properties.ZookeeperLeaderProperties.PROPERTY_PREFIX">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/properties/ZookeeperLeadershipProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></code></td>
+<td><code><a href="com/netflix/genie/web/properties/ZookeeperLeaderProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></code></td>
 <td class="colLast"><code>"genie.zookeeper.leader"</code></td>
 </tr>
 </tbody>

@@ -168,7 +168,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">localAgentLauncherHealthIndicator</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">localAgentLauncherHealthIndicator</a></span>(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                  <a href="../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
                                  <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
 <div class="block">Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.</div>
@@ -251,7 +251,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieAgen
 </dl>
 </li>
 </ul>
-<a name="localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">
+<a name="localAgentLauncherHealthIndicator-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.properties.LocalAgentLauncherProperties-com.netflix.genie.common.internal.util.GenieHostInfo-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -260,13 +260,13 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieAgen
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator.class</a>)
  @ConditionalOnBean(value={<a href="../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties.class</a>,<a href="../../../../../../../com/netflix/genie/web/agent/launchers/impl/LocalAgentLauncherImpl.html" title="class in com.netflix.genie.web.agent.launchers.impl">LocalAgentLauncherImpl.class</a>})
-public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a>&nbsp;localAgentLauncherHealthIndicator(<a href="../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/LocalAgentLauncherHealthIndicator.html" title="class in com.netflix.genie.web.health">LocalAgentLauncherHealthIndicator</a>&nbsp;localAgentLauncherHealthIndicator(<a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                                                                                                                                                                                                                                                         <a href="../../../../../../../com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a>&nbsp;launcherProperties,
                                                                                                                                                                                                                                                         <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
 <div class="block">Provide a health indicator tied to the ability to launch jobs with agents on the local hardware.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobSearchService</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services"><code>JobSearchService</code></a> implementation to use</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>launcherProperties</code> - The properties related to launching agent jobs locally</dd>
 <dd><code>genieHostInfo</code> - The <a href="../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util"><code>GenieHostInfo</code></a> to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>

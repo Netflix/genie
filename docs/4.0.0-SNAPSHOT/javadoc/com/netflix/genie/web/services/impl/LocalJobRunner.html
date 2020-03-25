@@ -137,7 +137,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobSubmitte
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/LocalJobRunner.html#LocalJobRunner-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">LocalJobRunner</a></span>(@NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/LocalJobRunner.html#LocalJobRunner-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">LocalJobRunner</a></span>(@NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
               @NonNull <a href="../../../../../../com/netflix/genie/web/events/GenieEventBus.html" title="interface in com.netflix.genie.web.events">GenieEventBus</a>&nbsp;genieEventBus,
               @NotNull java.util.List&lt;<a href="../../../../../../com/netflix/genie/web/jobs/workflow/WorkflowTask.html" title="interface in com.netflix.genie.web.jobs.workflow">WorkflowTask</a>&gt;&nbsp;workflowTasks,
               @NotNull org.springframework.core.io.Resource&nbsp;genieWorkingDir,
@@ -192,14 +192,14 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobSubmitte
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="LocalJobRunner-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">
+<a name="LocalJobRunner-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.events.GenieEventBus-java.util.List-org.springframework.core.io.Resource-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>LocalJobRunner</h4>
 <pre>public&nbsp;LocalJobRunner(@NotNull
-                      @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+                      @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                       @NonNull
                       @NonNull <a href="../../../../../../com/netflix/genie/web/events/GenieEventBus.html" title="interface in com.netflix.genie.web.events">GenieEventBus</a>&nbsp;genieEventBus,
                       @NotNull
@@ -211,7 +211,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobSubmitte
 <div class="block">Constructor create the object.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobPersistenceService</code> - Implementation of the job persistence service</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>genieEventBus</code> - The event bus implementation to use</dd>
 <dd><code>workflowTasks</code> - List of all the workflow tasks to be executed</dd>
 <dd><code>genieWorkingDir</code> - Working directory for genie where it creates jobs directories</dd>

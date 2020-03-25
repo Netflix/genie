@@ -132,8 +132,8 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobKillServiceV3.html#JobKillServiceV3-java.lang.String-com.netflix.genie.web.data.services.JobSearchService-org.apache.commons.exec.Executor-boolean-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">JobKillServiceV3</a></span>(@NotBlank java.lang.String&nbsp;hostname,
-                @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobKillServiceV3.html#JobKillServiceV3-java.lang.String-com.netflix.genie.web.data.services.DataServices-org.apache.commons.exec.Executor-boolean-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">JobKillServiceV3</a></span>(@NotBlank java.lang.String&nbsp;hostname,
+                @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                 @NotNull org.apache.commons.exec.Executor&nbsp;executor,
                 boolean&nbsp;runAsUser,
                 @NotNull <a href="../../../../../../com/netflix/genie/web/events/GenieEventBus.html" title="interface in com.netflix.genie.web.events">GenieEventBus</a>&nbsp;genieEventBus,
@@ -193,7 +193,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobKillServiceV3-java.lang.String-com.netflix.genie.web.data.services.JobSearchService-org.apache.commons.exec.Executor-boolean-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">
+<a name="JobKillServiceV3-java.lang.String-com.netflix.genie.web.data.services.DataServices-org.apache.commons.exec.Executor-boolean-com.netflix.genie.web.events.GenieEventBus-org.springframework.core.io.Resource-com.fasterxml.jackson.databind.ObjectMapper-com.netflix.genie.web.util.ProcessChecker.Factory-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -202,7 +202,7 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;JobKillServiceV3(@NotBlank
                         @NotBlank java.lang.String&nbsp;hostname,
                         @NotNull
-                        @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+                        @NotNull <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                         @NotNull
                         @NotNull org.apache.commons.exec.Executor&nbsp;executor,
                         boolean&nbsp;runAsUser,
@@ -218,7 +218,7 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>hostname</code> - The name of the host this Genie node is running on</dd>
-<dd><code>jobSearchService</code> - The job search service to use to locate job information</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>executor</code> - The executor to use to run system processes</dd>
 <dd><code>runAsUser</code> - True if jobs are run as the user who submitted the job</dd>
 <dd><code>genieEventBus</code> - The system event bus to use</dd>

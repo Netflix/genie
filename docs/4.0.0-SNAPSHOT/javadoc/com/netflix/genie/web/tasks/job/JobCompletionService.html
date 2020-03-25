@@ -126,8 +126,7 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/tasks/job/JobCompletionService.html#JobCompletionService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">JobCompletionService</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
-                    <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/tasks/job/JobCompletionService.html#JobCompletionService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">JobCompletionService</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                     <a href="../../../../../../com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services">JobArchiveService</a>&nbsp;jobArchiveService,
                     org.springframework.core.io.Resource&nbsp;genieWorkingDir,
                     <a href="../../../../../../com/netflix/genie/web/services/MailService.html" title="interface in com.netflix.genie.web.services">MailService</a>&nbsp;mailServiceImpl,
@@ -167,14 +166,13 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobCompletionService-com.netflix.genie.web.data.services.JobPersistenceService-com.netflix.genie.web.data.services.JobSearchService-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">
+<a name="JobCompletionService-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.common.internal.services.JobArchiveService-org.springframework.core.io.Resource-com.netflix.genie.web.services.MailService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.properties.JobsProperties-org.springframework.retry.support.RetryTemplate-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JobCompletionService</h4>
-<pre>public&nbsp;JobCompletionService(<a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
-                            <a href="../../../../../../com/netflix/genie/web/data/services/JobSearchService.html" title="interface in com.netflix.genie.web.data.services">JobSearchService</a>&nbsp;jobSearchService,
+<pre>public&nbsp;JobCompletionService(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                             <a href="../../../../../../com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services">JobArchiveService</a>&nbsp;jobArchiveService,
                             org.springframework.core.io.Resource&nbsp;genieWorkingDir,
                             <a href="../../../../../../com/netflix/genie/web/services/MailService.html" title="interface in com.netflix.genie.web.services">MailService</a>&nbsp;mailServiceImpl,
@@ -186,8 +184,7 @@ extends java.lang.Object</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobSearchService</code> - An implementation of the job search service.</dd>
-<dd><code>jobPersistenceService</code> - An implementation of the job persistence service.</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>jobArchiveService</code> - An implementation of <a href="../../../../../../com/netflix/genie/common/internal/services/JobArchiveService.html" title="interface in com.netflix.genie.common.internal.services"><code>JobArchiveService</code></a></dd>
 <dd><code>genieWorkingDir</code> - The working directory where all job directories are created.</dd>
 <dd><code>mailServiceImpl</code> - An implementation of the mail service.</dd>

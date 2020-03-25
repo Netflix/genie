@@ -137,7 +137,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/ArchivedJob
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/ArchivedJobServiceImpl.html#ArchivedJobServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">ArchivedJobServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/ArchivedJobServiceImpl.html#ArchivedJobServiceImpl-com.netflix.genie.web.data.services.DataServices-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">ArchivedJobServiceImpl</a></span>(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                       org.springframework.core.io.ResourceLoader&nbsp;resourceLoader,
                       io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</code>
 <div class="block">Constructor.</div>
@@ -186,19 +186,19 @@ implements <a href="../../../../../../com/netflix/genie/web/services/ArchivedJob
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="ArchivedJobServiceImpl-com.netflix.genie.web.data.services.JobPersistenceService-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">
+<a name="ArchivedJobServiceImpl-com.netflix.genie.web.data.services.DataServices-org.springframework.core.io.ResourceLoader-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>ArchivedJobServiceImpl</h4>
-<pre>public&nbsp;ArchivedJobServiceImpl(<a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a>&nbsp;jobPersistenceService,
+<pre>public&nbsp;ArchivedJobServiceImpl(<a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                               org.springframework.core.io.ResourceLoader&nbsp;resourceLoader,
                               io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>jobPersistenceService</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>JobPersistenceService</code></a> implementation to use</dd>
+<dd><code>dataServices</code> - The <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><code>DataServices</code></a> instance to use</dd>
 <dd><code>resourceLoader</code> - The <code>ResourceLoader</code> used to get resources</dd>
 <dd><code>meterRegistry</code> - The <code>MeterRegistry</code> used to collect metrics</dd>
 </dl>

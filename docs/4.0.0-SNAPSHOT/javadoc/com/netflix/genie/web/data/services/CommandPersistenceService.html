@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6,"i35":6,"i36":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/web/data/services/FilePersistenceService.html" title="interface in com.netflix.genie.web.data.services"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/web/data/services/CommandPersistenceService.html" target="_top">Frames</a></li>
@@ -187,39 +187,47 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
 </td>
 </tr>
 <tr id="i9" class="rowColor">
+<td class="colFirst"><code>int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#deleteUnusedCommands-java.util.Set-java.time.Instant-">deleteUnusedCommands</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
+                    java.time.Instant&nbsp;commandCreatedThreshold)</code>
+<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
+ before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#findCommandsMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findCommandsMatchingCriterion</a></span>(@Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&nbsp;criterion,
                              boolean&nbsp;addDefaultStatus)</code>
 <div class="block">Find all the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getApplicationsForCommand-java.lang.String-">getApplicationsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to get applications.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the applications for a given command.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getClusterCriteriaForCommand-java.lang.String-">getClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">For the given command id return the Cluster <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order that is currently
  associated with this command if any.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getClustersForCommand-java.lang.String-java.util.Set-">getClustersForCommand</a></span>(@NotBlank(message="No command id entered. Unable to get clusters.") java.lang.String&nbsp;id,
                      java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;statuses)</code>
 <div class="block">Get all the clusters the command with given id is associated with.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getCommand-java.lang.String-">getCommand</a></span>(@NotBlank(message="No id entered unable to get.") java.lang.String&nbsp;id)</code>
 <div class="block">Gets command configuration for given id.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>org.springframework.data.domain.Page&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getCommands-java.lang.String-java.lang.String-java.util.Set-java.util.Set-org.springframework.data.domain.Pageable-">getCommands</a></span>(java.lang.String&nbsp;name,
            java.lang.String&nbsp;user,
@@ -229,71 +237,71 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
 <div class="block">Get command configurations for given filter criteria.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getConfigsForCommand-java.lang.String-">getConfigsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to get configs.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of configuration files associated with the command with given
  id.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getDependenciesForCommand-java.lang.String-">getDependenciesForCommand</a></span>(@NotBlank(message="No command id entered. Unable to get dependencies.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of dependency files associated with the command with given id.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#getTagsForCommand-java.lang.String-">getTagsForCommand</a></span>(@NotBlank(message="No command id sent. Cannot retrieve tags.") java.lang.String&nbsp;id)</code>
 <div class="block">Get the set of tags associated with the command with given
  id.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#patchCommand-java.lang.String-com.github.fge.jsonpatch.JsonPatch-">patchCommand</a></span>(@NotBlank java.lang.String&nbsp;id,
             @NotNull com.github.fge.jsonpatch.JsonPatch&nbsp;patch)</code>
 <div class="block">Patch a command with the given json patch.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeAllClusterCriteriaForCommand-java.lang.String-">removeAllClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Remove all the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeAllConfigsForCommand-java.lang.String-">removeAllConfigsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove configs.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all configuration files from the command.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeAllDependenciesForCommand-java.lang.String-">removeAllDependenciesForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove dependencies.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all dependency files from the command.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeAllTagsForCommand-java.lang.String-">removeAllTagsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove tags.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove all tags from the command.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeApplicationForCommand-java.lang.String-java.lang.String-">removeApplicationForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove application.") java.lang.String&nbsp;id,
                            @NotBlank(message="No application id entered. Unable to remove application.") java.lang.String&nbsp;appId)</code>
 <div class="block">Remove the application from the command.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeApplicationsForCommand-java.lang.String-">removeApplicationsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove applications.") java.lang.String&nbsp;id)</code>
 <div class="block">Remove the applications from the command.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeClusterCriterionForCommand-java.lang.String-int-">removeClusterCriterionForCommand</a></span>(java.lang.String&nbsp;id,
                                 @Min(value=0L) int&nbsp;priority)</code>
@@ -301,35 +309,35 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
  associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeConfigForCommand-java.lang.String-java.lang.String-">removeConfigForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove configuration.") java.lang.String&nbsp;id,
                       @NotBlank(message="No config entered. Unable to remove.") java.lang.String&nbsp;config)</code>
 <div class="block">Remove a configuration file from the command.</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeDependencyForCommand-java.lang.String-java.lang.String-">removeDependencyForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove dependency.") java.lang.String&nbsp;id,
                           @NotBlank(message="No dependency entered. Unable to remove dependency.") java.lang.String&nbsp;dependency)</code>
 <div class="block">Remove a dependency file from the command.</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#removeTagForCommand-java.lang.String-java.lang.String-">removeTagForCommand</a></span>(@NotBlank(message="No command id entered. Unable to remove tag.") java.lang.String&nbsp;id,
                    @NotBlank(message="No tag entered. Unable to remove.") java.lang.String&nbsp;tag)</code>
 <div class="block">Remove a tag from the command.</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#setApplicationsForCommand-java.lang.String-java.util.List-">setApplicationsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to set applications.") java.lang.String&nbsp;id,
                          @NotNull(message="No application ids entered. Unable to set applications.") java.util.List&lt;java.lang.String&gt;&nbsp;applicationIds)</code>
 <div class="block">Set the applications for the command.</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#setClusterCriteriaForCommand-java.lang.String-java.util.List-">setClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id,
                             java.util.List&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code>
@@ -337,14 +345,14 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
  clusterCriteria.</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#updateCommand-java.lang.String-com.netflix.genie.common.external.dtos.v4.Command-">updateCommand</a></span>(@NotBlank(message="No id entered. Unable to update.") java.lang.String&nbsp;id,
              @NotNull(message="No command information entered. Unable to update.") @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;updateCommand)</code>
 <div class="block">Update command configuration.</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#updateConfigsForCommand-java.lang.String-java.util.Set-">updateConfigsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to update configurations.") java.lang.String&nbsp;id,
                        @NotEmpty(message="No configs entered. Unable to update.") java.util.Set&lt;java.lang.String&gt;&nbsp;configs)</code>
@@ -352,7 +360,7 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
  given id.</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i34" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#updateDependenciesForCommand-java.lang.String-java.util.Set-">updateDependenciesForCommand</a></span>(@NotBlank(message="No command id entered. Unable to update dependencies.") java.lang.String&nbsp;id,
                             @NotNull(message="No dependencies entered. Unable to update.") java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies)</code>
@@ -360,7 +368,18 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
  id.</div>
 </td>
 </tr>
-<tr id="i34" class="altColor">
+<tr id="i35" class="rowColor">
+<td class="colFirst"><code>int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands</a></span>(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
+                             java.time.Instant&nbsp;commandCreatedThreshold,
+                             java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
+                             java.time.Instant&nbsp;jobCreatedThreshold)</code>
+<div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
+ it was created before commandCreatedThreshold and it hasn't been used in any job that was created
+ in the Genie system after jobCreatedThreshold.</div>
+</td>
+</tr>
+<tr id="i36" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#updateTagsForCommand-java.lang.String-java.util.Set-">updateTagsForCommand</a></span>(@NotBlank(message="No command id entered. Unable to update tags.") java.lang.String&nbsp;id,
                     @NotEmpty(message="No tags entered. Unable to update.") java.util.Set&lt;java.lang.String&gt;&nbsp;tags)</code>
@@ -1111,7 +1130,7 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
 <a name="findCommandsMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>findCommandsMatchingCriterion</h4>
 <pre>java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;findCommandsMatchingCriterion(@Valid
@@ -1125,6 +1144,52 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
                          status isn't already present</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>All the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s which matched the <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>updateStatusForUnusedCommands</h4>
+<pre>int&nbsp;updateStatusForUnusedCommands(<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
+                                  java.time.Instant&nbsp;commandCreatedThreshold,
+                                  java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
+                                  java.time.Instant&nbsp;jobCreatedThreshold)</pre>
+<div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
+ it was created before commandCreatedThreshold and it hasn't been used in any job that was created
+ in the Genie system after jobCreatedThreshold.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>desiredStatus</code> - The new status the matching commands should have</dd>
+<dd><code>commandCreatedThreshold</code> - The instant in time which a command must have been created before to be
+                                considered for update. Exclusive</dd>
+<dd><code>currentStatuses</code> - The set of current statuses a command must have to be considered for update</dd>
+<dd><code>jobCreatedThreshold</code> - The instant in time after which a command must not have been used in a Genie job
+                                for it to be considered for update. Inclusive.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of commands whose statuses were updated to desiredStatus</dd>
+</dl>
+</li>
+</ul>
+<a name="deleteUnusedCommands-java.util.Set-java.time.Instant-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>deleteUnusedCommands</h4>
+<pre>int&nbsp;deleteUnusedCommands(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
+                         java.time.Instant&nbsp;commandCreatedThreshold)</pre>
+<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
+ before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>deleteStatuses</code> - The set of statuses a command must be in in order to be considered for deletion</dd>
+<dd><code>commandCreatedThreshold</code> - The instant in time a command must have been created before to be considered for
+                                deletion. Exclusive.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of commands that were deleted</dd>
 </dl>
 </li>
 </ul>
@@ -1156,7 +1221,7 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/web/data/services/FilePersistenceService.html" title="interface in com.netflix.genie.web.data.services"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/web/data/services/CommandPersistenceService.html" target="_top">Frames</a></li>

@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-03-10</span>
+<span id="revdate">2020-03-25</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5295,6 +5295,44 @@ lost and failed by the Genie leader</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.application-cleanup.skip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Applications table when performing database cleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.cluster-cleanup.skip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Clusters table when performing database cleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.command-cleanup.skip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Commands table when performing database cleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.command-deactivation.commandCreationThreshold</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of days before the current cleanup run that a command must have been created before in the system to be
+considered for deactivation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.command-deactivation.jobCreationThreshold</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of days before the current cleanup run that command must not have been used in a job for that command to be
+considered for deactivation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.command-deactivation.skip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip deactivating Commands when performing database cleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete old and unused records from the database at a scheduled interval.
 See: <code>genie.tasks.database-cleanup.expression</code></p></td>
@@ -5305,52 +5343,46 @@ See: <code>genie.tasks.database-cleanup.expression</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The cron expression for how often to run the database cleanup task</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.maxDeletedPerTransaction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.file-cleanup.skip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Files table when performing database cleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.job-cleanup.skip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Jobs table when performing database cleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.job-cleanup.maxDeletedPerTransaction</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of job records (across multiple tables) to delete from the database
 in a single transaction. Genie will loop and perform multiple transactions until
 all jobs older than the retention time are deleted.
 This is a soft limit, it could be rounded up to the next multiple of page size.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.pageSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.job-cleanup.pageSize</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The page size used within each cleanup transaction to iterate through the job records</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.retention</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.job-cleanup.retention</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to retain jobs in the database</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">90</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipClustersCleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Clusters table when performing database cleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipFilesCleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Files table when performing database cleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipJobsCleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Jobs table when performing database cleanup</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipTagsCleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.tag-cleanup.skip</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Tags table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.enabled</p></td>
@@ -6329,6 +6361,48 @@ had a status different than UP</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>host</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.applicationDeletion.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete application records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.clusterDeletion.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete cluster records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.commandDeactivation.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to deactivate command records in the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.commandDeletion.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete command records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.fileDeletion.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete file records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.tagDeletion.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to delete tag records from the database</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.duration.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to cleanup database records for jobs that executed over a given amount of time in the past</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
@@ -6336,8 +6410,29 @@ had a status different than UP</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedApplications.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of deleted application records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeactivatedCommands.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of command records set to INACTIVE during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedClusters.gauge</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of terminated cluster records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedCommands.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of deleted command records purged during the last database cleanup pass</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
@@ -6431,7 +6526,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-03-10 19:06:58 UTC
+Last updated 2020-03-25 20:29:01 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
