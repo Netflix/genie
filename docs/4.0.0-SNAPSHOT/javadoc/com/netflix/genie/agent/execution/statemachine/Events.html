@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li>Prev&nbsp;Class</li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/Events.html" target="_top">Frames</a></li>
@@ -118,7 +118,11 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public enum <span class="typeNameLabel">Events</span>
 extends java.lang.Enum&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a>&gt;</pre>
-<div class="block">Job execution state machine events.</div>
+<div class="block">Events that trigger execution state machine transition.</div>
+<dl>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>4.0.0</dd>
+</dl>
 </li>
 </ul>
 </div>
@@ -137,63 +141,13 @@ extends java.lang.Enum&lt;<a href="../../../../../../com/netflix/genie/agent/exe
 <th class="colOne" scope="col">Enum Constant and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#CANCEL_JOB_LAUNCH">CANCEL_JOB_LAUNCH</a></span></code>
-<div class="block">User request job launch cancelled before launch.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#CLEANUP_JOB_COMPLETE">CLEANUP_JOB_COMPLETE</a></span></code>
-<div class="block">Job cleanup completed successfully.</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#CONFIGURE_AGENT_COMPLETE">CONFIGURE_AGENT_COMPLETE</a></span></code>
-<div class="block">Agent configuration completed successfully.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#ERROR">ERROR</a></span></code>
-<div class="block">A state action failed to execute.</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#HANDLE_ERROR_COMPLETE">HANDLE_ERROR_COMPLETE</a></span></code>
-<div class="block">Handling of error completed successfully.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#INITIALIZE_COMPLETE">INITIALIZE_COMPLETE</a></span></code>
-<div class="block">Initialization completed successfully.</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#LAUNCH_JOB_COMPLETE">LAUNCH_JOB_COMPLETE</a></span></code>
-<div class="block">Job launch completed successfully.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#MONITOR_JOB_COMPLETE">MONITOR_JOB_COMPLETE</a></span></code>
-<div class="block">Job executed and completed (regardless of exit status).</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#RESOLVE_JOB_SPECIFICATION_COMPLETE">RESOLVE_JOB_SPECIFICATION_COMPLETE</a></span></code>
-<div class="block">Job specification resolution completed successfully.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#SETUP_JOB_COMPLETE">SETUP_JOB_COMPLETE</a></span></code>
-<div class="block">Job setup completed successfully.</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#SHUTDOWN_COMPLETE">SHUTDOWN_COMPLETE</a></span></code>
-<div class="block">Agent shutdown completed successfully.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#PROCEED">PROCEED</a></span></code>
+<div class="block">Event that triggers every other transition attempt (including retries and skips).</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html#START">START</a></span></code>
-<div class="block">Start the state machine.</div>
+<div class="block">Event that triggers the first transition.</div>
 </td>
 </tr>
 </table>
@@ -260,117 +214,17 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>START</h4>
 <pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> START</pre>
-<div class="block">Start the state machine.</div>
+<div class="block">Event that triggers the first transition.</div>
 </li>
 </ul>
-<a name="INITIALIZE_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>INITIALIZE_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> INITIALIZE_COMPLETE</pre>
-<div class="block">Initialization completed successfully.</div>
-</li>
-</ul>
-<a name="CONFIGURE_AGENT_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>CONFIGURE_AGENT_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> CONFIGURE_AGENT_COMPLETE</pre>
-<div class="block">Agent configuration completed successfully.</div>
-</li>
-</ul>
-<a name="RESOLVE_JOB_SPECIFICATION_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>RESOLVE_JOB_SPECIFICATION_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> RESOLVE_JOB_SPECIFICATION_COMPLETE</pre>
-<div class="block">Job specification resolution completed successfully.</div>
-</li>
-</ul>
-<a name="SETUP_JOB_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>SETUP_JOB_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> SETUP_JOB_COMPLETE</pre>
-<div class="block">Job setup completed successfully.</div>
-</li>
-</ul>
-<a name="LAUNCH_JOB_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>LAUNCH_JOB_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> LAUNCH_JOB_COMPLETE</pre>
-<div class="block">Job launch completed successfully.</div>
-</li>
-</ul>
-<a name="MONITOR_JOB_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>MONITOR_JOB_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> MONITOR_JOB_COMPLETE</pre>
-<div class="block">Job executed and completed (regardless of exit status).</div>
-</li>
-</ul>
-<a name="CLEANUP_JOB_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>CLEANUP_JOB_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> CLEANUP_JOB_COMPLETE</pre>
-<div class="block">Job cleanup completed successfully.</div>
-</li>
-</ul>
-<a name="SHUTDOWN_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>SHUTDOWN_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> SHUTDOWN_COMPLETE</pre>
-<div class="block">Agent shutdown completed successfully.</div>
-</li>
-</ul>
-<a name="CANCEL_JOB_LAUNCH">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>CANCEL_JOB_LAUNCH</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> CANCEL_JOB_LAUNCH</pre>
-<div class="block">User request job launch cancelled before launch.</div>
-</li>
-</ul>
-<a name="HANDLE_ERROR_COMPLETE">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>HANDLE_ERROR_COMPLETE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> HANDLE_ERROR_COMPLETE</pre>
-<div class="block">Handling of error completed successfully.</div>
-</li>
-</ul>
-<a name="ERROR">
+<a name="PROCEED">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>ERROR</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> ERROR</pre>
-<div class="block">A state action failed to execute.</div>
+<h4>PROCEED</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a> PROCEED</pre>
+<div class="block">Event that triggers every other transition attempt (including retries and skips).</div>
 </li>
 </ul>
 </li>
@@ -451,7 +305,7 @@ not permitted.)</div>
 <div class="subNav">
 <ul class="navList">
 <li>Prev&nbsp;Class</li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/Events.html" target="_top">Frames</a></li>

@@ -42,7 +42,7 @@
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/package-summary.html">Prev&nbsp;Package</a></li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/actions/package-summary.html">Next&nbsp;Package</a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">Next&nbsp;Package</a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/package-summary.html" target="_top">Frames</a></li>
@@ -89,7 +89,7 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></td>
 <td class="colLast">
-<div class="block">Interface JobExecutionStateMachine.</div>
+<div class="block">Interface JobExecutionStateMachine hides the actual state machine details.</div>
 </td>
 </tr>
 </tbody>
@@ -104,9 +104,27 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/StateMachineAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.statemachine">StateMachineAutoConfiguration</a></td>
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a></td>
 <td class="colLast">
-<div class="block">Spring auto configuration of <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine"><code>JobExecutionStateMachine</code></a> state machine for the agent process.</div>
+<div class="block">Stores runtime information that is passed from one state to the next.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext.TransitionExceptionRecord</a></td>
+<td class="colLast">
+<div class="block">Data object that contains an exception and the state in which it was encountered.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></td>
+<td class="colLast">
+<div class="block">Abstract base class for Genie Agent stage of execution.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></td>
+<td class="colLast">
+<div class="block">Implementation of JobExecutionStateMachine.</div>
 </td>
 </tr>
 </tbody>
@@ -123,13 +141,36 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a></td>
 <td class="colLast">
-<div class="block">Job execution state machine events.</div>
+<div class="block">Events that trigger execution state machine transition.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a></td>
 <td class="colLast">
-<div class="block">JobExecutionStateMachine states.</div>
+<div class="block">Execution state machine states.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="typeSummary" border="0" cellpadding="3" cellspacing="0" summary="Exception Summary table, listing exceptions, and an explanation">
+<caption><span>Exception Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Exception</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></td>
+<td class="colLast">
+<div class="block">Fatal exception that should stop the state machine, for example, claiming a job that is not in claimable state.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a></td>
+<td class="colLast">
+<div class="block">Exception thrown by state machine transition for retryable errors (e.g, network error talking to server).</div>
 </td>
 </tr>
 </tbody>
@@ -167,7 +208,7 @@
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/package-summary.html">Prev&nbsp;Package</a></li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/actions/package-summary.html">Next&nbsp;Package</a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">Next&nbsp;Package</a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/package-summary.html" target="_top">Frames</a></li>

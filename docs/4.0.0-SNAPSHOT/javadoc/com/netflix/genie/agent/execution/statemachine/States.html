@@ -47,7 +47,7 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/StateMachineAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
@@ -118,7 +118,11 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public enum <span class="typeNameLabel">States</span>
 extends java.lang.Enum&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a>&gt;</pre>
-<div class="block">JobExecutionStateMachine states.</div>
+<div class="block">Execution state machine states.</div>
+<dl>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>4.0.0</dd>
+</dl>
 </li>
 </ul>
 </div>
@@ -137,58 +141,148 @@ extends java.lang.Enum&lt;<a href="../../../../../../com/netflix/genie/agent/exe
 <th class="colOne" scope="col">Enum Constant and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#CLEANUP_JOB">CLEANUP_JOB</a></span></code>
-<div class="block">Clean up after job.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#ARCHIVE">ARCHIVE</a></span></code>
+<div class="block">Archive job outputs and logs.</div>
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#CONFIGURE_AGENT">CONFIGURE_AGENT</a></span></code>
-<div class="block">Configure agent.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#CLAIM_JOB">CLAIM_JOB</a></span></code>
+<div class="block">Claim the job for execution.</div>
 </td>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#END">END</a></span></code>
-<div class="block">Final pseudo-state (no action).</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#CLEAN">CLEAN</a></span></code>
+<div class="block">Clean job directory post-execution.</div>
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#HANDLE_ERROR">HANDLE_ERROR</a></span></code>
-<div class="block">Handle error.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#CONFIGURE_EXECUTION">CONFIGURE_EXECUTION</a></span></code>
+<div class="block">Configure the execution based on command-line arguments.</div>
 </td>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#INITIALIZE">INITIALIZE</a></span></code>
-<div class="block">Initialize.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#CREATE_JOB_DIRECTORY">CREATE_JOB_DIRECTORY</a></span></code>
+<div class="block">Create the job directory.</div>
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#CREATE_JOB_SCRIPT">CREATE_JOB_SCRIPT</a></span></code>
+<div class="block">Create the job script (a.k.a.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#DETERMINE_FINAL_STATUS">DETERMINE_FINAL_STATUS</a></span></code>
+<div class="block">Determine the job final status to publish to server.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#DONE">DONE</a></span></code>
+<div class="block">Final stage.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#DOWNLOAD_DEPENDENCIES">DOWNLOAD_DEPENDENCIES</a></span></code>
+<div class="block">Download dependencies.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#FORCE_FILE_MANIFEST_REFRESH">FORCE_FILE_MANIFEST_REFRESH</a></span></code>
+<div class="block">Trigger a job directory manifest refresh.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#HANDSHAKE">HANDSHAKE</a></span></code>
+<div class="block">Perform agent/server handshake.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#INITIALIZE_AGENT">INITIALIZE_AGENT</a></span></code>
+<div class="block">Initialize the agent.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#LAUNCH_JOB">LAUNCH_JOB</a></span></code>
-<div class="block">Launch job.</div>
+<div class="block">Launch the job process.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#LOG_EXECUTION_ERRORS">LOG_EXECUTION_ERRORS</a></span></code>
+<div class="block">Dump execution error summary in the log.</div>
 </td>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#MONITOR_JOB">MONITOR_JOB</a></span></code>
-<div class="block">Monitor job process.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#OBTAIN_JOB_SPECIFICATION">OBTAIN_JOB_SPECIFICATION</a></span></code>
+<div class="block">Obtain the job specification.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#READY">READY</a></span></code>
-<div class="block">Initial pseudo-state (no action).</div>
+<div class="block">Initial state, NOOP, before execution to start.</div>
 </td>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#RESOLVE_JOB_SPECIFICATION">RESOLVE_JOB_SPECIFICATION</a></span></code>
-<div class="block">Resolve job specification.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#RELOCATE_LOG">RELOCATE_LOG</a></span></code>
+<div class="block">Relocate the agent log inside the job directory.</div>
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#SETUP_JOB">SETUP_JOB</a></span></code>
-<div class="block">Set up job.</div>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#RESERVE_JOB_ID">RESERVE_JOB_ID</a></span></code>
+<div class="block">Reserve the job id.</div>
 </td>
 </tr>
 <tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#SET_STATUS_FINAL">SET_STATUS_FINAL</a></span></code>
+<div class="block">Final update to the job status.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#SET_STATUS_INIT">SET_STATUS_INIT</a></span></code>
+<div class="block">Update the job status to INIT.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#SET_STATUS_RUNNING">SET_STATUS_RUNNING</a></span></code>
+<div class="block">Update the job status to RUNNING.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#SHUTDOWN">SHUTDOWN</a></span></code>
-<div class="block">Shut down agent.</div>
+<div class="block">Shutdown execution state machine.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#START_FILE_STREAM_SERVICE">START_FILE_STREAM_SERVICE</a></span></code>
+<div class="block">Start file stream service.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#START_HEARTBEAT_SERVICE">START_HEARTBEAT_SERVICE</a></span></code>
+<div class="block">Start heartbeat service.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#START_KILL_SERVICE">START_KILL_SERVICE</a></span></code>
+<div class="block">Start kill service.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#STOP_FILES_STREAM_SERVICE">STOP_FILES_STREAM_SERVICE</a></span></code>
+<div class="block">Stop the file stream service.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#STOP_HEARTBEAT_SERVICE">STOP_HEARTBEAT_SERVICE</a></span></code>
+<div class="block">Stop the heartbeat service.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#STOP_KILL_SERVICE">STOP_KILL_SERVICE</a></span></code>
+<div class="block">Stop the kill service.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#WAIT_JOB_COMPLETION">WAIT_JOB_COMPLETION</a></span></code>
+<div class="block">Wait for job completion.</div>
 </td>
 </tr>
 </table>
@@ -255,47 +349,147 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>READY</h4>
 <pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> READY</pre>
-<div class="block">Initial pseudo-state (no action).</div>
+<div class="block">Initial state, NOOP, before execution to start.</div>
 </li>
 </ul>
-<a name="INITIALIZE">
+<a name="INITIALIZE_AGENT">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>INITIALIZE</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> INITIALIZE</pre>
-<div class="block">Initialize.</div>
+<h4>INITIALIZE_AGENT</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> INITIALIZE_AGENT</pre>
+<div class="block">Initialize the agent.</div>
 </li>
 </ul>
-<a name="CONFIGURE_AGENT">
+<a name="HANDSHAKE">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>CONFIGURE_AGENT</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> CONFIGURE_AGENT</pre>
-<div class="block">Configure agent.</div>
+<h4>HANDSHAKE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> HANDSHAKE</pre>
+<div class="block">Perform agent/server handshake.</div>
 </li>
 </ul>
-<a name="RESOLVE_JOB_SPECIFICATION">
+<a name="CONFIGURE_EXECUTION">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>RESOLVE_JOB_SPECIFICATION</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> RESOLVE_JOB_SPECIFICATION</pre>
-<div class="block">Resolve job specification.</div>
+<h4>CONFIGURE_EXECUTION</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> CONFIGURE_EXECUTION</pre>
+<div class="block">Configure the execution based on command-line arguments.</div>
 </li>
 </ul>
-<a name="SETUP_JOB">
+<a name="RESERVE_JOB_ID">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>SETUP_JOB</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> SETUP_JOB</pre>
-<div class="block">Set up job.</div>
+<h4>RESERVE_JOB_ID</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> RESERVE_JOB_ID</pre>
+<div class="block">Reserve the job id.</div>
+</li>
+</ul>
+<a name="OBTAIN_JOB_SPECIFICATION">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>OBTAIN_JOB_SPECIFICATION</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> OBTAIN_JOB_SPECIFICATION</pre>
+<div class="block">Obtain the job specification.</div>
+</li>
+</ul>
+<a name="CLAIM_JOB">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CLAIM_JOB</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> CLAIM_JOB</pre>
+<div class="block">Claim the job for execution.</div>
+</li>
+</ul>
+<a name="START_HEARTBEAT_SERVICE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>START_HEARTBEAT_SERVICE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> START_HEARTBEAT_SERVICE</pre>
+<div class="block">Start heartbeat service.</div>
+</li>
+</ul>
+<a name="START_KILL_SERVICE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>START_KILL_SERVICE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> START_KILL_SERVICE</pre>
+<div class="block">Start kill service.</div>
+</li>
+</ul>
+<a name="CREATE_JOB_DIRECTORY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CREATE_JOB_DIRECTORY</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> CREATE_JOB_DIRECTORY</pre>
+<div class="block">Create the job directory.</div>
+</li>
+</ul>
+<a name="RELOCATE_LOG">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>RELOCATE_LOG</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> RELOCATE_LOG</pre>
+<div class="block">Relocate the agent log inside the job directory.</div>
+</li>
+</ul>
+<a name="START_FILE_STREAM_SERVICE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>START_FILE_STREAM_SERVICE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> START_FILE_STREAM_SERVICE</pre>
+<div class="block">Start file stream service.</div>
+</li>
+</ul>
+<a name="SET_STATUS_INIT">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>SET_STATUS_INIT</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> SET_STATUS_INIT</pre>
+<div class="block">Update the job status to INIT.</div>
+</li>
+</ul>
+<a name="CREATE_JOB_SCRIPT">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CREATE_JOB_SCRIPT</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> CREATE_JOB_SCRIPT</pre>
+<div class="block">Create the job script (a.k.a. 'run' file).</div>
+</li>
+</ul>
+<a name="DOWNLOAD_DEPENDENCIES">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>DOWNLOAD_DEPENDENCIES</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> DOWNLOAD_DEPENDENCIES</pre>
+<div class="block">Download dependencies.</div>
 </li>
 </ul>
 <a name="LAUNCH_JOB">
@@ -305,27 +499,97 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>LAUNCH_JOB</h4>
 <pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> LAUNCH_JOB</pre>
-<div class="block">Launch job.</div>
+<div class="block">Launch the job process.</div>
 </li>
 </ul>
-<a name="MONITOR_JOB">
+<a name="SET_STATUS_RUNNING">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>MONITOR_JOB</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> MONITOR_JOB</pre>
-<div class="block">Monitor job process.</div>
+<h4>SET_STATUS_RUNNING</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> SET_STATUS_RUNNING</pre>
+<div class="block">Update the job status to RUNNING.</div>
 </li>
 </ul>
-<a name="CLEANUP_JOB">
+<a name="WAIT_JOB_COMPLETION">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>CLEANUP_JOB</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> CLEANUP_JOB</pre>
-<div class="block">Clean up after job.</div>
+<h4>WAIT_JOB_COMPLETION</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> WAIT_JOB_COMPLETION</pre>
+<div class="block">Wait for job completion.</div>
+</li>
+</ul>
+<a name="SET_STATUS_FINAL">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>SET_STATUS_FINAL</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> SET_STATUS_FINAL</pre>
+<div class="block">Final update to the job status.</div>
+</li>
+</ul>
+<a name="STOP_KILL_SERVICE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>STOP_KILL_SERVICE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> STOP_KILL_SERVICE</pre>
+<div class="block">Stop the kill service.</div>
+</li>
+</ul>
+<a name="LOG_EXECUTION_ERRORS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>LOG_EXECUTION_ERRORS</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> LOG_EXECUTION_ERRORS</pre>
+<div class="block">Dump execution error summary in the log.</div>
+</li>
+</ul>
+<a name="ARCHIVE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ARCHIVE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> ARCHIVE</pre>
+<div class="block">Archive job outputs and logs.</div>
+</li>
+</ul>
+<a name="STOP_HEARTBEAT_SERVICE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>STOP_HEARTBEAT_SERVICE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> STOP_HEARTBEAT_SERVICE</pre>
+<div class="block">Stop the heartbeat service.</div>
+</li>
+</ul>
+<a name="STOP_FILES_STREAM_SERVICE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>STOP_FILES_STREAM_SERVICE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> STOP_FILES_STREAM_SERVICE</pre>
+<div class="block">Stop the file stream service.</div>
+</li>
+</ul>
+<a name="CLEAN">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CLEAN</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> CLEAN</pre>
+<div class="block">Clean job directory post-execution.</div>
 </li>
 </ul>
 <a name="SHUTDOWN">
@@ -335,27 +599,37 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>SHUTDOWN</h4>
 <pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> SHUTDOWN</pre>
-<div class="block">Shut down agent.</div>
+<div class="block">Shutdown execution state machine.</div>
 </li>
 </ul>
-<a name="HANDLE_ERROR">
+<a name="DONE">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>HANDLE_ERROR</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> HANDLE_ERROR</pre>
-<div class="block">Handle error.</div>
+<h4>DONE</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> DONE</pre>
+<div class="block">Final stage.</div>
 </li>
 </ul>
-<a name="END">
+<a name="FORCE_FILE_MANIFEST_REFRESH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FORCE_FILE_MANIFEST_REFRESH</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> FORCE_FILE_MANIFEST_REFRESH</pre>
+<div class="block">Trigger a job directory manifest refresh.</div>
+</li>
+</ul>
+<a name="DETERMINE_FINAL_STATUS">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>END</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> END</pre>
-<div class="block">Final pseudo-state (no action).</div>
+<h4>DETERMINE_FINAL_STATUS</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> DETERMINE_FINAL_STATUS</pre>
+<div class="block">Determine the job final status to publish to server.</div>
 </li>
 </ul>
 </li>
@@ -435,7 +709,7 @@ not permitted.)</div>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/StateMachineAutoConfiguration.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">

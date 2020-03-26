@@ -134,92 +134,176 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_AGENT_CONFIGURATION">FAILED_AGENT_CONFIGURATION</a></span></code>
+<div class="block">The agent failed to configure itself, probably due to invalid command-line arguments.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_AGENT_SERVER_HANDSHAKE">FAILED_AGENT_SERVER_HANDSHAKE</a></span></code>
+<div class="block">The server refused to let the agent run a job, refusal is based on agent version or hostname.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_AGENT_STARTUP">FAILED_AGENT_STARTUP</a></span></code>
+<div class="block">The agent failed to start up (before any job-specific action is taken).</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_CLAIM_JOB">FAILED_TO_CLAIM_JOB</a></span></code>
+<div class="block">Agent failed to claim job id, job record does not exist, it is not in a state where it can be claimed.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_CREATE_JOB_DIRECTORY">FAILED_TO_CREATE_JOB_DIRECTORY</a></span></code>
+<div class="block">The agent failed to create a directory for the job.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_CREATE_JOB_SCRIPT">FAILED_TO_CREATE_JOB_SCRIPT</a></span></code>
+<div class="block">The agent failed to compose or write a job script.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_DOWNLOAD_DEPENDENCIES">FAILED_TO_DOWNLOAD_DEPENDENCIES</a></span></code>
+<div class="block">The agent failed to download dependencies.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_LAUNCH_JOB">FAILED_TO_LAUNCH_JOB</a></span></code>
+<div class="block">The agent encountered an error while attempting to launch the job process.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_OBTAIN_JOB_SPECIFICATION">FAILED_TO_OBTAIN_JOB_SPECIFICATION</a></span></code>
+<div class="block">The agent could not retrieve the job specifications.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_RESERVE_JOB_ID">FAILED_TO_RESERVE_JOB_ID</a></span></code>
+<div class="block">The agent failed to reserve the job id, possibly because it is already in use.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_START_SERVICE">FAILED_TO_START_SERVICE</a></span></code>
+<div class="block">The agent failed to initialize a required runtime service (file stream, heartbeat, kill).</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_UPDATE_STATUS">FAILED_TO_UPDATE_STATUS</a></span></code>
+<div class="block">The agent failed to update the persisted job status via server.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#FAILED_TO_WAIT_FOR_JOB_COMPLETION">FAILED_TO_WAIT_FOR_JOB_COMPLETION</a></span></code>
+<div class="block">The agent encountered an unhandled error while waiting for the job process to complete.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_EXCEEDED_STDERR_LENGTH">JOB_EXCEEDED_STDERR_LENGTH</a></span></code>
 <div class="block">Job killed because maximum stderr length was exceeded.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_EXCEEDED_STDOUT_LENGTH">JOB_EXCEEDED_STDOUT_LENGTH</a></span></code>
 <div class="block">Job killed because maximum stdout length was exceeded.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_EXCEEDED_TIMEOUT">JOB_EXCEEDED_TIMEOUT</a></span></code>
 <div class="block">Job killed because maximum run time was exceeded.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_FAILED">JOB_FAILED</a></span></code>
 <div class="block">Job terminated with non-zero exit code.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_FINISHED_SUCCESSFULLY">JOB_FINISHED_SUCCESSFULLY</a></span></code>
 <div class="block">Job completed successfully.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_INITIALIZING">JOB_INITIALIZING</a></span></code>
 <div class="block">The message for when the agent is preparing to launch the job.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_KILLED_BY_USER">JOB_KILLED_BY_USER</a></span></code>
 <div class="block">Job killed by user.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_PROCESS_NOT_FOUND">JOB_PROCESS_NOT_FOUND</a></span></code>
 <div class="block">Job killed, could not check on the process.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_RUNNING">JOB_RUNNING</a></span></code>
 <div class="block">The status message while a job is actively running.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#JOB_SETUP_FAILED">JOB_SETUP_FAILED</a></span></code>
 <div class="block">Job failed in in the setup portion of the run script (setting environment or running resources setup scripts).</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#PROCESS_DETECTED_TO_BE_COMPLETE">PROCESS_DETECTED_TO_BE_COMPLETE</a></span></code>
 <div class="block">Job PID terminated, exist status is yet to be verified.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#SUBMIT_INIT_FAILURE">SUBMIT_INIT_FAILURE</a></span></code>
 <div class="block">Job failed with unexpected exception during initialization.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#SUBMIT_PRECONDITION_FAILURE">SUBMIT_PRECONDITION_FAILURE</a></span></code>
 <div class="block">Job precondition was not satisfied during initialization.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#SYSTEM_CRASHED_WHILE_JOB_STARTING">SYSTEM_CRASHED_WHILE_JOB_STARTING</a></span></code>
 <div class="block">Job is undefined intermediate state caused by a crash during setup.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#UNABLE_TO_RE_ATTACH_ON_STARTUP">UNABLE_TO_RE_ATTACH_ON_STARTUP</a></span></code>
 <div class="block">Job was launched before Genie stopped, and it cannot be re-attached after restart.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/common/dto/JobStatusMessages.html#UNKNOWN_JOB_STATE">UNKNOWN_JOB_STATE</a></span></code>
+<div class="block">The agent could not determine what state the job is in.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -485,7 +569,7 @@ extends java.lang.Object</pre>
 <a name="JOB_SETUP_FAILED">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>JOB_SETUP_FAILED</h4>
 <pre>public static final&nbsp;java.lang.String JOB_SETUP_FAILED</pre>
@@ -493,6 +577,204 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.JOB_SETUP_FAILED">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_CLAIM_JOB">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_CLAIM_JOB</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_CLAIM_JOB</pre>
+<div class="block">Agent failed to claim job id, job record does not exist, it is not in a state where it can be claimed.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_CLAIM_JOB">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_CREATE_JOB_DIRECTORY">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_CREATE_JOB_DIRECTORY</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_CREATE_JOB_DIRECTORY</pre>
+<div class="block">The agent failed to create a directory for the job.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_CREATE_JOB_DIRECTORY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_CREATE_JOB_SCRIPT">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_CREATE_JOB_SCRIPT</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_CREATE_JOB_SCRIPT</pre>
+<div class="block">The agent failed to compose or write a job script.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_CREATE_JOB_SCRIPT">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_DOWNLOAD_DEPENDENCIES">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_DOWNLOAD_DEPENDENCIES</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_DOWNLOAD_DEPENDENCIES</pre>
+<div class="block">The agent failed to download dependencies. They may not exist, or the agent may not have the required permission
+ to read them or write them on local disk.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_DOWNLOAD_DEPENDENCIES">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_AGENT_SERVER_HANDSHAKE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_AGENT_SERVER_HANDSHAKE</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_AGENT_SERVER_HANDSHAKE</pre>
+<div class="block">The server refused to let the agent run a job, refusal is based on agent version or hostname.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_AGENT_SERVER_HANDSHAKE">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_LAUNCH_JOB">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_LAUNCH_JOB</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_LAUNCH_JOB</pre>
+<div class="block">The agent encountered an error while attempting to launch the job process.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_LAUNCH_JOB">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_RESERVE_JOB_ID">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_RESERVE_JOB_ID</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_RESERVE_JOB_ID</pre>
+<div class="block">The agent failed to reserve the job id, possibly because it is already in use.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_RESERVE_JOB_ID">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_WAIT_FOR_JOB_COMPLETION">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_WAIT_FOR_JOB_COMPLETION</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_WAIT_FOR_JOB_COMPLETION</pre>
+<div class="block">The agent encountered an unhandled error while waiting for the job process to complete.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_WAIT_FOR_JOB_COMPLETION">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="UNKNOWN_JOB_STATE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>UNKNOWN_JOB_STATE</h4>
+<pre>public static final&nbsp;java.lang.String UNKNOWN_JOB_STATE</pre>
+<div class="block">The agent could not determine what state the job is in.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.UNKNOWN_JOB_STATE">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_UPDATE_STATUS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_UPDATE_STATUS</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_UPDATE_STATUS</pre>
+<div class="block">The agent failed to update the persisted job status via server.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_UPDATE_STATUS">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_AGENT_STARTUP">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_AGENT_STARTUP</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_AGENT_STARTUP</pre>
+<div class="block">The agent failed to start up (before any job-specific action is taken).</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_AGENT_STARTUP">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_OBTAIN_JOB_SPECIFICATION">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_OBTAIN_JOB_SPECIFICATION</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_OBTAIN_JOB_SPECIFICATION</pre>
+<div class="block">The agent could not retrieve the job specifications.
+ Could mean it does not exist or cannot be resolved.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_OBTAIN_JOB_SPECIFICATION">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_TO_START_SERVICE">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>FAILED_TO_START_SERVICE</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_TO_START_SERVICE</pre>
+<div class="block">The agent failed to initialize a required runtime service (file stream, heartbeat, kill).</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_TO_START_SERVICE">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="FAILED_AGENT_CONFIGURATION">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>FAILED_AGENT_CONFIGURATION</h4>
+<pre>public static final&nbsp;java.lang.String FAILED_AGENT_CONFIGURATION</pre>
+<div class="block">The agent failed to configure itself, probably due to invalid command-line arguments.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../constant-values.html#com.netflix.genie.common.dto.JobStatusMessages.FAILED_AGENT_CONFIGURATION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
