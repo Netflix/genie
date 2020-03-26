@@ -1011,7 +1011,7 @@ class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
     void testDeleteUnusedCommands() {
         final Instant present = Instant.parse("2020-03-24T00:00:00.000Z");
         final Instant createdThreshold = present.minus(1, ChronoUnit.DAYS);
-        Assertions.assertThat(this.commandRepository.count()).isEqualTo(7);
+        Assertions.assertThat(this.commandRepository.count()).isEqualTo(8);
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command0")).isTrue();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command1")).isTrue();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command2")).isTrue();
@@ -1019,6 +1019,7 @@ class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command4")).isTrue();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isTrue();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isTrue();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command7")).isTrue();
         Assertions.assertThat(
             this.service.deleteUnusedCommands(
                 EnumSet.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED),
@@ -1032,6 +1033,7 @@ class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command4")).isTrue();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isFalse();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isFalse();
+        Assertions.assertThat(this.commandRepository.existsByUniqueId("command7")).isTrue();
     }
 
     private Command createTestCommand(
