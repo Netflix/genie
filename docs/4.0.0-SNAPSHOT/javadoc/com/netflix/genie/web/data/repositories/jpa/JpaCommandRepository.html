@@ -299,13 +299,13 @@ int&nbsp;setUnusedStatus(@Param(value="desiredStatus")
 <ul class="blockListLast">
 <li class="blockList">
 <h4>deleteUnused</h4>
-<pre>@Query(value="DELETE FROM commands WHERE status IN (:deleteStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL);",
+<pre>@Query(value="DELETE FROM commands WHERE status IN (:deleteStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands);",
        nativeQuery=true)
  @Modifying
 int&nbsp;deleteUnused(@Param(value="deleteStatuses")
-                                                                                                                                                                                                                                                        java.util.Set&lt;java.lang.String&gt;&nbsp;deleteStatuses,
-                                                                                                                                                                                                                                                        @Param(value="commandCreatedThreshold")
-                                                                                                                                                                                                                                                        java.time.Instant&nbsp;commandCreatedThreshold)</pre>
+                                                                                                                                                                                                                                                                                                                           java.util.Set&lt;java.lang.String&gt;&nbsp;deleteStatuses,
+                                                                                                                                                                                                                                                                                                                           @Param(value="commandCreatedThreshold")
+                                                                                                                                                                                                                                                                                                                           java.time.Instant&nbsp;commandCreatedThreshold)</pre>
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 <dl>

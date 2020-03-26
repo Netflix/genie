@@ -1985,7 +1985,7 @@
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#DELETE_COMMANDS_IN_STATUSES_QUERY">DELETE_COMMANDS_IN_STATUSES_QUERY</a></code></td>
-<td class="colLast"><code>"DELETE FROM commands WHERE status IN (:deleteStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL);"</code></td>
+<td class="colLast"><code>"DELETE FROM commands WHERE status IN (:deleteStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands);"</code></td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.SET_UNUSED_STATUS_QUERY">
