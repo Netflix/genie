@@ -58,6 +58,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -670,6 +671,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
      * {@inheritDoc}
      */
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public int updateStatusForUnusedCommands(
         final CommandStatus desiredStatus,
         final Instant commandCreatedThreshold,
