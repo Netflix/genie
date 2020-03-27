@@ -1308,10 +1308,11 @@ public&nbsp;java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/com
 <ul class="blockList">
 <li class="blockList">
 <h4>updateStatusForUnusedCommands</h4>
-<pre>public&nbsp;int&nbsp;updateStatusForUnusedCommands(<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
-                                         java.time.Instant&nbsp;commandCreatedThreshold,
-                                         java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
-                                         java.time.Instant&nbsp;jobCreatedThreshold)</pre>
+<pre>@Transactional(isolation=READ_COMMITTED)
+public&nbsp;int&nbsp;updateStatusForUnusedCommands(<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
+                                                                                  java.time.Instant&nbsp;commandCreatedThreshold,
+                                                                                  java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;currentStatuses,
+                                                                                  java.time.Instant&nbsp;jobCreatedThreshold)</pre>
 <div class="block">Update the status of a command to the desiredStatus if its status is in currentStatuses,
  it was created before commandCreatedThreshold and it hasn't been used in any job that was created
  in the Genie system after jobCreatedThreshold.</div>
