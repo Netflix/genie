@@ -17,29 +17,26 @@
  */
 package com.netflix.genie.web.scripts;
 
-import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
-import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
-import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
- * An extension of {@link ManagedScript} which from a set of commands and the original job request will attempt to
- * determine the best command to use for execution.
+ * An extension of {@link ResourceSelectorScript} which from a set of commands and the original job request will
+ * attempt to determine the best command to use for execution.
  *
  * @author tgianos
  * @since 4.0.0
  */
 @Slf4j
-public class CommandSelectorManagedScript extends ManagedScript implements ResourceSelectorScript<Command> {
+public class CommandSelectorManagedScript extends ResourceSelectorScript<Command> {
 
-    static final String JOB_REQUEST_BINDING = "jobRequestParameter";
     static final String COMMANDS_BINDING = "commandsParameter";
 
     /**
@@ -67,33 +64,18 @@ public class CommandSelectorManagedScript extends ManagedScript implements Resou
     ) throws ResourceSelectionException {
         log.debug("Called to attempt to select a command from {} for job {}", resources, jobRequest);
 
-        try {
-            final Object evaluationResult = this.evaluateScript(
-                ImmutableMap.of(
-                    JOB_REQUEST_BINDING, jobRequest,
-                    COMMANDS_BINDING, resources
-                )
-            );
-            if (!(evaluationResult instanceof ResourceSelectorScriptResult)) {
-                throw new ResourceSelectionException(
-                    "Command selector evaluation returned invalid type: " + evaluationResult.getClass().getName()
-                );
-            }
-            @SuppressWarnings("unchecked") final ResourceSelectorScriptResult<Command> result
-                = (ResourceSelectorScriptResult<Command>) evaluationResult;
+        return super.selectResource(resources, jobRequest);
+    }
 
-            // Validate that the selected resource is actually in the original set
-            if (result.getResource().isPresent() && !resources.contains(result.getResource().get())) {
-                throw new ResourceSelectionException(result.getResource().get() + " is not in original set");
-            }
-
-            return result;
-        } catch (
-            final ScriptExecutionException
-                | ScriptNotConfiguredException
-                | RuntimeException e
-        ) {
-            throw new ResourceSelectionException(e);
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addParametersForScript(
+        final Map<String, Object> parameters,
+        final Set<Command> resources,
+        final JobRequest jobRequest
+    ) {
+        parameters.put(COMMANDS_BINDING, resources);
     }
 }
