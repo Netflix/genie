@@ -20,7 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure.scripts;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.scripts.ScriptManager;
@@ -62,7 +62,7 @@ class ScriptsAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScriptProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(ScriptManager.class);
-                    Assertions.assertThat(context).doesNotHaveBean(ClusterSelectorScript.class);
+                    Assertions.assertThat(context).doesNotHaveBean(ClusterSelectorManagedScript.class);
                     Assertions.assertThat(context).doesNotHaveBean(CommandSelectorManagedScript.class);
                     Assertions.assertThat(context).doesNotHaveBean(ExecutionModeFilterScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);
@@ -85,7 +85,7 @@ class ScriptsAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScriptProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(ScriptManager.class);
-                    Assertions.assertThat(context).hasSingleBean(ClusterSelectorScript.class);
+                    Assertions.assertThat(context).hasSingleBean(ClusterSelectorManagedScript.class);
                     Assertions.assertThat(context).hasSingleBean(CommandSelectorManagedScript.class);
                     Assertions.assertThat(context).hasSingleBean(ExecutionModeFilterScript.class);
                     Assertions.assertThat(context).hasSingleBean(ScriptsAutoConfiguration.ManagedScriptPreLoader.class);

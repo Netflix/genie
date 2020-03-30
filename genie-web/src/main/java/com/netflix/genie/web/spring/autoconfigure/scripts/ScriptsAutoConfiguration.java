@@ -22,7 +22,7 @@ import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import com.netflix.genie.web.properties.ExecutionModeFilterScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.scripts.ExecutionModeFilterScript;
 import com.netflix.genie.web.scripts.ManagedScript;
@@ -99,22 +99,22 @@ public class ScriptsAutoConfiguration {
     }
 
     /**
-     * Create a {@link ClusterSelectorScript} unless one exists.
+     * Create a {@link ClusterSelectorManagedScript} unless one exists.
      *
      * @param scriptManager    script manager
      * @param scriptProperties script properties
      * @param meterRegistry    meter registry
-     * @return a {@link ClusterSelectorScript}
+     * @return a {@link ClusterSelectorManagedScript}
      */
     @Bean
-    @ConditionalOnMissingBean(ClusterSelectorScript.class)
+    @ConditionalOnMissingBean(ClusterSelectorManagedScript.class)
     @ConditionalOnProperty(value = ClusterSelectorScriptProperties.SOURCE_PROPERTY)
-    ClusterSelectorScript clusterSelectorScript(
+    ClusterSelectorManagedScript clusterSelectorScript(
         final ScriptManager scriptManager,
         final ClusterSelectorScriptProperties scriptProperties,
         final MeterRegistry meterRegistry
     ) {
-        return new ClusterSelectorScript(
+        return new ClusterSelectorManagedScript(
             scriptManager,
             scriptProperties,
             GenieObjectMapper.getMapper(),

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.selectors;
 
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
@@ -57,18 +57,18 @@ public class SelectorsAutoConfiguration {
      * Produce the {@link ScriptClusterSelectorImpl} instance to use for this Genie node if it was configured by the
      * user. This bean is only created if the script is configured.
      *
-     * @param clusterSelectorScript the cluster selector script
-     * @param registry              the metrics registry
+     * @param clusterSelectorManagedScript the cluster selector script
+     * @param registry                     the metrics registry
      * @return a {@link ScriptClusterSelectorImpl}
      */
     @Bean
     @Order(SCRIPT_CLUSTER_SELECTOR_PRECEDENCE)
-    @ConditionalOnBean(ClusterSelectorScript.class)
+    @ConditionalOnBean(ClusterSelectorManagedScript.class)
     public ScriptClusterSelectorImpl scriptClusterSelector(
-        final ClusterSelectorScript clusterSelectorScript,
+        final ClusterSelectorManagedScript clusterSelectorManagedScript,
         final MeterRegistry registry
     ) {
-        return new ScriptClusterSelectorImpl(clusterSelectorScript, registry);
+        return new ScriptClusterSelectorImpl(clusterSelectorManagedScript, registry);
     }
 
     /**

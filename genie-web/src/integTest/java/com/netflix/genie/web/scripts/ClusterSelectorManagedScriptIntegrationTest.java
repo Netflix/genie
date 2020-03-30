@@ -47,7 +47,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-class ClusterSelectorScriptIntegrationTest {
+class ClusterSelectorManagedScriptIntegrationTest {
 
     private static final Cluster CLUSTER_0 = new Cluster(
         "0",
@@ -106,7 +106,7 @@ class ClusterSelectorScriptIntegrationTest {
     );
 
     private ClusterSelectorScriptProperties scriptProperties;
-    private ClusterSelectorScript clusterSelectorScript;
+    private ClusterSelectorManagedScript clusterSelectorScript;
 
     @BeforeEach
     void setUp() {
@@ -126,7 +126,7 @@ class ClusterSelectorScriptIntegrationTest {
             meterRegistry
         );
         this.scriptProperties = new ClusterSelectorScriptProperties();
-        this.clusterSelectorScript = new ClusterSelectorScript(
+        this.clusterSelectorScript = new ClusterSelectorManagedScript(
             scriptManager,
             scriptProperties,
             objectMapper,

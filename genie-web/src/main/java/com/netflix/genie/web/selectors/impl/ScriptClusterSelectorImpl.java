@@ -22,7 +22,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -51,19 +51,19 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
     private static final String SCRIPT_SELECTED_RATIONALE = "Script selected this cluster";
 
     private final MeterRegistry registry;
-    private final ClusterSelectorScript clusterSelectorScript;
+    private final ClusterSelectorManagedScript clusterSelectorManagedScript;
 
     /**
      * Constructor.
      *
-     * @param clusterSelectorScript the cluster selector script
-     * @param registry              the metrics registry
+     * @param clusterSelectorManagedScript the cluster selector script
+     * @param registry                     the metrics registry
      */
     public ScriptClusterSelectorImpl(
-        final ClusterSelectorScript clusterSelectorScript,
+        final ClusterSelectorManagedScript clusterSelectorManagedScript,
         final MeterRegistry registry
     ) {
-        this.clusterSelectorScript = clusterSelectorScript;
+        this.clusterSelectorManagedScript = clusterSelectorManagedScript;
         this.registry = registry;
     }
 
@@ -81,7 +81,7 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
         final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
-            final Cluster selectedCluster = this.clusterSelectorScript.selectCluster(jobRequest, clusters);
+            final Cluster selectedCluster = this.clusterSelectorManagedScript.selectCluster(jobRequest, clusters);
             MetricsUtils.addSuccessTags(tags);
 
             if (selectedCluster == null) {
