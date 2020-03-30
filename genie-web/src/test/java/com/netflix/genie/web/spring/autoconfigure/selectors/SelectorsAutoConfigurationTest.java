@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.selectors;
 
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
+import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.selectors.CommandSelector;
@@ -136,8 +136,8 @@ class SelectorsAutoConfigurationTest {
          * Dummy script based cluster selector.
          */
         @Bean
-        public ClusterSelectorScript clusterSelectorScript() {
-            return Mockito.mock(ClusterSelectorScript.class);
+        public ClusterSelectorManagedScript clusterSelectorScript() {
+            return Mockito.mock(ClusterSelectorManagedScript.class);
         }
 
         /**

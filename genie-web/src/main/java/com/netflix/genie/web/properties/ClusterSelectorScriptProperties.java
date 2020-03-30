@@ -17,12 +17,11 @@
  */
 package com.netflix.genie.web.properties;
 
-import com.netflix.genie.web.scripts.ClusterSelectorScript;
 import com.netflix.genie.web.scripts.ManagedScriptBaseProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Properties for {@link ClusterSelectorScript}.
+ * Properties for cluster selection via script.
  *
  * @author mprimi
  * @since 4.0.0

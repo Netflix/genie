@@ -24,7 +24,7 @@ import com.netflix.genie.common.external.dtos.v4.ClusterMetadata
 import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException
-import com.netflix.genie.web.scripts.ClusterSelectorScript
+import com.netflix.genie.web.scripts.ClusterSelectorManagedScript
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.MeterRegistry
@@ -39,14 +39,14 @@ import java.util.concurrent.TimeUnit
  */
 class ScriptClusterSelectorImplSpec extends Specification {
 
-    ClusterSelectorScript script
+    ClusterSelectorManagedScript script
     MeterRegistry registry
     ScriptClusterSelectorImpl scriptClusterSelector
     Timer timer
 
     def setup() {
         this.timer = Mock(Timer)
-        this.script = Mock(ClusterSelectorScript)
+        this.script = Mock(ClusterSelectorManagedScript)
         this.registry = Mock(MeterRegistry)
         this.scriptClusterSelector = new ScriptClusterSelectorImpl(script, registry)
     }

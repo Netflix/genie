@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  * @author mprimi
  * @since 4.0.0
  */
-public class ClusterSelectorScript extends ManagedScript {
+public class ClusterSelectorManagedScript extends ManagedScript {
     private static final String CLUSTERS_BINDING = "clusters";
     private static final String JOB_REQUEST_BINDING = "jobRequest";
 
@@ -62,7 +62,7 @@ public class ClusterSelectorScript extends ManagedScript {
      * @param mapper        object mapper
      * @param registry      meter registry
      */
-    public ClusterSelectorScript(
+    public ClusterSelectorManagedScript(
         final ScriptManager scriptManager,
         final ClusterSelectorScriptProperties properties,
         final ObjectMapper mapper,
