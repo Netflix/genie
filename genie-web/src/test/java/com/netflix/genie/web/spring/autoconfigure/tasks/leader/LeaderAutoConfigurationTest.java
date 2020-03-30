@@ -36,6 +36,7 @@ import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.properties.ZookeeperLeaderProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
+import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
@@ -94,6 +95,7 @@ class LeaderAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(LocalLeader.class);
                 Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
                 Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
+                Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
 
                 // Optional beans
                 Assertions.assertThat(context).doesNotHaveBean(DatabaseCleanupTask.class);
@@ -130,6 +132,7 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
 
                     Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
+                    Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
 
                     // Optional beans
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupTask.class);
@@ -162,6 +165,7 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
 
                     Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
+                    Assertions.assertThat(context).hasSingleBean(LeaderElectionActuator.class);
 
                     // Optional beans
                     Assertions.assertThat(context).doesNotHaveBean(DatabaseCleanupTask.class);

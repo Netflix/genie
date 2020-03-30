@@ -29,6 +29,7 @@ import com.netflix.genie.web.properties.ZookeeperLeaderProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
 import com.netflix.genie.web.services.impl.ClusterLeaderServiceCuratorImpl;
 import com.netflix.genie.web.services.impl.ClusterLeaderServiceLocalLeaderImpl;
+import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
@@ -272,5 +273,19 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(ClusterLeaderService.class)
     public ClusterLeaderService localClusterLeaderService(final LocalLeader localLeader) {
         return new ClusterLeaderServiceLocalLeaderImpl(localLeader);
+    }
+
+    /**
+     * Create a {@link LeaderElectionActuator} bean if one is not already defined and if
+     * {@link ClusterLeaderService} is available. This bean is an endpoint that gets registered in Spring Actuator.
+     *
+     * @param clusterLeaderService the cluster leader service
+     * @return a {@link LeaderElectionActuator}
+     */
+    @Bean
+    @ConditionalOnBean(ClusterLeaderService.class)
+    @ConditionalOnMissingBean(LeaderElectionActuator.class)
+    public LeaderElectionActuator leaderElectionActuator(final ClusterLeaderService clusterLeaderService) {
+        return new LeaderElectionActuator(clusterLeaderService);
     }
 }
