@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.web.events.GenieEventBus;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,42 +60,69 @@ class LocalLeaderTest {
     }
 
     /**
-     * Make sure the event to grant leadership is fired if the node is the leader.
+     * Ensure behavior in case of start, stop, start when already running and stop when not running in case the module
+     * is configured to be leader.
      */
     @Test
-    void canStartLeadershipIfLeader() {
+    void startAndStopIfLeader() {
         this.localLeader = new LocalLeader(this.genieEventBus, true);
-        this.localLeader.startLeadership(this.contextRefreshedEvent);
-        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
-    }
-
-    /**
-     * Make sure the event to grant leadership is not fired if the node is not the leader.
-     */
-    @Test
-    void wontStartLeadershipIfNotLeader() {
-        this.localLeader = new LocalLeader(this.genieEventBus, false);
-        this.localLeader.startLeadership(this.contextRefreshedEvent);
+        Assertions.assertThat(this.localLeader.isRunning()).isFalse();
+        Assertions.assertThat(this.localLeader.isLeader()).isFalse();
         Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
-    }
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
 
-    /**
-     * Make sure the event to revoke leadership is fired if the node is the leader.
-     */
-    @Test
-    void canStopLeadershipIfLeader() {
-        this.localLeader = new LocalLeader(this.genieEventBus, true);
+        // Start with application context event
+        this.localLeader.startLeadership(this.contextRefreshedEvent);
+        Assertions.assertThat(this.localLeader.isRunning()).isTrue();
+        Assertions.assertThat(this.localLeader.isLeader()).isTrue();
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
+
+        // Start again
+        this.localLeader.start();
+        Assertions.assertThat(this.localLeader.isRunning()).isTrue();
+        Assertions.assertThat(this.localLeader.isLeader()).isTrue();
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
+
+        // Stop with application context event
         this.localLeader.stopLeadership(this.contextClosedEvent);
+        Assertions.assertThat(this.localLeader.isRunning()).isFalse();
+        Assertions.assertThat(this.localLeader.isLeader()).isFalse();
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
+
+        // Stop again
+        this.localLeader.stopLeadership(this.contextClosedEvent);
+        Assertions.assertThat(this.localLeader.isRunning()).isFalse();
+        Assertions.assertThat(this.localLeader.isLeader()).isFalse();
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
         Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
     }
 
     /**
-     * Make sure the event to revoke leadership is not fired if the node is not the leader.
+     * Ensure behavior in case of start, stop in case the module is not configured to be leader.
      */
     @Test
-    void wontStopLeadershipIfNotLeader() {
+    void startAndStopIfNotLeader() {
         this.localLeader = new LocalLeader(this.genieEventBus, false);
+        Assertions.assertThat(this.localLeader.isRunning()).isFalse();
+        Assertions.assertThat(this.localLeader.isLeader()).isFalse();
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
+
+        // Start
+        this.localLeader.start();
+        Assertions.assertThat(this.localLeader.isRunning()).isTrue();
+        Assertions.assertThat(this.localLeader.isLeader()).isFalse();
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
+
+        // Stop
         this.localLeader.stopLeadership(this.contextClosedEvent);
+        Assertions.assertThat(this.localLeader.isRunning()).isFalse();
+        Assertions.assertThat(this.localLeader.isLeader()).isFalse();
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
         Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
     }
 }

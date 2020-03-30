@@ -25,6 +25,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.integration.leader.event.OnGrantedEvent;
 import org.springframework.integration.leader.event.OnRevokedEvent;
 
+import javax.annotation.concurrent.ThreadSafe;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * A class to control leadership activities when remote leadership isn't enabled and this node has been forcibly
  * elected as the leader.
@@ -33,10 +36,12 @@ import org.springframework.integration.leader.event.OnRevokedEvent;
  * @since 3.0.0
  */
 @Slf4j
+@ThreadSafe
 public class LocalLeader {
 
     private final GenieEventBus genieEventBus;
     private final boolean isLeader;
+    private final AtomicBoolean isRunning;
 
     /**
      * Constructor.
@@ -48,6 +53,7 @@ public class LocalLeader {
     public LocalLeader(final GenieEventBus genieEventBus, final boolean isLeader) {
         this.genieEventBus = genieEventBus;
         this.isLeader = isLeader;
+        this.isRunning = new AtomicBoolean(false);
         if (this.isLeader) {
             log.info("Constructing LocalLeader. This node IS the leader.");
         } else {
@@ -56,28 +62,64 @@ public class LocalLeader {
     }
 
     /**
-     * Event listener for when a context is started up.
+     * Auto-start once application is up and running.
      *
      * @param event The Spring Boot application ready event to startup on
      */
     @EventListener
     public void startLeadership(final ContextRefreshedEvent event) {
-        if (this.isLeader) {
-            log.debug("Starting Leadership due to {}", event);
-            this.genieEventBus.publishSynchronousEvent(new OnGrantedEvent(this, null, "leader"));
-        }
+        log.debug("Starting Leadership due to {}", event);
+        this.start();
     }
 
     /**
-     * Before the application shuts down need to turn off leadership activities.
+     * Auto-stop once application is shutting down.
      *
      * @param event The application context closing event
      */
     @EventListener
     public void stopLeadership(final ContextClosedEvent event) {
-        if (this.isLeader) {
-            log.debug("Stopping Leadership due to {}", event);
+        log.debug("Stopping Leadership due to {}", event);
+        this.stop();
+    }
+
+    /**
+     * If configured to be leader and previously started, deactivate and send a leadership lost notification.
+     * NOOP if not running or if this node is not configured to be leader.
+     */
+    public void stop() {
+        if (this.isRunning.compareAndSet(true, false) && this.isLeader) {
+            log.info("Stopping Leadership");
             this.genieEventBus.publishSynchronousEvent(new OnRevokedEvent(this, null, "leader"));
         }
+    }
+
+    /**
+     * If configured to be leader, activate and send a leadership acquired notification.
+     * NOOP if already running or if this node is not configured to be leader.
+     */
+    public void start() {
+        if (this.isRunning.compareAndSet(false, true) && this.isLeader) {
+            log.debug("Starting Leadership");
+            this.genieEventBus.publishSynchronousEvent(new OnGrantedEvent(this, null, "leader"));
+        }
+    }
+
+    /**
+     * Whether this module is active.
+     *
+     * @return true if {@link LocalLeader#start()} was called.
+     */
+    public boolean isRunning() {
+        return this.isRunning.get();
+    }
+
+    /**
+     * Whether local node is leader.
+     *
+     * @return true if this module is active and the node is configured to be leader
+     */
+    public boolean isLeader() {
+        return this.isRunning() && this.isLeader;
     }
 }
