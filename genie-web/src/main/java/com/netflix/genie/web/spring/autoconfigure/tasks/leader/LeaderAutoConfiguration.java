@@ -26,6 +26,9 @@ import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.properties.ZookeeperLeaderProperties;
+import com.netflix.genie.web.services.ClusterLeaderService;
+import com.netflix.genie.web.services.impl.ClusterLeaderServiceCuratorImpl;
+import com.netflix.genie.web.services.impl.ClusterLeaderServiceLocalLeaderImpl;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
@@ -48,6 +51,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.integration.zookeeper.config.LeaderInitiatorFactoryBean;
+import org.springframework.integration.zookeeper.leader.LeaderInitiator;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.client.RestTemplate;
 
@@ -240,5 +244,33 @@ public class LeaderAutoConfiguration {
             agentCleanupProperties,
             registry
         );
+    }
+
+    /**
+     * Create a {@link ClusterLeaderService} based on Zookeeper/Curator if {@link LeaderInitiator} is
+     * available and the bean does not already exist.
+     *
+     * @param leaderInitiator the Spring Zookeeper/Curator based leader election component
+     * @return a {@link ClusterLeaderService}
+     */
+    @Bean
+    @ConditionalOnBean(LeaderInitiator.class)
+    @ConditionalOnMissingBean(ClusterLeaderService.class)
+    public ClusterLeaderService curatorClusterLeaderService(final LeaderInitiator leaderInitiator) {
+        return new ClusterLeaderServiceCuratorImpl(leaderInitiator);
+    }
+
+    /**
+     * Create a {@link ClusterLeaderService} based on static configuration if {@link LocalLeader} is
+     * available and the bean does not already exist.
+     *
+     * @param localLeader the configuration-based leader election component
+     * @return a {@link ClusterLeaderService}
+     */
+    @Bean
+    @ConditionalOnBean(LocalLeader.class)
+    @ConditionalOnMissingBean(ClusterLeaderService.class)
+    public ClusterLeaderService localClusterLeaderService(final LocalLeader localLeader) {
+        return new ClusterLeaderServiceLocalLeaderImpl(localLeader);
     }
 }
