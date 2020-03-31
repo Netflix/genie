@@ -177,6 +177,7 @@ message JobSpecificationError {
         NO_JOB_FOUND = 4;
         NO_SPECIFICATION_FOUND = 5;
         INVALID_REQUEST = 6;
+        RESOLUTION_FAILED = 7;
     }
     Type type = 1;
     string message = 2;

@@ -98,8 +98,9 @@ class JobServiceProtoErrorComposerSpec extends Specification {
         new GenieJobResolutionException(MESSAGE, new GenieCommandNotFoundException(MESSAGE))          | JobSpecificationError.Type.NO_COMMAND_FOUND
         new GenieJobResolutionException(MESSAGE, new GenieApplicationNotFoundException(MESSAGE))      | JobSpecificationError.Type.NO_APPLICATION_FOUND
         new GenieJobResolutionException(MESSAGE, new GenieJobSpecificationNotFoundException(MESSAGE)) | JobSpecificationError.Type.NO_SPECIFICATION_FOUND
-        new GenieJobResolutionException(MESSAGE)                                                      | JobSpecificationError.Type.UNKNOWN
-        new GenieJobResolutionException(new Throwable(MESSAGE))                                       | JobSpecificationError.Type.UNKNOWN
+        new GenieJobResolutionException(MESSAGE, new GeniePreconditionException(MESSAGE))             | JobSpecificationError.Type.RESOLUTION_FAILED
+        new GenieJobResolutionException(MESSAGE)                                                      | JobSpecificationError.Type.RESOLUTION_FAILED
+        new GenieJobResolutionException(new Throwable(MESSAGE))                                       | JobSpecificationError.Type.RESOLUTION_FAILED
     }
 
     @Unroll
