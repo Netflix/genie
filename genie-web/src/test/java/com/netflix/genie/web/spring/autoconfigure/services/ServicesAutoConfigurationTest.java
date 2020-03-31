@@ -19,7 +19,10 @@ package com.netflix.genie.web.spring.autoconfigure.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.agent.services.AgentFileStreamService;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
@@ -35,7 +38,9 @@ import com.netflix.genie.web.properties.JobsMaxProperties;
 import com.netflix.genie.web.properties.JobsMemoryProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersProperties;
+import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.FileTransferFactory;
+import com.netflix.genie.web.services.JobFileService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import com.netflix.genie.web.services.JobResolverService;
@@ -53,6 +58,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -207,6 +213,25 @@ public class ServicesAutoConfigurationTest {
                 Mockito.mock(JobResolverService.class),
                 Mockito.mock(MeterRegistry.class),
                 new GenieHostInfo(UUID.randomUUID().toString())
+            )
+        );
+    }
+
+    /**
+     * Can get the bean for Job Directory Server Service.
+     */
+    @Test
+    public void canGetJobDirectoryServerServiceBean() {
+        Assert.assertNotNull(
+            this.servicesAutoConfiguration.jobDirectoryServerService(
+                Mockito.mock(ResourceLoader.class),
+                Mockito.mock(DataServices.class),
+                Mockito.mock(AgentFileStreamService.class),
+                Mockito.mock(ArchivedJobService.class),
+                Mockito.mock(MeterRegistry.class),
+                Mockito.mock(JobFileService.class),
+                Mockito.mock(JobDirectoryManifestCreatorService.class),
+                Mockito.mock(AgentRoutingService.class)
             )
         );
     }

@@ -26,6 +26,7 @@ import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
 import com.netflix.genie.web.agent.services.AgentFileStreamService
+import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.JobPersistenceService
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException
@@ -73,6 +74,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     JobDirectoryServerServiceImpl.GenieResourceHandler handler
     JobDirectoryManifestCreatorService jobDirectoryManifestService
     ArchivedJobService archivedJobService
+    AgentRoutingService agentRoutingService
 
     void setup() {
         this.resourceLoader = Mock(ResourceLoader)
@@ -84,6 +86,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.handler = Mock(JobDirectoryServerServiceImpl.GenieResourceHandler)
         this.jobDirectoryManifestService = Mock(JobDirectoryManifestCreatorService)
         this.archivedJobService = Mock(ArchivedJobService)
+        this.agentRoutingService = Mock(AgentRoutingService)
         def dataServices = Mock(DataServices) {
             getJobPersistenceService() >> this.jobPersistenceService
         }
@@ -95,7 +98,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
             this.handlerFactory,
             this.meterRegistry,
             this.jobFileService,
-            this.jobDirectoryManifestService
+            this.jobDirectoryManifestService,
+            this.agentRoutingService
         )
 
         this.request = Mock(HttpServletRequest)
@@ -134,6 +138,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
         1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.empty()
         thrown(GenieServerUnavailableException)
 
@@ -145,6 +150,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
         1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
         1 * this.manifest.getEntry(REL_PATH) >> Optional.empty()
         thrown(GenieNotFoundException)
@@ -155,6 +161,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         then:
         1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
         1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
         1 * this.manifest.getEntry(REL_PATH) >> Optional.of(this.manifestEntry)
         1 * this.manifestEntry.isDirectory() >> false

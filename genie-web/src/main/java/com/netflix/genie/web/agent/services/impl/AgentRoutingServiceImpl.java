@@ -87,4 +87,12 @@ public class AgentRoutingServiceImpl implements AgentRoutingService {
         log.info("Agent executing job {} disconnected", jobId);
         this.agentConnectionPersistenceService.removeAgentConnection(jobId, genieHostInfo.getHostname());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAgentConnected(final String jobId) {
+        return getHostnameForAgentConnection(jobId).isPresent();
+    }
 }

@@ -24,6 +24,7 @@ import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorSer
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
@@ -422,6 +423,7 @@ public class ServicesAutoConfiguration {
      * @param jobFileService                     The service responsible for managing the job working directory on disk
      *                                           for V3 Jobs
      * @param jobDirectoryManifestCreatorService The job directory manifest service
+     * @param agentRoutingService                The agent routing service
      * @return An instance of {@link JobDirectoryServerServiceImpl}
      */
     @Bean
@@ -433,7 +435,8 @@ public class ServicesAutoConfiguration {
         final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
         final JobFileService jobFileService,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
+        final AgentRoutingService agentRoutingService
     ) {
         return new JobDirectoryServerServiceImpl(
             resourceLoader,
@@ -442,7 +445,8 @@ public class ServicesAutoConfiguration {
             archivedJobService,
             meterRegistry,
             jobFileService,
-            jobDirectoryManifestCreatorService
+            jobDirectoryManifestCreatorService,
+            agentRoutingService
         );
     }
 
