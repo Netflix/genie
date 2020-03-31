@@ -137,13 +137,14 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-">JobDirectoryServerServiceImpl</a></span>(org.springframework.core.io.ResourceLoader&nbsp;resourceLoader,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/services/impl/JobDirectoryServerServiceImpl.html#JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.web.agent.services.AgentRoutingService-">JobDirectoryServerServiceImpl</a></span>(org.springframework.core.io.ResourceLoader&nbsp;resourceLoader,
                              <a href="../../../../../../com/netflix/genie/web/data/services/DataServices.html" title="class in com.netflix.genie.web.data.services">DataServices</a>&nbsp;dataServices,
                              <a href="../../../../../../com/netflix/genie/web/agent/services/AgentFileStreamService.html" title="interface in com.netflix.genie.web.agent.services">AgentFileStreamService</a>&nbsp;agentFileStreamService,
                              <a href="../../../../../../com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services">ArchivedJobService</a>&nbsp;archivedJobService,
                              io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry,
                              <a href="../../../../../../com/netflix/genie/web/services/JobFileService.html" title="interface in com.netflix.genie.web.services">JobFileService</a>&nbsp;jobFileService,
-                             <a href="../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService)</code>
+                             <a href="../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService,
+                             <a href="../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -194,7 +195,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-">
+<a name="JobDirectoryServerServiceImpl-org.springframework.core.io.ResourceLoader-com.netflix.genie.web.data.services.DataServices-com.netflix.genie.web.agent.services.AgentFileStreamService-com.netflix.genie.web.services.ArchivedJobService-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.JobFileService-com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService-com.netflix.genie.web.agent.services.AgentRoutingService-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -206,7 +207,8 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
                                      <a href="../../../../../../com/netflix/genie/web/services/ArchivedJobService.html" title="interface in com.netflix.genie.web.services">ArchivedJobService</a>&nbsp;archivedJobService,
                                      io.micrometer.core.instrument.MeterRegistry&nbsp;meterRegistry,
                                      <a href="../../../../../../com/netflix/genie/web/services/JobFileService.html" title="interface in com.netflix.genie.web.services">JobFileService</a>&nbsp;jobFileService,
-                                     <a href="../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService)</pre>
+                                     <a href="../../../../../../com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services">JobDirectoryManifestCreatorService</a>&nbsp;jobDirectoryManifestCreatorService,
+                                     <a href="../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingService)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -218,6 +220,7 @@ implements <a href="../../../../../../com/netflix/genie/web/services/JobDirector
 <dd><code>meterRegistry</code> - The meter registry used to keep track of metrics</dd>
 <dd><code>jobFileService</code> - The service responsible for managing the job directory for V3 Jobs</dd>
 <dd><code>jobDirectoryManifestCreatorService</code> - The job directory manifest service</dd>
+<dd><code>agentRoutingService</code> - The agent routing service</dd>
 </dl>
 </li>
 </ul>

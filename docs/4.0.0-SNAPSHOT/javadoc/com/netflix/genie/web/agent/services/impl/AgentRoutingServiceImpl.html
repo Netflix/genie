@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -178,6 +178,12 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#isAgentConnected-java.lang.String-">isAgentConnected</a></span>(java.lang.String&nbsp;jobId)</code>
+<div class="block">Whether the agent executing a given job is currently connected.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal</a></span>(@NotBlank java.lang.String&nbsp;jobId)</code>
 <div class="block">Tells wether the agent running a given job is connected to the local node.</div>
 </td>
@@ -286,7 +292,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <a name="handleClientDisconnected-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>handleClientDisconnected</h4>
 <pre>public&nbsp;void&nbsp;handleClientDisconnected(@NotBlank
@@ -297,6 +303,24 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#handleClientDisconnected-java.lang.String-">handleClientDisconnected</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - the job id the disconnected agent is running</dd>
+</dl>
+</li>
+</ul>
+<a name="isAgentConnected-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>isAgentConnected</h4>
+<pre>public&nbsp;boolean&nbsp;isAgentConnected(java.lang.String&nbsp;jobId)</pre>
+<div class="block">Whether the agent executing a given job is currently connected.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#isAgentConnected-java.lang.String-">isAgentConnected</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobId</code> - the job id</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if an agent running the job is connected</dd>
 </dl>
 </li>
 </ul>

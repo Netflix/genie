@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -149,6 +149,12 @@ public interface <span class="typeNameLabel">AgentRoutingService</span></pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#isAgentConnected-java.lang.String-">isAgentConnected</a></span>(java.lang.String&nbsp;jobId)</code>
+<div class="block">Whether the agent executing a given job is currently connected.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html#isAgentConnectionLocal-java.lang.String-">isAgentConnectionLocal</a></span>(@NotBlank java.lang.String&nbsp;jobId)</code>
 <div class="block">Tells wether the agent running a given job is connected to the local node.</div>
 </td>
@@ -220,7 +226,7 @@ public interface <span class="typeNameLabel">AgentRoutingService</span></pre>
 <a name="handleClientDisconnected-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>handleClientDisconnected</h4>
 <pre>void&nbsp;handleClientDisconnected(@NotBlank
@@ -229,6 +235,22 @@ public interface <span class="typeNameLabel">AgentRoutingService</span></pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobId</code> - the job id the disconnected agent is running</dd>
+</dl>
+</li>
+</ul>
+<a name="isAgentConnected-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>isAgentConnected</h4>
+<pre>boolean&nbsp;isAgentConnected(java.lang.String&nbsp;jobId)</pre>
+<div class="block">Whether the agent executing a given job is currently connected.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jobId</code> - the job id</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if an agent running the job is connected</dd>
 </dl>
 </li>
 </ul>
