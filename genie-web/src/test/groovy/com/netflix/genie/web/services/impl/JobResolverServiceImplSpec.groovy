@@ -35,7 +35,6 @@ import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobStatus
-import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.web.data.services.ApplicationPersistenceService
@@ -150,10 +149,7 @@ class JobResolverServiceImplSpec extends Specification {
             jobRequest.getCriteria().getClusterCriteria(),
             jobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * this.clusterSelector.selectCluster(
-            clusters,
-            _ as com.netflix.genie.common.dto.JobRequest
-        ) >> clusterSelectionResult
+        1 * this.clusterSelector.selectCluster(clusters, jobRequest) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.commandService.getCommand(commandId) >> command
         1 * this.commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
@@ -193,10 +189,7 @@ class JobResolverServiceImplSpec extends Specification {
             jobRequestNoArchivalData.getCriteria().getClusterCriteria(),
             jobRequestNoArchivalData.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * this.clusterSelector.selectCluster(
-            clusters,
-            _ as com.netflix.genie.common.dto.JobRequest
-        ) >> clusterSelectionResult
+        1 * this.clusterSelector.selectCluster(clusters, jobRequestNoArchivalData) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.commandService.getCommand(commandId) >> command
         1 * this.commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
@@ -240,10 +233,7 @@ class JobResolverServiceImplSpec extends Specification {
             savedJobRequest.getCriteria().getClusterCriteria(),
             savedJobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * this.clusterSelector.selectCluster(
-            clusters,
-            _ as com.netflix.genie.common.dto.JobRequest
-        ) >> clusterSelectionResult
+        1 * this.clusterSelector.selectCluster(clusters, savedJobRequest) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.commandService.getCommand(commandId) >> command
         1 * this.commandService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
@@ -323,7 +313,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.commandSelector.selectCommand(commands, jobRequest) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command0)
         1 * this.clusterService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
-        1 * this.clusterSelector.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> clusterSelectionResult
+        1 * this.clusterSelector.selectCluster(clusters, jobRequest) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.commandService.getApplicationsForCommand(command0Id) >> Lists.newArrayList()
         jobSpec.getExecutableArgs() == expectedCommandArgs
@@ -358,7 +348,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.commandSelector.selectCommand(commands, jobRequestNoArchivalData) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command0)
         1 * this.clusterService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
-        1 * this.clusterSelector.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> clusterSelectionResult
+        1 * this.clusterSelector.selectCluster(clusters, jobRequestNoArchivalData) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.commandService.getApplicationsForCommand(command0Id) >> Lists.newArrayList()
         jobSpecNoArchivalData.getExecutableArgs() == expectedCommandArgs
@@ -400,7 +390,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.commandSelector.selectCommand(commands, savedJobRequest) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command1)
         1 * this.clusterService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
-        1 * this.clusterSelector.selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> clusterSelectionResult
+        1 * this.clusterSelector.selectCluster(clusters, savedJobRequest) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster2)
         1 * this.commandService.getApplicationsForCommand(command1Id) >> Lists.newArrayList()
         1 * this.jobService.saveResolvedJob(jobId, _ as ResolvedJob)
@@ -538,132 +528,6 @@ class JobResolverServiceImplSpec extends Specification {
         envVariables.get(JobConstants.GENIE_JOB_GROUPING_INSTANCE_ENV_VAR) == groupingInstance
         envVariables.get(JobConstants.GENIE_USER_ENV_VAR) == user
         envVariables.get(JobConstants.GENIE_USER_GROUP_ENV_VAR) == ""
-    }
-
-    def "Can convert V4 Criterion to V3 tags"() {
-        def id = UUID.randomUUID().toString()
-        def name = UUID.randomUUID().toString()
-        def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        Set<String> v3Tags
-
-        when:
-        v3Tags = this.service.toV3Tags(new Criterion.Builder().withId(id).withName(name).withTags(tags).build())
-
-        then:
-        v3Tags.size() == 4
-        v3Tags.contains("genie.id:" + id)
-        v3Tags.contains("genie.name:" + name)
-        v3Tags.containsAll(tags)
-
-        when:
-        v3Tags = this.service.toV3Tags(new Criterion.Builder().withId(id).withTags(tags).build())
-
-        then:
-        v3Tags.size() == 3
-        v3Tags.contains("genie.id:" + id)
-        v3Tags.containsAll(tags)
-
-        when:
-        v3Tags = this.service.toV3Tags(new Criterion.Builder().withName(name).withTags(tags).build())
-
-        then:
-        v3Tags.size() == 3
-        v3Tags.contains("genie.name:" + name)
-        v3Tags.containsAll(tags)
-
-        when:
-        v3Tags = this.service.toV3Tags(new Criterion.Builder().withTags(tags).build())
-
-        then:
-        v3Tags.size() == 2
-        v3Tags.containsAll(tags)
-    }
-
-    def "Can convert V4 Job Request to V3"() {
-        def id = UUID.randomUUID().toString()
-        def name = UUID.randomUUID().toString()
-        def user = UUID.randomUUID().toString()
-        def version = UUID.randomUUID().toString()
-        def clusterCriteria = Lists.newArrayList(
-            new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .build(),
-            new Criterion.Builder()
-                .withName(UUID.randomUUID().toString())
-                .withStatus(UUID.randomUUID().toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .build()
-        )
-        def commandCriterion = new Criterion.Builder()
-            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-            .build()
-        def applicationIds = Lists.newArrayList(UUID.randomUUID().toString())
-        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def tags = Sets.newHashSet(UUID.randomUUID().toString())
-        def email = UUID.randomUUID().toString()
-        def group = UUID.randomUUID().toString()
-        def grouping = UUID.randomUUID().toString()
-        def groupingInstance = UUID.randomUUID().toString()
-        def description = UUID.randomUUID().toString()
-        def metadata = GenieObjectMapper.mapper.createObjectNode()
-        def configs = Sets.newHashSet(UUID.randomUUID().toString())
-        def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        def setupFile = UUID.randomUUID().toString()
-        def timeout = 10835
-
-        def jobRequest = new JobRequest(
-            null,
-            new ExecutionEnvironment(configs, dependencies, setupFile),
-            commandArgs,
-            new JobMetadata.Builder(name, user, version)
-                .withTags(tags)
-                .withGroupingInstance(groupingInstance)
-                .withGrouping(grouping)
-                .withGroup(group)
-                .withEmail(email)
-                .withMetadata(metadata)
-                .withDescription(description)
-                .build(),
-            new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
-            null,
-            new AgentConfigRequest
-                .Builder()
-                .withArchivingDisabled(true)
-                .withInteractive(true)
-                .withTimeoutRequested(timeout)
-                .build(),
-            new JobArchivalDataRequest
-                .Builder()
-                .build()
-        )
-
-        when:
-        def v3JobRequest = this.service.toV3JobRequest(id, jobRequest)
-
-        then:
-        v3JobRequest.getId().orElse(UUID.randomUUID().toString()) == id
-        v3JobRequest.getName() == name
-        v3JobRequest.getUser() == user
-        v3JobRequest.getVersion() == version
-        v3JobRequest.getTags() == tags
-        v3JobRequest.getApplications() == applicationIds
-        v3JobRequest.getCommandArgs().orElse(UUID.randomUUID().toString()) == StringUtils.join(commandArgs, " ")
-        !v3JobRequest.getMemory().isPresent()
-        v3JobRequest.getTimeout().orElse(-1) == timeout
-        v3JobRequest.getMetadata().orElse(null) == metadata
-        v3JobRequest.getGrouping().orElse(UUID.randomUUID().toString()) == grouping
-        v3JobRequest.getGroupingInstance().orElse(UUID.randomUUID().toString()) == groupingInstance
-        v3JobRequest.getGroup().orElse(UUID.randomUUID().toString()) == group
-        v3JobRequest.getDescription().orElse(UUID.randomUUID().toString()) == description
-        !v3JobRequest.getCpu().isPresent()
-        v3JobRequest.getDependencies() == dependencies
-        v3JobRequest.getConfigs() == configs
-        v3JobRequest.getSetupFile().orElse(UUID.randomUUID().toString()) == setupFile
-        v3JobRequest.getEmail().orElse(UUID.randomUUID().toString()) == email
-        v3JobRequest.getCommandCriteria() == commandCriterion.getTags()
-        v3JobRequest.getClusterCriterias().size() == 2
-        v3JobRequest.getClusterCriterias().get(0).getTags() == clusterCriteria.get(0).getTags()
-        v3JobRequest.getClusterCriterias().get(1).getTags() == this.service.toV3Tags(clusterCriteria.get(1))
     }
 
     def "can merge criterion strings: #one #two with expected result #expected"() {
@@ -901,7 +765,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
-        1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> selectionResult
+        1 * this.clusterSelector.selectCluster(allClusters, jobRequest) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.empty()
         thrown(GenieJobResolutionException)
 
@@ -913,7 +777,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
-        1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> { throw new ResourceSelectionException() }
+        1 * this.clusterSelector.selectCluster(allClusters, jobRequest) >> { throw new ResourceSelectionException() }
         0 * selectionResult.getSelectedResource()
         thrown(GenieJobResolutionException)
 
@@ -925,7 +789,7 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
         1 * this.clusterService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
-        1 * this.clusterSelector.selectCluster(allClusters, _ as com.netflix.genie.common.dto.JobRequest) >> selectionResult
+        1 * this.clusterSelector.selectCluster(allClusters, jobRequest) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.of(cluster2)
         resolvedCluster == cluster2
     }

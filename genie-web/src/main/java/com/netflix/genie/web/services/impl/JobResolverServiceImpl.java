@@ -21,16 +21,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
-import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
-import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
@@ -76,7 +73,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the {@link JobResolverService} APIs.
@@ -471,7 +467,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     .findFirst()
                     .orElseThrow(() -> new GenieServerException("Couldn't get cluster when size was one"));
             } else {
-                cluster = this.selectClusterUsingClusterSelectors(counterTags, clusters, id, jobRequest);
+                cluster = this.selectClusterUsingClusterSelectors(counterTags, clusters, jobRequest);
             }
 
             if (cluster == null) {
@@ -563,7 +559,6 @@ public class JobResolverServiceImpl implements JobResolverService {
     private Cluster selectClusterUsingClusterSelectors(
         final Set<Tag> counterTags,
         final Set<Cluster> clusters,
-        final String id,
         final JobRequest jobRequest
     ) {
         Cluster cluster = null;
@@ -585,7 +580,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             try {
                 final ResourceSelectionResult<Cluster> result = clusterSelector.selectCluster(
                     clusters,
-                    this.toV3JobRequest(id, jobRequest)
+                    jobRequest
                 );
                 final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
                 if (selectedClusterOptional.isPresent()) {
@@ -679,64 +674,6 @@ public class JobResolverServiceImpl implements JobResolverService {
         envVariables.put(JobConstants.GENIE_USER_ENV_VAR, jobRequest.getMetadata().getUser());
         envVariables.put(JobConstants.GENIE_USER_GROUP_ENV_VAR, jobRequest.getMetadata().getGroup().orElse(""));
         return envVariables.build();
-    }
-
-    /**
-     * Helper method to convert a v4 JobRequest to a v3 job request.
-     *
-     * @param jobRequest The v4 job request instance
-     * @return The v3 job request instance
-     */
-    // TODO: This should be removed once we fully port rest of application to v4 and only have v3 interface with
-    //       Adapters at API level
-    private com.netflix.genie.common.dto.JobRequest toV3JobRequest(final String id, final JobRequest jobRequest) {
-        final com.netflix.genie.common.dto.JobRequest.Builder v3Builder
-            = new com.netflix.genie.common.dto.JobRequest.Builder(
-            jobRequest.getMetadata().getName(),
-            jobRequest.getMetadata().getUser(),
-            jobRequest.getMetadata().getVersion(),
-            jobRequest
-                .getCriteria()
-                .getClusterCriteria()
-                .stream()
-                .map(this::toClusterCriteria)
-                .collect(Collectors.toList()),
-            this.toV3Tags(jobRequest.getCriteria().getCommandCriterion())
-        )
-            .withId(id)
-            .withApplications(jobRequest.getCriteria().getApplicationIds())
-            .withCommandArgs(jobRequest.getCommandArgs())
-            .withDisableLogArchival(jobRequest.getRequestedAgentConfig().isArchivingDisabled())
-            .withTags(jobRequest.getMetadata().getTags());
-
-        final JobMetadata metadata = jobRequest.getMetadata();
-        metadata.getEmail().ifPresent(v3Builder::withEmail);
-        metadata.getGroup().ifPresent(v3Builder::withGroup);
-        metadata.getGrouping().ifPresent(v3Builder::withGrouping);
-        metadata.getGroupingInstance().ifPresent(v3Builder::withGroupingInstance);
-        metadata.getDescription().ifPresent(v3Builder::withDescription);
-        metadata.getMetadata().ifPresent(v3Builder::withMetadata);
-
-        final ExecutionEnvironment jobResources = jobRequest.getResources();
-        v3Builder.withConfigs(jobResources.getConfigs());
-        v3Builder.withDependencies(jobResources.getDependencies());
-        jobResources.getSetupFile().ifPresent(v3Builder::withSetupFile);
-
-        jobRequest.getRequestedAgentConfig().getTimeoutRequested().ifPresent(v3Builder::withTimeout);
-
-        return v3Builder.build();
-    }
-
-    private ClusterCriteria toClusterCriteria(final Criterion criterion) {
-        return new ClusterCriteria(this.toV3Tags(criterion));
-    }
-
-    private Set<String> toV3Tags(final Criterion criterion) {
-        final Set<String> tags = Sets.newHashSet();
-        criterion.getId().ifPresent(id -> tags.add("genie.id:" + id));
-        criterion.getName().ifPresent(name -> tags.add("genie.name:" + name));
-        tags.addAll(criterion.getTags());
-        return tags;
     }
 
     /**
@@ -937,7 +874,6 @@ public class JobResolverServiceImpl implements JobResolverService {
                         cluster = this.selectClusterUsingClusterSelectors(
                             Sets.newHashSet(),
                             clusters,
-                            jobId,
                             jobRequest
                         );
                     }

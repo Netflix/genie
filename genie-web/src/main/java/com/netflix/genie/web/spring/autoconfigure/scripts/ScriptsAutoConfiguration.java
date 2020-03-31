@@ -117,7 +117,6 @@ public class ScriptsAutoConfiguration {
         return new ClusterSelectorManagedScript(
             scriptManager,
             scriptProperties,
-            GenieObjectMapper.getMapper(),
             meterRegistry
         );
     }

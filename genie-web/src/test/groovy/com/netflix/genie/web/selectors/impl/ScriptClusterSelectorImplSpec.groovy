@@ -18,13 +18,14 @@
 package com.netflix.genie.web.selectors.impl
 
 import com.google.common.collect.Sets
-import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata
+import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript
+import com.netflix.genie.web.scripts.ResourceSelectorScriptResult
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.MeterRegistry
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Specifications for the {@link ScriptClusterSelectorImpl} class.
  */
+@SuppressWarnings("GroovyAccessibility")
 class ScriptClusterSelectorImplSpec extends Specification {
 
     ClusterSelectorManagedScript script
@@ -48,7 +50,7 @@ class ScriptClusterSelectorImplSpec extends Specification {
         this.timer = Mock(Timer)
         this.script = Mock(ClusterSelectorManagedScript)
         this.registry = Mock(MeterRegistry)
-        this.scriptClusterSelector = new ScriptClusterSelectorImpl(script, registry)
+        this.scriptClusterSelector = new ScriptClusterSelectorImpl(this.script, this.registry)
     }
 
     def "selectCluster"() {
@@ -61,34 +63,39 @@ class ScriptClusterSelectorImplSpec extends Specification {
 
         ResourceSelectionResult<Cluster> result
         Set<Tag> expectedTags
+        ResourceSelectorScriptResult<Cluster> scriptResult = Mock(ResourceSelectorScriptResult)
 
         when: "Script returns null"
         expectedTags = MetricsUtils.newSuccessTagsSet()
-        expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "null"))
+        expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, ScriptClusterSelectorImpl.NULL_TAG))
         result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
 
         then:
-        1 * script.selectCluster(jobRequest, clusters) >> null
-        1 * registry.timer(
+        1 * this.script.selectResource(clusters, jobRequest) >> scriptResult
+        1 * scriptResult.getResource() >> Optional.empty()
+        1 * scriptResult.getRationale() >> Optional.empty()
+        1 * this.registry.timer(
             ScriptClusterSelectorImpl.SELECT_TIMER_NAME,
             {
                 it == expectedTags
             }
-        ) >> timer
-        1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
+        ) >> this.timer
+        1 * this.timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
         !result.getSelectedResource().isPresent()
+        result.getSelectionRationale().orElse(null) == ScriptClusterSelectorImpl.NULL_RATIONALE
+        result.getSelectorClass() == ScriptClusterSelectorImpl.class
 
         when: "Script throws"
         expectedTags = MetricsUtils.newFailureTagsSetForException(executionException)
         this.scriptClusterSelector.selectCluster(clusters, jobRequest)
 
         then:
-        1 * script.selectCluster(jobRequest, clusters) >> { throw executionException }
-        1 * registry.timer(
+        1 * this.script.selectResource(clusters, jobRequest) >> { throw executionException }
+        1 * this.registry.timer(
             ScriptClusterSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
-        ) >> timer
-        1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
+        ) >> this.timer
+        1 * this.timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
         thrown(ResourceSelectionException)
 
         when: "Script selects cluster"
@@ -98,15 +105,19 @@ class ScriptClusterSelectorImplSpec extends Specification {
         result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
 
         then:
-        1 * script.selectCluster(jobRequest, clusters) >> cluster2
+        1 * this.script.selectResource(clusters, jobRequest) >> scriptResult
+        1 * scriptResult.getResource() >> Optional.of(cluster2)
+        1 * scriptResult.getRationale() >> Optional.of("Cluster 2 was good")
         1 * cluster2.getId() >> "cluster2"
         1 * cluster2.getMetadata() >> cluster2metadata
         1 * cluster2metadata.getName() >> "Cluster 2"
-        1 * registry.timer(
+        1 * this.registry.timer(
             ScriptClusterSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
-        ) >> timer
-        1 * timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
+        ) >> this.timer
+        1 * this.timer.record({ it > 0 }, TimeUnit.NANOSECONDS)
         result.getSelectedResource().orElse(null) == cluster2
+        result.getSelectionRationale().orElse(null) == "Cluster 2 was good"
+        result.getSelectorClass() == ScriptClusterSelectorImpl.class
     }
 }
