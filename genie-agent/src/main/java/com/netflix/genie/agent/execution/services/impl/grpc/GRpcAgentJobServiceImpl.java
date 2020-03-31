@@ -303,6 +303,7 @@ class GRpcAgentJobServiceImpl implements AgentJobService {
             case NO_CLUSTER_FOUND:
             case NO_JOB_FOUND:
             case NO_COMMAND_FOUND:
+            case RESOLUTION_FAILED:
                 throw new JobSpecificationResolutionException(
                     "Failed to obtain specification: "
                         + error.getType().name()

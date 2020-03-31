@@ -67,6 +67,8 @@ public class JobServiceProtoErrorComposer {
             .put(GenieApplicationNotFoundException.class, JobSpecificationError.Type.NO_APPLICATION_FOUND)
             .put(GenieJobSpecificationNotFoundException.class, JobSpecificationError.Type.NO_SPECIFICATION_FOUND)
             .put(ConstraintViolationException.class, JobSpecificationError.Type.INVALID_REQUEST)
+            .put(GenieJobResolutionException.class, JobSpecificationError.Type.RESOLUTION_FAILED)
+            .put(GeniePreconditionException.class, JobSpecificationError.Type.RESOLUTION_FAILED)
             .build();
 
     private static final Map<Class<? extends Exception>, ClaimJobError.Type> CLAIM_JOB_ERROR_MAP =
