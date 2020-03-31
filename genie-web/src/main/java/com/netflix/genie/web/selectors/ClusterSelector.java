@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.selectors;
 
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import org.springframework.validation.annotation.Validated;

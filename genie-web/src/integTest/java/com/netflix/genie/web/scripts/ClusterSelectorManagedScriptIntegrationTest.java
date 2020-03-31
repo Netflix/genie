@@ -17,24 +17,25 @@
  */
 package com.netflix.genie.web.scripts;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
-import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
+import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.TaskScheduler;
@@ -49,64 +50,60 @@ import java.util.concurrent.Executors;
 
 class ClusterSelectorManagedScriptIntegrationTest {
 
-    private static final Cluster CLUSTER_0 = new Cluster(
-        "0",
-        Instant.now(),
-        Instant.now(),
-        new ExecutionEnvironment(null, null, null),
-        new ClusterMetadata.Builder(
-            "d",
-            "e",
-            "f",
-            ClusterStatus.UP
-        ).build()
+    private static final ExecutionResourceCriteria CRITERIA = new ExecutionResourceCriteria(
+        Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
+        new Criterion.Builder().withName(UUID.randomUUID().toString()).build(),
+        null
     );
-    private static final Cluster CLUSTER_1 = new Cluster(
-        "1",
-        Instant.now(),
-        Instant.now(),
-        new ExecutionEnvironment(null, null, null),
-        new ClusterMetadata.Builder(
-            "g",
-            "h",
-            "i",
-            ClusterStatus.UP
-        ).build()
-    );
-    private static final Cluster CLUSTER_2 = new Cluster(
-        "2",
-        Instant.now(),
-        Instant.now(),
-        new ExecutionEnvironment(null, null, null),
-        new ClusterMetadata.Builder(
-            "a",
-            "b",
-            "c",
-            ClusterStatus.UP
-        ).build()
-    );
-
-
-    private static final JobRequest JOB_REQUEST = new JobRequest.Builder(
-        "jobName",
-        "jobUser",
-        "jobVersion",
-        Lists.newArrayList(
-            new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-        ),
-        Sets.newHashSet(UUID.randomUUID().toString())
+    private static final JobMetadata JOB_METADATA = new JobMetadata.Builder(
+        UUID.randomUUID().toString(),
+        UUID.randomUUID().toString(),
+        UUID.randomUUID().toString()
     ).build();
 
-    private static final Set<Cluster> ALL_CLUSTERS = Sets.newHashSet(
-        CLUSTER_0, CLUSTER_1, CLUSTER_2
-    );
+    private static final Cluster CLUSTER_0 = createTestCluster("0");
+    private static final Cluster CLUSTER_1 = createTestCluster("1");
+    private static final Cluster CLUSTER_2 = createTestCluster("2");
 
-    private static final Set<Cluster> NO_MATCH_CLUSTERS = Sets.newHashSet(
-        CLUSTER_0, CLUSTER_2
-    );
+    private static final JobRequest JOB_REQUEST_0 = createTestJobRequest("0");
+    private static final JobRequest JOB_REQUEST_1 = createTestJobRequest("1");
+    private static final JobRequest JOB_REQUEST_2 = createTestJobRequest("2");
+    private static final JobRequest JOB_REQUEST_3 = createTestJobRequest("3");
+    private static final JobRequest JOB_REQUEST_4 = createTestJobRequest("4");
+    private static final JobRequest JOB_REQUEST_5 = createTestJobRequest("5");
+
+    private static final Set<Cluster> CLUSTERS = Sets.newHashSet(CLUSTER_0, CLUSTER_1, CLUSTER_2);
 
     private ClusterSelectorScriptProperties scriptProperties;
     private ClusterSelectorManagedScript clusterSelectorScript;
+
+    private static Cluster createTestCluster(final String id) {
+        return new Cluster(
+            id,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.UP
+            ).build()
+        );
+    }
+
+    private static JobRequest createTestJobRequest(final String requestedId) {
+        return new JobRequest(
+            requestedId,
+            null,
+            null,
+            JOB_METADATA,
+            CRITERIA,
+            null,
+            null,
+            null
+        );
+    }
 
     @BeforeEach
     void setUp() {
@@ -116,7 +113,6 @@ class ClusterSelectorManagedScriptIntegrationTest {
         final ExecutorService executorService = Executors.newCachedThreadPool();
         final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
         final ResourceLoader resourceLoader = new DefaultResourceLoader();
-        final ObjectMapper objectMapper = GenieObjectMapper.getMapper();
         final ScriptManager scriptManager = new ScriptManager(
             scriptManagerProperties,
             taskScheduler,
@@ -128,25 +124,46 @@ class ClusterSelectorManagedScriptIntegrationTest {
         this.scriptProperties = new ClusterSelectorScriptProperties();
         this.clusterSelectorScript = new ClusterSelectorManagedScript(
             scriptManager,
-            scriptProperties,
-            objectMapper,
+            this.scriptProperties,
             meterRegistry
         );
     }
 
-    @ParameterizedTest(name = "Select using {0}")
-    @ValueSource(strings = {"selectCluster.js", "selectCluster.groovy"})
-    void selectClusterTest(
-        final String scriptFilename
-    ) throws Exception {
-        ManagedScriptIntegrationTest.loadScript(scriptFilename, clusterSelectorScript, scriptProperties);
+    @Test
+    void selectClusterTest() throws Exception {
+        ManagedScriptIntegrationTest.loadScript(
+            "selectCluster.groovy",
+            this.clusterSelectorScript,
+            this.scriptProperties
+        );
 
-        Assertions.assertThat(
-            this.clusterSelectorScript.selectCluster(JOB_REQUEST, ALL_CLUSTERS)
-        ).isEqualTo(CLUSTER_1);
+        ResourceSelectorScriptResult<Cluster> result;
 
-        Assertions.assertThat(
-            this.clusterSelectorScript.selectCluster(JOB_REQUEST, NO_MATCH_CLUSTERS)
-        ).isEqualTo(null);
+        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_0);
+        Assertions.assertThat(result.getResource()).isPresent().contains(CLUSTER_0);
+        Assertions.assertThat(result.getRationale()).isPresent().contains("selected 0");
+
+        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_1);
+        Assertions.assertThat(result.getResource()).isNotPresent();
+        Assertions.assertThat(result.getRationale()).isPresent().contains("Couldn't find anything");
+
+        Assertions
+            .assertThatExceptionOfType(ResourceSelectionException.class)
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_2))
+            .withNoCause();
+
+        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_3);
+        Assertions.assertThat(result.getResource()).isNotPresent();
+        Assertions.assertThat(result.getRationale()).isNotPresent();
+
+        Assertions
+            .assertThatExceptionOfType(ResourceSelectionException.class)
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_4))
+            .withCauseInstanceOf(ScriptExecutionException.class);
+
+        // Invalid return type from script
+        Assertions
+            .assertThatExceptionOfType(ResourceSelectionException.class)
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_5));
     }
 }

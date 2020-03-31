@@ -17,27 +17,19 @@
  */
 package com.netflix.genie.web.scripts;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
-import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
-import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.commons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * Implementation of {@link ManagedScript} that delegates selection of a job's cluster when more than one choice is
+ * Extension of {@link ResourceSelectorScript} that delegates selection of a job's cluster when more than one choice is
  * available. See also: {@link ClusterSelector}.
  * <p>
  * The contract between the script and the Java code is that the script will be supplied global variables
@@ -48,77 +40,48 @@ import java.util.stream.Collectors;
  * @author mprimi
  * @since 4.0.0
  */
-public class ClusterSelectorManagedScript extends ManagedScript {
-    private static final String CLUSTERS_BINDING = "clusters";
-    private static final String JOB_REQUEST_BINDING = "jobRequest";
+@Slf4j
+public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster> {
 
-    private final ObjectMapper mapper;
+    private static final String CLUSTERS_BINDING = "clustersParameter";
 
     /**
      * Constructor.
      *
      * @param scriptManager script manager
      * @param properties    script manager properties
-     * @param mapper        object mapper
      * @param registry      meter registry
      */
     public ClusterSelectorManagedScript(
         final ScriptManager scriptManager,
         final ClusterSelectorScriptProperties properties,
-        final ObjectMapper mapper,
         final MeterRegistry registry
     ) {
         super(scriptManager, properties, registry);
-        this.mapper = mapper;
     }
 
     /**
-     * Evaluate the script to select a cluster.
-     *
-     * @param jobRequest the job request
-     * @param clusters   the set of clusters that matched criteria
-     * @return the selected cluster from the input list, or null to indicate no preference
-     * @throws ScriptNotConfiguredException  if the script is not configured or not yet compiled
-     * @throws ScriptExecutionException      if the script fails to execute
-     * @throws GenieClusterNotFoundException if the script returns an id not in the input cluster list
+     * {@inheritDoc}
      */
-    @Nullable
-    public Cluster selectCluster(
-        final JobRequest jobRequest,
-        final Set<Cluster> clusters
-    ) throws ScriptNotConfiguredException, ScriptExecutionException, GenieClusterNotFoundException {
-        // TODO: For now for backwards compatibility with selector scripts continue writing Clusters out in
-        //       V3 format. Change to V4 once stabilize a bit more
-        final Set<com.netflix.genie.common.dto.Cluster> v3Clusters = clusters
-            .stream()
-            .map(DtoConverters::toV3Cluster)
-            .collect(Collectors.toSet());
+    @Override
+    public ResourceSelectorScriptResult<Cluster> selectResource(
+        final Set<Cluster> resources,
+        final JobRequest jobRequest
+    ) throws ResourceSelectionException {
+        log.debug("Called to attempt to select a cluster from {} for job {}", resources, jobRequest);
 
-        final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-        try {
-            builder.put(CLUSTERS_BINDING, this.mapper.writeValueAsString(v3Clusters));
-        } catch (final JsonProcessingException e) {
-            throw new ScriptExecutionException("Failed to convert: " + CLUSTERS_BINDING, e);
-        }
-        try {
-            builder.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
-        } catch (final JsonProcessingException e) {
-            throw new ScriptExecutionException("Failed to convert: " + JOB_REQUEST_BINDING, e);
-        }
-        final Map<String, Object> scriptParameters = builder.build();
-
-        final String selectedClusterId = (String) this.evaluateScript(scriptParameters);
-        if (StringUtils.isBlank(selectedClusterId)) {
-            return null;
-        }
-
-        for (final Cluster cluster : clusters) {
-            if (selectedClusterId.equals(cluster.getId())) {
-                return cluster;
-            }
-        }
-
-        throw new GenieClusterNotFoundException("No such cluster in input list: " + selectedClusterId);
+        return super.selectResource(resources, jobRequest);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addParametersForScript(
+        final Map<String, Object> parameters,
+        final Set<Cluster> resources,
+        final JobRequest jobRequest
+    ) {
+        parameters.put(CLUSTERS_BINDING, resources);
+    }
 }

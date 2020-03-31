@@ -18,11 +18,12 @@
 package com.netflix.genie.web.selectors.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.scripts.ClusterSelectorManagedScript;
+import com.netflix.genie.web.scripts.ResourceSelectorScriptResult;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +50,6 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
     static final String SELECT_TIMER_NAME = "genie.jobs.clusters.selectors.script.select.timer";
     private static final String NULL_TAG = "null";
     private static final String NULL_RATIONALE = "Script returned null, no preference";
-    private static final String SCRIPT_SELECTED_RATIONALE = "Script selected this cluster";
 
     private final MeterRegistry registry;
     private final ClusterSelectorManagedScript clusterSelectorManagedScript;
@@ -76,33 +77,41 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
         @Valid final JobRequest jobRequest
     ) throws ResourceSelectionException {
         final long selectStart = System.nanoTime();
-        log.debug("Called");
+        log.debug("Called to select cluster from {} for job {}", clusters, jobRequest);
         final Set<Tag> tags = Sets.newHashSet();
         final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
-            final Cluster selectedCluster = this.clusterSelectorManagedScript.selectCluster(jobRequest, clusters);
+            final ResourceSelectorScriptResult<Cluster> result
+                = this.clusterSelectorManagedScript.selectResource(clusters, jobRequest);
             MetricsUtils.addSuccessTags(tags);
 
-            if (selectedCluster == null) {
-                log.debug(NULL_RATIONALE);
+            final Optional<Cluster> clusterOptional = result.getResource();
+            if (!clusterOptional.isPresent()) {
+                final String rationale = result.getRationale().orElse(NULL_RATIONALE);
+                log.debug("No cluster selected due to: {}", rationale);
                 tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, NULL_TAG));
-                builder.withSelectionRationale(NULL_RATIONALE);
+                builder.withSelectionRationale(rationale);
                 return builder.build();
             }
 
+            final Cluster selectedCluster = clusterOptional.get();
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, selectedCluster.getId()));
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, selectedCluster.getMetadata().getName()));
 
             return builder
-                .withSelectionRationale(SCRIPT_SELECTED_RATIONALE)
+                .withSelectionRationale(result.getRationale().orElse(null))
                 .withSelectedResource(selectedCluster)
                 .build();
         } catch (final Throwable e) {
             final String errorMessage = "Cluster selection error: " + e.getMessage();
             log.error(errorMessage, e);
             MetricsUtils.addFailureTagsWithException(tags, e);
-            throw new ResourceSelectionException(e);
+            if (e instanceof ResourceSelectionException) {
+                throw e;
+            } else {
+                throw new ResourceSelectionException(e);
+            }
         } finally {
             this.registry
                 .timer(SELECT_TIMER_NAME, tags)
