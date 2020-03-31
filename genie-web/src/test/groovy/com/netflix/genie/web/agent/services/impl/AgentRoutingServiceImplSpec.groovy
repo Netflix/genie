@@ -119,4 +119,19 @@ class AgentRoutingServiceImplSpec extends Specification {
         1 * genieHostInfo.getHostname() >> HOSTNAME
         1 * persistenceService.removeAgentConnection(jobId, HOSTNAME)
     }
+
+    def "isAgentConnected"() {
+        boolean connected;
+        when:
+        connected = service.isAgentConnected(jobId)
+
+        then:
+        1 * persistenceService.lookupAgentConnectionServer(jobId) >> Optional.ofNullable(server)
+        connected == expectedConnected
+
+        where:
+        server    | expectedConnected
+        null      | false
+        "1.2.3.4" | true
+    }
 }

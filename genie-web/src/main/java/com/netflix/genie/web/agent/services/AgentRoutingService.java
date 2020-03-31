@@ -62,4 +62,11 @@ public interface AgentRoutingService {
      */
     void handleClientDisconnected(@NotBlank String jobId);
 
+    /**
+     * Whether the agent executing a given job is currently connected.
+     *
+     * @param jobId the job id
+     * @return true if an agent running the job is connected
+     */
+    boolean isAgentConnected(String jobId);
 }

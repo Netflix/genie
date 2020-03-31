@@ -30,6 +30,7 @@ import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
@@ -82,6 +83,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     private final GenieResourceHandler.Factory genieResourceHandlerFactory;
     private final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService;
     private final ArchivedJobService archivedJobService;
+    private final AgentRoutingService agentRoutingService;
 
     /**
      * Constructor.
@@ -94,6 +96,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
      * @param meterRegistry                      The meter registry used to keep track of metrics
      * @param jobFileService                     The service responsible for managing the job directory for V3 Jobs
      * @param jobDirectoryManifestCreatorService The job directory manifest service
+     * @param agentRoutingService                The agent routing service
      */
     public JobDirectoryServerServiceImpl(
         final ResourceLoader resourceLoader,
@@ -102,7 +105,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final ArchivedJobService archivedJobService,
         final MeterRegistry meterRegistry,
         final JobFileService jobFileService,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
+        final AgentRoutingService agentRoutingService
     ) {
         this(
             resourceLoader,
@@ -112,7 +116,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             new GenieResourceHandler.Factory(),
             meterRegistry,
             jobFileService,
-            jobDirectoryManifestCreatorService
+            jobDirectoryManifestCreatorService,
+            agentRoutingService
         );
     }
 
@@ -128,7 +133,8 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final GenieResourceHandler.Factory genieResourceHandlerFactory,
         final MeterRegistry meterRegistry,
         final JobFileService jobFileService,
-        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService
+        final JobDirectoryManifestCreatorService jobDirectoryManifestCreatorService,
+        final AgentRoutingService agentRoutingService
     ) {
         this.resourceLoader = resourceLoader;
         this.jobPersistenceService = dataServices.getJobPersistenceService();
@@ -138,6 +144,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         this.genieResourceHandlerFactory = genieResourceHandlerFactory;
         this.jobDirectoryManifestCreatorService = jobDirectoryManifestCreatorService;
         this.archivedJobService = archivedJobService;
+        this.agentRoutingService = agentRoutingService;
     }
 
     /**
@@ -168,7 +175,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final DirectoryManifest manifest;
         final URI jobDirRoot;
 
-        if (jobStatus.isActive() && isV4) { // Active V4 job
+        if (isV4 && this.agentRoutingService.isAgentConnectionLocal(jobId)) { // Active V4 job
             manifest = this.agentFileStreamService.getManifest(jobId).orElseThrow(
                 () -> new GenieServerUnavailableException("Manifest not found for job " + jobId)
             );
@@ -177,7 +184,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
             } catch (final URISyntaxException e) {
                 throw new GenieServerException("Failed to construct job directory path", e);
             }
-        } else if (jobStatus.isActive()) { // Active V3 job
+        } else if (jobStatus.isActive() && !isV4) { // Active V3 job
             final Resource jobDir = this.jobFileService.getJobFileAsResource(jobId, "");
             if (!jobDir.exists()) {
                 throw new GenieNotFoundException("Job directory does not exist: " + jobDir);

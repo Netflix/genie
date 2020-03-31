@@ -695,7 +695,10 @@ public class JobRestController {
 
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
         // if the job is finished all file serving is done from the archive it doesn't need to be forwarded anywhere
-        if (jobStatus.isActive() && this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
+        final boolean activeV3job = !isV4 && jobStatus.isActive();
+        final boolean activeV4job = isV4 && agentRoutingService.isAgentConnected(id);
+        final boolean shouldForward = activeV3job || activeV4job;
+        if (shouldForward && this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
             final String jobHostname = this.getJobOwnerHostname(id, isV4);
             if (!this.hostname.equals(jobHostname)) {
                 log.info("Job {} is not run on this node. Forwarding to {}", id, jobHostname);
