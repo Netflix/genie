@@ -86,6 +86,7 @@ com.netflix.genie.web.selectors
 com.netflix.genie.web.selectors.impl
 com.netflix.genie.web.services
 com.netflix.genie.web.services.impl
+com.netflix.genie.web.spring.actuators
 com.netflix.genie.web.spring.autoconfigure
 com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers
 com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints

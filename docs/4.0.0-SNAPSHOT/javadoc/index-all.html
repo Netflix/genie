@@ -1700,6 +1700,27 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/ClusterEntity_.html#ClusterEntity_--">ClusterEntity_()</a></span> - Constructor for class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/ClusterEntity_.html" title="class in com.netflix.genie.web.data.entities">ClusterEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">ClusterLeaderService</span></a> - Interface in <a href="com/netflix/genie/web/services/package-summary.html">com.netflix.genie.web.services</a></dt>
+<dd>
+<div class="block">Service interface for the abstracts the details of leadership within nodes in a Genie cluster.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">ClusterLeaderServiceCuratorImpl</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
+<dd>
+<div class="block">Implementation of <a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> using Spring's <code>LeaderInitiator</code> (Zookeeper/Curator based
+ leader election mechanism).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html#ClusterLeaderServiceCuratorImpl-org.springframework.integration.zookeeper.leader.LeaderInitiator-">ClusterLeaderServiceCuratorImpl(LeaderInitiator)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceCuratorImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl"><span class="typeNameLink">ClusterLeaderServiceLocalLeaderImpl</span></a> - Class in <a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a></dt>
+<dd>
+<div class="block">Implementation of <a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> using statically configured <a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader"><code>LocalLeader</code></a> module.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html#ClusterLeaderServiceLocalLeaderImpl-com.netflix.genie.web.tasks.leader.LocalLeader-">ClusterLeaderServiceLocalLeaderImpl(LocalLeader)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceLocalLeaderImpl</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/common/external/dtos/v4/ClusterMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">ClusterMetadata</span></a> - Class in <a href="com/netflix/genie/common/external/dtos/v4/package-summary.html">com.netflix.genie.common.external.dtos.v4</a></dt>
 <dd>
 <div class="block">Metadata supplied by a user for a Cluster resource.</div>
@@ -2149,6 +2170,10 @@
 <dt><a href="com/netflix/genie/web/services/impl/package-summary.html">com.netflix.genie.web.services.impl</a> - package com.netflix.genie.web.services.impl</dt>
 <dd>
 <div class="block">Implementations of services specific to a web application.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/spring/actuators/package-summary.html">com.netflix.genie.web.spring.actuators</a> - package com.netflix.genie.web.spring.actuators</dt>
+<dd>
+<div class="block">Actuator endpoints.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/spring/autoconfigure/package-summary.html">com.netflix.genie.web.spring.autoconfigure</a> - package com.netflix.genie.web.spring.autoconfigure</dt>
 <dd>
@@ -2765,6 +2790,11 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/CriterionEntity_.html#CriterionEntity_--">CriterionEntity_()</a></span> - Constructor for class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/CriterionEntity_.html" title="class in com.netflix.genie.web.data.entities">CriterionEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#curatorClusterLeaderService-org.springframework.integration.zookeeper.leader.LeaderInitiator-">curatorClusterLeaderService(LeaderInitiator)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dd>
+<div class="block">Create a <a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> based on Zookeeper/Curator if <code>LeaderInitiator</code> is
+ available and the bean does not already exist.</div>
+</dd>
 </dl>
 <a name="I:D">
 <!--   -->
@@ -3251,6 +3281,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/DiskJobFileServiceImpl.html#DiskJobFileServiceImpl-org.springframework.core.io.Resource-">DiskJobFileServiceImpl(Resource)</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/DiskJobFileServiceImpl.html" title="class in com.netflix.genie.web.services.impl">DiskJobFileServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html#doAction-com.netflix.genie.web.spring.actuators.LeaderElectionActuator.Action-">doAction(LeaderElectionActuator.Action)</a></span> - Method in class com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></dt>
+<dd>
+<div class="block">Forces the node to leave the leader election, then re-join it.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/JobStateServiceImpl.html#done-java.lang.String-">done(String)</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/JobStateServiceImpl.html" title="class in com.netflix.genie.web.services.impl">JobStateServiceImpl</a></dt>
 <dd>
@@ -6866,6 +6900,10 @@
 <dd>
 <div class="block">Get the current status of this resource.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html#getStatus--">getStatus()</a></span> - Method in class com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></dt>
+<dd>
+<div class="block">Provides the current leader service status: whether the leader service is running and whether the node is leader.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html#getStatusMessage--">getStatusMessage()</a></span> - Method in class com.netflix.genie.common.internal.dtos.v4.<a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a></dt>
 <dd>
 <div class="block">Getter for optional field.</div>
@@ -7853,6 +7891,22 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html#isLaunchInJobDirectory--">isLaunchInJobDirectory()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.RuntimeConfigurationArguments</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/ClusterLeaderService.html#isLeader--">isLeader()</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></dt>
+<dd>
+<div class="block">Whether or not this node is the current cluster leader.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html#isLeader--">isLeader()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceCuratorImpl</a></dt>
+<dd>
+<div class="block">Whether or not this node is the current cluster leader.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html#isLeader--">isLeader()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceLocalLeaderImpl</a></dt>
+<dd>
+<div class="block">Whether or not this node is the current cluster leader.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LocalLeader.html#isLeader--">isLeader()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a></dt>
+<dd>
+<div class="block">Whether local node is leader.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#isOpen--">isOpen()</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/projections/v4/V4JobRequestProjection.html#isRequestedId--">isRequestedId()</a></span> - Method in interface com.netflix.genie.web.data.entities.projections.v4.<a href="com/netflix/genie/web/data/entities/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.entities.projections.v4">V4JobRequestProjection</a></dt>
 <dd>
@@ -7861,6 +7915,22 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/projections/v4/JobSpecificationProjection.html#isResolved--">isResolved()</a></span> - Method in interface com.netflix.genie.web.data.entities.projections.v4.<a href="com/netflix/genie/web/data/entities/projections/v4/JobSpecificationProjection.html" title="interface in com.netflix.genie.web.data.entities.projections.v4">JobSpecificationProjection</a></dt>
 <dd>
 <div class="block">Get whether the job specification has been resolved yet or not.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/ClusterLeaderService.html#isRunning--">isRunning()</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></dt>
+<dd>
+<div class="block">Whether or not this node is participating in the cluster leader election.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html#isRunning--">isRunning()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceCuratorImpl</a></dt>
+<dd>
+<div class="block">Whether or not this node is participating in the cluster leader election.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html#isRunning--">isRunning()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceLocalLeaderImpl</a></dt>
+<dd>
+<div class="block">Whether or not this node is participating in the cluster leader election.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LocalLeader.html#isRunning--">isRunning()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a></dt>
+<dd>
+<div class="block">Whether this module is active.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/projections/v4/IsV4JobProjection.html#isV4--">isV4()</a></span> - Method in interface com.netflix.genie.web.data.entities.projections.v4.<a href="com/netflix/genie/web/data/entities/projections/v4/IsV4JobProjection.html" title="interface in com.netflix.genie.web.data.entities.projections.v4">IsV4JobProjection</a></dt>
 <dd>
@@ -9388,6 +9458,23 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#LeaderAutoConfiguration--">LeaderAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators"><span class="typeNameLink">LeaderElectionActuator</span></a> - Class in <a href="com/netflix/genie/web/spring/actuators/package-summary.html">com.netflix.genie.web.spring.actuators</a></dt>
+<dd>
+<div class="block">An actuator endpoint that exposes leadership status and allows stop/start/restart of the leader election service.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html#LeaderElectionActuator-com.netflix.genie.web.services.ClusterLeaderService-">LeaderElectionActuator(ClusterLeaderService)</a></span> - Constructor for class com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators">LeaderElectionActuator</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leaderElectionActuator-com.netflix.genie.web.services.ClusterLeaderService-">leaderElectionActuator(ClusterLeaderService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dd>
+<div class="block">Create a <a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.html" title="class in com.netflix.genie.web.spring.actuators"><code>LeaderElectionActuator</code></a> bean if one is not already defined and if
+ <a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> is available.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.Action.html" title="enum in com.netflix.genie.web.spring.actuators"><span class="typeNameLink">LeaderElectionActuator.Action</span></a> - Enum in <a href="com/netflix/genie/web/spring/actuators/package-summary.html">com.netflix.genie.web.spring.actuators</a></dt>
+<dd>
+<div class="block">Operations that this actuator can perform on the leader service.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#leaderInitiatorFactory-org.apache.curator.framework.CuratorFramework-com.netflix.genie.web.properties.ZookeeperLeaderProperties-">leaderInitiatorFactory(CuratorFramework, ZookeeperLeaderProperties)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
 <dd>
 <div class="block">The leadership initialization factory bean which will create a LeaderInitiator to kick off the leader election
@@ -9458,6 +9545,11 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html#LocalAgentLauncherProperties--">LocalAgentLauncherProperties()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html#localClusterLeaderService-com.netflix.genie.web.tasks.leader.LocalLeader-">localClusterLeaderService(LocalLeader)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.tasks.leader.<a href="com/netflix/genie/web/spring/autoconfigure/tasks/leader/LeaderAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.tasks.leader">LeaderAutoConfiguration</a></dt>
+<dd>
+<div class="block">Create a <a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services"><code>ClusterLeaderService</code></a> based on static configuration if <a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader"><code>LocalLeader</code></a> is
+ available and the bean does not already exist.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#localFileTransfer--">localFileTransfer()</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.jobs.<a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.jobs">JobsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Bean to create a local file transfer object.</div>
@@ -11809,6 +11901,22 @@
 <dd>
 <div class="block">Starts the state machine and returns.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/ClusterLeaderService.html#start--">start()</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></dt>
+<dd>
+<div class="block">Start the service (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html#start--">start()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceCuratorImpl</a></dt>
+<dd>
+<div class="block">Start the service (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html#start--">start()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceLocalLeaderImpl</a></dt>
+<dd>
+<div class="block">Start the service (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LocalLeader.html#start--">start()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a></dt>
+<dd>
+<div class="block">If configured to be leader, activate and send a leadership acquired notification.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#started">started</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#STARTED">STARTED</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
@@ -11839,7 +11947,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LocalLeader.html#startLeadership-org.springframework.context.event.ContextRefreshedEvent-">startLeadership(ContextRefreshedEvent)</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a></dt>
 <dd>
-<div class="block">Event listener for when a context is started up.</div>
+<div class="block">Auto-start once application is up and running.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/servers/GRpcServerUtils.html#startServer-io.grpc.Server-">startServer(Server)</a></span> - Static method in class com.netflix.genie.web.agent.apis.rpc.servers.<a href="com/netflix/genie/web/agent/apis/rpc/servers/GRpcServerUtils.html" title="class in com.netflix.genie.web.agent.apis.rpc.servers">GRpcServerUtils</a></dt>
 <dd>
@@ -11934,6 +12042,22 @@
 <div class="block">Request early termination of the state machine, for example in response to user submitting a kill via API or
  ctrl-c.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/ClusterLeaderService.html#stop--">stop()</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></dt>
+<dd>
+<div class="block">Stop the service (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html#stop--">stop()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceCuratorImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceCuratorImpl</a></dt>
+<dd>
+<div class="block">Stop the service (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html#stop--">stop()</a></span> - Method in class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/ClusterLeaderServiceLocalLeaderImpl.html" title="class in com.netflix.genie.web.services.impl">ClusterLeaderServiceLocalLeaderImpl</a></dt>
+<dd>
+<div class="block">Stop the service (i.e.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LocalLeader.html#stop--">stop()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a></dt>
+<dd>
+<div class="block">If configured to be leader and previously started, deactivate and send a leadership lost notification.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/StopFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">StopFileServiceStage</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
 <dd>
 <div class="block">Stops the file streaming service.</div>
@@ -11960,7 +12084,7 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LocalLeader.html#stopLeadership-org.springframework.context.event.ContextClosedEvent-">stopLeadership(ContextClosedEvent)</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LocalLeader.html" title="class in com.netflix.genie.web.tasks.leader">LocalLeader</a></dt>
 <dd>
-<div class="block">Before the application shuts down need to turn off leadership activities.</div>
+<div class="block">Auto-stop once application is shutting down.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/StopFileServiceStage.html#stopService--">stopService()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StopFileServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StopFileServiceStage</a></dt>
 <dd>&nbsp;</dd>
@@ -12982,6 +13106,10 @@
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.Action.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.Action.html" title="enum in com.netflix.genie.web.spring.actuators">LeaderElectionActuator.Action</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this type with the specified name.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/GenieTaskScheduleType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum com.netflix.genie.web.tasks.<a href="com/netflix/genie/web/tasks/GenieTaskScheduleType.html" title="enum in com.netflix.genie.web.tasks">GenieTaskScheduleType</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
@@ -13077,6 +13205,11 @@ the order they are declared.</div>
 the order they are declared.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/jobs/FileType.html#values--">values()</a></span> - Static method in enum com.netflix.genie.web.jobs.<a href="com/netflix/genie/web/jobs/FileType.html" title="enum in com.netflix.genie.web.jobs">FileType</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum type, in
+the order they are declared.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.Action.html#values--">values()</a></span> - Static method in enum com.netflix.genie.web.spring.actuators.<a href="com/netflix/genie/web/spring/actuators/LeaderElectionActuator.Action.html" title="enum in com.netflix.genie.web.spring.actuators">LeaderElectionActuator.Action</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>
