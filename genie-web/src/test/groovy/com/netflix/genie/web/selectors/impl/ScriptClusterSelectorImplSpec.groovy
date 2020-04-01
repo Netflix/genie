@@ -68,7 +68,7 @@ class ScriptClusterSelectorImplSpec extends Specification {
         when: "Script returns null"
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, ScriptClusterSelectorImpl.NULL_TAG))
-        result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
+        result = this.scriptClusterSelector.select(clusters, jobRequest)
 
         then:
         1 * this.script.selectResource(clusters, jobRequest) >> scriptResult
@@ -87,7 +87,7 @@ class ScriptClusterSelectorImplSpec extends Specification {
 
         when: "Script throws"
         expectedTags = MetricsUtils.newFailureTagsSetForException(executionException)
-        this.scriptClusterSelector.selectCluster(clusters, jobRequest)
+        this.scriptClusterSelector.select(clusters, jobRequest)
 
         then:
         1 * this.script.selectResource(clusters, jobRequest) >> { throw executionException }
@@ -102,7 +102,7 @@ class ScriptClusterSelectorImplSpec extends Specification {
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "cluster2"))
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, "Cluster 2"))
-        result = this.scriptClusterSelector.selectCluster(clusters, jobRequest)
+        result = this.scriptClusterSelector.select(clusters, jobRequest)
 
         then:
         1 * this.script.selectResource(clusters, jobRequest) >> scriptResult

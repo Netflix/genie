@@ -60,7 +60,7 @@ class RandomCommandSelectorImplTest {
         final Set<Command> commands = Sets.newHashSet(command1, command2, command3);
         final JobRequest jobRequest = Mockito.mock(JobRequest.class);
         for (int i = 0; i < 5; i++) {
-            final ResourceSelectionResult<Command> result = this.selector.selectCommand(commands, jobRequest);
+            final ResourceSelectionResult<Command> result = this.selector.select(commands, jobRequest);
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.getSelectorClass()).isEqualTo(RandomCommandSelectorImpl.class);
             Assertions.assertThat(result.getSelectedResource()).isPresent().get().isIn(commands);
@@ -76,7 +76,7 @@ class RandomCommandSelectorImplTest {
     @Test
     void testValidCommandSetOfOne() throws ResourceSelectionException {
         final Command command = Mockito.mock(Command.class);
-        final ResourceSelectionResult<Command> result = this.selector.selectCommand(
+        final ResourceSelectionResult<Command> result = this.selector.select(
             Sets.newHashSet(command),
             Mockito.mock(JobRequest.class)
         );
