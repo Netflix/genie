@@ -43,7 +43,7 @@ import java.util.Set;
 @Slf4j
 public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster> {
 
-    private static final String CLUSTERS_BINDING = "clustersParameter";
+    static final String CLUSTERS_BINDING = "clustersParameter";
 
     /**
      * Constructor.

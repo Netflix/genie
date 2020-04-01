@@ -52,6 +52,7 @@ dependencies {
     compile("org.apache.commons:commons-lang3")
     compile("org.apache.httpcomponents:httpclient")
     compile("org.bitbucket.b_c:jose4j")
+    compile("org.codehaus.groovy:groovy-all")
     compile("org.flywaydb:flyway-core")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-aop")
@@ -87,7 +88,6 @@ dependencies {
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
-    runtimeOnly("org.codehaus.groovy:groovy-all")
     runtimeOnly("org.postgresql:postgresql")
 
     /*******************************

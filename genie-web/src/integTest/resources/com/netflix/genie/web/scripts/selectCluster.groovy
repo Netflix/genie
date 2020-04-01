@@ -25,33 +25,10 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest
 import java.time.Instant
 
 def binding = this.getBinding()
-def clustersParameterName = "clustersParameter"
-def jobIdParameterName = "jobIdParameter"
-def jobRequestParameterName = "jobRequestParameter"
 
-if (!binding.hasVariable(jobIdParameterName)
-    || !(binding.getVariable(jobIdParameterName) instanceof String)) {
-    throw new IllegalArgumentException("jobIdParameter argument not instance of " + String.class.getName())
-}
-final String jobId = (String) binding.getVariable(jobIdParameterName)
-
-if (!binding.hasVariable(jobRequestParameterName)
-    || !(binding.getVariable(jobRequestParameterName) instanceof JobRequest)) {
-    throw new IllegalArgumentException("jobRequestParameter argument not instance of " + JobRequest.class.getName())
-}
-final JobRequest jobRequest = (JobRequest) binding.getVariable(jobRequestParameterName)
-
-if (!binding.hasVariable(clustersParameterName) || !(binding.getVariable(clustersParameterName) instanceof Set)) {
-    throw new IllegalArgumentException(
-        "Expected clustersParameter to be instance of Set. Got "
-            + binding.getVariable(clustersParameterName).getClass().getName()
-    )
-}
-def clustersParameterSet = (Set) binding.getVariable(clustersParameterName)
-if (clustersParameterSet.isEmpty() || !(clustersParameterSet.iterator().next() instanceof Cluster)) {
-    throw new IllegalArgumentException("Expected clustersParameter to be non-empty set of " + Cluster.class.getName())
-}
-final Set<Cluster> clusters = (Set<Cluster>) clustersParameterSet
+String jobId = GroovyScriptUtils.getJobId(binding)
+JobRequest jobRequest = GroovyScriptUtils.getJobRequest(binding)
+Set<Cluster> clusters = GroovyScriptUtils.getClusters(binding)
 
 Cluster selectedCluster = null
 String rationale = null
