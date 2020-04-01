@@ -17,11 +17,19 @@
  */
 package com.netflix.genie.web.selectors.impl;
 
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.web.dtos.ResourceSelectionResult;
+import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
+import com.netflix.genie.web.selectors.ResourceSelector;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * A base class for any selector which desires to select a random element from a collection of elements.
@@ -30,13 +38,33 @@ import java.util.Random;
  * @author tgianos
  * @since 4.0.0
  */
-abstract class RandomResourceSelectorBase<R> {
+@Slf4j
+class RandomResourceSelector<R> implements ResourceSelector<R> {
 
     static final String SELECTION_RATIONALE = "Selected randomly";
     private final Random random = new Random();
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResourceSelectionResult<R> select(
+        @NotEmpty final Set<@Valid R> resources,
+        @Valid final JobRequest jobRequest
+    ) throws ResourceSelectionException {
+        log.debug("called");
+        final ResourceSelectionResult.Builder<R> builder = new ResourceSelectionResult.Builder<>(this.getClass());
+
+        try {
+            final R selectedResource = this.randomlySelect(resources);
+            return builder.withSelectionRationale(SELECTION_RATIONALE).withSelectedResource(selectedResource).build();
+        } catch (final Exception e) {
+            throw new ResourceSelectionException(e);
+        }
+    }
+
     @Nullable
-    R randomlySelect(@NotEmpty final Collection<R> resources) {
+    private R randomlySelect(@NotEmpty final Collection<R> resources) {
         // return a random one
         final int index = this.random.nextInt(resources.size());
         final Iterator<R> resourceIterator = resources.iterator();

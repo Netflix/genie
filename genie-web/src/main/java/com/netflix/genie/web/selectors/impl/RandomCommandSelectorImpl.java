@@ -18,15 +18,7 @@
 package com.netflix.genie.web.selectors.impl;
 
 import com.netflix.genie.common.external.dtos.v4.Command;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
-import com.netflix.genie.web.dtos.ResourceSelectionResult;
-import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.selectors.CommandSelector;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import java.util.Set;
 
 /**
  * Basic implementation of a {@link CommandSelector} where a random {@link Command} is selected from the options
@@ -35,25 +27,5 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-@Slf4j
-public class RandomCommandSelectorImpl extends RandomResourceSelectorBase<Command> implements CommandSelector {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResourceSelectionResult<Command> select(
-        @NotEmpty final Set<@Valid Command> commands,
-        @Valid final JobRequest jobRequest
-    ) throws ResourceSelectionException {
-        log.debug("called");
-        final ResourceSelectionResult.Builder<Command> builder = new ResourceSelectionResult.Builder<>(this.getClass());
-
-        try {
-            final Command selectedCommand = this.randomlySelect(commands);
-            return builder.withSelectionRationale(SELECTION_RATIONALE).withSelectedResource(selectedCommand).build();
-        } catch (final Exception e) {
-            throw new ResourceSelectionException(e);
-        }
-    }
+public class RandomCommandSelectorImpl extends RandomResourceSelector<Command> implements CommandSelector {
 }
