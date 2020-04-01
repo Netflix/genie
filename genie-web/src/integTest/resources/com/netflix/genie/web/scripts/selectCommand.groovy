@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.scripts
 
-
 import com.netflix.genie.common.external.dtos.v4.Command
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata
 import com.netflix.genie.common.external.dtos.v4.CommandStatus
@@ -26,33 +25,10 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest
 import java.time.Instant
 
 def binding = this.getBinding()
-def commandsParameterName = "commandsParameter"
-def jobIdParameterName = "jobIdParameter"
-def jobRequestParameterName = "jobRequestParameter"
 
-if (!binding.hasVariable(jobIdParameterName)
-    || !(binding.getVariable(jobIdParameterName) instanceof String)) {
-    throw new IllegalArgumentException("jobIdParameter argument not instance of " + String.class.getName())
-}
-final String jobId = (String) binding.getVariable(jobIdParameterName)
-
-if (!binding.hasVariable(jobRequestParameterName)
-    || !(binding.getVariable(jobRequestParameterName) instanceof JobRequest)) {
-    throw new IllegalArgumentException("jobRequestParameter argument not instance of " + JobRequest.class.getName())
-}
-final JobRequest jobRequest = (JobRequest) binding.getVariable(jobRequestParameterName)
-
-if (!binding.hasVariable(commandsParameterName) || !(binding.getVariable(commandsParameterName) instanceof Set)) {
-    throw new IllegalArgumentException(
-        "Expected commandsParameter to be instance of Set. Got "
-            + binding.getVariable(commandsParameterName).getClass().getName()
-    )
-}
-def commandsParameterSet = (Set) binding.getVariable(commandsParameterName)
-if (commandsParameterSet.isEmpty() || !(commandsParameterSet.iterator().next() instanceof Command)) {
-    throw new IllegalArgumentException("Expected commandsParameter to be non-empty set of " + Command.class.getName())
-}
-final Set<Command> commands = (Set<Command>) commandsParameterSet
+String jobId = GroovyScriptUtils.getJobId(binding)
+JobRequest jobRequest = GroovyScriptUtils.getJobRequest(binding)
+Set<Command> commands = GroovyScriptUtils.getCommands(binding)
 
 Command selectedCommand = null
 String rationale = null
