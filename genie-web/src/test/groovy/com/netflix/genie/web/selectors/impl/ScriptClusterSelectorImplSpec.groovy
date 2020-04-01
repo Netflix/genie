@@ -59,6 +59,7 @@ class ScriptClusterSelectorImplSpec extends Specification {
         Set<Cluster> clusters = Sets.newHashSet(cluster1, cluster2)
         ClusterMetadata cluster2metadata = Mock(ClusterMetadata)
         JobRequest jobRequest = Mock(JobRequest)
+        String jobId = UUID.randomUUID().toString()
         Throwable executionException = new ScriptExecutionException("some error")
 
         ResourceSelectionResult<Cluster> result
@@ -68,10 +69,10 @@ class ScriptClusterSelectorImplSpec extends Specification {
         when: "Script returns null"
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, ScriptClusterSelectorImpl.NULL_TAG))
-        result = this.scriptClusterSelector.select(clusters, jobRequest)
+        result = this.scriptClusterSelector.select(clusters, jobRequest, jobId)
 
         then:
-        1 * this.script.selectResource(clusters, jobRequest) >> scriptResult
+        1 * this.script.selectResource(clusters, jobRequest, jobId) >> scriptResult
         1 * scriptResult.getResource() >> Optional.empty()
         1 * scriptResult.getRationale() >> Optional.empty()
         1 * this.registry.timer(
@@ -87,10 +88,10 @@ class ScriptClusterSelectorImplSpec extends Specification {
 
         when: "Script throws"
         expectedTags = MetricsUtils.newFailureTagsSetForException(executionException)
-        this.scriptClusterSelector.select(clusters, jobRequest)
+        this.scriptClusterSelector.select(clusters, jobRequest, jobId)
 
         then:
-        1 * this.script.selectResource(clusters, jobRequest) >> { throw executionException }
+        1 * this.script.selectResource(clusters, jobRequest, jobId) >> { throw executionException }
         1 * this.registry.timer(
             ScriptClusterSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
@@ -102,10 +103,10 @@ class ScriptClusterSelectorImplSpec extends Specification {
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "cluster2"))
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, "Cluster 2"))
-        result = this.scriptClusterSelector.select(clusters, jobRequest)
+        result = this.scriptClusterSelector.select(clusters, jobRequest, jobId)
 
         then:
-        1 * this.script.selectResource(clusters, jobRequest) >> scriptResult
+        1 * this.script.selectResource(clusters, jobRequest, jobId) >> scriptResult
         1 * scriptResult.getResource() >> Optional.of(cluster2)
         1 * scriptResult.getRationale() >> Optional.of("Cluster 2 was good")
         1 * cluster2.getId() >> "cluster2"

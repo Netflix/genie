@@ -40,6 +40,7 @@ import java.util.Set;
 public abstract class ResourceSelectorScript<R> extends ManagedScript {
 
     static final String JOB_REQUEST_BINDING = "jobRequestParameter";
+    static final String JOB_ID_BINDING = "jobIdParameter";
 
     /**
      * Constructor.
@@ -62,16 +63,19 @@ public abstract class ResourceSelectorScript<R> extends ManagedScript {
      *
      * @param resources  The set of resources of type {@literal R} which should be selected from
      * @param jobRequest The {@link JobRequest} that the resource will be running
+     * @param jobId      The id of the job this resource is being selected for
      * @return A {@link ResourceSelectorScriptResult} instance
      * @throws ResourceSelectionException If an unexpected error occurs during selection
      */
     public ResourceSelectorScriptResult<R> selectResource(
         final Set<R> resources,
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String jobId
     ) throws ResourceSelectionException {
         try {
             final Map<String, Object> parameters = Maps.newHashMap();
             parameters.put(JOB_REQUEST_BINDING, jobRequest);
+            parameters.put(JOB_ID_BINDING, jobId);
             this.addParametersForScript(parameters, resources, jobRequest);
             final Object evaluationResult = this.evaluateScript(parameters);
             if (!(evaluationResult instanceof ResourceSelectorScriptResult)) {

@@ -66,11 +66,12 @@ public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster
     @Override
     public ResourceSelectorScriptResult<Cluster> selectResource(
         final Set<Cluster> resources,
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String jobId
     ) throws ResourceSelectionException {
-        log.debug("Called to attempt to select a cluster from {} for job {}", resources, jobRequest);
+        log.debug("Called to attempt to select a cluster from {} for job {}", resources, jobId);
 
-        return super.selectResource(resources, jobRequest);
+        return super.selectResource(resources, jobRequest, jobId);
     }
 
     /**

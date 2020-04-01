@@ -24,26 +24,39 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest
 
 import java.time.Instant
 
-if (!(jobRequestParameter instanceof JobRequest)) {
+def binding = this.getBinding()
+def clustersParameterName = "clustersParameter"
+def jobIdParameterName = "jobIdParameter"
+def jobRequestParameterName = "jobRequestParameter"
+
+if (!binding.hasVariable(jobIdParameterName)
+    || !(binding.getVariable(jobIdParameterName) instanceof String)) {
+    throw new IllegalArgumentException("jobIdParameter argument not instance of " + String.class.getName())
+}
+final String jobId = (String) binding.getVariable(jobIdParameterName)
+
+if (!binding.hasVariable(jobRequestParameterName)
+    || !(binding.getVariable(jobRequestParameterName) instanceof JobRequest)) {
     throw new IllegalArgumentException("jobRequestParameter argument not instance of " + JobRequest.class.getName())
 }
-final JobRequest jobRequest = (JobRequest) jobRequestParameter
+final JobRequest jobRequest = (JobRequest) binding.getVariable(jobRequestParameterName)
 
-if (!(clustersParameter instanceof Set)) {
+if (!binding.hasVariable(clustersParameterName) || !(binding.getVariable(clustersParameterName) instanceof Set)) {
     throw new IllegalArgumentException(
-        "Expected clustersParameter to be instance of Set. Got " + commandsParameter.getClass().getName()
+        "Expected clustersParameter to be instance of Set. Got "
+            + binding.getVariable(clustersParameterName).getClass().getName()
     )
 }
-if (clustersParameter.isEmpty() || !(clustersParameter.iterator().next() instanceof Cluster)) {
+def clustersParameterSet = (Set) binding.getVariable(clustersParameterName)
+if (clustersParameterSet.isEmpty() || !(clustersParameterSet.iterator().next() instanceof Cluster)) {
     throw new IllegalArgumentException("Expected clustersParameter to be non-empty set of " + Cluster.class.getName())
 }
-final Set<Cluster> clusters = (Set<Cluster>) clustersParameter
+final Set<Cluster> clusters = (Set<Cluster>) clustersParameterSet
 
 Cluster selectedCluster = null
 String rationale = null
 
-def requestedJobId = jobRequest.getRequestedId().orElse(UUID.randomUUID().toString())
-switch (requestedJobId) {
+switch (jobId) {
     case "0":
         selectedCluster = clusters.find({ it -> (it.getId() == "0") })
         rationale = "selected 0"
@@ -69,7 +82,7 @@ switch (requestedJobId) {
     case "3":
         break
     case "5":
-        return "This is not the correct return type"
+        return jobRequest.getMetadata().getName()
     default:
         throw new Exception("uh oh")
 }

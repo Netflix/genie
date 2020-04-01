@@ -60,11 +60,12 @@ public class CommandSelectorManagedScript extends ResourceSelectorScript<Command
     @Override
     public ResourceSelectorScriptResult<Command> selectResource(
         final Set<Command> resources,
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String jobId
     ) throws ResourceSelectionException {
-        log.debug("Called to attempt to select a command from {} for job {}", resources, jobRequest);
+        log.debug("Called to attempt to select a command from {} for job {}", resources, jobId);
 
-        return super.selectResource(resources, jobRequest);
+        return super.selectResource(resources, jobRequest, jobId);
     }
 
     /**
