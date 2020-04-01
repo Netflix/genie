@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Test for {@link RandomClusterSelectorImpl}.
@@ -36,14 +37,14 @@ import java.util.Set;
  */
 class RandomClusterSelectorImplTest {
 
-    private RandomClusterSelectorImpl clb;
+    private RandomClusterSelectorImpl selector;
 
     /**
      * Setup the tests.
      */
     @BeforeEach
     void setup() {
-        this.clb = new RandomClusterSelectorImpl();
+        this.selector = new RandomClusterSelectorImpl();
     }
 
     /**
@@ -58,8 +59,9 @@ class RandomClusterSelectorImplTest {
         final Cluster cluster3 = Mockito.mock(Cluster.class);
         final Set<Cluster> clusters = Sets.newHashSet(cluster1, cluster2, cluster3);
         final JobRequest jobRequest = Mockito.mock(JobRequest.class);
+        final String jobId = UUID.randomUUID().toString();
         for (int i = 0; i < 5; i++) {
-            final ResourceSelectionResult<Cluster> result = this.clb.select(clusters, jobRequest);
+            final ResourceSelectionResult<Cluster> result = this.selector.select(clusters, jobRequest, jobId);
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.getSelectorClass()).isEqualTo(RandomClusterSelectorImpl.class);
             Assertions.assertThat(result.getSelectedResource()).isPresent().get().isIn(clusters);
@@ -75,9 +77,10 @@ class RandomClusterSelectorImplTest {
     @Test
     void testValidClusterSetOfOne() throws ResourceSelectionException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
-        final ResourceSelectionResult<Cluster> result = this.clb.select(
+        final ResourceSelectionResult<Cluster> result = this.selector.select(
             Sets.newHashSet(cluster1),
-            Mockito.mock(JobRequest.class)
+            Mockito.mock(JobRequest.class),
+            UUID.randomUUID().toString()
         );
         Assertions
             .assertThat(result.getSelectedResource())

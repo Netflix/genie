@@ -57,6 +57,7 @@ class ScriptCommandSelectorImplSpec extends Specification {
         def commands = Sets.newHashSet(command0, command1)
         def command1Metadata = Mock(CommandMetadata)
         def jobRequest = Mock(JobRequest)
+        def jobId = UUID.randomUUID().toString()
         def selectionException = new ResourceSelectionException("some error")
         def scriptResult = Mock(ResourceSelectorScriptResult)
 
@@ -66,10 +67,10 @@ class ScriptCommandSelectorImplSpec extends Specification {
         when: "Script returns no command"
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, "null"))
-        result = this.commandSelector.select(commands, jobRequest)
+        result = this.commandSelector.select(commands, jobRequest, jobId)
 
         then:
-        1 * this.script.selectResource(commands, jobRequest) >> scriptResult
+        1 * this.script.selectResource(commands, jobRequest, jobId) >> scriptResult
         1 * scriptResult.getResource() >> Optional.empty()
         1 * scriptResult.getRationale() >> Optional.empty()
         1 * this.registry.timer(
@@ -85,10 +86,10 @@ class ScriptCommandSelectorImplSpec extends Specification {
 
         when: "Script throws exception"
         expectedTags = MetricsUtils.newFailureTagsSetForException(selectionException)
-        this.commandSelector.select(commands, jobRequest)
+        this.commandSelector.select(commands, jobRequest, jobId)
 
         then:
-        1 * this.script.selectResource(commands, jobRequest) >> { throw selectionException }
+        1 * this.script.selectResource(commands, jobRequest, jobId) >> { throw selectionException }
         1 * this.registry.timer(
             ScriptCommandSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
@@ -100,10 +101,10 @@ class ScriptCommandSelectorImplSpec extends Specification {
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, "command 1 id"))
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, "command 1 name"))
-        result = this.commandSelector.select(commands, jobRequest)
+        result = this.commandSelector.select(commands, jobRequest, jobId)
 
         then:
-        1 * this.script.selectResource(commands, jobRequest) >> scriptResult
+        1 * this.script.selectResource(commands, jobRequest, jobId) >> scriptResult
         1 * scriptResult.getResource() >> Optional.of(command1)
         1 * scriptResult.getRationale() >> Optional.of("Good to go!")
         1 * command1.getId() >> "command 1 id"

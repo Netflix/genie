@@ -23,6 +23,7 @@ import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
@@ -41,6 +42,7 @@ public interface ResourceSelector<R> {
      *
      * @param resources  A set of resources which matched the user supplied criterion to chose from
      * @param jobRequest The job user's original job request
+     * @param jobId      The unique id the job has or will have within the Genie system
      * @return The a {@link ResourceSelectionResult} instance which contains information about the result of this
      * invocation
      * @throws ResourceSelectionException When the underlying implementation can't successfully come to a selection
@@ -48,6 +50,7 @@ public interface ResourceSelector<R> {
      */
     ResourceSelectionResult<R> select(
         @NotEmpty Set<@Valid R> resources,
-        @Valid JobRequest jobRequest
+        @Valid JobRequest jobRequest,
+        @NotBlank String jobId
     ) throws ResourceSelectionException;
 }

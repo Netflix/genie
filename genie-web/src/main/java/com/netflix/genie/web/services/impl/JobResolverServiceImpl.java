@@ -313,7 +313,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Command command;
 
         if (this.useV4ResourceSelection()) {
-            command = this.resolveCommand(jobRequest);
+            command = this.resolveCommand(jobRequest, id);
             cluster = this.resolveCluster(command, jobRequest, id);
         } else {
             final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
@@ -331,7 +331,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 final String v3CommandId = command.getId();
                 final Set<Tag> dualModeTags = Sets.newHashSet(Tag.of(V3_COMMAND_TAG, v3CommandId));
                 try {
-                    final Command v4Command = this.resolveCommand(jobRequest);
+                    final Command v4Command = this.resolveCommand(jobRequest, id);
                     final String v4CommandId = v4Command.getId();
                     dualModeTags.add(Tag.of(V4_COMMAND_TAG, v4CommandId));
 
@@ -467,7 +467,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     .findFirst()
                     .orElseThrow(() -> new GenieServerException("Couldn't get cluster when size was one"));
             } else {
-                cluster = this.selectClusterUsingClusterSelectors(counterTags, clusters, jobRequest);
+                cluster = this.selectClusterUsingClusterSelectors(counterTags, clusters, jobRequest, id);
             }
 
             if (cluster == null) {
@@ -559,7 +559,8 @@ public class JobResolverServiceImpl implements JobResolverService {
     private Cluster selectClusterUsingClusterSelectors(
         final Set<Tag> counterTags,
         final Set<Cluster> clusters,
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String jobId
     ) {
         Cluster cluster = null;
         for (final ClusterSelector clusterSelector : this.clusterSelectors) {
@@ -580,7 +581,8 @@ public class JobResolverServiceImpl implements JobResolverService {
             try {
                 final ResourceSelectionResult<Cluster> result = clusterSelector.select(
                     clusters,
-                    jobRequest
+                    jobRequest,
+                    jobId
                 );
                 final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
                 if (selectedClusterOptional.isPresent()) {
@@ -765,7 +767,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private Command resolveCommand(final JobRequest jobRequest) throws GenieJobResolutionException {
+    private Command resolveCommand(final JobRequest jobRequest, final String jobId) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -782,8 +784,11 @@ public class JobResolverServiceImpl implements JobResolverService {
                 log.debug("Found single command {} matching criterion {}", command.getId(), criterion);
             } else {
                 try {
-                    final ResourceSelectionResult<Command> result
-                        = this.commandSelector.select(commands, jobRequest);
+                    final ResourceSelectionResult<Command> result = this.commandSelector.select(
+                        commands,
+                        jobRequest,
+                        jobId
+                    );
                     command = result
                         .getSelectedResource()
                         .orElseThrow(
@@ -874,7 +879,8 @@ public class JobResolverServiceImpl implements JobResolverService {
                         cluster = this.selectClusterUsingClusterSelectors(
                             Sets.newHashSet(),
                             clusters,
-                            jobRequest
+                            jobRequest,
+                            jobId
                         );
                     }
 

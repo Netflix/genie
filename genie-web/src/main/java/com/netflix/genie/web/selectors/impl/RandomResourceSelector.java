@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Iterator;
@@ -50,9 +51,10 @@ class RandomResourceSelector<R> implements ResourceSelector<R> {
     @Override
     public ResourceSelectionResult<R> select(
         @NotEmpty final Set<@Valid R> resources,
-        @Valid final JobRequest jobRequest
+        @Valid final JobRequest jobRequest,
+        @NotBlank final String jobId
     ) throws ResourceSelectionException {
-        log.debug("called");
+        log.debug("Called to select for job {}", jobId);
         final ResourceSelectionResult.Builder<R> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {

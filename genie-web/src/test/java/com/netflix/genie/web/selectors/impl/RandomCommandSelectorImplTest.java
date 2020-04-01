@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Tests for {@link RandomCommandSelectorImpl}.
@@ -59,8 +60,9 @@ class RandomCommandSelectorImplTest {
         final Command command3 = Mockito.mock(Command.class);
         final Set<Command> commands = Sets.newHashSet(command1, command2, command3);
         final JobRequest jobRequest = Mockito.mock(JobRequest.class);
+        final String jobId = UUID.randomUUID().toString();
         for (int i = 0; i < 5; i++) {
-            final ResourceSelectionResult<Command> result = this.selector.select(commands, jobRequest);
+            final ResourceSelectionResult<Command> result = this.selector.select(commands, jobRequest, jobId);
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.getSelectorClass()).isEqualTo(RandomCommandSelectorImpl.class);
             Assertions.assertThat(result.getSelectedResource()).isPresent().get().isIn(commands);
@@ -78,7 +80,8 @@ class RandomCommandSelectorImplTest {
         final Command command = Mockito.mock(Command.class);
         final ResourceSelectionResult<Command> result = this.selector.select(
             Sets.newHashSet(command),
-            Mockito.mock(JobRequest.class)
+            Mockito.mock(JobRequest.class),
+            UUID.randomUUID().toString()
         );
         Assertions
             .assertThat(result.getSelectedResource())

@@ -73,16 +73,17 @@ public class ScriptCommandSelectorImpl implements CommandSelector {
     @Override
     public ResourceSelectionResult<Command> select(
         @NotEmpty final Set<@Valid Command> commands,
-        @Valid final JobRequest jobRequest
+        @Valid final JobRequest jobRequest,
+        @NotEmpty final String jobId
     ) throws ResourceSelectionException {
         final long selectStart = System.nanoTime();
-        log.debug("Called to select a command from {} for job request {}", commands, jobRequest);
+        log.debug("Called to select a command from {} for job {}", commands, jobId);
         final Set<Tag> tags = Sets.newHashSet();
         final ResourceSelectionResult.Builder<Command> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
             final ResourceSelectorScriptResult<Command> result
-                = this.commandSelectorManagedScript.selectResource(commands, jobRequest);
+                = this.commandSelectorManagedScript.selectResource(commands, jobRequest, jobId);
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<Command> commandOptional = result.getResource();

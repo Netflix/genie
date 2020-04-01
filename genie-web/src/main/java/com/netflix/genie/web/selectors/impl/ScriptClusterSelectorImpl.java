@@ -32,6 +32,7 @@ import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.Optional;
 import java.util.Set;
@@ -74,16 +75,17 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
     @Override
     public ResourceSelectionResult<Cluster> select(
         @NotEmpty final Set<@Valid Cluster> clusters,
-        @Valid final JobRequest jobRequest
+        @Valid final JobRequest jobRequest,
+        @NotBlank final String jobId
     ) throws ResourceSelectionException {
         final long selectStart = System.nanoTime();
-        log.debug("Called to select cluster from {} for job {}", clusters, jobRequest);
+        log.debug("Called to select cluster from {} for job {}", clusters, jobId);
         final Set<Tag> tags = Sets.newHashSet();
         final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
             final ResourceSelectorScriptResult<Cluster> result
-                = this.clusterSelectorManagedScript.selectResource(clusters, jobRequest);
+                = this.clusterSelectorManagedScript.selectResource(clusters, jobRequest, jobId);
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<Cluster> clusterOptional = result.getResource();

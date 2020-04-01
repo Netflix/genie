@@ -65,12 +65,19 @@ class ClusterSelectorManagedScriptIntegrationTest {
     private static final Cluster CLUSTER_1 = createTestCluster("1");
     private static final Cluster CLUSTER_2 = createTestCluster("2");
 
-    private static final JobRequest JOB_REQUEST_0 = createTestJobRequest("0");
-    private static final JobRequest JOB_REQUEST_1 = createTestJobRequest("1");
-    private static final JobRequest JOB_REQUEST_2 = createTestJobRequest("2");
-    private static final JobRequest JOB_REQUEST_3 = createTestJobRequest("3");
-    private static final JobRequest JOB_REQUEST_4 = createTestJobRequest("4");
-    private static final JobRequest JOB_REQUEST_5 = createTestJobRequest("5");
+    private static final String JOB_REQUEST_0_ID = "0";
+    private static final String JOB_REQUEST_1_ID = "1";
+    private static final String JOB_REQUEST_2_ID = "2";
+    private static final String JOB_REQUEST_3_ID = "3";
+    private static final String JOB_REQUEST_4_ID = "4";
+    private static final String JOB_REQUEST_5_ID = "5";
+
+    private static final JobRequest JOB_REQUEST_0 = createTestJobRequest(JOB_REQUEST_0_ID);
+    private static final JobRequest JOB_REQUEST_1 = createTestJobRequest(JOB_REQUEST_1_ID);
+    private static final JobRequest JOB_REQUEST_2 = createTestJobRequest(JOB_REQUEST_2_ID);
+    private static final JobRequest JOB_REQUEST_3 = createTestJobRequest(JOB_REQUEST_3_ID);
+    private static final JobRequest JOB_REQUEST_4 = createTestJobRequest(JOB_REQUEST_4_ID);
+    private static final JobRequest JOB_REQUEST_5 = createTestJobRequest(JOB_REQUEST_5_ID);
 
     private static final Set<Cluster> CLUSTERS = Sets.newHashSet(CLUSTER_0, CLUSTER_1, CLUSTER_2);
 
@@ -139,31 +146,31 @@ class ClusterSelectorManagedScriptIntegrationTest {
 
         ResourceSelectorScriptResult<Cluster> result;
 
-        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_0);
+        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_0, JOB_REQUEST_0_ID);
         Assertions.assertThat(result.getResource()).isPresent().contains(CLUSTER_0);
         Assertions.assertThat(result.getRationale()).isPresent().contains("selected 0");
 
-        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_1);
+        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_1, JOB_REQUEST_1_ID);
         Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isPresent().contains("Couldn't find anything");
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_2))
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_2, JOB_REQUEST_2_ID))
             .withNoCause();
 
-        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_3);
+        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_3, JOB_REQUEST_3_ID);
         Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isNotPresent();
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_4))
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_4, JOB_REQUEST_4_ID))
             .withCauseInstanceOf(ScriptExecutionException.class);
 
         // Invalid return type from script
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_5));
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_5, JOB_REQUEST_5_ID));
     }
 }
