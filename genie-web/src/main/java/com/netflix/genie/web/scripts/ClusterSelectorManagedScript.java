@@ -83,6 +83,7 @@ public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster
         final Set<Cluster> resources,
         final JobRequest jobRequest
     ) {
+        super.addParametersForScript(parameters, resources, jobRequest);
         parameters.put(CLUSTERS_BINDING, resources);
     }
 }

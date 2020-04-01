@@ -77,6 +77,7 @@ public class CommandSelectorManagedScript extends ResourceSelectorScript<Command
         final Set<Command> resources,
         final JobRequest jobRequest
     ) {
+        super.addParametersForScript(parameters, resources, jobRequest);
         parameters.put(COMMANDS_BINDING, resources);
     }
 }
