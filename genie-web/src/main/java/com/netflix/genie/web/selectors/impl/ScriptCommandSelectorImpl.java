@@ -71,7 +71,7 @@ public class ScriptCommandSelectorImpl implements CommandSelector {
      * {@inheritDoc}
      */
     @Override
-    public ResourceSelectionResult<Command> selectCommand(
+    public ResourceSelectionResult<Command> select(
         @NotEmpty final Set<@Valid Command> commands,
         @Valid final JobRequest jobRequest
     ) throws ResourceSelectionException {

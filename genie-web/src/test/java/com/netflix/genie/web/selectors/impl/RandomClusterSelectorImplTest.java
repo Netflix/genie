@@ -59,7 +59,7 @@ class RandomClusterSelectorImplTest {
         final Set<Cluster> clusters = Sets.newHashSet(cluster1, cluster2, cluster3);
         final JobRequest jobRequest = Mockito.mock(JobRequest.class);
         for (int i = 0; i < 5; i++) {
-            final ResourceSelectionResult<Cluster> result = this.clb.selectCluster(clusters, jobRequest);
+            final ResourceSelectionResult<Cluster> result = this.clb.select(clusters, jobRequest);
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.getSelectorClass()).isEqualTo(RandomClusterSelectorImpl.class);
             Assertions.assertThat(result.getSelectedResource()).isPresent().get().isIn(clusters);
@@ -75,7 +75,7 @@ class RandomClusterSelectorImplTest {
     @Test
     void testValidClusterSetOfOne() throws ResourceSelectionException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
-        final ResourceSelectionResult<Cluster> result = this.clb.selectCluster(
+        final ResourceSelectionResult<Cluster> result = this.clb.select(
             Sets.newHashSet(cluster1),
             Mockito.mock(JobRequest.class)
         );

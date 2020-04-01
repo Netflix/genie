@@ -578,7 +578,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             }
             counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
             try {
-                final ResourceSelectionResult<Cluster> result = clusterSelector.selectCluster(
+                final ResourceSelectionResult<Cluster> result = clusterSelector.select(
                     clusters,
                     jobRequest
                 );
@@ -783,7 +783,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             } else {
                 try {
                     final ResourceSelectionResult<Command> result
-                        = this.commandSelector.selectCommand(commands, jobRequest);
+                        = this.commandSelector.select(commands, jobRequest);
                     command = result
                         .getSelectedResource()
                         .orElseThrow(

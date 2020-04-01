@@ -72,7 +72,7 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
      * {@inheritDoc}
      */
     @Override
-    public ResourceSelectionResult<Cluster> selectCluster(
+    public ResourceSelectionResult<Cluster> select(
         @NotEmpty final Set<@Valid Cluster> clusters,
         @Valid final JobRequest jobRequest
     ) throws ResourceSelectionException {

@@ -66,7 +66,7 @@ class ScriptCommandSelectorImplSpec extends Specification {
         when: "Script returns no command"
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, "null"))
-        result = this.commandSelector.selectCommand(commands, jobRequest)
+        result = this.commandSelector.select(commands, jobRequest)
 
         then:
         1 * this.script.selectResource(commands, jobRequest) >> scriptResult
@@ -85,7 +85,7 @@ class ScriptCommandSelectorImplSpec extends Specification {
 
         when: "Script throws exception"
         expectedTags = MetricsUtils.newFailureTagsSetForException(selectionException)
-        this.commandSelector.selectCommand(commands, jobRequest)
+        this.commandSelector.select(commands, jobRequest)
 
         then:
         1 * this.script.selectResource(commands, jobRequest) >> { throw selectionException }
@@ -100,7 +100,7 @@ class ScriptCommandSelectorImplSpec extends Specification {
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, "command 1 id"))
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, "command 1 name"))
-        result = this.commandSelector.selectCommand(commands, jobRequest)
+        result = this.commandSelector.select(commands, jobRequest)
 
         then:
         1 * this.script.selectResource(commands, jobRequest) >> scriptResult
