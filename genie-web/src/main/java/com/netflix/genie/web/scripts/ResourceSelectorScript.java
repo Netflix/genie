@@ -37,7 +37,7 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Slf4j
-public abstract class ResourceSelectorScript<R> extends ManagedScript {
+public class ResourceSelectorScript<R> extends ManagedScript {
 
     static final String JOB_REQUEST_BINDING = "jobRequestParameter";
     static final String JOB_ID_BINDING = "jobIdParameter";
@@ -110,9 +110,10 @@ public abstract class ResourceSelectorScript<R> extends ManagedScript {
      * @param resources  The set of resources that need to be chosen from
      * @param jobRequest The job request necessitating the evaluation of this script
      */
-    protected abstract void addParametersForScript(
-        Map<String, Object> parameters,
-        Set<R> resources,
-        JobRequest jobRequest
-    );
+    protected void addParametersForScript(
+        final Map<String, Object> parameters,
+        final Set<R> resources,
+        final JobRequest jobRequest
+    ) {
+    }
 }
