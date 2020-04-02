@@ -164,6 +164,14 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         // Is it V3 or V4?
         final boolean isV4 = this.jobPersistenceService.isV4(jobId);
 
+        log.debug(
+            "Serving file: {} for job: {} (status: {}, type: {})",
+            relativePath,
+            jobId,
+            jobStatus.name(),
+            isV4 ? "agent" : "embedded"
+        );
+
         // Normalize the base url. Make sure it ends in /.
         final URI baseUri;
         try {
@@ -176,6 +184,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final URI jobDirRoot;
 
         if (isV4 && this.agentRoutingService.isAgentConnectionLocal(jobId)) { // Active V4 job
+            log.debug("Routing request to a live agent");
             manifest = this.agentFileStreamService.getManifest(jobId).orElseThrow(
                 () -> new GenieServerUnavailableException("Manifest not found for job " + jobId)
             );
@@ -185,6 +194,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 throw new GenieServerException("Failed to construct job directory path", e);
             }
         } else if (jobStatus.isActive() && !isV4) { // Active V3 job
+            log.debug("Routing request to a local file");
             final Resource jobDir = this.jobFileService.getJobFileAsResource(jobId, "");
             if (!jobDir.exists()) {
                 throw new GenieNotFoundException("Job directory does not exist: " + jobDir);
@@ -203,6 +213,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
                 throw new GenieServerException("Failed to construct manifest: " + e.getMessage(), e);
             }
         } else { // Archived job
+            log.debug("Routing request to archive");
             try {
                 final ArchivedJobMetadata archivedJobMetadata = this.archivedJobService.getArchivedJobMetadata(jobId);
                 manifest = archivedJobMetadata.getManifest();

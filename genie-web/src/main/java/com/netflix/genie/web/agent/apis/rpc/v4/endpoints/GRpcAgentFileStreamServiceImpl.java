@@ -137,6 +137,12 @@ public class GRpcAgentFileStreamServiceImpl
 
         // A unique ID for this file transfer
         final String fileTransferId = UUID.randomUUID().toString();
+        log.debug(
+            "Initiating transfer {} for file: {} of job: {}",
+            fileTransferId,
+            relativePath,
+            jobId
+        );
 
         // TODO: code upstream of here assumes files is requested in its entirety.
         // But rest of the code downstream actually treats everything as a range request.
@@ -147,9 +153,12 @@ public class GRpcAgentFileStreamServiceImpl
         final StreamBuffer buffer = new StreamBuffer();
 
         if (endOffset - startOffset == 0) {
+            log.debug("Transfer {} file is empty, completing", fileTransferId);
             // When requesting an empty file (or a range of 0 bytes), short-circuit and just return an empty resource.
             buffer.closeForCompleted();
         } else {
+            log.debug("Transfer {} initiating (offsets: ({}-{}])", fileTransferId, startOffset, endOffset);
+
             // Expecting some data. Track this stream and its buffer so incoming chunks can be appended.
             this.pendingTransferBuffersMap.put(fileTransferId, buffer);
 
@@ -273,7 +282,7 @@ public class GRpcAgentFileStreamServiceImpl
         // Remove buffer from the set of transfers waiting to start and move it to the 'in progress' map.
         final StreamBuffer streamBufferFromPending = this.pendingTransferBuffersMap.remove(streamId);
         if (streamBufferFromPending != null) {
-            log.debug("Moving buffer for file stream {} from 'pending' to 'in progress'", streamId);
+            log.debug("Moving buffer for file stream: {} from 'pending' to 'in progress'", streamId);
             this.inProgressTransferBuffersMap.put(streamId, streamBufferFromPending);
         }
 
@@ -282,6 +291,7 @@ public class GRpcAgentFileStreamServiceImpl
 
         // Write into it, if the stream is still there
         if (streamBuffer != null) {
+            log.debug("Writing {} bytes into stream of transfer {}", data.size(), streamId);
             streamBuffer.write(data);
         }
     }
@@ -312,6 +322,7 @@ public class GRpcAgentFileStreamServiceImpl
         final FileTransferStreamObserver fileTransferStreamObserver,
         @Nullable final String streamId
     ) {
+        log.info("Completed file transfer: {}", streamId);
         this.pendingTransferObserversSet.remove(fileTransferStreamObserver);
 
         final StreamBuffer pendingTransferBuffer = this.pendingTransferBuffersMap.remove(streamId);
