@@ -64,7 +64,7 @@ public class GenieAgentApplicationSmokeTest {
         Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
 
         // Test info
-        runner.run("info");
+        runner.run("info", "--beans", "--env", "--properties", "--state-machine");
         Assert.assertThat(runner.getExitCode(), Matchers.is(ExitCode.SUCCESS.getCode()));
     }
 }
