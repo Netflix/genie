@@ -17,7 +17,8 @@
  */
 package com.netflix.genie.agent.execution;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
@@ -28,6 +29,7 @@ import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
+import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
@@ -67,6 +69,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.StateMachine;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -83,7 +86,7 @@ class ExecutionAutoConfigurationTest {
             )
             .withUserConfiguration(MocksConfiguration.class);
 
-    private Set<Class> executionStageClasses = Sets.newHashSet(
+    private Set<Class<? extends ExecutionStage>> uniqueExecutionStages = ImmutableSet.of(
         ArchiveJobOutputsStage.class,
         ClaimJobStage.class,
         CleanupJobDirectoryStage.class,
@@ -97,7 +100,6 @@ class ExecutionAutoConfigurationTest {
         LaunchJobStage.class,
         LogExecutionErrorsStage.class,
         ObtainJobSpecificationStage.class,
-        RefreshManifestStage.class,
         RelocateLogFileStage.class,
         ReserveJobIdStage.class,
         SetJobStatusFinal.class,
@@ -113,6 +115,10 @@ class ExecutionAutoConfigurationTest {
         WaitJobCompletionStage.class
     );
 
+    private Map<Class<? extends ExecutionStage>, Integer> repeatedExecutionStages = ImmutableMap.of(
+        RefreshManifestStage.class, 3
+    );
+
     /**
      * Test beans are created successfully.
      */
@@ -124,9 +130,13 @@ class ExecutionAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(ExecutionContext.class);
                 Assertions.assertThat(context).hasSingleBean(JobExecutionStateMachine.class);
                 Assertions.assertThat(context).hasSingleBean(StateMachine.class);
-                executionStageClasses.forEach(
+                uniqueExecutionStages.forEach(
                     stageClass ->
                         Assertions.assertThat(context).hasSingleBean(stageClass)
+                );
+                repeatedExecutionStages.forEach(
+                    (clazz, count) ->
+                        Assertions.assertThat(context).getBeans(clazz).hasSize(count)
                 );
             }
         );

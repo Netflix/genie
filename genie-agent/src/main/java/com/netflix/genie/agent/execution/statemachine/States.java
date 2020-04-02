@@ -166,14 +166,24 @@ public enum States {
     DONE(0, false),
 
     /**
-     * Trigger a job directory manifest refresh.
-     */
-    FORCE_FILE_MANIFEST_REFRESH(0, true),
-
-    /**
      * Determine the job final status to publish to server.
      */
-    DETERMINE_FINAL_STATUS(0, false, JobStatusMessages.UNKNOWN_JOB_STATE);
+    DETERMINE_FINAL_STATUS(0, false, JobStatusMessages.UNKNOWN_JOB_STATE),
+
+    /**
+     * Trigger a job directory manifest refresh after the job has launched.
+     */
+    POST_LAUNCH_MANIFEST_REFRESH(0, true),
+
+    /**
+     * Trigger a job directory manifest refresh after job setup completed.
+     */
+    POST_SETUP_MANIFEST_REFRESH(0, true),
+
+    /**
+     * Trigger a job directory manifest refresh after job process terminated.
+     */
+    POST_EXECUTION_MANIFEST_REFRESH(0, false);
 
     /**
      * If a state is critical, then upon encountering a {@link FatalTransitionException} while in it, execution is

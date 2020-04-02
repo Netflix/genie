@@ -396,6 +396,19 @@ public class ExecutionAutoConfiguration {
     }
 
     /**
+     * Create a {@link RefreshManifestStage} bean if one is not already defined.
+     *
+     * @param agentFileStreamService the agent file stream service
+     */
+    @Bean
+    @Lazy
+    @Order(145)
+    @ConditionalOnMissingBean(name = "postSetupRefreshManifestStage")
+    RefreshManifestStage postSetupRefreshManifestStage(final AgentFileStreamService agentFileStreamService) {
+        return new RefreshManifestStage(agentFileStreamService, States.POST_SETUP_MANIFEST_REFRESH);
+    }
+
+    /**
      * Create a {@link LaunchJobStage} bean if one is not already defined.
      *
      * @param jobProcessManager the job process manager
@@ -415,10 +428,10 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(160)
-    @ConditionalOnMissingBean(RefreshManifestStage.class)
-    RefreshManifestStage refreshManifestStage(final AgentFileStreamService agentFileStreamService) {
-        return new RefreshManifestStage(agentFileStreamService);
+    @Order(155)
+    @ConditionalOnMissingBean(name = "postLaunchRefreshManifestStage")
+    RefreshManifestStage postLaunchRefreshManifestStage(final AgentFileStreamService agentFileStreamService) {
+        return new RefreshManifestStage(agentFileStreamService, States.POST_LAUNCH_MANIFEST_REFRESH);
     }
 
     /**
@@ -428,7 +441,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(170)
+    @Order(160)
     @ConditionalOnMissingBean(SetJobStatusRunning.class)
     SetJobStatusRunning setJobStatusRunning(final AgentJobService agentJobService) {
         return new SetJobStatusRunning(agentJobService);
@@ -441,10 +454,23 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(180)
+    @Order(170)
     @ConditionalOnMissingBean(WaitJobCompletionStage.class)
     WaitJobCompletionStage waitJobCompletionStage(final JobProcessManager jobProcessManager) {
         return new WaitJobCompletionStage(jobProcessManager);
+    }
+
+    /**
+     * Create a {@link RefreshManifestStage} bean if one is not already defined.
+     *
+     * @param agentFileStreamService the agent file stream service
+     */
+    @Bean
+    @Lazy
+    @Order(175)
+    @ConditionalOnMissingBean(name = "postExecutionRefreshManifestStage")
+    RefreshManifestStage postExecutionRefreshManifestStage(final AgentFileStreamService agentFileStreamService) {
+        return new RefreshManifestStage(agentFileStreamService, States.POST_EXECUTION_MANIFEST_REFRESH);
     }
 
     /**
@@ -452,7 +478,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(190)
+    @Order(180)
     @ConditionalOnMissingBean(DetermineJobFinalStatusStage.class)
     DetermineJobFinalStatusStage determineJobFinalStatusStage() {
         return new DetermineJobFinalStatusStage();
@@ -465,7 +491,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(200)
+    @Order(190)
     @ConditionalOnMissingBean(SetJobStatusFinal.class)
     SetJobStatusFinal setJobStatusFinal(final AgentJobService agentJobService) {
         return new SetJobStatusFinal(agentJobService);
@@ -478,7 +504,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(210)
+    @Order(200)
     @ConditionalOnMissingBean(StopKillServiceStage.class)
     StopKillServiceStage stopKillServiceStage(final AgentJobKillService killService) {
         return new StopKillServiceStage(killService);
@@ -489,7 +515,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(220)
+    @Order(210)
     @ConditionalOnMissingBean(LogExecutionErrorsStage.class)
     LogExecutionErrorsStage logExecutionErrorsStage() {
         return new LogExecutionErrorsStage();
@@ -502,7 +528,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(230)
+    @Order(220)
     @ConditionalOnMissingBean(ArchiveJobOutputsStage.class)
     ArchiveJobOutputsStage archiveJobOutputsStage(final JobArchiveService jobArchiveService) {
         return new ArchiveJobOutputsStage(jobArchiveService);
@@ -515,7 +541,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(240)
+    @Order(230)
     @ConditionalOnMissingBean(StopHeartbeatServiceStage.class)
     StopHeartbeatServiceStage stopHeartbeatServiceStage(final AgentHeartBeatService heartbeatService) {
         return new StopHeartbeatServiceStage(heartbeatService);
@@ -528,7 +554,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(250)
+    @Order(240)
     @ConditionalOnMissingBean(StopFileServiceStage.class)
     StopFileServiceStage stopFileServiceStage(final AgentFileStreamService agentFileStreamService) {
         return new StopFileServiceStage(agentFileStreamService);
@@ -541,7 +567,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(260)
+    @Order(250)
     @ConditionalOnMissingBean(CleanupJobDirectoryStage.class)
     CleanupJobDirectoryStage cleanupJobDirectoryStage(final JobSetupService jobSetupService) {
         return new CleanupJobDirectoryStage(jobSetupService);
@@ -552,7 +578,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(270)
+    @Order(260)
     @ConditionalOnMissingBean(ShutdownStage.class)
     ShutdownStage shutdownStage() {
         return new ShutdownStage();

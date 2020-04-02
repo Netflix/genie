@@ -39,9 +39,10 @@ public class RefreshManifestStage extends ExecutionStage {
      * Constructor.
      *
      * @param agentFileStreamService agent file stream service
+     * @param state                  the associated state
      */
-    public RefreshManifestStage(final AgentFileStreamService agentFileStreamService) {
-        super(States.FORCE_FILE_MANIFEST_REFRESH);
+    public RefreshManifestStage(final AgentFileStreamService agentFileStreamService, final States state) {
+        super(state);
         this.agentFileStreamService = agentFileStreamService;
     }
 
@@ -49,8 +50,9 @@ public class RefreshManifestStage extends ExecutionStage {
     protected void attemptTransition(
         final ExecutionContext executionContext
     ) throws RetryableTransitionException, FatalTransitionException {
-
-        this.agentFileStreamService.forceServerSync();
-
+        if (executionContext.getJobDirectory() != null) {
+            log.info("Forcing a manifest refresh");
+            this.agentFileStreamService.forceServerSync();
+        }
     }
 }
