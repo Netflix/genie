@@ -186,33 +186,43 @@ extends java.lang.Enum&lt;<a href="../../../../../../com/netflix/genie/agent/exe
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#FORCE_FILE_MANIFEST_REFRESH">FORCE_FILE_MANIFEST_REFRESH</a></span></code>
-<div class="block">Trigger a job directory manifest refresh.</div>
-</td>
-</tr>
-<tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#HANDSHAKE">HANDSHAKE</a></span></code>
 <div class="block">Perform agent/server handshake.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#INITIALIZE_AGENT">INITIALIZE_AGENT</a></span></code>
 <div class="block">Initialize the agent.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#LAUNCH_JOB">LAUNCH_JOB</a></span></code>
 <div class="block">Launch the job process.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#LOG_EXECUTION_ERRORS">LOG_EXECUTION_ERRORS</a></span></code>
 <div class="block">Dump execution error summary in the log.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#OBTAIN_JOB_SPECIFICATION">OBTAIN_JOB_SPECIFICATION</a></span></code>
 <div class="block">Obtain the job specification.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#POST_EXECUTION_MANIFEST_REFRESH">POST_EXECUTION_MANIFEST_REFRESH</a></span></code>
+<div class="block">Trigger a job directory manifest refresh after job process terminated.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#POST_LAUNCH_MANIFEST_REFRESH">POST_LAUNCH_MANIFEST_REFRESH</a></span></code>
+<div class="block">Trigger a job directory manifest refresh after the job has launched.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html#POST_SETUP_MANIFEST_REFRESH">POST_SETUP_MANIFEST_REFRESH</a></span></code>
+<div class="block">Trigger a job directory manifest refresh after job setup completed.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -612,24 +622,44 @@ the order they are declared.</div>
 <div class="block">Final stage.</div>
 </li>
 </ul>
-<a name="FORCE_FILE_MANIFEST_REFRESH">
+<a name="DETERMINE_FINAL_STATUS">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>FORCE_FILE_MANIFEST_REFRESH</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> FORCE_FILE_MANIFEST_REFRESH</pre>
-<div class="block">Trigger a job directory manifest refresh.</div>
+<h4>DETERMINE_FINAL_STATUS</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> DETERMINE_FINAL_STATUS</pre>
+<div class="block">Determine the job final status to publish to server.</div>
 </li>
 </ul>
-<a name="DETERMINE_FINAL_STATUS">
+<a name="POST_LAUNCH_MANIFEST_REFRESH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>POST_LAUNCH_MANIFEST_REFRESH</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> POST_LAUNCH_MANIFEST_REFRESH</pre>
+<div class="block">Trigger a job directory manifest refresh after the job has launched.</div>
+</li>
+</ul>
+<a name="POST_SETUP_MANIFEST_REFRESH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>POST_SETUP_MANIFEST_REFRESH</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> POST_SETUP_MANIFEST_REFRESH</pre>
+<div class="block">Trigger a job directory manifest refresh after job setup completed.</div>
+</li>
+</ul>
+<a name="POST_EXECUTION_MANIFEST_REFRESH">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>DETERMINE_FINAL_STATUS</h4>
-<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> DETERMINE_FINAL_STATUS</pre>
-<div class="block">Determine the job final status to publish to server.</div>
+<h4>POST_EXECUTION_MANIFEST_REFRESH</h4>
+<pre>public static final&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a> POST_EXECUTION_MANIFEST_REFRESH</pre>
+<div class="block">Trigger a job directory manifest refresh after job process terminated.</div>
 </li>
 </ul>
 </li>

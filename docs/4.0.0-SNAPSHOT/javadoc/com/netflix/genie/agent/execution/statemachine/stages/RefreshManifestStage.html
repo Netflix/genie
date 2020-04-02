@@ -137,7 +137,8 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html#RefreshManifestStage-com.netflix.genie.agent.execution.services.AgentFileStreamService-">RefreshManifestStage</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services">AgentFileStreamService</a>&nbsp;agentFileStreamService)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html#RefreshManifestStage-com.netflix.genie.agent.execution.services.AgentFileStreamService-com.netflix.genie.agent.execution.statemachine.States-">RefreshManifestStage</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services">AgentFileStreamService</a>&nbsp;agentFileStreamService,
+                    <a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a>&nbsp;state)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -191,17 +192,19 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="RefreshManifestStage-com.netflix.genie.agent.execution.services.AgentFileStreamService-">
+<a name="RefreshManifestStage-com.netflix.genie.agent.execution.services.AgentFileStreamService-com.netflix.genie.agent.execution.statemachine.States-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>RefreshManifestStage</h4>
-<pre>public&nbsp;RefreshManifestStage(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services">AgentFileStreamService</a>&nbsp;agentFileStreamService)</pre>
+<pre>public&nbsp;RefreshManifestStage(<a href="../../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services">AgentFileStreamService</a>&nbsp;agentFileStreamService,
+                            <a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a>&nbsp;state)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>agentFileStreamService</code> - agent file stream service</dd>
+<dd><code>state</code> - the associated state</dd>
 </dl>
 </li>
 </ul>
