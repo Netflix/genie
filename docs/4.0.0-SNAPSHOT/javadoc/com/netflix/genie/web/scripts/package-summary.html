@@ -79,24 +79,6 @@
 <div class="contentContainer">
 <ul class="blockList">
 <li class="blockList">
-<table class="typeSummary" border="0" cellpadding="3" cellspacing="0" summary="Interface Summary table, listing interfaces, and an explanation">
-<caption><span>Interface Summary</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Interface</th>
-<th class="colLast" scope="col">Description</th>
-</tr>
-<tbody>
-<tr class="altColor">
-<td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="interface in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;R&gt;</td>
-<td class="colLast">
-<div class="block">Interface for defining the contract between the selection of a resource from a set of resources for a given
- job request.</div>
-</td>
-</tr>
-</tbody>
-</table>
-</li>
-<li class="blockList">
 <table class="typeSummary" border="0" cellpadding="3" cellspacing="0" summary="Class Summary table, listing classes, and an explanation">
 <caption><span>Class Summary</span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
@@ -105,17 +87,17 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/ClusterSelectorScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorScript</a></td>
+<td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></td>
 <td class="colLast">
-<div class="block">Implementation of <a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts"><code>ManagedScript</code></a> that delegates selection of a job's cluster when more than one choice is
+<div class="block">Extension of <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> that delegates selection of a job's cluster when more than one choice is
  available.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></td>
 <td class="colLast">
-<div class="block">An extension of <a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts"><code>ManagedScript</code></a> which from a set of commands and the original job request will attempt to
- determine the best command to use for execution.</div>
+<div class="block">An extension of <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> which from a set of commands and the original job request will
+ attempt to determine the best command to use for execution.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -126,15 +108,28 @@
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></td>
+<td class="colLast">
+<div class="block">Utility functions that can be used within Groovy scripts executed from Genie.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">ManagedScript</a></td>
 <td class="colLast">
 <div class="block">Abstract script class for components that rely on an external script to be loaded and invoked at runtime.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/ManagedScriptBaseProperties.html" title="class in com.netflix.genie.web.scripts">ManagedScriptBaseProperties</a></td>
 <td class="colLast">
 <div class="block">Base abstract properties for individual script classes to extend.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;R&gt;</td>
+<td class="colLast">
+<div class="block">Interface for defining the contract between the selection of a resource from a set of resources for a given
+ job request.</div>
 </td>
 </tr>
 <tr class="rowColor">

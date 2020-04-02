@@ -187,7 +187,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#scriptClusterSelector-com.netflix.genie.web.scripts.ClusterSelectorScript-io.micrometer.core.instrument.MeterRegistry-">scriptClusterSelector</a></span>(<a href="../../../../../../../com/netflix/genie/web/scripts/ClusterSelectorScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorScript</a>&nbsp;clusterSelectorScript,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#scriptClusterSelector-com.netflix.genie.web.scripts.ClusterSelectorManagedScript-io.micrometer.core.instrument.MeterRegistry-">scriptClusterSelector</a></span>(<a href="../../../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a>&nbsp;clusterSelectorManagedScript,
                      io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
 <div class="block">Produce the <a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>ScriptClusterSelectorImpl</code></a> instance to use for this Genie node if it was configured by the
  user.</div>
@@ -258,7 +258,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="scriptClusterSelector-com.netflix.genie.web.scripts.ClusterSelectorScript-io.micrometer.core.instrument.MeterRegistry-">
+<a name="scriptClusterSelector-com.netflix.genie.web.scripts.ClusterSelectorManagedScript-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -266,14 +266,14 @@ extends java.lang.Object</pre>
 <h4>scriptClusterSelector</h4>
 <pre>@Bean
  @Order(value=2147483597)
- @ConditionalOnBean(value=<a href="../../../../../../../com/netflix/genie/web/scripts/ClusterSelectorScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorScript.class</a>)
-public&nbsp;<a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a>&nbsp;scriptClusterSelector(<a href="../../../../../../../com/netflix/genie/web/scripts/ClusterSelectorScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorScript</a>&nbsp;clusterSelectorScript,
-                                                                                                                                              io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+ @ConditionalOnBean(value=<a href="../../../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript.class</a>)
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a>&nbsp;scriptClusterSelector(<a href="../../../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a>&nbsp;clusterSelectorManagedScript,
+                                                                                                                                                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
 <div class="block">Produce the <a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>ScriptClusterSelectorImpl</code></a> instance to use for this Genie node if it was configured by the
  user. This bean is only created if the script is configured.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>clusterSelectorScript</code> - the cluster selector script</dd>
+<dd><code>clusterSelectorManagedScript</code> - the cluster selector script</dd>
 <dd><code>registry</code> - the metrics registry</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <a href="../../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl"><code>ScriptClusterSelectorImpl</code></a></dd>

@@ -17,12 +17,6 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
-var altColor = "altColor";
-var rowColor = "rowColor";
-var tableTab = "tableTab";
-var activeTableTab = "activeTableTab";
 </script>
 <noscript>
 <div>JavaScript is disabled on your browser.</div>
@@ -75,13 +69,13 @@ var activeTableTab = "activeTableTab";
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
-<li><a href="#method.summary">Method</a></li>
+<li>Method</li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
-<li><a href="#method.detail">Method</a></li>
+<li>Method</li>
 </ul>
 </div>
 <a name="skip.navbar.top">
@@ -98,15 +92,21 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt>All Superinterfaces:</dt>
+<dd><a href="../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</dd>
+</dl>
+<dl>
 <dt>All Known Implementing Classes:</dt>
 <dd><a href="../../../../../com/netflix/genie/web/selectors/impl/RandomClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">RandomClusterSelectorImpl</a>, <a href="../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a></dd>
 </dl>
 <hr>
 <br>
 <pre>@Validated
-public interface <span class="typeNameLabel">ClusterSelector</span></pre>
-<div class="block">Interface for the cluster selector, which returns the "best" cluster to
- run job on from an array of candidates.</div>
+public interface <span class="typeNameLabel">ClusterSelector</span>
+extends <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</pre>
+<div class="block">Interface for any classes which provide a way to select a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> from a set of clusters
+ which matched criterion provided by a user in a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and combined with the criteria for the command
+ selected for a given job.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>2.0.0</dd>
@@ -123,57 +123,12 @@ public interface <span class="typeNameLabel">ClusterSelector</span></pre>
 <!--   -->
 </a>
 <h3>Method Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colLast" scope="col">Method and Description</th>
-</tr>
-<tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/selectors/ClusterSelector.html#selectCluster-java.util.Set-com.netflix.genie.common.dto.JobRequest-">selectCluster</a></span>(@NotEmpty java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;clusters,
-             @Valid <a href="../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest)</code>
-<div class="block">Return best cluster to run job on.</div>
-</td>
-</tr>
-</table>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="details">
 <ul class="blockList">
-<li class="blockList">
-<!-- ============ METHOD DETAIL ========== -->
-<ul class="blockList">
-<li class="blockList"><a name="method.detail">
+<li class="blockList"><a name="methods.inherited.from.class.com.netflix.genie.web.selectors.ResourceSelector">
 <!--   -->
 </a>
-<h3>Method Detail</h3>
-<a name="selectCluster-java.util.Set-com.netflix.genie.common.dto.JobRequest-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>selectCluster</h4>
-<pre><a href="../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;selectCluster(@NotEmpty
-                                               @NotEmpty java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;clusters,
-                                               @Valid
-                                               @Valid <a href="../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a>&nbsp;jobRequest)
-                                        throws <a href="../../../../../com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
-<div class="block">Return best cluster to run job on.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>clusters</code> - An immutable, non-empty list of available clusters to choose from</dd>
-<dd><code>jobRequest</code> - The job request these clusters are being selected for</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A <a href="../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos"><code>ResourceSelectionResult</code></a> which contains details about the outcome of the invocation</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></code> - When the underlying implementation can't successfully come to a selection
-                                    decision</dd>
-</dl>
-</li>
+<h3>Methods inherited from interface&nbsp;com.netflix.genie.web.selectors.<a href="../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a></h3>
+<code><a href="../../../../../com/netflix/genie/web/selectors/ResourceSelector.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select</a></code></li>
 </ul>
 </li>
 </ul>
@@ -230,13 +185,13 @@ public interface <span class="typeNameLabel">ClusterSelector</span></pre>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
-<li><a href="#method.summary">Method</a></li>
+<li>Method</li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
-<li><a href="#method.detail">Method</a></li>
+<li>Method</li>
 </ul>
 </div>
 <a name="skip.navbar.bottom">

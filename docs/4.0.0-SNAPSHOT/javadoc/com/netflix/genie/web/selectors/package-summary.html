@@ -90,8 +90,9 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a></td>
 <td class="colLast">
-<div class="block">Interface for the cluster selector, which returns the "best" cluster to
- run job on from an array of candidates.</div>
+<div class="block">Interface for any classes which provide a way to select a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> from a set of clusters
+ which matched criterion provided by a user in a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and combined with the criteria for the command
+ selected for a given job.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -99,6 +100,12 @@
 <td class="colLast">
 <div class="block">Interface for any classes which provide a way to select a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> from a set of commands
  which matched criterion provided by a user in a <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;R&gt;</td>
+<td class="colLast">
+<div class="block">Generic interface for a selector which selects a resource from a set of resources for a given job request.</div>
 </td>
 </tr>
 </tbody>

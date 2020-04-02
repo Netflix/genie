@@ -107,7 +107,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a></dd>
+<dd><a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a>, <a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</dd>
 </dl>
 <hr>
 <br>
@@ -160,9 +160,10 @@ implements <a href="../../../../../../com/netflix/genie/web/selectors/CommandSel
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html#selectCommand-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">selectCommand</a></span>(@NotEmpty java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;commands,
-             @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)</code>
-<div class="block">Select a command from the given set of commands if possible.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select</a></span>(@NotEmpty java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;commands,
+      @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+      @NotEmpty java.lang.String&nbsp;jobId)</code>
+<div class="block">Select a resource from the given set of resources if possible.</div>
 </td>
 </tr>
 </table>
@@ -211,24 +212,27 @@ implements <a href="../../../../../../com/netflix/genie/web/selectors/CommandSel
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="selectCommand-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">
+<a name="select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>selectCommand</h4>
-<pre>public&nbsp;<a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;selectCommand(@NotEmpty
-                                                      @NotEmpty java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;commands,
-                                                      @Valid
-                                                      @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)
-                                               throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
-<div class="block">Select a command from the given set of commands if possible.</div>
+<h4>select</h4>
+<pre>public&nbsp;<a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;select(@NotEmpty
+                                               @NotEmpty java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;&nbsp;commands,
+                                               @Valid
+                                               @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
+                                               @NotEmpty
+                                               @NotEmpty java.lang.String&nbsp;jobId)
+                                        throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
+<div class="block">Select a resource from the given set of resources if possible.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html#selectCommand-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">selectCommand</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors">CommandSelector</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>commands</code> - A set of commands which matched the user supplied criterion to chose from</dd>
+<dd><code>commands</code> - A set of resources which matched the user supplied criterion to chose from</dd>
 <dd><code>jobRequest</code> - The job user's original job request</dd>
+<dd><code>jobId</code> - The unique id the job has or will have within the Genie system</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The a <a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos"><code>ResourceSelectionResult</code></a> instance which contains information about the result of this
  invocation</dd>
