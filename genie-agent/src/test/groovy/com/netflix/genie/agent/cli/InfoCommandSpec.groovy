@@ -126,7 +126,7 @@ class InfoCommandSpec extends Specification {
         1 * env.getSystemEnvironment() >> map
         1 * env.getSystemProperties() >> map
         1 * env.getPropertySources() >> new MutablePropertySources()
-        1 * ctx.getBean(JobExecutionStateMachineImpl.class) >> jobExecutionStateMachine
+        1 * ctx.getBean("jobExecutionStateMachine", JobExecutionStateMachineImpl.class) >> jobExecutionStateMachine
         1 * jobExecutionStateMachine.getExecutionStages() >> stages
         1 * jobExecutionStateMachine.getStateMachine() >> stateMachine
         2 * stateMachine.getStates() >> states

@@ -204,7 +204,7 @@ class InfoCommand implements AgentCommand {
                 .append(NEWLINE);
 
             final JobExecutionStateMachineImpl jobExecutionStateMachine
-                = applicationContext.getBean(JobExecutionStateMachineImpl.class);
+                = applicationContext.getBean("jobExecutionStateMachine", JobExecutionStateMachineImpl.class);
 
             final StateMachine<States, Events> stateMachine = jobExecutionStateMachine.getStateMachine();
             final List<ExecutionStage> stages = jobExecutionStateMachine.getExecutionStages();
