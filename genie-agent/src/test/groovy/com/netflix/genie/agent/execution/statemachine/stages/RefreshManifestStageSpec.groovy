@@ -20,24 +20,42 @@ package com.netflix.genie.agent.execution.statemachine.stages
 import com.netflix.genie.agent.execution.services.AgentFileStreamService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
+import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class RefreshManifestStageSpec extends Specification {
     AgentFileStreamService agentFileService
-    ExecutionStage stage
+
     ExecutionContext executionContext
 
     void setup() {
         this.agentFileService = Mock(AgentFileStreamService)
         this.executionContext = Mock(ExecutionContext)
-        this.stage = new RefreshManifestStage(agentFileService)
     }
 
-    def "AttemptTransition"() {
+    @Unroll
+    def "AttemptTransition for state #state"() {
+        ExecutionStage stage = new RefreshManifestStage(agentFileService, state)
+
         when:
-        this.stage.attemptTransition(executionContext)
+        stage.attemptTransition(executionContext)
 
         then:
+        1 * executionContext.getJobDirectory() >> Mock(File)
         1 * agentFileService.forceServerSync()
+
+        when:
+        stage.attemptTransition(executionContext)
+
+        then:
+        1 * executionContext.getJobDirectory() >> null
+        0 * agentFileService.forceServerSync()
+
+        where:
+        state | _
+        States.POST_SETUP_MANIFEST_REFRESH | _
+        States.POST_LAUNCH_MANIFEST_REFRESH | _
+        States.POST_EXECUTION_MANIFEST_REFRESH | _
     }
 }
