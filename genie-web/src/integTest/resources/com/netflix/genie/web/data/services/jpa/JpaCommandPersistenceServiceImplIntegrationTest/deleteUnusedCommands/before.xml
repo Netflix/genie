@@ -15,6 +15,10 @@
     limitations under the License.
 -->
 <dataset>
+    <criteria
+        id="0"
+        name="blah"
+    />
     <commands
         id="0"
         created="2020-03-23 01:47:00"
@@ -88,6 +92,11 @@
         version="7.8.9"
         check_delay="20000"
         status="DEPRECATED"
+    />
+    <commands_cluster_criteria
+        command_id="5"
+        criterion_id="0"
+        priority_order="0"
     />
     <commands
         id="6"

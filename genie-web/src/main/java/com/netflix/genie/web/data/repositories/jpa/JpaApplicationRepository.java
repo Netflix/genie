@@ -16,11 +16,11 @@
 package com.netflix.genie.web.data.repositories.jpa;
 
 import com.netflix.genie.web.data.entities.ApplicationEntity;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Set;
 
 /**
  * Application repository.
@@ -30,14 +30,15 @@ import java.time.Instant;
 public interface JpaApplicationRepository extends JpaBaseRepository<ApplicationEntity> {
 
     /**
-     * Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+     * Find any application records where they are not linked to any jobs and it's not linked to any commands and was
      * created before the given time.
      */
-    String DELETE_APPLICATIONS_QUERY =
-        "DELETE FROM applications"
+    String FIND_UNUSED_APPLICATIONS_QUERY =
+        "SELECT id"
+            + " FROM applications"
             + " WHERE created < :createdThreshold"
             + " AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications)"
-            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications);";
+            + " AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)";
 
 
     /**
@@ -45,9 +46,8 @@ public interface JpaApplicationRepository extends JpaBaseRepository<ApplicationE
      * created before the given time.
      *
      * @param createdThreshold The instant in time before which records should be considered for deletion. Exclusive.O
-     * @return The number of applications deleted
+     * @return The ids of the applications that are unused
      */
-    @Query(value = DELETE_APPLICATIONS_QUERY, nativeQuery = true)
-    @Modifying
-    int deleteUnusedApplications(@Param("createdThreshold") Instant createdThreshold);
+    @Query(value = FIND_UNUSED_APPLICATIONS_QUERY, nativeQuery = true)
+    Set<Long> findUnusedApplications(@Param("createdThreshold") Instant createdThreshold);
 }

@@ -404,11 +404,15 @@ public interface ClusterPersistenceService {
     ) throws GenieException;
 
     /**
-     * Delete all clusters that are in a terminated state and aren't attached to any jobs.
+     * Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
+     * the given time.
      *
+     * @param deleteStatuses The set of {@link ClusterStatus} a cluster must be in to be considered for deletion.
+     * @param clusterCreatedThreshold The instant in time before which a cluster must have been created to be
+     *                                considered for deletion. Exclusive.
      * @return The number of clusters deleted
      */
-    long deleteTerminatedClusters();
+    long deleteUnusedClusters(Set<ClusterStatus> deleteStatuses, Instant clusterCreatedThreshold);
 
     /**
      * Find all the {@link Cluster}'s that match the given {@link Criterion}.

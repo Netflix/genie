@@ -48,6 +48,7 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Interfaces for providing persistence functions for jobs other than search.
@@ -145,16 +146,16 @@ public interface JobPersistenceService {
     /**
      * This method will delete a chunk of jobs whose creation time is earlier than the given date.
      *
-     * @param date       The date before which all jobs should be deleted
-     * @param maxDeleted The maximum number of jobs that should be deleted
-     *                   (soft limit, can be rounded up to multiple of page size)
-     * @param pageSize   Page size used to iterate through jobs
+     * @param creationThreshold The instant in time before which all jobs should be deleted
+     * @param excludeStatuses   The set of statuses that should be excluded from deletion if a job is in one of these
+     *                          statuses
+     * @param batchSize         The maximum number of jobs that should be deleted per query
      * @return the number of deleted jobs
      */
-    long deleteBatchOfJobsCreatedBeforeDate(
-        @NotNull Instant date,
-        @Min(1) int maxDeleted,
-        @Min(1) int pageSize
+    long deleteJobsCreatedBefore(
+        @NotNull Instant creationThreshold,
+        @NotNull Set<JobStatus> excludeStatuses,
+        @Min(1) int batchSize
     );
 
     // V4 APIs

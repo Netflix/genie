@@ -52,6 +52,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -447,9 +448,12 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
      * {@inheritDoc}
      */
     @Override
-    public int deleteUnusedApplicationsCreatedBefore(final Instant createdThreshold) {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteUnusedApplicationsCreatedBefore(final Instant createdThreshold) {
         log.info("Attempting to delete unused applications created before {}", createdThreshold);
-        return this.getApplicationRepository().deleteUnusedApplications(createdThreshold);
+        return this.getApplicationRepository().deleteByIdIn(
+            this.getApplicationRepository().findUnusedApplications(createdThreshold)
+        );
     }
 
     /**

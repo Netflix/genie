@@ -18,7 +18,9 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
@@ -70,6 +72,9 @@ public class DatabaseCleanupTask extends LeaderTask {
     );
     // TODO: May want to make this a property
     private static final Set<CommandStatus> TO_DELETE_COMMAND_STATUSES = EnumSet.of(CommandStatus.INACTIVE);
+    // TODO: May want to make this a property. Currently this maintains consistent behavior with before but it would
+    //       be nice to add OUT_OF_SERVICE
+    private static final Set<ClusterStatus> TO_DELETE_CLUSTER_STATUSES = EnumSet.of(ClusterStatus.TERMINATED);
 
     private final DatabaseCleanupProperties cleanupProperties;
     private final Environment environment;
@@ -174,13 +179,12 @@ public class DatabaseCleanupTask extends LeaderTask {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             this.deleteJobs();
-            this.deleteClusters();
-
-            this.deactivateCommands(runtime);
 
             // Get now - 1 hour to avoid deleting references that were created as part of new resources recently
             final Instant creationThreshold = runtime.minus(1L, ChronoUnit.HOURS);
 
+            this.deleteClusters(creationThreshold);
+            this.deactivateCommands(runtime);
             this.deleteCommands(creationThreshold);
             this.deleteApplications(creationThreshold);
             this.deleteFiles(creationThreshold);
@@ -224,6 +228,7 @@ public class DatabaseCleanupTask extends LeaderTask {
             log.info("Skipping job cleanup");
             this.numDeletedJobs.set(0);
         } else {
+            // TODO: Maybe we shouldn't reset it to midnight no matter what... just go with runtime minus something
             final Instant midnightUTC = TaskUtils.getMidnightUTC();
             final Instant retentionLimit = midnightUTC.minus(
                 this.environment.getProperty(
@@ -234,11 +239,6 @@ public class DatabaseCleanupTask extends LeaderTask {
                 ChronoUnit.DAYS
             );
             final int batchSize = this.environment.getProperty(
-                DatabaseCleanupProperties.JobDatabaseCleanupProperties.MAX_DELETED_PER_TRANSACTION_PROPERTY,
-                Integer.class,
-                this.cleanupProperties.getJobCleanup().getMaxDeletedPerTransaction()
-            );
-            final int pageSize = this.environment.getProperty(
                 DatabaseCleanupProperties.JobDatabaseCleanupProperties.PAGE_SIZE_PROPERTY,
                 Integer.class,
                 this.cleanupProperties.getJobCleanup().getPageSize()
@@ -249,18 +249,16 @@ public class DatabaseCleanupTask extends LeaderTask {
                 retentionLimit,
                 batchSize
             );
-            long totalDeletedJobs = 0;
-            while (true) {
-                final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+            long numDeletedJobsInBatch;
+            long totalDeletedJobs = 0L;
+            do {
+                numDeletedJobsInBatch = this.jobPersistenceService.deleteJobsCreatedBefore(
                     retentionLimit,
-                    batchSize,
-                    pageSize
+                    JobStatus.getActiveStatuses(),
+                    batchSize
                 );
-                totalDeletedJobs += numberDeletedJobs;
-                if (numberDeletedJobs == 0) {
-                    break;
-                }
-            }
+                totalDeletedJobs += numDeletedJobsInBatch;
+            } while (numDeletedJobsInBatch != 0);
             log.info(
                 "Deleted {} jobs",
                 totalDeletedJobs
@@ -272,7 +270,7 @@ public class DatabaseCleanupTask extends LeaderTask {
     /*
      * Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted.
      */
-    private void deleteClusters() {
+    private void deleteClusters(final Instant creationThreshold) {
         final long startTime = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -285,10 +283,16 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping clusters cleanup");
                 this.numDeletedClusters.set(0);
             } else {
-                final long countDeletedClusters = this.clusterPersistenceService.deleteTerminatedClusters();
+                final long countDeletedClusters = this.clusterPersistenceService.deleteUnusedClusters(
+                    TO_DELETE_CLUSTER_STATUSES,
+                    creationThreshold
+                );
                 log.info(
-                    "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
-                    countDeletedClusters
+                    "Deleted {} clusters that were in one of {} states, were created before {} and weren't "
+                        + " attached to any jobs",
+                    countDeletedClusters,
+                    TO_DELETE_CLUSTER_STATUSES,
+                    creationThreshold
                 );
                 this.numDeletedClusters.set(countDeletedClusters);
             }
@@ -432,7 +436,7 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping command cleanup");
                 this.numDeletedCommands.set(0);
             } else {
-                final int deletedCommandCount = this.commandPersistenceService.deleteUnusedCommands(
+                final long deletedCommandCount = this.commandPersistenceService.deleteUnusedCommands(
                     TO_DELETE_COMMAND_STATUSES,
                     creationThreshold
                 );
@@ -465,8 +469,8 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping application cleanup");
                 this.numDeletedCommands.set(0);
             } else {
-                final int deletedApplicationCount
-                    = this.applicationPersistenceService.deleteUnusedApplicationsCreatedBefore(creationThreshold);
+                final long deletedApplicationCount = this.applicationPersistenceService
+                    .deleteUnusedApplicationsCreatedBefore(creationThreshold);
                 log.info(
                     "Deleted {} applications that were unused by any resource and created over an hour ago",
                     deletedApplicationCount

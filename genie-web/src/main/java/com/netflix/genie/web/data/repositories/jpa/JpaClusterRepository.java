@@ -16,9 +16,10 @@
 package com.netflix.genie.web.data.repositories.jpa;
 
 import com.netflix.genie.web.data.entities.ClusterEntity;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.Set;
 
 /**
@@ -29,29 +30,29 @@ import java.util.Set;
 public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity>, CriteriaResolutionRepository {
 
     /**
-     * The SQL to find all clusters in a TERMINATED state that aren't attached to any jobs still in the database.
+     * The SQL to find all clusters that aren't attached to any jobs still in the database and were created before
+     * a certain point in time.
      */
-    String FIND_TERMINATED_CLUSTERS_SQL =
-        "SELECT id "
-            + "FROM clusters "
-            + "WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) "
-            + "AND status = 'TERMINATED' "
-            + "FOR UPDATE;";
+    String FIND_UNUSED_CLUSTERS_SQL =
+        "SELECT id"
+            + " FROM clusters"
+            + " WHERE status IN (:unusedStatuses)"
+            + " AND created < :clusterCreatedThreshold"
+            + " AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)";
 
     /**
-     * Find the ids of all clusters that are in a terminated state and aren't attached to any jobs.
+     * Find all the clusters that aren't attached to any jobs in the database, were created before the given time
+     * and have one of the given statuses.
      *
-     * @return The IDs of matching clusters
+     * @param unusedStatuses          The set of statuses a cluster must have to be considered unused
+     * @param clusterCreatedThreshold The instant in time which a cluster must have been created before to be considered
+     *                                unused. Exclusive.
+     * @return The ids of the clusters that are considered unused
      */
-    @Query(value = FIND_TERMINATED_CLUSTERS_SQL, nativeQuery = true)
-    Set<Number> findTerminatedUnusedClusters();
-
-    /**
-     * Delete all clusters whose ids are contained in the given set of ids.
-     *
-     * @param ids The ids of the clusters to delete
-     * @return The number of deleted clusters
-     */
-    @Modifying
-    Long deleteByIdIn(Set<Long> ids);
+    @Query(value = FIND_UNUSED_CLUSTERS_SQL, nativeQuery = true)
+    // TODO: Could use different lock mode
+    Set<Long> findUnusedClusters(
+        @Param("unusedStatuses") Set<String> unusedStatuses,
+        @Param("clusterCreatedThreshold") Instant clusterCreatedThreshold
+    );
 }

@@ -59,6 +59,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -564,13 +565,21 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
      * {@inheritDoc}
      */
     @Override
-    public long deleteTerminatedClusters() {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteUnusedClusters(
+        final Set<ClusterStatus> deleteStatuses,
+        final Instant clusterCreateThreshold
+    ) {
+        log.info(
+            "Deleting clusters with statuses {} that were created before {} and aren't attached to any jobs",
+            deleteStatuses,
+            clusterCreateThreshold
+        );
         return this.getClusterRepository().deleteByIdIn(
-            this.getClusterRepository()
-                .findTerminatedUnusedClusters()
-                .stream()
-                .map(Number::longValue)
-                .collect(Collectors.toSet())
+            this.getClusterRepository().findUnusedClusters(
+                deleteStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
+                clusterCreateThreshold
+            )
         );
     }
 

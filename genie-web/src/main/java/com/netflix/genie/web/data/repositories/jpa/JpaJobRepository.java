@@ -19,20 +19,14 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.entities.JobEntity;
 import com.netflix.genie.web.data.entities.aggregates.UserJobResourcesAggregate;
 import com.netflix.genie.web.data.entities.projections.AgentHostnameProjection;
-import com.netflix.genie.web.data.entities.projections.IdProjection;
 import com.netflix.genie.web.data.entities.projections.JobProjection;
 import com.netflix.genie.web.data.entities.projections.UniqueIdProjection;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,6 +35,15 @@ import java.util.Set;
  * @author tgianos
  */
 public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
+
+    /**
+     * The query used to find batches of jobs before a certain time.
+     */
+    String FIND_OLD_JOBS_QUERY =
+        "SELECT id"
+            + " FROM jobs"
+            + " WHERE created < :createdThreshold AND status NOT IN (:excludedStatuses)"
+            + " LIMIT :batchSize"; // JPQL doesn't support limit so this needs to be native query
 
     // TODO: Make interfaces generic but be aware of https://jira.spring.io/browse/DATAJPA-1185
 
@@ -88,15 +91,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Set<AgentHostnameProjection> findDistinctByStatusInAndV4IsFalse(Set<String> statuses);
 
     /**
-     * Deletes all jobs for the given ids.
-     *
-     * @param ids list of ids for which the jobs should be deleted
-     * @return no. of jobs deleted
-     */
-    @Modifying
-    Long deleteByIdIn(@NotNull List<Long> ids);
-
-    /**
      * Count all jobs that belong to a given user and are in any of the given states.
      *
      * @param user     the user name
@@ -106,14 +100,19 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Long countJobsByUserAndStatusIn(@NotBlank String user, @NotEmpty Set<String> statuses);
 
     /**
-     * Returns the slice of ids for job requests created before the given date.
+     * Find a batch of jobs that were created before the given time.
      *
-     * @param date     The date before which the job requests were created
-     * @param pageable The page of data to get
-     * @return List of job request ids
+     * @param createdThreshold The time before which the jobs were submitted. Exclusive
+     * @param excludeStatuses  The set of statuses which should be excluded from the results
+     * @param limit            The maximum number of jobs to to find
+     * @return The number of deleted jobs
      */
-    // TODO: Explore deleteFirst{N}ByCreatedBefore
-    Slice<IdProjection> findByCreatedBefore(@NotNull Instant date, @NotNull Pageable pageable);
+    @Query(value = FIND_OLD_JOBS_QUERY, nativeQuery = true)
+    Set<Long> findJobsCreatedBefore(
+        @Param("createdThreshold") Instant createdThreshold,
+        @Param("excludedStatuses") Set<String> excludeStatuses,
+        @Param("batchSize") int limit
+    );
 
     /**
      * Returns resources usage for each user that has a running job.

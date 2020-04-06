@@ -17,7 +17,9 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
@@ -144,11 +146,9 @@ class DatabaseCleanupTaskTest {
         final int days = 5;
         final int negativeDays = -1 * days;
         final int pageSize = 10;
-        final int maxDeleted = 10_000;
 
         Mockito.when(this.jobCleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
         Mockito.when(this.jobCleanupProperties.getPageSize()).thenReturn(pageSize);
-        Mockito.when(this.jobCleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
 
         Mockito.when(this.commandDeactivationProperties.getCommandCreationThreshold()).thenReturn(60);
         Mockito.when(this.commandDeactivationProperties.getJobCreationThreshold()).thenReturn(30);
@@ -159,10 +159,10 @@ class DatabaseCleanupTaskTest {
         final long deletedCount3 = 2L;
         Mockito
             .when(
-                this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                this.jobPersistenceService.deleteJobsCreatedBefore(
                     Mockito.any(Instant.class),
-                    Mockito.anyInt(),
-                    Mockito.anyInt()
+                    Mockito.eq(JobStatus.getActiveStatuses()),
+                    Mockito.eq(pageSize)
                 )
             )
             .thenReturn(deletedCount1)
@@ -171,12 +171,18 @@ class DatabaseCleanupTaskTest {
             .thenReturn(deletedCount3)
             .thenReturn(0L);
 
-        Mockito.when(this.clusterPersistenceService.deleteTerminatedClusters()).thenReturn(1L, 2L);
+        Mockito
+            .when(
+                this.clusterPersistenceService.deleteUnusedClusters(
+                    Mockito.eq(EnumSet.of(ClusterStatus.TERMINATED)),
+                    Mockito.any(Instant.class)
+                )
+            ).thenReturn(1L, 2L);
         Mockito.when(this.filePersistenceService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3L, 4L);
         Mockito.when(this.tagPersistenceService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5L, 6L);
         Mockito
             .when(this.applicationPersistenceService.deleteUnusedApplicationsCreatedBefore(Mockito.any(Instant.class)))
-            .thenReturn(11, 117);
+            .thenReturn(11L, 117L);
         Mockito
             .when(
                 this.commandPersistenceService.updateStatusForUnusedCommands(
@@ -194,7 +200,7 @@ class DatabaseCleanupTaskTest {
                     Mockito.any(Instant.class)
                 )
             )
-            .thenReturn(11, 81);
+            .thenReturn(11L, 81L);
 
         // The multiple calendar instances are to protect against running this test when the day flips
         final Calendar before = Calendar.getInstance(JobConstants.UTC);
@@ -205,7 +211,11 @@ class DatabaseCleanupTaskTest {
         if (before.get(Calendar.DAY_OF_YEAR) == after.get(Calendar.DAY_OF_YEAR)) {
             Mockito
                 .verify(this.jobPersistenceService, Mockito.times(5))
-                .deleteBatchOfJobsCreatedBeforeDate(argument.capture(), Mockito.eq(maxDeleted), Mockito.eq(pageSize));
+                .deleteJobsCreatedBefore(
+                    argument.capture(),
+                    Mockito.eq(JobStatus.getActiveStatuses()),
+                    Mockito.eq(pageSize)
+                );
             final Calendar date = Calendar.getInstance(JobConstants.UTC);
             date.set(Calendar.HOUR_OF_DAY, 0);
             date.set(Calendar.MINUTE, 0);
@@ -214,7 +224,10 @@ class DatabaseCleanupTaskTest {
             date.add(Calendar.DAY_OF_YEAR, negativeDays);
             Assertions.assertThat(argument.getAllValues().get(0).toEpochMilli()).isEqualTo(date.getTime().getTime());
             Assertions.assertThat(argument.getAllValues().get(1).toEpochMilli()).isEqualTo(date.getTime().getTime());
-            Mockito.verify(this.clusterPersistenceService, Mockito.times(2)).deleteTerminatedClusters();
+            Mockito.verify(this.clusterPersistenceService, Mockito.times(2)).deleteUnusedClusters(
+                Mockito.eq(EnumSet.of(ClusterStatus.TERMINATED)),
+                Mockito.any(Instant.class)
+            );
             Mockito
                 .verify(this.filePersistenceService, Mockito.times(2))
                 .deleteUnusedFiles(Mockito.any(Instant.class));
@@ -246,17 +259,15 @@ class DatabaseCleanupTaskTest {
         final int days = 5;
         final int negativeDays = -1 * days;
         final int pageSize = 10;
-        final int maxDeleted = 10_000;
 
         Mockito.when(this.jobCleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
         Mockito.when(this.jobCleanupProperties.getPageSize()).thenReturn(pageSize);
-        Mockito.when(this.jobCleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
 
         Mockito
             .when(
-                this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                this.jobPersistenceService.deleteJobsCreatedBefore(
                     Mockito.any(Instant.class),
-                    Mockito.anyInt(),
+                    Mockito.anySet(),
                     Mockito.anyInt()
                 )
             )
@@ -309,14 +320,14 @@ class DatabaseCleanupTaskTest {
             );
         Mockito
             .verify(this.jobPersistenceService, Mockito.never())
-            .deleteBatchOfJobsCreatedBeforeDate(
+            .deleteJobsCreatedBefore(
                 Mockito.any(Instant.class),
-                Mockito.anyInt(),
+                Mockito.anySet(),
                 Mockito.anyInt()
             );
         Mockito
             .verify(this.clusterPersistenceService, Mockito.never())
-            .deleteTerminatedClusters();
+            .deleteUnusedClusters(Mockito.anySet(), Mockito.any(Instant.class));
         Mockito
             .verify(this.filePersistenceService, Mockito.never())
             .deleteUnusedFiles(Mockito.any(Instant.class));
