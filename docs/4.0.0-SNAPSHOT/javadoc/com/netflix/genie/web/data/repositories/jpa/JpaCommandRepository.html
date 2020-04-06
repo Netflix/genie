@@ -126,8 +126,8 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#DELETE_COMMANDS_IN_STATUSES_QUERY">DELETE_COMMANDS_IN_STATUSES_QUERY</a></span></code>
-<div class="block">The query used to delete commands.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#FIND_UNUSED_COMMANDS_QUERY">FIND_UNUSED_COMMANDS_QUERY</a></span></code>
+<div class="block">The query used to find commands that are unused to delete.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -152,10 +152,10 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#deleteUnused-java.util.Set-java.time.Instant-">deleteUnused</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;deleteStatuses,
-            java.time.Instant&nbsp;commandCreatedThreshold)</code>
-<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
+<td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#findUnusedCommands-java.util.Set-java.time.Instant-">findUnusedCommands</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                  java.time.Instant&nbsp;commandCreatedThreshold)</code>
+<div class="block">Find commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 </td>
 </tr>
@@ -174,7 +174,7 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.netflix.genie.web.data.repositories.jpa.<a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaBaseRepository</a></h3>
-<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
+<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.springframework.data.jpa.repository.JpaRepository">
@@ -239,17 +239,17 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 </dl>
 </li>
 </ul>
-<a name="DELETE_COMMANDS_IN_STATUSES_QUERY">
+<a name="FIND_UNUSED_COMMANDS_QUERY">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>DELETE_COMMANDS_IN_STATUSES_QUERY</h4>
-<pre>static final&nbsp;java.lang.String DELETE_COMMANDS_IN_STATUSES_QUERY</pre>
-<div class="block">The query used to delete commands.</div>
+<h4>FIND_UNUSED_COMMANDS_QUERY</h4>
+<pre>static final&nbsp;java.lang.String FIND_UNUSED_COMMANDS_QUERY</pre>
+<div class="block">The query used to find commands that are unused to delete.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.DELETE_COMMANDS_IN_STATUSES_QUERY">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.FIND_UNUSED_COMMANDS_QUERY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -267,17 +267,17 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <ul class="blockList">
 <li class="blockList">
 <h4>setUnusedStatus</h4>
-<pre>@Query(value="UPDATE commands SET status = :desiredStatus WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold);",
+<pre>@Query(value="UPDATE commands SET status = :desiredStatus WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold)",
        nativeQuery=true)
  @Modifying
 int&nbsp;setUnusedStatus(@Param(value="desiredStatus")
-                                                                                                                                                                                                                                                                                                                       java.lang.String&nbsp;desiredStatus,
-                                                                                                                                                                                                                                                                                                                       @Param(value="commandCreatedThreshold")
-                                                                                                                                                                                                                                                                                                                       java.time.Instant&nbsp;commandCreatedThreshold,
-                                                                                                                                                                                                                                                                                                                       @Param(value="currentStatuses")
-                                                                                                                                                                                                                                                                                                                       java.util.Set&lt;java.lang.String&gt;&nbsp;currentStatuses,
-                                                                                                                                                                                                                                                                                                                       @Param(value="jobCreatedThreshold")
-                                                                                                                                                                                                                                                                                                                       java.time.Instant&nbsp;jobCreatedThreshold)</pre>
+                                                                                                                                                                                                                                                                                                                      java.lang.String&nbsp;desiredStatus,
+                                                                                                                                                                                                                                                                                                                      @Param(value="commandCreatedThreshold")
+                                                                                                                                                                                                                                                                                                                      java.time.Instant&nbsp;commandCreatedThreshold,
+                                                                                                                                                                                                                                                                                                                      @Param(value="currentStatuses")
+                                                                                                                                                                                                                                                                                                                      java.util.Set&lt;java.lang.String&gt;&nbsp;currentStatuses,
+                                                                                                                                                                                                                                                                                                                      @Param(value="jobCreatedThreshold")
+                                                                                                                                                                                                                                                                                                                      java.time.Instant&nbsp;jobCreatedThreshold)</pre>
 <div class="block">Bulk set the status of commands which match the given inputs. Considers whether a command was used in some
  period of time till now.</div>
 <dl>
@@ -293,28 +293,27 @@ int&nbsp;setUnusedStatus(@Param(value="desiredStatus")
 </dl>
 </li>
 </ul>
-<a name="deleteUnused-java.util.Set-java.time.Instant-">
+<a name="findUnusedCommands-java.util.Set-java.time.Instant-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>deleteUnused</h4>
-<pre>@Query(value="DELETE FROM commands WHERE status IN (:deleteStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands);",
+<h4>findUnusedCommands</h4>
+<pre>@Query(value="SELECT id FROM commands WHERE status IN (:unusedStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands)",
        nativeQuery=true)
- @Modifying
-int&nbsp;deleteUnused(@Param(value="deleteStatuses")
-                                                                                                                                                                                                                                                                                                                           java.util.Set&lt;java.lang.String&gt;&nbsp;deleteStatuses,
-                                                                                                                                                                                                                                                                                                                           @Param(value="commandCreatedThreshold")
-                                                                                                                                                                                                                                                                                                                           java.time.Instant&nbsp;commandCreatedThreshold)</pre>
-<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
+java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedCommands(@Param(value="unusedStatuses")
+                                                                                                                                                                                                                                                                                                                                                 java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                                                                                                                                                                                                                                                                                                                                                 @Param(value="commandCreatedThreshold")
+                                                                                                                                                                                                                                                                                                                                                 java.time.Instant&nbsp;commandCreatedThreshold)</pre>
+<div class="block">Find commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>deleteStatuses</code> - The set of statuses a command must be in in order to be considered for deletion</dd>
-<dd><code>commandCreatedThreshold</code> - The instant in time a command must have been created before to be considered for
-                                deletion. Exclusive.</dd>
+<dd><code>unusedStatuses</code> - The set of statuses a command must be in in order to be considered unused</dd>
+<dd><code>commandCreatedThreshold</code> - The instant in time a command must have been created before to be considered
+                                unused. Exclusive.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The number of commands that were deleted</dd>
+<dd>The ids of the commands that are considered unused</dd>
 </dl>
 </li>
 </ul>

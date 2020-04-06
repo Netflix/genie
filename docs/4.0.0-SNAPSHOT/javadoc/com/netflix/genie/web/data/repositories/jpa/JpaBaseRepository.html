@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -133,18 +133,24 @@ public interface <span class="typeNameLabel">JpaBaseRepository&lt;E extends <a h
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>java.lang.Long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn</a></span>(java.util.Set&lt;java.lang.Long&gt;&nbsp;ids)</code>
+<div class="block">Delete all entities whose ids are contained in the given set of ids.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a></span>(java.lang.String&nbsp;uniqueId)</code>
 <div class="block">Find out whether an entity with the given unique id exists.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html" title="type parameter in JpaBaseRepository">E</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a></span>(java.lang.String&nbsp;uniqueId)</code>
 <div class="block">Find an entity by its unique id.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>&lt;T&gt;&nbsp;java.util.Optional&lt;T&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></span>(java.lang.String&nbsp;uniqueId,
               java.lang.Class&lt;T&gt;&nbsp;type)</code>
@@ -240,7 +246,7 @@ public interface <span class="typeNameLabel">JpaBaseRepository&lt;E extends <a h
 <a name="existsByUniqueId-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>existsByUniqueId</h4>
 <pre>boolean&nbsp;existsByUniqueId(java.lang.String&nbsp;uniqueId)</pre>
@@ -250,6 +256,23 @@ public interface <span class="typeNameLabel">JpaBaseRepository&lt;E extends <a h
 <dd><code>uniqueId</code> - The unique id to check for existence</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>True if an entity with the unique id exists</dd>
+</dl>
+</li>
+</ul>
+<a name="deleteByIdIn-java.util.Set-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>deleteByIdIn</h4>
+<pre>@Modifying
+java.lang.Long&nbsp;deleteByIdIn(java.util.Set&lt;java.lang.Long&gt;&nbsp;ids)</pre>
+<div class="block">Delete all entities whose ids are contained in the given set of ids.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>ids</code> - The ids of the entities to delete</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The number of deleted entities</dd>
 </dl>
 </li>
 </ul>

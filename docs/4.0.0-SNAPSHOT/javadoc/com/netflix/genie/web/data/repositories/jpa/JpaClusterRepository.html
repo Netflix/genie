@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6};
+var methods = {"i0":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -126,8 +126,9 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#FIND_TERMINATED_CLUSTERS_SQL">FIND_TERMINATED_CLUSTERS_SQL</a></span></code>
-<div class="block">The SQL to find all clusters in a TERMINATED state that aren't attached to any jobs still in the database.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#FIND_UNUSED_CLUSTERS_SQL">FIND_UNUSED_CLUSTERS_SQL</a></span></code>
+<div class="block">The SQL to find all clusters that aren't attached to any jobs still in the database and were created before
+ a certain point in time.</div>
 </td>
 </tr>
 </table>
@@ -146,15 +147,11 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>java.lang.Long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn</a></span>(java.util.Set&lt;java.lang.Long&gt;&nbsp;ids)</code>
-<div class="block">Delete all clusters whose ids are contained in the given set of ids.</div>
-</td>
-</tr>
-<tr id="i1" class="rowColor">
-<td class="colFirst"><code>java.util.Set&lt;java.lang.Number&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#findTerminatedUnusedClusters--">findTerminatedUnusedClusters</a></span>()</code>
-<div class="block">Find the ids of all clusters that are in a terminated state and aren't attached to any jobs.</div>
+<td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#findUnusedClusters-java.util.Set-java.time.Instant-">findUnusedClusters</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                  java.time.Instant&nbsp;clusterCreatedThreshold)</code>
+<div class="block">Find all the clusters that aren't attached to any jobs in the database, were created before the given time
+ and have one of the given statuses.</div>
 </td>
 </tr>
 </table>
@@ -163,7 +160,7 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.netflix.genie.web.data.repositories.jpa.<a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaBaseRepository</a></h3>
-<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
+<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.springframework.data.jpa.repository.JpaRepository">
@@ -221,17 +218,18 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Field Detail</h3>
-<a name="FIND_TERMINATED_CLUSTERS_SQL">
+<a name="FIND_UNUSED_CLUSTERS_SQL">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>FIND_TERMINATED_CLUSTERS_SQL</h4>
-<pre>static final&nbsp;java.lang.String FIND_TERMINATED_CLUSTERS_SQL</pre>
-<div class="block">The SQL to find all clusters in a TERMINATED state that aren't attached to any jobs still in the database.</div>
+<h4>FIND_UNUSED_CLUSTERS_SQL</h4>
+<pre>static final&nbsp;java.lang.String FIND_UNUSED_CLUSTERS_SQL</pre>
+<div class="block">The SQL to find all clusters that aren't attached to any jobs still in the database and were created before
+ a certain point in time.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository.FIND_TERMINATED_CLUSTERS_SQL">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository.FIND_UNUSED_CLUSTERS_SQL">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -243,36 +241,27 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="findTerminatedUnusedClusters--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>findTerminatedUnusedClusters</h4>
-<pre>@Query(value="SELECT id FROM clusters WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) AND status = \'TERMINATED\' FOR UPDATE;",
-       nativeQuery=true)
-java.util.Set&lt;java.lang.Number&gt;&nbsp;findTerminatedUnusedClusters()</pre>
-<div class="block">Find the ids of all clusters that are in a terminated state and aren't attached to any jobs.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The IDs of matching clusters</dd>
-</dl>
-</li>
-</ul>
-<a name="deleteByIdIn-java.util.Set-">
+<a name="findUnusedClusters-java.util.Set-java.time.Instant-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>deleteByIdIn</h4>
-<pre>@Modifying
-java.lang.Long&nbsp;deleteByIdIn(java.util.Set&lt;java.lang.Long&gt;&nbsp;ids)</pre>
-<div class="block">Delete all clusters whose ids are contained in the given set of ids.</div>
+<h4>findUnusedClusters</h4>
+<pre>@Query(value="SELECT id FROM clusters WHERE status IN (:unusedStatuses) AND created &lt; :clusterCreatedThreshold AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)",
+       nativeQuery=true)
+java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedClusters(@Param(value="unusedStatuses")
+                                                                                                                                                                                                                                                                              java.util.Set&lt;java.lang.String&gt;&nbsp;unusedStatuses,
+                                                                                                                                                                                                                                                                              @Param(value="clusterCreatedThreshold")
+                                                                                                                                                                                                                                                                              java.time.Instant&nbsp;clusterCreatedThreshold)</pre>
+<div class="block">Find all the clusters that aren't attached to any jobs in the database, were created before the given time
+ and have one of the given statuses.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>ids</code> - The ids of the clusters to delete</dd>
+<dd><code>unusedStatuses</code> - The set of statuses a cluster must have to be considered unused</dd>
+<dd><code>clusterCreatedThreshold</code> - The instant in time which a cluster must have been created before to be considered
+                                unused. Exclusive.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The number of deleted clusters</dd>
+<dd>The ids of the clusters that are considered unused</dd>
 </dl>
 </li>
 </ul>

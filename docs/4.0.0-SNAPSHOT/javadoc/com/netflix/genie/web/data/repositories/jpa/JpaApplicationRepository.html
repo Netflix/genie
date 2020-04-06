@@ -126,8 +126,8 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#DELETE_APPLICATIONS_QUERY">DELETE_APPLICATIONS_QUERY</a></span></code>
-<div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#FIND_UNUSED_APPLICATIONS_QUERY">FIND_UNUSED_APPLICATIONS_QUERY</a></span></code>
+<div class="block">Find any application records where they are not linked to any jobs and it's not linked to any commands and was
  created before the given time.</div>
 </td>
 </tr>
@@ -147,8 +147,8 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#deleteUnusedApplications-java.time.Instant-">deleteUnusedApplications</a></span>(java.time.Instant&nbsp;createdThreshold)</code>
+<td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#findUnusedApplications-java.time.Instant-">findUnusedApplications</a></span>(java.time.Instant&nbsp;createdThreshold)</code>
 <div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
  created before the given time.</div>
 </td>
@@ -159,7 +159,7 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.netflix.genie.web.data.repositories.jpa.<a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaBaseRepository</a></h3>
-<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
+<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.springframework.data.jpa.repository.JpaRepository">
@@ -210,18 +210,18 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Field Detail</h3>
-<a name="DELETE_APPLICATIONS_QUERY">
+<a name="FIND_UNUSED_APPLICATIONS_QUERY">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>DELETE_APPLICATIONS_QUERY</h4>
-<pre>static final&nbsp;java.lang.String DELETE_APPLICATIONS_QUERY</pre>
-<div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+<h4>FIND_UNUSED_APPLICATIONS_QUERY</h4>
+<pre>static final&nbsp;java.lang.String FIND_UNUSED_APPLICATIONS_QUERY</pre>
+<div class="block">Find any application records where they are not linked to any jobs and it's not linked to any commands and was
  created before the given time.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository.DELETE_APPLICATIONS_QUERY">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository.FIND_UNUSED_APPLICATIONS_QUERY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -233,24 +233,23 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="deleteUnusedApplications-java.time.Instant-">
+<a name="findUnusedApplications-java.time.Instant-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>deleteUnusedApplications</h4>
-<pre>@Query(value="DELETE FROM applications WHERE created &lt; :createdThreshold AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications) AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications);",
+<h4>findUnusedApplications</h4>
+<pre>@Query(value="SELECT id FROM applications WHERE created &lt; :createdThreshold AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications) AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)",
        nativeQuery=true)
- @Modifying
-int&nbsp;deleteUnusedApplications(@Param(value="createdThreshold")
-                                                                                                                                                                                                                                                                                                java.time.Instant&nbsp;createdThreshold)</pre>
+java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedApplications(@Param(value="createdThreshold")
+                                                                                                                                                                                                                                                                                                              java.time.Instant&nbsp;createdThreshold)</pre>
 <div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
  created before the given time.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>createdThreshold</code> - The instant in time before which records should be considered for deletion. Exclusive.O</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The number of applications deleted</dd>
+<dd>The ids of the applications that are unused</dd>
 </dl>
 </li>
 </ul>

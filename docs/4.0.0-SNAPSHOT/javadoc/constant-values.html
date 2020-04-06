@@ -1943,11 +1943,11 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository.DELETE_APPLICATIONS_QUERY">
+<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository.FIND_UNUSED_APPLICATIONS_QUERY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#DELETE_APPLICATIONS_QUERY">DELETE_APPLICATIONS_QUERY</a></code></td>
-<td class="colLast"><code>"DELETE FROM applications WHERE created &lt; :createdThreshold AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications) AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications);"</code></td>
+<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#FIND_UNUSED_APPLICATIONS_QUERY">FIND_UNUSED_APPLICATIONS_QUERY</a></code></td>
+<td class="colLast"><code>"SELECT id FROM applications WHERE created &lt; :createdThreshold AND id NOT IN (SELECT DISTINCT(application_id) FROM commands_applications) AND id NOT IN (SELECT DISTINCT(application_id) FROM jobs_applications)"</code></td>
 </tr>
 </tbody>
 </table>
@@ -1962,11 +1962,11 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository.FIND_TERMINATED_CLUSTERS_SQL">
+<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository.FIND_UNUSED_CLUSTERS_SQL">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#FIND_TERMINATED_CLUSTERS_SQL">FIND_TERMINATED_CLUSTERS_SQL</a></code></td>
-<td class="colLast"><code>"SELECT id FROM clusters WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) AND status = \'TERMINATED\' FOR UPDATE;"</code></td>
+<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#FIND_UNUSED_CLUSTERS_SQL">FIND_UNUSED_CLUSTERS_SQL</a></code></td>
+<td class="colLast"><code>"SELECT id FROM clusters WHERE status IN (:unusedStatuses) AND created &lt; :clusterCreatedThreshold AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)"</code></td>
 </tr>
 </tbody>
 </table>
@@ -1981,18 +1981,18 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.DELETE_COMMANDS_IN_STATUSES_QUERY">
+<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.FIND_UNUSED_COMMANDS_QUERY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
-<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#DELETE_COMMANDS_IN_STATUSES_QUERY">DELETE_COMMANDS_IN_STATUSES_QUERY</a></code></td>
-<td class="colLast"><code>"DELETE FROM commands WHERE status IN (:deleteStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands);"</code></td>
+<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#FIND_UNUSED_COMMANDS_QUERY">FIND_UNUSED_COMMANDS_QUERY</a></code></td>
+<td class="colLast"><code>"SELECT id FROM commands WHERE status IN (:unusedStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands)"</code></td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository.SET_UNUSED_STATUS_QUERY">
 <!--   -->
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#SET_UNUSED_STATUS_QUERY">SET_UNUSED_STATUS_QUERY</a></code></td>
-<td class="colLast"><code>"UPDATE commands SET status = :desiredStatus WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold);"</code></td>
+<td class="colLast"><code>"UPDATE commands SET status = :desiredStatus WHERE status IN (:currentStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL AND created &gt;= :jobCreatedThreshold)"</code></td>
 </tr>
 </tbody>
 </table>
@@ -2012,6 +2012,25 @@
 </a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
 <td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaFileRepository.html#SELECT_FOR_UPDATE_UNUSED_FILES_SQL">SELECT_FOR_UPDATE_UNUSED_FILES_SQL</a></code></td>
 <td class="colLast"><code>"SELECT id FROM files WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM clusters WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM clusters_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM commands WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM commands_dependencies) AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) AND created &lt;= :createdThreshold FOR UPDATE;"</code></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="constantsSummary" border="0" cellpadding="3" cellspacing="0" summary="Constant Field Values table, listing constant fields, and values">
+<caption><span>com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th scope="col">Constant Field</th>
+<th class="colLast" scope="col">Value</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a name="com.netflix.genie.web.data.repositories.jpa.JpaJobRepository.FIND_OLD_JOBS_QUERY">
+<!--   -->
+</a><code>public&nbsp;static&nbsp;final&nbsp;java.lang.String</code></td>
+<td><code><a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#FIND_OLD_JOBS_QUERY">FIND_OLD_JOBS_QUERY</a></code></td>
+<td class="colLast"><code>"SELECT id FROM jobs WHERE created &lt; :createdThreshold AND status NOT IN (:excludedStatuses) LIMIT :batchSize"</code></td>
 </tr>
 </tbody>
 </table>

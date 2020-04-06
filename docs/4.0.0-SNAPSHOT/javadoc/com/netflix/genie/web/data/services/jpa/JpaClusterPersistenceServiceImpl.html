@@ -206,8 +206,10 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/Clu
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html#deleteTerminatedClusters--">deleteTerminatedClusters</a></span>()</code>
-<div class="block">Delete all clusters that are in a terminated state and aren't attached to any jobs.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html#deleteUnusedClusters-java.util.Set-java.time.Instant-">deleteUnusedClusters</a></span>(java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
+                    java.time.Instant&nbsp;clusterCreateThreshold)</code>
+<div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
+ the given time.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
@@ -1087,17 +1089,24 @@ public&nbsp;java.util.List&lt;<a href="../../../../../../../com/netflix/genie/co
 </dl>
 </li>
 </ul>
-<a name="deleteTerminatedClusters--">
+<a name="deleteUnusedClusters-java.util.Set-java.time.Instant-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>deleteTerminatedClusters</h4>
-<pre>public&nbsp;long&nbsp;deleteTerminatedClusters()</pre>
-<div class="block">Delete all clusters that are in a terminated state and aren't attached to any jobs.</div>
+<h4>deleteUnusedClusters</h4>
+<pre>@Transactional(isolation=READ_COMMITTED)
+public&nbsp;long&nbsp;deleteUnusedClusters(java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">ClusterStatus</a>&gt;&nbsp;deleteStatuses,
+                                                                          java.time.Instant&nbsp;clusterCreateThreshold)</pre>
+<div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
+ the given time.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#deleteTerminatedClusters--">deleteTerminatedClusters</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a></code></dd>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html#deleteUnusedClusters-java.util.Set-java.time.Instant-">deleteUnusedClusters</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>deleteStatuses</code> - The set of <a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>ClusterStatus</code></a> a cluster must be in to be considered for deletion.</dd>
+<dd><code>clusterCreateThreshold</code> - The instant in time before which a cluster must have been created to be
+                                considered for deletion. Exclusive.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The number of clusters deleted</dd>
 </dl>

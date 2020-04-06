@@ -202,7 +202,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/App
 </td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code>int</code></td>
+<td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#deleteUnusedApplicationsCreatedBefore-java.time.Instant-">deleteUnusedApplicationsCreatedBefore</a></span>(java.time.Instant&nbsp;createdThreshold)</code>
 <div class="block">Delete any unused applications that were created before the given time.</div>
 </td>
@@ -935,7 +935,8 @@ public&nbsp;java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/com
 <ul class="blockListLast">
 <li class="blockList">
 <h4>deleteUnusedApplicationsCreatedBefore</h4>
-<pre>public&nbsp;int&nbsp;deleteUnusedApplicationsCreatedBefore(java.time.Instant&nbsp;createdThreshold)</pre>
+<pre>@Transactional(isolation=READ_COMMITTED)
+public&nbsp;long&nbsp;deleteUnusedApplicationsCreatedBefore(java.time.Instant&nbsp;createdThreshold)</pre>
 <div class="block">Delete any unused applications that were created before the given time.
  Unused means they aren't linked to any other resources in the Genie system like jobs or commands and therefore
  referential integrity is maintained.</div>

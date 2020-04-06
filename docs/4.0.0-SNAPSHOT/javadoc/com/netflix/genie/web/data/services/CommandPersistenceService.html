@@ -187,7 +187,7 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
 </td>
 </tr>
 <tr id="i9" class="rowColor">
-<td class="colFirst"><code>int</code></td>
+<td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/data/services/CommandPersistenceService.html#deleteUnusedCommands-java.util.Set-java.time.Instant-">deleteUnusedCommands</a></span>(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
                     java.time.Instant&nbsp;commandCreatedThreshold)</code>
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
@@ -1179,8 +1179,8 @@ public interface <span class="typeNameLabel">CommandPersistenceService</span></p
 <ul class="blockListLast">
 <li class="blockList">
 <h4>deleteUnusedCommands</h4>
-<pre>int&nbsp;deleteUnusedCommands(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
-                         java.time.Instant&nbsp;commandCreatedThreshold)</pre>
+<pre>long&nbsp;deleteUnusedCommands(java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&gt;&nbsp;deleteStatuses,
+                          java.time.Instant&nbsp;commandCreatedThreshold)</pre>
 <div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
  before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 <dl>

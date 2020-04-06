@@ -178,9 +178,9 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/Job
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html#deleteBatchOfJobsCreatedBeforeDate-java.time.Instant-int-int-">deleteBatchOfJobsCreatedBeforeDate</a></span>(@NotNull java.time.Instant&nbsp;date,
-                                  @Min(value=1L) int&nbsp;maxDeleted,
-                                  @Min(value=1L) int&nbsp;pageSize)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html#deleteJobsCreatedBefore-java.time.Instant-java.util.Set-int-">deleteJobsCreatedBefore</a></span>(@NotNull java.time.Instant&nbsp;creationThreshold,
+                       @NotNull java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;ignoreStatuses,
+                       @Min(value=1L) int&nbsp;batchSize)</code>
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 </td>
 </tr>
@@ -496,27 +496,28 @@ implements <a href="../../../../../../../com/netflix/genie/web/data/services/Job
 </dl>
 </li>
 </ul>
-<a name="deleteBatchOfJobsCreatedBeforeDate-java.time.Instant-int-int-">
+<a name="deleteJobsCreatedBefore-java.time.Instant-java.util.Set-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>deleteBatchOfJobsCreatedBeforeDate</h4>
-<pre>public&nbsp;long&nbsp;deleteBatchOfJobsCreatedBeforeDate(@NotNull
-                                               @NotNull java.time.Instant&nbsp;date,
-                                               @Min(value=1L)
-                                               @Min(value=1L) int&nbsp;maxDeleted,
-                                               @Min(value=1L)
-                                               @Min(value=1L) int&nbsp;pageSize)</pre>
+<h4>deleteJobsCreatedBefore</h4>
+<pre>@Transactional(isolation=READ_COMMITTED)
+public&nbsp;long&nbsp;deleteJobsCreatedBefore(@NotNull
+                                                                             @NotNull java.time.Instant&nbsp;creationThreshold,
+                                                                             @NotNull
+                                                                             @NotNull java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&gt;&nbsp;ignoreStatuses,
+                                                                             @Min(value=1L)
+                                                                             @Min(value=1L) int&nbsp;batchSize)</pre>
 <div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html#deleteBatchOfJobsCreatedBeforeDate-java.time.Instant-int-int-">deleteBatchOfJobsCreatedBeforeDate</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a></code></dd>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html#deleteJobsCreatedBefore-java.time.Instant-java.util.Set-int-">deleteJobsCreatedBefore</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>date</code> - The date before which all jobs should be deleted</dd>
-<dd><code>maxDeleted</code> - The maximum number of jobs that should be deleted
-                   (soft limit, can be rounded up to multiple of page size)</dd>
-<dd><code>pageSize</code> - Page size used to iterate through jobs</dd>
+<dd><code>creationThreshold</code> - The instant in time before which all jobs should be deleted</dd>
+<dd><code>ignoreStatuses</code> - The set of statuses that should be excluded from deletion if a job is in one of these
+                          statuses</dd>
+<dd><code>batchSize</code> - The maximum number of jobs that should be deleted per query</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the number of deleted jobs</dd>
 </dl>

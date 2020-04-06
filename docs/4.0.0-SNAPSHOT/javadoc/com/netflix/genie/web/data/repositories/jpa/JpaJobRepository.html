@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -73,13 +73,13 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -112,6 +112,27 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#FIND_OLD_JOBS_QUERY">FIND_OLD_JOBS_QUERY</a></span></code>
+<div class="block">The query used to find batches of jobs before a certain time.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -139,45 +160,40 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>java.lang.Long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#deleteByIdIn-java.util.List-">deleteByIdIn</a></span>(@NotNull java.util.List&lt;java.lang.Long&gt;&nbsp;ids)</code>
-<div class="block">Deletes all jobs for the given ids.</div>
-</td>
-</tr>
-<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/web/data/entities/projections/JobProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">JobProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">findByAgentHostnameAndStatusIn</a></span>(java.lang.String&nbsp;agentHostname,
                               java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Find jobs by host name and status.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code>org.springframework.data.domain.Slice&lt;<a href="../../../../../../../com/netflix/genie/web/data/entities/projections/IdProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">IdProjection</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findByCreatedBefore-java.time.Instant-org.springframework.data.domain.Pageable-">findByCreatedBefore</a></span>(@NotNull java.time.Instant&nbsp;date,
-                   @NotNull org.springframework.data.domain.Pageable&nbsp;pageable)</code>
-<div class="block">Returns the slice of ids for job requests created before the given date.</div>
-</td>
-</tr>
-<tr id="i5" class="rowColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/web/data/entities/projections/AgentHostnameProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">AgentHostnameProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findDistinctByStatusInAndV4IsFalse-java.util.Set-">findDistinctByStatusInAndV4IsFalse</a></span>(java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Find the jobs with one of the statuses entered.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Set&lt;java.lang.Long&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findJobsCreatedBefore-java.time.Instant-java.util.Set-int-">findJobsCreatedBefore</a></span>(java.time.Instant&nbsp;createdThreshold,
+                     java.util.Set&lt;java.lang.String&gt;&nbsp;excludeStatuses,
+                     int&nbsp;limit)</code>
+<div class="block">Find a batch of jobs that were created before the given time.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/web/data/entities/projections/UniqueIdProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">UniqueIdProjection</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#getAgentJobIdsWithNoConnectionInState-java.util.Set-">getAgentJobIdsWithNoConnectionInState</a></span>(@NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Find agent jobs in the given set of states that don't have an entry in the connections table.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#getTotalMemoryUsedOnHost-java.lang.String-java.util.Set-">getTotalMemoryUsedOnHost</a></span>(java.lang.String&nbsp;agentHostname,
                         java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
 <div class="block">Given the hostname that agents are running on return the total memory their jobs are currently using.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/web/data/entities/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.entities.aggregates">UserJobResourcesAggregate</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#getUserJobResourcesAggregates--">getUserJobResourcesAggregates</a></span>()</code>
 <div class="block">Returns resources usage for each user that has a running job.</div>
@@ -189,7 +205,7 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.netflix.genie.web.data.repositories.jpa.<a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaBaseRepository</a></h3>
-<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
+<code><a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#existsByUniqueId-java.lang.String-">existsByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-">findByUniqueId</a>, <a href="../../../../../../../com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#findByUniqueId-java.lang.String-java.lang.Class-">findByUniqueId</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.springframework.data.jpa.repository.JpaRepository">
@@ -234,6 +250,28 @@ extends <a href="../../../../../../../com/netflix/genie/web/data/repositories/jp
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="FIND_OLD_JOBS_QUERY">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>FIND_OLD_JOBS_QUERY</h4>
+<pre>static final&nbsp;java.lang.String FIND_OLD_JOBS_QUERY</pre>
+<div class="block">The query used to find batches of jobs before a certain time.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../constant-values.html#com.netflix.genie.web.data.repositories.jpa.JpaJobRepository.FIND_OLD_JOBS_QUERY">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -313,24 +351,6 @@ long&nbsp;getTotalMemoryUsedOnHost(@Param(value="agentHostname")
 </dl>
 </li>
 </ul>
-<a name="deleteByIdIn-java.util.List-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>deleteByIdIn</h4>
-<pre>@Modifying
-java.lang.Long&nbsp;deleteByIdIn(@NotNull
-                                       @NotNull java.util.List&lt;java.lang.Long&gt;&nbsp;ids)</pre>
-<div class="block">Deletes all jobs for the given ids.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>ids</code> - list of ids for which the jobs should be deleted</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>no. of jobs deleted</dd>
-</dl>
-</li>
-</ul>
 <a name="countJobsByUserAndStatusIn-java.lang.String-java.util.Set-">
 <!--   -->
 </a>
@@ -351,23 +371,28 @@ java.lang.Long&nbsp;deleteByIdIn(@NotNull
 </dl>
 </li>
 </ul>
-<a name="findByCreatedBefore-java.time.Instant-org.springframework.data.domain.Pageable-">
+<a name="findJobsCreatedBefore-java.time.Instant-java.util.Set-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>findByCreatedBefore</h4>
-<pre>org.springframework.data.domain.Slice&lt;<a href="../../../../../../../com/netflix/genie/web/data/entities/projections/IdProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">IdProjection</a>&gt;&nbsp;findByCreatedBefore(@NotNull
-                                                                        @NotNull java.time.Instant&nbsp;date,
-                                                                        @NotNull
-                                                                        @NotNull org.springframework.data.domain.Pageable&nbsp;pageable)</pre>
-<div class="block">Returns the slice of ids for job requests created before the given date.</div>
+<h4>findJobsCreatedBefore</h4>
+<pre>@Query(value="SELECT id FROM jobs WHERE created &lt; :createdThreshold AND status NOT IN (:excludedStatuses) LIMIT :batchSize",
+       nativeQuery=true)
+java.util.Set&lt;java.lang.Long&gt;&nbsp;findJobsCreatedBefore(@Param(value="createdThreshold")
+                                                                                                                                                                                                          java.time.Instant&nbsp;createdThreshold,
+                                                                                                                                                                                                          @Param(value="excludedStatuses")
+                                                                                                                                                                                                          java.util.Set&lt;java.lang.String&gt;&nbsp;excludeStatuses,
+                                                                                                                                                                                                          @Param(value="batchSize")
+                                                                                                                                                                                                          int&nbsp;limit)</pre>
+<div class="block">Find a batch of jobs that were created before the given time.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>date</code> - The date before which the job requests were created</dd>
-<dd><code>pageable</code> - The page of data to get</dd>
+<dd><code>createdThreshold</code> - The time before which the jobs were submitted. Exclusive</dd>
+<dd><code>excludeStatuses</code> - The set of statuses which should be excluded from the results</dd>
+<dd><code>limit</code> - The maximum number of jobs to to find</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>List of job request ids</dd>
+<dd>The number of deleted jobs</dd>
 </dl>
 </li>
 </ul>
@@ -458,13 +483,13 @@ java.util.Set&lt;<a href="../../../../../../../com/netflix/genie/web/data/entiti
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>

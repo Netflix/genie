@@ -2953,15 +2953,6 @@
 <dd>
 <div class="block">Delete the attachments for the given job.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#DELETE_APPLICATIONS_QUERY">DELETE_APPLICATIONS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a></dt>
-<dd>
-<div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
- created before the given time.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#DELETE_COMMANDS_IN_STATUSES_QUERY">DELETE_COMMANDS_IN_STATUSES_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
-<dd>
-<div class="block">The query used to delete commands.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#deleteAll-java.lang.String-">deleteAll(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
 <dd>
 <div class="block">Delete all the attachments that were associated with the given id.</div>
@@ -3058,25 +3049,13 @@
 <dd>
 <div class="block">Given the id of a job delete all the attachments that were saved for it.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/JobPersistenceService.html#deleteBatchOfJobsCreatedBeforeDate-java.time.Instant-int-int-">deleteBatchOfJobsCreatedBeforeDate(Instant, int, int)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn(Set&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaBaseRepository</a></dt>
 <dd>
-<div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html#deleteBatchOfJobsCreatedBeforeDate-java.time.Instant-int-int-">deleteBatchOfJobsCreatedBeforeDate(Instant, int, int)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaJobPersistenceServiceImpl</a></dt>
-<dd>
-<div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn(Set&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a></dt>
-<dd>
-<div class="block">Delete all clusters whose ids are contained in the given set of ids.</div>
+<div class="block">Delete all entities whose ids are contained in the given set of ids.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaFileRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn(Set&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaFileRepository</a></dt>
 <dd>
 <div class="block">Delete all files from the database that are in the current set of ids.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#deleteByIdIn-java.util.List-">deleteByIdIn(List&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a></dt>
-<dd>
-<div class="block">Deletes all jobs for the given ids.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaTagRepository.html#deleteByIdIn-java.util.Set-">deleteByIdIn(Set&lt;Long&gt;)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaTagRepository</a></dt>
 <dd>
@@ -3138,23 +3117,13 @@
 <div class="block">Given a job id this API will delete the entire file from the job directory this service implementation is
  managing.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/ClusterPersistenceService.html#deleteTerminatedClusters--">deleteTerminatedClusters()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/JobPersistenceService.html#deleteJobsCreatedBefore-java.time.Instant-java.util.Set-int-">deleteJobsCreatedBefore(Instant, Set&lt;JobStatus&gt;, int)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/JobPersistenceService.html" title="interface in com.netflix.genie.web.data.services">JobPersistenceService</a></dt>
 <dd>
-<div class="block">Delete all clusters that are in a terminated state and aren't attached to any jobs.</div>
+<div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html#deleteTerminatedClusters--">deleteTerminatedClusters()</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaClusterPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html#deleteJobsCreatedBefore-java.time.Instant-java.util.Set-int-">deleteJobsCreatedBefore(Instant, Set&lt;JobStatus&gt;, int)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaJobPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaJobPersistenceServiceImpl</a></dt>
 <dd>
-<div class="block">Delete all clusters that are in a terminated state and aren't attached to any jobs.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#deleteUnused-java.util.Set-java.time.Instant-">deleteUnused(Set&lt;String&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
-<dd>
-<div class="block">Bulk delete commands from the database where their status is in deleteStatuses they were created
- before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#deleteUnusedApplications-java.time.Instant-">deleteUnusedApplications(Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a></dt>
-<dd>
-<div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
- created before the given time.</div>
+<div class="block">This method will delete a chunk of jobs whose creation time is earlier than the given date.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/ApplicationPersistenceService.html#deleteUnusedApplicationsCreatedBefore-java.time.Instant-">deleteUnusedApplicationsCreatedBefore(Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/ApplicationPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ApplicationPersistenceService</a></dt>
 <dd>
@@ -3163,6 +3132,16 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html#deleteUnusedApplicationsCreatedBefore-java.time.Instant-">deleteUnusedApplicationsCreatedBefore(Instant)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaApplicationPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaApplicationPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Delete any unused applications that were created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/ClusterPersistenceService.html#deleteUnusedClusters-java.util.Set-java.time.Instant-">deleteUnusedClusters(Set&lt;ClusterStatus&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/ClusterPersistenceService.html" title="interface in com.netflix.genie.web.data.services">ClusterPersistenceService</a></dt>
+<dd>
+<div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
+ the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html#deleteUnusedClusters-java.util.Set-java.time.Instant-">deleteUnusedClusters(Set&lt;ClusterStatus&gt;, Instant)</a></span> - Method in class com.netflix.genie.web.data.services.jpa.<a href="com/netflix/genie/web/data/services/jpa/JpaClusterPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.jpa">JpaClusterPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Delete all clusters that are in one of the given states, aren't attached to any jobs and were created before
+ the given time.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/CommandPersistenceService.html#deleteUnusedCommands-java.util.Set-java.time.Instant-">deleteUnusedCommands(Set&lt;CommandStatus&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/CommandPersistenceService.html" title="interface in com.netflix.genie.web.data.services">CommandPersistenceService</a></dt>
 <dd>
@@ -3879,17 +3858,27 @@
 <dd>
 <div class="block">Get a specification using the specified parameters.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#FIND_TERMINATED_CLUSTERS_SQL">FIND_TERMINATED_CLUSTERS_SQL</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#FIND_OLD_JOBS_QUERY">FIND_OLD_JOBS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a></dt>
 <dd>
-<div class="block">The SQL to find all clusters in a TERMINATED state that aren't attached to any jobs still in the database.</div>
+<div class="block">The query used to find batches of jobs before a certain time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#FIND_UNUSED_APPLICATIONS_QUERY">FIND_UNUSED_APPLICATIONS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a></dt>
+<dd>
+<div class="block">Find any application records where they are not linked to any jobs and it's not linked to any commands and was
+ created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#FIND_UNUSED_CLUSTERS_SQL">FIND_UNUSED_CLUSTERS_SQL</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a></dt>
+<dd>
+<div class="block">The SQL to find all clusters that aren't attached to any jobs still in the database and were created before
+ a certain point in time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#FIND_UNUSED_COMMANDS_QUERY">FIND_UNUSED_COMMANDS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">The query used to find commands that are unused to delete.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findByAgentHostnameAndStatusIn-java.lang.String-java.util.Set-">findByAgentHostnameAndStatusIn(String, Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a></dt>
 <dd>
 <div class="block">Find jobs by host name and status.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findByCreatedBefore-java.time.Instant-org.springframework.data.domain.Pageable-">findByCreatedBefore(Instant, Pageable)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a></dt>
-<dd>
-<div class="block">Returns the slice of ids for job requests created before the given date.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaFileRepository.html#findByFile-java.lang.String-">findByFile(String)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaFileRepository</a></dt>
 <dd>
@@ -3983,9 +3972,24 @@
 <dd>
 <div class="block">Search for jobs which match the given filter criteria.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#findTerminatedUnusedClusters--">findTerminatedUnusedClusters()</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html#findJobsCreatedBefore-java.time.Instant-java.util.Set-int-">findJobsCreatedBefore(Instant, Set&lt;String&gt;, int)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaJobRepository</a></dt>
 <dd>
-<div class="block">Find the ids of all clusters that are in a terminated state and aren't attached to any jobs.</div>
+<div class="block">Find a batch of jobs that were created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html#findUnusedApplications-java.time.Instant-">findUnusedApplications(Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaApplicationRepository</a></dt>
+<dd>
+<div class="block">Delete any application records where it's not linked to any jobs and it's not linked to any commands and was
+ created before the given time.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html#findUnusedClusters-java.util.Set-java.time.Instant-">findUnusedClusters(Set&lt;String&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaClusterRepository</a></dt>
+<dd>
+<div class="block">Find all the clusters that aren't attached to any jobs in the database, were created before the given time
+ and have one of the given statuses.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html#findUnusedCommands-java.util.Set-java.time.Instant-">findUnusedCommands(Set&lt;String&gt;, Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Find commands from the database where their status is in deleteStatuses they were created
+ before commandCreatedThreshold and they aren't attached to any jobs still in the database.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/JpaFileRepository.html#findUnusedFiles-java.time.Instant-">findUnusedFiles(Instant)</a></span> - Method in interface com.netflix.genie.web.data.repositories.jpa.<a href="com/netflix/genie/web/data/repositories/jpa/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.repositories.jpa">JpaFileRepository</a></dt>
 <dd>
