@@ -53,6 +53,7 @@ import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -966,8 +967,11 @@ class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
             ).build();
         this.service.createCluster(testCluster);
 
+        final Instant creationThreshold = Instant.now().plus(1L, ChronoUnit.SECONDS);
+        final Set<ClusterStatus> deleteStatuses = EnumSet.of(ClusterStatus.TERMINATED);
+
         // Shouldn't delete any clusters as all are UP or OOS
-        Assertions.assertThat(this.service.deleteTerminatedClusters()).isEqualTo(0L);
+        Assertions.assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold)).isEqualTo(0);
 
         // Change status to UP
         String patchString = "[{ \"op\": \"replace\", \"path\": \"/metadata/status\", \"value\": \"UP\" }]";
@@ -978,7 +982,7 @@ class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
             .isEqualTo(ClusterStatus.UP);
 
         // All clusters are UP/OOS or attached to jobs
-        Assertions.assertThat(this.service.deleteTerminatedClusters()).isEqualTo(0L);
+        Assertions.assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold)).isEqualTo(0);
 
         // Change status to terminated
         patchString = "[{ \"op\": \"replace\", \"path\": \"/metadata/status\", \"value\": \"TERMINATED\" }]";
@@ -989,7 +993,7 @@ class JpaClusterPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
             .isEqualTo(ClusterStatus.TERMINATED);
 
         // All clusters are UP/OOS or attached to jobs
-        Assertions.assertThat(this.service.deleteTerminatedClusters()).isEqualTo(1L);
+        Assertions.assertThat(this.service.deleteUnusedClusters(deleteStatuses, creationThreshold)).isEqualTo(1);
 
         // Make sure it didn't delete any of the clusters we wanted
         Assertions.assertThat(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID)).isTrue();

@@ -43,22 +43,22 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
             + " FROM jobs"
             + " WHERE command_id IS NOT NULL"
             + " AND created >= :jobCreatedThreshold"
-            + ");";
+            + ")";
 
     /**
-     * The query used to delete commands.
+     * The query used to find commands that are unused to delete.
      */
-    String DELETE_COMMANDS_IN_STATUSES_QUERY =
-        "DELETE"
+    String FIND_UNUSED_COMMANDS_QUERY =
+        "SELECT id"
             + " FROM commands"
-            + " WHERE status IN (:deleteStatuses)"
+            + " WHERE status IN (:unusedStatuses)"
             + " AND created < :commandCreatedThreshold"
             + " AND id NOT IN ("
             + "SELECT DISTINCT(command_id)"
             + " FROM jobs"
             + " WHERE command_id IS NOT NULL"
             + ")"
-            + " AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands);";
+            + " AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands)";
 
     /**
      * Bulk set the status of commands which match the given inputs. Considers whether a command was used in some
@@ -82,18 +82,17 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
     );
 
     /**
-     * Bulk delete commands from the database where their status is in {@literal deleteStatuses} they were created
+     * Find commands from the database where their status is in {@literal deleteStatuses} they were created
      * before {@literal commandCreatedThreshold} and they aren't attached to any jobs still in the database.
      *
-     * @param deleteStatuses          The set of statuses a command must be in in order to be considered for deletion
-     * @param commandCreatedThreshold The instant in time a command must have been created before to be considered for
-     *                                deletion. Exclusive.
-     * @return The number of commands that were deleted
+     * @param unusedStatuses          The set of statuses a command must be in in order to be considered unused
+     * @param commandCreatedThreshold The instant in time a command must have been created before to be considered
+     *                                unused. Exclusive.
+     * @return The ids of the commands that are considered unused
      */
-    @Query(value = DELETE_COMMANDS_IN_STATUSES_QUERY, nativeQuery = true)
-    @Modifying
-    int deleteUnused(
-        @Param("deleteStatuses") Set<String> deleteStatuses,
+    @Query(value = FIND_UNUSED_COMMANDS_QUERY, nativeQuery = true)
+    Set<Long> findUnusedCommands(
+        @Param("unusedStatuses") Set<String> unusedStatuses,
         @Param("commandCreatedThreshold") Instant commandCreatedThreshold
     );
 }

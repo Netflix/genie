@@ -179,58 +179,48 @@ class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase 
 
     @Test
     @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
-    void canDeleteJobsCreatedBeforeDateWithMinTransactionAndPageSize() {
+    void canDeleteJobsCreatedBeforeDateWithBatchSizeGreaterThanExpectedTotalDeletions() {
         final Instant cal = ZonedDateTime
             .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
             .toInstant();
 
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 1, 1);
+        final long deleted = this.jobPersistenceService.deleteJobsCreatedBefore(cal, JobStatus.getActiveStatuses(), 10);
 
         Assertions.assertThat(deleted).isEqualTo(1L);
         Assertions.assertThat(this.jobRepository.count()).isEqualTo(2L);
-        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
+        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_1_ID)).isFalse();
+        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_2_ID)).isTrue();
+        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_3_ID)).isTrue();
     }
 
     @Test
     @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
-    void canDeleteJobsCreatedBeforeDateWithPageLargerThanMax() {
+    void canDeleteJobsCreatedBeforeDateWithBatchSizeLessThanExpectedTotalDeletions() {
         final Instant cal = ZonedDateTime
             .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
             .toInstant();
 
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 1, 10);
+        final long deleted = this.jobPersistenceService.deleteJobsCreatedBefore(cal, JobStatus.getActiveStatuses(), 1);
 
-        Assertions.assertThat(deleted).isEqualTo(2L);
-        Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
-        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
+        Assertions.assertThat(deleted).isEqualTo(1L);
+        Assertions.assertThat(this.jobRepository.count()).isEqualTo(2L);
+        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_3_ID)).isTrue();
     }
 
     @Test
     @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
-    void canDeleteJobsCreatedBeforeDateWithMaxLargerThanPage() {
+    void canDeleteJobsRegardlessOfStatus() {
         final Instant cal = ZonedDateTime
             .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
             .toInstant();
 
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 10, 1);
+        final long deleted = this.jobPersistenceService.deleteJobsCreatedBefore(cal, Sets.newHashSet(), 10);
 
         Assertions.assertThat(deleted).isEqualTo(2L);
         Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
-        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
-    }
-
-    @Test
-    @DatabaseSetup("JpaJobPersistenceServiceImplIntegrationTest/init.xml")
-    void canDeleteJobsCreatedBeforeDateWithLargeTransactionAndPageSize() {
-        final Instant cal = ZonedDateTime
-            .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
-            .toInstant();
-
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 10_000, 1);
-
-        Assertions.assertThat(deleted).isEqualTo(2L);
-        Assertions.assertThat(this.jobRepository.count()).isEqualTo(1L);
-        Assertions.assertThat(this.jobRepository.findByUniqueId(JOB_3_ID)).isPresent();
+        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_1_ID)).isFalse();
+        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_2_ID)).isFalse();
+        Assertions.assertThat(this.jobRepository.existsByUniqueId(JOB_3_ID)).isTrue();
     }
 
     @Test

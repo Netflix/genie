@@ -1020,6 +1020,7 @@ class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isTrue();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isTrue();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command7")).isTrue();
+        Assertions.assertThat(this.criterionRepository.count()).isEqualTo(1L);
         Assertions.assertThat(
             this.service.deleteUnusedCommands(
                 EnumSet.of(CommandStatus.INACTIVE, CommandStatus.DEPRECATED),
@@ -1034,6 +1035,7 @@ class JpaCommandPersistenceServiceImplIntegrationTest extends DBIntegrationTestB
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command5")).isFalse();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command6")).isFalse();
         Assertions.assertThat(this.commandRepository.existsByUniqueId("command7")).isTrue();
+        Assertions.assertThat(this.criterionRepository.count()).isEqualTo(0L);
     }
 
     private Command createTestCommand(

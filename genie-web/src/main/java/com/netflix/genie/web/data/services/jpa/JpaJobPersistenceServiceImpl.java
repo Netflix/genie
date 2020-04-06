@@ -56,7 +56,6 @@ import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.CriterionEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.JobEntity;
-import com.netflix.genie.web.data.entities.projections.IdProjection;
 import com.netflix.genie.web.data.entities.projections.JobApiProjection;
 import com.netflix.genie.web.data.entities.projections.JobArchiveLocationProjection;
 import com.netflix.genie.web.data.entities.projections.StatusProjection;
@@ -78,9 +77,7 @@ import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
@@ -296,52 +293,28 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * {@inheritDoc}
      */
     @Override
-    public long deleteBatchOfJobsCreatedBeforeDate(
-        @NotNull final Instant date,
-        @Min(1) final int maxDeleted,
-        @Min(1) final int pageSize
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteJobsCreatedBefore(
+        @NotNull final Instant creationThreshold,
+        @NotNull final Set<JobStatus> ignoreStatuses,
+        @Min(1) final int batchSize
     ) {
         log.info(
-            "Attempting to delete batch of jobs (at most {}) created before {} ms from epoch",
-            maxDeleted,
-            date.toEpochMilli()
+            "Attempting to delete {} jobs created before {} that are do not have any status in {}",
+            batchSize,
+            creationThreshold,
+            ignoreStatuses
         );
-        long jobsDeleted = 0;
-        long totalAttemptedDeletions = 0;
-        final Pageable page = PageRequest.of(0, pageSize);
-        Slice<IdProjection> idProjections;
-        do {
-            idProjections = this.jobRepository.findByCreatedBefore(date, page);
-            if (idProjections.hasContent()) {
-                final List<Long> ids = idProjections
-                    .getContent()
-                    .stream()
-                    .map(IdProjection::getId)
-                    .collect(Collectors.toList());
-
-                final long toBeDeleted = ids.size();
-                totalAttemptedDeletions += toBeDeleted;
-
-                log.debug("Attempting to delete {} rows from jobs...", toBeDeleted);
-                final long deletedJobs = this.jobRepository.deleteByIdIn(ids);
-                log.debug("Successfully deleted {} rows from jobs...", deletedJobs);
-                if (deletedJobs != toBeDeleted) {
-                    log.error(
-                        "Deleted {} job records but expected to delete {}",
-                        deletedJobs,
-                        toBeDeleted
-                    );
-                }
-                jobsDeleted += deletedJobs;
-            }
-        } while (idProjections.hasNext() && totalAttemptedDeletions < maxDeleted);
-
-        log.info(
-            "Deleted a chunk of {} job records: {} job",
-            totalAttemptedDeletions,
-            jobsDeleted
+        final Set<String> ignoredStatusStrings = ignoreStatuses.stream().map(Enum::name).collect(Collectors.toSet());
+        final long numJobsDeleted = this.jobRepository.deleteByIdIn(
+            this.jobRepository.findJobsCreatedBefore(
+                creationThreshold,
+                ignoredStatusStrings,
+                batchSize
+            )
         );
-        return totalAttemptedDeletions;
+        log.info("Finished deleting batch of {} jobs.", numJobsDeleted);
+        return numJobsDeleted;
     }
 
     /**

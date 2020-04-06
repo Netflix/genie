@@ -18,9 +18,11 @@
 package com.netflix.genie.web.data.repositories.jpa;
 
 import com.netflix.genie.web.data.entities.BaseEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A common repository for inheritance of common methods for Entities extending BaseEntity.
@@ -58,4 +60,13 @@ public interface JpaBaseRepository<E extends BaseEntity> extends JpaIdRepository
      * @return True if an entity with the unique id exists
      */
     boolean existsByUniqueId(String uniqueId);
+
+    /**
+     * Delete all entities whose ids are contained in the given set of ids.
+     *
+     * @param ids The ids of the entities to delete
+     * @return The number of deleted entities
+     */
+    @Modifying
+    Long deleteByIdIn(Set<Long> ids);
 }

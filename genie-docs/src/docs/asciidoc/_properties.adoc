@@ -495,16 +495,8 @@ See: `genie.tasks.database-cleanup.expression`
 |false
 |yes
 
-|genie.tasks.database-cleanup.job-cleanup.maxDeletedPerTransaction
-|The number of job records (across multiple tables) to delete from the database
-in a single transaction. Genie will loop and perform multiple transactions until
-all jobs older than the retention time are deleted.
-This is a soft limit, it could be rounded up to the next multiple of page size.
-|1000
-|yes
-
 |genie.tasks.database-cleanup.job-cleanup.pageSize
-|The page size used within each cleanup transaction to iterate through the job records
+|The max number of jobs to delete per transaction
 |1000
 |yes
 

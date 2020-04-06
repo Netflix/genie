@@ -506,5 +506,5 @@ public interface CommandPersistenceService {
      *                                deletion. Exclusive.
      * @return The number of commands that were deleted
      */
-    int deleteUnusedCommands(Set<CommandStatus> deleteStatuses, Instant commandCreatedThreshold);
+    long deleteUnusedCommands(Set<CommandStatus> deleteStatuses, Instant commandCreatedThreshold);
 }

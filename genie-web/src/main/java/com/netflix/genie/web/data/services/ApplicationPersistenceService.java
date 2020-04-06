@@ -348,5 +348,5 @@ public interface ApplicationPersistenceService {
      *                         desired.
      * @return The number of successfully deleted applications
      */
-    int deleteUnusedApplicationsCreatedBefore(Instant createdThreshold);
+    long deleteUnusedApplicationsCreatedBefore(Instant createdThreshold);
 }
