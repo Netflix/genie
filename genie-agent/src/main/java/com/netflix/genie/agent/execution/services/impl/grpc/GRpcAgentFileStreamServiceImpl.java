@@ -42,8 +42,10 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
@@ -141,15 +143,16 @@ public class GRpcAgentFileStreamServiceImpl implements AgentFileStreamService {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void forceServerSync() {
+    public synchronized Optional<ScheduledFuture<?>> forceServerSync() {
         if (started.get()) {
             try {
                 this.jobDirectoryManifestCreatorService.invalidateCachedDirectoryManifest(jobDirectoryPath);
-                this.pushManifest();
+                return Optional.of(this.taskScheduler.schedule(this::pushManifest, Instant.now()));
             } catch (Exception e) {
                 log.error("Failed to force push a fresh manifest", e);
             }
         }
+        return Optional.empty();
     }
 
     private synchronized void pushManifest() {

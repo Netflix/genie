@@ -18,6 +18,8 @@
 package com.netflix.genie.agent.execution.services;
 
 import java.nio.file.Path;
+import java.util.Optional;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * This service regularly produces a manifest of the executing job folder and pushes it to the server.
@@ -42,6 +44,9 @@ public interface AgentFileStreamService {
     /**
      * Request the service perform an update outside of the regular schedule to make sure the server has the most
      * up-to-date view of local files.
+     *
+     * @return a scheduled future optional, which the caller can use to synchronously wait on the operation completion
+     * and outcome. The optional is empty if the task was not scheduled (because the service is not running).
      */
-    void forceServerSync();
+    Optional<ScheduledFuture<?>> forceServerSync();
 }

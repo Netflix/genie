@@ -24,14 +24,20 @@ import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeoutException
+
 class RefreshManifestStageSpec extends Specification {
     AgentFileStreamService agentFileService
 
     ExecutionContext executionContext
+    ScheduledFuture<?> future
 
     void setup() {
         this.agentFileService = Mock(AgentFileStreamService)
         this.executionContext = Mock(ExecutionContext)
+        this.future = Mock(ScheduledFuture)
     }
 
     @Unroll
@@ -43,7 +49,15 @@ class RefreshManifestStageSpec extends Specification {
 
         then:
         1 * executionContext.getJobDirectory() >> Mock(File)
-        1 * agentFileService.forceServerSync()
+        1 * agentFileService.forceServerSync() >> Optional.<ScheduledFuture<?>>of(future)
+        1 * future.get(_, _)
+
+        when:
+        stage.attemptStageAction(executionContext)
+
+        then:
+        1 * executionContext.getJobDirectory() >> Mock(File)
+        1 * agentFileService.forceServerSync() >> Optional.empty()
 
         when:
         stage.attemptTransition(executionContext)
@@ -57,5 +71,27 @@ class RefreshManifestStageSpec extends Specification {
         States.POST_SETUP_MANIFEST_REFRESH | _
         States.POST_LAUNCH_MANIFEST_REFRESH | _
         States.POST_EXECUTION_MANIFEST_REFRESH | _
+    }
+
+    @Unroll
+    def "Failed push task #state with #exception"() {
+        ExecutionStage stage = new RefreshManifestStage(agentFileService, state)
+
+        when:
+        stage.attemptStageAction(executionContext)
+
+        then:
+        1 * executionContext.getJobDirectory() >> Mock(File)
+        1 * agentFileService.forceServerSync() >> Optional.<ScheduledFuture<?>>of(future)
+        1 * future.get(_, _) >> { throw exception }
+
+        where:
+        state                                  | exception
+        States.POST_SETUP_MANIFEST_REFRESH     | new TimeoutException()
+        States.POST_LAUNCH_MANIFEST_REFRESH    | new TimeoutException()
+        States.POST_EXECUTION_MANIFEST_REFRESH | new TimeoutException()
+        States.POST_SETUP_MANIFEST_REFRESH     | new ExecutionException("...", new RuntimeException())
+        States.POST_LAUNCH_MANIFEST_REFRESH    | new ExecutionException("...", new RuntimeException())
+        States.POST_EXECUTION_MANIFEST_REFRESH | new ExecutionException("...", new RuntimeException())
     }
 }
