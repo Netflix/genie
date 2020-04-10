@@ -186,6 +186,16 @@ public enum States {
     POST_EXECUTION_MANIFEST_REFRESH(0, false);
 
     /**
+     * Initial pseudo-state.
+     */
+    public static final States INITIAL_STATE = READY;
+
+    /**
+     * Final pseudo-state.
+     */
+    public static final States FINAL_STATE = DONE;
+
+    /**
      * If a state is critical, then upon encountering a {@link FatalTransitionException} while in it, execution is
      * aborted. Whereas for non critical stage execution is not aborted.
      */

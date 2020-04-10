@@ -21,9 +21,8 @@ import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.agent.execution.services.KillService;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
-import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
+import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.Getter;
@@ -44,7 +43,6 @@ class ExecCommand implements AgentCommand {
 
     private final ExecCommandArguments execCommandArguments;
     private final JobExecutionStateMachine stateMachine;
-    private final ExecutionContext executionContext;
     private final KillService killService;
     private final List<sun.misc.Signal> signalsToIntercept = Collections.unmodifiableList(Arrays.asList(
         new sun.misc.Signal("INT"),
@@ -54,12 +52,10 @@ class ExecCommand implements AgentCommand {
     ExecCommand(
         final ExecCommandArguments execCommandArguments,
         final JobExecutionStateMachine stateMachine,
-        final ExecutionContext executionContext,
         final KillService killService
     ) {
         this.execCommandArguments = execCommandArguments;
         this.stateMachine = stateMachine;
-        this.executionContext = executionContext;
         this.killService = killService;
     }
 
@@ -69,20 +65,15 @@ class ExecCommand implements AgentCommand {
             sun.misc.Signal.handle(s, signal -> handleTerminationSignal());
         }
 
-        log.info("Running job state machine");
-        stateMachine.start();
-
-        final States finalState;
+        log.info("Starting job execution");
         try {
-            finalState = stateMachine.waitForStop();
+            this.stateMachine.run();
         } catch (final Exception e) {
-            log.warn("Job state machine execution failed", e);
-            throw new RuntimeException("Job execution error", e);
+            log.error("Job state machine execution failed: {}", e.getMessage());
+            throw e;
         }
 
-        if (!States.DONE.equals(finalState)) {
-            throw new RuntimeException("Job execution failed (final state: " + finalState + ")");
-        }
+        final ExecutionContext executionContext = this.stateMachine.getExecutionContext();
 
         final JobStatus finalJobStatus = executionContext.getCurrentJobStatus();
         final boolean jobLaunched = executionContext.isJobLaunched();
@@ -91,9 +82,8 @@ class ExecCommand implements AgentCommand {
 
         if (fatalException != null) {
             UserConsole.getLogger().error(
-                "Job execution fatal error in state {}: {} {}",
+                "Job execution fatal error in state {}: {}",
                 fatalException.getSourceState(),
-                fatalException.getCause().getClass().getSimpleName(),
                 fatalException.getCause().getMessage()
             );
         }
@@ -102,11 +92,11 @@ class ExecCommand implements AgentCommand {
 
         switch (finalJobStatus) {
             case SUCCEEDED:
-                log.info("Job execution completed successfully");
+                log.info("Job executed successfully");
                 exitCode = ExitCode.SUCCESS;
                 break;
             case KILLED:
-                log.info("Job execution killed by user");
+                log.info("Job killed during execution");
                 exitCode = ExitCode.EXEC_ABORTED;
                 break;
             case FAILED:
@@ -132,7 +122,7 @@ class ExecCommand implements AgentCommand {
     @VisibleForTesting
     void handleTerminationSignal() {
         UserConsole.getLogger().info("Kill requested, terminating job");
-        killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
+        this.killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
     }
 
     @Parameters(commandNames = CommandNames.EXEC, commandDescription = "Execute a Genie job")

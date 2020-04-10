@@ -19,8 +19,6 @@ package com.netflix.genie.agent.execution.statemachine;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.statemachine.StateContext;
-import org.springframework.statemachine.action.Action;
 
 /**
  * Abstract base class for Genie Agent stage of execution.
@@ -40,11 +38,7 @@ import org.springframework.statemachine.action.Action;
 @Slf4j
 @Getter
 public abstract class ExecutionStage {
-    static final String EXECUTION_CONTEXT_CONTEXT_KEY = "genie_job_execution_context";
     private final States state;
-    private final Action<States, Events> stateAction;
-    private final Action<States, Events> transitionAction;
-    private final Action<States, Events> transitionErrorAction;
 
     /**
      * Constructor.
@@ -55,101 +49,6 @@ public abstract class ExecutionStage {
         final States state
     ) {
         this.state = state;
-
-        // Action performed when entering a state for the first time
-        this.stateAction = this::executeStateAction;
-
-        // Action performed while transitioning from one state to the next
-        this.transitionAction = this::executeTransitionAction;
-
-        // Action performed when transition action throws an exception
-        this.transitionErrorAction = this::handleTransitionActionError;
-    }
-
-    private void executeStateAction(final StateContext<States, Events> context) {
-        // Reset the number of attempts for the next transition
-        final ExecutionContext executionContext = getExecutionContext(context);
-        executionContext.setAttemptsLeft(1 + state.getTransitionRetries());
-        // Trigger the transition to next state
-        context.getStateMachine().sendEvent(Events.PROCEED);
-    }
-
-    private void executeTransitionAction(final StateContext<States, Events> context) {
-        final ExecutionContext executionContext = getExecutionContext(context);
-
-        final boolean executionAborted = executionContext.isExecutionAborted();
-        final String stateName = this.state.name();
-        final int attemptsLeft = executionContext.getAttemptsLeft();
-
-        if (executionAborted && this.state.isSkippedDuringAbortedExecution()) {
-            log.info("Skipping transition action of state {} due to execution aborted", stateName);
-        } else if (attemptsLeft > 0) {
-            // Decrement attempts left
-            executionContext.setAttemptsLeft(attemptsLeft - 1);
-            log.info("Attempting transition action of state {}", stateName);
-            this.attemptTransition(executionContext);
-        } else {
-            // Out of retries (or fatal error which set attempts left to 0)
-            log.info("Skipping transition action of state {} due to errors", stateName);
-        }
-    }
-
-
-    private void handleTransitionActionError(final StateContext<States, Events> context) {
-        final String stateName = this.state.name();
-        final Exception transitionException = context.getException();
-        final ExecutionContext executionContext = getExecutionContext(context);
-
-        log.warn(
-            "Transition action of state {} failed with error: {}: {}",
-            stateName,
-            transitionException.getClass().getSimpleName(),
-            transitionException.getMessage()
-        );
-
-        final int attemptsLeft = executionContext.getAttemptsLeft();
-
-        final Exception recordedException;
-
-        if (transitionException instanceof FatalTransitionException) {
-            // Record fatal exception (which aborts execution)
-            recordedException = transitionException;
-            // Zero attempts left, fatal error means retries are unnecessary
-            executionContext.setAttemptsLeft(0);
-        } else if (transitionException instanceof RetryableTransitionException && attemptsLeft > 0) {
-            // Record retryable exception
-            // TODO delay retry in this case
-            recordedException = transitionException;
-        } else if (transitionException instanceof RetryableTransitionException && attemptsLeft == 0) {
-            // Out of retries, make a fatal exception out of the retryable
-            recordedException = this.createFatalException(
-                "No more attempts left for retryable error in state " + this.state.name(),
-                transitionException
-            );
-        } else {
-            // Unhandled exception, consider it fatal
-            recordedException = this.createFatalException(
-                "Unhandled transition exception in state " + this.state.name() + ": " + transitionException,
-                transitionException
-            );
-            // Zero attempts left, this should never happen
-            executionContext.setAttemptsLeft(0);
-        }
-
-        // Save error in history
-        executionContext.recordTransitionException(this.state, recordedException);
-
-        if (
-            this.state.isCriticalState()
-                && recordedException instanceof FatalTransitionException
-                && executionContext.getExecutionAbortedFatalException() == null
-        ) {
-            log.warn("Aborting execution due to fatal error in state: {}", this.state.name());
-            executionContext.setExecutionAbortedFatalException((FatalTransitionException) recordedException);
-        }
-
-        // Re-trigger transition action (may be skipped this time, depending on the error)
-        context.getStateMachine().sendEvent(Events.PROCEED);
     }
 
     protected FatalTransitionException createFatalException(final String message, final Throwable cause) {
@@ -168,10 +67,6 @@ public abstract class ExecutionStage {
             "Retryable error in state " + this.getState().name() + ": " + cause.getMessage(),
             cause
         );
-    }
-
-    private ExecutionContext getExecutionContext(final StateContext<States, Events> context) {
-        return context.getExtendedState().get(EXECUTION_CONTEXT_CONTEXT_KEY, ExecutionContext.class);
     }
 
     /**
