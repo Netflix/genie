@@ -38,6 +38,7 @@ import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.Trigger
 import spock.lang.Specification
 
+import java.time.Instant
 import java.util.concurrent.ScheduledFuture
 
 class GRpcAgentFileStreamServiceImplSpec extends Specification {
@@ -176,11 +177,7 @@ class GRpcAgentFileStreamServiceImplSpec extends Specification {
 
         then:
         1 * this.jobDirectoryManifestService.invalidateCachedDirectoryManifest(temporaryFolder.getRoot().toPath())
-        1 * jobDirectoryManifestService.getDirectoryManifest(temporaryFolder.getRoot().toPath()) >> manifest
-        1 * converter.manifestToProtoMessage(jobId, manifest) >> manifestMessage
-        1 == remoteService.activeSyncStreams.size()
-        3 == remoteService.manifestMessageReceived.size()
-        manifestMessage == remoteService.manifestMessageReceived.get(2)
+        1 * this.taskScheduler.schedule(_ as Runnable, _ as Instant)
 
         when:
         this.grpcServerRule.getChannel().shutdownNow()

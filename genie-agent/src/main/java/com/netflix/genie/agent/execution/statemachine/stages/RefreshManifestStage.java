@@ -25,6 +25,12 @@ import com.netflix.genie.agent.execution.statemachine.RetryableTransitionExcepti
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 /**
  * Triggers a manual refresh of the cached files manifest.
  *
@@ -33,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class RefreshManifestStage extends ExecutionStage {
+    protected static final int TIMEOUT_SECONDS = 3; //TODO make configurable
     private final AgentFileStreamService agentFileStreamService;
 
     /**
@@ -52,7 +59,17 @@ public class RefreshManifestStage extends ExecutionStage {
     ) throws RetryableTransitionException, FatalTransitionException {
         if (executionContext.getJobDirectory() != null) {
             log.info("Forcing a manifest refresh");
-            this.agentFileStreamService.forceServerSync();
+            final Optional<ScheduledFuture<?>> optionalFuture = this.agentFileStreamService.forceServerSync();
+            if (optionalFuture.isPresent()) {
+                // Give it a little time to complete, but don't block execution if it doesn't
+                try {
+                    optionalFuture.get().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                } catch (InterruptedException | TimeoutException e) {
+                    log.warn("Forced manifest refresh timeout: {}", e.getMessage());
+                } catch (ExecutionException e) {
+                    log.error("Failed to force push manifest", e);
+                }
+            }
         }
     }
 }
