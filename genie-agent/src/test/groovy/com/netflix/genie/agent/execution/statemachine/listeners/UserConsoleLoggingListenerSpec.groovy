@@ -21,11 +21,11 @@ import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
 import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
 
-class LoggingListenerSpec extends Specification {
+class UserConsoleLoggingListenerSpec extends Specification {
 
     def "Test all methods"() {
         setup:
-        LoggingListener listener = new LoggingListener()
+        UserConsoleLoggingListener listener = new UserConsoleLoggingListener()
 
         when:
         listener.stateEntered(States.SET_STATUS_FINAL)

@@ -28,7 +28,6 @@ dependencies {
     // Spring
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework.cloud:spring-cloud-starter-aws")
-    compile("org.springframework.statemachine:spring-statemachine-core")
 
     // Misc
     compile("com.beust:jcommander")
@@ -52,7 +51,6 @@ dependencies {
 
     testCompile(project(":genie-test"))
     testCompile("io.grpc:grpc-testing")
-    testCompile("org.springframework.statemachine:spring-statemachine-test")
 }
 
 def genieVersion = project.version.toString()

@@ -17,21 +17,15 @@
  */
 package com.netflix.genie.agent.cli
 
-import com.beust.jcommander.internal.Lists
+
 import com.google.common.collect.ImmutableList
 import com.netflix.genie.agent.AgentMetadata
-import com.netflix.genie.agent.execution.ExecutionAutoConfiguration
-import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineImpl
+import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.core.env.MutablePropertySources
-import org.springframework.statemachine.StateMachine
-import org.springframework.statemachine.state.State
-import org.springframework.statemachine.transition.Transition
-import org.springframework.statemachine.trigger.Trigger
 import spock.lang.Specification
 
 class InfoCommandSpec extends Specification {
@@ -54,57 +48,12 @@ class InfoCommandSpec extends Specification {
     def "Run"() {
         setup:
 
-        def readyState = Mock(State) {
-            getId() >> States.READY
-        }
-        def launchState = Mock(State) {
-            getId() >> States.LAUNCH_JOB
-        }
-        def waitState = Mock(State) {
-            getId() >> States.WAIT_JOB_COMPLETION
-        }
-        def doneState = Mock(State) {
-            getId() >> States.DONE
+        ExecutionStage executionStage = Mock(ExecutionStage) {
+            getState() >> States.INITIALIZE_AGENT >> States.HANDSHAKE >> States.RESERVE_JOB_ID >> States.SET_STATUS_FINAL
         }
 
-        def readyTransition = Mock(Transition) {
-            getSource() >> readyState
-            getTarget() >> launchState
-            getTrigger() >> Mock(Trigger) {
-                getEvent() >> Events.START
-            }
-        }
-        def launchTransition = Mock(Transition) {
-            getSource() >> launchState
-            getTarget() >> waitState
-            getTrigger() >> Mock(Trigger) {
-                getEvent() >> Events.PROCEED
-            }
-        }
-        def waitTransition = Mock(Transition) {
-            getSource() >> waitState
-            getTarget() >> doneState
-            getTrigger() >> Mock(Trigger) {
-                getEvent() >> Events.PROCEED
-            }
-        }
-        def readyStage = Mock(ExecutionStage) {
-            getState() >> States.READY
-        }
-        def launchStage = Mock(ExecutionStage) {
-            getState() >> States.LAUNCH_JOB
-        }
-        def waitStage = Mock(ExecutionStage) {
-            getState() >> States.WAIT_JOB_COMPLETION
-        }
-        def doneStage = Mock(ExecutionStage) {
-            getState() >> States.DONE
-        }
-        StateMachine<States, Events> stateMachine = Mock(StateMachine)
-        List<State<Events, States>> states = Lists.newArrayList(readyState, launchState, waitState, doneState)
-        List<Transition<Events, States>> transitions = Lists.newArrayList(readyTransition, launchTransition, waitTransition)
-        List<ExecutionStage> stages = ImmutableList.of(readyStage, launchStage, waitStage, doneStage)
-        JobExecutionStateMachineImpl jobExecutionStateMachine = Mock(JobExecutionStateMachineImpl)
+        JobExecutionStateMachine jobExecutionStateMachine = Mock(JobExecutionStateMachine)
+        List<ExecutionStage> stages = ImmutableList.of(executionStage, executionStage, executionStage, executionStage)
         def cmd = new InfoCommand(args, ctx, agentMetadata)
 
         when:
@@ -126,12 +75,8 @@ class InfoCommandSpec extends Specification {
         1 * env.getSystemEnvironment() >> map
         1 * env.getSystemProperties() >> map
         1 * env.getPropertySources() >> new MutablePropertySources()
-        1 * ctx.getBean("jobExecutionStateMachine", JobExecutionStateMachineImpl.class) >> jobExecutionStateMachine
+        1 * ctx.getBean(JobExecutionStateMachine.class) >> jobExecutionStateMachine
         1 * jobExecutionStateMachine.getExecutionStages() >> stages
-        1 * jobExecutionStateMachine.getStateMachine() >> stateMachine
-        2 * stateMachine.getStates() >> states
-        2 * stateMachine.getTransitions() >> transitions
-        1 * stateMachine.getInitialState() >> readyState
         exitCode == ExitCode.SUCCESS
     }
 

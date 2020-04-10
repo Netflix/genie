@@ -26,7 +26,6 @@ import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.JobSetupService;
-import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
@@ -34,6 +33,7 @@ import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineIm
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
+import com.netflix.genie.agent.execution.statemachine.listeners.UserConsoleLoggingListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ClaimJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CleanupJobDirectoryStage;
@@ -67,10 +67,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
-import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.config.StateMachineBuilder;
-import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
-import org.springframework.statemachine.config.configurers.StateConfigurer;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
@@ -92,9 +88,21 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(LoggingListener.class)
     public LoggingListener loggingListener() {
         return new LoggingListener();
+    }
+
+    /**
+     * Provide a lazy {@link UserConsoleLoggingListener} bean.
+     *
+     * @return A {@link UserConsoleLoggingListener} instance
+     */
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean(UserConsoleLoggingListener.class)
+    public UserConsoleLoggingListener userConsoleLoggingListener() {
+        return new UserConsoleLoggingListener();
     }
 
     /**
@@ -110,96 +118,14 @@ public class ExecutionAutoConfiguration {
         return new ExecutionContext();
     }
 
-    /**
-     * Provide the {@link JobExecutionStateMachine} bean.
-     *
-     * @return A {@link JobExecutionStateMachine}.
-     */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean
-    JobExecutionStateMachine jobExecutionStateMachine(
-        final StateMachine<States, Events> stateMachine,
-        final ExecutionContext executionContext,
-        @NotEmpty final List<ExecutionStage> executionStages
-    ) {
-        return new JobExecutionStateMachineImpl(stateMachine, executionContext, executionStages);
-    }
-
-    /**
-     * Provide the {@link StateMachine} bean.
-     *
-     * @return A {@link StateMachine}.
-     */
-    @Bean
-    @Lazy
-    StateMachine<States, Events> stateMachine(
+    JobExecutionStateMachine jobExecutionStateMachine2(
         @NotEmpty final List<ExecutionStage> executionStages,
+        final ExecutionContext executionContext,
         final Collection<JobExecutionListener> listeners
-    ) throws Exception {
-
-        // Just to calm the compiler warnings below
-        assert !executionStages.isEmpty();
-
-        final StateMachineBuilder.Builder<States, Events> builder = new StateMachineBuilder.Builder<>();
-
-        builder.configureConfiguration().withConfiguration()
-            .autoStartup(false);
-
-        // Configure states
-        final StateConfigurer<States, Events> stateConfigurer = builder.configureStates()
-            .withStates();
-
-        // Start and end states are special (not created out of an ExecutionStage
-        stateConfigurer
-            .initial(States.READY)
-            .end(States.DONE);
-
-        // Add intermediate states for each ExecutionStage
-        for (ExecutionStage stage : executionStages) {
-            stateConfigurer.state(stage.getState(), stage.getStateAction());
-        }
-
-        // Configure transitions
-        final StateMachineTransitionConfigurer<States, Events> transitionConfigurer = builder.configureTransitions();
-
-        final ExecutionStage firstStage = executionStages.get(0);
-        final ExecutionStage lastStage = executionStages.get(executionStages.size() - 1);
-
-        // Special first transition with no action
-        transitionConfigurer
-            .withExternal()
-            .source(States.READY)
-            .target(firstStage.getState())
-            .event(Events.START);
-
-        // Special last transition with no action
-        transitionConfigurer
-            .withExternal()
-            .source(lastStage.getState())
-            .target(States.DONE)
-            .event(Events.PROCEED);
-
-        // Add intermediate state/stage transitions
-        for (int i = 0; i < executionStages.size() - 1; i++) {
-
-            final ExecutionStage currentStage = executionStages.get(i);
-            final ExecutionStage nextStage = executionStages.get(i + 1);
-
-            transitionConfigurer
-                .withExternal()
-                .source(currentStage.getState())
-                .target(nextStage.getState())
-                .event(Events.PROCEED)
-                .action(currentStage.getTransitionAction(), currentStage.getTransitionErrorAction());
-        }
-
-        final StateMachine<States, Events> stateMachine = builder.build();
-
-        // Register listeners
-        listeners.forEach(stateMachine::addStateListener);
-
-        return stateMachine;
+    ) {
+        return new JobExecutionStateMachineImpl(executionStages, executionContext, listeners);
     }
 
     /**

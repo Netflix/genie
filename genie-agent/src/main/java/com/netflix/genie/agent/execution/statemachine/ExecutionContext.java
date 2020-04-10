@@ -37,10 +37,12 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Stores runtime information that is passed from one state to the next.
@@ -50,9 +52,15 @@ import java.util.List;
  * @author mprimi
  * @since 4.0.0
  */
-@Getter
-@Setter
+@Getter(onMethod_ = {@Synchronized})
+@Setter(onMethod_ = {@Synchronized})
 public class ExecutionContext {
+
+    /**
+     * Whether the state machine associated to this execution context has already been started.
+     */
+    private final AtomicBoolean started = new AtomicBoolean(false);
+
     /**
      * Agent client metadata sent to the server in certain requests.
      * Present if {@link InitializeAgentStage} ran successfully.
@@ -187,10 +195,6 @@ public class ExecutionContext {
         this.transitionExceptionRecords.add(
             new TransitionExceptionRecord(state, recordedException)
         );
-    }
-
-    // Override and hide lombok-generated setter
-    private void setTransitionExceptionRecords(final List<TransitionExceptionRecord> transitionExceptionRecords) {
     }
 
     /**

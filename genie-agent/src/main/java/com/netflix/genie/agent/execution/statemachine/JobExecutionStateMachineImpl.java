@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,84 +17,169 @@
  */
 package com.netflix.genie.agent.execution.statemachine;
 
+import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.listener.StateMachineListenerAdapter;
+import org.springframework.scheduling.TriggerContext;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
- * Implementation of JobExecutionStateMachine.
+ * Implementation of the job execution state machine.
  *
  * @author mprimi
  * @since 4.0.0
  */
 @Slf4j
 public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
-
-    @Getter
-    private final StateMachine<States, Events> stateMachine;
-    private final StateMachineListenerAdapter<States, Events> executionCompletionListener;
-    private final CountDownLatch completionLatch = new CountDownLatch(1);
-    private final ExecutionContext executionContext;
+    private static final long RETRY_DELAY = 250;
     @Getter
     private final List<ExecutionStage> executionStages;
+    @Getter
+    private final ExecutionContext executionContext;
+    private final JobExecutionListener listener;
 
     /**
      * Constructor.
      *
-     * @param stateMachine     the state machine
-     * @param executionContext the execution context
-     * @param executionStages  the execution stages
+     * @param executionStages  the (ordered) list of execution stages
+     * @param executionContext the execution context passed across stages during execution
+     * @param listeners        the list of listeners
      */
     public JobExecutionStateMachineImpl(
-        final StateMachine<States, Events> stateMachine,
+        final List<ExecutionStage> executionStages,
         final ExecutionContext executionContext,
-        final List<ExecutionStage> executionStages
+        final Collection<JobExecutionListener> listeners
     ) {
-        this.stateMachine = stateMachine;
         this.executionStages = executionStages;
         this.executionContext = executionContext;
-        this.stateMachine
-            .getExtendedState()
-            .getVariables()
-            .put(ExecutionStage.EXECUTION_CONTEXT_CONTEXT_KEY, executionContext);
-        this.executionCompletionListener = new StateMachineListenerAdapter<States, Events>() {
-            @Override
-            public void stateMachineStopped(final StateMachine<States, Events> sm) {
-                log.debug("State machine execution complete");
-                completionLatch.countDown();
+        this.listener = new CompositeListener(ImmutableSet.copyOf(listeners));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void run() {
+        if (!this.executionContext.getStarted().compareAndSet(false, true)) {
+            throw new IllegalStateException("Called run on an already started state machine");
+        }
+
+        this.listener.stateMachineStarted();
+
+        for (final ExecutionStage executionStage : executionStages) {
+            final States state = executionStage.getState();
+
+            log.debug("Execution stage: {} for state {} ({}, {}, {} retries)",
+                executionStage.getClass().getSimpleName(),
+                state.name(),
+                state.isCriticalState() ? "CRITICAL" : "NON-CRITICAL",
+                state.isSkippedDuringAbortedExecution() ? "SKIP" : "NON-SKIP",
+                state.getTransitionRetries()
+            );
+
+            this.listener.stateEntered(state);
+
+            this.executeStageAction(state, executionStage);
+
+            this.listener.stateExited(state);
+        }
+
+        this.listener.stateEntered(States.DONE);
+        this.listener.stateMachineStopped();
+    }
+
+    private void executeStageAction(final States state, final ExecutionStage executionStage) {
+
+        // Reset retries backoff
+        long currentRetryDelay = 0;
+
+        int retriesLeft = state.getTransitionRetries();
+        while (true) {
+
+            // If execution is a aborted and this is a skip state, stop.
+            if (this.executionContext.isExecutionAborted() && state.isSkippedDuringAbortedExecution()) {
+                this.listener.stateSkipped(state);
+                log.debug("Skipping stage {} due to aborted execution", state);
+                return;
             }
-        };
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void start() {
-        // Listen for state machine stop event
-        stateMachine.addStateListener(executionCompletionListener);
-        // Start the state machine execution
-        stateMachine.start();
-        // Kick off first transition
-        stateMachine.sendEvent(Events.START);
-    }
+            // Attempt the stage action
+            this.listener.beforeStateActionAttempt(state);
+            Exception exception = null;
+            try {
+                executionStage.attemptTransition(executionContext);
+            } catch (Exception e) {
+                log.debug("Exception in state: " + state, e);
+                exception = e;
+            }
+            this.listener.afterStateActionAttempt(state, exception);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public States waitForStop() throws InterruptedException {
-        try {
-            completionLatch.await();
-            return stateMachine.getState().getId();
-        } catch (final InterruptedException e) {
-            log.error("Interrupted while waiting for state machine to complete");
-            throw e;
+            // No exception, stop
+            if (exception == null) {
+                log.debug("Stage execution successful");
+                return;
+            }
+
+            // Record the raw exception
+            this.executionContext.recordTransitionException(state, exception);
+
+            FatalTransitionException fatalTransitionException = null;
+
+            if (exception instanceof RetryableTransitionException && retriesLeft > 0) {
+                // Try action again after a delay
+                retriesLeft--;
+                currentRetryDelay += RETRY_DELAY;
+
+            } else if (exception instanceof RetryableTransitionException) {
+                // No retries left, save as fatal exception
+                fatalTransitionException = new FatalTransitionException(
+                    state,
+                    "No more attempts left for retryable error in state " + state,
+                    exception
+                );
+                this.executionContext.recordTransitionException(state, fatalTransitionException);
+
+            } else if (exception instanceof FatalTransitionException) {
+                // Save fatal exception
+                fatalTransitionException = (FatalTransitionException) exception;
+            } else {
+                // Create fatal exception out of unexpected exception
+                fatalTransitionException = new FatalTransitionException(
+                    state,
+                    "Unhandled exception" + exception.getMessage(),
+                    exception
+                );
+                this.executionContext.recordTransitionException(state, fatalTransitionException);
+            }
+
+            if (fatalTransitionException != null) {
+
+                if (state.isCriticalState() && !executionContext.isExecutionAborted()) {
+                    // Fatal exception in critical stage aborts execution, unless it's already aborted
+                    this.executionContext.setExecutionAbortedFatalException(fatalTransitionException);
+                    this.listener.executionAborted(state, fatalTransitionException);
+                }
+
+                this.listener.fatalException(state, fatalTransitionException);
+                // Fatal exception always stops further attempts
+                return;
+            }
+
+            // Calculate delay before next retry
+            // Delay the next attempt
+            log.debug("Action will be attempted again in {}ms", currentRetryDelay);
+            this.listener.delayedStateActionRetry(state, currentRetryDelay);
+            try {
+                Thread.sleep(currentRetryDelay);
+            } catch (InterruptedException ex) {
+                log.info("Interrupted during delayed retry");
+            }
         }
     }
 
@@ -102,18 +187,101 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
      * {@inheritDoc}
      */
     @Override
-    public void stop() {
-        log.info("Stopping state machine (in state: {})", stateMachine.getState().getId());
-        // Mark the job as killed and wait for the state machine to do its job
+    public void onApplicationEvent(final KillService.KillEvent event) {
+        log.info("Received kill signal (source: {}", event.getKillSource());
         this.executionContext.setJobKilled(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onApplicationEvent(final KillService.KillEvent event) {
-        log.info("Stopping state machine due to kill event (source: {})", event.getKillSource());
-        this.stop();
+    private static final class CompositeListener implements JobExecutionListener {
+        private final Collection<JobExecutionListener> listeners;
+
+        private CompositeListener(final Collection<JobExecutionListener> listeners) {
+            this.listeners = listeners;
+        }
+
+        @Override
+        public void stateEntered(final States state) {
+            listeners.forEach(listener -> listener.stateEntered(state));
+        }
+
+        @Override
+        public void stateExited(final States state) {
+            listeners.forEach(listener -> listener.stateExited(state));
+        }
+
+        @Override
+        public void beforeStateActionAttempt(final States state) {
+            listeners.forEach(listener -> listener.beforeStateActionAttempt(state));
+        }
+
+        @Override
+        public void afterStateActionAttempt(final States state, @Nullable final Exception exception) {
+            listeners.forEach(listener -> listener.afterStateActionAttempt(state, exception));
+        }
+
+        @Override
+        public void stateMachineStarted() {
+            listeners.forEach(JobExecutionListener::stateMachineStarted);
+        }
+
+        @Override
+        public void stateMachineStopped() {
+            listeners.forEach(JobExecutionListener::stateMachineStopped);
+        }
+
+        @Override
+        public void stateSkipped(final States state) {
+            listeners.forEach(listener -> listener.stateSkipped(state));
+        }
+
+        @Override
+        public void fatalException(final States state, final FatalTransitionException exception) {
+            listeners.forEach(listener -> listener.fatalException(state, exception));
+        }
+
+        @Override
+        public void executionAborted(final States state, final FatalTransitionException exception) {
+            listeners.forEach(listener -> listener.executionAborted(state, exception));
+        }
+
+        @Override
+        public void delayedStateActionRetry(final States state, final long retryDelay) {
+            listeners.forEach(listener -> listener.delayedStateActionRetry(state, retryDelay));
+        }
+    }
+
+    private static final class StateActionRetryTracker implements TriggerContext, JobExecutionListener {
+
+        private Date lastActualExecutionTime = new Date();
+        private Date lastCompletionTime = new Date();
+
+        StateActionRetryTracker() {
+            super();
+        }
+
+        @Override
+        public Date lastScheduledExecutionTime() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Date lastActualExecutionTime() {
+            return this.lastActualExecutionTime;
+        }
+
+        @Override
+        public Date lastCompletionTime() {
+            return this.lastCompletionTime;
+        }
+
+        @Override
+        public void beforeStateActionAttempt(final States state) {
+            this.lastActualExecutionTime = new Date();
+        }
+
+        @Override
+        public void afterStateActionAttempt(final States state, @Nullable final Exception exception) {
+            this.lastCompletionTime = new Date();
+        }
     }
 }

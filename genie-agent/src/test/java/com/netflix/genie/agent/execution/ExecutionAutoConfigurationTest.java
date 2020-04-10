@@ -32,6 +32,7 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
+import com.netflix.genie.agent.execution.statemachine.listeners.UserConsoleLoggingListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ClaimJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CleanupJobDirectoryStage;
@@ -67,7 +68,6 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.StateMachine;
 
 import java.util.Map;
 import java.util.Set;
@@ -127,9 +127,9 @@ class ExecutionAutoConfigurationTest {
         contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(LoggingListener.class);
+                Assertions.assertThat(context).hasSingleBean(UserConsoleLoggingListener.class);
                 Assertions.assertThat(context).hasSingleBean(ExecutionContext.class);
                 Assertions.assertThat(context).hasSingleBean(JobExecutionStateMachine.class);
-                Assertions.assertThat(context).hasSingleBean(StateMachine.class);
                 uniqueExecutionStages.forEach(
                     stageClass ->
                         Assertions.assertThat(context).hasSingleBean(stageClass)

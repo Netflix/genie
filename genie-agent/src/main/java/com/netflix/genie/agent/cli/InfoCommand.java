@@ -19,23 +19,20 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import com.netflix.genie.agent.AgentMetadata;
-import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineImpl;
+import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySources;
-import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.state.State;
 
 import javax.validation.constraints.Min;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -203,13 +200,12 @@ class InfoCommand implements AgentCommand {
                 .append("// ------------------------------------------------------------------------")
                 .append(NEWLINE);
 
-            final JobExecutionStateMachineImpl jobExecutionStateMachine
-                = applicationContext.getBean("jobExecutionStateMachine", JobExecutionStateMachineImpl.class);
+            final JobExecutionStateMachine jobExecutionStateMachine
+                = applicationContext.getBean(JobExecutionStateMachine.class);
 
-            final StateMachine<States, Events> stateMachine = jobExecutionStateMachine.getStateMachine();
             final List<ExecutionStage> stages = jobExecutionStateMachine.getExecutionStages();
 
-            createStateMachineDotGraph(stages, stateMachine, messageBuilder);
+            createStateMachineDotGraph(stages, messageBuilder);
         }
 
         System.out.println(messageBuilder.toString());
@@ -219,16 +215,20 @@ class InfoCommand implements AgentCommand {
 
     private void createStateMachineDotGraph(
         final List<ExecutionStage> stages,
-        final StateMachine<States, Events> stateMachine,
         final StringBuilder messageBuilder
     ) {
-        final State<States, Events> initialState = stateMachine.getInitialState();
 
-        final HashSet<State<States, Events>> terminalStates = Sets.newHashSet(stateMachine.getStates());
-        stateMachine.getTransitions().forEach(
-            transition ->
-                terminalStates.remove(transition.getSource())
-        );
+        final List<States> states = Lists.newArrayList();
+
+        states.add(States.INITIAL_STATE);
+        stages.forEach(stage -> states.add(stage.getState()));
+        states.add(States.FINAL_STATE);
+
+        final List<Pair<States, States>> transitions = Lists.newArrayList();
+
+        for (int i = 0; i < states.size() - 1; i++) {
+            transitions.add(Pair.of(states.get(i), states.get(i + 1)));
+        }
 
         messageBuilder
             .append("digraph state_machine {")
@@ -239,19 +239,19 @@ class InfoCommand implements AgentCommand {
             .append(NEWLINE);
 
 
-        stateMachine.getStates().forEach(
+        states.forEach(
             state -> {
                 final String shape;
-                if (state == initialState) {
+                if (state == States.INITIAL_STATE) {
                     shape = "shape=diamond";
-                } else if (terminalStates.contains(state)) {
+                } else if (state == States.FINAL_STATE) {
                     shape = "shape=rectangle";
                 } else {
                     shape = "";
                 }
 
                 final String edgeTickness;
-                if (state.getId().isCriticalState()) {
+                if (state.isCriticalState()) {
                     edgeTickness = "penwidth=3.0";
                 } else {
                     edgeTickness = "";
@@ -259,9 +259,9 @@ class InfoCommand implements AgentCommand {
 
                 messageBuilder
                     .append("  ")
-                    .append(state.getId())
+                    .append(state.name())
                     .append(" [label=")
-                    .append(state.getId())
+                    .append(state.name())
                     .append(" ")
                     .append(shape)
                     .append(" ")
@@ -275,16 +275,13 @@ class InfoCommand implements AgentCommand {
             .append("  // Transitions")
             .append(NEWLINE);
 
-        stateMachine.getTransitions().forEach(
+        transitions.forEach(
             transition ->
                 messageBuilder
                     .append("  ")
-                    .append(transition.getSource().getId())
+                    .append(transition.getLeft())
                     .append(" -> ")
-                    .append(transition.getTarget().getId())
-                    .append(" [label=\"")
-                    .append(transition.getTrigger().getEvent())
-                    .append("\"]")
+                    .append(transition.getRight())
                     .append(NEWLINE)
         );
 
@@ -293,15 +290,13 @@ class InfoCommand implements AgentCommand {
             .append(NEWLINE);
 
         // Draw an edge from a state whose next state is skippable to the next non-skippable state.
-        for (int i = 0; i < stages.size() - 2; i++) {
-            final ExecutionStage stage = stages.get(i);
-            final States state = stage.getState();
-            final boolean skipNext = stages.get(i + 1).getState().isSkippedDuringAbortedExecution();
+        for (int i = 0; i < states.size() - 2; i++) {
+            final States state = states.get(i);
+            final boolean skipNext = states.get(i + 1).isSkippedDuringAbortedExecution();
             if (skipNext) {
                 // Find the next non-skipped stage
-                for (int j = i + 1; j < stages.size() - 1; j++) {
-                    final ExecutionStage nextStage = stages.get(j);
-                    final States nextState = nextStage.getState();
+                for (int j = i + 1; j < states.size() - 1; j++) {
+                    final States nextState = states.get(j);
                     if (!nextState.isSkippedDuringAbortedExecution()) {
                         messageBuilder
                             .append("  ")
@@ -320,9 +315,8 @@ class InfoCommand implements AgentCommand {
             .append("  // Retry transitions")
             .append(NEWLINE);
 
-        stages.forEach(
-            stage -> {
-                final States state = stage.getState();
+        states.forEach(
+            state -> {
                 final @Min(0) int retries = state.getTransitionRetries();
                 if (retries > 0) {
                     messageBuilder

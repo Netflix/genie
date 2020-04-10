@@ -22,7 +22,6 @@ import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
-import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.proto.PingServiceGrpc;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -112,7 +111,6 @@ public class CliAutoConfiguration {
      *
      * @param execCommandArguments     The exec command arguments to use
      * @param jobExecutionStateMachine The job execution state machine instance to use
-     * @param executionContext         The execution context to use
      * @param killService              The kill service to use
      * @return A bean definition for an {@link ExecCommand} if one hasn't already been defined
      */
@@ -121,10 +119,9 @@ public class CliAutoConfiguration {
     public ExecCommand execCommand(
         final ExecCommand.ExecCommandArguments execCommandArguments,
         final JobExecutionStateMachine jobExecutionStateMachine,
-        final ExecutionContext executionContext,
         final KillService killService
     ) {
-        return new ExecCommand(execCommandArguments, jobExecutionStateMachine, executionContext, killService);
+        return new ExecCommand(execCommandArguments, jobExecutionStateMachine, killService);
     }
 
     /**

@@ -20,6 +20,8 @@ package com.netflix.genie.agent.execution.statemachine;
 import com.netflix.genie.agent.execution.services.KillService;
 import org.springframework.context.ApplicationListener;
 
+import java.util.List;
+
 /**
  * Interface JobExecutionStateMachine hides the actual state machine details.
  *
@@ -29,27 +31,22 @@ import org.springframework.context.ApplicationListener;
 public interface JobExecutionStateMachine extends ApplicationListener<KillService.KillEvent> {
 
     /**
-     * Starts the state machine and returns.
+     * Runs the state machine until completion.
      */
-    void start();
+    void run();
 
     /**
-     * Waits for the state machine to stop executing (i.e. reach a terminal state).
+     * Get the list of execution stages.
      *
-     * @return the final state in which the machine stopped
-     * @throws InterruptedException if the waiting thread is interrupted
+     * @return an immutable ordered list of execution stages
      */
-    States waitForStop() throws InterruptedException;
+    List<ExecutionStage> getExecutionStages();
 
     /**
-     * Request early termination of the state machine, for example in response to user submitting a kill via API or
-     * ctrl-c.
-     * <p>
-     * Notice:
-     * - Transition actions are not interrupted. Shutdown procedure will start after the currently executing transition
-     *   action has completed
-     * - Some transition actions are still performed before the program exits. For example publish the updated final job
-     *   status server-side, or archiving logs.
+     * Get the execution context.
+     * This is meant for post-execution read-only access.
+     *
+     * @return the execution context used by the state machine.
      */
-    void stop();
+    ExecutionContext getExecutionContext();
 }
