@@ -74,18 +74,18 @@ public class ScriptClusterSelectorImpl implements ClusterSelector {
      */
     @Override
     public ResourceSelectionResult<Cluster> select(
-        @NotEmpty final Set<@Valid Cluster> clusters,
+        @NotEmpty final Set<@Valid Cluster> resources,
         @Valid final JobRequest jobRequest,
         @NotBlank final String jobId
     ) throws ResourceSelectionException {
         final long selectStart = System.nanoTime();
-        log.debug("Called to select cluster from {} for job {}", clusters, jobId);
+        log.debug("Called to select cluster from {} for job {}", resources, jobId);
         final Set<Tag> tags = Sets.newHashSet();
         final ResourceSelectionResult.Builder<Cluster> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
             final ResourceSelectorScriptResult<Cluster> result
-                = this.clusterSelectorManagedScript.selectResource(clusters, jobRequest, jobId);
+                = this.clusterSelectorManagedScript.selectResource(resources, jobRequest, jobId);
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<Cluster> clusterOptional = result.getResource();
