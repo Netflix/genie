@@ -32,6 +32,7 @@ import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.Optional;
 import java.util.Set;
@@ -72,18 +73,18 @@ public class ScriptCommandSelectorImpl implements CommandSelector {
      */
     @Override
     public ResourceSelectionResult<Command> select(
-        @NotEmpty final Set<@Valid Command> commands,
+        @NotEmpty final Set<@Valid Command> resources,
         @Valid final JobRequest jobRequest,
-        @NotEmpty final String jobId
+        @NotBlank final String jobId
     ) throws ResourceSelectionException {
         final long selectStart = System.nanoTime();
-        log.debug("Called to select a command from {} for job {}", commands, jobId);
+        log.debug("Called to select a command from {} for job {}", resources, jobId);
         final Set<Tag> tags = Sets.newHashSet();
         final ResourceSelectionResult.Builder<Command> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
             final ResourceSelectorScriptResult<Command> result
-                = this.commandSelectorManagedScript.selectResource(commands, jobRequest, jobId);
+                = this.commandSelectorManagedScript.selectResource(resources, jobRequest, jobId);
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<Command> commandOptional = result.getResource();
