@@ -19,8 +19,8 @@ package com.netflix.genie.agent.execution.statemachine.stages;
 
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
@@ -53,9 +53,9 @@ public class ArchiveJobOutputsStage extends ExecutionStage {
     }
 
     @Override
-    protected void attemptTransition(
+    protected void attemptStageAction(
         final ExecutionContext executionContext
-    ) throws RetryableTransitionException, FatalTransitionException {
+    ) throws RetryableJobExecutionException, FatalJobExecutionException {
 
         final JobSpecification jobSpecification = executionContext.getJobSpecification();
         final File jobDirectory = executionContext.getJobDirectory();

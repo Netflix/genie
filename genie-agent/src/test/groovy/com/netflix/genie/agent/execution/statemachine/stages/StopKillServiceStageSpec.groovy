@@ -17,9 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages
 
-
 import com.netflix.genie.agent.execution.services.AgentJobKillService
-import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import spock.lang.Specification
 
 class StopKillServiceStageSpec extends Specification {

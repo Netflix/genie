@@ -21,8 +21,8 @@ import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionEx
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
@@ -45,7 +45,7 @@ class ObtainJobSpecificationStageSpec extends Specification {
 
     def "AttemptTransition -- api job"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -59,20 +59,20 @@ class ObtainJobSpecificationStageSpec extends Specification {
         JobSpecificationResolutionException resolutionException = Mock(JobSpecificationResolutionException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
         1 * executionContext.isPreResolved() >> true
         1 * agentJobService.getJobSpecification(jobId) >> { throw resolutionException }
         0 * executionContext.setJobSpecification(jobSpec)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == resolutionException
     }
 
     def "AttemptTransition -- CLI job"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -87,7 +87,7 @@ class ObtainJobSpecificationStageSpec extends Specification {
         Throwable resolutionException = Mock(JobSpecificationResolutionException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -95,7 +95,7 @@ class ObtainJobSpecificationStageSpec extends Specification {
         1 * agentJobService.resolveJobSpecification(jobId) >> { throw resolutionException }
         0 * executionContext.setCurrentJobStatus(JobStatus.RESOLVED)
         0 * executionContext.setJobSpecification(jobSpec)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == resolutionException
     }
 
@@ -104,7 +104,7 @@ class ObtainJobSpecificationStageSpec extends Specification {
         Throwable resolutionException = Mock(GenieRuntimeException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -112,7 +112,7 @@ class ObtainJobSpecificationStageSpec extends Specification {
         1 * agentJobService.resolveJobSpecification(jobId) >> { throw resolutionException }
         0 * executionContext.setCurrentJobStatus(JobStatus.RESOLVED)
         0 * executionContext.setJobSpecification(jobSpec)
-        def e = thrown(RetryableTransitionException)
+        def e = thrown(RetryableJobExecutionException)
         e.getCause() == resolutionException
     }
 }

@@ -45,7 +45,7 @@ class RefreshManifestStageSpec extends Specification {
         ExecutionStage stage = new RefreshManifestStage(agentFileService, state)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> Mock(File)
@@ -60,16 +60,16 @@ class RefreshManifestStageSpec extends Specification {
         1 * agentFileService.forceServerSync() >> Optional.empty()
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> null
         0 * agentFileService.forceServerSync()
 
         where:
-        state | _
-        States.POST_SETUP_MANIFEST_REFRESH | _
-        States.POST_LAUNCH_MANIFEST_REFRESH | _
+        state                                  | _
+        States.POST_SETUP_MANIFEST_REFRESH     | _
+        States.POST_LAUNCH_MANIFEST_REFRESH    | _
         States.POST_EXECUTION_MANIFEST_REFRESH | _
     }
 

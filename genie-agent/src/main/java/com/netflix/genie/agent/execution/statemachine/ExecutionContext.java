@@ -60,13 +60,15 @@ public class ExecutionContext {
      * Whether the state machine associated to this execution context has already been started.
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
-
+    /**
+     * List of all exception thrown by state transitions.
+     */
+    private final List<TransitionExceptionRecord> transitionExceptionRecords = Lists.newArrayList();
     /**
      * Agent client metadata sent to the server in certain requests.
      * Present if {@link InitializeAgentStage} ran successfully.
      */
     private AgentClientMetadata agentClientMetadata;
-
     /**
      * Job id requested by the user.
      * Present if the the jobId option is present on the command-line and the
@@ -74,98 +76,79 @@ public class ExecutionContext {
      * May be blank/null if the the agent is not executing an "API" job.
      */
     private String requestedJobId;
-
     /**
      * Job id reserved for this job.
      * Present and guaranteed not to be blank if the {@link ReserveJobIdStage} ran successfully.
      */
     private String reservedJobId;
-
     /**
      * Job id claimed by this agent for execution.
      * Present and guaranteed not to be blank if the {@link ClaimJobStage} ran successfully.
      */
     private String claimedJobId;
-
     /**
      * The job status as seen by the server.
      * Present if {@link ReserveJobIdStage} ran successfully, modified as execution progresses.
      */
     private JobStatus currentJobStatus = JobStatus.INVALID;
-
     /**
      * The job request constructed from command-line arguments.
      * Present if {@link ConfigureExecutionStage} ran successfully and if the agent is excuting a new job specified via
      * command-line arguments (as opposed to claiming a pre-resolved job submitted via API).
      */
     private AgentJobRequest agentJobRequest;
-
     /**
      * True if the agent is executing a job that was submitted via API and is pre-resolved on the server.
      * False if the agent is creating and executing a new job based on command-line arguments.
      */
     private boolean isPreResolved;
-
     /**
      * The job specification obtained from the server.
      * Present if {@link ObtainJobSpecificationStage} ran successfully.
      */
     private JobSpecification jobSpecification;
-
     /**
      * The local job directory created to execute a job.
      * Present if {@link CreateJobDirectoryStage} ran successfully.
      */
     private File jobDirectory;
-
     /**
      * The local job script file.
      * Present if {@link CreateJobScriptStage} ran successfully.
      */
     private File jobScript;
-
     /**
      * True if the job process should be launched from within the job directory.
      * False if the job should be launched from the current directory.
      */
     private boolean isRunFromJobDirectory;
-
     /**
      * True if the job process was launched (in {@link LaunchJobStage}), false if execution was aborted before reaching
      * that stage.
      */
     private boolean jobLaunched;
-
     /**
      * The result (based on exit code) of launching the job process.
      * Present if the job was launched and
      * {@link WaitJobCompletionStage} ran successfully.
      */
     private JobProcessResult jobProcessResult;
-
     /**
      * True if at any point a request was received to kill the job.
      */
     private boolean isJobKilled;
-
     /**
      * Current tally of attempts left for a given state transition.
      * Reset to 1 (or bigger) when each new state is reached.
      * Can be zeroed if an attempt results in a fatal error.
      */
     private int attemptsLeft;
-
-    /**
-     * List of all exception thrown by state transitions.
-     */
-    private final List<TransitionExceptionRecord> transitionExceptionRecords = Lists.newArrayList();
-
     /**
      * An exception that caused the execution to be aborted.
      * Present if a critical stage encountered a fatal exception (either thrown by the transition, or due to exhaustion
      * of attempts, or due to unhandled exception.
      */
-    private FatalTransitionException executionAbortedFatalException;
+    private FatalJobExecutionException executionAbortedFatalException;
 
     /**
      * The kind of cleanup to perform post-execution.

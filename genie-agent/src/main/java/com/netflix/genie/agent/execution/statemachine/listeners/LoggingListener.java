@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.listeners;
 
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 
@@ -96,7 +96,7 @@ public class LoggingListener implements JobExecutionListener {
      * {@inheritDoc}
      */
     @Override
-    public void fatalException(final States state, final FatalTransitionException exception) {
+    public void fatalException(final States state, final FatalJobExecutionException exception) {
         log.error("Fatal exception in state {}: {}", state, exception.getMessage(), exception);
     }
 
@@ -104,7 +104,7 @@ public class LoggingListener implements JobExecutionListener {
      * {@inheritDoc}
      */
     @Override
-    public void executionAborted(final States state, final FatalTransitionException exception) {
+    public void executionAborted(final States state, final FatalJobExecutionException exception) {
         log.info("Execution aborted in state {} due to: {}", state, exception.getMessage());
     }
 

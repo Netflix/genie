@@ -38,8 +38,8 @@ class ExecutionContextSpec extends Specification {
         File jobDirectory = Mock(File)
         File jobScript = Mock(File)
         JobProcessResult jobProcessResult = Mock(JobProcessResult)
-        Exception retryableException = new RetryableTransitionException("...", null)
-        Exception fatalException = new FatalTransitionException(States.CREATE_JOB_DIRECTORY, "...", new IOException())
+        Exception retryableException = new RetryableJobExecutionException("...", null)
+        Exception fatalException = new FatalJobExecutionException(States.CREATE_JOB_DIRECTORY, "...", new IOException())
         ExecutionContext executionContext = new ExecutionContext()
 
 

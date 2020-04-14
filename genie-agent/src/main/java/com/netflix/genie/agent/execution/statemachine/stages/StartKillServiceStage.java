@@ -18,8 +18,8 @@
 package com.netflix.genie.agent.execution.statemachine.stages;
 
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
-import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
+import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;

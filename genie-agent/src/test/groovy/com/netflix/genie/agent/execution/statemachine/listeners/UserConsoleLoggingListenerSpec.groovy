@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.listeners
 
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
 
@@ -36,8 +36,8 @@ class UserConsoleLoggingListenerSpec extends Specification {
         listener.stateMachineStarted()
         listener.stateMachineStopped()
         listener.stateSkipped()
-        listener.fatalException(States.SET_STATUS_FINAL, new FatalTransitionException(States.SET_STATUS_FINAL, "..."))
-        listener.executionAborted(States.SET_STATUS_FINAL, new FatalTransitionException(States.SET_STATUS_FINAL, "..."))
+        listener.fatalException(States.SET_STATUS_FINAL, new FatalJobExecutionException(States.SET_STATUS_FINAL, "..."))
+        listener.executionAborted(States.SET_STATUS_FINAL, new FatalJobExecutionException(States.SET_STATUS_FINAL, "..."))
         listener.delayedStateActionRetry(States.SET_STATUS_FINAL, 200L)
 
         then:

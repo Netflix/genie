@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.process.JobProcessManager
 import com.netflix.genie.agent.execution.process.JobProcessResult
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import spock.lang.Specification
 
@@ -40,7 +40,7 @@ class WaitJobCompletionStageSpec extends Specification {
 
     def "AttemptTransition -- not launched"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.isJobLaunched() >> false
@@ -49,7 +49,7 @@ class WaitJobCompletionStageSpec extends Specification {
 
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.isJobLaunched() >> true
@@ -63,12 +63,12 @@ class WaitJobCompletionStageSpec extends Specification {
         InterruptedException interruptedException = Mock(InterruptedException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.isJobLaunched() >> true
         1 * jobProcessManager.waitFor() >> { throw interruptedException }
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == interruptedException
         0 * executionContext.setJobProcessResult(jobProcessResult)
         0 * jobProcessResult.getFinalStatus() >> JobStatus.KILLED

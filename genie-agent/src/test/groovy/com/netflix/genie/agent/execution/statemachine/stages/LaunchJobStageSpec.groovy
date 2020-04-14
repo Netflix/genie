@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.process.JobProcessManager
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
@@ -48,7 +48,7 @@ class LaunchJobStageSpec extends Specification {
     @Unroll
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> jobDir
@@ -73,7 +73,7 @@ class LaunchJobStageSpec extends Specification {
         JobLaunchException launchException = Mock(JobLaunchException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> jobDir
@@ -86,7 +86,7 @@ class LaunchJobStageSpec extends Specification {
         0 * executionContext.setNextJobStatus(JobStatus.RUNNING)
         0 * executionContext.setNextJobStatusMessage(JobStatusMessages.JOB_RUNNING)
         0 * executionContext.setJobLaunched(true)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == launchException
 
     }

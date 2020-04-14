@@ -19,7 +19,7 @@ package com.netflix.genie.agent.execution.statemachine.stages
 
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
 
@@ -40,7 +40,7 @@ class StartServiceStageSpec extends Specification {
 
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getClaimedJobId() >> jobId
@@ -52,12 +52,12 @@ class StartServiceStageSpec extends Specification {
         Exception argumentException = Mock(IllegalArgumentException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getClaimedJobId() >> jobId
         1 * service.start(jobId) >> { throw argumentException }
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == argumentException
     }
 

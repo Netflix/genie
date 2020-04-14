@@ -196,7 +196,7 @@ public enum States {
     public static final States FINAL_STATE = DONE;
 
     /**
-     * If a state is critical, then upon encountering a {@link FatalTransitionException} while in it, execution is
+     * If a state is critical, then upon encountering a {@link FatalJobExecutionException} while in it, execution is
      * aborted. Whereas for non critical stage execution is not aborted.
      */
     private final boolean criticalState;
@@ -216,7 +216,7 @@ public enum States {
 
     /**
      * Number of retries (i.e. does not include initial attempt) in case a state transition throws
-     * {@link RetryableTransitionException}.
+     * {@link RetryableJobExecutionException}.
      */
     @Min(0)
     private final int transitionRetries;

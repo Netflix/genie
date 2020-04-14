@@ -21,7 +21,7 @@ package com.netflix.genie.agent.execution.statemachine.stages
 import com.netflix.genie.agent.execution.process.JobProcessResult
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.JobStatus
@@ -35,7 +35,7 @@ class DetermineJobFinalStatusStageSpec extends Specification {
     ExecutionContext executionContext
 
     @Shared
-    FatalTransitionException claimException = new FatalTransitionException(States.CLAIM_JOB, "...", new IOException())
+    FatalJobExecutionException claimException = new FatalJobExecutionException(States.CLAIM_JOB, "...", new IOException())
     @Shared
     String killedResultMessage = "Killed"
     @Shared
@@ -51,7 +51,7 @@ class DetermineJobFinalStatusStageSpec extends Specification {
 
     def "AttemptTransition"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getCurrentJobStatus() >> currentJobStatus

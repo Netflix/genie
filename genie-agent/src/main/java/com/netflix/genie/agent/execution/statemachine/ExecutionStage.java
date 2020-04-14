@@ -46,26 +46,26 @@ public abstract class ExecutionStage {
      * @param state the state machine state associated with this stage
      */
     protected ExecutionStage(
-        final States state
+            final States state
     ) {
         this.state = state;
     }
 
-    protected FatalTransitionException createFatalException(final String message, final Throwable cause) {
-        return new FatalTransitionException(this.getState(), message, cause);
+    protected FatalJobExecutionException createFatalException(final String message, final Throwable cause) {
+        return new FatalJobExecutionException(this.getState(), message, cause);
     }
 
-    protected FatalTransitionException createFatalException(final Throwable cause) {
+    protected FatalJobExecutionException createFatalException(final Throwable cause) {
         return this.createFatalException(
-            "Fatal error in state " + this.getState().name() + ": " + cause.getMessage(),
-            cause
+                "Fatal error in state " + this.getState().name() + ": " + cause.getMessage(),
+                cause
         );
     }
 
-    protected RetryableTransitionException createRetryableException(final Throwable cause) {
-        throw new RetryableTransitionException(
-            "Retryable error in state " + this.getState().name() + ": " + cause.getMessage(),
-            cause
+    protected RetryableJobExecutionException createRetryableException(final Throwable cause) {
+        throw new RetryableJobExecutionException(
+                "Retryable error in state " + this.getState().name() + ": " + cause.getMessage(),
+                cause
         );
     }
 
@@ -74,12 +74,12 @@ public abstract class ExecutionStage {
      * or if the action was attempted and threw a fatal exception, or if the retriable attempts were exhausted.
      *
      * @param executionContext the execution context, carrying execution state across actions
-     * @throws RetryableTransitionException in case of error that deserves another attempt (for example, temporary
-     *                                      failure to connect to the server
-     * @throws FatalTransitionException     in case of error that should not be retried and should cause the execution
-     *                                      to be aborted (for example, trying to use a job id that was already in use)
+     * @throws RetryableJobExecutionException in case of error that deserves another attempt (for example, temporary
+     *                                        failure to connect to the server
+     * @throws FatalJobExecutionException     in case of error that should not be retried (for example, trying to use a
+     *                                        job id that was already in use)
      */
-    protected abstract void attemptTransition(
-        ExecutionContext executionContext
-    ) throws RetryableTransitionException, FatalTransitionException;
+    protected abstract void attemptStageAction(
+            ExecutionContext executionContext
+    ) throws RetryableJobExecutionException, FatalJobExecutionException;
 }

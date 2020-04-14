@@ -22,13 +22,13 @@ import lombok.Getter;
 import javax.annotation.Nullable;
 
 /**
- * Fatal exception that should stop the state machine, for example, claiming a job that is not in claimable state.
+ * Fatal exception that should stop execution early. For example, claiming a job that is not in claimable state.
  *
  * @author mprimi
  * @since 4.0.0
  */
 @Getter
-public class FatalTransitionException extends RuntimeException {
+public class FatalJobExecutionException extends RuntimeException {
 
     private final States sourceState;
 
@@ -38,7 +38,7 @@ public class FatalTransitionException extends RuntimeException {
      * @param sourceState state in which error was encountered
      * @param message     message
      */
-    public FatalTransitionException(
+    public FatalJobExecutionException(
         final States sourceState,
         final String message
     ) {
@@ -52,7 +52,7 @@ public class FatalTransitionException extends RuntimeException {
      * @param message     message
      * @param cause       cause
      */
-    public FatalTransitionException(
+    public FatalJobExecutionException(
         final States sourceState,
         final String message,
         @Nullable final Throwable cause

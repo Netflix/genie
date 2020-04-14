@@ -19,11 +19,9 @@ package com.netflix.genie.agent.execution.statemachine.stages
 
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
-
-import javax.validation.constraints.NotBlank
 
 class StopServiceStageSpec extends Specification {
     ExecutionStage stage
@@ -38,7 +36,7 @@ class StopServiceStageSpec extends Specification {
 
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * service.stop()
@@ -49,11 +47,11 @@ class StopServiceStageSpec extends Specification {
         Exception runtimeException = Mock(RuntimeException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * service.stop() >> { throw runtimeException }
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == runtimeException
     }
 

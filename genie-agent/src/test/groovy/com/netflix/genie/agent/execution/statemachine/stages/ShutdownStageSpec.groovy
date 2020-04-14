@@ -32,7 +32,7 @@ class ShutdownStageSpec extends Specification {
 
     def "AttemptTransition"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         true

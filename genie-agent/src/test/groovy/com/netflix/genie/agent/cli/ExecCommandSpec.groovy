@@ -19,7 +19,7 @@ package com.netflix.genie.agent.cli
 
 import com.netflix.genie.agent.execution.services.KillService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.common.external.dtos.v4.JobStatus
@@ -95,7 +95,7 @@ class ExecCommandSpec extends Specification {
         1 * stateMachine.getExecutionContext() >> execContext
         1 * execContext.getCurrentJobStatus() >> JobStatus.FAILED
         1 * execContext.isJobLaunched() >> launched
-        1 * execContext.getExecutionAbortedFatalException() >> new FatalTransitionException(States.CREATE_JOB_DIRECTORY, "...", new IOException())
+        1 * execContext.getExecutionAbortedFatalException() >> new FatalJobExecutionException(States.CREATE_JOB_DIRECTORY, "...", new IOException())
 
         exitCode == expectedExitCode
 

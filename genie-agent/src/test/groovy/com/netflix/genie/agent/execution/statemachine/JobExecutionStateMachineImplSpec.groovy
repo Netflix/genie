@@ -95,7 +95,7 @@ class JobExecutionStateMachineImplSpec extends Specification {
         1 * mockListener.stateEntered(state)
         1 * context.isExecutionAborted() >> false
         1 * mockListener.beforeStateActionAttempt(state)
-        1 * mockExecutionStage.attemptTransition(context)
+        1 * mockExecutionStage.attemptStageAction(context)
         1 * mockListener.afterStateActionAttempt(state, null)
         1 * mockListener.stateExited(state)
         1 * mockListener.stateEntered(States.DONE)
@@ -104,7 +104,7 @@ class JobExecutionStateMachineImplSpec extends Specification {
 
     def "Retry until fatal exception, then abort execution"() {
         setup:
-        Throwable retryableException = new RetryableTransitionException("...", new IOException(""))
+        Throwable retryableException = new RetryableJobExecutionException("...", new IOException(""))
         States state = States.HANDSHAKE
         stages.addAll([
             mockExecutionStage
@@ -122,20 +122,20 @@ class JobExecutionStateMachineImplSpec extends Specification {
         // This part repeats for 1 + number of retries
         4 * context.isExecutionAborted() >> false
         4 * mockListener.beforeStateActionAttempt(state)
-        4 * mockExecutionStage.attemptTransition(context) >> { throw retryableException }
+        4 * mockExecutionStage.attemptStageAction(context) >> { throw retryableException }
         4 * mockListener.afterStateActionAttempt(state, retryableException)
         4 * context.recordTransitionException(state, retryableException)
         1 * mockListener.delayedStateActionRetry(state, 1 * JobExecutionStateMachineImpl.RETRY_DELAY)
         1 * mockListener.delayedStateActionRetry(state, 2 * JobExecutionStateMachineImpl.RETRY_DELAY)
         1 * mockListener.delayedStateActionRetry(state, 3 * JobExecutionStateMachineImpl.RETRY_DELAY)
-        1 * mockListener.fatalException(state, _ as FatalTransitionException) >> {
+        1 * mockListener.fatalException(state, _ as FatalJobExecutionException) >> {
             args ->
-                assert (args[1] as FatalTransitionException).getCause() == retryableException
+                assert (args[1] as FatalJobExecutionException).getCause() == retryableException
         }
-        1 * context.recordTransitionException(state, _ as FatalTransitionException)
+        1 * context.recordTransitionException(state, _ as FatalJobExecutionException)
         1 * context.isExecutionAborted() >> false
-        1 * context.setExecutionAbortedFatalException(_ as FatalTransitionException)
-        1 * mockListener.executionAborted(state, _ as FatalTransitionException)
+        1 * context.setExecutionAbortedFatalException(_ as FatalJobExecutionException)
+        1 * mockListener.executionAborted(state, _ as FatalJobExecutionException)
         1 * mockListener.stateExited(state)
         1 * mockListener.stateEntered(States.DONE)
         1 * mockListener.stateMachineStopped()
@@ -147,7 +147,7 @@ class JobExecutionStateMachineImplSpec extends Specification {
 
     def "Fatal exception stops retries"() {
         setup:
-        Throwable fatalException = new FatalTransitionException(States.HANDSHAKE, "...", new IOException())
+        Throwable fatalException = new FatalJobExecutionException(States.HANDSHAKE, "...", new IOException())
         States state = States.HANDSHAKE
         stages.addAll([
             mockExecutionStage
@@ -165,7 +165,7 @@ class JobExecutionStateMachineImplSpec extends Specification {
         // This part repeats for 1 + number of retries
         1 * context.isExecutionAborted() >> false
         1 * mockListener.beforeStateActionAttempt(state)
-        1 * mockExecutionStage.attemptTransition(context) >> { throw fatalException }
+        1 * mockExecutionStage.attemptStageAction(context) >> { throw fatalException }
         1 * mockListener.afterStateActionAttempt(state, fatalException)
         1 * context.recordTransitionException(state, fatalException)
         0 * mockListener.delayedStateActionRetry(state, _ as Long)
@@ -202,17 +202,17 @@ class JobExecutionStateMachineImplSpec extends Specification {
         // This part repeats for 1 + number of retries
         1 * context.isExecutionAborted() >> false
         1 * mockListener.beforeStateActionAttempt(state)
-        1 * mockExecutionStage.attemptTransition(context) >> { throw exception }
+        1 * mockExecutionStage.attemptStageAction(context) >> { throw exception }
         1 * mockListener.afterStateActionAttempt(state, exception)
-        1 * context.recordTransitionException(state, _ as FatalTransitionException) >> {
+        1 * context.recordTransitionException(state, _ as FatalJobExecutionException) >> {
             args ->
-                (args[1] as FatalTransitionException).getCause() == exception
+                (args[1] as FatalJobExecutionException).getCause() == exception
         }
         0 * mockListener.delayedStateActionRetry(state, _ as Long)
-        1 * mockListener.fatalException(state, _ as FatalTransitionException)
+        1 * mockListener.fatalException(state, _ as FatalJobExecutionException)
         1 * context.isExecutionAborted() >> false
-        1 * context.setExecutionAbortedFatalException(_ as FatalTransitionException)
-        1 * mockListener.executionAborted(state, _ as FatalTransitionException)
+        1 * context.setExecutionAbortedFatalException(_ as FatalJobExecutionException)
+        1 * mockListener.executionAborted(state, _ as FatalJobExecutionException)
         1 * mockListener.stateExited(state)
         1 * mockListener.stateEntered(States.DONE)
         1 * mockListener.stateMachineStopped()
@@ -242,16 +242,16 @@ class JobExecutionStateMachineImplSpec extends Specification {
         // This part repeats for 1 + number of retries
         1 * context.isExecutionAborted() >> false
         1 * mockListener.beforeStateActionAttempt(state)
-        1 * mockExecutionStage.attemptTransition(context) >> { throw exception }
+        1 * mockExecutionStage.attemptStageAction(context) >> { throw exception }
         1 * mockListener.afterStateActionAttempt(state, exception)
-        1 * context.recordTransitionException(state, _ as FatalTransitionException) >> {
+        1 * context.recordTransitionException(state, _ as FatalJobExecutionException) >> {
             args ->
-                (args[1] as FatalTransitionException).getCause() == exception
+                (args[1] as FatalJobExecutionException).getCause() == exception
         }
         0 * mockListener.delayedStateActionRetry(state, _ as Long)
-        1 * mockListener.fatalException(state, _ as FatalTransitionException)
-        0 * context.setExecutionAbortedFatalException(_ as FatalTransitionException)
-        0 * mockListener.executionAborted(state, _ as FatalTransitionException)
+        1 * mockListener.fatalException(state, _ as FatalJobExecutionException)
+        0 * context.setExecutionAbortedFatalException(_ as FatalJobExecutionException)
+        0 * mockListener.executionAborted(state, _ as FatalJobExecutionException)
         1 * mockListener.stateExited(state)
         1 * mockListener.stateEntered(States.DONE)
         1 * mockListener.stateMachineStopped()
@@ -276,7 +276,7 @@ class JobExecutionStateMachineImplSpec extends Specification {
         1 * context.getStarted() >> started
         1 * mockExecutionStage.getState() >> state
         1 * context.isExecutionAborted() >> true
-        1 * mockExecutionStage.attemptTransition(context)
+        1 * mockExecutionStage.attemptStageAction(context)
     }
 
     def "Skippable states are not executed after execution is aborted"() {
@@ -294,7 +294,7 @@ class JobExecutionStateMachineImplSpec extends Specification {
         1 * context.getStarted() >> started
         1 * mockExecutionStage.getState() >> state
         1 * context.isExecutionAborted() >> true
-        0 * mockExecutionStage.attemptTransition(context)
+        0 * mockExecutionStage.attemptStageAction(context)
     }
 
     def "First fatal exception in critical stage is preserved"() {
@@ -316,14 +316,14 @@ class JobExecutionStateMachineImplSpec extends Specification {
         1 * context.getStarted() >> started
         1 * mockExecutionStage.getState() >> state1
         2 * context.isExecutionAborted() >> false
-        1 * mockExecutionStage.attemptTransition(context) >> { throw new RuntimeException() }
-        1 * context.recordTransitionException(state1, _ as FatalTransitionException)
-        1 * context.setExecutionAbortedFatalException(_ as FatalTransitionException)
+        1 * mockExecutionStage.attemptStageAction(context) >> { throw new RuntimeException() }
+        1 * context.recordTransitionException(state1, _ as FatalJobExecutionException)
+        1 * context.setExecutionAbortedFatalException(_ as FatalJobExecutionException)
         1 * otherMockExecutionStage.getState() >> state2
         2 * context.isExecutionAborted() >> true
-        1 * otherMockExecutionStage.attemptTransition(context) >> { throw new RuntimeException() }
-        1 * context.recordTransitionException(state2, _ as FatalTransitionException)
-        0 * context.setExecutionAbortedFatalException(_ as FatalTransitionException)
+        1 * otherMockExecutionStage.attemptStageAction(context) >> { throw new RuntimeException() }
+        1 * context.recordTransitionException(state2, _ as FatalJobExecutionException)
+        0 * context.setExecutionAbortedFatalException(_ as FatalJobExecutionException)
     }
 
     def "Abort via kill only executes non-skip states"() {
@@ -344,10 +344,10 @@ class JobExecutionStateMachineImplSpec extends Specification {
         1 * context.getStarted() >> started
         1 * mockExecutionStage.getState() >> state1
         1 * context.isExecutionAborted() >> true
-        0 * mockExecutionStage.attemptTransition(context)
+        0 * mockExecutionStage.attemptStageAction(context)
         1 * otherMockExecutionStage.getState() >> state2
         1 * context.isExecutionAborted() >> true
-        1 * otherMockExecutionStage.attemptTransition(context)
+        1 * otherMockExecutionStage.attemptStageAction(context)
     }
 
     // A stage that takes a certain amount of time to complete its action.
@@ -360,7 +360,7 @@ class JobExecutionStateMachineImplSpec extends Specification {
         }
 
         @Override
-        protected void attemptTransition(final ExecutionContext executionContext) throws RetryableTransitionException, FatalTransitionException {
+        protected void attemptStageAction(final ExecutionContext executionContext) throws RetryableJobExecutionException, FatalJobExecutionException {
             sleep(actionDuration)
         }
     }
