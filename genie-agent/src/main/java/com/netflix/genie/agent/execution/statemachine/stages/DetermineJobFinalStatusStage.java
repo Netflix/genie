@@ -20,8 +20,8 @@ package com.netflix.genie.agent.execution.statemachine.stages;
 import com.netflix.genie.agent.execution.process.JobProcessResult;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
@@ -55,16 +55,17 @@ public class DetermineJobFinalStatusStage extends ExecutionStage {
     }
 
     @Override
-    protected void attemptTransition(
+    protected void attemptStageAction(
         final ExecutionContext executionContext
-    ) throws RetryableTransitionException, FatalTransitionException {
+    ) throws RetryableJobExecutionException, FatalJobExecutionException {
 
         final JobStatus currentJobStatus = executionContext.getCurrentJobStatus();
         assert currentJobStatus != null;
 
         final boolean launched = executionContext.isJobLaunched();
         final boolean killed = executionContext.isJobKilled();
-        final FatalTransitionException fatalTransitionException = executionContext.getExecutionAbortedFatalException();
+        final FatalJobExecutionException fatalJobExecutionException =
+            executionContext.getExecutionAbortedFatalException();
         final JobProcessResult jobProcessResult = executionContext.getJobProcessResult();
 
         final JobStatus finalJobStatus;
@@ -79,10 +80,10 @@ public class DetermineJobFinalStatusStage extends ExecutionStage {
             finalJobStatusMessage = jobProcessResult.getFinalStatusMessage();
             log.info("Job executed, final status is: {}", finalJobStatus);
 
-        } else if (INTERMEDIATE_ACTIVE_STATUSES.contains(currentJobStatus) && fatalTransitionException != null) {
+        } else if (INTERMEDIATE_ACTIVE_STATUSES.contains(currentJobStatus) && fatalJobExecutionException != null) {
             // Execution was aborted before getting to launch
             finalJobStatus = JobStatus.FAILED;
-            finalJobStatusMessage = fatalTransitionException.getSourceState().getFatalErrorStatusMessage();
+            finalJobStatusMessage = fatalJobExecutionException.getSourceState().getFatalErrorStatusMessage();
             log.info("Job execution failed, last reported state was {}", currentJobStatus);
 
         } else if (INTERMEDIATE_ACTIVE_STATUSES.contains(currentJobStatus) && killed) {

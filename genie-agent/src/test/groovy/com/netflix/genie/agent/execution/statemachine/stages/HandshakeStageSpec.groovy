@@ -21,8 +21,8 @@ import com.netflix.genie.agent.execution.exceptions.HandshakeException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import spock.lang.Specification
@@ -42,7 +42,7 @@ class HandshakeStageSpec extends Specification {
 
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getAgentClientMetadata() >> agentClientMetadata
@@ -54,12 +54,12 @@ class HandshakeStageSpec extends Specification {
         def handshakeException = Mock(HandshakeException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getAgentClientMetadata() >> agentClientMetadata
         1 * agentJobService.handshake(agentClientMetadata) >> { throw handshakeException }
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == handshakeException
     }
 
@@ -68,12 +68,12 @@ class HandshakeStageSpec extends Specification {
         def handshakeException = Mock(GenieRuntimeException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getAgentClientMetadata() >> agentClientMetadata
         1 * agentJobService.handshake(agentClientMetadata) >> { throw handshakeException }
-        def e = thrown(RetryableTransitionException)
+        def e = thrown(RetryableJobExecutionException)
         e.getCause() == handshakeException
     }
 }

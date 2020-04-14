@@ -50,7 +50,7 @@ class LogExecutionErrorsStageSpec extends Specification {
         )
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getTransitionExceptionRecords() >> records
@@ -60,7 +60,7 @@ class LogExecutionErrorsStageSpec extends Specification {
         setup:
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getTransitionExceptionRecords() >> records

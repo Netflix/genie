@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import spock.lang.Specification
 
 import java.nio.file.Path
@@ -44,7 +44,7 @@ class CleanupJobDirectoryStageSpec extends Specification {
 
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> jobDirectory
@@ -55,7 +55,7 @@ class CleanupJobDirectoryStageSpec extends Specification {
 
     def "AttemptTransition -- no job directory"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> null
@@ -66,14 +66,14 @@ class CleanupJobDirectoryStageSpec extends Specification {
 
     def "AttemptTransition -- error"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> jobDirectory
         1 * executionContext.getCleanupStrategy() >> cleanupStrategy
         1 * jobDirectory.toPath() >> jobDirectoryPath
         1 * jobSetupService.cleanupJobDirectory(jobDirectoryPath, cleanupStrategy) >> { throw new IOException() }
-        def e = thrown(RetryableTransitionException)
+        def e = thrown(RetryableJobExecutionException)
         e.getCause().getClass() == IOException
     }
 }

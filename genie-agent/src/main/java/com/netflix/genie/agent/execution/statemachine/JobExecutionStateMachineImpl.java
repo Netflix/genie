@@ -113,7 +113,7 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
             this.listener.beforeStateActionAttempt(state);
             Exception exception = null;
             try {
-                executionStage.attemptTransition(executionContext);
+                executionStage.attemptStageAction(executionContext);
             } catch (Exception e) {
                 log.debug("Exception in state: " + state, e);
                 exception = e;
@@ -129,44 +129,44 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
             // Record the raw exception
             this.executionContext.recordTransitionException(state, exception);
 
-            FatalTransitionException fatalTransitionException = null;
+            FatalJobExecutionException fatalJobExecutionException = null;
 
-            if (exception instanceof RetryableTransitionException && retriesLeft > 0) {
+            if (exception instanceof RetryableJobExecutionException && retriesLeft > 0) {
                 // Try action again after a delay
                 retriesLeft--;
                 currentRetryDelay += RETRY_DELAY;
 
-            } else if (exception instanceof RetryableTransitionException) {
+            } else if (exception instanceof RetryableJobExecutionException) {
                 // No retries left, save as fatal exception
-                fatalTransitionException = new FatalTransitionException(
+                fatalJobExecutionException = new FatalJobExecutionException(
                     state,
                     "No more attempts left for retryable error in state " + state,
                     exception
                 );
-                this.executionContext.recordTransitionException(state, fatalTransitionException);
+                this.executionContext.recordTransitionException(state, fatalJobExecutionException);
 
-            } else if (exception instanceof FatalTransitionException) {
+            } else if (exception instanceof FatalJobExecutionException) {
                 // Save fatal exception
-                fatalTransitionException = (FatalTransitionException) exception;
+                fatalJobExecutionException = (FatalJobExecutionException) exception;
             } else {
                 // Create fatal exception out of unexpected exception
-                fatalTransitionException = new FatalTransitionException(
+                fatalJobExecutionException = new FatalJobExecutionException(
                     state,
                     "Unhandled exception" + exception.getMessage(),
                     exception
                 );
-                this.executionContext.recordTransitionException(state, fatalTransitionException);
+                this.executionContext.recordTransitionException(state, fatalJobExecutionException);
             }
 
-            if (fatalTransitionException != null) {
+            if (fatalJobExecutionException != null) {
 
                 if (state.isCriticalState() && !executionContext.isExecutionAborted()) {
                     // Fatal exception in critical stage aborts execution, unless it's already aborted
-                    this.executionContext.setExecutionAbortedFatalException(fatalTransitionException);
-                    this.listener.executionAborted(state, fatalTransitionException);
+                    this.executionContext.setExecutionAbortedFatalException(fatalJobExecutionException);
+                    this.listener.executionAborted(state, fatalJobExecutionException);
                 }
 
-                this.listener.fatalException(state, fatalTransitionException);
+                this.listener.fatalException(state, fatalJobExecutionException);
                 // Fatal exception always stops further attempts
                 return;
             }
@@ -235,12 +235,12 @@ public class JobExecutionStateMachineImpl implements JobExecutionStateMachine {
         }
 
         @Override
-        public void fatalException(final States state, final FatalTransitionException exception) {
+        public void fatalException(final States state, final FatalJobExecutionException exception) {
             listeners.forEach(listener -> listener.fatalException(state, exception));
         }
 
         @Override
-        public void executionAborted(final States state, final FatalTransitionException exception) {
+        public void executionAborted(final States state, final FatalJobExecutionException exception) {
             listeners.forEach(listener -> listener.executionAborted(state, exception));
         }
 

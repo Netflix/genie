@@ -47,7 +47,7 @@ class ArchiveJobOutputsStageSpec extends Specification {
 
     def "AttemptTransition - success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
@@ -59,7 +59,7 @@ class ArchiveJobOutputsStageSpec extends Specification {
 
     def "AttemptTransition - no spec"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> null
@@ -68,7 +68,7 @@ class ArchiveJobOutputsStageSpec extends Specification {
 
     def "AttemptTransition - no archive location"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
@@ -78,14 +78,14 @@ class ArchiveJobOutputsStageSpec extends Specification {
 
     def "AttemptTransition - archive error"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
         1 * executionContext.getJobDirectory() >> jobDir
         1 * jobSpec.getArchiveLocation() >> Optional.of(archiveLocation)
         1 * jobDir.toPath() >> jobDirPath
-        1 * jobArchiveService.archiveDirectory(jobDirPath, _ as URI) >> { throw new JobArchiveException()}
+        1 * jobArchiveService.archiveDirectory(jobDirPath, _ as URI) >> { throw new JobArchiveException() }
         noExceptionThrown()
     }
 }

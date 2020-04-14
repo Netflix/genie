@@ -18,11 +18,10 @@
 package com.netflix.genie.agent.execution.statemachine.stages
 
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
-import com.netflix.genie.agent.execution.services.AgentFileStreamService
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import org.assertj.core.util.Sets
 import spock.lang.Specification
@@ -48,7 +47,7 @@ class DownloadDependenciesStageSpec extends Specification {
         Set<File> files = Sets.newHashSet()
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
@@ -61,13 +60,13 @@ class DownloadDependenciesStageSpec extends Specification {
 
         SetUpJobException setupException = Mock(SetUpJobException)
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
         1 * executionContext.getJobDirectory() >> jobDir
         1 * jobSetupService.downloadJobResources(jobSpec, jobDir) >> { throw setupException }
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == setupException
     }
 

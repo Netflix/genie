@@ -22,7 +22,7 @@ import com.netflix.genie.agent.cli.JobRequestConverter
 import com.netflix.genie.agent.execution.CleanupStrategy
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import spock.lang.Specification
 
@@ -65,7 +65,7 @@ class ConfigureExecutionStageSpec extends Specification {
         this.cleanupStrategy = CleanupStrategy.FULL_CLEANUP
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * jobRequestArgs.isJobRequestedViaAPI() >> apiJob
@@ -84,7 +84,7 @@ class ConfigureExecutionStageSpec extends Specification {
         apiJob = true
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * jobRequestArgs.isJobRequestedViaAPI() >> apiJob
@@ -94,7 +94,7 @@ class ConfigureExecutionStageSpec extends Specification {
         1 * cleanupArgs.getCleanupStrategy() >> cleanupStrategy
         1 * executionContext.setCleanupStrategy(cleanupStrategy)
         1 * jobRequestArgs.getJobId() >> null
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause().getClass() == IllegalArgumentException
     }
 
@@ -105,7 +105,7 @@ class ConfigureExecutionStageSpec extends Specification {
         jobId = null
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * jobRequestArgs.isJobRequestedViaAPI() >> apiJob
@@ -128,7 +128,7 @@ class ConfigureExecutionStageSpec extends Specification {
         def conversionException = Mock(JobRequestConverter.ConversionException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * jobRequestArgs.isJobRequestedViaAPI() >> apiJob
@@ -141,7 +141,7 @@ class ConfigureExecutionStageSpec extends Specification {
         1 * jobRequestConverter.agentJobRequestArgsToDTO(jobRequestArgs) >> { throw conversionException }
         0 * executionContext.setAgentJobRequest(agentJobRequest)
         0 * executionContext.setRequestedJobId(jobId)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == conversionException
     }
 }

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.listeners;
 
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 
 import javax.annotation.Nullable;
@@ -91,7 +91,7 @@ public interface JobExecutionListener {
      * @param state     the state whose action produced a fatal exception
      * @param exception the exception
      */
-    default void fatalException(States state, FatalTransitionException exception) {
+    default void fatalException(States state, FatalJobExecutionException exception) {
     }
 
     /**
@@ -101,13 +101,14 @@ public interface JobExecutionListener {
      * @param state     the state whose action produced a fatal exception
      * @param exception the exception
      */
-    default void executionAborted(States state, FatalTransitionException exception) {
+    default void executionAborted(States state, FatalJobExecutionException exception) {
     }
 
     /**
      * Invoked when the state machine is about to wait before retrying the action associated to the given state as a
      * result of a retryable exception on the previous attempt.
-     *  @param state      the state whose action will be retried after a pause
+     *
+     * @param state      the state whose action will be retried after a pause
      * @param retryDelay the retry delay in milliseconds
      */
     default void delayedStateActionRetry(States state, final long retryDelay) {

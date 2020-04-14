@@ -23,15 +23,15 @@ package com.netflix.genie.agent.execution.statemachine;
  * @author mprimi
  * @since 4.0.0
  */
-public class RetryableTransitionException extends RuntimeException {
+public class RetryableJobExecutionException extends RuntimeException {
 
     /**
      * Constructor.
      *
      * @param message message
-     * @param cause cause
+     * @param cause   cause
      */
-    public RetryableTransitionException(final String message, final Throwable cause) {
+    public RetryableJobExecutionException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

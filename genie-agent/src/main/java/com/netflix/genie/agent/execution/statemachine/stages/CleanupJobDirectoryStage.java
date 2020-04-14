@@ -21,8 +21,8 @@ import com.netflix.genie.agent.execution.CleanupStrategy;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,9 +50,9 @@ public class CleanupJobDirectoryStage extends ExecutionStage {
     }
 
     @Override
-    protected void attemptTransition(
+    protected void attemptStageAction(
         final ExecutionContext executionContext
-    ) throws RetryableTransitionException, FatalTransitionException {
+    ) throws RetryableJobExecutionException, FatalJobExecutionException {
         final File jobDirectory = executionContext.getJobDirectory();
         final CleanupStrategy cleanupStrategy = executionContext.getCleanupStrategy();
 
@@ -64,7 +64,7 @@ public class CleanupJobDirectoryStage extends ExecutionStage {
                     cleanupStrategy
                 );
             } catch (final IOException e) {
-                throw new RetryableTransitionException("Failed to cleanup job directory", e);
+                throw new RetryableJobExecutionException("Failed to cleanup job directory", e);
             }
         }
     }

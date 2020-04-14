@@ -20,11 +20,11 @@ package com.netflix.genie.agent.execution.statemachine
 import spock.lang.Specification
 
 
-class RetryableTransitionExceptionSpec extends Specification {
+class RetryableJobExecutionExceptionSpec extends Specification {
 
     def "Constructor"() {
         when:
-        Exception e = new RetryableTransitionException("...", new IOException("..."))
+        Exception e = new RetryableJobExecutionException("...", new IOException("..."))
 
         then:
         e.getCause().getClass() == IOException

@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.exceptions.SetUpJobException
 import com.netflix.genie.agent.execution.services.JobSetupService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import spock.lang.Specification
 
@@ -44,7 +44,7 @@ class CreateJobScriptStageSpec extends Specification {
 
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
@@ -58,14 +58,14 @@ class CreateJobScriptStageSpec extends Specification {
         SetUpJobException setupException = Mock(SetUpJobException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobSpecification() >> jobSpec
         1 * executionContext.getJobDirectory() >> jobDir
         1 * jobSetupService.createJobScript(jobSpec, jobDir) >> { throw setupException }
         0 * executionContext.setJobScript(jobScript)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == setupException
     }
 }

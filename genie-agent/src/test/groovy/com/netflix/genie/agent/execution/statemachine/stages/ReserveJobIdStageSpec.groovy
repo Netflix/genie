@@ -21,8 +21,8 @@ import com.netflix.genie.agent.execution.exceptions.JobReservationException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.AgentJobRequest
 import com.netflix.genie.common.external.dtos.v4.JobStatus
@@ -48,7 +48,7 @@ class ReserveJobIdStageSpec extends Specification {
 
     def "AttemptTransition -- pre-reserved job"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.isPreResolved() >> true
@@ -59,7 +59,7 @@ class ReserveJobIdStageSpec extends Specification {
 
     def "AttemptTransition -- new job"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.isPreResolved() >> false
@@ -76,17 +76,17 @@ class ReserveJobIdStageSpec extends Specification {
         Throwable reservationException = Mock(JobReservationException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.isPreResolved() >> false
         1 * executionContext.getRequestedJobId() >> jobId
         1 * executionContext.getAgentJobRequest() >> jobRequest
         1 * executionContext.getAgentClientMetadata() >> agentClientMetadata
-        1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> { throw reservationException}
+        1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> { throw reservationException }
         0 * executionContext.setCurrentJobStatus(JobStatus.RESERVED)
         0 * executionContext.setReservedJobId(jobId)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == reservationException
     }
 
@@ -95,17 +95,17 @@ class ReserveJobIdStageSpec extends Specification {
         Throwable reservationException = Mock(GenieRuntimeException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.isPreResolved() >> false
         1 * executionContext.getRequestedJobId() >> jobId
         1 * executionContext.getAgentJobRequest() >> jobRequest
         1 * executionContext.getAgentClientMetadata() >> agentClientMetadata
-        1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> { throw reservationException}
+        1 * agentJobService.reserveJobId(jobRequest, agentClientMetadata) >> { throw reservationException }
         0 * executionContext.setCurrentJobStatus(JobStatus.RESERVED)
         0 * executionContext.setReservedJobId(jobId)
-        def e = thrown(RetryableTransitionException)
+        def e = thrown(RetryableJobExecutionException)
         e.getCause() == reservationException
     }
 }

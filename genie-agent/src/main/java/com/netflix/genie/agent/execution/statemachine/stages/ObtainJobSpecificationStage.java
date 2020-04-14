@@ -20,11 +20,11 @@ package com.netflix.genie.agent.execution.statemachine.stages;
 import com.netflix.genie.agent.cli.UserConsole;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
-import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
-import com.netflix.genie.agent.execution.statemachine.States;
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
+import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
@@ -51,9 +51,9 @@ public class ObtainJobSpecificationStage extends ExecutionStage {
     }
 
     @Override
-    protected void attemptTransition(
+    protected void attemptStageAction(
         final ExecutionContext executionContext
-    ) throws RetryableTransitionException, FatalTransitionException {
+    ) throws RetryableJobExecutionException, FatalJobExecutionException {
 
         final String reservedJobId = executionContext.getReservedJobId();
         assert reservedJobId != null;

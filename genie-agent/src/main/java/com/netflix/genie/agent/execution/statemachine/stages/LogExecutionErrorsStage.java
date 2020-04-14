@@ -18,8 +18,8 @@
 package com.netflix.genie.agent.execution.statemachine.stages;
 
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,9 +43,9 @@ public class LogExecutionErrorsStage extends com.netflix.genie.agent.execution.s
     }
 
     @Override
-    protected void attemptTransition(
+    protected void attemptStageAction(
         final ExecutionContext executionContext
-    ) throws RetryableTransitionException, FatalTransitionException {
+    ) throws RetryableJobExecutionException, FatalJobExecutionException {
 
         final List<ExecutionContext.TransitionExceptionRecord> records;
         records = executionContext.getTransitionExceptionRecords();
@@ -61,7 +61,7 @@ public class LogExecutionErrorsStage extends com.netflix.genie.agent.execution.s
 
                     log.info(
                         " * {} error in state {}: {} - {}",
-                        exception instanceof FatalTransitionException ? "Fatal" : "Retryable",
+                        exception instanceof FatalJobExecutionException ? "Fatal" : "Retryable",
                         state.name(),
                         exception.getClass().getSimpleName(),
                         exception.getMessage()

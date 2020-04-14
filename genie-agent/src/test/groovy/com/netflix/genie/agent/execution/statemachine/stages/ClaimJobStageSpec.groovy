@@ -21,8 +21,8 @@ import com.netflix.genie.agent.execution.exceptions.JobReservationException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import com.netflix.genie.common.dto.JobStatusMessages
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.JobStatus
@@ -46,7 +46,7 @@ class ClaimJobStageSpec extends Specification {
 
     def "AttemptTransition - success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -62,7 +62,7 @@ class ClaimJobStageSpec extends Specification {
         Exception reservationException = new JobReservationException("...")
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -70,7 +70,7 @@ class ClaimJobStageSpec extends Specification {
         1 * agentJobService.claimJob(jobId, agentClientMetadata) >> { throw reservationException }
         0 * executionContext.setCurrentJobStatus(JobStatus.CLAIMED)
         0 * executionContext.setClaimedJobId(jobId)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == reservationException
     }
 
@@ -78,7 +78,7 @@ class ClaimJobStageSpec extends Specification {
         Exception genieRuntimeException = new GenieRuntimeException("...")
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -86,7 +86,7 @@ class ClaimJobStageSpec extends Specification {
         1 * agentJobService.claimJob(jobId, agentClientMetadata) >> { throw genieRuntimeException }
         0 * executionContext.setCurrentJobStatus(JobStatus.CLAIMED)
         0 * executionContext.setClaimedJobId(jobId)
-        def e = thrown(RetryableTransitionException)
+        def e = thrown(RetryableJobExecutionException)
         e.getCause() == genieRuntimeException
     }
 }

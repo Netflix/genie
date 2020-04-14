@@ -22,8 +22,8 @@ import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
@@ -53,9 +53,9 @@ public class HandshakeStage extends ExecutionStage {
     }
 
     @Override
-    protected void attemptTransition(
+    protected void attemptStageAction(
         final ExecutionContext executionContext
-    ) throws RetryableTransitionException, FatalTransitionException {
+    ) throws RetryableJobExecutionException, FatalJobExecutionException {
 
         final AgentClientMetadata agentClientMetadata = executionContext.getAgentClientMetadata();
         assert agentClientMetadata != null;

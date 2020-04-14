@@ -21,19 +21,19 @@ package com.netflix.genie.agent.execution.statemachine
 import spock.lang.Specification
 
 
-class FatalTransitionExceptionSpec extends Specification {
+class FatalJobExecutionExceptionSpec extends Specification {
     void setup() {
     }
 
     def "Construct"() {
         setup:
-        FatalTransitionException e1 = new FatalTransitionException(
+        FatalJobExecutionException e1 = new FatalJobExecutionException(
             States.CREATE_JOB_DIRECTORY,
             "...",
             new IOException("...")
         )
 
-        FatalTransitionException e2 = new FatalTransitionException(
+        FatalJobExecutionException e2 = new FatalJobExecutionException(
             States.CREATE_JOB_DIRECTORY,
             "..."
         )

@@ -22,7 +22,7 @@ import com.beust.jcommander.ParametersDelegate;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException;
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import lombok.Getter;
@@ -78,7 +78,7 @@ class ExecCommand implements AgentCommand {
         final JobStatus finalJobStatus = executionContext.getCurrentJobStatus();
         final boolean jobLaunched = executionContext.isJobLaunched();
 
-        final FatalTransitionException fatalException = executionContext.getExecutionAbortedFatalException();
+        final FatalJobExecutionException fatalException = executionContext.getExecutionAbortedFatalException();
 
         if (fatalException != null) {
             UserConsole.getLogger().error(

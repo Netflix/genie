@@ -29,7 +29,7 @@ class RelocateLogFileStageSpec extends Specification {
     File jobDir
 
     @Rule
-    TemporaryFolder temporaryFolder  = new TemporaryFolder()
+    TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     void setup() {
         this.jobDir = temporaryFolder.getRoot()
@@ -39,7 +39,7 @@ class RelocateLogFileStageSpec extends Specification {
 
     def "AttemptTransition"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> jobDir

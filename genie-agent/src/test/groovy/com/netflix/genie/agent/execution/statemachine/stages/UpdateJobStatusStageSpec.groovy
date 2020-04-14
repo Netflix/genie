@@ -21,8 +21,8 @@ import com.netflix.genie.agent.execution.exceptions.ChangeJobStatusException
 import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
-import com.netflix.genie.agent.execution.statemachine.FatalTransitionException
-import com.netflix.genie.agent.execution.statemachine.RetryableTransitionException
+import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
+import com.netflix.genie.agent.execution.statemachine.RetryableJobExecutionException
 import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import spock.lang.Specification
@@ -53,7 +53,7 @@ abstract class UpdateJobStatusStageSpec extends Specification {
 
     def "AttemptTransition -- success"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -66,7 +66,7 @@ abstract class UpdateJobStatusStageSpec extends Specification {
 
     def "AttemptTransition -- skip due to invalid status"() {
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -82,7 +82,7 @@ abstract class UpdateJobStatusStageSpec extends Specification {
         Throwable changeStatusException = Mock(ChangeJobStatusException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -91,7 +91,7 @@ abstract class UpdateJobStatusStageSpec extends Specification {
         1 * executionContext.getNextJobStatusMessage() >> nextStatusMessage
         1 * agentJobService.changeJobStatus(jobId, currentStatus, nextStatus, nextStatusMessage) >> { throw changeStatusException }
         0 * executionContext.setCurrentJobStatus(nextStatus)
-        def e = thrown(FatalTransitionException)
+        def e = thrown(FatalJobExecutionException)
         e.getCause() == changeStatusException
     }
 
@@ -100,7 +100,7 @@ abstract class UpdateJobStatusStageSpec extends Specification {
         Throwable changeStatusException = Mock(GenieRuntimeException)
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getReservedJobId() >> jobId
@@ -109,7 +109,7 @@ abstract class UpdateJobStatusStageSpec extends Specification {
         1 * executionContext.getNextJobStatusMessage() >> nextStatusMessage
         1 * agentJobService.changeJobStatus(jobId, currentStatus, nextStatus, nextStatusMessage) >> { throw changeStatusException }
         0 * executionContext.setCurrentJobStatus(nextStatus)
-        def e = thrown(RetryableTransitionException)
+        def e = thrown(RetryableJobExecutionException)
         e.getCause() == changeStatusException
     }
 }

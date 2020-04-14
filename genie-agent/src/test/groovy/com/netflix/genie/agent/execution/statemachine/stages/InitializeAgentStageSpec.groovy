@@ -41,7 +41,7 @@ class InitializeAgentStageSpec extends Specification {
         String pid = "12345"
 
         when:
-        stage.attemptTransition(executionContext)
+        stage.attemptStageAction(executionContext)
 
         then:
         1 * agentMetadata.getAgentHostName() >> host
