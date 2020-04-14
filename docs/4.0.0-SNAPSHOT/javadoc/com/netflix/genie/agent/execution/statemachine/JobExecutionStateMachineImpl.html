@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" target="_top">Frames</a></li>
@@ -114,7 +114,7 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">JobExecutionStateMachineImpl</span>
 extends java.lang.Object
 implements <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></pre>
-<div class="block">Implementation of JobExecutionStateMachine.</div>
+<div class="block">Implementation of the job execution state machine.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
@@ -137,9 +137,9 @@ implements <a href="../../../../../../com/netflix/genie/agent/execution/statemac
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#JobExecutionStateMachineImpl-org.springframework.statemachine.StateMachine-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.List-">JobExecutionStateMachineImpl</a></span>(org.springframework.statemachine.StateMachine&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a>,<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a>&gt;&nbsp;stateMachine,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#JobExecutionStateMachineImpl-java.util.List-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.Collection-">JobExecutionStateMachineImpl</a></span>(java.util.List&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a>&gt;&nbsp;executionStages,
                             <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext,
-                            java.util.List&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a>&gt;&nbsp;executionStages)</code>
+                            java.util.Collection&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a>&gt;&nbsp;listeners)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -164,21 +164,8 @@ implements <a href="../../../../../../com/netflix/genie/agent/execution/statemac
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#start--">start</a></span>()</code>
-<div class="block">Starts the state machine and returns.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#stop--">stop</a></span>()</code>
-<div class="block">Request early termination of the state machine, for example in response to user submitting a kill via API or
- ctrl-c.</div>
-</td>
-</tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#waitForStop--">waitForStop</a></span>()</code>
-<div class="block">Waits for the state machine to stop executing (i.e.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#run--">run</a></span>()</code>
+<div class="block">Runs the state machine until completion.</div>
 </td>
 </tr>
 </table>
@@ -188,6 +175,13 @@ implements <a href="../../../../../../com/netflix/genie/agent/execution/statemac
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
 <code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine">
+<!--   -->
+</a>
+<h3>Methods inherited from interface&nbsp;com.netflix.genie.agent.execution.statemachine.<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></h3>
+<code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#getExecutionContext--">getExecutionContext</a>, <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#getExecutionStages--">getExecutionStages</a></code></li>
 </ul>
 </li>
 </ul>
@@ -203,21 +197,21 @@ implements <a href="../../../../../../com/netflix/genie/agent/execution/statemac
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobExecutionStateMachineImpl-org.springframework.statemachine.StateMachine-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.List-">
+<a name="JobExecutionStateMachineImpl-java.util.List-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JobExecutionStateMachineImpl</h4>
-<pre>public&nbsp;JobExecutionStateMachineImpl(org.springframework.statemachine.StateMachine&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a>,<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a>&gt;&nbsp;stateMachine,
+<pre>public&nbsp;JobExecutionStateMachineImpl(java.util.List&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a>&gt;&nbsp;executionStages,
                                     <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext,
-                                    java.util.List&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a>&gt;&nbsp;executionStages)</pre>
+                                    java.util.Collection&lt;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a>&gt;&nbsp;listeners)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>stateMachine</code> - the state machine</dd>
-<dd><code>executionContext</code> - the execution context</dd>
-<dd><code>executionStages</code> - the execution stages</dd>
+<dd><code>executionStages</code> - the (ordered) list of execution stages</dd>
+<dd><code>executionContext</code> - the execution context passed across stages during execution</dd>
+<dd><code>listeners</code> - the list of listeners</dd>
 </dl>
 </li>
 </ul>
@@ -229,57 +223,17 @@ implements <a href="../../../../../../com/netflix/genie/agent/execution/statemac
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="start--">
+<a name="run--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>start</h4>
-<pre>public&nbsp;void&nbsp;start()</pre>
-<div class="block">Starts the state machine and returns.</div>
+<h4>run</h4>
+<pre>public&nbsp;void&nbsp;run()</pre>
+<div class="block">Runs the state machine until completion.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#start--">start</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></code></dd>
-</dl>
-</li>
-</ul>
-<a name="waitForStop--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>waitForStop</h4>
-<pre>public&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a>&nbsp;waitForStop()
-                   throws java.lang.InterruptedException</pre>
-<div class="block">Waits for the state machine to stop executing (i.e. reach a terminal state).</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#waitForStop--">waitForStop</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the final state in which the machine stopped</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.lang.InterruptedException</code> - if the waiting thread is interrupted</dd>
-</dl>
-</li>
-</ul>
-<a name="stop--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>stop</h4>
-<pre>public&nbsp;void&nbsp;stop()</pre>
-<div class="block">Request early termination of the state machine, for example in response to user submitting a kill via API or
- ctrl-c.
- <p>
- Notice:
- - Transition actions are not interrupted. Shutdown procedure will start after the currently executing transition
-   action has completed
- - Some transition actions are still performed before the program exits. For example publish the updated final job
-   status server-side, or archiving logs.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#stop--">stop</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#run--">run</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -324,7 +278,7 @@ implements <a href="../../../../../../com/netflix/genie/agent/execution/statemac
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" target="_top">Frames</a></li>

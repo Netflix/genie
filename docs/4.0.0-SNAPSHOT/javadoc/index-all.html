@@ -380,6 +380,18 @@
 <dd>
 <div class="block">The three possible Admin resources in Genie.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#afterStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-java.lang.Exception-">afterStateActionAttempt(States, Exception)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked after the action associated with a given state is invoked.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#afterStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-java.lang.Exception-">afterStateActionAttempt(States, Exception)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked after the action associated with a given state is invoked.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#afterStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-java.lang.Exception-">afterStateActionAttempt(States, Exception)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked after the action associated with a given state is invoked.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#AGENT_HOSTNAME">AGENT_HOSTNAME</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html#AGENT_JAR_PLACEHOLDER">AGENT_JAR_PLACEHOLDER</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/LocalAgentLauncherProperties.html" title="class in com.netflix.genie.web.properties">LocalAgentLauncherProperties</a></dt>
@@ -985,45 +997,45 @@
 <dd>
 <div class="block">The attachment service to use.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></dt>
 <dd>
 <div class="block">Action associated with this stage.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ArchiveJobOutputsStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ArchiveJobOutputsStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ArchiveJobOutputsStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ArchiveJobOutputsStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ArchiveJobOutputsStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ArchiveJobOutputsStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ClaimJobStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ClaimJobStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ClaimJobStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ClaimJobStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ClaimJobStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ClaimJobStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CleanupJobDirectoryStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CleanupJobDirectoryStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CleanupJobDirectoryStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CleanupJobDirectoryStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CleanupJobDirectoryStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CleanupJobDirectoryStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ConfigureExecutionStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ConfigureExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ConfigureExecutionStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobDirectoryStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobDirectoryStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CreateJobDirectoryStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobDirectoryStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobDirectoryStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CreateJobDirectoryStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobScriptStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobScriptStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CreateJobScriptStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobScriptStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/CreateJobScriptStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">CreateJobScriptStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/DetermineJobFinalStatusStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/DetermineJobFinalStatusStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">DetermineJobFinalStatusStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/DetermineJobFinalStatusStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/DetermineJobFinalStatusStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">DetermineJobFinalStatusStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/DownloadDependenciesStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/DownloadDependenciesStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">DownloadDependenciesStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/DownloadDependenciesStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/DownloadDependenciesStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">DownloadDependenciesStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/HandshakeStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/HandshakeStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">HandshakeStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/HandshakeStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/HandshakeStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">HandshakeStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/InitializeAgentStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/InitializeAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">InitializeAgentStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/InitializeAgentStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/InitializeAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">InitializeAgentStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/LaunchJobStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/LaunchJobStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">LaunchJobStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/LaunchJobStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/LaunchJobStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">LaunchJobStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/LogExecutionErrorsStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/LogExecutionErrorsStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">LogExecutionErrorsStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/LogExecutionErrorsStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/LogExecutionErrorsStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">LogExecutionErrorsStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ObtainJobSpecificationStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ObtainJobSpecificationStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ObtainJobSpecificationStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ObtainJobSpecificationStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ObtainJobSpecificationStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ObtainJobSpecificationStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RefreshManifestStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RefreshManifestStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RelocateLogFileStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RelocateLogFileStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ReserveJobIdStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ReserveJobIdStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ReserveJobIdStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ReserveJobIdStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ReserveJobIdStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ReserveJobIdStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ShutdownStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/ShutdownStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">ShutdownStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">WaitJobCompletionStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction(ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">WaitJobCompletionStage</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/data/entities/AuditEntity.html" title="class in com.netflix.genie.web.data.entities"><span class="typeNameLink">AuditEntity</span></a> - Class in <a href="com/netflix/genie/web/data/entities/package-summary.html">com.netflix.genie.web.data.entities</a></dt>
 <dd>
@@ -1107,6 +1119,18 @@
 <dt><a href="com/netflix/genie/common/dto/search/BaseSearchResult.html" title="class in com.netflix.genie.common.dto.search"><span class="typeNameLink">BaseSearchResult</span></a> - Class in <a href="com/netflix/genie/common/dto/search/package-summary.html">com.netflix.genie.common.dto.search</a></dt>
 <dd>
 <div class="block">Base class for search results containing common fields.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#beforeStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-">beforeStateActionAttempt(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked before the action associated to a given state is invoked.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#beforeStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-">beforeStateActionAttempt(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked before the action associated to a given state is invoked.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#beforeStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-">beforeStateActionAttempt(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked before the action associated to a given state is invoked.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/agent/inspectors/impl/BlacklistedVersionAgentMetadataInspector.html" title="class in com.netflix.genie.web.agent.inspectors.impl"><span class="typeNameLink">BlacklistedVersionAgentMetadataInspector</span></a> - Class in <a href="com/netflix/genie/web/agent/inspectors/impl/package-summary.html">com.netflix.genie.web.agent.inspectors.impl</a></dt>
 <dd>
@@ -2943,6 +2967,21 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/DefaultMailServiceImpl.html#DefaultMailServiceImpl--">DefaultMailServiceImpl()</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/DefaultMailServiceImpl.html" title="class in com.netflix.genie.web.services.impl">DefaultMailServiceImpl</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#delayedStateActionRetry-com.netflix.genie.agent.execution.statemachine.States-long-">delayedStateActionRetry(States, long)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
+ result of a retryable exception on the previous attempt.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#delayedStateActionRetry-com.netflix.genie.agent.execution.statemachine.States-long-">delayedStateActionRetry(States, long)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
+ result of a retryable exception on the previous attempt.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#delayedStateActionRetry-com.netflix.genie.agent.execution.statemachine.States-long-">delayedStateActionRetry(States, long)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
+ result of a retryable exception on the previous attempt.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/AttachmentService.html#delete-java.lang.String-">delete(String)</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/AttachmentService.html" title="interface in com.netflix.genie.web.services">AttachmentService</a></dt>
 <dd>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>
@@ -3445,11 +3484,6 @@
 <dd>
 <div class="block">Evaluate a given script.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#eventNotAccepted-org.springframework.messaging.Message-">eventNotAccepted(Message&lt;Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Events</span></a> - Enum in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
-<dd>
-<div class="block">Events that trigger execution state machine transition.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/spring/autoconfigure/events/EventsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.events"><span class="typeNameLink">EventsAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/web/spring/autoconfigure/events/package-summary.html">com.netflix.genie.web.spring.autoconfigure.events</a></dt>
 <dd>
 <div class="block">Configuration related to Eventing within the Genie application.</div>
@@ -3464,7 +3498,7 @@
 <dd>
 <div class="block">The name of the <code>PropertyFilter</code> used to serialize Genie exceptions.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.statemachine.ExecutionContext-com.netflix.genie.agent.execution.services.KillService-">execCommand(ExecCommand.ExecCommandArguments, JobExecutionStateMachine, ExecutionContext, KillService)</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-">execCommand(ExecCommand.ExecCommandArguments, JobExecutionStateMachine, KillService)</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a lazy bean definition for an <code>ExecCommand</code>.</div>
 </dd>
@@ -3520,6 +3554,21 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/JobExecutionModeSelector.html#executeWithAgent-com.netflix.genie.common.dto.JobRequest-javax.servlet.http.HttpServletRequest-">executeWithAgent(JobRequest, HttpServletRequest)</a></span> - Method in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/JobExecutionModeSelector.html" title="class in com.netflix.genie.web.util">JobExecutionModeSelector</a></dt>
 <dd>
 <div class="block">Inspect the incoming request and decide whether to execute using the new Agent-based execution mode.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#executionAborted-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">executionAborted(States, FatalJobExecutionException)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine encounters a fatal exception in a critical state, which causes the execution to
+ abort.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#executionAborted-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">executionAborted(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine encounters a fatal exception in a critical state, which causes the execution to
+ abort.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#executionAborted-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">executionAborted(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine encounters a fatal exception in a critical state, which causes the execution to
+ abort.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html" title="class in com.netflix.genie.agent.execution"><span class="typeNameLink">ExecutionAutoConfiguration</span></a> - Class in <a href="com/netflix/genie/agent/execution/package-summary.html">com.netflix.genie.agent.execution</a></dt>
 <dd>
@@ -3646,7 +3695,6 @@
 <dd>
 <div class="block">The cron expression for when the cleanup task should occur.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#extendedStateChanged-java.lang.Object-java.lang.Object-">extendedStateChanged(Object, Object)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
 </dl>
 <a name="I:F">
 <!--   -->
@@ -3721,15 +3769,27 @@
 <dd>
 <div class="block">Tag value to denote failure (used with TagKeys.STATUS).</div>
 </dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">FatalTransitionException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#fatalException-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">fatalException(States, FatalJobExecutionException)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
-<div class="block">Fatal exception that should stop the state machine, for example, claiming a job that is not in claimable state.</div>
+<div class="block">Invoked when the state machine encounters a fatal exception while invoking the action for a given state.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html#FatalTransitionException-com.netflix.genie.agent.execution.statemachine.States-java.lang.String-">FatalTransitionException(States, String)</a></span> - Constructor for exception com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#fatalException-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">fatalException(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine encounters a fatal exception while invoking the action for a given state.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#fatalException-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">fatalException(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine encounters a fatal exception while invoking the action for a given state.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">FatalJobExecutionException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
+<dd>
+<div class="block">Fatal exception that should stop execution early.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html#FatalJobExecutionException-com.netflix.genie.agent.execution.statemachine.States-java.lang.String-">FatalJobExecutionException(States, String)</a></span> - Constructor for exception com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></dt>
 <dd>
 <div class="block">Constructor without cause.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html#FatalTransitionException-com.netflix.genie.agent.execution.statemachine.States-java.lang.String-java.lang.Throwable-">FatalTransitionException(States, String, Throwable)</a></span> - Constructor for exception com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html#FatalJobExecutionException-com.netflix.genie.agent.execution.statemachine.States-java.lang.String-java.lang.Throwable-">FatalJobExecutionException(States, String, Throwable)</a></span> - Constructor for exception com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -3845,6 +3905,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/util/GenieObjectMapper.html#FILTER_PROVIDER">FILTER_PROVIDER</a></span> - Static variable in class com.netflix.genie.common.external.util.<a href="com/netflix/genie/common/external/util/GenieObjectMapper.html" title="class in com.netflix.genie.common.external.util">GenieObjectMapper</a></dt>
 <dd>
 <div class="block">The <code>FilterProvider</code> to be installed in the <code>ObjectMapper</code>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/States.html#FINAL_STATE">FINAL_STATE</a></span> - Static variable in enum com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a></dt>
+<dd>
+<div class="block">Final pseudo-state.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaApplicationSpecs.html#find-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-">find(String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, String)</a></span> - Static method in class com.netflix.genie.web.data.repositories.jpa.specifications.<a href="com/netflix/genie/web/data/repositories/jpa/specifications/JpaApplicationSpecs.html" title="class in com.netflix.genie.web.data.repositories.jpa.specifications">JpaApplicationSpecs</a></dt>
 <dd>
@@ -5718,6 +5782,14 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.html#getExecutableArgs--">getExecutableArgs()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/JobSpecification.html" title="class in com.netflix.genie.common.external.dtos.v4">JobSpecification</a></dt>
 <dd>
 <div class="block">Returns an unmodifiable list of executable and arguments provided by the Command resolved to.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#getExecutionContext--">getExecutionContext()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></dt>
+<dd>
+<div class="block">Get the execution context.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#getExecutionStages--">getExecutionStages()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></dt>
+<dd>
+<div class="block">Get the list of execution stages.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/GenieAgentRunner.html#getExitCode--">getExitCode()</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli">GenieAgentRunner</a></dt>
 <dd>&nbsp;</dd>
@@ -7735,6 +7807,10 @@
 <dd>
 <div class="block">Initialize the job.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/States.html#INITIAL_STATE">INITIAL_STATE</a></span> - Static variable in enum com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a></dt>
+<dd>
+<div class="block">Initial pseudo-state.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/InitializeAgentStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">InitializeAgentStage</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
 <dd>
 <div class="block">Performs generic initialization.</div>
@@ -8430,7 +8506,7 @@
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">JobExecutionListener</span></a> - Interface in <a href="com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">com.netflix.genie.agent.execution.statemachine.listeners</a></dt>
 <dd>
-<div class="block">Interface for StateMachineListener for JobExecutionStateMachine.</div>
+<div class="block">Listener of job execution.</div>
 </dd>
 <dt><a href="com/netflix/genie/client/interceptors/JobExecutionModeInterceptor.html" title="class in com.netflix.genie.client.interceptors"><span class="typeNameLink">JobExecutionModeInterceptor</span></a> - Class in <a href="com/netflix/genie/client/interceptors/package-summary.html">com.netflix.genie.client.interceptors</a></dt>
 <dd>
@@ -8473,9 +8549,9 @@
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">JobExecutionStateMachineImpl</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
 <dd>
-<div class="block">Implementation of JobExecutionStateMachine.</div>
+<div class="block">Implementation of the job execution state machine.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#JobExecutionStateMachineImpl-org.springframework.statemachine.StateMachine-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.List-">JobExecutionStateMachineImpl(StateMachine&lt;States, Events&gt;, ExecutionContext, List&lt;ExecutionStage&gt;)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#JobExecutionStateMachineImpl-java.util.List-com.netflix.genie.agent.execution.statemachine.ExecutionContext-java.util.Collection-">JobExecutionStateMachineImpl(List&lt;ExecutionStage&gt;, ExecutionContext, Collection&lt;JobExecutionListener&gt;)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9927,7 +10003,6 @@
 <dd>
 <div class="block">Updates the created and updated timestamps to be creation time.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#onExecute-org.springframework.statemachine.StateMachine-org.springframework.statemachine.action.Action-long-">onExecute(StateMachine&lt;States, Events&gt;, Action&lt;States, Events&gt;, long)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/job/JobMonitoringCoordinator.html#onJobFinished-com.netflix.genie.web.events.JobFinishedEvent-">onJobFinished(JobFinishedEvent)</a></span> - Method in class com.netflix.genie.web.tasks.job.<a href="com/netflix/genie/web/tasks/job/JobMonitoringCoordinator.html" title="class in com.netflix.genie.web.tasks.job">JobMonitoringCoordinator</a></dt>
 <dd>
 <div class="block">When a job is finished this event is fired.</div>
@@ -11065,11 +11140,11 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">RetryableTransitionException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">RetryableJobExecutionException</span></a> - Exception in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
 <dd>
 <div class="block">Exception thrown by state machine transition for retryable errors (e.g, network error talking to server).</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html#RetryableTransitionException-java.lang.String-java.lang.Throwable-">RetryableTransitionException(String, Throwable)</a></span> - Constructor for exception com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html#RetryableJobExecutionException-java.lang.String-java.lang.Throwable-">RetryableJobExecutionException(String, Throwable)</a></span> - Constructor for exception com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -11113,6 +11188,14 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/GenieAgentRunner.html#run-java.lang.String...-">run(String...)</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli">GenieAgentRunner</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#run--">run()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></dt>
+<dd>
+<div class="block">Runs the state machine until completion.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#run--">run()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
+<dd>
+<div class="block">Runs the state machine until completion.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/jobs/JobLauncher.html#run--">run()</a></span> - Method in class com.netflix.genie.web.jobs.<a href="com/netflix/genie/web/jobs/JobLauncher.html" title="class in com.netflix.genie.web.jobs">JobLauncher</a></dt>
 <dd>
 <div class="block">Starts the job setup and launch process once the thread is activated.</div>
@@ -11928,14 +12011,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#start-java.lang.String-">start(String)</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#start--">start()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></dt>
-<dd>
-<div class="block">Starts the state machine and returns.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#start--">start()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
-<dd>
-<div class="block">Starts the state machine and returns.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/ClusterLeaderService.html#start--">start()</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></dt>
 <dd>
 <div class="block">Start the service (i.e.</div>
@@ -11994,16 +12069,72 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html#startService-java.lang.String-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">startService(String, ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartKillServiceStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateChanged-org.springframework.statemachine.state.State-org.springframework.statemachine.state.State-">stateChanged(State&lt;States, Events&gt;, State&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateContext-org.springframework.statemachine.StateContext-">stateContext(StateContext&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateEntered-org.springframework.statemachine.state.State-">stateEntered(State&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateExited-org.springframework.statemachine.state.State-">stateExited(State&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateMachineError-org.springframework.statemachine.StateMachine-java.lang.Exception-">stateMachineError(StateMachine&lt;States, Events&gt;, Exception)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateMachineStarted-org.springframework.statemachine.StateMachine-">stateMachineStarted(StateMachine&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateMachineStopped-org.springframework.statemachine.StateMachine-">stateMachineStopped(StateMachine&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateEntered-com.netflix.genie.agent.execution.statemachine.States-">stateEntered(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine reaches the next state, before any of the logic for that state is evaluated.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateEntered-com.netflix.genie.agent.execution.statemachine.States-">stateEntered(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine reaches the next state, before any of the logic for that state is evaluated.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateEntered-com.netflix.genie.agent.execution.statemachine.States-">stateEntered(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine reaches the next state, before any of the logic for that state is evaluated.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateExited-com.netflix.genie.agent.execution.statemachine.States-">stateExited(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine is done processing a state and it is about to enter the next one.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateExited-com.netflix.genie.agent.execution.statemachine.States-">stateExited(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine is done processing a state and it is about to enter the next one.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateExited-com.netflix.genie.agent.execution.statemachine.States-">stateExited(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine is done processing a state and it is about to enter the next one.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateMachineStarted--">stateMachineStarted()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine starts running.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateMachineStarted--">stateMachineStarted()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine starts running.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateMachineStarted--">stateMachineStarted()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine starts running.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateMachineStopped--">stateMachineStopped()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine stops.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateMachineStopped--">stateMachineStopped()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine stops.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateMachineStopped--">stateMachineStopped()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine stops.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">States</span></a> - Enum in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
 <dd>
 <div class="block">Execution state machine states.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateSkipped-com.netflix.genie.agent.execution.statemachine.States-">stateSkipped(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
+<dd>
+<div class="block">Invoked when the action of a given state is skipped because execution was aborted and the state is set to be
+ skipped in case of aborted execution.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateSkipped-com.netflix.genie.agent.execution.statemachine.States-">stateSkipped(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the action of a given state is skipped because execution was aborted and the state is set to be
+ skipped in case of aborted execution.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateSkipped-com.netflix.genie.agent.execution.statemachine.States-">stateSkipped(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Invoked when the action of a given state is skipped because execution was aborted and the state is set to be
+ skipped in case of aborted execution.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/BaseEntity_.html#status">status</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/BaseEntity_.html" title="class in com.netflix.genie.web.data.entities">BaseEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -12067,16 +12198,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#stop--">stop()</a></span> - Method in class com.netflix.genie.agent.execution.services.impl.grpc.<a href="com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc">GRpcAgentJobKillServiceImpl</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#stop--">stop()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></dt>
-<dd>
-<div class="block">Request early termination of the state machine, for example in response to user submitting a kill via API or
- ctrl-c.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#stop--">stop()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
-<dd>
-<div class="block">Request early termination of the state machine, for example in response to user submitting a kill via API or
- ctrl-c.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/ClusterLeaderService.html#stop--">stop()</a></span> - Method in interface com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/ClusterLeaderService.html" title="interface in com.netflix.genie.web.services">ClusterLeaderService</a></dt>
 <dd>
 <div class="block">Stop the service (i.e.</div>
@@ -12308,6 +12429,8 @@
 <dd>
 <div class="block">Protected constructor for utility class.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html#TIMEOUT_SECONDS">TIMEOUT_SECONDS</a></span> - Static variable in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RefreshManifestStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RefreshManifestStage</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#TIMEOUT_USED">TIMEOUT_USED</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/JobEntity_.html#timeoutUsed">timeoutUsed</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.entities">JobEntity_</a></dt>
@@ -12563,11 +12686,8 @@
 <dd>
 <div class="block">Attempt to convert a Job status string into a known enumeration value from <a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><code>JobStatus</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#transition-org.springframework.statemachine.transition.Transition-">transition(Transition&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#transitionEnded-org.springframework.statemachine.transition.Transition-">transitionEnded(Transition&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html#TransitionExceptionRecord--">TransitionExceptionRecord()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext.TransitionExceptionRecord</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#transitionStarted-org.springframework.statemachine.transition.Transition-">transitionStarted(Transition&lt;States, Events&gt;)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html#transmit-io.grpc.stub.StreamObserver-">transmit(StreamObserver&lt;ServerAckMessage&gt;)</a></span> - Method in class com.netflix.genie.web.agent.apis.rpc.v4.endpoints.<a href="com/netflix/genie/web/agent/apis/rpc/v4/endpoints/GRpcAgentFileStreamServiceImpl.html" title="class in com.netflix.genie.web.agent.apis.rpc.v4.endpoints">GRpcAgentFileStreamServiceImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/entities/ApplicationEntity_.html#type">type</a></span> - Static variable in class com.netflix.genie.web.data.entities.<a href="com/netflix/genie/web/data/entities/ApplicationEntity_.html" title="class in com.netflix.genie.web.data.entities">ApplicationEntity_</a></dt>
 <dd>&nbsp;</dd>
@@ -13003,6 +13123,18 @@
 <dd>
 <div class="block">Utilities for interacting with the user terminal/console.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html#userConsoleLoggingListener--">userConsoleLoggingListener()</a></span> - Method in class com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html" title="class in com.netflix.genie.agent.execution">ExecutionAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>UserConsoleLoggingListener</code></a> bean.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">UserConsoleLoggingListener</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">com.netflix.genie.agent.execution.statemachine.listeners</a></dt>
+<dd>
+<div class="block">Job execution listener that prints messages visible to the user in the console.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#UserConsoleLoggingListener--">UserConsoleLoggingListener()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/data/entities/aggregates/UserJobResourcesAggregate.html" title="interface in com.netflix.genie.web.data.entities.aggregates"><span class="typeNameLink">UserJobResourcesAggregate</span></a> - Interface in <a href="com/netflix/genie/web/data/entities/aggregates/package-summary.html">com.netflix.genie.web.data.entities.aggregates</a></dt>
 <dd>
 <div class="block">An aggregate of running jobs and memory used for a given user.</div>
@@ -13074,10 +13206,6 @@
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/KillService.KillSource.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/KillService.KillSource.html" title="enum in com.netflix.genie.agent.execution.services">KillService.KillSource</a></dt>
-<dd>
-<div class="block">Returns the enum constant of this type with the specified name.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/Events.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this type with the specified name.</div>
 </dd>
@@ -13160,11 +13288,6 @@ the order they are declared.</div>
 the order they are declared.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/services/KillService.KillSource.html#values--">values()</a></span> - Static method in enum com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/KillService.KillSource.html" title="enum in com.netflix.genie.agent.execution.services">KillService.KillSource</a></dt>
-<dd>
-<div class="block">Returns an array containing the constants of this enum type, in
-the order they are declared.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/Events.html#values--">values()</a></span> - Static method in enum com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum type, in
 the order they are declared.</div>
@@ -13287,14 +13410,6 @@ the order they are declared.</div>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/JobClient.html#waitForCompletion-java.lang.String-long-">waitForCompletion(String, long)</a></span> - Method in class com.netflix.genie.client.<a href="com/netflix/genie/client/JobClient.html" title="class in com.netflix.genie.client">JobClient</a></dt>
 <dd>
 <div class="block">Wait for job to complete, until the given timeout.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html#waitForStop--">waitForStop()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a></dt>
-<dd>
-<div class="block">Waits for the state machine to stop executing (i.e.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html#waitForStop--">waitForStop()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></dt>
-<dd>
-<div class="block">Waits for the state machine to stop executing (i.e.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/WaitJobCompletionStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">WaitJobCompletionStage</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
 <dd>

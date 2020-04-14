@@ -158,7 +158,7 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/stages/SetJobStatusInit.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction</a></span>(<a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)</code>
 <div class="block">Action associated with this stage.</div>
 </td>
 </tr>
@@ -213,28 +213,28 @@ extends <a href="../../../../../../../com/netflix/genie/agent/execution/statemac
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">
+<a name="attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>attemptTransition</h4>
-<pre>protected&nbsp;void&nbsp;attemptTransition(<a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)
-                          throws <a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a>,
-                                 <a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">ExecutionStage</a></code></span></div>
+<h4>attemptStageAction</h4>
+<pre>protected&nbsp;void&nbsp;attemptStageAction(<a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)
+                           throws <a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a>,
+                                  <a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">ExecutionStage</a></code></span></div>
 <div class="block">Action associated with this stage. May be skipped if execution is aborted and the stage is defined as skippable,
  or if the action was attempted and threw a fatal exception, or if the retriable attempts were exhausted.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></code></dd>
+<dd><code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>executionContext</code> - the execution context, carrying execution state across actions</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a></code> - in case of error that deserves another attempt (for example, temporary
-                                      failure to connect to the server</dd>
-<dd><code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></code> - in case of error that should not be retried and should cause the execution
-                                      to be aborted (for example, trying to use a job id that was already in use)</dd>
+<dd><code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a></code> - in case of error that deserves another attempt (for example, temporary
+                                        failure to connect to the server</dd>
+<dd><code><a href="../../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></code> - in case of error that should not be retried (for example, trying to use a
+                                        job id that was already in use)</dd>
 </dl>
 </li>
 </ul>

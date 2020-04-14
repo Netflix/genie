@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -156,6 +156,12 @@ extends java.lang.Object</pre>
 <div class="block">Provide a lazy <a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>LoggingListener</code></a> bean.</div>
 </td>
 </tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html#userConsoleLoggingListener--">userConsoleLoggingListener</a></span>()</code>
+<div class="block">Provide a lazy <a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>UserConsoleLoggingListener</code></a> bean.</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -198,17 +204,34 @@ extends java.lang.Object</pre>
 <a name="loggingListener--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>loggingListener</h4>
 <pre>@Bean
  @Lazy
- @ConditionalOnMissingBean
+ @ConditionalOnMissingBean(value=<a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener.class</a>)
 public&nbsp;<a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a>&nbsp;loggingListener()</pre>
 <div class="block">Provide a lazy <a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>LoggingListener</code></a> bean.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>LoggingListener</code></a> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="userConsoleLoggingListener--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>userConsoleLoggingListener</h4>
+<pre>@Bean
+ @Lazy
+ @ConditionalOnMissingBean(value=<a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener.class</a>)
+public&nbsp;<a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a>&nbsp;userConsoleLoggingListener()</pre>
+<div class="block">Provide a lazy <a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>UserConsoleLoggingListener</code></a> bean.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <a href="../../../../../com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>UserConsoleLoggingListener</code></a> instance</dd>
 </dl>
 </li>
 </ul>

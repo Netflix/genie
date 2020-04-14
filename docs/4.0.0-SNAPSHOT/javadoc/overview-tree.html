@@ -784,7 +784,7 @@
 <li type="circle">com.netflix.genie.agent.execution.exceptions.<a href="com/netflix/genie/agent/execution/exceptions/LockException.html" title="class in com.netflix.genie.agent.execution.exceptions"><span class="typeNameLink">LockException</span></a></li>
 <li type="circle">java.lang.RuntimeException
 <ul>
-<li type="circle">com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">FatalTransitionException</span></a></li>
+<li type="circle">com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">FatalJobExecutionException</span></a></li>
 <li type="circle">com.netflix.genie.common.internal.exceptions.unchecked.<a href="com/netflix/genie/common/internal/exceptions/unchecked/GenieRuntimeException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked"><span class="typeNameLink">GenieRuntimeException</span></a>
 <ul>
 <li type="circle">com.netflix.genie.common.internal.exceptions.unchecked.<a href="com/netflix/genie/common/internal/exceptions/unchecked/GenieAgentRejectedException.html" title="class in com.netflix.genie.common.internal.exceptions.unchecked"><span class="typeNameLink">GenieAgentRejectedException</span></a></li>
@@ -799,7 +799,7 @@
 </ul>
 </li>
 <li type="circle">com.netflix.genie.agent.execution.exceptions.<a href="com/netflix/genie/agent/execution/exceptions/InvalidStateException.html" title="class in com.netflix.genie.agent.execution.exceptions"><span class="typeNameLink">InvalidStateException</span></a></li>
-<li type="circle">com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">RetryableTransitionException</span></a></li>
+<li type="circle">com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">RetryableJobExecutionException</span></a></li>
 </ul>
 </li>
 <li type="circle">com.netflix.genie.agent.execution.exceptions.<a href="com/netflix/genie/agent/execution/exceptions/SetUpJobException.html" title="class in com.netflix.genie.agent.execution.exceptions"><span class="typeNameLink">SetUpJobException</span></a></li>
@@ -816,6 +816,7 @@
 <li type="circle">com.netflix.genie.web.properties.converters.<a href="com/netflix/genie/web/properties/converters/URIPropertyConverter.html" title="class in com.netflix.genie.web.properties.converters"><span class="typeNameLink">URIPropertyConverter</span></a> (implements org.springframework.core.convert.converter.Converter&lt;S,T&gt;)</li>
 <li type="circle">com.netflix.genie.client.interceptors.<a href="com/netflix/genie/client/interceptors/UserAgentInsertInterceptor.html" title="class in com.netflix.genie.client.interceptors"><span class="typeNameLink">UserAgentInsertInterceptor</span></a> (implements okhttp3.Interceptor)</li>
 <li type="circle">com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/UserConsole.html" title="class in com.netflix.genie.agent.cli"><span class="typeNameLink">UserConsole</span></a></li>
+<li type="circle">com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">UserConsoleLoggingListener</span></a> (implements com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a>)</li>
 <li type="circle">com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/UserMetricsProperties.html" title="class in com.netflix.genie.web.properties"><span class="typeNameLink">UserMetricsProperties</span></a></li>
 <li type="circle">com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/UserResourcesSummary.html" title="class in com.netflix.genie.common.dto"><span class="typeNameLink">UserResourcesSummary</span></a></li>
 <li type="circle">com.netflix.genie.ui.controllers.<a href="com/netflix/genie/ui/controllers/UserRestController.html" title="class in com.netflix.genie.ui.controllers"><span class="typeNameLink">UserRestController</span></a></li>
@@ -828,11 +829,6 @@
 </ul>
 <h2 title="Interface Hierarchy">Interface Hierarchy</h2>
 <ul>
-<li type="circle">org.springframework.statemachine.action.ActionListener&lt;S,E&gt;
-<ul>
-<li type="circle">com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">JobExecutionListener</span></a> (also extends org.springframework.statemachine.listener.StateMachineListener&lt;S,E&gt;)</li>
-</ul>
-</li>
 <li type="circle">com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/AgentCommand.html" title="interface in com.netflix.genie.agent.cli"><span class="typeNameLink">AgentCommand</span></a></li>
 <li type="circle">com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/AgentConnectionPersistenceService.html" title="interface in com.netflix.genie.web.data.services"><span class="typeNameLink">AgentConnectionPersistenceService</span></a></li>
 <li type="circle">com.netflix.genie.agent.execution.services.<a href="com/netflix/genie/agent/execution/services/AgentFileStreamService.html" title="interface in com.netflix.genie.agent.execution.services"><span class="typeNameLink">AgentFileStreamService</span></a></li>
@@ -1055,6 +1051,7 @@
 <li type="circle">com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobCoordinatorService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">JobCoordinatorService</span></a></li>
 <li type="circle">com.netflix.genie.common.internal.services.<a href="com/netflix/genie/common/internal/services/JobDirectoryManifestCreatorService.html" title="interface in com.netflix.genie.common.internal.services"><span class="typeNameLink">JobDirectoryManifestCreatorService</span></a></li>
 <li type="circle">com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobDirectoryServerService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">JobDirectoryServerService</span></a></li>
+<li type="circle">com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">JobExecutionListener</span></a></li>
 <li type="circle">com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobFileService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">JobFileService</span></a></li>
 <li type="circle">com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobKillService.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">JobKillService</span></a></li>
 <li type="circle">com.netflix.genie.web.services.<a href="com/netflix/genie/web/services/JobKillServiceV4.html" title="interface in com.netflix.genie.web.services"><span class="typeNameLink">JobKillServiceV4</span></a></li>
@@ -1162,11 +1159,6 @@
 <li type="circle">com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/JobRequestProjection.html" title="interface in com.netflix.genie.web.data.entities.projections"><span class="typeNameLink">JobRequestProjection</span></a> (also extends com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/JobCommonFieldsProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">JobCommonFieldsProjection</a>)</li>
 </ul>
 </li>
-<li type="circle">org.springframework.statemachine.listener.StateMachineListener&lt;S,E&gt;
-<ul>
-<li type="circle">com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">JobExecutionListener</span></a> (also extends org.springframework.statemachine.action.ActionListener&lt;S,E&gt;)</li>
-</ul>
-</li>
 <li type="circle">com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/StatusProjection.html" title="interface in com.netflix.genie.web.data.entities.projections"><span class="typeNameLink">StatusProjection</span></a>
 <ul>
 <li type="circle">com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/JobProjection.html" title="interface in com.netflix.genie.web.data.entities.projections"><span class="typeNameLink">JobProjection</span></a> (also extends com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/JobArchiveLocationProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">JobArchiveLocationProjection</a>, com.netflix.genie.web.data.entities.projections.<a href="com/netflix/genie/web/data/entities/projections/JobCommonFieldsProjection.html" title="interface in com.netflix.genie.web.data.entities.projections">JobCommonFieldsProjection</a>)</li>
@@ -1197,7 +1189,6 @@
 <li type="circle">com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ClusterStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">ClusterStatus</span></a></li>
 <li type="circle">com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/CommandStatus.html" title="enum in com.netflix.genie.common.dto"><span class="typeNameLink">CommandStatus</span></a></li>
 <li type="circle">com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4"><span class="typeNameLink">CommandStatus</span></a></li>
-<li type="circle">com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Events</span></a></li>
 <li type="circle">com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ExitCode.html" title="enum in com.netflix.genie.agent.cli"><span class="typeNameLink">ExitCode</span></a></li>
 <li type="circle">com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/ExponentialBackOffTrigger.DelayType.html" title="enum in com.netflix.genie.common.internal.util"><span class="typeNameLink">ExponentialBackOffTrigger.DelayType</span></a></li>
 <li type="circle">com.netflix.genie.web.jobs.<a href="com/netflix/genie/web/jobs/FileType.html" title="enum in com.netflix.genie.web.jobs"><span class="typeNameLink">FileType</span></a></li>

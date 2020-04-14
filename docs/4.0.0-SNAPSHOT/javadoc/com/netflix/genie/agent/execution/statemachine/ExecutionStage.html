@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" target="_top">Frames</a></li>
@@ -168,21 +168,21 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected abstract void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptTransition</a></span>(<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">attemptStageAction</a></span>(<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)</code>
 <div class="block">Action associated with this stage.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>protected <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></code></td>
+<td class="colFirst"><code>protected <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#createFatalException-java.lang.String-java.lang.Throwable-">createFatalException</a></span>(java.lang.String&nbsp;message,
                     java.lang.Throwable&nbsp;cause)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>protected <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></code></td>
+<td class="colFirst"><code>protected <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#createFatalException-java.lang.Throwable-">createFatalException</a></span>(java.lang.Throwable&nbsp;cause)</code>&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code>protected <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a></code></td>
+<td class="colFirst"><code>protected <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#createRetryableException-java.lang.Throwable-">createRetryableException</a></span>(java.lang.Throwable&nbsp;cause)</code>&nbsp;</td>
 </tr>
 </table>
@@ -235,8 +235,8 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>createFatalException</h4>
-<pre>protected&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a>&nbsp;createFatalException(java.lang.String&nbsp;message,
-                                                        java.lang.Throwable&nbsp;cause)</pre>
+<pre>protected&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a>&nbsp;createFatalException(java.lang.String&nbsp;message,
+                                                          java.lang.Throwable&nbsp;cause)</pre>
 </li>
 </ul>
 <a name="createFatalException-java.lang.Throwable-">
@@ -245,7 +245,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>createFatalException</h4>
-<pre>protected&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a>&nbsp;createFatalException(java.lang.Throwable&nbsp;cause)</pre>
+<pre>protected&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a>&nbsp;createFatalException(java.lang.Throwable&nbsp;cause)</pre>
 </li>
 </ul>
 <a name="createRetryableException-java.lang.Throwable-">
@@ -254,28 +254,28 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>createRetryableException</h4>
-<pre>protected&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a>&nbsp;createRetryableException(java.lang.Throwable&nbsp;cause)</pre>
+<pre>protected&nbsp;<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a>&nbsp;createRetryableException(java.lang.Throwable&nbsp;cause)</pre>
 </li>
 </ul>
-<a name="attemptTransition-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">
+<a name="attemptStageAction-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>attemptTransition</h4>
-<pre>protected abstract&nbsp;void&nbsp;attemptTransition(<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)
-                                   throws <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a>,
-                                          <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></pre>
+<h4>attemptStageAction</h4>
+<pre>protected abstract&nbsp;void&nbsp;attemptStageAction(<a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionContext</a>&nbsp;executionContext)
+                                    throws <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a>,
+                                           <a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></pre>
 <div class="block">Action associated with this stage. May be skipped if execution is aborted and the stage is defined as skippable,
  or if the action was attempted and threw a fatal exception, or if the retriable attempts were exhausted.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>executionContext</code> - the execution context, carrying execution state across actions</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a></code> - in case of error that deserves another attempt (for example, temporary
-                                      failure to connect to the server</dd>
-<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></code> - in case of error that should not be retried and should cause the execution
-                                      to be aborted (for example, trying to use a job id that was already in use)</dd>
+<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a></code> - in case of error that deserves another attempt (for example, temporary
+                                        failure to connect to the server</dd>
+<dd><code><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></code> - in case of error that should not be retried (for example, trying to use a
+                                        job id that was already in use)</dd>
 </dl>
 </li>
 </ul>
@@ -307,7 +307,7 @@ extends java.lang.Object</pre>
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/ExecutionContext.TransitionExceptionRecord.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../../index.html?com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" target="_top">Frames</a></li>

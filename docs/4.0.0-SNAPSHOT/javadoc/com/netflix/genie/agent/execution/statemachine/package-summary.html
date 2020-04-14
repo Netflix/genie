@@ -124,7 +124,7 @@
 <tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachineImpl.html" title="class in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachineImpl</a></td>
 <td class="colLast">
-<div class="block">Implementation of JobExecutionStateMachine.</div>
+<div class="block">Implementation of the job execution state machine.</div>
 </td>
 </tr>
 </tbody>
@@ -139,12 +139,6 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/Events.html" title="enum in com.netflix.genie.agent.execution.statemachine">Events</a></td>
-<td class="colLast">
-<div class="block">Events that trigger execution state machine transition.</div>
-</td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine">States</a></td>
 <td class="colLast">
 <div class="block">Execution state machine states.</div>
@@ -162,13 +156,13 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalTransitionException</a></td>
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/FatalJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">FatalJobExecutionException</a></td>
 <td class="colLast">
-<div class="block">Fatal exception that should stop the state machine, for example, claiming a job that is not in claimable state.</div>
+<div class="block">Fatal exception that should stop execution early.</div>
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableTransitionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableTransitionException</a></td>
+<td class="colFirst"><a href="../../../../../../com/netflix/genie/agent/execution/statemachine/RetryableJobExecutionException.html" title="class in com.netflix.genie.agent.execution.statemachine">RetryableJobExecutionException</a></td>
 <td class="colLast">
 <div class="block">Exception thrown by state machine transition for retryable errors (e.g, network error talking to server).</div>
 </td>

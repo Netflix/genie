@@ -128,7 +128,7 @@ var activeTableTab = "activeTableTab";
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code>java.util.Optional&lt;java.util.concurrent.ScheduledFuture&lt;?&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/execution/services/AgentFileStreamService.html#forceServerSync--">forceServerSync</a></span>()</code>
 <div class="block">Request the service perform an update outside of the regular schedule to make sure the server has the most
  up-to-date view of local files.</div>
@@ -194,9 +194,14 @@ var activeTableTab = "activeTableTab";
 <ul class="blockListLast">
 <li class="blockList">
 <h4>forceServerSync</h4>
-<pre>void&nbsp;forceServerSync()</pre>
+<pre>java.util.Optional&lt;java.util.concurrent.ScheduledFuture&lt;?&gt;&gt;&nbsp;forceServerSync()</pre>
 <div class="block">Request the service perform an update outside of the regular schedule to make sure the server has the most
  up-to-date view of local files.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a scheduled future optional, which the caller can use to synchronously wait on the operation completion
+ and outcome. The optional is empty if the task was not scheduled (because the service is not running).</dd>
+</dl>
 </li>
 </ul>
 </li>
