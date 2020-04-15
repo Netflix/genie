@@ -418,17 +418,6 @@ class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBase {
 
     @Test
     @DatabaseSetup("JpaJobSearchServiceImplIntegrationTest/init.xml")
-    void canGetJobStatus() throws GenieException {
-        Assertions.assertThat(this.service.getJobStatus(JOB_1_ID)).isEqualTo(JobStatus.SUCCEEDED);
-        Assertions.assertThat(this.service.getJobStatus(JOB_2_ID)).isEqualTo(JobStatus.INIT);
-        Assertions.assertThat(this.service.getJobStatus(JOB_3_ID)).isEqualTo(JobStatus.RUNNING);
-        Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.getJobStatus(UUID.randomUUID().toString()));
-    }
-
-    @Test
-    @DatabaseSetup("JpaJobSearchServiceImplIntegrationTest/init.xml")
     void canGetJobRequest() throws GenieException {
         final JobRequest job1Request = this.service.getJobRequest(JOB_1_ID);
         Assertions.assertThat(job1Request.getCommandArgs()).contains("-f query.q");

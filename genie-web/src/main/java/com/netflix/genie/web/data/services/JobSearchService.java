@@ -116,17 +116,6 @@ public interface JobSearchService {
     Job getJob(@NotBlank(message = "No id entered. Unable to get job.") String id) throws GenieException;
 
     /**
-     * Get the status of the job with the given id.
-     *
-     * @param id The id of the job to get status for
-     * @return The job status
-     * @throws GenieException When any error, including not found, is encountered
-     * @deprecated Use {@link JobPersistenceService#getJobStatus(String)} instead
-     */
-    @Deprecated
-    JobStatus getJobStatus(@NotBlank String id) throws GenieException;
-
-    /**
      * Get job request for given job id.
      *
      * @param id id of job request to look up

@@ -24,7 +24,7 @@ import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class GRpcJobKillServiceImpl
 
     private final Map<String, StreamObserver<JobKillRegistrationResponse>> parkedJobKillResponseObservers =
         Maps.newConcurrentMap();
-    private final JobSearchService jobSearchService;
+    private final JobPersistenceService jobPersistenceService;
 
     /**
      * Constructor.
@@ -53,7 +53,7 @@ public class GRpcJobKillServiceImpl
      * @param dataServices The {@link DataServices} instance to use
      */
     public GRpcJobKillServiceImpl(final DataServices dataServices) {
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
     }
 
     /**
@@ -97,7 +97,7 @@ public class GRpcJobKillServiceImpl
                 "Job not killed. No response observer found for killing the job with id: " + jobId);
         }
 
-        if (jobSearchService.getJobStatus(jobId).isFinished()) {
+        if (this.jobPersistenceService.getJobStatus(jobId).isFinished()) {
             log.info("v4 job {} was already finished when the kill request came", jobId);
         } else { //Non null response observer and an unfinished job. Send a kill to the agent
             responseObserver.onNext(
