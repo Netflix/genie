@@ -122,7 +122,7 @@ public interface JobSearchService {
      * @return the job
      * @throws GenieException if there is an error
      */
-    JobRequest getJobRequest(@NotBlank String id) throws GenieException;
+    JobRequest getV3JobRequest(@NotBlank String id) throws GenieException;
 
     /**
      * Get job execution for given job id.
