@@ -24,6 +24,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
 import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.ApplicationPersistenceService;
@@ -68,10 +69,7 @@ public class DataAutoConfiguration {
      *
      * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
      * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param applicationRepository  The {@link JpaApplicationRepository} to use
-     * @param clusterRepository      The {@link JpaClusterRepository} to use
-     * @param commandRepository      The {@link JpaCommandRepository} to use
-     * @param criterionRepository    The {@link JpaCriterionRepository} to use
+     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
      * @return A {@link JpaApplicationPersistenceServiceImpl} instance.
      */
     @Bean
@@ -79,19 +77,9 @@ public class DataAutoConfiguration {
     public JpaApplicationPersistenceServiceImpl applicationPersistenceService(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository,
-        final JpaCriterionRepository criterionRepository
+        final JpaRepositories jpaRepositories
     ) {
-        return new JpaApplicationPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            applicationRepository,
-            clusterRepository,
-            commandRepository,
-            criterionRepository
-        );
+        return new JpaApplicationPersistenceServiceImpl(tagPersistenceService, filePersistenceService, jpaRepositories);
     }
 
     /**
@@ -99,10 +87,7 @@ public class DataAutoConfiguration {
      *
      * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
      * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param applicationRepository  The {@link JpaApplicationRepository} to use
-     * @param clusterRepository      The {@link JpaClusterRepository} to use
-     * @param commandRepository      The {@link JpaCommandRepository} to use
-     * @param criterionRepository    The {@link JpaCriterionRepository} to use
+     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
      * @return A {@link JpaClusterPersistenceServiceImpl} instance
      */
     @Bean
@@ -110,19 +95,9 @@ public class DataAutoConfiguration {
     public JpaClusterPersistenceServiceImpl clusterPersistenceService(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository,
-        final JpaCriterionRepository criterionRepository
+        final JpaRepositories jpaRepositories
     ) {
-        return new JpaClusterPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            applicationRepository,
-            clusterRepository,
-            commandRepository,
-            criterionRepository
-        );
+        return new JpaClusterPersistenceServiceImpl(tagPersistenceService, filePersistenceService, jpaRepositories);
     }
 
     /**
@@ -130,10 +105,7 @@ public class DataAutoConfiguration {
      *
      * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
      * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param applicationRepository  The {@link JpaApplicationRepository} to use
-     * @param clusterRepository      The {@link JpaClusterRepository} to use
-     * @param commandRepository      The {@link JpaCommandRepository} to use
-     * @param criterionRepository    The {@link JpaCriterionRepository} to use
+     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
      * @return A {@link JpaCommandPersistenceServiceImpl} instance
      */
     @Bean
@@ -141,19 +113,9 @@ public class DataAutoConfiguration {
     public JpaCommandPersistenceServiceImpl commandPersistenceService(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository,
-        final JpaCriterionRepository criterionRepository
+        final JpaRepositories jpaRepositories
     ) {
-        return new JpaCommandPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            applicationRepository,
-            clusterRepository,
-            commandRepository,
-            criterionRepository
-        );
+        return new JpaCommandPersistenceServiceImpl(tagPersistenceService, filePersistenceService, jpaRepositories);
     }
 
     /**
@@ -187,11 +149,7 @@ public class DataAutoConfiguration {
      *
      * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
      * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param applicationRepository  The {@link JpaApplicationRepository} to use
-     * @param clusterRepository      The {@link JpaClusterRepository} to use
-     * @param commandRepository      The {@link JpaCommandRepository} to use
-     * @param criterionRepository    The {@link JpaCriterionRepository} to use
-     * @param jobRepository          The {@link JpaJobRepository} to use
+     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
      * @param attachmentService      The {@link AttachmentService} implementation to use to store attachments for a job
      *                               before they are converted to dependencies
      * @return Instance of {@link JpaJobPersistenceServiceImpl}
@@ -201,21 +159,13 @@ public class DataAutoConfiguration {
     public JpaJobPersistenceServiceImpl jobPersistenceService(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository,
-        final JpaCriterionRepository criterionRepository,
-        final JpaJobRepository jobRepository,
+        final JpaRepositories jpaRepositories,
         final AttachmentService attachmentService
     ) {
         return new JpaJobPersistenceServiceImpl(
             tagPersistenceService,
             filePersistenceService,
-            applicationRepository,
-            clusterRepository,
-            commandRepository,
-            criterionRepository,
-            jobRepository,
+            jpaRepositories,
             attachmentService
         );
     }
@@ -223,19 +173,13 @@ public class DataAutoConfiguration {
     /**
      * Get a JPA implementation of the {@link JobSearchService} if one didn't already exist.
      *
-     * @param jobRepository     The repository to use for job entities
-     * @param clusterRepository The repository to use for cluster entities
-     * @param commandRepository The repository to use for command entities
+     * @param jpaRepositories The {@link JpaRepositories} containing all the repositories to use
      * @return A {@link JpaJobSearchServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(JobSearchService.class)
-    public JpaJobSearchServiceImpl jobSearchService(
-        final JpaJobRepository jobRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
-    ) {
-        return new JpaJobSearchServiceImpl(jobRepository, clusterRepository, commandRepository);
+    public JpaJobSearchServiceImpl jobSearchService(final JpaRepositories jpaRepositories) {
+        return new JpaJobSearchServiceImpl(jpaRepositories);
     }
 
     /**
@@ -286,6 +230,43 @@ public class DataAutoConfiguration {
             jobPersistenceService,
             jobSearchService,
             tagPersistenceService
+        );
+    }
+
+    /**
+     * Provide a {@link JpaRepositories} container instance if one wasn't already provided.
+     *
+     * @param agentConnectionRepository The {@link JpaAgentConnectionRepository} instance
+     * @param applicationRepository     The {@link JpaApplicationRepository} instance
+     * @param clusterRepository         The {@link JpaClusterRepository} instance
+     * @param commandRepository         The {@link JpaCommandRepository} instance
+     * @param criterionRepository       The {@link JpaCriterionRepository} instance
+     * @param fileRepository            The {@link JpaFileRepository} instance
+     * @param jobRepository             The {@link JpaJobRepository} instance
+     * @param tagRepository             The {@link JpaTagRepository} instance
+     * @return A new {@link JpaRepositories} instance to simplify passing around all repositories
+     */
+    @Bean
+    @ConditionalOnMissingBean(JpaRepositories.class)
+    public JpaRepositories genieJpaRepositories(
+        final JpaAgentConnectionRepository agentConnectionRepository,
+        final JpaApplicationRepository applicationRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository,
+        final JpaCriterionRepository criterionRepository,
+        final JpaFileRepository fileRepository,
+        final JpaJobRepository jobRepository,
+        final JpaTagRepository tagRepository
+    ) {
+        return new JpaRepositories(
+            agentConnectionRepository,
+            applicationRepository,
+            clusterRepository,
+            commandRepository,
+            criterionRepository,
+            fileRepository,
+            jobRepository,
+            tagRepository
         );
     }
 }

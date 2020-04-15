@@ -51,8 +51,8 @@ import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.services.AttachmentService;
 import org.assertj.core.api.Assertions;
@@ -107,14 +107,16 @@ public class JpaJobPersistenceServiceImplTest {
         this.tagPersistenceService = Mockito.mock(JpaTagPersistenceService.class);
         this.filePersistenceService = Mockito.mock(JpaFilePersistenceService.class);
 
+        final JpaRepositories jpaRepositories = Mockito.mock(JpaRepositories.class);
+        Mockito.when(jpaRepositories.getApplicationRepository()).thenReturn(this.applicationRepository);
+        Mockito.when(jpaRepositories.getClusterRepository()).thenReturn(this.clusterRepository);
+        Mockito.when(jpaRepositories.getCommandRepository()).thenReturn(this.commandRepository);
+        Mockito.when(jpaRepositories.getJobRepository()).thenReturn(this.jobRepository);
+
         this.jobPersistenceService = new JpaJobPersistenceServiceImpl(
             this.tagPersistenceService,
             this.filePersistenceService,
-            this.applicationRepository,
-            this.clusterRepository,
-            this.commandRepository,
-            Mockito.mock(JpaCriterionRepository.class),
-            this.jobRepository,
+            jpaRepositories,
             Mockito.mock(AttachmentService.class)
         );
     }

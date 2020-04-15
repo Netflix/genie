@@ -52,6 +52,7 @@ import com.netflix.genie.web.data.repositories.jpa.JpaBaseRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import com.netflix.genie.web.data.repositories.jpa.specifications.JpaJobSpecs;
 import com.netflix.genie.web.data.services.JobSearchService;
 import lombok.extern.slf4j.Slf4j;
@@ -118,18 +119,12 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     /**
      * Constructor.
      *
-     * @param jobRepository     The repository to use for job entities
-     * @param clusterRepository The repository to use for cluster entities
-     * @param commandRepository The repository to use for command entities
+     * @param jpaRepositories The {@link JpaRepositories} containing all the repositories to use
      */
-    public JpaJobSearchServiceImpl(
-        final JpaJobRepository jobRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
-    ) {
-        this.jobRepository = jobRepository;
-        this.clusterRepository = clusterRepository;
-        this.commandRepository = commandRepository;
+    public JpaJobSearchServiceImpl(final JpaRepositories jpaRepositories) {
+        this.jobRepository = jpaRepositories.getJobRepository();
+        this.clusterRepository = jpaRepositories.getClusterRepository();
+        this.commandRepository = jpaRepositories.getCommandRepository();
     }
 
     /**

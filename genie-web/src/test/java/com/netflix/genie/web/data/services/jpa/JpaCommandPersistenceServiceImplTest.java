@@ -31,9 +31,8 @@ import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,13 +72,13 @@ class JpaCommandPersistenceServiceImplTest {
     void setup() {
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
+        final JpaRepositories jpaRepositories = Mockito.mock(JpaRepositories.class);
+        Mockito.when(jpaRepositories.getApplicationRepository()).thenReturn(this.jpaApplicationRepository);
+        Mockito.when(jpaRepositories.getCommandRepository()).thenReturn(this.jpaCommandRepository);
         this.service = new JpaCommandPersistenceServiceImpl(
             Mockito.mock(JpaTagPersistenceService.class),
             Mockito.mock(JpaFilePersistenceService.class),
-            this.jpaApplicationRepository,
-            Mockito.mock(JpaClusterRepository.class),
-            this.jpaCommandRepository,
-            Mockito.mock(JpaCriterionRepository.class)
+            jpaRepositories
         );
     }
 

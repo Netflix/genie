@@ -33,9 +33,8 @@ import com.netflix.genie.web.data.entities.projections.JobClusterProjection;
 import com.netflix.genie.web.data.entities.projections.JobCommandProjection;
 import com.netflix.genie.web.data.entities.projections.JobProjection;
 import com.netflix.genie.web.data.entities.projections.UniqueIdProjection;
-import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,11 +61,9 @@ class JpaJobSearchServiceImplTest {
     @BeforeEach
     void setup() {
         this.jobRepository = Mockito.mock(JpaJobRepository.class);
-        this.service = new JpaJobSearchServiceImpl(
-            this.jobRepository,
-            Mockito.mock(JpaClusterRepository.class),
-            Mockito.mock(JpaCommandRepository.class)
-        );
+        final JpaRepositories jpaRepositories = Mockito.mock(JpaRepositories.class);
+        Mockito.when(jpaRepositories.getJobRepository()).thenReturn(this.jobRepository);
+        this.service = new JpaJobSearchServiceImpl(jpaRepositories);
     }
 
     /**
