@@ -21,10 +21,7 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.Criterion
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.web.data.entities.TagEntity
-import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository
-import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository
-import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository
-import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories
 import spock.lang.Specification
 
 /**
@@ -42,10 +39,7 @@ class JpaBaseServiceSpec extends Specification {
         def service = new JpaBaseService(
             Mock(JpaTagPersistenceService),
             fileService,
-            Mock(JpaApplicationRepository),
-            Mock(JpaClusterRepository),
-            Mock(JpaCommandRepository),
-            Mock(JpaCriterionRepository)
+            Mock(JpaRepositories)
         )
 
         when:
@@ -63,10 +57,7 @@ class JpaBaseServiceSpec extends Specification {
         def service = new JpaBaseService(
             tagService,
             Mock(JpaFilePersistenceService),
-            Mock(JpaApplicationRepository),
-            Mock(JpaClusterRepository),
-            Mock(JpaCommandRepository),
-            Mock(JpaCriterionRepository)
+            Mock(JpaRepositories)
         )
 
         when:
@@ -86,10 +77,7 @@ class JpaBaseServiceSpec extends Specification {
         def service = new JpaBaseService(
             tagService,
             Mock(JpaFilePersistenceService),
-            Mock(JpaApplicationRepository),
-            Mock(JpaClusterRepository),
-            Mock(JpaCommandRepository),
-            Mock(JpaCriterionRepository)
+            Mock(JpaRepositories)
         )
         def criterion = new Criterion.Builder()
             .withId(id)

@@ -64,11 +64,8 @@ import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
-import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
@@ -121,33 +118,18 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      *
      * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
      * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param applicationRepository  The {@link JpaApplicationRepository} to use
-     * @param clusterRepository      The {@link JpaClusterRepository} to use
-     * @param commandRepository      The {@link JpaCommandRepository} to use
-     * @param criterionRepository    The {@link JpaCriterionRepository} to use
-     * @param jobRepository          The {@link JpaJobRepository} to use
+     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
      * @param attachmentService      The {@link AttachmentService} implementation to use to persist attachments before
      *                               converting them to dependencies of the job
      */
     public JpaJobPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository,
-        final JpaCriterionRepository criterionRepository,
-        final JpaJobRepository jobRepository,
+        final JpaRepositories jpaRepositories,
         final AttachmentService attachmentService
     ) {
-        super(
-            tagPersistenceService,
-            filePersistenceService,
-            applicationRepository,
-            clusterRepository,
-            commandRepository,
-            criterionRepository
-        );
-        this.jobRepository = jobRepository;
+        super(tagPersistenceService, filePersistenceService, jpaRepositories);
+        this.jobRepository = jpaRepositories.getJobRepository();
         this.attachmentService = attachmentService;
     }
 

@@ -48,10 +48,7 @@ import com.netflix.genie.web.data.entities.FileEntity;
 import com.netflix.genie.web.data.entities.TagEntity;
 import com.netflix.genie.web.data.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
-import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import com.netflix.genie.web.data.repositories.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import lombok.extern.slf4j.Slf4j;
@@ -98,27 +95,14 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
      *
      * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
      * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param applicationRepository  The {@link JpaApplicationRepository} to use
-     * @param clusterRepository      The {@link JpaClusterRepository} to use
-     * @param commandRepository      The {@link JpaCommandRepository} to use
-     * @param criterionRepository    The {@link JpaCriterionRepository} to use
+     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
      */
     public JpaClusterPersistenceServiceImpl(
         final JpaTagPersistenceService tagPersistenceService,
         final JpaFilePersistenceService filePersistenceService,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository,
-        final JpaCriterionRepository criterionRepository
+        final JpaRepositories jpaRepositories
     ) {
-        super(
-            tagPersistenceService,
-            filePersistenceService,
-            applicationRepository,
-            clusterRepository,
-            commandRepository,
-            criterionRepository
-        );
+        super(tagPersistenceService, filePersistenceService, jpaRepositories);
     }
 
     /**
