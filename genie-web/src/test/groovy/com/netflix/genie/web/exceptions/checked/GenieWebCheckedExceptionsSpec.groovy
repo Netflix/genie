@@ -69,6 +69,7 @@ class GenieWebCheckedExceptionsSpec extends Specification {
         JobDirectoryManifestNotFoundException | _
         JobNotArchivedException               | _
         JobNotFoundException                  | _
+        NotFoundException                     | _
         ResourceSelectionException            | _
         SaveAttachmentException               | _
         ScriptExecutionException              | _
