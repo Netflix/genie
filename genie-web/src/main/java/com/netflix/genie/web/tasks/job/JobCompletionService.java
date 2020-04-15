@@ -275,7 +275,8 @@ public class JobCompletionService {
      */
     private void cleanupProcesses(final String jobId) {
         try {
-            if (!this.jobSearchService.getJobStatus(jobId).equals(JobStatus.INVALID)) {
+            if (!this.jobPersistenceService.getJobStatus(jobId)
+                .equals(com.netflix.genie.common.external.dtos.v4.JobStatus.INVALID)) {
                 this.jobSearchService.getJobExecution(jobId).getProcessId().ifPresent(pid -> {
                     try {
                         final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
@@ -522,7 +523,11 @@ public class JobCompletionService {
         final Optional<String> oJobId = job.getId();
 
         // The deletion of dependencies and archiving only happens for job requests which are not Invalid.
-        if (oJobId.isPresent() && !(this.jobSearchService.getJobStatus(oJobId.get()).equals(JobStatus.INVALID))) {
+        if (oJobId.isPresent()
+            && !
+            (this.jobPersistenceService.getJobStatus(oJobId.get())
+                .equals(com.netflix.genie.common.external.dtos.v4.JobStatus.INVALID))
+        ) {
             final String jobId = oJobId.get();
             final File jobDir = new File(this.baseWorkingDir, jobId);
 
@@ -565,7 +570,8 @@ public class JobCompletionService {
 
         if (email.isPresent() && !Strings.isNullOrEmpty(email.get())) {
             log.debug("Got a job finished event. Sending email: {}", email.get());
-            final JobStatus status = this.jobSearchService.getJobStatus(jobId);
+            final com.netflix.genie.common.external.dtos.v4.JobStatus status
+                = this.jobPersistenceService.getJobStatus(jobId);
 
             final StringBuilder subject = new StringBuilder()
                 .append("Genie Job Finished. Id: [")

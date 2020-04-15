@@ -19,12 +19,13 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.io.Files;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -50,7 +51,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Unit tests for the JobKillServiceV3 class.
+ * Unit tests for the {@link JobKillServiceV3} class.
  *
  * @author tgianos
  * @since 3.0.0
@@ -62,6 +63,7 @@ public class JobKillServiceV3Test {
     private static final int PID = 18243;
     private static final String KILL_REASON = "Killed by test";
     private CommandLine killCommand;
+    private JobPersistenceService jobPersistenceService;
     private JobSearchService jobSearchService;
     private Executor executor;
     private JobKillServiceV3 service;
@@ -83,12 +85,14 @@ public class JobKillServiceV3Test {
         this.genieWorkingDir = new FileSystemResource(tempDirectory);
         Files.createParentDirs(new File(tempDirectory.getPath() + "/" + ID + "/genie/x"));
         this.jobSearchService = Mockito.mock(JobSearchService.class);
+        this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.executor = Mockito.mock(Executor.class);
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
         this.processCheckerFactory = Mockito.mock(ProcessChecker.Factory.class);
         this.processChecker = Mockito.mock(ProcessChecker.class);
         this.dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
+        Mockito.when(this.dataServices.getJobPersistenceService()).thenReturn(this.jobPersistenceService);
+        Mockito.when(this.dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
         this.service = new JobKillServiceV3(
             HOSTNAME,
             this.dataServices,
@@ -97,7 +101,7 @@ public class JobKillServiceV3Test {
             this.genieEventBus,
             this.genieWorkingDir,
             GenieObjectMapper.getMapper(),
-            processCheckerFactory
+            this.processCheckerFactory
         );
 
         this.killCommand = new CommandLine("kill");
@@ -112,7 +116,7 @@ public class JobKillServiceV3Test {
     @Test
     public void wontKillJobIfAlreadyNotRunning() throws GenieException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.of(1));
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
 
@@ -129,7 +133,7 @@ public class JobKillServiceV3Test {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(UUID.randomUUID().toString());
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
 
         this.service.killJob(ID, KILL_REASON);
@@ -147,7 +151,7 @@ public class JobKillServiceV3Test {
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new ExecuteException("blah", 1));
         Mockito.when(
@@ -173,7 +177,7 @@ public class JobKillServiceV3Test {
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(
             this.processCheckerFactory.get(Mockito.eq(PID), Mockito.any(Instant.class))
@@ -197,7 +201,7 @@ public class JobKillServiceV3Test {
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
         Mockito.when(
@@ -221,7 +225,7 @@ public class JobKillServiceV3Test {
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(0, 0);
         Mockito.when(
@@ -257,7 +261,7 @@ public class JobKillServiceV3Test {
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
         Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(
             this.processCheckerFactory.get(Mockito.eq(PID), Mockito.any(Instant.class))
@@ -281,7 +285,7 @@ public class JobKillServiceV3Test {
     @Test
     public void wontKillJobIfAlreadyFinished() throws GenieException, IOException {
         Mockito
-            .when(this.jobSearchService.getJobStatus(ID))
+            .when(this.jobPersistenceService.getJobStatus(ID))
             .thenReturn(JobStatus.SUCCEEDED)
             .thenReturn(JobStatus.FAILED)
             .thenReturn(JobStatus.INVALID)
@@ -306,7 +310,7 @@ public class JobKillServiceV3Test {
     @Test
     public void canKillJobInInitState() throws GenieException, IOException {
         final ArgumentCaptor<JobFinishedEvent> captor = ArgumentCaptor.forClass(JobFinishedEvent.class);
-        Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.INIT);
+        Mockito.when(this.jobPersistenceService.getJobStatus(ID)).thenReturn(JobStatus.INIT);
         this.service.killJob(ID, KILL_REASON);
 
         Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(captor.capture());

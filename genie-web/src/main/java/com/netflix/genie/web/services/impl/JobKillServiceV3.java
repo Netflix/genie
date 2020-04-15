@@ -19,13 +19,14 @@ package com.netflix.genie.web.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.JobPersistenceService;
 import com.netflix.genie.web.data.services.JobSearchService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -58,6 +59,7 @@ import java.time.temporal.ChronoUnit;
 public class JobKillServiceV3 {
 
     private final String hostname;
+    private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final Executor executor;
     private final boolean runAsUser;
@@ -89,6 +91,7 @@ public class JobKillServiceV3 {
         @NotNull final ProcessChecker.Factory processCheckerFactory
     ) {
         this.hostname = hostname;
+        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.jobSearchService = dataServices.getJobSearchService();
         this.executor = executor;
         this.runAsUser = runAsUser;
@@ -116,7 +119,7 @@ public class JobKillServiceV3 {
     ) throws GenieException {
         // Will throw exception if not found
         // TODO: Could instead check JobMonitorCoordinator eventually for in memory check
-        final JobStatus jobStatus = this.jobSearchService.getJobStatus(id);
+        final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(id);
         if (jobStatus == JobStatus.INIT) {
             // Send a job finished event to force system to update the job to killed
             this.genieEventBus.publishSynchronousEvent(

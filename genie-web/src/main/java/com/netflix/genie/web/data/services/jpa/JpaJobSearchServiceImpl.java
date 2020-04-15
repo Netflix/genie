@@ -32,7 +32,6 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.data.entities.BaseEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
@@ -46,7 +45,6 @@ import com.netflix.genie.web.data.entities.projections.JobExecutionProjection;
 import com.netflix.genie.web.data.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.entities.projections.JobProjection;
 import com.netflix.genie.web.data.entities.projections.JobRequestProjection;
-import com.netflix.genie.web.data.entities.projections.StatusProjection;
 import com.netflix.genie.web.data.entities.projections.UniqueIdProjection;
 import com.netflix.genie.web.data.repositories.jpa.JpaBaseRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
@@ -293,23 +291,6 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             this.jobRepository
                 .findByUniqueId(id, JobProjection.class)
                 .orElseThrow(() -> new GenieNotFoundException("No job with id " + id))
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
-        log.debug("Called with id {}", id);
-        return DtoConverters.toV3JobStatus(
-            DtoConverters.toV4JobStatus(
-                this.jobRepository
-                    .findByUniqueId(id, StatusProjection.class)
-                    .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists."))
-                    .getStatus()
-            )
         );
     }
 
