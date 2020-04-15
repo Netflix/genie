@@ -572,7 +572,7 @@ public class JobRestController {
     public EntityModel<JobRequest> getJobRequest(
         @PathVariable("id") final String id) throws GenieException {
         log.info("[getJobRequest] Called for job request with id {}", id);
-        return this.jobRequestModelAssembler.toModel(this.jobSearchService.getJobRequest(id));
+        return this.jobRequestModelAssembler.toModel(this.jobSearchService.getV3JobRequest(id));
     }
 
     /**

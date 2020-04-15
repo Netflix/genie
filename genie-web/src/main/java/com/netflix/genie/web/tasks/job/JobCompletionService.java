@@ -564,7 +564,7 @@ public class JobCompletionService {
      * @throws GenieException If there is any problem.
      */
     private boolean sendEmail(final String jobId) throws GenieException {
-        final JobRequest jobRequest = this.jobSearchService.getJobRequest(jobId);
+        final JobRequest jobRequest = this.jobSearchService.getV3JobRequest(jobId);
         boolean result = false;
         final Optional<String> email = jobRequest.getEmail();
 

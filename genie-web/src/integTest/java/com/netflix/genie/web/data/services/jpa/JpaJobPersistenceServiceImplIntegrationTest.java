@@ -296,7 +296,7 @@ class JpaJobPersistenceServiceImplIntegrationTest extends DBIntegrationTestBase 
             .extracting(JobEntity::isV4)
             .isEqualTo(false);
 
-        this.validateJobRequest(this.jobSearchService.getJobRequest(UNIQUE_ID));
+        this.validateJobRequest(this.jobSearchService.getV3JobRequest(UNIQUE_ID));
         this.validateJob(this.jobSearchService.getJob(UNIQUE_ID));
         this.validateJobExecution(this.jobSearchService.getJobExecution(UNIQUE_ID));
 

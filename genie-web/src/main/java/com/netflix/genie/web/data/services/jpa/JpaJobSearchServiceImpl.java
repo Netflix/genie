@@ -298,7 +298,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public JobRequest getJobRequest(@NotBlank final String id) throws GenieException {
+    public JobRequest getV3JobRequest(@NotBlank final String id) throws GenieException {
         log.debug("Called with id {}", id);
         return JpaServiceUtils.toJobRequestDto(
             this.jobRepository

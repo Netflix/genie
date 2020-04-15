@@ -182,7 +182,7 @@ class JobCompletionServiceSpec extends Specification {
         noExceptionThrown()
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
             .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
-        1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet())
+        1 * jobSearchService.getV3JobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet())
             .withId(jobId).withCommandArgs(COMMAND_ARGS).withEmail('admin@netflix.com').build()
         1 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
         1 * mailService.sendEmail('admin@netflix.com', _ as String, _ as String)

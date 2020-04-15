@@ -419,7 +419,7 @@ class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBase {
     @Test
     @DatabaseSetup("JpaJobSearchServiceImplIntegrationTest/init.xml")
     void canGetJobRequest() throws GenieException {
-        final JobRequest job1Request = this.service.getJobRequest(JOB_1_ID);
+        final JobRequest job1Request = this.service.getV3JobRequest(JOB_1_ID);
         Assertions.assertThat(job1Request.getCommandArgs()).contains("-f query.q");
         Assertions.assertThat(job1Request.getClusterCriterias()).hasSize(2);
         Assertions
@@ -434,11 +434,11 @@ class JpaJobSearchServiceImplIntegrationTest extends DBIntegrationTestBase {
             .assertThat(job1Request.getCommandCriteria())
             .hasSize(3)
             .containsExactlyInAnyOrder("type:spark", "ver:1.6.0", "genie.name:spark");
-        Assertions.assertThat(this.service.getJobRequest(JOB_2_ID).getCommandArgs()).contains("-f spark.jar");
-        Assertions.assertThat(this.service.getJobRequest(JOB_3_ID).getCommandArgs()).contains("-f spark.jar");
+        Assertions.assertThat(this.service.getV3JobRequest(JOB_2_ID).getCommandArgs()).contains("-f spark.jar");
+        Assertions.assertThat(this.service.getV3JobRequest(JOB_3_ID).getCommandArgs()).contains("-f spark.jar");
         Assertions
             .assertThatExceptionOfType(GenieNotFoundException.class)
-            .isThrownBy(() -> this.service.getJobRequest(UUID.randomUUID().toString()));
+            .isThrownBy(() -> this.service.getV3JobRequest(UUID.randomUUID().toString()));
     }
 
     @Test
