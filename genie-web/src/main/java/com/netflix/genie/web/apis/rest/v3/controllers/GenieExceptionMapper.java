@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeExcept
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import com.netflix.genie.web.util.MetricsConstants;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -132,6 +133,8 @@ public class GenieExceptionMapper {
             return new ResponseEntity<>(e, HttpStatus.CONFLICT);
         } else if (e instanceof JobNotFoundException | e instanceof NotFoundException) {
             return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
+        } else if (e instanceof PreconditionFailedException) {
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
