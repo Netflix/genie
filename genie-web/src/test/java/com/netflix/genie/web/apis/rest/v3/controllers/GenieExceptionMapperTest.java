@@ -42,6 +42,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeExcept
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.util.MetricsConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -231,6 +232,7 @@ class GenieExceptionMapperTest {
         exceptions.put(new SaveAttachmentException(), HttpStatus.INTERNAL_SERVER_ERROR);
         exceptions.put(new JobNotFoundException(), HttpStatus.NOT_FOUND);
         exceptions.put(new NotFoundException(), HttpStatus.NOT_FOUND);
+        exceptions.put(new PreconditionFailedException(), HttpStatus.BAD_REQUEST);
 
         for (final Map.Entry<GenieCheckedException, HttpStatus> exception : exceptions.entrySet()) {
             final ResponseEntity<GenieCheckedException> response =
