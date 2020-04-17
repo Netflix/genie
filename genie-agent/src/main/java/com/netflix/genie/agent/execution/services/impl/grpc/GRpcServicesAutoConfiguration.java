@@ -68,7 +68,7 @@ public class GRpcServicesAutoConfiguration {
      *
      * @param jobKillServiceFutureStub The future stub to use for the service communication with the server
      * @param killService              The kill service to use to terminate this agent gracefully
-     * @param taskExecutor             The task executor to use
+     * @param taskScheduler            The task scheduler to use
      * @return A {@link GRpcAgentJobKillServiceImpl} instance
      */
     @Bean
@@ -77,9 +77,9 @@ public class GRpcServicesAutoConfiguration {
     public AgentJobKillService agentJobKillService(
         final JobKillServiceGrpc.JobKillServiceFutureStub jobKillServiceFutureStub,
         final KillService killService,
-        @Qualifier("sharedAgentTaskExecutor") final TaskExecutor taskExecutor
+        @Qualifier("sharedAgentTaskScheduler") final TaskScheduler taskScheduler
     ) {
-        return new GRpcAgentJobKillServiceImpl(jobKillServiceFutureStub, killService, taskExecutor);
+        return new GRpcAgentJobKillServiceImpl(jobKillServiceFutureStub, killService, taskScheduler);
     }
 
     /**

@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.services.KillService
+import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
 import com.netflix.genie.proto.JobKillServiceGrpc
@@ -26,8 +27,11 @@ import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
 import org.junit.Rule
-import org.springframework.core.task.TaskExecutor
+import org.springframework.scheduling.TaskScheduler
+import org.springframework.scheduling.Trigger
 import spock.lang.Specification
+
+import java.util.concurrent.ScheduledFuture
 
 class GRpcAgentJobKillServiceImplSpec extends Specification {
 
@@ -37,126 +41,152 @@ class GRpcAgentJobKillServiceImplSpec extends Specification {
     GRpcAgentJobKillServiceImpl service
     JobKillServiceGrpc.JobKillServiceFutureStub client;
     KillService killService
-    TaskExecutor killExecutor
-    TestJobKillService server
+    TaskScheduler taskScheduler
+    ScheduledFuture<?> periodicTaskScheduledFuture
+    JobKillServiceGrpc.JobKillServiceImplBase server
 
     void setup() {
-        server = new TestJobKillService()
-        grpcServerRule.getServiceRegistry().addService(server)
-        jobId = UUID.randomUUID().toString()
-        client = JobKillServiceGrpc.newFutureStub(grpcServerRule.getChannel())
-        killService = Mock(KillService)
-        killExecutor = Mock(TaskExecutor)
-        service = new GRpcAgentJobKillServiceImpl(client, killService, killExecutor)
+        this.server = Mock(JobKillServiceGrpc.JobKillServiceImplBase)
+        this.grpcServerRule.getServiceRegistry().addService(server)
+        this.jobId = UUID.randomUUID().toString()
+        this.client = JobKillServiceGrpc.newFutureStub(grpcServerRule.getChannel())
+        this.killService = Mock(KillService)
+        this.taskScheduler = Mock(TaskScheduler)
+        this.periodicTaskScheduledFuture = Mock(ScheduledFuture)
+        this.service = new GRpcAgentJobKillServiceImpl(client, killService, taskScheduler)
     }
 
     void cleanup() {
-        service.stop()
         grpcServerRule.getChannel().shutdownNow()
     }
 
-    def "Starting service more than once throws Exception"() {
+    def "Run without kill or errors"() {
+        Runnable task
+        Trigger trigger
+        StreamObserver<JobKillRegistrationResponse> observer
 
         when:
         service.start(jobId)
+
+        then:
+        1 * server.registerForKillNotification(_ as JobKillRegistrationRequest, _ as StreamObserver<JobKillRegistrationResponse>) >> {
+            args ->
+                (args[0] as JobKillRegistrationRequest).getJobId() == jobId
+                observer = args[1] as StreamObserver<JobKillRegistrationResponse>
+        }
+        1 * taskScheduler.schedule(_ as Runnable, _ as Trigger) >> {
+            args ->
+                task = args[0] as Runnable
+                trigger = args[1] as Trigger
+                return periodicTaskScheduledFuture
+        }
+        task != null
+        trigger != null
+        observer != null
+
+        when:
+        task.run()
 
         then:
         noExceptionThrown()
 
         when:
-        service.start(jobId)
+        service.stop()
 
         then:
-        thrown(IllegalStateException)
+        1 * periodicTaskScheduledFuture.cancel(true)
     }
 
-    def "Successfully handle kill notification from the service"() {
-
-        Runnable killCallback
+    def "Kill"() {
+        Runnable task
+        ExponentialBackOffTrigger trigger
+        StreamObserver<JobKillRegistrationResponse> observer
 
         when:
         service.start(jobId)
 
         then:
+        1 * server.registerForKillNotification(_ as JobKillRegistrationRequest, _ as StreamObserver<JobKillRegistrationResponse>) >> {
+            args ->
+                (args[0] as JobKillRegistrationRequest).getJobId() == jobId
+                observer = args[1] as StreamObserver<JobKillRegistrationResponse>
+        }
+        1 * taskScheduler.schedule(_ as Runnable, _ as ExponentialBackOffTrigger) >> {
+            args ->
+                task = args[0] as Runnable
+                trigger = args[1] as ExponentialBackOffTrigger
+                return periodicTaskScheduledFuture
+        }
+        observer != null
+        task != null
+        trigger != null
+
+        when:
+        task.run()
+
+        then:
+        0 * server.registerForKillNotification(_ , _)
+
+        when:
+        observer.onNext(JobKillRegistrationResponse.newInstance())
+        observer.onCompleted()
+
+        then:
         noExceptionThrown()
 
         when:
-        server.sendKill()
-
-        then:
-        1 * killExecutor.execute(_ as Runnable) >> {
-            args -> killCallback = args[0]
-        }
-
-        when:
-        killCallback.run()
+        task.run()
 
         then:
         1 * killService.kill(KillService.KillSource.API_KILL_REQUEST)
     }
 
-    def "Failure registering with the service followed by successful reregistration and kill notification"() {
-        Runnable killCallback
+
+
+    def "Error"() {
+        Runnable task
+        ExponentialBackOffTrigger trigger
+        StreamObserver<JobKillRegistrationResponse> observer
 
         when:
         service.start(jobId)
 
         then:
+        1 * server.registerForKillNotification(_ as JobKillRegistrationRequest, _ as StreamObserver<JobKillRegistrationResponse>) >> {
+            args ->
+                (args[0] as JobKillRegistrationRequest).getJobId() == jobId
+                observer = args[1] as StreamObserver<JobKillRegistrationResponse>
+        }
+        1 * taskScheduler.schedule(_ as Runnable, _ as ExponentialBackOffTrigger) >> {
+            args ->
+                task = args[0] as Runnable
+                trigger = args[1] as ExponentialBackOffTrigger
+                return periodicTaskScheduledFuture
+        }
+        observer != null
+        task != null
+        trigger != null
+
+        when:
+        observer.onError(new RuntimeException())
+
+        then:
         noExceptionThrown()
 
         when:
-        server.sendError()
+        task.run()
 
         then:
-        1 * killExecutor.execute(_ as Runnable) >> {
-            args -> killCallback = args[0]
-        }
+        0 * killService.kill(KillService.KillSource.API_KILL_REQUEST)
 
         when:
-        killCallback.run()
+        task.run()
 
         then:
-        0 * killService.kill(_)
-
-        when:
-        server.sendKill()
-
-        then: "onSuccess callback gets invoked"
-        1 * killExecutor.execute(_ as Runnable) >> {
-            args -> killCallback = args[0]
-        }
-
-        when:
-        killCallback.run()
-
-        then:
-        1 * killService.kill(KillService.KillSource.API_KILL_REQUEST)
-    }
-
-    /**
-     * Mock service for testing.
-     */
-    private class TestJobKillService extends JobKillServiceGrpc.JobKillServiceImplBase {
-
-        StreamObserver<JobKillRegistrationResponse> killResponseObserver
-
-        @Override
-        void registerForKillNotification(
-            final JobKillRegistrationRequest request,
-            final StreamObserver<JobKillRegistrationResponse> responseObserver
-        ) {
-            killResponseObserver = responseObserver
-        }
-
-        void sendError() {
-            killResponseObserver.onError(new StatusRuntimeException(Status.UNAVAILABLE))
-        }
-
-        void sendKill() {
-            killResponseObserver.onNext(
-                JobKillRegistrationResponse.newBuilder().build()
-            )
-            killResponseObserver.onCompleted()
+        1 * server.registerForKillNotification(_ as JobKillRegistrationRequest, _ as StreamObserver<JobKillRegistrationResponse>) >> {
+            args ->
+                (args[0] as JobKillRegistrationRequest).getJobId() == jobId
+                observer = args[1] as StreamObserver<JobKillRegistrationResponse>
         }
     }
 }
