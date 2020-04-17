@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.proto.AgentHeartBeat;
 import com.netflix.genie.proto.HeartBeatServiceGrpc;
 import com.netflix.genie.proto.ServerHeartBeat;
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import io.grpc.stub.StreamObserver;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -47,30 +48,28 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
 
     private static final long HEART_BEAT_PERIOD_MILLIS = 5_000L; // TODO make configurable
     private static final String HEARTBEATING_GAUGE_NAME = "genie.agents.heartbeating.gauge";
+    private final AgentConnectionTrackingService agentConnectionTrackingService;
     private final Map<String, AgentStreamRecord> activeStreamsMap = Maps.newHashMap();
     private final ScheduledFuture<?> sendHeartbeatsFuture;
     private MeterRegistry registry;
-    private final AgentRoutingService agentRoutingService;
 
     /**
      * Constructor.
-     *
-     * @param agentRoutingService The {@link AgentRoutingService} implementation to use
+     *  @param agentConnectionTrackingService The {@link AgentRoutingService} implementation to use
      * @param taskScheduler       The {@link TaskScheduler} instance to use
      * @param registry            The meter registry
      */
     public GRpcHeartBeatServiceImpl(
-        final AgentRoutingService agentRoutingService,
+        final AgentConnectionTrackingService agentConnectionTrackingService,
         final TaskScheduler taskScheduler,
         final MeterRegistry registry
     ) {
-        this.agentRoutingService = agentRoutingService;
+        this.agentConnectionTrackingService = agentConnectionTrackingService;
         this.sendHeartbeatsFuture = taskScheduler.scheduleWithFixedDelay(
             this::sendHeartbeats,
             HEART_BEAT_PERIOD_MILLIS
         );
         this.registry = registry;
-
         this.registry.gaugeMapSize(HEARTBEATING_GAUGE_NAME, Sets.newHashSet(), activeStreamsMap);
     }
 
@@ -84,11 +83,15 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
         }
 
         synchronized (activeStreamsMap) {
+            for (final Map.Entry<String, AgentStreamRecord> agentStreamRecordEntry : activeStreamsMap.entrySet()) {
+                final String streamId = agentStreamRecordEntry.getKey();
+                final AgentStreamRecord agentStreamRecord = agentStreamRecordEntry.getValue();
+                if (agentStreamRecord.hasJobId()) {
+                    this.agentConnectionTrackingService.notifyDisconnected(streamId, agentStreamRecord.getJobId());
+                }
+            }
             for (final AgentStreamRecord agentStreamRecord : activeStreamsMap.values()) {
                 agentStreamRecord.responseObserver.onCompleted();
-                if (agentStreamRecord.hasJobId()) {
-                    notifyAgentDisconnected(agentStreamRecord.getJobId());
-                }
             }
             activeStreamsMap.clear();
         }
@@ -140,12 +143,12 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
         } else if (StringUtils.isBlank(claimedJobId)) {
             log.warn("Ignoring heartbeat lacking job id");
         } else {
-            log.debug("Received heartbeat from agent that claimed job: {}", claimedJobId);
+            log.debug("Received heartbeat for job: {} (stream id: {})", claimedJobId, streamId);
             final boolean isFirstHeartBeat = agentStreamRecord.updateRecord(claimedJobId);
-            // On first heartbeat, notify listeners of a new agent connection
             if (isFirstHeartBeat) {
-                notifyAgentConnected(agentStreamRecord.getJobId());
+                log.info("Received first heartbeat for job: {} (stream id: {})", claimedJobId, streamId);
             }
+            this.agentConnectionTrackingService.notifyHeartbeat(streamId, claimedJobId);
         }
     }
 
@@ -159,10 +162,11 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
         if (agentStreamRecord == null) {
             log.warn("Received completion from an unknown stream");
         } else {
-            agentStreamRecord.responseObserver.onCompleted();
+            log.debug("Received completion from stream {}", streamId);
             if (agentStreamRecord.hasJobId()) {
-                notifyAgentDisconnected(agentStreamRecord.getJobId());
+                this.agentConnectionTrackingService.notifyDisconnected(streamId, agentStreamRecord.getJobId());
             }
+            agentStreamRecord.responseObserver.onCompleted();
         }
     }
 
@@ -176,19 +180,12 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
         if (agentStreamRecord == null) {
             log.warn("Received error from an unknown stream");
         } else {
-            agentStreamRecord.responseObserver.onError(t);
+            log.debug("Received error from stream {}", streamId);
             if (agentStreamRecord.hasJobId()) {
-                notifyAgentDisconnected(agentStreamRecord.getJobId());
+                this.agentConnectionTrackingService.notifyDisconnected(streamId, agentStreamRecord.getJobId());
             }
+            agentStreamRecord.responseObserver.onError(t);
         }
-    }
-
-    private void notifyAgentConnected(final String jobId) {
-        agentRoutingService.handleClientConnected(jobId);
-    }
-
-    private void notifyAgentDisconnected(final String jobId) {
-        agentRoutingService.handleClientDisconnected(jobId);
     }
 
     private static class AgentStreamRecord {

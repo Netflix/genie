@@ -34,7 +34,6 @@ import java.util.Map;
 
 /**
  * Service to kill agent jobs.
- * TODO Register with HeartBeatService to listen for agent stream to become inactive and clean it up.
  *
  * @author standon
  * @since 4.0.0
@@ -68,7 +67,13 @@ public class GRpcJobKillServiceImpl
         final JobKillRegistrationRequest request,
         final StreamObserver<JobKillRegistrationResponse> responseObserver
     ) {
-        parkedJobKillResponseObservers.put(request.getJobId(), responseObserver);
+        final StreamObserver<JobKillRegistrationResponse> existingObserver =
+            parkedJobKillResponseObservers.put(request.getJobId(), responseObserver);
+
+        // If a previous observer/request is present,
+        if (existingObserver != null) {
+            existingObserver.onCompleted();
+        }
     }
 
     /**

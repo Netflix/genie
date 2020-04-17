@@ -19,10 +19,12 @@ package com.netflix.genie.web.spring.autoconfigure.agent.services;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.agent.services.impl.AgentConnectionTrackingServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentMetricsServiceImpl;
@@ -31,9 +33,11 @@ import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
 
 import java.util.List;
 
@@ -67,6 +71,25 @@ public class AgentServicesAutoConfiguration {
             jobResolverService,
             agentFilterService,
             meterRegistry
+        );
+    }
+
+    /**
+     * Get an implementation of {@link AgentConnectionTrackingService} if one hasn't already been defined.
+     *
+     * @param agentRoutingService the agent routing service
+     * @param taskScheduler       the task scheduler
+     * @return A {@link AgentConnectionTrackingServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(AgentConnectionTrackingService.class)
+    public AgentConnectionTrackingService agentConnectionTrackingService(
+        final AgentRoutingService agentRoutingService,
+        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler
+    ) {
+        return new AgentConnectionTrackingServiceImpl(
+            agentRoutingService,
+            taskScheduler
         );
     }
 

@@ -29,8 +29,8 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcHeartBeatServiceImp
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcJobServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcPingServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer;
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentJobService;
-import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.JobSearchService;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -161,8 +161,8 @@ class AgentRpcEndpointsAutoConfigurationTest {
         }
 
         @Bean
-        AgentRoutingService agentRoutingService() {
-            return Mockito.mock(AgentRoutingService.class);
+        AgentConnectionTrackingService agentConnectionTrackingService() {
+            return Mockito.mock(AgentConnectionTrackingService.class);
         }
 
         @Bean

@@ -19,6 +19,7 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints
 
 import com.netflix.genie.proto.AgentHeartBeat
 import com.netflix.genie.proto.ServerHeartBeat
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService
 import com.netflix.genie.web.agent.services.AgentRoutingService
 import io.grpc.stub.StreamObserver
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
@@ -28,7 +29,7 @@ import spock.lang.Specification
 import java.util.concurrent.ScheduledFuture
 
 class GRpcHeartBeatServiceImplSpec extends Specification {
-    AgentRoutingService agentRoutingService
+    AgentConnectionTrackingService agentConnectionTrackingService
     GRpcHeartBeatServiceImpl service
     StreamObserver<ServerHeartBeat> responseObserver
     TaskScheduler taskScheduler
@@ -44,9 +45,9 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
                     return taskFuture
             }
         }
-        this.agentRoutingService = Mock(AgentRoutingService)
+        this.agentConnectionTrackingService = Mock(AgentConnectionTrackingService)
         this.responseObserver = Mock(StreamObserver)
-        this.service = new GRpcHeartBeatServiceImpl(agentRoutingService, taskScheduler, new SimpleMeterRegistry())
+        this.service = new GRpcHeartBeatServiceImpl(agentConnectionTrackingService, taskScheduler, new SimpleMeterRegistry())
         assert task != null
     }
 
@@ -60,6 +61,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         setup:
         String jobId = UUID.randomUUID().toString()
         StreamObserver<ServerHeartBeat> responseObserver = Mock(StreamObserver)
+        String streamId
 
         when:
         StreamObserver<AgentHeartBeat> requestObserver = service.heartbeat(responseObserver)
@@ -71,46 +73,50 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         requestObserver.onNext(AgentHeartBeat.newBuilder().setClaimedJobId("").build())
 
         then:
-        0 * agentRoutingService.handleClientConnected(jobId)
+        0 * agentConnectionTrackingService._
 
         when:
         requestObserver.onNext(AgentHeartBeat.newBuilder().setClaimedJobId(jobId).build())
 
         then:
-        1 * agentRoutingService.handleClientConnected(jobId)
+        1 * agentConnectionTrackingService.notifyHeartbeat(_ as String, jobId) >> {
+            args ->
+                streamId = (args[0] as String)
+        }
+        streamId != null
 
         when:
         requestObserver.onNext(AgentHeartBeat.newBuilder().setClaimedJobId(jobId).build())
 
         then:
-        0 * agentRoutingService.handleClientConnected(jobId)
+        1 * agentConnectionTrackingService.notifyHeartbeat(streamId, jobId)
 
         when:
         requestObserver.onCompleted()
 
         then:
-        1 * agentRoutingService.handleClientDisconnected(jobId)
+        1 * agentConnectionTrackingService.notifyDisconnected(streamId as String, jobId)
         1 * responseObserver.onCompleted()
 
         when:
         requestObserver.onNext(AgentHeartBeat.newBuilder().setClaimedJobId(jobId).build())
 
         then:
-        0 * agentRoutingService.handleClientConnected(jobId)
+        0 * agentConnectionTrackingService._
 
         when:
         requestObserver.onCompleted()
 
         then:
         0 * responseObserver.onCompleted()
-        0 * agentRoutingService.handleClientDisconnected(_ as String)
+        0 * agentConnectionTrackingService._
 
         when:
         requestObserver.onError(new RuntimeException())
 
         then:
         0 * responseObserver.onError(_ as Exception)
-        0 * agentRoutingService.handleClientDisconnected(_ as String)
+        0 * agentConnectionTrackingService._
 
         when:
         service.shutdown()
@@ -118,7 +124,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         then:
         1 * taskFuture.cancel(false)
         0 * responseObserver.onCompleted()
-        0 * agentRoutingService.handleClientDisconnected(_ as String)
+        0 * agentConnectionTrackingService._
     }
 
     def "Connect, heartbeat, error"() {
@@ -126,6 +132,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         String jobId = UUID.randomUUID().toString()
         StreamObserver<ServerHeartBeat> responseObserver = Mock(StreamObserver)
         Exception e = new RuntimeException()
+        String streamId
 
         when:
         StreamObserver<AgentHeartBeat> requestObserver = service.heartbeat(responseObserver)
@@ -137,13 +144,17 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         requestObserver.onNext(AgentHeartBeat.newBuilder().setClaimedJobId(jobId).build())
 
         then:
-        1 * agentRoutingService.handleClientConnected(jobId)
+        1 * agentConnectionTrackingService.notifyHeartbeat(_ as String, jobId) >> {
+            args ->
+                streamId = args[0] as String
+        }
+        streamId != null
 
         when:
         requestObserver.onError(e)
 
         then:
-        1 * agentRoutingService.handleClientDisconnected(jobId)
+        1 * agentConnectionTrackingService.notifyDisconnected(streamId, jobId)
         1 * responseObserver.onError(e)
     }
 
@@ -162,7 +173,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         requestObserver.onCompleted()
 
         then:
-        0 * agentRoutingService.handleClientDisconnected(jobId)
+        0 * agentConnectionTrackingService._
         1 * responseObserver.onCompleted()
     }
 
@@ -181,7 +192,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         requestObserver.onError(e)
 
         then:
-        0 * agentRoutingService.handleClientConnected(_ as String)
+        0 * agentConnectionTrackingService._
         1 * responseObserver.onError(e)
     }
 
@@ -189,6 +200,8 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         setup:
         String jobId1 = UUID.randomUUID().toString()
         String jobId2 = UUID.randomUUID().toString()
+        String streamId1
+        String streamId2
 
         StreamObserver<ServerHeartBeat> responseObserver1 = Mock(StreamObserver)
         StreamObserver<ServerHeartBeat> responseObserver2 = Mock(StreamObserver)
@@ -206,8 +219,16 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         requestObserver2.onNext(AgentHeartBeat.newBuilder().setClaimedJobId(jobId2).build())
 
         then:
-        1 * agentRoutingService.handleClientConnected(jobId1)
-        1 * agentRoutingService.handleClientConnected(jobId2)
+        1 * agentConnectionTrackingService.notifyHeartbeat(_ as String, jobId1) >> {
+            args ->
+                streamId1 = args[0] as String
+        }
+        1 * agentConnectionTrackingService.notifyHeartbeat(_ as String, jobId2) >> {
+            args ->
+                streamId2 = args[0] as String
+        }
+        streamId1 != null
+        streamId2 != null
 
         when:
         task.run()
@@ -222,8 +243,8 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
 
         then:
         1 * taskFuture.cancel(false)
-        1 * agentRoutingService.handleClientDisconnected(jobId1)
-        1 * agentRoutingService.handleClientDisconnected(jobId2)
+        1 * agentConnectionTrackingService.notifyDisconnected(streamId1, jobId1)
+        1 * agentConnectionTrackingService.notifyDisconnected(streamId2, jobId2)
         1 * responseObserver1.onCompleted()
         1 * responseObserver2.onCompleted()
     }
@@ -243,7 +264,7 @@ class GRpcHeartBeatServiceImplSpec extends Specification {
         requestObserver.onNext(AgentHeartBeat.newBuilder().setClaimedJobId(jobId).build())
 
         then:
-        0 * agentRoutingService.handleClientConnected(jobId)
+        0 * agentConnectionTrackingService._
 
         when:
         task.run()
