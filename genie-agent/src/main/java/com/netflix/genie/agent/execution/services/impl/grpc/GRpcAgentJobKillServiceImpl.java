@@ -17,23 +17,29 @@
  */
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.execution.services.AgentJobKillService;
 import com.netflix.genie.agent.execution.services.KillService;
+import com.netflix.genie.common.internal.util.ExponentialBackOffTrigger;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 
 import javax.validation.constraints.NotBlank;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Implementation of the {@link AgentJobKillService}.
+ * Implementation of the {@link AgentJobKillService}, listens for kill coming from server using long-polling.
  *
- * @author standon
+ * Note: this implementation still suffers from a serious flaw: because it is implemented with a unary call,
+ * the server will never realize the client is gone if the connection is broken. This can lead to an accumulation of
+ * parked calls on the server. A new protocol (based on a bidirectional stream) is necessary to solve this problem.
+ *
+ * @author mprimi
  * @since 4.0.0
  */
 @Slf4j
@@ -41,93 +47,135 @@ public class GRpcAgentJobKillServiceImpl implements AgentJobKillService {
 
     private final JobKillServiceGrpc.JobKillServiceFutureStub client;
     private final KillService killService;
-    private final TaskExecutor killTaskExecutor;
-    private ListenableFuture<JobKillRegistrationResponse> jobKillFuture;
-    private boolean started;
+    private final TaskScheduler taskScheduler;
+    private final AtomicBoolean started = new AtomicBoolean(false);
+    private final ExponentialBackOffTrigger trigger;
+    private ScheduledFuture<?> periodicTaskScheduledFuture;
 
     /**
      * Constructor.
      *
-     * @param client           The gRPC client to use to call the server
-     * @param killService      KillService for killing the agent
-     * @param killTaskExecutor A task executor to execute killing the agent
+     * @param client        The gRPC client to use to call the server
+     * @param killService   KillService for killing the agent
+     * @param taskScheduler A task scheduler
      */
     public GRpcAgentJobKillServiceImpl(
         final JobKillServiceGrpc.JobKillServiceFutureStub client,
         final KillService killService,
-        final TaskExecutor killTaskExecutor
+        final TaskScheduler taskScheduler
     ) {
         this.client = client;
         this.killService = killService;
-        this.killTaskExecutor = killTaskExecutor;
-    }
-
-    @Override
-    public synchronized void start(@NotBlank(message = "Job id cannot be blank") final String jobId) {
-        //Service can be started only once
-        if (started) {
-            throw new IllegalStateException("Service can be started only once");
-        }
-
-        registerForRemoteKillNotification(jobId);
-        started = true;
-    }
-
-    @Override
-    public void stop() {
-        cancelPreviousAndUpdateJobKillFuture(null);
-    }
-
-    private void registerForRemoteKillNotification(final String jobId) {
-
-        final ListenableFuture<JobKillRegistrationResponse> future = this.client
-            .registerForKillNotification(
-                JobKillRegistrationRequest.newBuilder()
-                    .setJobId(jobId)
-                    .build()
-            );
-
-        cancelPreviousAndUpdateJobKillFuture(future);
-
-        Futures.addCallback(
-            future,
-            new JobKillFutureCallback(jobId),
-            this.killTaskExecutor
+        this.taskScheduler = taskScheduler;
+        this.trigger = new ExponentialBackOffTrigger(
+            ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_EXECUTION_COMPLETION,
+            500, //TODO make configurable
+            5_000, //TODO make configurable
+            1.2f //TODO make configurable
         );
     }
 
-    /* Cancel the current future */
-    private synchronized void cancelJobKillFuture() {
-        if (this.jobKillFuture != null) {
-            this.jobKillFuture.cancel(false);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized void start(@NotBlank(message = "Job id cannot be blank") final String jobId) {
+        //Service can be started only once
+        if (started.compareAndSet(false, true)) {
+            final PeriodicTask periodicTask = new PeriodicTask(client, killService, jobId, this.trigger);
+
+            // Run once immediately
+            periodicTask.run();
+
+            // Then run on task scheduler periodically
+            this.periodicTaskScheduledFuture = this.taskScheduler.schedule(periodicTask, this.trigger);
         }
     }
 
-    /* Cancel current future and store the new future */
-    private synchronized void cancelPreviousAndUpdateJobKillFuture(
-        final ListenableFuture<JobKillRegistrationResponse> killFuture
-    ) {
-        cancelJobKillFuture();
-        this.jobKillFuture = killFuture;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stop() {
+        if (this.started.compareAndSet(true, false)) {
+            this.periodicTaskScheduledFuture.cancel(true);
+            this.periodicTaskScheduledFuture = null;
+        }
     }
 
-    private class JobKillFutureCallback implements FutureCallback<JobKillRegistrationResponse> {
-
+    private static final class PeriodicTask implements Runnable {
+        private final JobKillServiceGrpc.JobKillServiceFutureStub client;
+        private final KillService killService;
         private final String jobId;
+        private final ExponentialBackOffTrigger trigger;
+        private ListenableFuture<JobKillRegistrationResponse> pendingKillRequestFuture;
 
-        JobKillFutureCallback(final String jobId) {
+        PeriodicTask(
+            final JobKillServiceGrpc.JobKillServiceFutureStub client,
+            final KillService killService,
+            final String jobId,
+            final ExponentialBackOffTrigger trigger
+        ) {
+            this.client = client;
+            this.killService = killService;
             this.jobId = jobId;
+            this.trigger = trigger;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public void onSuccess(final JobKillRegistrationResponse result) {
-            log.info("Received kill signal from server");
-            killService.kill(KillService.KillSource.API_KILL_REQUEST);
+        public void run() {
+            try {
+                this.periodicCheckForKill();
+            } catch (Throwable t) {
+                log.error("Error in periodic kill check task: {}", t.getMessage(), t);
+            }
         }
 
-        @Override
-        public void onFailure(final Throwable t) {
-            registerForRemoteKillNotification(this.jobId);
+        private void periodicCheckForKill() throws InterruptedException {
+
+            if (this.pendingKillRequestFuture == null) {
+                // No pending kill request, create one
+                this.pendingKillRequestFuture = this.client
+                    .registerForKillNotification(
+                        JobKillRegistrationRequest.newBuilder()
+                            .setJobId(jobId)
+                            .build()
+                    );
+            }
+
+            if (!this.pendingKillRequestFuture.isDone()) {
+                // Still waiting for a kill, nothing to do
+                log.debug("Kill request still pending");
+
+            } else {
+                // Kill response received or error
+                JobKillRegistrationResponse killResponse = null;
+                Throwable exception = null;
+
+                try {
+                    killResponse = this.pendingKillRequestFuture.get();
+                } catch (ExecutionException e) {
+                    log.warn("Kill request failed");
+                    exception = e.getCause() != null ? e.getCause() : e;
+                }
+
+                // Delete current pending so a new one will be re-created
+                this.pendingKillRequestFuture = null;
+
+                if (killResponse != null) {
+                    log.info("Received kill signal from server");
+                    this.killService.kill(KillService.KillSource.API_KILL_REQUEST);
+                }
+
+                if (exception != null) {
+                    log.warn("Kill request produced an error", exception);
+                    // Re-schedule this task soon
+                    this.trigger.reset();
+                }
+            }
         }
     }
 }
