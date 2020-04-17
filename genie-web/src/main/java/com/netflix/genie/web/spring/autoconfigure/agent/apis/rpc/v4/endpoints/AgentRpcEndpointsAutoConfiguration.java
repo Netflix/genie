@@ -31,8 +31,8 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcJobKillServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcJobServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.GRpcPingServiceImpl;
 import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorComposer;
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentJobService;
-import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -102,19 +102,19 @@ public class AgentRpcEndpointsAutoConfiguration {
      * Provide an implementation of {@link com.netflix.genie.proto.HeartBeatServiceGrpc.HeartBeatServiceImplBase}
      * if no other is provided.
      *
-     * @param agentRoutingService The {@link AgentRoutingService} implementation to use
-     * @param taskScheduler       The {@link TaskScheduler} instance to use
-     * @param registry            The meter registry
+     * @param agentConnectionTrackingService The {@link AgentConnectionTrackingService} implementation to use
+     * @param taskScheduler                  The {@link TaskScheduler} instance to use
+     * @param registry                       The meter registry
      * @return A {@link GRpcHeartBeatServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(HeartBeatServiceGrpc.HeartBeatServiceImplBase.class)
     public GRpcHeartBeatServiceImpl gRpcHeartBeatService(
-        final AgentRoutingService agentRoutingService,
+        final AgentConnectionTrackingService agentConnectionTrackingService,
         @Qualifier("heartBeatServiceTaskScheduler") final TaskScheduler taskScheduler,
         final MeterRegistry registry
     ) {
-        return new GRpcHeartBeatServiceImpl(agentRoutingService, taskScheduler, registry);
+        return new GRpcHeartBeatServiceImpl(agentConnectionTrackingService, taskScheduler, registry);
     }
 
     /**
