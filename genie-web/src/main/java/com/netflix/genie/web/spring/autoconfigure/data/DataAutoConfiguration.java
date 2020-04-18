@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.data;
 
+import com.netflix.genie.web.data.jpa.services.JpaPersistenceServiceImpl;
 import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
@@ -26,25 +27,8 @@ import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.FilePersistenceService;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
-import com.netflix.genie.web.data.services.TagPersistenceService;
-import com.netflix.genie.web.data.services.jpa.JpaAgentConnectionPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaApplicationPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaClusterPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaCommandPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaFilePersistenceService;
-import com.netflix.genie.web.data.services.jpa.JpaFilePersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaJobPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaJobSearchServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceService;
-import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.services.AttachmentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -65,172 +49,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class DataAutoConfiguration {
 
     /**
-     * The JPA based implementation of the {@link ApplicationPersistenceService} interface.
-     *
-     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
-     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
-     * @return A {@link JpaApplicationPersistenceServiceImpl} instance.
-     */
-    @Bean
-    @ConditionalOnMissingBean(ApplicationPersistenceService.class)
-    public JpaApplicationPersistenceServiceImpl applicationPersistenceService(
-        final JpaTagPersistenceService tagPersistenceService,
-        final JpaFilePersistenceService filePersistenceService,
-        final JpaRepositories jpaRepositories
-    ) {
-        return new JpaApplicationPersistenceServiceImpl(tagPersistenceService, filePersistenceService, jpaRepositories);
-    }
-
-    /**
-     * The JPA implementation of the {@link ClusterPersistenceService} interface.
-     *
-     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
-     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
-     * @return A {@link JpaClusterPersistenceServiceImpl} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(ClusterPersistenceService.class)
-    public JpaClusterPersistenceServiceImpl clusterPersistenceService(
-        final JpaTagPersistenceService tagPersistenceService,
-        final JpaFilePersistenceService filePersistenceService,
-        final JpaRepositories jpaRepositories
-    ) {
-        return new JpaClusterPersistenceServiceImpl(tagPersistenceService, filePersistenceService, jpaRepositories);
-    }
-
-    /**
-     * The JPA implementation of the {@link CommandPersistenceService} interface.
-     *
-     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
-     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
-     * @return A {@link JpaCommandPersistenceServiceImpl} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(CommandPersistenceService.class)
-    public JpaCommandPersistenceServiceImpl commandPersistenceService(
-        final JpaTagPersistenceService tagPersistenceService,
-        final JpaFilePersistenceService filePersistenceService,
-        final JpaRepositories jpaRepositories
-    ) {
-        return new JpaCommandPersistenceServiceImpl(tagPersistenceService, filePersistenceService, jpaRepositories);
-    }
-
-    /**
-     * A JPA implementation of the {@link FilePersistenceService} interface. Also implements
-     * {@link JpaFilePersistenceService}.
-     *
-     * @param fileRepository The repository to use to perform CRUD operations on files
-     * @return A {@link JpaFilePersistenceServiceImpl} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(FilePersistenceService.class)
-    public JpaFilePersistenceServiceImpl filePersistenceService(final JpaFileRepository fileRepository) {
-        return new JpaFilePersistenceServiceImpl(fileRepository);
-    }
-
-    /**
-     * A JPA implementation of the {@link TagPersistenceService} interface. Also implements
-     * {@link JpaTagPersistenceService}.
-     *
-     * @param tagRepository The repository to use to perform CRUD operations on tags
-     * @return A {@link JpaTagPersistenceServiceImpl} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(TagPersistenceService.class)
-    public JpaTagPersistenceServiceImpl tagPersistenceService(final JpaTagRepository tagRepository) {
-        return new JpaTagPersistenceServiceImpl(tagRepository);
-    }
-
-    /**
-     * JPA implementation of the {@link JobPersistenceService} interface.
-     *
-     * @param tagPersistenceService  The {@link JpaTagPersistenceService} to use
-     * @param filePersistenceService The {@link JpaFilePersistenceService} to use
-     * @param jpaRepositories        The {@link JpaRepositories} containing all the repositories to use
-     * @param attachmentService      The {@link AttachmentService} implementation to use to store attachments for a job
-     *                               before they are converted to dependencies
-     * @return Instance of {@link JpaJobPersistenceServiceImpl}
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobPersistenceService.class)
-    public JpaJobPersistenceServiceImpl jobPersistenceService(
-        final JpaTagPersistenceService tagPersistenceService,
-        final JpaFilePersistenceService filePersistenceService,
-        final JpaRepositories jpaRepositories,
-        final AttachmentService attachmentService
-    ) {
-        return new JpaJobPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            jpaRepositories,
-            attachmentService
-        );
-    }
-
-    /**
-     * Get a JPA implementation of the {@link JobSearchService} if one didn't already exist.
-     *
-     * @param jpaRepositories The {@link JpaRepositories} containing all the repositories to use
-     * @return A {@link JpaJobSearchServiceImpl} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(JobSearchService.class)
-    public JpaJobSearchServiceImpl jobSearchService(final JpaRepositories jpaRepositories) {
-        return new JpaJobSearchServiceImpl(jpaRepositories);
-    }
-
-    /**
-     * A JPA implementation of the {@link AgentConnectionPersistenceService} interface.
-     *
-     * @param jpaAgentConnectionRepository The repository to use for agent connection entities
-     * @return A {@link JpaAgentConnectionPersistenceServiceImpl} instance
-     */
-    @Bean
-    @ConditionalOnMissingBean(AgentConnectionPersistenceService.class)
-    public JpaAgentConnectionPersistenceServiceImpl agentConnectionPersistenceService(
-        final JpaAgentConnectionRepository jpaAgentConnectionRepository
-    ) {
-        return new JpaAgentConnectionPersistenceServiceImpl(jpaAgentConnectionRepository);
-    }
-
-    /**
      * Provide a {@link DataServices} instance if one isn't already in the context.
      *
-     * @param agentConnectionPersistenceService The {@link AgentConnectionPersistenceService} implementation to use
-     * @param applicationPersistenceService     The {@link ApplicationPersistenceService} implementation to use
-     * @param clusterPersistenceService         The {@link ClusterPersistenceService} implementation to use
-     * @param commandPersistenceService         The {@link CommandPersistenceService} implementation to use
-     * @param filePersistenceService            The {@link FilePersistenceService} implementation to use
-     * @param jobPersistenceService             The {@link JobPersistenceService} implementation to use
-     * @param jobSearchService                  The {@link JobSearchService} implementation to use
-     * @param tagPersistenceService             The {@link TagPersistenceService} implementation to use
+     * @param persistenceService The {@link PersistenceService} implementation to use
      * @return A {@link DataServices} instance
      */
     @Bean
     @ConditionalOnMissingBean(DataServices.class)
-    public DataServices genieDataServices(
-        final AgentConnectionPersistenceService agentConnectionPersistenceService,
-        final ApplicationPersistenceService applicationPersistenceService,
-        final ClusterPersistenceService clusterPersistenceService,
-        final CommandPersistenceService commandPersistenceService,
-        final FilePersistenceService filePersistenceService,
-        final JobPersistenceService jobPersistenceService,
-        final JobSearchService jobSearchService,
-        final TagPersistenceService tagPersistenceService
-    ) {
-        return new DataServices(
-            agentConnectionPersistenceService,
-            applicationPersistenceService,
-            clusterPersistenceService,
-            commandPersistenceService,
-            filePersistenceService,
-            jobPersistenceService,
-            jobSearchService,
-            tagPersistenceService
-        );
+    public DataServices genieDataServices(final PersistenceService persistenceService) {
+        return new DataServices(persistenceService);
     }
 
     /**
@@ -268,5 +95,22 @@ public class DataAutoConfiguration {
             jobRepository,
             tagRepository
         );
+    }
+
+    /**
+     * Provide a default implementation of {@link PersistenceService} if no other has been defined.
+     *
+     * @param jpaRepositories   The {@link JpaRepositories} for Genie
+     * @param attachmentService The {@link AttachmentService} implementation to use
+     * @return A {@link JpaPersistenceServiceImpl} instance which implements {@link PersistenceService} backed by
+     * JPA and a relational database
+     */
+    @Bean
+    @ConditionalOnMissingBean(PersistenceService.class)
+    public JpaPersistenceServiceImpl geniePersistenceService(
+        final JpaRepositories jpaRepositories,
+        final AttachmentService attachmentService
+    ) {
+        return new JpaPersistenceServiceImpl(jpaRepositories, attachmentService);
     }
 }

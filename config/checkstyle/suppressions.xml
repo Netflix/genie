@@ -5,5 +5,5 @@
 
 <!-- Certain checks can't be handled by @SuppressWarnings. We can put them here... -->
 <suppressions>
-    <suppress checks="FileLength" files="CommandRestControllerIntegrationTest.java"/>
+    <suppress checks="FileLength" files="CommandRestControllerIntegrationTest.java|JpaPersistenceServiceImpl.java"/>
 </suppressions>

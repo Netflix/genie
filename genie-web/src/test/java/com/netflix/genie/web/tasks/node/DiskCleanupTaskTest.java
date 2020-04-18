@@ -17,23 +17,23 @@
  */
 package com.netflix.genie.web.tasks.node;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.TaskUtils;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -41,6 +41,8 @@ import org.springframework.scheduling.Trigger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -52,55 +54,40 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-// TODO: Switch to Junit 5 once boot upgrades to >= junit 5.4 for @TempDir support
-public class DiskCleanupTaskTest {
+class DiskCleanupTaskTest {
 
-    /**
-     * Temporary folder used for storing fake job files. Deleted after tests are done.
-     */
-    @Rule
-    public TemporaryFolder tmpJobDir = new TemporaryFolder();
-
-    /**
-     * Test the constructor on error case.
-     *
-     * @throws IOException on error
-     */
-    @Test(expected = IOException.class)
-    public void cantConstruct() throws IOException {
+    @Test
+    public void cantConstruct() {
         final JobsProperties properties = JobsProperties.getJobsPropertiesDefaults();
         properties.getUsers().setRunAsUserEnabled(false);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(false);
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
-        Assert.assertNotNull(
-            new DiskCleanupTask(
-                new DiskCleanupProperties(),
-                Mockito.mock(TaskScheduler.class),
-                jobsDir,
-                dataServices,
-                properties,
-                Mockito.mock(Executor.class),
-                new SimpleMeterRegistry()
-            )
-        );
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
+        Assertions
+            .assertThatIOException()
+            .isThrownBy(
+                () -> new DiskCleanupTask(
+                    new DiskCleanupProperties(),
+                    Mockito.mock(TaskScheduler.class),
+                    jobsDir,
+                    dataServices,
+                    properties,
+                    Mockito.mock(Executor.class),
+                    new SimpleMeterRegistry()
+                )
+            );
     }
 
-    /**
-     * Test the constructor on error case.
-     *
-     * @throws IOException on error
-     */
     @Test
-    public void wontScheduleOnNonUnixWithSudo() throws IOException {
-        Assume.assumeTrue(!SystemUtils.IS_OS_UNIX);
+    void wontScheduleOnNonUnixWithSudo() throws IOException {
+        Assumptions.assumeTrue(!SystemUtils.IS_OS_UNIX);
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(true);
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
-        Assert.assertNotNull(
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
+        Assertions.assertThat(
             new DiskCleanupTask(
                 new DiskCleanupProperties(),
                 scheduler,
@@ -110,24 +97,19 @@ public class DiskCleanupTaskTest {
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
             )
-        );
+        ).isNotNull();
         Mockito.verify(scheduler, Mockito.never()).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
     }
 
-    /**
-     * Test the constructor.
-     *
-     * @throws IOException on error
-     */
     @Test
-    public void willScheduleOnUnixWithSudo() throws IOException {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+    void willScheduleOnUnixWithSudo() throws IOException {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(true);
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
-        Assert.assertNotNull(
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
+        Assertions.assertThat(
             new DiskCleanupTask(
                 new DiskCleanupProperties(),
                 scheduler,
@@ -137,26 +119,21 @@ public class DiskCleanupTaskTest {
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
             )
-        );
+        ).isNotNull();
         Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
     }
 
-    /**
-     * Test the constructor.
-     *
-     * @throws IOException on error
-     */
     @Test
-    public void willScheduleOnUnixWithoutSudo() throws IOException {
+    void willScheduleOnUnixWithoutSudo() throws IOException {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_UNIX);
         final JobsProperties properties = JobsProperties.getJobsPropertiesDefaults();
         properties.getUsers().setRunAsUserEnabled(false);
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(true);
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
-        Assert.assertNotNull(
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
+        Assertions.assertThat(
             new DiskCleanupTask(
                 new DiskCleanupProperties(),
                 scheduler,
@@ -166,23 +143,18 @@ public class DiskCleanupTaskTest {
                 Mockito.mock(Executor.class),
                 new SimpleMeterRegistry()
             )
-        );
+        ).isNotNull();
         Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
     }
 
-    /**
-     * Make sure we can run successfully when runAsUser is false for the system.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    public void canRunWithoutSudo() throws IOException, GenieException {
+    void canRunWithoutSudo(@TempDir final Path tempDir) throws IOException, GenieException {
         final JobsProperties jobsProperties = JobsProperties.getJobsPropertiesDefaults();
         jobsProperties.getUsers().setRunAsUserEnabled(false);
 
         // Create some random junk file that should be ignored
-        this.tmpJobDir.newFile(UUID.randomUUID().toString());
+        final Path testFile = tempDir.resolve(UUID.randomUUID().toString());
+        Files.write(testFile, Lists.newArrayList("hi", "bye"));
         final DiskCleanupProperties properties = new DiskCleanupProperties();
         final Instant threshold = TaskUtils.getMidnightUTC().minus(properties.getRetention(), ChronoUnit.DAYS);
 
@@ -203,26 +175,26 @@ public class DiskCleanupTaskTest {
         Mockito.when(job4.getStatus()).thenReturn(JobStatus.FAILED);
         Mockito.when(job4.getFinished()).thenReturn(Optional.of(threshold));
 
-        this.createJobDir(job1Id);
-        this.createJobDir(job2Id);
-        this.createJobDir(job3Id);
-        this.createJobDir(job4Id);
-        this.createJobDir(job5Id);
+        this.createJobDir(job1Id, tempDir);
+        this.createJobDir(job2Id, tempDir);
+        this.createJobDir(job3Id, tempDir);
+        this.createJobDir(job4Id, tempDir);
+        this.createJobDir(job5Id, tempDir);
 
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobDir = Mockito.mock(Resource.class);
         Mockito.when(jobDir.exists()).thenReturn(true);
-        Mockito.when(jobDir.getFile()).thenReturn(this.tmpJobDir.getRoot());
-        final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
+        Mockito.when(jobDir.getFile()).thenReturn(tempDir.toFile());
+        final PersistenceService persistenceService = Mockito.mock(PersistenceService.class);
 
-        Mockito.when(jobSearchService.getJob(job1Id)).thenReturn(job1);
-        Mockito.when(jobSearchService.getJob(job2Id)).thenReturn(job2);
-        Mockito.when(jobSearchService.getJob(job3Id)).thenReturn(job3);
-        Mockito.when(jobSearchService.getJob(job4Id)).thenReturn(job4);
-        Mockito.when(jobSearchService.getJob(job5Id)).thenThrow(new GenieServerException("blah"));
+        Mockito.when(persistenceService.getJob(job1Id)).thenReturn(job1);
+        Mockito.when(persistenceService.getJob(job2Id)).thenReturn(job2);
+        Mockito.when(persistenceService.getJob(job3Id)).thenReturn(job3);
+        Mockito.when(persistenceService.getJob(job4Id)).thenReturn(job4);
+        Mockito.when(persistenceService.getJob(job5Id)).thenThrow(new GenieServerException("blah"));
 
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(jobSearchService);
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
 
         final DiskCleanupTask task = new DiskCleanupTask(
             properties,
@@ -234,15 +206,15 @@ public class DiskCleanupTaskTest {
             new SimpleMeterRegistry()
         );
         task.run();
-        Assert.assertTrue(new File(jobDir.getFile(), job1Id).exists());
-        Assert.assertTrue(new File(jobDir.getFile(), job2Id).exists());
-        Assert.assertFalse(new File(jobDir.getFile(), job3Id).exists());
-        Assert.assertTrue(new File(jobDir.getFile(), job4Id).exists());
-        Assert.assertTrue(new File(jobDir.getFile(), job5Id).exists());
+        Assertions.assertThat(new File(jobDir.getFile(), job1Id).exists()).isTrue();
+        Assertions.assertThat(new File(jobDir.getFile(), job2Id).exists()).isTrue();
+        Assertions.assertThat(new File(jobDir.getFile(), job3Id).exists()).isFalse();
+        Assertions.assertThat(new File(jobDir.getFile(), job4Id).exists()).isTrue();
+        Assertions.assertThat(new File(jobDir.getFile(), job5Id).exists()).isTrue();
     }
 
-    private void createJobDir(final String id) throws IOException {
-        final File dir = this.tmpJobDir.newFolder(id);
+    private void createJobDir(final String id, final Path tmpDir) throws IOException {
+        final File dir = Files.createDirectory(tmpDir.resolve(id)).toFile();
 
         for (int i = 0; i < 5; i++) {
             new File(dir, UUID.randomUUID().toString());

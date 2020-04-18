@@ -218,8 +218,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
             responseObserver.onNext(ClaimJobResponse.newBuilder().setSuccessful(true).build());
         } catch (final Exception e) {
             log.error("Error claiming job for request " + request, e);
-            responseObserver.onNext(protoErrorComposer.toProtoClaimJobResponse(e));
-
+            responseObserver.onNext(this.protoErrorComposer.toProtoClaimJobResponse(e));
         }
         responseObserver.onCompleted();
     }

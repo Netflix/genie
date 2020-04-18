@@ -21,7 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -288,13 +289,8 @@ class CommandEntityTest extends EntityTestBase {
         Assertions.assertThat(this.c.getTags()).isEmpty();
     }
 
-    /**
-     * Test setting applications.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
     @Test
-    void testSetApplications() throws GeniePreconditionException {
+    void testSetApplications() throws GenieCheckedException {
         Assertions.assertThat(this.c.getApplications()).isEmpty();
         final ApplicationEntity one = new ApplicationEntity();
         one.setUniqueId("one");
@@ -329,17 +325,17 @@ class CommandEntityTest extends EntityTestBase {
         Mockito.when(two.getUniqueId()).thenReturn(UUID.randomUUID().toString());
 
         Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .assertThatExceptionOfType(PreconditionFailedException.class)
             .isThrownBy(() -> this.c.setApplications(Lists.newArrayList(one, two, one)));
     }
 
     /**
      * Test to make sure we can add an application.
      *
-     * @throws GeniePreconditionException On error
+     * @throws PreconditionFailedException On error
      */
     @Test
-    void canAddApplication() throws GeniePreconditionException {
+    void canAddApplication() throws PreconditionFailedException {
         final String id = UUID.randomUUID().toString();
         final ApplicationEntity app = new ApplicationEntity();
         app.setUniqueId(id);
@@ -352,27 +348,27 @@ class CommandEntityTest extends EntityTestBase {
     /**
      * Test to make sure we can't add an application to a command if it's already in the list.
      *
-     * @throws GeniePreconditionException on duplicate
+     * @throws PreconditionFailedException on duplicate
      */
     @Test
-    void cantAddApplicationThatAlreadyIsInList() throws GeniePreconditionException {
+    void cantAddApplicationThatAlreadyIsInList() throws PreconditionFailedException {
         final String id = UUID.randomUUID().toString();
         final ApplicationEntity app = new ApplicationEntity();
         app.setUniqueId(id);
 
         this.c.addApplication(app);
         Assertions
-            .assertThatExceptionOfType(GeniePreconditionException.class)
+            .assertThatExceptionOfType(PreconditionFailedException.class)
             .isThrownBy(() -> this.c.addApplication(app));
     }
 
     /**
      * Test removing an application.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws PreconditionFailedException If any precondition isn't met.
      */
     @Test
-    void canRemoveApplication() throws GeniePreconditionException {
+    void canRemoveApplication() throws PreconditionFailedException {
         final ApplicationEntity one = new ApplicationEntity();
         one.setUniqueId("one");
         final ApplicationEntity two = new ApplicationEntity();

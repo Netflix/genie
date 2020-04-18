@@ -96,7 +96,7 @@ dependencies {
 
     testCompile(project(":genie-test"))
     testCompile(project(":genie-test-web"))
-    testCompile("com.github.springtestdbunit:spring-test-dbunit")
+    testCompile("com.github.ppodgorsek:spring-test-dbunit-core")
     testCompile("com.jayway.jsonpath:json-path")
     testCompile("net.sf.jtidy:jtidy")
     testCompile("org.apache.tomcat:tomcat-jdbc")

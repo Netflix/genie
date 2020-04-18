@@ -19,10 +19,8 @@ package com.netflix.genie.web.aspects;
 
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
-import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
-import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -100,33 +98,22 @@ public class DataServiceRetryAspect implements Ordered {
      *
      * @param pjp join point
      * @return return the data method response
-     * @throws GenieException           any exception thrown by the data service method
-     * @throws IdAlreadyExistsException When a resource is attempted to be saved but has an unique id conflict
-     * @throws SaveAttachmentException  When a job attachment is attempted to be saved to underlying storage but
-     *                                  can't be
+     * @throws GenieException        any exception thrown by the data service method
+     * @throws GenieCheckedException any exception thrown by one of the data service methods Genie code
      */
     @Around("com.netflix.genie.web.aspects.SystemArchitecture.dataOperation()")
-    public Object profile(final ProceedingJoinPoint pjp) throws
-        GenieException,
-        IdAlreadyExistsException,
-        SaveAttachmentException {
+    public Object profile(final ProceedingJoinPoint pjp) throws GenieException, GenieCheckedException {
         try {
             return retryTemplate.execute(context -> pjp.proceed());
         } catch (
             GenieException
+                | GenieCheckedException
                 | GenieRuntimeException
-                | ConstraintViolationException
-                | IdAlreadyExistsException
-                | SaveAttachmentException e
+                | ConstraintViolationException e
         ) {
             throw e;
         } catch (Throwable e) {
-            // TODO: We need to be careful about this as it throws a checked exception via aspect and could impact
-            //       methods that aren't marked to throw a checked exception. We should probably switch this to runtime
-            throw new GenieServerException(
-                "Failed to execute data service method",
-                e
-            );
+            throw new GenieRuntimeException("Failed to execute data service method", e);
         }
     }
 

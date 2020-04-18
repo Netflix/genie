@@ -19,12 +19,14 @@ package com.netflix.genie.web.agent.apis.rpc.v4.endpoints;
 
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.proto.JobKillRegistrationRequest;
 import com.netflix.genie.proto.JobKillRegistrationResponse;
 import com.netflix.genie.proto.JobKillServiceGrpc;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +47,7 @@ public class GRpcJobKillServiceImpl
 
     private final Map<String, StreamObserver<JobKillRegistrationResponse>> parkedJobKillResponseObservers =
         Maps.newConcurrentMap();
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
 
     /**
      * Constructor.
@@ -53,7 +55,7 @@ public class GRpcJobKillServiceImpl
      * @param dataServices The {@link DataServices} instance to use
      */
     public GRpcJobKillServiceImpl(final DataServices dataServices) {
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
     }
 
     /**
@@ -81,13 +83,13 @@ public class GRpcJobKillServiceImpl
      *
      * @param jobId  id of job to kill
      * @param reason brief reason for requesting the job be killed
-     * @throws GenieServerException in case there is no response observer
-     *                              found to communicate with the agent
+     * @throws GenieServerException in case there is no response observer found to communicate with the agent
      */
     @Override
-    public void killJob(final @NotBlank(message = "No job id entered. Unable to kill job.") String jobId,
-                        final @NotBlank(message = "No reason provided.") String reason) throws GenieException {
-
+    public void killJob(
+        @NotBlank(message = "No job id entered. Unable to kill job.") final String jobId,
+        @NotBlank(message = "No reason provided.") final String reason
+    ) throws GenieException {
         final StreamObserver<JobKillRegistrationResponse> responseObserver =
             parkedJobKillResponseObservers.remove(jobId);
 
@@ -97,15 +99,19 @@ public class GRpcJobKillServiceImpl
                 "Job not killed. No response observer found for killing the job with id: " + jobId);
         }
 
-        if (this.jobPersistenceService.getJobStatus(jobId).isFinished()) {
-            log.info("v4 job {} was already finished when the kill request came", jobId);
-        } else { //Non null response observer and an unfinished job. Send a kill to the agent
-            responseObserver.onNext(
-                JobKillRegistrationResponse.newBuilder().build()
-            );
-            responseObserver.onCompleted();
+        try {
+            if (this.persistenceService.getJobStatus(jobId).isFinished()) {
+                log.info("v4 job {} was already finished when the kill request came", jobId);
+            } else { //Non null response observer and an unfinished job. Send a kill to the agent
+                responseObserver.onNext(
+                    JobKillRegistrationResponse.newBuilder().build()
+                );
+                responseObserver.onCompleted();
 
-            log.info("Agent notified for killing job {}", jobId);
+                log.info("Agent notified for killing job {}", jobId);
+            }
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage(), e);
         }
     }
 }

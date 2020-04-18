@@ -18,14 +18,14 @@
 package com.netflix.genie.web.agent.services.impl
 
 import com.netflix.genie.common.internal.util.GenieHostInfo
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 
 import java.util.function.ToDoubleFunction
 
 /**
- * Specifications for {@link com.netflix.genie.web.agent.services.impl.AgentMetricsServiceImpl}.
+ * Specifications for {@link AgentMetricsServiceImpl}.
  *
  * @author tgianos
  */
@@ -33,16 +33,16 @@ class AgentMetricsServiceImplSpec extends Specification {
 
     def "Can get the number of connected agents on the server"() {
         def hostInfo = Mock(GenieHostInfo)
-        def agentConnectionPersistenceService = Mock(AgentConnectionPersistenceService)
+        def persistenceService = Mock(PersistenceService)
         def meterRegistry = Mock(MeterRegistry)
         def host = "netflix.github.io"
 
         when:
-        def service = new AgentMetricsServiceImpl(hostInfo, agentConnectionPersistenceService, meterRegistry)
+        def service = new AgentMetricsServiceImpl(hostInfo, persistenceService, meterRegistry)
 
         then:
         1 * meterRegistry.gauge(
-            AgentMetricsServiceImpl.CONNECTED_GUAGE_METRIC_NAME,
+            AgentMetricsServiceImpl.CONNECTED_GAUGE_METRIC_NAME,
             _ as AgentMetricsServiceImpl,
             _ as ToDoubleFunction
         )
@@ -52,7 +52,7 @@ class AgentMetricsServiceImplSpec extends Specification {
 
         then:
         1 * hostInfo.getHostname() >> host
-        1 * agentConnectionPersistenceService.getNumAgentConnectionsOnServer(host) >> 3452L
+        1 * persistenceService.getNumAgentConnectionsOnServer(host) >> 3452L
         num == 3452L
     }
 }

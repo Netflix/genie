@@ -18,10 +18,9 @@
 package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.Job;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.util.UUID;
@@ -32,7 +31,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobModelAssemblerTest {
+class JobModelAssemblerTest {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
@@ -42,31 +41,29 @@ public class JobModelAssemblerTest {
     private Job job;
     private JobModelAssembler assembler;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.job = new Job.Builder(NAME, USER, VERSION).withId(ID).build();
         this.assembler = new JobModelAssembler();
     }
 
-    /**
-     * Make sure we can construct the assembler.
-     */
     @Test
     public void canConstruct() {
-        Assert.assertNotNull(this.assembler);
+        Assertions.assertThat(this.assembler).isNotNull();
     }
 
-    /**
-     * Make sure we can convert the DTO to a resource with links.
-     */
     @Test
-    @Ignore
-    public void canConvertToResource() {
+    public void canConvertToModel() {
         final EntityModel<Job> model = this.assembler.toModel(this.job);
-        Assert.assertTrue(model.getLinks().hasSize(1));
-        Assert.assertNotNull(model.getLink("self"));
+        Assertions.assertThat(model.getLinks()).hasSize(9);
+        Assertions.assertThat(model.getLink("self")).isPresent();
+        Assertions.assertThat(model.getLink("output")).isPresent();
+        Assertions.assertThat(model.getLink("request")).isPresent();
+        Assertions.assertThat(model.getLink("execution")).isPresent();
+        Assertions.assertThat(model.getLink("metadata")).isPresent();
+        Assertions.assertThat(model.getLink("status")).isPresent();
+        Assertions.assertThat(model.getLink("cluster")).isPresent();
+        Assertions.assertThat(model.getLink("command")).isPresent();
+        Assertions.assertThat(model.getLink("applications")).isPresent();
     }
 }

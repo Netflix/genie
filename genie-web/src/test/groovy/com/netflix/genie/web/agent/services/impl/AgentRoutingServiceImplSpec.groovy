@@ -19,13 +19,13 @@ package com.netflix.genie.web.agent.services.impl
 
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.agent.services.AgentRoutingService
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
 import spock.lang.Specification
 
 class AgentRoutingServiceImplSpec extends Specification {
     private static final String HOSTNAME = "10.1.2.3"
 
-    AgentConnectionPersistenceService persistenceService = Mock()
+    PersistenceService persistenceService = Mock()
     GenieHostInfo genieHostInfo = Mock()
     AgentRoutingService service
     String jobId

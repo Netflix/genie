@@ -20,7 +20,7 @@ package com.netflix.genie.web.services.impl;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import java.util.UUID;
 class JobMetricsServiceImplTest {
 
     private final String hostName = UUID.randomUUID().toString();
-    private JobSearchService jobSearchService;
+    private PersistenceService persistenceService;
     private JobMetricsServiceImpl jobMetricsService;
 
     /**
@@ -45,9 +45,9 @@ class JobMetricsServiceImplTest {
      */
     @BeforeEach
     void setup() {
-        this.jobSearchService = Mockito.mock(JobSearchService.class);
+        this.persistenceService = Mockito.mock(PersistenceService.class);
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(this.persistenceService);
         this.jobMetricsService = new JobMetricsServiceImpl(dataServices, this.hostName);
     }
 
@@ -57,7 +57,7 @@ class JobMetricsServiceImplTest {
     @Test
     void canGetNumJobs() {
         Mockito
-            .when(this.jobSearchService.getAllActiveJobsOnHost(this.hostName))
+            .when(this.persistenceService.getAllActiveJobsOnHost(this.hostName))
             .thenReturn(
                 Sets.newHashSet(
                     Mockito.mock(Job.class),

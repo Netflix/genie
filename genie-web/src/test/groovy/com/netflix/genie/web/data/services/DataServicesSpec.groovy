@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.data.services
 
+
 import spock.lang.Specification
 
 /**
@@ -27,35 +28,12 @@ import spock.lang.Specification
 class DataServicesSpec extends Specification {
 
     def "can build properly"() {
-        def agentConnectionService = Mock(AgentConnectionPersistenceService)
-        def applicationService = Mock(ApplicationPersistenceService)
-        def clusterService = Mock(ClusterPersistenceService)
-        def commandService = Mock(CommandPersistenceService)
-        def fileService = Mock(FilePersistenceService)
-        def jobService = Mock(JobPersistenceService)
-        def jobSearchService = Mock(JobSearchService)
-        def tagService = Mock(TagPersistenceService)
+        def persistenceService = Mock(PersistenceService)
 
         when:
-        def services = new DataServices(
-            agentConnectionService,
-            applicationService,
-            clusterService,
-            commandService,
-            fileService,
-            jobService,
-            jobSearchService,
-            tagService
-        )
+        def services = new DataServices(persistenceService)
 
         then:
-        services.getAgentConnectionPersistenceService() == agentConnectionService
-        services.getApplicationPersistenceService() == applicationService
-        services.getClusterPersistenceService() == clusterService
-        services.getCommandPersistenceService() == commandService
-        services.getFilePersistenceService() == fileService
-        services.getJobPersistenceService() == jobService
-        services.getJobSearchService() == jobSearchService
-        services.getTagPersistenceService() == tagService
+        services.getPersistenceService() == persistenceService
     }
 }

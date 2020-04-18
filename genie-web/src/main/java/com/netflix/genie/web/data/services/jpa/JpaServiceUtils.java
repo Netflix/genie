@@ -17,9 +17,7 @@
  */
 package com.netflix.genie.web.data.services.jpa;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -32,7 +30,6 @@ import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.data.entities.ApplicationEntity;
-import com.netflix.genie.web.data.entities.BaseEntity;
 import com.netflix.genie.web.data.entities.ClusterEntity;
 import com.netflix.genie.web.data.entities.CommandEntity;
 import com.netflix.genie.web.data.entities.FileEntity;
@@ -163,9 +160,10 @@ public final class JpaServiceUtils {
     /**
      * Convert the data in this job projection into a job DTO for external exposure.
      *
+     * @param jobProjection The data from the database
      * @return The job DTO representation
      */
-    static Job toJobDto(final JobProjection jobProjection) {
+    public static Job toJobDto(final JobProjection jobProjection) {
         final Job.Builder builder = new Job.Builder(
             jobProjection.getName(),
             jobProjection.getUser(),
@@ -192,7 +190,13 @@ public final class JpaServiceUtils {
         return builder.build();
     }
 
-    static JobRequest toJobRequestDto(final JobRequestProjection jobRequestProjection) {
+    /**
+     * Convert database record into a DTO.
+     *
+     * @param jobRequestProjection The database data to convert
+     * @return A {@link JobRequest} instance
+     */
+    public static JobRequest toJobRequestDto(final JobRequestProjection jobRequestProjection) {
         final JobRequest.Builder builder = new JobRequest.Builder(
             jobRequestProjection.getName(),
             jobRequestProjection.getUser(),
@@ -245,7 +249,13 @@ public final class JpaServiceUtils {
         return builder.build();
     }
 
-    static JobExecution toJobExecutionDto(final JobExecutionProjection jobExecutionProjection) {
+    /**
+     * Convert job execution database data into a DTO.
+     *
+     * @param jobExecutionProjection The database data
+     * @return {@link JobExecution} instance
+     */
+    public static JobExecution toJobExecutionDto(final JobExecutionProjection jobExecutionProjection) {
         final JobExecution.Builder builder = new JobExecution
             .Builder(jobExecutionProjection.getAgentHostname().orElse(UUID.randomUUID().toString()))
             .withId(jobExecutionProjection.getUniqueId())
@@ -265,7 +275,13 @@ public final class JpaServiceUtils {
         return builder.build();
     }
 
-    static JobMetadata toJobMetadataDto(final JobMetadataProjection jobMetadataProjection) {
+    /**
+     * Convert job metadata information to a DTO.
+     *
+     * @param jobMetadataProjection The database information
+     * @return A {@link JobMetadata} instance
+     */
+    public static JobMetadata toJobMetadataDto(final JobMetadataProjection jobMetadataProjection) {
         final JobMetadata.Builder builder = new JobMetadata.Builder()
             .withId(jobMetadataProjection.getUniqueId())
             .withCreated(jobMetadataProjection.getCreated())
@@ -297,25 +313,13 @@ public final class JpaServiceUtils {
         }
     }
 
-    static <D extends CommonDTO, E extends BaseEntity> void setEntityMetadata(
-        final ObjectMapper mapper,
-        final D dto,
-        final E entity
-    ) {
-        if (dto.getMetadata().isPresent()) {
-            try {
-                entity.setMetadata(mapper.writeValueAsString(dto.getMetadata().get()));
-            } catch (final JsonProcessingException jpe) {
-                // Should never happen. Swallow and set to null as metadata is not Genie critical
-                log.error("Invalid JSON, unable to convert to string", jpe);
-                entity.setMetadata(null);
-            }
-        } else {
-            entity.setMetadata(null);
-        }
-    }
-
-    static UserResourcesSummary toUserResourceSummaryDto(
+    /**
+     * Convert a user resources summary to a DTO.
+     *
+     * @param userJobResourcesAggregate The database data to convert
+     * @return A {@link UserResourcesSummary} instance
+     */
+    public static UserResourcesSummary toUserResourceSummaryDto(
         final UserJobResourcesAggregate userJobResourcesAggregate
     ) {
         final String user = userJobResourcesAggregate.getUser();

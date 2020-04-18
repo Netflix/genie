@@ -33,10 +33,11 @@ import com.netflix.genie.web.agent.inspectors.InspectionReport;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -66,7 +67,7 @@ public class AgentJobServiceImpl implements AgentJobService {
     private static final String AGENT_VERSION_METRIC_TAG_NAME = "agentVersion";
     private static final String AGENT_HOST_METRIC_TAG_NAME = "agentHost";
     private static final String HANDSHAKE_DECISION_METRIC_TAG_NAME = "handshakeDecision";
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
     private final AgentFilterService agentFilterService;
     private final MeterRegistry meterRegistry;
@@ -85,7 +86,7 @@ public class AgentJobServiceImpl implements AgentJobService {
         final AgentFilterService agentFilterService,
         final MeterRegistry meterRegistry
     ) {
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.jobResolverService = jobResolverService;
         this.agentFilterService = agentFilterService;
         this.meterRegistry = meterRegistry;
@@ -133,7 +134,7 @@ public class AgentJobServiceImpl implements AgentJobService {
     ) {
         final JobRequestMetadata jobRequestMetadata = new JobRequestMetadata(null, agentClientMetadata, 0, 0);
         try {
-            return this.jobPersistenceService.saveJobSubmission(
+            return this.persistenceService.saveJobSubmission(
                 new JobSubmission.Builder(jobRequest, jobRequestMetadata).build()
             );
         } catch (final IdAlreadyExistsException e) {
@@ -149,15 +150,15 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification resolveJobSpecification(
-        @NotBlank final String id
-    ) throws GenieJobResolutionException {
-        final JobRequest jobRequest = this.jobPersistenceService
-            .getJobRequest(id)
-            .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
-        final ResolvedJob resolvedJob = this.jobResolverService.resolveJob(id, jobRequest, false);
-        this.jobPersistenceService.saveResolvedJob(id, resolvedJob);
-        return resolvedJob.getJobSpecification();
+    public JobSpecification resolveJobSpecification(@NotBlank final String id) throws GenieJobResolutionException {
+        try {
+            final JobRequest jobRequest = this.persistenceService.getJobRequest(id);
+            final ResolvedJob resolvedJob = this.jobResolverService.resolveJob(id, jobRequest, false);
+            this.persistenceService.saveResolvedJob(id, resolvedJob);
+            return resolvedJob.getJobSpecification();
+        } catch (final NotFoundException e) {
+            throw new GenieJobResolutionException(e);
+        }
     }
 
     /**
@@ -166,11 +167,17 @@ public class AgentJobServiceImpl implements AgentJobService {
     @Override
     @Transactional(readOnly = true)
     public JobSpecification getJobSpecification(@NotBlank final String id) {
-        return this.jobPersistenceService
-            .getJobSpecification(id)
-            .orElseThrow(
-                () -> new GenieJobSpecificationNotFoundException("No job specification exists for job with id " + id)
-            );
+        try {
+            return this.persistenceService
+                .getJobSpecification(id)
+                .orElseThrow(
+                    () -> new GenieJobSpecificationNotFoundException(
+                        "No job specification exists for job with id " + id
+                    )
+                );
+        } catch (final NotFoundException e) {
+            throw new GenieJobNotFoundException(e);
+        }
     }
 
     /**
@@ -193,7 +200,11 @@ public class AgentJobServiceImpl implements AgentJobService {
      */
     @Override
     public void claimJob(@NotBlank final String id, @Valid final AgentClientMetadata agentClientMetadata) {
-        this.jobPersistenceService.claimJob(id, agentClientMetadata);
+        try {
+            this.persistenceService.claimJob(id, agentClientMetadata);
+        } catch (final NotFoundException e) {
+            throw new GenieJobNotFoundException(e);
+        }
     }
 
     /**
@@ -206,6 +217,10 @@ public class AgentJobServiceImpl implements AgentJobService {
         final JobStatus newStatus,
         @Nullable final String newStatusMessage
     ) {
-        this.jobPersistenceService.updateJobStatus(id, currentStatus, newStatus, newStatusMessage);
+        try {
+            this.persistenceService.updateJobStatus(id, currentStatus, newStatus, newStatusMessage);
+        } catch (final NotFoundException e) {
+            throw new GenieJobNotFoundException(e);
+        }
     }
 }

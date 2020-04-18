@@ -19,10 +19,9 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.util.UUID;
@@ -33,7 +32,7 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-public class ClusterModelAssemblerTest {
+class ClusterModelAssemblerTest {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
@@ -43,32 +42,22 @@ public class ClusterModelAssemblerTest {
     private Cluster cluster;
     private ClusterModelAssembler assembler;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.cluster = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build();
         this.assembler = new ClusterModelAssembler();
     }
 
-    /**
-     * Make sure we can construct the assembler.
-     */
     @Test
-    public void canConstruct() {
-        Assert.assertNotNull(this.assembler);
+    void canConstruct() {
+        Assertions.assertThat(this.assembler).isNotNull();
     }
 
-    /**
-     * Make sure we can convert the DTO to a resource with links.
-     */
     @Test
-    @Ignore
-    public void canConvertToResource() {
+    void canConvertToModel() {
         final EntityModel<Cluster> model = this.assembler.toModel(this.cluster);
-        Assert.assertTrue(model.getLinks().hasSize(2));
-        Assert.assertNotNull(model.getLink("self"));
-        Assert.assertNotNull(model.getLink("commands"));
+        Assertions.assertThat(model.getLinks()).hasSize(2);
+        Assertions.assertThat(model.getLink("self")).isPresent();
+        Assertions.assertThat(model.getLink("commands")).isPresent();
     }
 }

@@ -59,7 +59,6 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-//TODO: Add tests for error conditions
 public class ClusterRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final String ID = UUID.randomUUID().toString();
@@ -221,7 +220,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .post(CLUSTERS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.containsString("A version is required and must be at most 255 characters")
@@ -578,7 +577,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .get(CLUSTERS_API + "/{id}", id2)
             .then()
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.containsString("No cluster with id")
@@ -875,7 +874,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
             .post(clusterCommandsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.containsString("No command ids entered. Unable to add commands.")
@@ -1377,8 +1376,7 @@ public class ClusterRestControllerIntegrationTest extends RestControllerIntegrat
                 .get(CLUSTERS_API + "/{id}" + path, ID)
                 .then()
                 .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .body(EXCEPTION_CODE_PATH, Matchers.is(404))
+                .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
                 .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No cluster with id " + ID));
         }
     }

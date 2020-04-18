@@ -78,7 +78,11 @@ public class SystemArchitecture {
      * dao interface. This definition assumes that interfaces are placed in the
      * "dao" package, and that implementation types are in sub-packages.
      */
-    @Pointcut("execution(* com.netflix.genie.web.data.services.jpa.*.*(..))")
+    // TODO: fix once data services modifications finished
+    @Pointcut(
+        "execution(* com.netflix.genie.web.data.services.jpa.*.*(..)) "
+            + "|| execution(* com.netflix.genie.web.data.jpa.services.*.*(..))"
+    )
     public void dataOperation() {
     }
 }

@@ -20,10 +20,9 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.util.List;
@@ -47,34 +46,25 @@ public class CommandModelAssemblerTest {
     private Command command;
     private CommandModelAssembler assembler;
 
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         this.command = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE_AND_ARGS, CHECK_DELAY)
             .withId(ID)
             .build();
         this.assembler = new CommandModelAssembler();
     }
 
-    /**
-     * Make sure we can construct the assembler.
-     */
     @Test
-    public void canConstruct() {
-        Assert.assertNotNull(this.assembler);
+    void canConstruct() {
+        Assertions.assertThat(this.assembler).isNotNull();
     }
 
-    /**
-     * Make sure we can convert the DTO to a resource with links.
-     */
     @Test
-    @Ignore
-    public void canConvertToResource() {
+    void canConvertToResource() {
         final EntityModel<Command> model = this.assembler.toModel(this.command);
-        Assert.assertTrue(model.getLinks().hasSize(2));
-        Assert.assertNotNull(model.getLink("self"));
-        Assert.assertNotNull(model.getLink("clusters"));
+        Assertions.assertThat(model.getLinks()).hasSize(3);
+        Assertions.assertThat(model.getLink("self")).isPresent();
+        Assertions.assertThat(model.getLink("applications")).isPresent();
+        Assertions.assertThat(model.getLink("clusters")).isPresent();
     }
 }

@@ -63,7 +63,6 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-//TODO: Add tests for error conditions
 public class CommandRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     private static final String ID = UUID.randomUUID().toString();
@@ -361,7 +360,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .post(COMMANDS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.containsString("must not be empty"
@@ -785,7 +784,7 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .get(COMMANDS_API + "/{id}", id2)
             .then()
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.containsString("No command with id"
@@ -1164,11 +1163,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
             .post(commandApplicationsAPI, ID)
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .body(
-                EXCEPTION_MESSAGE_PATH,
-                Matchers.containsString("No application ids entered. Unable to add applications.")
-            );
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
+            .body(EXCEPTION_MESSAGE_PATH, Matchers.notNullValue());
 
         final String applicationId3 = UUID.randomUUID().toString();
         this.createConfigResource(
@@ -1754,9 +1750,8 @@ public class CommandRestControllerIntegrationTest extends RestControllerIntegrat
                 .get(COMMANDS_API + "/{id}" + relationPath, ID)
                 .then()
                 .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .body(EXCEPTION_CODE_PATH, Matchers.is(404))
-                .body(EXCEPTION_MESSAGE_PATH, Matchers.is("No command with id " + ID + " exists."));
+                .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
+                .body(EXCEPTION_MESSAGE_PATH, Matchers.is("No command with id " + ID + " exists"));
         }
     }
 

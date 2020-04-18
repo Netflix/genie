@@ -19,7 +19,7 @@ package com.netflix.genie.web.tasks.leader
 
 import com.netflix.genie.common.dto.UserResourcesSummary
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobSearchService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.properties.UserMetricsProperties
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
 import com.netflix.genie.web.util.MetricsConstants
@@ -34,19 +34,19 @@ import java.util.function.ToDoubleFunction
 @SuppressWarnings("GroovyAccessibility")
 class UserMetricsTaskSpec extends Specification {
     MeterRegistry registry
-    JobSearchService jobSearchService
+    PersistenceService persistenceService
     UserMetricsProperties userMetricProperties
     UserMetricsTask task
     Map<String, Closure<Double>> gaugesFunctions
     DataServices dataServices
 
-    void setup() {
+    def setup() {
         this.registry = Mock(MeterRegistry)
-        this.jobSearchService = Mock(JobSearchService)
+        this.persistenceService = Mock(PersistenceService)
         this.userMetricProperties = Mock(UserMetricsProperties)
         this.gaugesFunctions = Maps.newHashMap()
         this.dataServices = Mock(DataServices) {
-            getJobSearchService() >> this.jobSearchService
+            getPersistenceService() >> this.persistenceService
         }
     }
 
@@ -87,7 +87,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> fooBarSummariesMap
+        1 * persistenceService.getUserResourcesSummaries() >> fooBarSummariesMap
         4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
@@ -102,7 +102,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> fooBooSummariesMap
+        1 * persistenceService.getUserResourcesSummaries() >> fooBooSummariesMap
         2 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)
         }
@@ -119,7 +119,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> emptySummariesMap
+        1 * persistenceService.getUserResourcesSummaries() >> emptySummariesMap
         measureActiveUsers() == 0
         measureJobs("foo") == Double.NaN
         measureMemory("foo") == Double.NaN
@@ -144,7 +144,7 @@ class UserMetricsTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * jobSearchService.getUserResourcesSummaries() >> fooBarSummariesMap
+        1 * persistenceService.getUserResourcesSummaries() >> fooBarSummariesMap
 
         4 * registry.gauge(_ as Meter.Id, _, _ as ToDoubleFunction) >> {
             args -> return captureGauge(args[0] as Meter.Id, args[1] as Object, args[2] as ToDoubleFunction<Object>)

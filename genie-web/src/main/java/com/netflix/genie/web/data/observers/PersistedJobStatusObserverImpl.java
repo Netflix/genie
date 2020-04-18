@@ -40,9 +40,7 @@ public class PersistedJobStatusObserverImpl implements PersistedJobStatusObserve
      *
      * @param genieEventBus the genie event bus
      */
-    public PersistedJobStatusObserverImpl(
-        final GenieEventBus genieEventBus
-    ) {
+    public PersistedJobStatusObserverImpl(final GenieEventBus genieEventBus) {
         this.genieEventBus = genieEventBus;
     }
 
@@ -50,11 +48,7 @@ public class PersistedJobStatusObserverImpl implements PersistedJobStatusObserve
      * {@inheritDoc}
      */
     @Override
-    public void notify(
-        final String jobId,
-        @Nullable final JobStatus previousStatus,
-        final JobStatus currentStatus
-    ) {
+    public void notify(final String jobId, @Nullable final JobStatus previousStatus, final JobStatus currentStatus) {
         final JobStateChangeEvent event = new JobStateChangeEvent(jobId, previousStatus, currentStatus, this);
         log.warn("Publishing event: {}", event);
         this.genieEventBus.publishAsynchronousEvent(event);

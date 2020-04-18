@@ -32,7 +32,7 @@ import com.netflix.genie.web.agent.apis.rpc.v4.endpoints.JobServiceProtoErrorCom
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -166,8 +166,8 @@ class AgentRpcEndpointsAutoConfigurationTest {
         }
 
         @Bean
-        JobSearchService jobSearchService() {
-            return Mockito.mock(JobSearchService.class);
+        PersistenceService geniePersistenceService() {
+            return Mockito.mock(PersistenceService.class);
         }
 
         @Bean
@@ -186,9 +186,9 @@ class AgentRpcEndpointsAutoConfigurationTest {
         }
 
         @Bean
-        DataServices genieDataServices(final JobSearchService jobSearchService) {
+        DataServices genieDataServices(final PersistenceService persistenceService) {
             final DataServices dataServices = Mockito.mock(DataServices.class);
-            Mockito.when(dataServices.getJobSearchService()).thenReturn(jobSearchService);
+            Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
             return dataServices;
         }
     }

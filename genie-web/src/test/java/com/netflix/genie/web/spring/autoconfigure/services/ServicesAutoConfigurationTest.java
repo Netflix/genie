@@ -24,8 +24,7 @@ import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.properties.ExponentialBackOffTriggerProperties;
@@ -115,7 +114,7 @@ public class ServicesAutoConfigurationTest {
     @Test
     public void canGetJobKillServiceV3Bean() {
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(Mockito.mock(JobSearchService.class));
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
         Assert.assertNotNull(
             this.servicesAutoConfiguration.jobKillServiceV3(
                 new GenieHostInfo("localhost"),
@@ -136,7 +135,7 @@ public class ServicesAutoConfigurationTest {
     @Test
     public void canGetJobKillServiceBean() {
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(Mockito.mock(JobPersistenceService.class));
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(Mockito.mock(PersistenceService.class));
         Assert.assertNotNull(
             this.servicesAutoConfiguration.jobKillService(
                 Mockito.mock(JobKillServiceV3.class),
@@ -181,9 +180,9 @@ public class ServicesAutoConfigurationTest {
      */
     @Test
     public void canGetJobSubmitterServiceBean() {
-        final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
+        final PersistenceService persistenceService = Mockito.mock(PersistenceService.class);
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(jobPersistenceService);
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
         final GenieEventBus genieEventBus = Mockito.mock(GenieEventBus.class);
         final Resource resource = Mockito.mock(Resource.class);
         final List<WorkflowTask> workflowTasks = new ArrayList<>();

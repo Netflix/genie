@@ -19,18 +19,21 @@ package com.netflix.genie.web.tasks.job
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Lists
+import com.google.common.collect.Sets
 import com.google.common.io.Files
-import com.netflix.genie.common.dto.Application
-import com.netflix.genie.common.dto.Cluster
-import com.netflix.genie.common.dto.Command
 import com.netflix.genie.common.dto.Job
-import com.netflix.genie.common.dto.JobRequest
+import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
+import com.netflix.genie.common.external.dtos.v4.Application
+import com.netflix.genie.common.external.dtos.v4.Cluster
+import com.netflix.genie.common.external.dtos.v4.Command
+import com.netflix.genie.common.external.dtos.v4.JobMetadata
+import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.internal.services.JobArchiveService
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
-import com.netflix.genie.web.data.services.JobSearchService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.events.JobFinishedEvent
 import com.netflix.genie.web.events.JobFinishedReason
 import com.netflix.genie.web.properties.JobsProperties
@@ -39,8 +42,6 @@ import com.netflix.genie.web.util.MetricsConstants
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
-import org.assertj.core.util.Lists
-import org.assertj.core.util.Sets
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.FileSystemResource
@@ -50,7 +51,7 @@ import spock.lang.Specification
 import java.util.concurrent.TimeUnit
 
 /**
- * Unit tests for JobCompletionHandler
+ * Unit tests for {@link JobCompletionService}.
  *
  * @author amajumdar
  */
@@ -60,8 +61,7 @@ class JobCompletionServiceSpec extends Specification {
     private static final String USER = UUID.randomUUID().toString()
     private static final String VERSION = UUID.randomUUID().toString()
     private static final List<String> COMMAND_ARGS = Lists.newArrayList(UUID.randomUUID().toString())
-    JobPersistenceService jobPersistenceService
-    JobSearchService jobSearchService
+    PersistenceService persistenceService
     JobCompletionService jobCompletionService
     MailService mailService
     JobArchiveService jobArchiveService
@@ -79,8 +79,7 @@ class JobCompletionServiceSpec extends Specification {
     public TemporaryFolder tmpJobDir = new TemporaryFolder()
 
     def setup() {
-        jobPersistenceService = Mock(JobPersistenceService.class)
-        jobSearchService = Mock(JobSearchService.class)
+        persistenceService = Mock(PersistenceService.class)
         mailService = Mock(MailService.class)
         jobArchiveService = Mock(JobArchiveService.class)
         jobsProperties = JobsProperties.getJobsPropertiesDefaults()
@@ -99,13 +98,12 @@ class JobCompletionServiceSpec extends Specification {
         jobsProperties.cleanup.deleteDependencies = false
         jobsProperties.users.runAsUserEnabled = false
         def dataServices = Mock(DataServices) {
-            getJobSearchService() >> this.jobSearchService
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         jobCompletionService = new JobCompletionService(
             dataServices,
             jobArchiveService,
-            new FileSystemResource("/tmp"),
+            new FileSystemResource(this.tmpJobDir.getRoot()),
             mailService,
             registry,
             jobsProperties,
@@ -116,11 +114,15 @@ class JobCompletionServiceSpec extends Specification {
     def handleJobCompletion() throws Exception {
         given:
         def jobId = "1"
+        def jobRequest = Mock(JobRequest)
+        def jobMetadata = Mock(JobMetadata)
+
         when:
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
+
         then:
         noExceptionThrown()
-        3 * jobSearchService.getJob(jobId) >>
+        3 * persistenceService.getJob(jobId) >>
             { throw new GenieServerException("null") } >>
             { throw new GenieServerException("null") } >>
             { throw new GenieServerException("null") }
@@ -135,9 +137,9 @@ class JobCompletionServiceSpec extends Specification {
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
         then:
         noExceptionThrown()
-        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
+        1 * persistenceService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
             .withId(jobId).withStatus(JobStatus.SUCCEEDED).withCommandArgs(COMMAND_ARGS).build()
-        0 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
+        0 * persistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
         timerTagsCapture == ImmutableSet.of(
             Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
@@ -147,9 +149,9 @@ class JobCompletionServiceSpec extends Specification {
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
         then:
         noExceptionThrown()
-        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
+        1 * persistenceService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
             .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
-        1 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
+        1 * persistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
         1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableSet.of(
             Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
@@ -177,21 +179,46 @@ class JobCompletionServiceSpec extends Specification {
         ))
 
         when:
+        def jobDir = this.tmpJobDir.newFolder(jobId)
+        def genieDir = java.nio.file.Files.createDirectory(jobDir.toPath().resolve("genie"))
+        def doneFile = genieDir.resolve("genie.done")
+        java.nio.file.Files.write(doneFile, Lists.newArrayList("{", "\"exitCode\":999", "}"))
+        def killReasonFile = genieDir.resolve("kill-reason")
+        java.nio.file.Files.write(killReasonFile, Lists.newArrayList("{", "\"killReason\":\"blah\"", "}"))
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
+
         then:
         noExceptionThrown()
-        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
-            .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
-        1 * jobSearchService.getV3JobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet())
-            .withId(jobId).withCommandArgs(COMMAND_ARGS).withEmail('admin@netflix.com').build()
-        1 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
-        1 * mailService.sendEmail('admin@netflix.com', _ as String, _ as String)
+        1 * persistenceService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
+            .withId(jobId)
+            .withStatus(JobStatus.RUNNING)
+            .withCommandArgs(COMMAND_ARGS)
+            .build()
+        3 * persistenceService.getJobStatus(jobId) >> com.netflix.genie.common.external.dtos.v4.JobStatus.RUNNING
+        1 * persistenceService.getJobExecution(jobId) >> Mock(JobExecution) {
+            getProcessId() >> Optional.empty()
+        }
+        1 * persistenceService.setJobCompletionInformation(
+            jobId,
+            999,
+            JobStatus.KILLED,
+            "blah",
+            null,
+            null
+        )
+        1 * persistenceService.getJobRequest(jobId) >> jobRequest
+        1 * jobRequest.getMetadata() >> jobMetadata
+        2 * jobMetadata.getName() >> NAME
+        1 * jobMetadata.getUser() >> USER
+        1 * jobMetadata.getEmail() >> Optional.of("admin@genie.com")
+        1 * jobMetadata.getTags() >> Sets.newHashSet()
+        1 * jobMetadata.getDescription() >> Optional.empty()
+        1 * mailService.sendEmail('admin@genie.com', _ as String, _ as String)
         1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableSet.of(
             Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
             Tag.of(JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString())
         )
-        3 * errorCounter.increment()
     }
 
     def deleteDependenciesDirectories() {
@@ -206,16 +233,16 @@ class JobCompletionServiceSpec extends Specification {
         dependencyDirs.forEach({ d -> Files.createParentDirs(new File(d, "a_dependency")) })
         def jobId = "1"
         def app1 = Mock(Application)
-        app1.getId() >> Optional.ofNullable("app1")
+        app1.getId() >> "app1"
         def app2 = Mock(Application)
-        app2.getId() >> Optional.ofNullable("app2")
-        jobSearchService.getJobApplications(jobId) >> Arrays.asList(app1, app2)
+        app2.getId() >> "app2"
+        persistenceService.getJobApplications(jobId) >> Lists.newArrayList(app1, app2)
         def cluster = Mock(Cluster)
-        cluster.getId() >> Optional.ofNullable("cluster-x")
-        jobSearchService.getJobCluster(jobId) >> cluster
+        cluster.getId() >> "cluster-x"
+        persistenceService.getJobCluster(jobId) >> cluster
         def command = Mock(Command)
-        command.getId() >> Optional.ofNullable("command-y")
-        jobSearchService.getJobCommand(jobId) >> command
+        command.getId() >> "command-y"
+        persistenceService.getJobCommand(jobId) >> command
 
         when:
         jobCompletionService.deleteDependenciesDirectories(jobId, tmpJobDir.root)

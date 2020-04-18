@@ -18,7 +18,7 @@
 package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.services.JobMetricsService;
 
 import javax.validation.constraints.NotNull;
@@ -32,7 +32,7 @@ import javax.validation.constraints.NotNull;
  */
 public class JobMetricsServiceImpl implements JobMetricsService {
 
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final String hostname;
 
     /**
@@ -42,7 +42,7 @@ public class JobMetricsServiceImpl implements JobMetricsService {
      * @param hostname     The name of this host
      */
     public JobMetricsServiceImpl(@NotNull final DataServices dataServices, @NotNull final String hostname) {
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.hostname = hostname;
     }
 
@@ -51,7 +51,7 @@ public class JobMetricsServiceImpl implements JobMetricsService {
      */
     @Override
     public int getNumActiveJobs() {
-        return this.jobSearchService.getAllActiveJobsOnHost(this.hostname).size();
+        return this.persistenceService.getAllActiveJobsOnHost(this.hostname).size();
     }
 
     /**

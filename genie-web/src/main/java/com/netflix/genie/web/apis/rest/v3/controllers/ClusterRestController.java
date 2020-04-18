@@ -32,8 +32,11 @@ import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -85,7 +88,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ClusterRestController {
 
-    private final ClusterPersistenceService clusterPersistenceService;
+    private final PersistenceService persistenceService;
     private final ClusterModelAssembler clusterModelAssembler;
     private final CommandModelAssembler commandModelAssembler;
 
@@ -97,7 +100,7 @@ public class ClusterRestController {
      */
     @Autowired
     public ClusterRestController(final DataServices dataServices, final EntityModelAssemblers entityModelAssemblers) {
-        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
     }
@@ -107,13 +110,15 @@ public class ClusterRestController {
      *
      * @param cluster contains the cluster information to create
      * @return The created cluster
-     * @throws GenieException For any error
+     * @throws IdAlreadyExistsException If there is a conflict for the id
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createCluster(@RequestBody @Valid final Cluster cluster) throws GenieException {
+    public ResponseEntity<Void> createCluster(
+        @RequestBody @Valid final Cluster cluster
+    ) throws IdAlreadyExistsException {
         log.info("Called to create new cluster {}", cluster);
-        final String id = this.clusterPersistenceService.createCluster(DtoConverters.toV4ClusterRequest(cluster));
+        final String id = this.persistenceService.saveCluster(DtoConverters.toV4ClusterRequest(cluster));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -130,14 +135,14 @@ public class ClusterRestController {
      *
      * @param id id for the cluster
      * @return the cluster
-     * @throws GenieException For any error
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Cluster> getCluster(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Cluster> getCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id: {}", id);
         return this.clusterModelAssembler.toModel(
-            DtoConverters.toV3Cluster(this.clusterPersistenceService.getCluster(id))
+            DtoConverters.toV3Cluster(this.persistenceService.getCluster(id))
         );
     }
 
@@ -199,8 +204,8 @@ public class ClusterRestController {
                     tag -> {
                         final String id = tag.substring(prefixLength);
                         try {
-                            clusterList.add(DtoConverters.toV3Cluster(this.clusterPersistenceService.getCluster(id)));
-                        } catch (final GenieException ge) {
+                            clusterList.add(DtoConverters.toV3Cluster(this.persistenceService.getCluster(id)));
+                        } catch (final NotFoundException ge) {
                             log.debug("No cluster with id {} found", id, ge);
                         }
                     }
@@ -219,8 +224,8 @@ public class ClusterRestController {
                     .map(tag -> tag.substring(DtoConverters.GENIE_NAME_PREFIX.length()))
                     .findFirst();
 
-                clusters = this.clusterPersistenceService
-                    .getClusters(
+                clusters = this.persistenceService
+                    .findClusters(
                         finalName.orElse(null),
                         enumStatuses,
                         finalTags,
@@ -230,8 +235,8 @@ public class ClusterRestController {
                     )
                     .map(DtoConverters::toV3Cluster);
             } else {
-                clusters = this.clusterPersistenceService
-                    .getClusters(
+                clusters = this.persistenceService
+                    .findClusters(
                         name,
                         enumStatuses,
                         finalTags,
@@ -242,8 +247,8 @@ public class ClusterRestController {
                     .map(DtoConverters::toV3Cluster);
             }
         } else {
-            clusters = this.clusterPersistenceService
-                .getClusters(
+            clusters = this.persistenceService
+                .findClusters(
                     name,
                     enumStatuses,
                     tags,
@@ -270,11 +275,7 @@ public class ClusterRestController {
                     )
             ).withSelfRel();
 
-        return assembler.toModel(
-            clusters,
-            this.clusterModelAssembler,
-            self
-        );
+        return assembler.toModel(clusters, this.clusterModelAssembler, self);
     }
 
     /**
@@ -282,16 +283,17 @@ public class ClusterRestController {
      *
      * @param id            unique if for cluster to update
      * @param updateCluster contains the cluster information to update
-     * @throws GenieException For any error
+     * @throws NotFoundException           If no cluster with {@literal id} exists
+     * @throws PreconditionFailedException If the ids don't match
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCluster(
         @PathVariable("id") final String id,
         @RequestBody final Cluster updateCluster
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException {
         log.info("Called to update cluster with id {} update fields {}", id, updateCluster);
-        this.clusterPersistenceService.updateCluster(id, DtoConverters.toV4Cluster(updateCluster));
+        this.persistenceService.updateCluster(id, DtoConverters.toV4Cluster(updateCluster));
     }
 
     /**
@@ -299,17 +301,19 @@ public class ClusterRestController {
      *
      * @param id    The id of the cluster to patch
      * @param patch The JSON Patch instructions
-     * @throws GenieException On error
+     * @throws NotFoundException           If no cluster with {@literal id} exists
+     * @throws PreconditionFailedException If the ids don't match
+     * @throws GenieServerException        If the patch can't be applied
      */
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchCluster(
         @PathVariable("id") final String id,
         @RequestBody final JsonPatch patch
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException, GenieServerException {
         log.info("Called to patch cluster {} with patch {}", id, patch);
 
-        final Cluster currentCluster = DtoConverters.toV3Cluster(this.clusterPersistenceService.getCluster(id));
+        final Cluster currentCluster = DtoConverters.toV3Cluster(this.persistenceService.getCluster(id));
 
         try {
             log.debug("Will patch cluster {}. Original state: {}", id, currentCluster);
@@ -317,7 +321,7 @@ public class ClusterRestController {
             final JsonNode postPatchNode = patch.apply(clusterNode);
             final Cluster patchedCluster = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Cluster.class);
             log.debug("Finished patching cluster {}. New state: {}", id, patchedCluster);
-            this.clusterPersistenceService.updateCluster(id, DtoConverters.toV4Cluster(patchedCluster));
+            this.persistenceService.updateCluster(id, DtoConverters.toV4Cluster(patchedCluster));
         } catch (final JsonPatchException | IOException e) {
             log.error("Unable to patch cluster {} with patch {} due to exception.", id, patch, e);
             throw new GenieServerException(e.getLocalizedMessage(), e);
@@ -328,248 +332,264 @@ public class ClusterRestController {
      * Delete a cluster configuration.
      *
      * @param id unique id for cluster to delete
-     * @throws GenieException For any error
+     * @throws PreconditionFailedException If the cluster can't be deleted due to constraints
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCluster(@PathVariable("id") final String id) throws GenieException {
+    public void deleteCluster(@PathVariable("id") final String id) throws PreconditionFailedException {
         log.info("Delete cluster called for id: {}", id);
-        this.clusterPersistenceService.deleteCluster(id);
+        this.persistenceService.deleteCluster(id);
     }
 
     /**
      * Delete all clusters from database.
      *
-     * @throws GenieException For any error
+     * @throws PreconditionFailedException If any cluster can't be deleted due to a constraint in the system
      */
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllClusters() throws GenieException {
+    public void deleteAllClusters() throws PreconditionFailedException {
         log.warn("Delete all clusters called");
-        this.clusterPersistenceService.deleteAllClusters();
+        this.persistenceService.deleteAllClusters();
     }
 
     /**
      * Add new configuration files to a given cluster.
      *
-     * @param id      The id of the cluster to add the configuration file to. Not
-     *                null/empty/blank.
+     * @param id      The id of the cluster to add the configuration file to. Not null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsForCluster(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and config {}", id, configs);
-        this.clusterPersistenceService.addConfigsForCluster(id, configs);
+        this.persistenceService.addConfigsToResource(
+            id,
+            configs,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Get all the configuration files for a given cluster.
      *
-     * @param id The id of the cluster to get the configuration files for. Not
-     *           NULL/empty/blank.
+     * @param id The id of the cluster to get the configuration files for. Not NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getConfigsForCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return this.clusterPersistenceService.getConfigsForCluster(id);
+        return this.persistenceService.getConfigsForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Update the configuration files for a given cluster.
      *
-     * @param id      The id of the cluster to update the configuration files for.
-     *                Not null/empty/blank.
-     * @param configs The configuration files to replace existing configuration
-     *                files with. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id      The id of the cluster to update the configuration files for. Not null/empty/blank.
+     * @param configs The configuration files to replace existing configuration files with. Not null/empty/blank.
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForCluster(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and configs {}", id, configs);
-        this.clusterPersistenceService.updateConfigsForCluster(id, configs);
+        this.persistenceService.updateConfigsForResource(
+            id,
+            configs,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Delete the all configuration files from a given cluster.
      *
-     * @param id The id of the cluster to delete the configuration files from.
-     *           Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id The id of the cluster to delete the configuration files from. Not null/empty/blank.
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllConfigsForCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.clusterPersistenceService.removeAllConfigsForCluster(id);
+        this.persistenceService.removeAllConfigsForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Add new dependency files for a given cluster.
      *
-     * @param id           The id of the cluster to add the dependency file to. Not
-     *                     null/empty/blank.
+     * @param id           The id of the cluster to add the dependency file to. Not null/empty/blank.
      * @param dependencies The dependency files to add. Not null.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDependenciesForCluster(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
-        this.clusterPersistenceService.addDependenciesForCluster(id, dependencies);
+        this.persistenceService.addDependenciesToResource(
+            id,
+            dependencies,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Get all the dependency files for a given cluster.
      *
-     * @param id The id of the cluster to get the dependency files for. Not
-     *           NULL/empty/blank.
-     * @return The set of dependency files.
-     * @throws GenieException For any error
+     * @param id The id of the cluster to get the dependency files for. Not NULL/empty/blank
+     * @return The set of dependency files
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getDependenciesForCluster(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getDependenciesForCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return this.clusterPersistenceService.getDependenciesForCluster(id);
+        return this.persistenceService.getDependenciesForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Update the dependency files for a given cluster.
      *
-     * @param id           The id of the cluster to update the dependency files for. Not
-     *                     null/empty/blank.
-     * @param dependencies The dependency files to replace existing dependency files with. Not
-     *                     null/empty/blank.
-     * @throws GenieException For any error
+     * @param id           The id of the cluster to update the dependency files for. Not null/empty/blank.
+     * @param dependencies The dependency files to replace existing dependency files with. Not null/empty/blank.
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateDependenciesForCluster(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
-        this.clusterPersistenceService.updateDependenciesForCluster(id, dependencies);
+        this.persistenceService.updateDependenciesForResource(
+            id,
+            dependencies,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Delete the all dependency files from a given cluster.
      *
-     * @param id The id of the cluster to delete the dependency files from. Not
-     *           null/empty/blank.
-     * @throws GenieException For any error
+     * @param id The id of the cluster to delete the dependency files from. Not null/empty/blank.
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllDependenciesForCluster(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllDependenciesForCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.clusterPersistenceService.removeAllDependenciesForCluster(id);
+        this.persistenceService.removeAllDependenciesForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Add new tags to a given cluster.
      *
-     * @param id   The id of the cluster to add the tags to. Not
-     *             null/empty/blank.
+     * @param id   The id of the cluster to add the tags to. Not null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForCluster(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
-        this.clusterPersistenceService.addTagsForCluster(id, tags);
+        this.persistenceService.addTagsToResource(id, tags, com.netflix.genie.common.external.dtos.v4.Cluster.class);
     }
 
     /**
      * Get all the tags for a given cluster.
      *
-     * @param id The id of the cluster to get the tags for. Not
-     *           NULL/empty/blank.
+     * @param id The id of the cluster to get the tags for. Not NULL/empty/blank.
      * @return The active set of tags.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getTagsForCluster(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getTagsForCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return DtoConverters.toV3Cluster(this.clusterPersistenceService.getCluster(id)).getTags();
+        // Left this way for v3 tag conversion
+        return DtoConverters.toV3Cluster(this.persistenceService.getCluster(id)).getTags();
     }
 
     /**
      * Update the tags for a given cluster.
      *
-     * @param id   The id of the cluster to update the tags for.
-     *             Not null/empty/blank.
-     * @param tags The tags to replace existing configuration
-     *             files with. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id   The id of the cluster to update the tags for. Not null/empty/blank.
+     * @param tags The tags to replace existing configuration files with. Not null/empty/blank.
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForCluster(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
-        this.clusterPersistenceService.updateTagsForCluster(id, tags);
+        this.persistenceService.updateTagsForResource(
+            id,
+            tags,
+            com.netflix.genie.common.external.dtos.v4.Cluster.class
+        );
     }
 
     /**
      * Delete the all tags from a given cluster.
      *
-     * @param id The id of the cluster to delete the tags from.
-     *           Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id The id of the cluster to delete the tags from. Not null/empty/blank.
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllTagsForCluster(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllTagsForCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.clusterPersistenceService.removeAllTagsForCluster(id);
+        this.persistenceService.removeAllTagsForResource(id, com.netflix.genie.common.external.dtos.v4.Cluster.class);
     }
 
     /**
      * Remove an tag from a given cluster.
      *
-     * @param id  The id of the cluster to delete the tag from. Not
-     *            null/empty/blank.
+     * @param id  The id of the cluster to delete the tag from. Not null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no cluster with {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForCluster(
         @PathVariable("id") final String id,
         @PathVariable("tag") final String tag
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tag {}", id, tag);
-        this.clusterPersistenceService.removeTagForCluster(id, tag);
+        this.persistenceService.removeTagForResource(id, tag, com.netflix.genie.common.external.dtos.v4.Cluster.class);
     }
 
     /**
      * Add new commandIds to the given cluster.
      *
-     * @param id         The id of the cluster to add the commandIds to. Not
-     *                   null/empty/blank.
+     * @param id         The id of the cluster to add the commandIds to. Not null/empty/blank.
      * @param commandIds The ids of the commandIds to add. Not null.
      * @throws GenieException For any error
      */
@@ -580,14 +600,13 @@ public class ClusterRestController {
         @RequestBody final List<String> commandIds
     ) throws GenieException {
         log.info("Called with id {} and commandIds {}", id, commandIds);
-        this.clusterPersistenceService.addCommandsForCluster(id, commandIds);
+        this.persistenceService.addCommandsForCluster(id, commandIds);
     }
 
     /**
      * Get all the commandIds configured for a given cluster.
      *
-     * @param id       The id of the cluster to get the command files for. Not
-     *                 NULL/empty/blank.
+     * @param id       The id of the cluster to get the command files for. Not NULL/empty/blank.
      * @param statuses The various statuses to return commandIds for.
      * @return The active set of commandIds for the cluster.
      * @throws GenieException For any error
@@ -610,7 +629,7 @@ public class ClusterRestController {
             }
         }
 
-        return this.clusterPersistenceService.getCommandsForCluster(id, enumStatuses)
+        return this.persistenceService.getCommandsForCluster(id, enumStatuses)
             .stream()
             .map(DtoConverters::toV3Command)
             .map(this.commandModelAssembler::toModel)
@@ -620,10 +639,8 @@ public class ClusterRestController {
     /**
      * Set the commandIds for a given cluster.
      *
-     * @param id         The id of the cluster to update the configuration files for.
-     *                   Not null/empty/blank.
-     * @param commandIds The ids of the commands to replace existing commands with. Not
-     *                   null/empty/blank.
+     * @param id         The id of the cluster to update the configuration files for. Not null/empty/blank.
+     * @param commandIds The ids of the commands to replace existing commands with. Not null/empty/blank.
      * @throws GenieException For any error
      */
     @PutMapping(value = "/{id}/commands", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -633,28 +650,26 @@ public class ClusterRestController {
         @RequestBody final List<String> commandIds
     ) throws GenieException {
         log.info("Called with id {} and commandIds {}", id, commandIds);
-        this.clusterPersistenceService.setCommandsForCluster(id, commandIds);
+        this.persistenceService.setCommandsForCluster(id, commandIds);
     }
 
     /**
      * Remove the all commandIds from a given cluster.
      *
-     * @param id The id of the cluster to delete the commandIds from. Not
-     *           null/empty/blank.
+     * @param id The id of the cluster to delete the commandIds from. Not null/empty/blank.
      * @throws GenieException For any error
      */
     @DeleteMapping(value = "/{id}/commands")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllCommandsForCluster(@PathVariable("id") final String id) throws GenieException {
         log.info("Called with id {}", id);
-        this.clusterPersistenceService.removeAllCommandsForCluster(id);
+        this.persistenceService.removeAllCommandsForCluster(id);
     }
 
     /**
      * Remove an command from a given cluster.
      *
-     * @param id        The id of the cluster to delete the command from. Not
-     *                  null/empty/blank.
+     * @param id        The id of the cluster to delete the command from. Not null/empty/blank.
      * @param commandId The id of the command to remove. Not null/empty/blank.
      * @throws GenieException For any error
      */
@@ -665,6 +680,6 @@ public class ClusterRestController {
         @PathVariable("commandId") final String commandId
     ) throws GenieException {
         log.info("Called with id {} and command id {}", id, commandId);
-        this.clusterPersistenceService.removeCommandForCluster(id, commandId);
+        this.persistenceService.removeCommandForCluster(id, commandId);
     }
 }

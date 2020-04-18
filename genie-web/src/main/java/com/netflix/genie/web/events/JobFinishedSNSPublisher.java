@@ -20,14 +20,14 @@ package com.netflix.genie.web.events;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.SNSNotificationsProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -96,7 +96,7 @@ public class JobFinishedSNSPublisher
     private static final String CLUSTER_UPDATED_ISO_TIMESTAMP_KEY_NAME = "clusterUpdatedIsoTimestamp";
     private static final String APPLICATIONS_KEY_NAME = "applications";
 
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
 
     /**
      * Constructor.
@@ -115,7 +115,7 @@ public class JobFinishedSNSPublisher
         final ObjectMapper mapper
     ) {
         super(properties, registry, snsClient, mapper);
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
     }
 
     /**
@@ -138,8 +138,8 @@ public class JobFinishedSNSPublisher
 
         final FinishedJob job;
         try {
-            job = jobPersistenceService.getFinishedJob(jobId);
-        } catch (GenieNotFoundException | GenieInvalidStatusException e) {
+            job = persistenceService.getFinishedJob(jobId);
+        } catch (final NotFoundException | GenieInvalidStatusException e) {
             log.error("Failed to retrieve finished job: {}", jobId, e);
             return;
         }

@@ -21,13 +21,8 @@ import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.FilePersistenceService;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.TagPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -61,12 +56,7 @@ class DatabaseCleanupTaskTest {
     private DatabaseCleanupProperties.JobDatabaseCleanupProperties jobCleanupProperties;
     private DatabaseCleanupProperties.TagDatabaseCleanupProperties tagCleanupProperties;
     private MockEnvironment environment;
-    private ApplicationPersistenceService applicationPersistenceService;
-    private CommandPersistenceService commandPersistenceService;
-    private JobPersistenceService jobPersistenceService;
-    private ClusterPersistenceService clusterPersistenceService;
-    private FilePersistenceService filePersistenceService;
-    private TagPersistenceService tagPersistenceService;
+    private PersistenceService persistenceService;
     private DatabaseCleanupTask task;
 
     /**
@@ -92,19 +82,9 @@ class DatabaseCleanupTaskTest {
         this.tagCleanupProperties = Mockito.mock(DatabaseCleanupProperties.TagDatabaseCleanupProperties.class);
         Mockito.when(this.cleanupProperties.getTagCleanup()).thenReturn(this.tagCleanupProperties);
         this.environment = new MockEnvironment();
-        this.applicationPersistenceService = Mockito.mock(ApplicationPersistenceService.class);
-        this.commandPersistenceService = Mockito.mock(CommandPersistenceService.class);
-        this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
-        this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
-        this.tagPersistenceService = Mockito.mock(TagPersistenceService.class);
+        this.persistenceService = Mockito.mock(PersistenceService.class);
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getApplicationPersistenceService()).thenReturn(this.applicationPersistenceService);
-        Mockito.when(dataServices.getCommandPersistenceService()).thenReturn(this.commandPersistenceService);
-        Mockito.when(dataServices.getClusterPersistenceService()).thenReturn(this.clusterPersistenceService);
-        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(this.jobPersistenceService);
-        Mockito.when(dataServices.getFilePersistenceService()).thenReturn(this.filePersistenceService);
-        Mockito.when(dataServices.getTagPersistenceService()).thenReturn(this.tagPersistenceService);
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(this.persistenceService);
         this.task = new DatabaseCleanupTask(
             this.cleanupProperties,
             this.environment,
@@ -159,7 +139,7 @@ class DatabaseCleanupTaskTest {
         final long deletedCount3 = 2L;
         Mockito
             .when(
-                this.jobPersistenceService.deleteJobsCreatedBefore(
+                this.persistenceService.deleteJobsCreatedBefore(
                     Mockito.any(Instant.class),
                     Mockito.eq(JobStatus.getActiveStatuses()),
                     Mockito.eq(pageSize)
@@ -173,19 +153,19 @@ class DatabaseCleanupTaskTest {
 
         Mockito
             .when(
-                this.clusterPersistenceService.deleteUnusedClusters(
+                this.persistenceService.deleteUnusedClusters(
                     Mockito.eq(EnumSet.of(ClusterStatus.TERMINATED)),
                     Mockito.any(Instant.class)
                 )
             ).thenReturn(1L, 2L);
-        Mockito.when(this.filePersistenceService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3L, 4L);
-        Mockito.when(this.tagPersistenceService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5L, 6L);
+        Mockito.when(this.persistenceService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3L, 4L);
+        Mockito.when(this.persistenceService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5L, 6L);
         Mockito
-            .when(this.applicationPersistenceService.deleteUnusedApplicationsCreatedBefore(Mockito.any(Instant.class)))
+            .when(this.persistenceService.deleteUnusedApplications(Mockito.any(Instant.class)))
             .thenReturn(11L, 117L);
         Mockito
             .when(
-                this.commandPersistenceService.updateStatusForUnusedCommands(
+                this.persistenceService.updateStatusForUnusedCommands(
                     Mockito.eq(CommandStatus.INACTIVE),
                     Mockito.any(Instant.class),
                     Mockito.eq(EnumSet.of(CommandStatus.DEPRECATED, CommandStatus.ACTIVE)),
@@ -195,7 +175,7 @@ class DatabaseCleanupTaskTest {
             .thenReturn(50, 242);
         Mockito
             .when(
-                this.commandPersistenceService.deleteUnusedCommands(
+                this.persistenceService.deleteUnusedCommands(
                     Mockito.eq(EnumSet.of(CommandStatus.INACTIVE)),
                     Mockito.any(Instant.class)
                 )
@@ -210,7 +190,7 @@ class DatabaseCleanupTaskTest {
 
         if (before.get(Calendar.DAY_OF_YEAR) == after.get(Calendar.DAY_OF_YEAR)) {
             Mockito
-                .verify(this.jobPersistenceService, Mockito.times(5))
+                .verify(this.persistenceService, Mockito.times(5))
                 .deleteJobsCreatedBefore(
                     argument.capture(),
                     Mockito.eq(JobStatus.getActiveStatuses()),
@@ -224,24 +204,24 @@ class DatabaseCleanupTaskTest {
             date.add(Calendar.DAY_OF_YEAR, negativeDays);
             Assertions.assertThat(argument.getAllValues().get(0).toEpochMilli()).isEqualTo(date.getTime().getTime());
             Assertions.assertThat(argument.getAllValues().get(1).toEpochMilli()).isEqualTo(date.getTime().getTime());
-            Mockito.verify(this.clusterPersistenceService, Mockito.times(2)).deleteUnusedClusters(
+            Mockito.verify(this.persistenceService, Mockito.times(2)).deleteUnusedClusters(
                 Mockito.eq(EnumSet.of(ClusterStatus.TERMINATED)),
                 Mockito.any(Instant.class)
             );
             Mockito
-                .verify(this.filePersistenceService, Mockito.times(2))
+                .verify(this.persistenceService, Mockito.times(2))
                 .deleteUnusedFiles(Mockito.any(Instant.class));
             Mockito
-                .verify(this.tagPersistenceService, Mockito.times(2))
+                .verify(this.persistenceService, Mockito.times(2))
                 .deleteUnusedTags(Mockito.any(Instant.class));
             Mockito
-                .verify(this.applicationPersistenceService, Mockito.times(2))
-                .deleteUnusedApplicationsCreatedBefore(Mockito.any(Instant.class));
+                .verify(this.persistenceService, Mockito.times(2))
+                .deleteUnusedApplications(Mockito.any(Instant.class));
             Mockito
-                .verify(this.commandPersistenceService, Mockito.times(2))
+                .verify(this.persistenceService, Mockito.times(2))
                 .deleteUnusedCommands(Mockito.eq(EnumSet.of(CommandStatus.INACTIVE)), Mockito.any(Instant.class));
             Mockito
-                .verify(this.commandPersistenceService, Mockito.times(2))
+                .verify(this.persistenceService, Mockito.times(2))
                 .updateStatusForUnusedCommands(
                     Mockito.eq(CommandStatus.INACTIVE),
                     Mockito.any(Instant.class),
@@ -265,7 +245,7 @@ class DatabaseCleanupTaskTest {
 
         Mockito
             .when(
-                this.jobPersistenceService.deleteJobsCreatedBefore(
+                this.persistenceService.deleteJobsCreatedBefore(
                     Mockito.any(Instant.class),
                     Mockito.anySet(),
                     Mockito.anyInt()
@@ -305,13 +285,13 @@ class DatabaseCleanupTaskTest {
         this.task.run();
 
         Mockito
-            .verify(this.applicationPersistenceService, Mockito.never())
-            .deleteUnusedApplicationsCreatedBefore(Mockito.any(Instant.class));
+            .verify(this.persistenceService, Mockito.never())
+            .deleteUnusedApplications(Mockito.any(Instant.class));
         Mockito
-            .verify(this.commandPersistenceService, Mockito.never())
+            .verify(this.persistenceService, Mockito.never())
             .deleteUnusedCommands(Mockito.anySet(), Mockito.any(Instant.class));
         Mockito
-            .verify(this.commandPersistenceService, Mockito.never())
+            .verify(this.persistenceService, Mockito.never())
             .updateStatusForUnusedCommands(
                 Mockito.any(CommandStatus.class),
                 Mockito.any(Instant.class),
@@ -319,20 +299,20 @@ class DatabaseCleanupTaskTest {
                 Mockito.any(Instant.class)
             );
         Mockito
-            .verify(this.jobPersistenceService, Mockito.never())
+            .verify(this.persistenceService, Mockito.never())
             .deleteJobsCreatedBefore(
                 Mockito.any(Instant.class),
                 Mockito.anySet(),
                 Mockito.anyInt()
             );
         Mockito
-            .verify(this.clusterPersistenceService, Mockito.never())
+            .verify(this.persistenceService, Mockito.never())
             .deleteUnusedClusters(Mockito.anySet(), Mockito.any(Instant.class));
         Mockito
-            .verify(this.filePersistenceService, Mockito.never())
+            .verify(this.persistenceService, Mockito.never())
             .deleteUnusedFiles(Mockito.any(Instant.class));
         Mockito
-            .verify(this.tagPersistenceService, Mockito.never())
+            .verify(this.persistenceService, Mockito.never())
             .deleteUnusedTags(Mockito.any(Instant.class));
     }
 }

@@ -22,6 +22,7 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionEx
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import org.springframework.validation.annotation.Validated;
 
@@ -51,6 +52,8 @@ public interface JobLaunchService {
      * @throws AgentLaunchException        If the system was unable to launch an agent to handle job execution
      * @throws GenieJobResolutionException If the job, based on user input and current system state, can't be
      *                                     successfully resolved for whatever reason
+     * @throws NotFoundException           When a resource that is expected to exist, like a job or a cluster, is not
+     *                                     found in the system at runtime for some reason
      * @throws IdAlreadyExistsException    If the unique identifier for the job conflicts with an already existing job
      * @throws SaveAttachmentException     When a job is submitted with attachments but there is an error saving them
      */
@@ -59,5 +62,6 @@ public interface JobLaunchService {
         AgentLaunchException,
         GenieJobResolutionException,
         IdAlreadyExistsException,
+        NotFoundException,
         SaveAttachmentException;
 }

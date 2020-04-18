@@ -25,10 +25,8 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -73,9 +71,7 @@ public class ClusterCheckerTask extends LeaderTask {
 
     private final String hostname;
     private final ClusterCheckerProperties properties;
-    private final JobSearchService jobSearchService;
-    private final JobPersistenceService jobPersistenceService;
-    private final AgentConnectionPersistenceService agentConnectionPersistenceService;
+    private final PersistenceService persistenceService;
     private final RestTemplate restTemplate;
     private final MeterRegistry registry;
     private final String scheme;
@@ -104,9 +100,7 @@ public class ClusterCheckerTask extends LeaderTask {
     ) {
         this.hostname = genieHostInfo.getHostname();
         this.properties = properties;
-        this.jobSearchService = dataServices.getJobSearchService();
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
-        this.agentConnectionPersistenceService = dataServices.getAgentConnectionPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.restTemplate = restTemplate;
         this.registry = registry;
         this.scheme = this.properties.getScheme() + "://";
@@ -124,7 +118,7 @@ public class ClusterCheckerTask extends LeaderTask {
     @Override
     public void run() {
         log.info("Checking for cluster node health...");
-        this.jobSearchService.getAllHostsWithActiveJobs()
+        this.persistenceService.getAllHostsWithActiveJobs()
             .stream()
             .filter(host -> !this.hostname.equals(host))
             .forEach(this::validateHostAndUpdateErrorCount);
@@ -156,13 +150,13 @@ public class ClusterCheckerTask extends LeaderTask {
     }
 
     private void updateJobsToFailedOnHost(final String host) {
-        final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(host);
+        final Set<Job> jobs = this.persistenceService.getAllActiveJobsOnHost(host);
         jobs.forEach(
             job -> {
                 final Set<Tag> tags = MetricsUtils.newSuccessTagsSet();
                 tags.add(Tag.of(MetricsConstants.TagKeys.HOST, host));
                 try {
-                    this.jobPersistenceService.setJobCompletionInformation(
+                    this.persistenceService.setJobCompletionInformation(
                         job.getId().orElseThrow(IllegalArgumentException::new),
                         JobExecution.LOST_EXIT_CODE,
                         JobStatus.FAILED,
@@ -188,7 +182,7 @@ public class ClusterCheckerTask extends LeaderTask {
         tags.add(Tag.of(MetricsConstants.TagKeys.HOST, host));
         int reapedConnectionsCount = 1;
         try {
-            reapedConnectionsCount = this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host);
+            reapedConnectionsCount = this.persistenceService.removeAllAgentConnectionsToServer(host);
             log.info("Dropped {} agent connections to host {}", reapedConnectionsCount, host);
         } catch (RuntimeException e) {
             MetricsUtils.addFailureTagsWithException(tags, e);

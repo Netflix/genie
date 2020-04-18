@@ -20,23 +20,26 @@ package com.netflix.genie.web.tasks.job;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.jobs.JobDoneFile;
 import com.netflix.genie.web.jobs.JobKillReasonFile;
 import com.netflix.genie.web.properties.JobsProperties;
@@ -82,8 +85,7 @@ public class JobCompletionService {
     static final String JOB_COMPLETION_ERROR_COUNTER_NAME = "genie.jobs.errors.count";
     static final String ERROR_SOURCE_TAG = "error";
     static final String JOB_FINAL_STATE = "jobFinalState";
-    private final JobPersistenceService jobPersistenceService;
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final JobArchiveService jobArchiveService;
     private final File baseWorkingDir;
     private final MailService mailServiceImpl;
@@ -117,8 +119,7 @@ public class JobCompletionService {
         final JobsProperties jobsProperties,
         @NotNull final RetryTemplate retryTemplate
     ) throws GenieException {
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.jobArchiveService = jobArchiveService;
         this.mailServiceImpl = mailServiceImpl;
         this.deleteDependencies = jobsProperties.getCleanup().isDeleteDependencies();
@@ -206,7 +207,7 @@ public class JobCompletionService {
     }
 
     private Job getJob(final String jobId) throws GenieException {
-        return this.jobSearchService.getJob(jobId);
+        return this.persistenceService.getJob(jobId);
     }
 
     private Void updateJob(
@@ -258,7 +259,7 @@ public class JobCompletionService {
 
             if (eventStatus != null) {
                 tags.add(Tag.of(JOB_FINAL_STATE, status.toString()));
-                this.jobPersistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
+                this.persistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
             }
         } catch (Throwable t) {
             incrementErrorCounter("JOB_UPDATE_FAILURE", t);
@@ -275,9 +276,9 @@ public class JobCompletionService {
      */
     private void cleanupProcesses(final String jobId) {
         try {
-            if (!this.jobPersistenceService.getJobStatus(jobId)
+            if (!this.persistenceService.getJobStatus(jobId)
                 .equals(com.netflix.genie.common.external.dtos.v4.JobStatus.INVALID)) {
-                this.jobSearchService.getJobExecution(jobId).getProcessId().ifPresent(pid -> {
+                this.persistenceService.getJobExecution(jobId).getProcessId().ifPresent(pid -> {
                     try {
                         final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
                         commandLine.addArgument(JobConstants.getKillFlag());
@@ -293,7 +294,7 @@ public class JobCompletionService {
                     }
                 });
             }
-        } catch (final GenieException ge) {
+        } catch (final GenieException | GenieCheckedException ge) {
             log.error("Unable to cleanup process for job {} due to exception.", jobId, ge);
             incrementErrorCounter("JOB_CLEANUP_FAILURE", ge);
         } catch (Throwable t) {
@@ -340,7 +341,7 @@ public class JobCompletionService {
             final JobStatus finalStatus;
             switch (exitCode) {
                 case JobExecution.KILLED_EXIT_CODE:
-                    this.jobPersistenceService.setJobCompletionInformation(
+                    this.persistenceService.setJobCompletionInformation(
                         id,
                         exitCode,
                         JobStatus.KILLED,
@@ -351,7 +352,7 @@ public class JobCompletionService {
                     finalStatus = JobStatus.KILLED;
                     break;
                 case JobExecution.SUCCESS_EXIT_CODE:
-                    this.jobPersistenceService.setJobCompletionInformation(
+                    this.persistenceService.setJobCompletionInformation(
                         id,
                         exitCode,
                         JobStatus.SUCCEEDED,
@@ -363,7 +364,7 @@ public class JobCompletionService {
                     break;
                 // catch all for non-zero and non-zombie, killed and failed exit codes
                 default:
-                    this.jobPersistenceService.setJobCompletionInformation(
+                    this.persistenceService.setJobCompletionInformation(
                         id,
                         exitCode,
                         JobStatus.FAILED,
@@ -380,7 +381,7 @@ public class JobCompletionService {
             // The run.sh should theoretically ALWAYS generate a done file so we should never hit this code.
             // But if we do handle it generate a metric for it which we can track
             log.error("Could not load the done file for job {}. Marking it as failed.", id, ioe);
-            this.jobPersistenceService.updateJobStatus(
+            this.persistenceService.updateJobStatus(
                 id,
                 JobStatus.FAILED,
                 JobStatusMessages.COULD_NOT_LOAD_DONE_FILE
@@ -402,83 +403,79 @@ public class JobCompletionService {
         log.debug("Deleting dependencies.");
 
         if (jobDir.exists()) {
-
             final Collection<File> dependencyDirectories = Sets.newHashSet();
 
             // Collect application dependencies
             try {
-                for (Application application : this.jobSearchService.getJobApplications(jobId)) {
-                    application.getId().ifPresent(
-                        appId ->
-                            dependencyDirectories.add(
-                                new File(
-                                    jobDir,
-                                    JobConstants.GENIE_PATH_VAR
-                                        + JobConstants.FILE_PATH_DELIMITER
-                                        + JobConstants.APPLICATION_PATH_VAR
-                                        + JobConstants.FILE_PATH_DELIMITER
-                                        + appId
-                                        + JobConstants.FILE_PATH_DELIMITER
-                                        + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
-                                )
-                            )
+                for (Application application : this.persistenceService.getJobApplications(jobId)) {
+                    dependencyDirectories.add(
+                        new File(
+                            jobDir,
+                            JobConstants.GENIE_PATH_VAR
+                                + JobConstants.FILE_PATH_DELIMITER
+                                + JobConstants.APPLICATION_PATH_VAR
+                                + JobConstants.FILE_PATH_DELIMITER
+                                + application.getId()
+                                + JobConstants.FILE_PATH_DELIMITER
+                                + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                        )
                     );
                 }
-            } catch (GenieException e) {
+            } catch (NotFoundException e) {
                 log.error(
                     "Error collecting application dependencies for job: {} due to error {}",
                     jobId,
-                    e.toString());
+                    e.getMessage(),
+                    e
+                );
                 incrementErrorCounter("DELETE_APPLICATION_DEPENDENCIES_FAILURE", e);
             }
 
             // Collect cluster dependencies
             try {
-                this.jobSearchService.getJobCluster(jobId).getId().ifPresent(
-                    clusterId ->
-                        dependencyDirectories.add(
-                            new File(
-                                jobDir,
-                                JobConstants.GENIE_PATH_VAR
-                                    + JobConstants.FILE_PATH_DELIMITER
-                                    + JobConstants.CLUSTER_PATH_VAR
-                                    + JobConstants.FILE_PATH_DELIMITER
-                                    + clusterId
-                                    + JobConstants.FILE_PATH_DELIMITER
-                                    + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
-                            )
-                        )
+                dependencyDirectories.add(
+                    new File(
+                        jobDir,
+                        JobConstants.GENIE_PATH_VAR
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + JobConstants.CLUSTER_PATH_VAR
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + this.persistenceService.getJobCluster(jobId).getId()
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                    )
                 );
-            } catch (GenieException e) {
+            } catch (NotFoundException e) {
                 log.error(
                     "Error collecting cluster dependency for job: {} due to error {}",
                     jobId,
-                    e.toString());
+                    e.getMessage(),
+                    e
+                );
                 incrementErrorCounter("DELETE_CLUSTER_DEPENDENCIES_FAILURE", e);
             }
 
             // Collect command dependencies
             try {
-                this.jobSearchService.getJobCommand(jobId).getId().ifPresent(
-                    commandId ->
-                        dependencyDirectories.add(
-                            new File(
-                                jobDir,
-                                JobConstants.GENIE_PATH_VAR
-                                    + JobConstants.FILE_PATH_DELIMITER
-                                    + JobConstants.COMMAND_PATH_VAR
-                                    + JobConstants.FILE_PATH_DELIMITER
-                                    + commandId
-                                    + JobConstants.FILE_PATH_DELIMITER
-                                    + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
-                            )
-                        )
+                dependencyDirectories.add(
+                    new File(
+                        jobDir,
+                        JobConstants.GENIE_PATH_VAR
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + JobConstants.COMMAND_PATH_VAR
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + this.persistenceService.getJobCommand(jobId).getId()
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                    )
                 );
-            } catch (GenieException e) {
+            } catch (NotFoundException e) {
                 log.error(
                     "Error collecting command dependency for job: {} due to error {}",
                     jobId,
-                    e.toString());
+                    e.getMessage(),
+                    e
+                );
                 incrementErrorCounter("DELETE_COMMAND_DEPENDENCIES_FAILURE", e);
             }
 
@@ -523,35 +520,39 @@ public class JobCompletionService {
         final Optional<String> oJobId = job.getId();
 
         // The deletion of dependencies and archiving only happens for job requests which are not Invalid.
-        if (oJobId.isPresent()
-            && !
-            (this.jobPersistenceService.getJobStatus(oJobId.get())
-                .equals(com.netflix.genie.common.external.dtos.v4.JobStatus.INVALID))
-        ) {
+        if (oJobId.isPresent()) {
             final String jobId = oJobId.get();
-            final File jobDir = new File(this.baseWorkingDir, jobId);
+            final com.netflix.genie.common.external.dtos.v4.JobStatus status;
+            try {
+                status = this.persistenceService.getJobStatus(jobId);
+            } catch (final NotFoundException e) {
+                throw new GenieNotFoundException(e.getMessage(), e);
+            }
+            if (!status.equals(com.netflix.genie.common.external.dtos.v4.JobStatus.INVALID)) {
+                final File jobDir = new File(this.baseWorkingDir, jobId);
 
-            if (jobDir.exists()) {
-                if (this.deleteDependencies) {
-                    this.deleteDependenciesDirectories(jobId, jobDir);
-                }
-
-                final Optional<String> archiveLocation = job.getArchiveLocation();
-                if (archiveLocation.isPresent() && !Strings.isNullOrEmpty(archiveLocation.get())) {
-                    log.debug("Archiving job directory");
-
-                    try {
-                        this.jobArchiveService.archiveDirectory(jobDir.toPath(), new URI(archiveLocation.get()));
-                    } catch (final JobArchiveException | URISyntaxException e) {
-                        log.warn("Failed to archive job files for job {} due to {}", jobId, e.getMessage(), e);
-                        incrementErrorCounter("JOB_ARCHIVAL_FAILURE", e);
-                        return false;
+                if (jobDir.exists()) {
+                    if (this.deleteDependencies) {
+                        this.deleteDependenciesDirectories(jobId, jobDir);
                     }
-                }
 
-                // TODO: Probably need to schedule deletion of the job directory to save disk space
-                //       Currently this will be handled by DiskCleanupTask so not prioritizing as of
-                //       also this code hopefully will be irrelevent with agent 2/4/18 - TJG
+                    final Optional<String> archiveLocation = job.getArchiveLocation();
+                    if (archiveLocation.isPresent() && !Strings.isNullOrEmpty(archiveLocation.get())) {
+                        log.debug("Archiving job directory");
+
+                        try {
+                            this.jobArchiveService.archiveDirectory(jobDir.toPath(), new URI(archiveLocation.get()));
+                        } catch (final JobArchiveException | URISyntaxException e) {
+                            log.warn("Failed to archive job files for job {} due to {}", jobId, e.getMessage(), e);
+                            incrementErrorCounter("JOB_ARCHIVAL_FAILURE", e);
+                            return false;
+                        }
+                    }
+
+                    // TODO: Probably need to schedule deletion of the job directory to save disk space
+                    //       Currently this will be handled by DiskCleanupTask so not prioritizing as of
+                    //       also this code hopefully will be irrelevent with agent 2/4/18 - TJG
+                }
             }
         }
         return true;
@@ -564,20 +565,30 @@ public class JobCompletionService {
      * @throws GenieException If there is any problem.
      */
     private boolean sendEmail(final String jobId) throws GenieException {
-        final JobRequest jobRequest = this.jobSearchService.getV3JobRequest(jobId);
+        final JobRequest jobRequest;
+        try {
+            jobRequest = this.persistenceService.getJobRequest(jobId);
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage(), e);
+        }
         boolean result = false;
-        final Optional<String> email = jobRequest.getEmail();
+        final JobMetadata jobMetadata = jobRequest.getMetadata();
+        final Optional<String> email = jobMetadata.getEmail();
 
         if (email.isPresent() && !Strings.isNullOrEmpty(email.get())) {
             log.debug("Got a job finished event. Sending email: {}", email.get());
-            final com.netflix.genie.common.external.dtos.v4.JobStatus status
-                = this.jobPersistenceService.getJobStatus(jobId);
+            final com.netflix.genie.common.external.dtos.v4.JobStatus status;
+            try {
+                status = this.persistenceService.getJobStatus(jobId);
+            } catch (final NotFoundException e) {
+                throw new GenieNotFoundException(e.getMessage(), e);
+            }
 
             final StringBuilder subject = new StringBuilder()
                 .append("Genie Job Finished. Id: [")
                 .append(jobId)
                 .append("], Name: [")
-                .append(jobRequest.getName())
+                .append(jobMetadata.getName())
                 .append("], Status: [")
                 .append(status)
                 .append("].");
@@ -587,18 +598,18 @@ public class JobCompletionService {
                 .append(jobId)
                 .append("]\n")
                 .append("Name: [")
-                .append(jobRequest.getName())
+                .append(jobMetadata.getName())
                 .append("]\n")
                 .append("Status: [")
                 .append(status)
                 .append("]\n")
                 .append("User: [")
-                .append(jobRequest.getUser())
+                .append(jobMetadata.getUser())
                 .append("]\n")
                 .append("Tags: ")
-                .append(jobRequest.getTags())
+                .append(jobMetadata.getTags())
                 .append("\n");
-            jobRequest
+            jobMetadata
                 .getDescription()
                 .ifPresent(
                     description ->

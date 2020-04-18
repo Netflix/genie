@@ -18,15 +18,15 @@
 package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Sets
-import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.DirectoryManifest
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException
+import com.netflix.genie.web.exceptions.checked.NotFoundException
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.springframework.core.io.Resource
@@ -35,7 +35,6 @@ import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 import java.time.Instant
-
 /**
  * Specifications for {@link ArchivedJobServiceImpl}.
  *
@@ -43,17 +42,17 @@ import java.time.Instant
  */
 class ArchivedJobServiceImplSpec extends Specification {
 
-    JobPersistenceService jobPersistenceService
+    PersistenceService persistenceService
     ResourceLoader resourceLoader
     MeterRegistry meterRegistry
     ArchivedJobServiceImpl service
 
     def setup() {
-        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.persistenceService = Mock(PersistenceService)
         this.resourceLoader = Mock(ResourceLoader)
         this.meterRegistry = new SimpleMeterRegistry()
         def dataServices = Mock(DataServices) {
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         this.service = new ArchivedJobServiceImpl(dataServices, this.resourceLoader, this.meterRegistry)
     }
@@ -68,8 +67,8 @@ class ArchivedJobServiceImplSpec extends Specification {
         this.service.getArchivedJobMetadata(jobId)
 
         then: "A job not found exception is thrown"
-        1 * this.jobPersistenceService.getJobArchiveLocation(jobId) >> {
-            throw new GenieNotFoundException("job not found")
+        1 * this.persistenceService.getJobArchiveLocation(jobId) >> {
+            throw new NotFoundException("job not found")
         }
         thrown(JobNotFoundException)
 
@@ -77,21 +76,21 @@ class ArchivedJobServiceImplSpec extends Specification {
         this.service.getArchivedJobMetadata(jobId)
 
         then: "A job not archived exception is thrown"
-        1 * this.jobPersistenceService.getJobArchiveLocation(jobId) >> Optional.empty()
+        1 * this.persistenceService.getJobArchiveLocation(jobId) >> Optional.empty()
         thrown(JobNotArchivedException)
 
         when: "When the archive location isn't valid"
         this.service.getArchivedJobMetadata(jobId)
 
         then: "A runtime exception is thrown"
-        1 * this.jobPersistenceService.getJobArchiveLocation(jobId) >> Optional.of("I'm not a valid URI")
+        1 * this.persistenceService.getJobArchiveLocation(jobId) >> Optional.of("I'm not a valid URI")
         thrown(GenieRuntimeException)
 
         when: "The manifest doesn't exist in the expected location"
         this.service.getArchivedJobMetadata(jobId)
 
         then: "A manifest not found exception is thrown"
-        1 * this.jobPersistenceService.getJobArchiveLocation(jobId) >> Optional.of(archiveLocation)
+        1 * this.persistenceService.getJobArchiveLocation(jobId) >> Optional.of(archiveLocation)
         1 * this.resourceLoader.getResource(_ as String) >> manifestResource
         1 * manifestResource.exists() >> false
         thrown(JobDirectoryManifestNotFoundException)
@@ -100,7 +99,7 @@ class ArchivedJobServiceImplSpec extends Specification {
         this.service.getArchivedJobMetadata(jobId)
 
         then: "A runtime exception is thrown"
-        1 * this.jobPersistenceService.getJobArchiveLocation(jobId) >> Optional.of(archiveLocation)
+        1 * this.persistenceService.getJobArchiveLocation(jobId) >> Optional.of(archiveLocation)
         1 * this.resourceLoader.getResource(_ as String) >> manifestResource
         1 * manifestResource.exists() >> true
         1 * manifestResource.getInputStream() >> badInputStream
@@ -143,7 +142,7 @@ class ArchivedJobServiceImplSpec extends Specification {
         def metadata = this.service.getArchivedJobMetadata(jobId)
 
         then:
-        1 * this.jobPersistenceService.getJobArchiveLocation(jobId) >> Optional.of(archiveLocation)
+        1 * this.persistenceService.getJobArchiveLocation(jobId) >> Optional.of(archiveLocation)
         1 * this.resourceLoader.getResource(_ as String) >> manifestResource
         1 * manifestResource.exists() >> true
         1 * manifestResource.getInputStream() >> manifestByteStream

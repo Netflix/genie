@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
 import com.netflix.genie.common.external.dtos.v4.JobMetadata;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
@@ -63,12 +63,12 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
 
 
     private final String hostname;
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final LocalAgentLauncherProperties launcherProperties;
     private final ExecutorFactory executorFactory;
     private final MeterRegistry registry;
     private final Executor sharedExecutor;
-    private int rpcPort;
+    private final int rpcPort;
 
     /**
      * Constructor.
@@ -91,7 +91,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
     ) {
         this.hostname = hostInfo.getHostname();
         this.rpcPort = rpcInfo.getRpcPort();
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.launcherProperties = launcherProperties;
         this.executorFactory = executorFactory;
         this.registry = registry;
@@ -144,7 +144,7 @@ public class LocalAgentLauncherImpl implements AgentLauncher {
 
         // One at a time to ensure we don't overflow configured max
         synchronized (MEMORY_CHECK_LOCK) {
-            final long usedMemoryOnHost = this.jobSearchService.getUsedMemoryOnHost(this.hostname);
+            final long usedMemoryOnHost = this.persistenceService.getUsedMemoryOnHost(this.hostname);
             final long expectedUsedMemoryOnHost = usedMemoryOnHost + jobMemory;
             if (expectedUsedMemoryOnHost > this.launcherProperties.getMaxTotalJobMemory()) {
                 throw new AgentLaunchException(

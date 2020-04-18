@@ -18,15 +18,16 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.spring.autoconfigure.CachingAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.RetryAutoConfiguration;
@@ -85,7 +86,7 @@ class ArchivedJobServiceImplIntegrationTest {
     private ArchivedJobService archivedJobService;
 
     @MockBean
-    private JobPersistenceService jobPersistenceService;
+    private PersistenceService persistenceService;
 
     /**
      * Make sure that when the correct exception is thrown it retries the expected number of times.
@@ -95,14 +96,14 @@ class ArchivedJobServiceImplIntegrationTest {
     @Test
     void testRetryOnMissingManifest() throws Exception {
         Mockito
-            .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
+            .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.of(ARCHIVE_LOCATION));
 
         try {
             this.archivedJobService.getArchivedJobMetadata(JOB_ID);
         } catch (final JobDirectoryManifestNotFoundException ignored) {
             Mockito
-                .verify(this.jobPersistenceService, Mockito.times(NUM_GET_RETRIES))
+                .verify(this.persistenceService, Mockito.times(NUM_GET_RETRIES))
                 .getJobArchiveLocation(JOB_ID);
         }
     }
@@ -115,14 +116,14 @@ class ArchivedJobServiceImplIntegrationTest {
     @Test
     void testNoRetryOnJobNotFound() throws Exception {
         Mockito
-            .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
-            .thenThrow(new GenieNotFoundException("blah"));
+            .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
+            .thenThrow(new NotFoundException("blah"));
 
         try {
             this.archivedJobService.getArchivedJobMetadata(JOB_ID);
         } catch (final JobNotFoundException ignored) {
             Mockito
-                .verify(this.jobPersistenceService, Mockito.times(1))
+                .verify(this.persistenceService, Mockito.times(1))
                 .getJobArchiveLocation(JOB_ID);
         }
     }
@@ -130,19 +131,19 @@ class ArchivedJobServiceImplIntegrationTest {
     /**
      * Make sure that when a runtime exception is thrown it doesn't retry.
      *
-     * @throws GenieNotFoundException If this happens something really bizarre happened
+     * @throws GenieCheckedException If this happens something really bizarre happened
      */
     @Test
-    void testNoRetryOnUnexpectedException() throws GenieNotFoundException {
+    void testNoRetryOnUnexpectedException() throws GenieCheckedException {
         Mockito
-            .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
+            .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.of("Not a valid URI"));
 
         try {
             this.archivedJobService.getArchivedJobMetadata(JOB_ID);
         } catch (final Exception ignored) {
             Mockito
-                .verify(this.jobPersistenceService, Mockito.times(1))
+                .verify(this.persistenceService, Mockito.times(1))
                 .getJobArchiveLocation(JOB_ID);
         }
     }
@@ -155,14 +156,14 @@ class ArchivedJobServiceImplIntegrationTest {
     @Test
     void testNoRetryOnJobNotArchived() throws Exception {
         Mockito
-            .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
+            .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.empty());
 
         try {
             this.archivedJobService.getArchivedJobMetadata(JOB_ID);
         } catch (final JobNotArchivedException ignored) {
             Mockito
-                .verify(this.jobPersistenceService, Mockito.times(1))
+                .verify(this.persistenceService, Mockito.times(1))
                 .getJobArchiveLocation(JOB_ID);
         }
     }
@@ -185,7 +186,7 @@ class ArchivedJobServiceImplIntegrationTest {
         );
 
         Mockito
-            .when(this.jobPersistenceService.getJobArchiveLocation(JOB_ID))
+            .when(this.persistenceService.getJobArchiveLocation(JOB_ID))
             .thenReturn(Optional.of(archiveLocation));
 
         final ArchivedJobMetadata metadata = this.archivedJobService.getArchivedJobMetadata(JOB_ID);
@@ -200,7 +201,7 @@ class ArchivedJobServiceImplIntegrationTest {
 
         // This should only have actually been used one time despite two service API calls
         Mockito
-            .verify(this.jobPersistenceService, Mockito.times(1))
+            .verify(this.persistenceService, Mockito.times(1))
             .getJobArchiveLocation(JOB_ID);
     }
 
@@ -227,9 +228,9 @@ class ArchivedJobServiceImplIntegrationTest {
         }
 
         @Bean
-        DataServices dataServices(final JobPersistenceService jobPersistenceService) {
+        DataServices dataServices(final PersistenceService persistenceService) {
             final DataServices dataServices = Mockito.mock(DataServices.class);
-            Mockito.when(dataServices.getJobPersistenceService()).thenReturn(jobPersistenceService);
+            Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
             return dataServices;
         }
     }

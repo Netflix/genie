@@ -19,17 +19,17 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.external.util.GenieObjectMapper;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -69,7 +69,7 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
     private static final String GET_ARCHIVED_JOB_METADATA_METRIC_NAME
         = "genie.web.services.archivedJobService.getArchivedJobMetadata.timer";
 
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final ResourceLoader resourceLoader;
     private final MeterRegistry meterRegistry;
 
@@ -85,7 +85,7 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
         final ResourceLoader resourceLoader,
         final MeterRegistry meterRegistry
     ) {
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.resourceLoader = resourceLoader;
         this.meterRegistry = meterRegistry;
     }
@@ -121,10 +121,10 @@ public class ArchivedJobServiceImpl implements ArchivedJobService {
             final String archiveLocation;
 
             try {
-                archiveLocation = this.jobPersistenceService
+                archiveLocation = this.persistenceService
                     .getJobArchiveLocation(jobId)
                     .orElseThrow(() -> new JobNotArchivedException("Job " + jobId + " wasn't archived"));
-            } catch (final GenieNotFoundException nfe) {
+            } catch (final NotFoundException nfe) {
                 throw new JobNotFoundException(nfe);
             }
 

@@ -22,11 +22,12 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.web.agent.launchers.AgentLauncher;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.AgentLaunchException;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
 import com.netflix.genie.web.services.JobLaunchService;
 import com.netflix.genie.web.services.JobResolverService;
@@ -51,7 +52,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
 
     private static final String LAUNCH_JOB_TIMER = "genie.services.jobLaunch.launchJob.timer";
 
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
     private final AgentLauncher agentLauncher;
     private final MeterRegistry registry;
@@ -70,7 +71,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
         final AgentLauncher agentLauncher,
         final MeterRegistry registry
     ) {
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.jobResolverService = jobResolverService;
         this.agentLauncher = agentLauncher;
         this.registry = registry;
@@ -83,7 +84,12 @@ public class JobLaunchServiceImpl implements JobLaunchService {
     @Nonnull
     public String launchJob(
         @Valid final JobSubmission jobSubmission
-    ) throws AgentLaunchException, GenieJobResolutionException, IdAlreadyExistsException, SaveAttachmentException {
+    ) throws
+        AgentLaunchException,
+        GenieJobResolutionException,
+        IdAlreadyExistsException,
+        NotFoundException,
+        SaveAttachmentException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -96,15 +102,14 @@ public class JobLaunchServiceImpl implements JobLaunchService {
              * 4. Launch the agent process given the implementation configured for this Genie instance
              * 5. If the agent launch fails mark the job failed else return
              */
-
-            final String jobId = this.jobPersistenceService.saveJobSubmission(jobSubmission);
+            final String jobId = this.persistenceService.saveJobSubmission(jobSubmission);
 
             final ResolvedJob resolvedJob;
             try {
                 resolvedJob = this.jobResolverService.resolveJob(jobId);
             } catch (final Throwable t) {
                 MetricsUtils.addFailureTagsWithException(tags, t);
-                this.jobPersistenceService.updateJobStatus(
+                this.persistenceService.updateJobStatus(
                     jobId,
                     JobStatus.RESERVED,
                     JobStatus.FAILED,
@@ -116,7 +121,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
             // Job state should be RESOLVED now. Mark it ACCEPTED to avoid race condition with agent starting up
             // before we get return from launchAgent and trying to set it to CLAIMED
             try {
-                this.jobPersistenceService.updateJobStatus(
+                this.persistenceService.updateJobStatus(
                     jobId,
                     JobStatus.RESOLVED,
                     JobStatus.ACCEPTED,
@@ -133,7 +138,7 @@ public class JobLaunchServiceImpl implements JobLaunchService {
                 this.agentLauncher.launchAgent(resolvedJob);
             } catch (final AgentLaunchException e) {
                 // TODO: this could fail as well
-                this.jobPersistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage());
+                this.persistenceService.updateJobStatus(jobId, JobStatus.ACCEPTED, JobStatus.FAILED, e.getMessage());
                 // TODO: How will we get the ID back to the user? Should we add it to an exception? We don't get
                 //       We don't get the ID until after saveJobSubmission so if that fails we'd still return nothing
                 //       Probably need multiple exceptions to be thrown from this API (if we go with checked)

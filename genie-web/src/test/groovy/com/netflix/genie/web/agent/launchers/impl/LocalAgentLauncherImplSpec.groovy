@@ -21,7 +21,7 @@ import com.netflix.genie.common.external.dtos.v4.JobEnvironment
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobSearchService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.introspection.GenieWebHostInfo
 import com.netflix.genie.web.introspection.GenieWebRpcInfo
@@ -55,7 +55,7 @@ class LocalAgentLauncherImplSpec extends Specification {
 
     GenieWebHostInfo hostInfo
     GenieWebRpcInfo rpcInfo
-    JobSearchService jobSearchService
+    PersistenceService persistenceService
     LocalAgentLauncherProperties launchProperties
     ExecutorFactory executorFactory
     MeterRegistry meterRegistry
@@ -76,7 +76,7 @@ class LocalAgentLauncherImplSpec extends Specification {
     def setup() {
         this.hostInfo = Mock(GenieWebHostInfo)
         this.rpcInfo = Mock(GenieWebRpcInfo)
-        this.jobSearchService = Mock(JobSearchService)
+        this.persistenceService = Mock(PersistenceService)
         this.launchProperties = new LocalAgentLauncherProperties()
         this.executorFactory = Mock(ExecutorFactory)
         this.meterRegistry = Mock(MeterRegistry)
@@ -92,7 +92,7 @@ class LocalAgentLauncherImplSpec extends Specification {
         this.executor = Mock(Executor)
         this.additionalEnvironment = [foo: "bar"]
         this.dataServices = Mock(DataServices) {
-            getJobSearchService() >> this.jobSearchService
+            getPersistenceService() >> this.persistenceService
         }
     }
 
@@ -135,7 +135,7 @@ class LocalAgentLauncherImplSpec extends Specification {
         1 * this.resolvedJob.getJobSpecification() >> this.jobSpec
         1 * this.jobSpec.getJob() >> this.job
         1 * this.job.getId() >> JOB_ID
-        1 * this.jobSearchService.getUsedMemoryOnHost(this.hostname)
+        1 * this.persistenceService.getUsedMemoryOnHost(this.hostname)
         1 * this.executorFactory.newInstance(true) >> executor
         1 * this.executor.execute(_ as CommandLine, _ as Map, _ as LocalAgentLauncherImpl.AgentResultHandler) >> {
             args ->

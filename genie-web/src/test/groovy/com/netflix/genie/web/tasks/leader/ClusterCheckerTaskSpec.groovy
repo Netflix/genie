@@ -23,10 +23,8 @@ import com.netflix.genie.common.dto.JobExecution
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.internal.util.GenieHostInfo
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
-import com.netflix.genie.web.data.services.JobSearchService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.properties.ClusterCheckerProperties
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
 import com.netflix.genie.web.util.MetricsConstants
@@ -45,9 +43,7 @@ class ClusterCheckerTaskSpec extends Specification {
     ClusterCheckerTask task
     String hostname
     ClusterCheckerProperties properties
-    JobSearchService jobSearchService
-    JobPersistenceService jobPersistenceService
-    AgentConnectionPersistenceService agentConnectionPersistenceService
+    PersistenceService persistenceService
     RestTemplate restTemplate
     MeterRegistry meterRegistry
 
@@ -60,9 +56,7 @@ class ClusterCheckerTaskSpec extends Specification {
             _ * getLostThreshold() >> 3
         }
 
-        this.jobSearchService = Mock(JobSearchService.class)
-        this.jobPersistenceService = Mock(JobPersistenceService.class)
-        this.agentConnectionPersistenceService = Mock(AgentConnectionPersistenceService)
+        this.persistenceService = Mock(PersistenceService.class)
         this.restTemplate = Mock(RestTemplate.class)
         this.meterRegistry = new SimpleMeterRegistry()
 
@@ -72,9 +66,7 @@ class ClusterCheckerTaskSpec extends Specification {
         }
 
         def dataServices = Mock(DataServices) {
-            getJobSearchService() >> this.jobSearchService
-            getJobPersistenceService() >> this.jobPersistenceService
-            getAgentConnectionPersistenceService() >> this.agentConnectionPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
 
         this.task = new ClusterCheckerTask(
@@ -154,7 +146,7 @@ class ClusterCheckerTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * this.jobSearchService.getAllHostsWithActiveJobs() >> hosts
+        1 * this.persistenceService.getAllHostsWithActiveJobs() >> hosts
         1 * this.restTemplate.getForObject(host1url, String.class) >> ""
         1 * this.restTemplate.getForObject(host2url, String.class) >> { throw restException }
         1 * this.restTemplate.getForObject(host3url, String.class) >> { throw outOfServiceHealthException }
@@ -180,7 +172,7 @@ class ClusterCheckerTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * this.jobSearchService.getAllHostsWithActiveJobs() >> hosts
+        1 * this.persistenceService.getAllHostsWithActiveJobs() >> hosts
         1 * this.restTemplate.getForObject(host1url, String.class) >> healthyResponse
         1 * this.restTemplate.getForObject(host2url, String.class) >> { throw restException }
         1 * this.restTemplate.getForObject(host3url, String.class) >> { throw outOfServiceButHealthyException }
@@ -212,7 +204,7 @@ class ClusterCheckerTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * this.jobSearchService.getAllHostsWithActiveJobs() >> hosts
+        1 * this.persistenceService.getAllHostsWithActiveJobs() >> hosts
         1 * this.restTemplate.getForObject(host1url, String.class) >> healthyResponse
         1 * this.restTemplate.getForObject(host2url, String.class) >> { throw restException }
         1 * this.restTemplate.getForObject(host3url, String.class) >> { throw outOfServiceButHealthyException }
@@ -240,8 +232,8 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.HEALTH_STATUS, "OUT_OF_SERVICE"
         ).count() == 0
 
-        1 * this.jobSearchService.getAllActiveJobsOnHost(host2) >> [job1, job2]
-        1 * this.jobPersistenceService.setJobCompletionInformation(
+        1 * this.persistenceService.getAllActiveJobsOnHost(host2) >> [job1, job2]
+        1 * this.persistenceService.setJobCompletionInformation(
             job1.getId().get(),
             JobExecution.LOST_EXIT_CODE,
             JobStatus.FAILED,
@@ -255,7 +247,7 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS
         ).count() == 1
 
-        1 * this.jobPersistenceService.setJobCompletionInformation(
+        1 * this.persistenceService.setJobCompletionInformation(
             job2.getId().get(),
             JobExecution.LOST_EXIT_CODE,
             JobStatus.FAILED,
@@ -270,7 +262,7 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.EXCEPTION_CLASS, jobPersistenceServiceException.class.getCanonicalName()
         ).count() == 1
 
-        1 * this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host2) >> {
+        1 * this.persistenceService.removeAllAgentConnectionsToServer(host2) >> {
             throw new RuntimeException("...")
         }
         1 * this.meterRegistry.counter(
@@ -284,7 +276,7 @@ class ClusterCheckerTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * this.jobSearchService.getAllHostsWithActiveJobs() >> hosts
+        1 * this.persistenceService.getAllHostsWithActiveJobs() >> hosts
         1 * this.restTemplate.getForObject(host1url, String.class) >> healthyResponse
         1 * this.restTemplate.getForObject(host2url, String.class) >> { throw restException }
         1 * this.restTemplate.getForObject(host3url, String.class) >> healthyResponse
@@ -295,8 +287,8 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.HOST, host2
         ).count() == 4
 
-        1 * this.jobSearchService.getAllActiveJobsOnHost(host2) >> [job2]
-        1 * this.jobPersistenceService.setJobCompletionInformation(
+        1 * this.persistenceService.getAllActiveJobsOnHost(host2) >> [job2]
+        1 * this.persistenceService.setJobCompletionInformation(
             job2.getId().get(),
             JobExecution.LOST_EXIT_CODE,
             JobStatus.FAILED,
@@ -310,7 +302,7 @@ class ClusterCheckerTaskSpec extends Specification {
             MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS
         ).count() == 2
 
-        1 * this.agentConnectionPersistenceService.removeAllAgentConnectionToServer(host2) >> 4
+        1 * this.persistenceService.removeAllAgentConnectionsToServer(host2) >> 4
         1 * this.meterRegistry.counter(
             ClusterCheckerTask.REAPED_CONNECTIONS_METRIC_NAME,
             MetricsConstants.TagKeys.HOST, host2,
@@ -321,7 +313,7 @@ class ClusterCheckerTaskSpec extends Specification {
         this.task.run()
 
         then:
-        1 * this.jobSearchService.getAllHostsWithActiveJobs() >> hosts
+        1 * this.persistenceService.getAllHostsWithActiveJobs() >> hosts
         1 * this.restTemplate.getForObject(host1url, String.class) >> badResponse1
         1 * this.restTemplate.getForObject(host2url, String.class) >> badResponse2
         1 * this.restTemplate.getForObject(host3url, String.class) >> badResponse3

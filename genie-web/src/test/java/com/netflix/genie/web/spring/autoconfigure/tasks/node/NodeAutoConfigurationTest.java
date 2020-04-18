@@ -18,7 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.tasks.node;
 
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
@@ -93,31 +93,16 @@ class NodeAutoConfigurationTest {
      */
     static class MockBeanConfig {
 
-        /**
-         * Mocked bean.
-         *
-         * @return Mocked bean instance
-         */
         @Bean
         ThreadPoolTaskScheduler genieTaskScheduler() {
             return Mockito.mock(ThreadPoolTaskScheduler.class);
         }
 
-        /**
-         * Mocked bean.
-         *
-         * @return Mocked bean instance
-         */
         @Bean
-        JobSearchService jobSearchService() {
-            return Mockito.mock(JobSearchService.class);
+        PersistenceService geniePersistenceService() {
+            return Mockito.mock(PersistenceService.class);
         }
 
-        /**
-         * Mocked bean.
-         *
-         * @return Mocked bean instance
-         */
         @Bean
         Resource jobsDir() {
             final Resource resource = Mockito.mock(Resource.class);
@@ -125,40 +110,25 @@ class NodeAutoConfigurationTest {
             return resource;
         }
 
-        /**
-         * Mocked bean.
-         *
-         * @return Mocked bean instance
-         */
         @Bean
         JobsProperties jobsProperties() {
             return JobsProperties.getJobsPropertiesDefaults();
         }
 
-        /**
-         * Mocked bean.
-         *
-         * @return Mocked bean instance
-         */
         @Bean
         MeterRegistry meterRegistry() {
             return Mockito.mock(MeterRegistry.class);
         }
 
-        /**
-         * Mocked bean.
-         *
-         * @return Mocked bean instance
-         */
         @Bean
         Executor executor() {
             return Mockito.mock(Executor.class);
         }
 
         @Bean
-        DataServices genieDataServices(final JobSearchService jobSearchService) {
+        DataServices genieDataServices(final PersistenceService persistenceService) {
             final DataServices dataServices = Mockito.mock(DataServices.class);
-            Mockito.when(dataServices.getJobSearchService()).thenReturn(jobSearchService);
+            Mockito.when(dataServices.getPersistenceService()).thenReturn(persistenceService);
             return dataServices;
         }
     }
