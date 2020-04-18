@@ -19,7 +19,7 @@ package com.netflix.genie.web.agent.services.impl;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import io.micrometer.core.instrument.MeterRegistry;
 
 /**
@@ -30,28 +30,28 @@ import io.micrometer.core.instrument.MeterRegistry;
  */
 public class AgentMetricsServiceImpl implements AgentMetricsService {
 
-    static final String CONNECTED_GUAGE_METRIC_NAME = "genie.agents.connected.gauge";
+    static final String CONNECTED_GAUGE_METRIC_NAME = "genie.agents.connected.gauge";
 
     private final GenieHostInfo genieHostInfo;
-    private final AgentConnectionPersistenceService agentConnectionPersistenceService;
+    private final PersistenceService persistenceService;
 
     /**
      * Constructor.
      *
-     * @param agentConnectionPersistenceService The service to get connection information from
-     * @param genieHostInfo                     Information regarding to the host this Genie server is running on
-     * @param registry                          The metrics repository
+     * @param persistenceService The service to get connection information from
+     * @param genieHostInfo      Information regarding to the host this Genie server is running on
+     * @param registry           The metrics repository
      */
     public AgentMetricsServiceImpl(
         final GenieHostInfo genieHostInfo,
-        final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        final PersistenceService persistenceService,
         final MeterRegistry registry
     ) {
         this.genieHostInfo = genieHostInfo;
-        this.agentConnectionPersistenceService = agentConnectionPersistenceService;
+        this.persistenceService = persistenceService;
 
         // Schedule metrics collection
-        registry.gauge(CONNECTED_GUAGE_METRIC_NAME, this, AgentMetricsServiceImpl::getNumConnectedAgents);
+        registry.gauge(CONNECTED_GAUGE_METRIC_NAME, this, AgentMetricsServiceImpl::getNumConnectedAgents);
     }
 
     /**
@@ -59,6 +59,6 @@ public class AgentMetricsServiceImpl implements AgentMetricsService {
      */
     @Override
     public long getNumConnectedAgents() {
-        return this.agentConnectionPersistenceService.getNumAgentConnectionsOnServer(this.genieHostInfo.getHostname());
+        return this.persistenceService.getNumAgentConnectionsOnServer(this.genieHostInfo.getHostname());
     }
 }

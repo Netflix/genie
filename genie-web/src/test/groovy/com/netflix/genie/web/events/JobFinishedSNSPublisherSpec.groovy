@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
-import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.common.external.dtos.v4.Application
 import com.netflix.genie.common.external.dtos.v4.ApplicationMetadata
 import com.netflix.genie.common.external.dtos.v4.Cluster
@@ -34,7 +33,8 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.common.external.util.GenieObjectMapper
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.exceptions.checked.NotFoundException
 import com.netflix.genie.web.properties.SNSNotificationsProperties
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
@@ -50,7 +50,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
     String topicARN
     AmazonSNS snsClient
     SNSNotificationsProperties snsProperties
-    JobPersistenceService jobPersistenceService
+    PersistenceService persistenceService
     MeterRegistry registry
     Counter counter
     ObjectMapper mapper
@@ -63,13 +63,13 @@ class JobFinishedSNSPublisherSpec extends Specification {
         this.topicARN = UUID.randomUUID().toString()
         this.snsClient = Mock(AmazonSNS)
         this.snsProperties = Mock(SNSNotificationsProperties)
-        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.persistenceService = Mock(PersistenceService)
         this.registry = Mock(MeterRegistry)
         this.counter = Mock(Counter)
         this.mapper = GenieObjectMapper.getMapper()
         this.event = Mock(JobStateChangeEvent)
         def dataServices = Mock(DataServices) {
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         this.publisher = new JobFinishedSNSPublisher(
             this.snsClient,
@@ -87,7 +87,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         then:
         1 * snsProperties.isEnabled() >> false
         0 * event._
-        0 * jobPersistenceService._
+        0 * persistenceService._
         0 * snsClient._
     }
 
@@ -99,7 +99,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * event.getNewStatus() >> JobStatus.RUNNING
         0 * event._
-        0 * jobPersistenceService._
+        0 * persistenceService._
         0 * snsClient._
     }
 
@@ -111,7 +111,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * event.getNewStatus() >> JobStatus.SUCCEEDED
         1 * event.getJobId() >> jobId
-        1 * jobPersistenceService.getFinishedJob(jobId) >> { throw new GenieNotFoundException("...") }
+        1 * persistenceService.getFinishedJob(jobId) >> { throw new NotFoundException("...") }
         0 * snsClient._
     }
 
@@ -141,7 +141,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * event.getNewStatus() >> JobStatus.FAILED
         1 * event.getJobId() >> jobId
-        1 * jobPersistenceService.getFinishedJob(jobId) >> finishedJob
+        1 * persistenceService.getFinishedJob(jobId) >> finishedJob
         1 * snsProperties.topicARN >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
         1 * snsClient.publish(topicARN, _ as String) >> {
@@ -227,7 +227,7 @@ class JobFinishedSNSPublisherSpec extends Specification {
         1 * snsProperties.isEnabled() >> true
         1 * event.getNewStatus() >> JobStatus.FAILED
         1 * event.getJobId() >> jobId
-        1 * jobPersistenceService.getFinishedJob(jobId) >> finishedJob
+        1 * persistenceService.getFinishedJob(jobId) >> finishedJob
         1 * snsProperties.topicARN >> topicARN
         1 * snsProperties.getAdditionalEventKeys() >> extraKeysMap
         1 * snsClient.publish(topicARN, _ as String) >> {

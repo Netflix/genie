@@ -20,6 +20,7 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.apis.rest.v3.controllers.ClusterRestController;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -61,7 +62,7 @@ public class ClusterModelAssembler implements RepresentationModelAssembler<Clust
                         .getCommandsForCluster(id, null)
                 ).withRel(COMMANDS_LINK)
             );
-        } catch (final GenieException ge) {
+        } catch (final GenieException | NotFoundException ge) {
             // If we can't convert it we might as well force a server exception
             throw new RuntimeException(ge);
         }

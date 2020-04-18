@@ -20,7 +20,7 @@ package com.netflix.genie.web.health;
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -45,7 +45,7 @@ public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
     @VisibleForTesting
     static final String AVAILABLE_MAX_JOB_CAPACITY = "availableMaxJobCapacity";
 
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final LocalAgentLauncherProperties launcherProperties;
     private final String hostname;
 
@@ -61,7 +61,7 @@ public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
         final LocalAgentLauncherProperties launcherProperties,
         final GenieHostInfo genieHostInfo
     ) {
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.launcherProperties = launcherProperties;
         this.hostname = genieHostInfo.getHostname();
     }
@@ -71,8 +71,8 @@ public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
      */
     @Override
     public Health health() {
-        final long allocatedMemoryOnHost = this.jobSearchService.getAllocatedMemoryOnHost(this.hostname);
-        final long usedMemoryOnHost = this.jobSearchService.getUsedMemoryOnHost(this.hostname);
+        final long allocatedMemoryOnHost = this.persistenceService.getAllocatedMemoryOnHost(this.hostname);
+        final long usedMemoryOnHost = this.persistenceService.getUsedMemoryOnHost(this.hostname);
 
         // Use allocated memory to make the host go OOS early enough that we don't throw as many exceptions on
         // accepted jobs during launch
@@ -89,7 +89,7 @@ public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
         }
 
         return builder
-            .withDetail(NUMBER_RUNNING_JOBS_KEY, this.jobSearchService.getActiveJobCountOnHost(this.hostname))
+            .withDetail(NUMBER_RUNNING_JOBS_KEY, this.persistenceService.getActiveJobCountOnHost(this.hostname))
             .withDetail(ALLOCATED_MEMORY_KEY, allocatedMemoryOnHost)
             .withDetail(AVAILABLE_MEMORY, availableMemory)
             .withDetail(USED_MEMORY_KEY, usedMemoryOnHost)

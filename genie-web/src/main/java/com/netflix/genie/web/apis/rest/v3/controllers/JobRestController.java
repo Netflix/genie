@@ -52,9 +52,9 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
@@ -140,7 +140,6 @@ public class JobRestController {
     private static final String COMMA = ",";
 
     private final JobLaunchService jobLaunchService;
-    private final JobSearchService jobSearchService;
     private final JobCoordinatorService jobCoordinatorService;
     private final ApplicationModelAssembler applicationModelAssembler;
     private final ClusterModelAssembler clusterModelAssembler;
@@ -155,7 +154,7 @@ public class JobRestController {
     private final JobDirectoryServerService jobDirectoryServerService;
     private final JobsProperties jobsProperties;
     private final AgentRoutingService agentRoutingService;
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final Environment environment;
 
     // TODO: V3 Execution only
@@ -201,7 +200,6 @@ public class JobRestController {
         final JobExecutionModeSelector jobExecutionModeSelector
     ) {
         this.jobLaunchService = jobLaunchService;
-        this.jobSearchService = dataServices.getJobSearchService();
         this.jobCoordinatorService = jobCoordinatorService;
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
@@ -216,7 +214,7 @@ public class JobRestController {
         this.jobDirectoryServerService = jobDirectoryServerService;
         this.jobsProperties = jobsProperties;
         this.agentRoutingService = agentRoutingService;
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.environment = environment;
 
         // TODO: V3 Only. Remove.
@@ -340,7 +338,7 @@ public class JobRestController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<Job> getJob(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJob] Called for job with id: {}", id);
-        return this.jobModelAssembler.toModel(this.jobSearchService.getJob(id));
+        return this.jobModelAssembler.toModel(this.persistenceService.getJob(id));
     }
 
     /**
@@ -348,17 +346,17 @@ public class JobRestController {
      *
      * @param id The id of the job to get status for
      * @return The status of the job as one of: {@link JobStatus}
-     * @throws GenieException on error
+     * @throws NotFoundException When no job with {@literal id} exists
      */
     @GetMapping(value = "/{id}/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JsonNode getJobStatus(@PathVariable("id") final String id) throws GenieException {
+    public JsonNode getJobStatus(@PathVariable("id") final String id) throws NotFoundException {
         log.info("[getJobStatus] Called for job with id: {}", id);
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
             .objectNode()
             .set(
                 "status",
-                factory.textNode(DtoConverters.toV3JobStatus(this.jobPersistenceService.getJobStatus(id)).toString())
+                factory.textNode(DtoConverters.toV3JobStatus(this.persistenceService.getJobStatus(id)).toString())
             );
     }
 
@@ -468,7 +466,7 @@ public class JobRestController {
             ).withSelfRel();
 
         return assembler.toModel(
-            this.jobSearchService.findJobs(
+            this.persistenceService.findJobs(
                 id,
                 name,
                 user,
@@ -498,8 +496,9 @@ public class JobRestController {
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
      * @param response      the servlet response
-     * @throws GenieException For any error
-     * @throws IOException    on redirect error
+     * @throws GenieException    For any error
+     * @throws NotFoundException When no job with {@literal id} exists
+     * @throws IOException       on redirect error
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -509,10 +508,10 @@ public class JobRestController {
         @Nullable final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws GenieException, IOException {
+    ) throws GenieException, NotFoundException, IOException {
         log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
 
-        if (this.jobPersistenceService.getJobStatus(id).isFinished()) {
+        if (this.persistenceService.getJobStatus(id).isFinished()) {
             // Job is already done no need to kill
             return;
         }
@@ -521,7 +520,7 @@ public class JobRestController {
         if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
             final String jobHostname;
             try {
-                jobHostname = this.getJobOwnerHostname(id, this.jobPersistenceService.isV4(id));
+                jobHostname = this.getJobOwnerHostname(id, this.persistenceService.isV4(id));
             } catch (final GenieJobNotFoundException e) {
                 throw new GenieNotFoundException("Job " + id + " not found", e);
             }
@@ -572,7 +571,7 @@ public class JobRestController {
     public EntityModel<JobRequest> getJobRequest(
         @PathVariable("id") final String id) throws GenieException {
         log.info("[getJobRequest] Called for job request with id {}", id);
-        return this.jobRequestModelAssembler.toModel(this.jobSearchService.getV3JobRequest(id));
+        return this.jobRequestModelAssembler.toModel(this.persistenceService.getV3JobRequest(id));
     }
 
     /**
@@ -588,7 +587,7 @@ public class JobRestController {
         @PathVariable("id") final String id
     ) throws GenieException {
         log.info("[getJobExecution] Called for job execution with id {}", id);
-        return this.jobExecutionModelAssembler.toModel(this.jobSearchService.getJobExecution(id));
+        return this.jobExecutionModelAssembler.toModel(this.persistenceService.getJobExecution(id));
     }
 
     /**
@@ -603,7 +602,7 @@ public class JobRestController {
     @ResponseStatus(HttpStatus.OK)
     public EntityModel<JobMetadata> getJobMetadata(@PathVariable("id") final String id) throws GenieException {
         log.info("[getJobMetadata] Called for job metadata with id {}", id);
-        return this.jobMetadataModelAssembler.toModel(this.jobSearchService.getJobMetadata(id));
+        return this.jobMetadataModelAssembler.toModel(this.persistenceService.getJobMetadata(id));
     }
 
     /**
@@ -611,13 +610,13 @@ public class JobRestController {
      *
      * @param id The id of the job to get the cluster for
      * @return The cluster
-     * @throws GenieException Usually GenieNotFound exception when either the job or the cluster aren't found
+     * @throws NotFoundException When either the job or the cluster aren't found
      */
     @GetMapping(value = "/{id}/cluster", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Cluster> getJobCluster(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Cluster> getJobCluster(@PathVariable("id") final String id) throws NotFoundException {
         log.info("[getJobCluster] Called for job with id {}", id);
-        return this.clusterModelAssembler.toModel(this.jobSearchService.getJobCluster(id));
+        return this.clusterModelAssembler.toModel(DtoConverters.toV3Cluster(this.persistenceService.getJobCluster(id)));
     }
 
     /**
@@ -625,13 +624,13 @@ public class JobRestController {
      *
      * @param id The id of the job to get the command for
      * @return The command
-     * @throws GenieException Usually GenieNotFound exception when either the job or the command aren't found
+     * @throws NotFoundException When either the job or the command aren't found
      */
     @GetMapping(value = "/{id}/command", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Command> getJobCommand(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Command> getJobCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("[getJobCommand] Called for job with id {}", id);
-        return this.commandModelAssembler.toModel(this.jobSearchService.getJobCommand(id));
+        return this.commandModelAssembler.toModel(DtoConverters.toV3Command(this.persistenceService.getJobCommand(id)));
     }
 
     /**
@@ -639,18 +638,19 @@ public class JobRestController {
      *
      * @param id The id of the job to get the applications for
      * @return The applications
-     * @throws GenieException Usually GenieNotFound exception when either the job or the applications aren't found
+     * @throws NotFoundException When either the job or the applications aren't found
      */
     @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<EntityModel<Application>> getJobApplications(
         @PathVariable("id") final String id
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("[getJobApplications] Called for job with id {}", id);
 
-        return this.jobSearchService
+        return this.persistenceService
             .getJobApplications(id)
             .stream()
+            .map(DtoConverters::toV3Application)
             .map(this.applicationModelAssembler::toModel)
             .collect(Collectors.toList());
     }
@@ -662,7 +662,8 @@ public class JobRestController {
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
      * @param response      the servlet response
-     * @throws GenieException on any Genie internal error
+     * @throws NotFoundException When no job with {@literal id} exists
+     * @throws GenieException    on any Genie internal error
      */
     @GetMapping(
         value = {
@@ -677,10 +678,10 @@ public class JobRestController {
         @Nullable final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws GenieException {
-        final boolean isV4 = this.jobPersistenceService.isV4(id);
+    ) throws GenieException, NotFoundException {
+        final boolean isV4 = this.persistenceService.isV4(id);
         final com.netflix.genie.common.external.dtos.v4.JobStatus jobStatus
-            = this.jobPersistenceService.getJobStatus(id);
+            = this.persistenceService.getJobStatus(id);
         final String path = ControllerUtils.getRemainingPath(request);
         final URL baseUrl;
         try {
@@ -806,15 +807,13 @@ public class JobRestController {
     private String getJobOwnerHostname(
         @NotBlank(message = "No job id entered. Unable to find the job owner.") final String jobId,
         final boolean isV4
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         if (isV4) {
             return this.agentRoutingService
                 .getHostnameForAgentConnection(jobId)
-                .orElseThrow(
-                    () -> new GenieNotFoundException("No hostname found for v4 job - " + jobId)
-                );
+                .orElseThrow(() -> new NotFoundException("No hostname found for v4 job - " + jobId));
         } else {
-            return this.jobSearchService.getJobHost(jobId);
+            return this.persistenceService.getJobHost(jobId);
         }
     }
 

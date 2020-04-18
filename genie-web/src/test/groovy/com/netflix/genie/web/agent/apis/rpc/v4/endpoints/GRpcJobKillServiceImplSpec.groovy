@@ -22,7 +22,7 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus
 import com.netflix.genie.proto.JobKillRegistrationRequest
 import com.netflix.genie.proto.JobKillRegistrationResponse
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
 
@@ -37,7 +37,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
     String jobId
     JobKillRegistrationRequest request
     JobKillRegistrationResponse response
-    JobPersistenceService jobPersistenceService = Mock()
+    PersistenceService persistenceService = Mock()
     StreamObserver<JobKillRegistrationResponse> responseObserver = Mock()
 
     void setup() {
@@ -45,7 +45,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         request = JobKillRegistrationRequest.newBuilder().setJobId(jobId).build()
         response = JobKillRegistrationResponse.newBuilder().build()
         def dataServices = Mock(DataServices) {
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         service = new GRpcJobKillServiceImpl(dataServices)
     }
@@ -62,7 +62,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.getJobStatus(jobId) >> JobStatus.RUNNING
+        1 * persistenceService.getJobStatus(jobId) >> JobStatus.RUNNING
         1 * responseObserver.onNext(response)
         1 * responseObserver.onCompleted()
 
@@ -85,7 +85,7 @@ class GRpcJobKillServiceImplSpec extends Specification {
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.getJobStatus(jobId) >> JobStatus.SUCCEEDED
+        1 * persistenceService.getJobStatus(jobId) >> JobStatus.SUCCEEDED
         0 * responseObserver.onNext(response)
         0 * responseObserver.onCompleted()
 

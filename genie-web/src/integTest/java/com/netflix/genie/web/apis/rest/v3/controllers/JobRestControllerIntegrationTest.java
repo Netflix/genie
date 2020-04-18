@@ -149,19 +149,11 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
     private static final String CMD1_USER = "genie";
     private static final String CMD1_VERSION = "1.0";
     private static final String CMD1_EXECUTABLE = "/bin/bash";
-    private static final String CMD1_TAGS
-        = BASH_COMMAND_TAG + ","
-        + "genie.id:" + CMD1_ID + ","
-        + "genie.name:" + CMD1_NAME;
     private static final ArrayList<String> CMD1_EXECUTABLE_AND_ARGS = Lists.newArrayList(CMD1_EXECUTABLE);
     private static final String CLUSTER1_ID = "cluster1";
     private static final String CLUSTER1_NAME = "Local laptop";
     private static final String CLUSTER1_USER = "genie";
     private static final String CLUSTER1_VERSION = "1.0";
-    private static final String CLUSTER1_TAGS
-        = "genie.id:" + CLUSTER1_ID + ","
-        + "genie.name:" + CLUSTER1_NAME + ","
-        + LOCALHOST_CLUSTER_TAG;
     private static final String JOB_TAG_1 = "aTag";
     private static final String JOB_TAG_2 = "zTag";
     private static final Set<String> JOB_TAGS = Sets.newHashSet(JOB_TAG_1, JOB_TAG_2);
@@ -274,7 +266,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .port(this.port)
             .post(JOBS_API)
             .then()
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
             .body(
                 EXCEPTION_MESSAGE_PATH,
@@ -559,7 +551,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .get(JOBS_API + "/{id}/output/{filePath}", id, "")
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE));
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE));
 
         outputDirJsonResponse
             .body("parent", Matchers.blankOrNullString())
@@ -1119,7 +1111,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .post(JOBS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.anyOf(
@@ -1320,8 +1312,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .get(JOBS_API + "/{id}/output/{filePath}", jobId, "")
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .body("parent", Matchers.isEmptyOrNullString())
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
+            .body("parent", Matchers.is(Matchers.emptyOrNullString()))
             .body("directories[0].name", Matchers.is("genie/"));
 
         outputResponse
@@ -1650,8 +1642,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
                 .get(JOBS_API + "/{id}" + path, jobId)
                 .then()
                 .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .body(EXCEPTION_CODE_PATH, Matchers.is(HttpStatus.NOT_FOUND.value()))
+                .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
                 .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No job"))
                 .body(EXCEPTION_MESSAGE_PATH, Matchers.containsString(jobId));
         }
@@ -1666,7 +1657,7 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
             .get(JOBS_API + "/{id}/output", jobId)
             .then()
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.startsWith(MediaType.APPLICATION_JSON_VALUE))
             .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No job with id " + jobId));
     }
 

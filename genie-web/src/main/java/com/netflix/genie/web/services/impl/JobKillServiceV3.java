@@ -21,17 +21,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.KillJobEvent;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.jobs.JobKillReasonFile;
 import com.netflix.genie.web.util.ProcessChecker;
 import lombok.extern.slf4j.Slf4j;
@@ -59,8 +60,7 @@ import java.time.temporal.ChronoUnit;
 public class JobKillServiceV3 {
 
     private final String hostname;
-    private final JobPersistenceService jobPersistenceService;
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final Executor executor;
     private final boolean runAsUser;
     private final GenieEventBus genieEventBus;
@@ -91,8 +91,7 @@ public class JobKillServiceV3 {
         @NotNull final ProcessChecker.Factory processCheckerFactory
     ) {
         this.hostname = hostname;
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.executor = executor;
         this.runAsUser = runAsUser;
         this.genieEventBus = genieEventBus;
@@ -119,7 +118,12 @@ public class JobKillServiceV3 {
     ) throws GenieException {
         // Will throw exception if not found
         // TODO: Could instead check JobMonitorCoordinator eventually for in memory check
-        final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(id);
+        final JobStatus jobStatus;
+        try {
+            jobStatus = this.persistenceService.getJobStatus(id);
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage(), e);
+        }
         if (jobStatus == JobStatus.INIT) {
             // Send a job finished event to force system to update the job to killed
             this.genieEventBus.publishSynchronousEvent(
@@ -131,7 +135,7 @@ public class JobKillServiceV3 {
                 )
             );
         } else if (jobStatus == JobStatus.RUNNING) {
-            final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
+            final JobExecution jobExecution = this.persistenceService.getJobExecution(id);
             if (jobExecution.getExitCode().isPresent()) {
                 // Job is already finished one way or another
                 return;

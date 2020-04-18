@@ -39,10 +39,5 @@ public interface PersistedJobStatusObserver {
      * @param previousStatus the previous job status, or null if this job was just created and persisted
      * @param currentStatus  the job status that was just persisted. Guaranteed to be different than the previous.
      */
-    void notify(
-        String jobId,
-        @Nullable JobStatus previousStatus,
-        JobStatus currentStatus
-    );
-
+    void notify(String jobId, @Nullable JobStatus previousStatus, JobStatus currentStatus);
 }

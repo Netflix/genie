@@ -37,12 +37,8 @@ import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.JobsActiveLimitProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobCoordinatorService;
@@ -79,13 +75,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
     private static final String NO_ID_FOUND = "No id found";
 
-    private final JobPersistenceService jobPersistenceService;
     private final JobKillService jobKillService;
     private final JobStateService jobStateService;
-    private final ApplicationPersistenceService applicationPersistenceService;
-    private final JobSearchService jobSearchService;
-    private final ClusterPersistenceService clusterPersistenceService;
-    private final CommandPersistenceService commandPersistenceService;
+    private final PersistenceService persistenceService;
     private final JobResolverService jobResolverService;
     private final JobsProperties jobsProperties;
     private final String hostname;
@@ -114,13 +106,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         @NotNull final MeterRegistry registry,
         @NotBlank final String hostname
     ) {
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
         this.jobKillService = jobKillService;
         this.jobStateService = jobStateService;
-        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
-        this.jobSearchService = dataServices.getJobSearchService();
-        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
-        this.commandPersistenceService = dataServices.getCommandPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.jobResolverService = jobResolverService;
         this.jobsProperties = jobsProperties;
         this.hostname = hostname;
@@ -180,7 +168,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 .build();
 
             // Log all the job initial job information
-            this.jobPersistenceService.createJob(jobRequest, jobMetadata, jobBuilder.build(), jobExecution);
+            this.persistenceService.createJob(jobRequest, jobMetadata, jobBuilder.build(), jobExecution);
             this.jobStateService.init(jobId);
             log.info("Finding possible clusters and commands for job {}", jobRequest.getId().orElse(NO_ID_FOUND));
             final JobSpecification jobSpecification;
@@ -194,8 +182,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 // Remap to existing contract
                 throw new GeniePreconditionException(e.getMessage(), e);
             }
-            final Cluster cluster = this.clusterPersistenceService.getCluster(jobSpecification.getCluster().getId());
-            final Command command = this.commandPersistenceService.getCommand(jobSpecification.getCommand().getId());
+            final Cluster cluster = this.persistenceService.getCluster(jobSpecification.getCluster().getId());
+            final Command command = this.persistenceService.getCommand(jobSpecification.getCommand().getId());
 
             // Now that we have command how much memory should the job use?
             final int memory = jobRequest.getMemory()
@@ -203,7 +191,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
             final ImmutableList.Builder<Application> applicationsBuilder = ImmutableList.builder();
             for (final JobSpecification.ExecutionResource applicationResource : jobSpecification.getApplications()) {
-                applicationsBuilder.add(this.applicationPersistenceService.getApplication(applicationResource.getId()));
+                applicationsBuilder.add(this.persistenceService.getApplication(applicationResource.getId()));
             }
             final ImmutableList<Application> applications = applicationsBuilder.build();
 
@@ -226,7 +214,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             final JobsActiveLimitProperties activeLimit = this.jobsProperties.getActiveLimit();
             if (activeLimit.isEnabled()) {
                 final long activeJobsLimit = activeLimit.getUserLimit(jobRequest.getUser());
-                final long activeJobsCount = this.jobSearchService.getActiveJobCountForUser(jobRequest.getUser());
+                final long activeJobsCount = this.persistenceService.getActiveJobCountForUser(jobRequest.getUser());
                 if (activeJobsCount >= activeJobsLimit) {
 
                     this.registry.counter(
@@ -294,7 +282,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             //
             if (this.jobStateService.jobExists(jobId)) {
                 this.jobStateService.done(jobId);
-                this.jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+                this.persistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
             throw e;
         } catch (final Exception e) {
@@ -305,7 +293,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             //
             if (this.jobStateService.jobExists(jobId)) {
                 this.jobStateService.done(jobId);
-                this.jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+                this.persistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
             throw new GenieServerException("Failed to coordinate job launch", e);
         } catch (final Throwable t) {
@@ -338,7 +326,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         try {
             final String clusterId = cluster.getId();
             final String commandId = command.getId();
-            this.jobPersistenceService.updateJobWithRuntimeEnvironment(
+            this.persistenceService.updateJobWithRuntimeEnvironment(
                 jobId,
                 clusterId,
                 commandId,

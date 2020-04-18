@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
@@ -32,8 +33,11 @@ import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -83,7 +87,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ApplicationRestController {
 
-    private final ApplicationPersistenceService applicationPersistenceService;
+    private final PersistenceService persistenceService;
     private final ApplicationModelAssembler applicationModelAssembler;
     private final CommandModelAssembler commandModelAssembler;
 
@@ -98,7 +102,7 @@ public class ApplicationRestController {
         final DataServices dataServices,
         final EntityModelAssemblers entityModelAssemblers
     ) {
-        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
     }
@@ -108,15 +112,13 @@ public class ApplicationRestController {
      *
      * @param app The application to create
      * @return The created application configuration
-     * @throws GenieException For any error
+     * @throws IdAlreadyExistsException If the ID was already in use
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createApplication(@RequestBody final Application app) throws GenieException {
+    public ResponseEntity<Void> createApplication(@RequestBody final Application app) throws IdAlreadyExistsException {
         log.info("Called to create new application: {}", app);
-        final String id = this.applicationPersistenceService.createApplication(
-            DtoConverters.toV4ApplicationRequest(app)
-        );
+        final String id = this.persistenceService.saveApplication(DtoConverters.toV4ApplicationRequest(app));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -131,13 +133,13 @@ public class ApplicationRestController {
     /**
      * Delete all applications from database.
      *
-     * @throws GenieException For any error
+     * @throws PreconditionFailedException If any of the applications were still linked to a command
      */
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllApplications() throws GenieException {
+    public void deleteAllApplications() throws PreconditionFailedException {
         log.warn("Called to delete all Applications");
-        this.applicationPersistenceService.deleteAllApplications();
+        this.persistenceService.deleteAllApplications();
     }
 
     /**
@@ -197,9 +199,9 @@ public class ApplicationRestController {
                         final String id = tag.substring(prefixLength);
                         try {
                             applicationList.add(
-                                DtoConverters.toV3Application(this.applicationPersistenceService.getApplication(id))
+                                DtoConverters.toV3Application(this.persistenceService.getApplication(id))
                             );
-                        } catch (final GenieException ge) {
+                        } catch (final NotFoundException ge) {
                             log.debug("No application with id {} found", id, ge);
                         }
                     }
@@ -218,17 +220,17 @@ public class ApplicationRestController {
                     .map(tag -> tag.substring(DtoConverters.GENIE_NAME_PREFIX.length()))
                     .findFirst();
 
-                applications = this.applicationPersistenceService
-                    .getApplications(finalName.orElse(null), user, enumStatuses, finalTags, type, page)
+                applications = this.persistenceService
+                    .findApplications(finalName.orElse(null), user, enumStatuses, finalTags, type, page)
                     .map(DtoConverters::toV3Application);
             } else {
-                applications = this.applicationPersistenceService
-                    .getApplications(name, user, enumStatuses, finalTags, type, page)
+                applications = this.persistenceService
+                    .findApplications(name, user, enumStatuses, finalTags, type, page)
                     .map(DtoConverters::toV3Application);
             }
         } else {
-            applications = this.applicationPersistenceService
-                .getApplications(name, user, enumStatuses, tags, type, page)
+            applications = this.persistenceService
+                .findApplications(name, user, enumStatuses, tags, type, page)
                 .map(DtoConverters::toV3Application);
         }
 
@@ -250,14 +252,14 @@ public class ApplicationRestController {
      *
      * @param id unique id for application configuration
      * @return The application configuration
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application exists with the given id
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Application> getApplication(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Application> getApplication(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called to get Application for id {}", id);
         return this.applicationModelAssembler.toModel(
-            DtoConverters.toV3Application(this.applicationPersistenceService.getApplication(id))
+            DtoConverters.toV3Application(this.persistenceService.getApplication(id))
         );
     }
 
@@ -266,16 +268,17 @@ public class ApplicationRestController {
      *
      * @param id        unique id for configuration to update
      * @param updateApp contains the application information to update
-     * @throws GenieException For any error
+     * @throws NotFoundException           If no application with the given id exists
+     * @throws PreconditionFailedException When the id in the update doesn't match
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateApplication(
         @PathVariable("id") final String id,
         @RequestBody final Application updateApp
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException {
         log.info("called to update application {} with info {}", id, updateApp);
-        this.applicationPersistenceService.updateApplication(id, DtoConverters.toV4Application(updateApp));
+        this.persistenceService.updateApplication(id, DtoConverters.toV4Application(updateApp));
     }
 
     /**
@@ -283,18 +286,18 @@ public class ApplicationRestController {
      *
      * @param id    The id of the application to patch
      * @param patch The JSON Patch instructions
-     * @throws GenieException On error
+     * @throws NotFoundException           If no application with the given id exists
+     * @throws PreconditionFailedException When the id in the update doesn't match
+     * @throws GenieServerException        If the patch can't be successfully applied
      */
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchApplication(
         @PathVariable("id") final String id,
         @RequestBody final JsonPatch patch
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException, GenieServerException {
         log.info("Called to patch application {} with patch {}", id, patch);
-        final Application currentApp = DtoConverters.toV3Application(
-            this.applicationPersistenceService.getApplication(id)
-        );
+        final Application currentApp = DtoConverters.toV3Application(this.persistenceService.getApplication(id));
 
         try {
             log.debug("Will patch application {}. Original state: {}", id, currentApp);
@@ -302,7 +305,7 @@ public class ApplicationRestController {
             final JsonNode postPatchNode = patch.apply(applicationNode);
             final Application patchedApp = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Application.class);
             log.debug("Finished patching application {}. New state: {}", id, patchedApp);
-            this.applicationPersistenceService.updateApplication(id, DtoConverters.toV4Application(patchedApp));
+            this.persistenceService.updateApplication(id, DtoConverters.toV4Application(patchedApp));
         } catch (final JsonPatchException | IOException e) {
             log.error("Unable to patch application {} with patch {} due to exception.", id, patch, e);
             throw new GenieServerException(e.getLocalizedMessage(), e);
@@ -313,13 +316,13 @@ public class ApplicationRestController {
      * Delete an application configuration from database.
      *
      * @param id unique id of configuration to delete
-     * @throws GenieException For any error
+     * @throws PreconditionFailedException If the application is still tied to a command
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteApplication(@PathVariable("id") final String id) throws GenieException {
+    public void deleteApplication(@PathVariable("id") final String id) throws PreconditionFailedException {
         log.info("Delete an application with id {}", id);
-        this.applicationPersistenceService.deleteApplication(id);
+        this.persistenceService.deleteApplication(id);
     }
 
     /**
@@ -328,16 +331,20 @@ public class ApplicationRestController {
      * @param id      The id of the application to add the configuration file to. Not
      *                null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given id exists
      */
     @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsToApplication(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and config {}", id, configs);
-        this.applicationPersistenceService.addConfigsToApplication(id, configs);
+        this.persistenceService.addConfigsToResource(
+            id,
+            configs,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -346,13 +353,16 @@ public class ApplicationRestController {
      * @param id The id of the application to get the configuration files for.
      *           Not NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given id exists
      */
     @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getConfigsForApplication(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return this.applicationPersistenceService.getConfigsForApplication(id);
+        return this.persistenceService.getConfigsForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -362,16 +372,20 @@ public class ApplicationRestController {
      *                for. Not null/empty/blank.
      * @param configs The configuration files to replace existing configuration
      *                files with. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForApplication(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and configs {}", id, configs);
-        this.applicationPersistenceService.updateConfigsForApplication(id, configs);
+        this.persistenceService.updateConfigsForResource(
+            id,
+            configs,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -379,13 +393,16 @@ public class ApplicationRestController {
      *
      * @param id The id of the application to delete the configuration files
      *           from. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllConfigsForApplication(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.applicationPersistenceService.removeAllConfigsForApplication(id);
+        this.persistenceService.removeAllConfigsForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -394,16 +411,20 @@ public class ApplicationRestController {
      * @param id           The id of the application to add the dependency file to. Not
      *                     null/empty/blank.
      * @param dependencies The dependency files to add. Not null.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDependenciesForApplication(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
-        this.applicationPersistenceService.addDependenciesForApplication(id, dependencies);
+        this.persistenceService.addDependenciesToResource(
+            id,
+            dependencies,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -412,13 +433,16 @@ public class ApplicationRestController {
      * @param id The id of the application to get the dependency files for. Not
      *           NULL/empty/blank.
      * @return The set of dependency files.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getDependenciesForApplication(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return this.applicationPersistenceService.getDependenciesForApplication(id);
+        return this.persistenceService.getDependenciesForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -428,16 +452,20 @@ public class ApplicationRestController {
      *                     null/empty/blank.
      * @param dependencies The dependency files to replace existing dependency files with. Not
      *                     null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateDependenciesForApplication(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
-        this.applicationPersistenceService.updateDependenciesForApplication(id, dependencies);
+        this.persistenceService.updateDependenciesForResource(
+            id,
+            dependencies,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -445,13 +473,16 @@ public class ApplicationRestController {
      *
      * @param id The id of the application to delete the dependency files from. Not
      *           null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllDependenciesForApplication(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.applicationPersistenceService.removeAllDependenciesForApplication(id);
+        this.persistenceService.removeAllDependenciesForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -460,16 +491,20 @@ public class ApplicationRestController {
      * @param id   The id of the application to add the tags to. Not
      *             null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForApplication(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and config {}", id, tags);
-        this.applicationPersistenceService.addTagsForApplication(id, tags);
+        this.persistenceService.addTagsToResource(
+            id,
+            tags,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -478,13 +513,14 @@ public class ApplicationRestController {
      * @param id The id of the application to get the tags for. Not
      *           NULL/empty/blank.
      * @return The active set of tags.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return DtoConverters.toV3Application(this.applicationPersistenceService.getApplication(id)).getTags();
+        // This is done so that the v3 tags (genie.id, genie.name) are added properly
+        return DtoConverters.toV3Application(this.persistenceService.getApplication(id)).getTags();
     }
 
     /**
@@ -494,16 +530,20 @@ public class ApplicationRestController {
      *             Not null/empty/blank.
      * @param tags The tags to replace existing configuration
      *             files with. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForApplication(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
-        this.applicationPersistenceService.updateTagsForApplication(id, tags);
+        this.persistenceService.updateTagsForResource(
+            id,
+            tags,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -511,13 +551,16 @@ public class ApplicationRestController {
      *
      * @param id The id of the application to delete the tags from.
      *           Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllTagsForApplication(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllTagsForApplication(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.applicationPersistenceService.removeAllTagsForApplication(id);
+        this.persistenceService.removeAllTagsForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -526,16 +569,20 @@ public class ApplicationRestController {
      * @param id  The id of the application to delete the tag from. Not
      *            null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException If no application with the given ID exists
      */
     @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForApplication(
         @PathVariable("id") final String id,
         @PathVariable("tag") final String tag
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tag {}", id, tag);
-        this.applicationPersistenceService.removeTagForApplication(id, tag);
+        this.persistenceService.removeTagForResource(
+            id,
+            tag,
+            com.netflix.genie.common.external.dtos.v4.Application.class
+        );
     }
 
     /**
@@ -545,13 +592,14 @@ public class ApplicationRestController {
      *                 NULL/empty/blank.
      * @param statuses The various statuses of the commands to retrieve
      * @return The set of commands.
-     * @throws GenieException For any error
+     * @throws NotFoundException          If no application with the given ID exists
+     * @throws GeniePreconditionException When the statuses can't be parsed successfully
      */
     @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
     public Set<EntityModel<Command>> getCommandsForApplication(
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
-    ) throws GenieException {
+    ) throws NotFoundException, GeniePreconditionException {
         log.info("Called with id {} and statuses {}", id, statuses);
 
         Set<CommandStatus> enumStatuses = null;
@@ -564,7 +612,7 @@ public class ApplicationRestController {
             }
         }
 
-        return this.applicationPersistenceService.getCommandsForApplication(id, enumStatuses)
+        return this.persistenceService.getCommandsForApplication(id, enumStatuses)
             .stream()
             .map(DtoConverters::toV3Command)
             .map(this.commandModelAssembler::toModel)

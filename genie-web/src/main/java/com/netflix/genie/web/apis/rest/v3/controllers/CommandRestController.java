@@ -25,7 +25,7 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
@@ -37,9 +37,11 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ApplicationModelAss
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.ClusterModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.CommandModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.EntityModelAssemblers;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -92,8 +94,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CommandRestController {
 
-    private final CommandPersistenceService commandPersistenceService;
-    private final ClusterPersistenceService clusterPersistenceService;
+    private final PersistenceService persistenceService;
     private final CommandModelAssembler commandModelAssembler;
     private final ApplicationModelAssembler applicationModelAssembler;
     private final ClusterModelAssembler clusterModelAssembler;
@@ -106,8 +107,7 @@ public class CommandRestController {
      */
     @Autowired
     public CommandRestController(final DataServices dataServices, final EntityModelAssemblers entityModelAssemblers) {
-        this.commandPersistenceService = dataServices.getCommandPersistenceService();
-        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.commandModelAssembler = entityModelAssemblers.getCommandModelAssembler();
         this.applicationModelAssembler = entityModelAssemblers.getApplicationModelAssembler();
         this.clusterModelAssembler = entityModelAssemblers.getClusterModelAssembler();
@@ -118,13 +118,15 @@ public class CommandRestController {
      *
      * @param command The command configuration to create
      * @return The command created
-     * @throws GenieException For any error
+     * @throws IdAlreadyExistsException When the command id was already used
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createCommand(@RequestBody @Valid final Command command) throws GenieException {
+    public ResponseEntity<Void> createCommand(
+        @RequestBody @Valid final Command command
+    ) throws IdAlreadyExistsException {
         log.info("Called to create new command {}", command);
-        final String id = this.commandPersistenceService.createCommand(DtoConverters.toV4CommandRequest(command));
+        final String id = this.persistenceService.saveCommand(DtoConverters.toV4CommandRequest(command));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -141,14 +143,14 @@ public class CommandRestController {
      *
      * @param id unique id for command configuration
      * @return The command configuration
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Command> getCommand(@PathVariable("id") final String id) throws GenieException {
+    public EntityModel<Command> getCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called to get command with id {}", id);
         return this.commandModelAssembler.toModel(
-            DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id))
+            DtoConverters.toV3Command(this.persistenceService.getCommand(id))
         );
     }
 
@@ -205,8 +207,8 @@ public class CommandRestController {
                     tag -> {
                         final String id = tag.substring(prefixLength);
                         try {
-                            commandList.add(DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id)));
-                        } catch (final GenieException ge) {
+                            commandList.add(DtoConverters.toV3Command(this.persistenceService.getCommand(id)));
+                        } catch (final NotFoundException ge) {
                             log.debug("No command with id {} found", id, ge);
                         }
                     }
@@ -225,8 +227,8 @@ public class CommandRestController {
                     .map(tag -> tag.substring(DtoConverters.GENIE_NAME_PREFIX.length()))
                     .findFirst();
 
-                commands = this.commandPersistenceService
-                    .getCommands(
+                commands = this.persistenceService
+                    .findCommands(
                         finalName.orElse(null),
                         user,
                         enumStatuses,
@@ -235,8 +237,8 @@ public class CommandRestController {
                     )
                     .map(DtoConverters::toV3Command);
             } else {
-                commands = this.commandPersistenceService
-                    .getCommands(
+                commands = this.persistenceService
+                    .findCommands(
                         name,
                         user,
                         enumStatuses,
@@ -246,8 +248,8 @@ public class CommandRestController {
                     .map(DtoConverters::toV3Command);
             }
         } else {
-            commands = this.commandPersistenceService
-                .getCommands(
+            commands = this.persistenceService
+                .findCommands(
                     name,
                     user,
                     enumStatuses,
@@ -284,16 +286,17 @@ public class CommandRestController {
      *
      * @param id            unique id for the configuration to update.
      * @param updateCommand the information to update the command with
-     * @throws GenieException For any error
+     * @throws NotFoundException           When no {@link Command} with the given {@literal id} exists
+     * @throws PreconditionFailedException When {@literal id} and the {@literal updateCommand} id don't match
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCommand(
         @PathVariable("id") final String id,
         @RequestBody final Command updateCommand
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException {
         log.debug("Called to update command {}", updateCommand);
-        this.commandPersistenceService.updateCommand(id, DtoConverters.toV4Command(updateCommand));
+        this.persistenceService.updateCommand(id, DtoConverters.toV4Command(updateCommand));
     }
 
     /**
@@ -301,17 +304,19 @@ public class CommandRestController {
      *
      * @param id    The id of the command to patch
      * @param patch The JSON Patch instructions
-     * @throws GenieException On error
+     * @throws NotFoundException           When no {@link Command} with the given {@literal id} exists
+     * @throws PreconditionFailedException When {@literal id} and the {@literal updateCommand} id don't match
+     * @throws GenieServerException        When the patch can't be applied
      */
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchCommand(
         @PathVariable("id") final String id,
         @RequestBody final JsonPatch patch
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException, GenieServerException {
         log.info("Called to patch command {} with patch {}", id, patch);
 
-        final Command currentCommand = DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id));
+        final Command currentCommand = DtoConverters.toV3Command(this.persistenceService.getCommand(id));
 
         try {
             log.debug("Will patch cluster {}. Original state: {}", id, currentCommand);
@@ -319,7 +324,7 @@ public class CommandRestController {
             final JsonNode postPatchNode = patch.apply(commandNode);
             final Command patchedCommand = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Command.class);
             log.debug("Finished patching command {}. New state: {}", id, patchedCommand);
-            this.commandPersistenceService.updateCommand(id, DtoConverters.toV4Command(patchedCommand));
+            this.persistenceService.updateCommand(id, DtoConverters.toV4Command(patchedCommand));
         } catch (final JsonPatchException | IOException e) {
             log.error("Unable to patch command {} with patch {} due to exception.", id, patch, e);
             throw new GenieServerException(e.getLocalizedMessage(), e);
@@ -329,277 +334,302 @@ public class CommandRestController {
     /**
      * Delete all applications from database.
      *
-     * @throws GenieException For any error
+     * @throws PreconditionFailedException When deleting one of the commands would violated a consistency issue
      */
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllCommands() throws GenieException {
+    public void deleteAllCommands() throws PreconditionFailedException {
         log.warn("Called to delete all commands.");
-        this.commandPersistenceService.deleteAllCommands();
+        this.persistenceService.deleteAllCommands();
     }
 
     /**
      * Delete a command.
      *
      * @param id unique id for configuration to delete
-     * @throws GenieException For any error
+     * @throws NotFoundException If no {@link Command} exists with the given {@literal id}
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCommand(@PathVariable("id") final String id) throws GenieException {
+    public void deleteCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called to delete command with id {}", id);
-        this.commandPersistenceService.deleteCommand(id);
+        this.persistenceService.deleteCommand(id);
     }
 
     /**
      * Add new configuration files to a given command.
      *
-     * @param id      The id of the command to add the configuration file to. Not
-     *                null/empty/blank.
+     * @param id      The id of the command to add the configuration file to. Not null/empty/blank.
      * @param configs The configuration files to add. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsForCommand(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and config {}", id, configs);
-        this.commandPersistenceService.addConfigsForCommand(id, configs);
+        this.persistenceService.addConfigsToResource(
+            id,
+            configs,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Get all the configuration files for a given command.
      *
-     * @param id The id of the command to get the configuration files for. Not
-     *           NULL/empty/blank.
+     * @param id The id of the command to get the configuration files for. Not NULL/empty/blank.
      * @return The active set of configuration files.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getConfigsForCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return this.commandPersistenceService.getConfigsForCommand(id);
+        return this.persistenceService.getConfigsForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Update the configuration files for a given command.
      *
-     * @param id      The id of the command to update the configuration files for.
-     *                Not null/empty/blank.
-     * @param configs The configuration files to replace existing configuration
-     *                files with. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id      The id of the command to update the configuration files for. Not null/empty/blank.
+     * @param configs The configuration files to replace existing configuration files with. Not null/empty/blank.
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForCommand(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> configs
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and configs {}", id, configs);
-        this.commandPersistenceService.updateConfigsForCommand(id, configs);
+        this.persistenceService.updateConfigsForResource(
+            id,
+            configs,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Delete the all configuration files from a given command.
      *
-     * @param id The id of the command to delete the configuration files from.
-     *           Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id The id of the command to delete the configuration files from. Not null/empty/blank.
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllConfigsForCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.commandPersistenceService.removeAllConfigsForCommand(id);
+        this.persistenceService.removeAllConfigsForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Add new dependency files for a given command.
      *
-     * @param id           The id of the command to add the dependency file to. Not
-     *                     null/empty/blank.
+     * @param id           The id of the command to add the dependency file to. Not null/empty/blank.
      * @param dependencies The dependency files to add. Not null.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDependenciesForCommand(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
-        this.commandPersistenceService.addDependenciesForCommand(id, dependencies);
+        this.persistenceService.addDependenciesToResource(
+            id,
+            dependencies,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Get all the dependency files for a given command.
      *
-     * @param id The id of the command to get the dependency files for. Not
-     *           NULL/empty/blank.
+     * @param id The id of the command to get the dependency files for. Not NULL/empty/blank.
      * @return The set of dependency files.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getDependenciesForCommand(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getDependenciesForCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return this.commandPersistenceService.getDependenciesForCommand(id);
+        return this.persistenceService.getDependenciesForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Update the dependency files for a given command.
      *
-     * @param id           The id of the command to update the dependency files for. Not
-     *                     null/empty/blank.
-     * @param dependencies The dependency files to replace existing dependency files with. Not
-     *                     null/empty/blank.
-     * @throws GenieException For any error
+     * @param id           The id of the command to update the dependency files for. Not null/empty/blank.
+     * @param dependencies The dependency files to replace existing dependency files with. Not null/empty/blank.
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateDependenciesForCommand(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> dependencies
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and dependencies {}", id, dependencies);
-        this.commandPersistenceService.updateDependenciesForCommand(id, dependencies);
+        this.persistenceService.updateDependenciesForResource(
+            id,
+            dependencies,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Delete the all dependency files from a given command.
      *
-     * @param id The id of the command to delete the dependency files from. Not
-     *           null/empty/blank.
-     * @throws GenieException For any error
+     * @param id The id of the command to delete the dependency files from. Not null/empty/blank.
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllDependenciesForCommand(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllDependenciesForCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.commandPersistenceService.removeAllDependenciesForCommand(id);
+        this.persistenceService.removeAllDependenciesForResource(
+            id,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Add new tags to a given command.
      *
-     * @param id   The id of the command to add the tags to. Not
-     *             null/empty/blank.
+     * @param id   The id of the command to add the tags to. Not null/empty/blank.
      * @param tags The tags to add. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForCommand(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
-        this.commandPersistenceService.addTagsForCommand(id, tags);
+        this.persistenceService.addTagsToResource(
+            id,
+            tags,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Get all the tags for a given command.
      *
-     * @param id The id of the command to get the tags for. Not
-     *           NULL/empty/blank.
+     * @param id The id of the command to get the tags for. Not NULL/empty/blank.
      * @return The active set of tags.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws GenieException {
+    public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        return DtoConverters.toV3Command(this.commandPersistenceService.getCommand(id)).getTags();
+        // Kept this way for V3 tag conversion
+        return DtoConverters.toV3Command(this.persistenceService.getCommand(id)).getTags();
     }
 
     /**
      * Update the tags for a given command.
      *
-     * @param id   The id of the command to update the tags for.
-     *             Not null/empty/blank.
-     * @param tags The tags to replace existing configuration
-     *             files with. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id   The id of the command to update the tags for. Not null/empty/blank.
+     * @param tags The tags to replace existing tags with. Not null/empty/blank.
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForCommand(
         @PathVariable("id") final String id,
         @RequestBody final Set<String> tags
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tags {}", id, tags);
-        this.commandPersistenceService.updateTagsForCommand(id, tags);
+        this.persistenceService.updateTagsForResource(
+            id,
+            tags,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Delete the all tags from a given command.
      *
-     * @param id The id of the command to delete the tags from.
-     *           Not null/empty/blank.
-     * @throws GenieException For any error
+     * @param id The id of the command to delete the tags from. Not null/empty/blank.
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllTagsForCommand(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllTagsForCommand(@PathVariable("id") final String id) throws NotFoundException {
         log.info("Called with id {}", id);
-        this.commandPersistenceService.removeAllTagsForCommand(id);
+        this.persistenceService.removeAllTagsForResource(id, com.netflix.genie.common.external.dtos.v4.Command.class);
     }
 
     /**
      * Remove an tag from a given command.
      *
-     * @param id  The id of the command to delete the tag from. Not
-     *            null/empty/blank.
+     * @param id  The id of the command to delete the tag from. Not null/empty/blank.
      * @param tag The tag to remove. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForCommand(
         @PathVariable("id") final String id,
         @PathVariable("tag") final String tag
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {} and tag {}", id, tag);
-        this.commandPersistenceService.removeTagForCommand(id, tag);
+        this.persistenceService.removeTagForResource(
+            id,
+            tag,
+            com.netflix.genie.common.external.dtos.v4.Command.class
+        );
     }
 
     /**
      * Add applications for the given command.
      *
-     * @param id             The id of the command to add the applications to. Not
-     *                       null/empty/blank.
-     * @param applicationIds The ids of the applications to add. Not null.
-     * @throws GenieException For any error
+     * @param id             The id of the command to add the applications to. Not null/empty/blank.
+     * @param applicationIds The ids of the applications to add. Not null. No duplicates
+     * @throws NotFoundException           When no {@link Command} with the given {@literal id} exists
+     * @throws PreconditionFailedException If there are any duplicate applications in the list or when combined with
+     *                                     existing applications associated with the command
      */
     @PostMapping(value = "/{id}/applications", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addApplicationsForCommand(
         @PathVariable("id") final String id,
         @RequestBody final List<String> applicationIds
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException {
         log.info("Called with id {} and application {}", id, applicationIds);
-        this.commandPersistenceService.addApplicationsForCommand(id, applicationIds);
+        this.persistenceService.addApplicationsForCommand(id, applicationIds);
     }
 
     /**
      * Get the applications configured for a given command.
      *
-     * @param id The id of the command to get the application files for. Not
-     *           NULL/empty/blank.
+     * @param id The id of the command to get the application files for. Not NULL/empty/blank.
      * @return The active applications for the command.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<EntityModel<Application>> getApplicationsForCommand(
         @PathVariable("id") final String id
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id {}", id);
-        return this.commandPersistenceService.getApplicationsForCommand(id)
+        return this.persistenceService.getApplicationsForCommand(id)
             .stream()
             .map(DtoConverters::toV3Application)
             .map(this.applicationModelAssembler::toModel)
@@ -609,68 +639,69 @@ public class CommandRestController {
     /**
      * Set the applications for the given command.
      *
-     * @param id             The id of the command to add the applications to. Not
-     *                       null/empty/blank.
+     * @param id             The id of the command to add the applications to. Not null/empty/blank.
      * @param applicationIds The ids of the applications to set in order. Not null.
-     * @throws GenieException For any error
+     * @throws NotFoundException           When no {@link Command} with the given {@literal id} exists
+     * @throws PreconditionFailedException If there are any duplicate applications in the list
      */
     @PutMapping(value = "/{id}/applications", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setApplicationsForCommand(
         @PathVariable("id") final String id,
         @RequestBody final List<String> applicationIds
-    ) throws GenieException {
+    ) throws NotFoundException, PreconditionFailedException {
         log.info("Called with id {} and application {}", id, applicationIds);
-        this.commandPersistenceService.setApplicationsForCommand(id, applicationIds);
+        this.persistenceService.setApplicationsForCommand(id, applicationIds);
     }
 
     /**
      * Remove the applications from a given command.
      *
-     * @param id The id of the command to delete the applications from. Not
-     *           null/empty/blank.
-     * @throws GenieException For any error
+     * @param id The id of the command to delete the applications from. Not null/empty/blank.
+     * @throws NotFoundException           When no {@link Command} with the given {@literal id} exists
+     * @throws PreconditionFailedException If constraints block removal
      */
     @DeleteMapping(value = "/{id}/applications")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllApplicationsForCommand(@PathVariable("id") final String id) throws GenieException {
+    public void removeAllApplicationsForCommand(
+        @PathVariable("id") final String id
+    ) throws NotFoundException, PreconditionFailedException {
         log.info("Called with id '{}'", id);
-        this.commandPersistenceService.removeApplicationsForCommand(id);
+        this.persistenceService.removeApplicationsForCommand(id);
     }
 
     /**
      * Remove the application from a given command.
      *
-     * @param id    The id of the command to delete the application from. Not
-     *              null/empty/blank.
+     * @param id    The id of the command to delete the application from. Not null/empty/blank.
      * @param appId The id of the application to remove from the command. Not null/empty/blank.
-     * @throws GenieException For any error
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists or no application exists
      */
     @DeleteMapping(value = "/{id}/applications/{appId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeApplicationForCommand(
         @PathVariable("id") final String id,
         @PathVariable("appId") final String appId
-    ) throws GenieException {
+    ) throws NotFoundException {
         log.info("Called with id '{}' and app id {}", id, appId);
-        this.commandPersistenceService.removeApplicationForCommand(id, appId);
+        this.persistenceService.removeApplicationForCommand(id, appId);
     }
 
     /**
      * Get all the clusters this command is associated with.
      *
-     * @param id       The id of the command to get the clusters for. Not
-     *                 NULL/empty/blank.
+     * @param id       The id of the command to get the clusters for. Not NULL/empty/blank.
      * @param statuses The statuses of the clusters to get
-     * @return The list of clusters.
-     * @throws GenieException For any error
+     * @return The list of clusters
+     * @throws NotFoundException          When no {@link Command} with the given {@literal id} exists
+     * @throws GeniePreconditionException If a supplied status is not valid
      */
     @GetMapping(value = "/{id}/clusters", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<EntityModel<Cluster>> getClustersForCommand(
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) @Nullable final Set<String> statuses
-    ) throws GenieException {
+    ) throws NotFoundException, GeniePreconditionException {
         log.info("Called with id {} and statuses {}", id, statuses);
 
         Set<ClusterStatus> enumStatuses = null;
@@ -683,7 +714,7 @@ public class CommandRestController {
             }
         }
 
-        return this.commandPersistenceService.getClustersForCommand(id, enumStatuses)
+        return this.persistenceService.getClustersForCommand(id, enumStatuses)
             .stream()
             .map(DtoConverters::toV3Cluster)
             .map(this.clusterModelAssembler::toModel)
@@ -695,30 +726,30 @@ public class CommandRestController {
      *
      * @param id The id of the command to get the criteria for
      * @return The criteria
-     * @throws GenieNotFoundException If no command with {@literal id} exists
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @GetMapping(value = "/{id}/clusterCriteria", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<Criterion> getClusterCriteriaForCommand(
         @PathVariable("id") final String id
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         log.info("Called for command {}", id);
-        return this.commandPersistenceService.getClusterCriteriaForCommand(id);
+        return this.persistenceService.getClusterCriteriaForCommand(id);
     }
 
     /**
      * Remove all the {@link Criterion} currently associated with the command.
      *
      * @param id The id of the command to remove the criteria for
-     * @throws GenieNotFoundException If no command with {@literal id} exists
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/clusterCriteria")
     @ResponseStatus(HttpStatus.OK)
     public void removeAllClusterCriteriaFromCommand(
         @PathVariable("id") final String id
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         log.info("Called for command {}", id);
-        this.commandPersistenceService.removeAllClusterCriteriaForCommand(id);
+        this.persistenceService.removeAllClusterCriteriaForCommand(id);
     }
 
     /**
@@ -726,16 +757,16 @@ public class CommandRestController {
      *
      * @param id        The id of the command to add the new criterion to
      * @param criterion The {@link Criterion} to add
-     * @throws GenieNotFoundException If no command with {@literal id} exists
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PostMapping(value = "/{id}/clusterCriteria", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void addClusterCriterionForCommand(
         @PathVariable("id") final String id,
         @RequestBody @Valid final Criterion criterion
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         log.info("Called to add {} as the lowest priority cluster criterion for command {}", criterion, id);
-        this.commandPersistenceService.addClusterCriterionForCommand(id, criterion);
+        this.persistenceService.addClusterCriterionForCommand(id, criterion);
     }
 
     /**
@@ -743,16 +774,16 @@ public class CommandRestController {
      *
      * @param id              The id of the command to add the new criteria to
      * @param clusterCriteria The list of {@link Criterion} in priority order to set for the given command
-     * @throws GenieNotFoundException If no command with {@literal id} exists
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PutMapping(value = "/{id}/clusterCriteria", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void setClusterCriteriaForCommand(
         @PathVariable("id") final String id,
         @RequestBody @Valid final List<Criterion> clusterCriteria
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         log.info("Called to set {} as the cluster criteria for command {}", clusterCriteria, id);
-        this.commandPersistenceService.setClusterCriteriaForCommand(id, clusterCriteria);
+        this.persistenceService.setClusterCriteriaForCommand(id, clusterCriteria);
     }
 
     /**
@@ -761,7 +792,7 @@ public class CommandRestController {
      * @param id        The id of the command to add the new criterion for
      * @param priority  The priority (min 0) to insert the criterion at in the list
      * @param criterion The {@link Criterion} to add
-     * @throws GenieNotFoundException If no command with {@literal id} exists
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @PutMapping(value = "/{id}/clusterCriteria/{priority}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -769,9 +800,9 @@ public class CommandRestController {
         @PathVariable("id") final String id,
         @PathVariable("priority") @Min(0) final int priority,
         @RequestBody @Valid final Criterion criterion
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         log.info("Called to insert new criterion {} for command {} with priority {}", criterion, id, priority);
-        this.commandPersistenceService.addClusterCriterionForCommand(id, criterion, priority);
+        this.persistenceService.addClusterCriterionForCommand(id, criterion, priority);
     }
 
     /**
@@ -779,16 +810,16 @@ public class CommandRestController {
      *
      * @param id       The id of the command to remove the criterion from
      * @param priority The priority (min 0, max number of existing criteria minus one) of the criterion to remove
-     * @throws GenieNotFoundException If no command with {@literal id} exists
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @DeleteMapping(value = "/{id}/clusterCriteria/{priority}")
     @ResponseStatus(HttpStatus.OK)
     public void removeClusterCriterionFromCommand(
         @PathVariable("id") final String id,
         @PathVariable("priority") @Min(0) final int priority
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         log.info("Called to remove the criterion from command {} with priority {}", id, priority);
-        this.commandPersistenceService.removeClusterCriterionForCommand(id, priority);
+        this.persistenceService.removeClusterCriterionForCommand(id, priority);
     }
 
     /**
@@ -800,24 +831,24 @@ public class CommandRestController {
      *                         if no status currently is within the {@link Criterion}. The default value is
      *                         {@literal true} which will currently add the status {@link ClusterStatus#UP}
      * @return A list {@link ResolvedResources} of each criterion to the {@link Cluster}'s it resolved to
-     * @throws GenieNotFoundException If no command with {@literal id} is found
+     * @throws NotFoundException When no {@link Command} with the given {@literal id} exists
      */
     @GetMapping(value = "/{id}/resolvedClusters", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ResolvedResources<Cluster>> resolveClustersForCommandClusterCriteria(
         @PathVariable("id") final String id,
         @RequestParam(value = "addDefaultStatus", defaultValue = "true") final Boolean addDefaultStatus
-    ) throws GenieNotFoundException {
+    ) throws NotFoundException {
         log.info("Called to resolve clusters for command {}", id);
 
-        final List<Criterion> criteria = this.commandPersistenceService.getClusterCriteriaForCommand(id);
+        final List<Criterion> criteria = this.persistenceService.getClusterCriteriaForCommand(id);
 
         final List<ResolvedResources<Cluster>> resolvedResources = Lists.newArrayList();
         for (final Criterion criterion : criteria) {
             resolvedResources.add(
                 new ResolvedResources<>(
                     criterion,
-                    this.clusterPersistenceService
+                    this.persistenceService
                         .findClustersMatchingCriterion(criterion, addDefaultStatus)
                         .stream()
                         .map(DtoConverters::toV3Cluster)

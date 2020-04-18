@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 /**
- * Fields common to every Genie v4 resource (job, cluster, etc).
+ * Fields common to every Genie v4 resource (cluster, command, etc).
  *
  * @author tgianos
  * @since 4.0.0
@@ -36,7 +36,7 @@ import java.time.Instant;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-abstract class CommonResource implements Serializable {
+public abstract class CommonResource implements Serializable {
 
     private static final long serialVersionUID = -2939351280830204953L;
 

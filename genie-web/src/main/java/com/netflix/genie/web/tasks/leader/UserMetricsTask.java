@@ -22,7 +22,7 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.netflix.genie.common.dto.UserResourcesSummary;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.UserMetricsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -47,7 +47,7 @@ public class UserMetricsTask extends LeaderTask {
     private static final String USER_ACTIVE_USERS_METRIC_NAME = "genie.user.active-users.gauge";
     private static final UserResourcesRecord USER_RECORD_PLACEHOLDER = new UserResourcesRecord("nobody");
     private final MeterRegistry registry;
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final UserMetricsProperties userMetricsProperties;
 
     private final Map<String, UserResourcesRecord> userResourcesRecordMap = Maps.newHashMap();
@@ -66,7 +66,7 @@ public class UserMetricsTask extends LeaderTask {
         final UserMetricsProperties userMetricsProperties
     ) {
         this.registry = registry;
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.userMetricsProperties = userMetricsProperties;
         this.activeUsersCount = new AtomicDouble(Double.NaN);
 
@@ -98,7 +98,7 @@ public class UserMetricsTask extends LeaderTask {
     public void run() {
         log.debug("Publishing user metrics");
 
-        final Map<String, UserResourcesSummary> summaries = this.jobSearchService.getUserResourcesSummaries();
+        final Map<String, UserResourcesSummary> summaries = this.persistenceService.getUserResourcesSummaries();
 
         // Update number of active users
         log.debug("Number of users with active jobs: {}", summaries.size());

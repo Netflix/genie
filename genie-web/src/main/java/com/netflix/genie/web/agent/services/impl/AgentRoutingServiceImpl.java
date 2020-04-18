@@ -19,7 +19,7 @@ package com.netflix.genie.web.agent.services.impl;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 
@@ -36,20 +36,17 @@ import java.util.Optional;
 @Slf4j
 public class AgentRoutingServiceImpl implements AgentRoutingService {
 
-    private final AgentConnectionPersistenceService agentConnectionPersistenceService;
+    private final PersistenceService persistenceService;
     private final GenieHostInfo genieHostInfo;
 
     /**
      * Constructor.
      *
-     * @param agentConnectionPersistenceService agent connection persistence service
-     * @param genieHostInfo                     local genie node host information
+     * @param persistenceService persistence service
+     * @param genieHostInfo      local genie node host information
      */
-    public AgentRoutingServiceImpl(
-        final AgentConnectionPersistenceService agentConnectionPersistenceService,
-        final GenieHostInfo genieHostInfo
-    ) {
-        this.agentConnectionPersistenceService = agentConnectionPersistenceService;
+    public AgentRoutingServiceImpl(final PersistenceService persistenceService, final GenieHostInfo genieHostInfo) {
+        this.persistenceService = persistenceService;
         this.genieHostInfo = genieHostInfo;
     }
 
@@ -58,7 +55,7 @@ public class AgentRoutingServiceImpl implements AgentRoutingService {
      */
     @Override
     public Optional<String> getHostnameForAgentConnection(final @NotBlank String jobId) {
-        return this.agentConnectionPersistenceService.lookupAgentConnectionServer(jobId);
+        return this.persistenceService.lookupAgentConnectionServer(jobId);
     }
 
     /**
@@ -76,7 +73,7 @@ public class AgentRoutingServiceImpl implements AgentRoutingService {
     @Override
     public void handleClientConnected(@NotBlank final String jobId) {
         log.info("Agent executing job {} connected", jobId);
-        this.agentConnectionPersistenceService.saveAgentConnection(jobId, genieHostInfo.getHostname());
+        this.persistenceService.saveAgentConnection(jobId, genieHostInfo.getHostname());
     }
 
     /**
@@ -85,7 +82,7 @@ public class AgentRoutingServiceImpl implements AgentRoutingService {
     @Override
     public void handleClientDisconnected(@NotBlank final String jobId) {
         log.info("Agent executing job {} disconnected", jobId);
-        this.agentConnectionPersistenceService.removeAgentConnection(jobId, genieHostInfo.getHostname());
+        this.persistenceService.removeAgentConnection(jobId, genieHostInfo.getHostname());
     }
 
     /**

@@ -20,7 +20,8 @@ package com.netflix.genie.web.services.impl
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.exceptions.checked.NotFoundException
 import com.netflix.genie.web.services.JobKillServiceV4
 import spock.lang.Specification
 
@@ -32,17 +33,17 @@ import spock.lang.Specification
 class JobKillServiceImplSpec extends Specification {
     JobKillServiceV3 jobKillServiceV3
     JobKillServiceImpl service
-    JobPersistenceService jobPersistenceService
+    PersistenceService persistenceService
     JobKillServiceV4 jobKillServiceV4
     String jobId
 
     void setup() {
-        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.persistenceService = Mock(PersistenceService)
         this.jobKillServiceV4 = Mock(JobKillServiceV4)
         this.jobKillServiceV3 = Mock(JobKillServiceV3)
         this.jobId = UUID.randomUUID().toString()
         def dataServices = Mock(DataServices) {
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         this.service = new JobKillServiceImpl(this.jobKillServiceV3, this.jobKillServiceV4, dataServices)
     }
@@ -53,7 +54,7 @@ class JobKillServiceImplSpec extends Specification {
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.isV4(jobId) >> false
+        1 * persistenceService.isV4(jobId) >> false
         0 * jobKillServiceV4.killJob(jobId, "testing")
         1 * jobKillServiceV3.killJob(jobId, "testing")
     }
@@ -64,7 +65,7 @@ class JobKillServiceImplSpec extends Specification {
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.isV4(jobId) >> true
+        1 * persistenceService.isV4(jobId) >> true
         1 * jobKillServiceV4.killJob(jobId, "testing")
         0 * jobKillServiceV3.killJob(jobId, "testing")
     }
@@ -75,14 +76,14 @@ class JobKillServiceImplSpec extends Specification {
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.isV4(jobId) >> { throw new GenieJobNotFoundException() }
+        1 * persistenceService.isV4(jobId) >> { throw new NotFoundException() }
         thrown(GenieJobNotFoundException)
 
         when:
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.isV4(jobId) >> true
+        1 * persistenceService.isV4(jobId) >> true
         1 * jobKillServiceV4.killJob(jobId, "testing") >> { throw new GenieServerException("Error killing v4 job") }
         thrown(GenieServerException)
 
@@ -90,7 +91,7 @@ class JobKillServiceImplSpec extends Specification {
         service.killJob(jobId, "testing")
 
         then:
-        1 * jobPersistenceService.isV4(jobId) >> false
+        1 * persistenceService.isV4(jobId) >> false
         1 * jobKillServiceV3.killJob(jobId, "testing") >> { throw new GenieServerException("Error killing v3 job") }
         thrown(GenieServerException)
     }

@@ -18,13 +18,10 @@
 package com.netflix.genie.web.aspects
 
 import com.netflix.genie.common.exceptions.GenieException
-import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
-import com.netflix.genie.web.data.services.JobPersistenceService
-import com.netflix.genie.web.data.services.JobSearchService
-import com.netflix.genie.web.data.services.jpa.JpaJobPersistenceServiceImpl
-import com.netflix.genie.web.data.services.jpa.JpaJobSearchServiceImpl
+import com.netflix.genie.web.data.jpa.services.JpaPersistenceServiceImpl
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException
@@ -65,7 +62,7 @@ class DataServiceRetryAspectSpec extends Specification {
         dataServiceRetryAspect.profile(joinPoint)
 
         then:
-        thrown(GenieServerException.class)
+        thrown(GenieRuntimeException.class)
         2 * joinPoint.proceed() >> { throw new QueryTimeoutException(null, null) }
 
         when:
@@ -86,7 +83,7 @@ class DataServiceRetryAspectSpec extends Specification {
         dataServiceRetryAspect.profile(joinPoint)
 
         then:
-        thrown(GenieServerException.class)
+        thrown(GenieRuntimeException.class)
         2 * joinPoint.proceed() >>
             { throw new QueryTimeoutException(null, null) } >>
             { throw new QueryTimeoutException(null, null) } >> null
@@ -95,10 +92,10 @@ class DataServiceRetryAspectSpec extends Specification {
     def testDataServiceMethod() {
         given:
         def id = '1'
-        def dataService = Mock(JpaJobSearchServiceImpl.class)
+        def dataService = Mock(JpaPersistenceServiceImpl.class)
         AspectJProxyFactory factory = new AspectJProxyFactory(dataService)
         factory.addAspect(dataServiceRetryAspect)
-        JobSearchService dataServiceProxy = factory.getProxy()
+        PersistenceService dataServiceProxy = factory.getProxy()
 
         when:
         dataServiceProxy.getJob(id)
@@ -125,7 +122,7 @@ class DataServiceRetryAspectSpec extends Specification {
         dataServiceProxy.getJob(id)
 
         then:
-        thrown(GenieServerException.class)
+        thrown(GenieRuntimeException.class)
         2 * dataService.getJob(id) >> { throw new QueryTimeoutException(null, null) }
 
         when:
@@ -146,7 +143,7 @@ class DataServiceRetryAspectSpec extends Specification {
         dataServiceProxy.getJob(id)
 
         then:
-        thrown(GenieServerException.class)
+        thrown(GenieRuntimeException.class)
         2 * dataService.getJob(id) >>
             { throw new QueryTimeoutException(null, null) } >>
             { throw new QueryTimeoutException(null, null) } >> null
@@ -154,10 +151,10 @@ class DataServiceRetryAspectSpec extends Specification {
 
     def testSaveJobSubmission() {
         def jobSubmission = Mock(JobSubmission.class)
-        def dataService = Mock(JpaJobPersistenceServiceImpl.class)
+        def dataService = Mock(PersistenceService.class)
         AspectJProxyFactory factory = new AspectJProxyFactory(dataService)
         factory.addAspect(dataServiceRetryAspect)
-        JobPersistenceService dataServiceProxy = factory.getProxy()
+        PersistenceService dataServiceProxy = factory.getProxy()
 
         when:
         dataServiceProxy.saveJobSubmission(jobSubmission)

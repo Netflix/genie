@@ -22,13 +22,8 @@ import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.jobs.JobConstants;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.FilePersistenceService;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.TagPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
@@ -78,12 +73,7 @@ public class DatabaseCleanupTask extends LeaderTask {
 
     private final DatabaseCleanupProperties cleanupProperties;
     private final Environment environment;
-    private final JobPersistenceService jobPersistenceService;
-    private final ClusterPersistenceService clusterPersistenceService;
-    private final CommandPersistenceService commandPersistenceService;
-    private final ApplicationPersistenceService applicationPersistenceService;
-    private final FilePersistenceService filePersistenceService;
-    private final TagPersistenceService tagPersistenceService;
+    private final PersistenceService persistenceService;
 
     private final MeterRegistry registry;
     private final AtomicLong numDeletedJobs;
@@ -111,12 +101,7 @@ public class DatabaseCleanupTask extends LeaderTask {
         this.registry = registry;
         this.cleanupProperties = cleanupProperties;
         this.environment = environment;
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
-        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
-        this.commandPersistenceService = dataServices.getCommandPersistenceService();
-        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
-        this.filePersistenceService = dataServices.getFilePersistenceService();
-        this.tagPersistenceService = dataServices.getTagPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
 
         this.numDeletedJobs = this.registry.gauge(
             "genie.tasks.databaseCleanup.numDeletedJobs.gauge",
@@ -252,7 +237,7 @@ public class DatabaseCleanupTask extends LeaderTask {
             long numDeletedJobsInBatch;
             long totalDeletedJobs = 0L;
             do {
-                numDeletedJobsInBatch = this.jobPersistenceService.deleteJobsCreatedBefore(
+                numDeletedJobsInBatch = this.persistenceService.deleteJobsCreatedBefore(
                     retentionLimit,
                     JobStatus.getActiveStatuses(),
                     batchSize
@@ -283,7 +268,7 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping clusters cleanup");
                 this.numDeletedClusters.set(0);
             } else {
-                final long countDeletedClusters = this.clusterPersistenceService.deleteUnusedClusters(
+                final long countDeletedClusters = this.persistenceService.deleteUnusedClusters(
                     TO_DELETE_CLUSTER_STATUSES,
                     creationThreshold
                 );
@@ -319,7 +304,7 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping files cleanup");
                 this.numDeletedFiles.set(0);
             } else {
-                final long countDeletedFiles = this.filePersistenceService.deleteUnusedFiles(creationThreshold);
+                final long countDeletedFiles = this.persistenceService.deleteUnusedFiles(creationThreshold);
                 log.info(
                     "Deleted {} files that were unused by any resource and created over an hour ago",
                     countDeletedFiles
@@ -349,7 +334,7 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping tags cleanup");
                 this.numDeletedTags.set(0);
             } else {
-                final long countDeletedTags = this.tagPersistenceService.deleteUnusedTags(creationThreshold);
+                final long countDeletedTags = this.persistenceService.deleteUnusedTags(creationThreshold);
                 log.info(
                     "Deleted {} tags that were unused by any resource and created over an hour ago",
                     countDeletedTags
@@ -399,7 +384,7 @@ public class DatabaseCleanupTask extends LeaderTask {
                     ),
                     ChronoUnit.DAYS
                 );
-                final int deactivatedCommandCount = this.commandPersistenceService.updateStatusForUnusedCommands(
+                final int deactivatedCommandCount = this.persistenceService.updateStatusForUnusedCommands(
                     CommandStatus.INACTIVE,
                     commandCreationThreshold,
                     TO_DEACTIVATE_COMMAND_STATUSES,
@@ -436,7 +421,7 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping command cleanup");
                 this.numDeletedCommands.set(0);
             } else {
-                final long deletedCommandCount = this.commandPersistenceService.deleteUnusedCommands(
+                final long deletedCommandCount = this.persistenceService.deleteUnusedCommands(
                     TO_DELETE_COMMAND_STATUSES,
                     creationThreshold
                 );
@@ -469,8 +454,8 @@ public class DatabaseCleanupTask extends LeaderTask {
                 log.info("Skipping application cleanup");
                 this.numDeletedCommands.set(0);
             } else {
-                final long deletedApplicationCount = this.applicationPersistenceService
-                    .deleteUnusedApplicationsCreatedBefore(creationThreshold);
+                final long deletedApplicationCount = this.persistenceService
+                    .deleteUnusedApplications(creationThreshold);
                 log.info(
                     "Deleted {} applications that were unused by any resource and created over an hour ago",
                     deletedApplicationCount

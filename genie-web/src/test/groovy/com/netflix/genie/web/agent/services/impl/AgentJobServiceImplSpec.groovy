@@ -22,15 +22,16 @@ import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
 import com.netflix.genie.common.external.dtos.v4.JobSpecification
 import com.netflix.genie.common.external.dtos.v4.JobStatus
+import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieAgentRejectedException
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.web.agent.inspectors.InspectionReport
 import com.netflix.genie.web.agent.services.AgentFilterService
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.dtos.ResolvedJob
+import com.netflix.genie.web.exceptions.checked.NotFoundException
 import com.netflix.genie.web.services.JobResolverService
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
@@ -38,7 +39,6 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import spock.lang.Specification
-
 /**
  * Specifications for the {@link AgentJobServiceImpl} class.
  *
@@ -50,7 +50,7 @@ class AgentJobServiceImplSpec extends Specification {
     public static final String version = "1.2.3"
     public static final String hostname = "127.0.0.1"
 
-    JobPersistenceService jobPersistenceService
+    PersistenceService persistenceService
     JobResolverService jobSpecificationService
     AgentFilterService agentFilterService
     MeterRegistry meterRegistry
@@ -58,13 +58,13 @@ class AgentJobServiceImplSpec extends Specification {
     Counter counter
 
     def setup() {
-        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.persistenceService = Mock(PersistenceService)
         this.jobSpecificationService = Mock(JobResolverService)
         this.agentFilterService = Mock(AgentFilterService)
         this.meterRegistry = Mock(MeterRegistry)
         this.counter = Mock(Counter)
         def dataServices = Mock(DataServices) {
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         this.service = new AgentJobServiceImpl(
             dataServices,
@@ -166,7 +166,7 @@ class AgentJobServiceImplSpec extends Specification {
         def id = service.reserveJobId(jobRequest, agentClientMetadata)
 
         then:
-        1 * jobPersistenceService.saveJobSubmission(_ as JobSubmission) >> reservedId
+        1 * persistenceService.saveJobSubmission(_ as JobSubmission) >> reservedId
         id == reservedId
     }
 
@@ -180,17 +180,17 @@ class AgentJobServiceImplSpec extends Specification {
         service.resolveJobSpecification(jobId)
 
         then:
-        1 * jobPersistenceService.getJobRequest(jobId) >> Optional.empty()
-        thrown(GenieJobNotFoundException)
+        1 * persistenceService.getJobRequest(jobId) >> { throw new NotFoundException("Not found") }
+        thrown(GenieJobResolutionException)
 
         when:
         def jobSpecification = service.resolveJobSpecification(jobId)
 
         then:
-        1 * jobPersistenceService.getJobRequest(jobId) >> Optional.of(jobRequest)
+        1 * persistenceService.getJobRequest(jobId) >> jobRequest
         1 * this.jobSpecificationService.resolveJob(jobId, jobRequest, false) >> resolvedJobMock
         1 * resolvedJobMock.getJobSpecification() >> jobSpecificationMock
-        1 * jobPersistenceService.saveResolvedJob(jobId, resolvedJobMock)
+        1 * persistenceService.saveResolvedJob(jobId, resolvedJobMock)
         jobSpecification == jobSpecificationMock
     }
 
@@ -204,14 +204,14 @@ class AgentJobServiceImplSpec extends Specification {
         jobSpecification = service.getJobSpecification(jobId)
 
         then:
-        1 * jobPersistenceService.getJobSpecification(jobId) >> Optional.of(jobSpecificationMock)
+        1 * persistenceService.getJobSpecification(jobId) >> Optional.of(jobSpecificationMock)
         jobSpecification == jobSpecificationMock
 
         when:
         service.getJobSpecification(jobId)
 
         then:
-        1 * jobPersistenceService.getJobSpecification(jobId) >> Optional.empty()
+        1 * persistenceService.getJobSpecification(jobId) >> Optional.empty()
         thrown(GenieJobSpecificationNotFoundException)
     }
 
@@ -249,7 +249,7 @@ class AgentJobServiceImplSpec extends Specification {
         service.claimJob(id, agentClientMetadata)
 
         then:
-        1 * jobPersistenceService.claimJob(id, agentClientMetadata)
+        1 * persistenceService.claimJob(id, agentClientMetadata)
     }
 
     def "Can update job status"() {
@@ -259,6 +259,6 @@ class AgentJobServiceImplSpec extends Specification {
         service.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, UUID.randomUUID().toString())
 
         then:
-        1 * jobPersistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
+        1 * persistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
     }
 }

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.data;
 
+import com.netflix.genie.web.data.jpa.services.JpaPersistenceServiceImpl;
 import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
@@ -24,15 +25,9 @@ import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
 import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
 import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
-import com.netflix.genie.web.data.services.jpa.JpaAgentConnectionPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaApplicationPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaClusterPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaCommandPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaFilePersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaJobPersistenceServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaJobSearchServiceImpl;
-import com.netflix.genie.web.data.services.jpa.JpaTagPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.DataServices;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -72,14 +67,9 @@ class DataAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(JpaJobRepository.class);
                 Assertions.assertThat(context).hasSingleBean(JpaTagRepository.class);
 
-                Assertions.assertThat(context).hasSingleBean(JpaAgentConnectionPersistenceServiceImpl.class);
-                Assertions.assertThat(context).hasSingleBean(JpaApplicationPersistenceServiceImpl.class);
-                Assertions.assertThat(context).hasSingleBean(JpaClusterPersistenceServiceImpl.class);
-                Assertions.assertThat(context).hasSingleBean(JpaCommandPersistenceServiceImpl.class);
-                Assertions.assertThat(context).hasSingleBean(JpaFilePersistenceServiceImpl.class);
-                Assertions.assertThat(context).hasSingleBean(JpaJobPersistenceServiceImpl.class);
-                Assertions.assertThat(context).hasSingleBean(JpaJobSearchServiceImpl.class);
-                Assertions.assertThat(context).hasSingleBean(JpaTagPersistenceServiceImpl.class);
+                Assertions.assertThat(context).hasSingleBean(JpaRepositories.class);
+                Assertions.assertThat(context).hasSingleBean(DataServices.class);
+                Assertions.assertThat(context).hasSingleBean(JpaPersistenceServiceImpl.class);
             }
         );
     }

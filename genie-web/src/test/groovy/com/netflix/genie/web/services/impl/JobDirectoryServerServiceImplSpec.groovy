@@ -28,10 +28,11 @@ import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver
 import com.netflix.genie.web.agent.services.AgentFileStreamService
 import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException
+import com.netflix.genie.web.exceptions.checked.NotFoundException
 import com.netflix.genie.web.services.ArchivedJobService
 import com.netflix.genie.web.services.JobDirectoryServerService
 import com.netflix.genie.web.services.JobFileService
@@ -60,7 +61,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
     static final URI EXPECTED_V3_JOB_DIR_URI = new URI("file:/tmp/genie/jobs/" + JOB_ID)
 
     ResourceLoader resourceLoader
-    JobPersistenceService jobPersistenceService
+    PersistenceService persistenceService
     JobFileService jobFileService
     AgentFileStreamService agentFileStreamService
     MeterRegistry meterRegistry
@@ -78,7 +79,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
 
     void setup() {
         this.resourceLoader = Mock(ResourceLoader)
-        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.persistenceService = Mock(PersistenceService)
         this.jobFileService = Mock(JobFileService)
         this.agentFileStreamService = Mock(AgentFileStreamService)
         this.meterRegistry = Mock(MeterRegistry)
@@ -88,7 +89,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.archivedJobService = Mock(ArchivedJobService)
         this.agentRoutingService = Mock(AgentRoutingService)
         def dataServices = Mock(DataServices) {
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         this.service = new JobDirectoryServerServiceImpl(
             this.resourceLoader,
@@ -116,15 +117,15 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> { throw new GenieNotFoundException("...") }
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> { throw new NotFoundException("...") }
         thrown(GenieNotFoundException)
 
         when: "Not found when doing v4 lookup"
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, request, response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> { throw new GenieNotFoundException("...") }
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> { throw new NotFoundException("...") }
         thrown(GenieNotFoundException)
     }
 
@@ -136,8 +137,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> true
         1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.empty()
         thrown(GenieServerUnavailableException)
@@ -148,8 +149,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> true
         1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
         1 * this.manifest.getEntry(REL_PATH) >> Optional.empty()
@@ -159,8 +160,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> true
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> true
         1 * this.agentRoutingService.isAgentConnectionLocal(JOB_ID) >> true
         1 * this.agentFileStreamService.getManifest(JOB_ID) >> Optional.of(this.manifest)
         1 * this.manifest.getEntry(REL_PATH) >> Optional.of(this.manifestEntry)
@@ -180,8 +181,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> false
         1 * this.jobFileService.getJobFileAsResource(JOB_ID, "") >> resource
         1 * this.resource.exists() >> false
         thrown(GenieNotFoundException)
@@ -192,8 +193,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> false
         1 * this.jobFileService.getJobFileAsResource(JOB_ID, "") >> resource
         1 * this.resource.exists() >> true
         1 * this.resource.getURI() >> EXPECTED_V3_JOB_DIR_URI
@@ -204,8 +205,8 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
-        1 * this.jobPersistenceService.isV4(JOB_ID) >> false
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.RUNNING
+        1 * this.persistenceService.isV4(JOB_ID) >> false
         1 * this.jobFileService.getJobFileAsResource(JOB_ID, "") >> resource
         1 * this.resource.exists() >> true
         1 * this.resource.getURI() >> EXPECTED_V3_JOB_DIR_URI
@@ -226,7 +227,7 @@ class JobDirectoryServerServiceImplSpec extends Specification {
         this.service.serveResource(JOB_ID, BASE_URL, REL_PATH, this.request, this.response)
 
         then:
-        1 * this.jobPersistenceService.getJobStatus(JOB_ID) >> JobStatus.SUCCEEDED
+        1 * this.persistenceService.getJobStatus(JOB_ID) >> JobStatus.SUCCEEDED
         1 * this.archivedJobService.getArchivedJobMetadata(JOB_ID) >> {
             throw exception
         }

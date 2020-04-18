@@ -29,8 +29,8 @@ import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentMetricsServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -96,20 +96,17 @@ public class AgentServicesAutoConfiguration {
     /**
      * Get an implementation of {@link AgentRoutingService} if one hasn't already been defined.
      *
-     * @param agentConnectionPersistenceService The persistence service to use for agent connections
-     * @param genieHostInfo                     The local genie host information
+     * @param persistenceService The persistence service to use for agent connections
+     * @param genieHostInfo      The local genie host information
      * @return A {@link AgentRoutingServiceImpl} instance
      */
     @Bean
     @ConditionalOnMissingBean(AgentRoutingService.class)
     public AgentRoutingServiceImpl agentRoutingService(
-        final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        final PersistenceService persistenceService,
         final GenieHostInfo genieHostInfo
     ) {
-        return new AgentRoutingServiceImpl(
-            agentConnectionPersistenceService,
-            genieHostInfo
-        );
+        return new AgentRoutingServiceImpl(persistenceService, genieHostInfo);
     }
 
     /**
@@ -130,19 +127,19 @@ public class AgentServicesAutoConfiguration {
     /**
      * Provide an implementation of {@link AgentMetricsService} if one hasn't been provided.
      *
-     * @param genieHostInfo                     The Genie host information
-     * @param agentConnectionPersistenceService Implementation of {@link AgentConnectionPersistenceService} to get
-     *                                          information about running agents in the ecosystem
-     * @param registry                          The metrics repository
+     * @param genieHostInfo      The Genie host information
+     * @param persistenceService Implementation of {@link PersistenceService} to get information about running agents
+     *                           in the ecosystem
+     * @param registry           The metrics repository
      * @return An instance of {@link AgentMetricsServiceImpl}
      */
     @Bean
     @ConditionalOnMissingBean(AgentMetricsService.class)
     public AgentMetricsServiceImpl agentMetricsService(
         final GenieHostInfo genieHostInfo,
-        final AgentConnectionPersistenceService agentConnectionPersistenceService,
+        final PersistenceService persistenceService,
         final MeterRegistry registry
     ) {
-        return new AgentMetricsServiceImpl(genieHostInfo, agentConnectionPersistenceService, registry);
+        return new AgentMetricsServiceImpl(genieHostInfo, persistenceService, registry);
     }
 }

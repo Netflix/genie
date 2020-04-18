@@ -18,8 +18,10 @@
 package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobKillServiceV4;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +41,7 @@ public class JobKillServiceImpl implements JobKillService {
 
     private final JobKillServiceV3 jobKillServiceV3;
     private final JobKillServiceV4 jobKillServiceV4;
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
 
     /**
      * Constructor.
@@ -55,7 +57,7 @@ public class JobKillServiceImpl implements JobKillService {
     ) {
         this.jobKillServiceV3 = jobKillServiceV3;
         this.jobKillServiceV4 = jobKillServiceV4;
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
     }
 
     /**
@@ -66,11 +68,14 @@ public class JobKillServiceImpl implements JobKillService {
         @NotBlank(message = "No id entered. Unable to kill job.") final String id,
         @NotBlank(message = "No reason provided.") final String reason
     ) throws GenieException {
-
-        if (jobPersistenceService.isV4(id)) {
-            jobKillServiceV4.killJob(id, reason);
-        } else {
-            jobKillServiceV3.killJob(id, reason);
+        try {
+            if (persistenceService.isV4(id)) {
+                jobKillServiceV4.killJob(id, reason);
+            } else {
+                jobKillServiceV3.killJob(id, reason);
+            }
+        } catch (final NotFoundException e) {
+            throw new GenieJobNotFoundException(e.getMessage(), e);
         }
     }
 }

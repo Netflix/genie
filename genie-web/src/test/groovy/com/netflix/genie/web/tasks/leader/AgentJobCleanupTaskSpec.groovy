@@ -21,8 +21,7 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.web.data.services.DataServices
-import com.netflix.genie.web.data.services.JobPersistenceService
-import com.netflix.genie.web.data.services.JobSearchService
+import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.properties.AgentCleanupProperties
 import com.netflix.genie.web.tasks.GenieTaskScheduleType
 import com.netflix.genie.web.util.MetricsUtils
@@ -34,18 +33,15 @@ import spock.lang.Specification
 class AgentJobCleanupTaskSpec extends Specification {
 
     AgentJobCleanupTask task
-    JobSearchService jobSearchService
-    JobPersistenceService jobPersistenceService
+    PersistenceService persistenceService
     AgentCleanupProperties taskProperties
     MeterRegistry registry
     Counter counter
 
     void setup() {
-        this.jobSearchService = Mock(JobSearchService)
-        this.jobPersistenceService = Mock(JobPersistenceService)
+        this.persistenceService = Mock(PersistenceService)
         def dataServices = Mock(DataServices) {
-            getJobSearchService() >> this.jobSearchService
-            getJobPersistenceService() >> this.jobPersistenceService
+            getPersistenceService() >> this.persistenceService
         }
         this.taskProperties = Mock(AgentCleanupProperties)
         this.registry = Mock(MeterRegistry)
@@ -74,17 +70,17 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * jobSearchService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j1", "j2")
+        1 * persistenceService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j1", "j2")
         2 * taskProperties.getTimeLimit() >> -1 // Make sure it's past deadline next iteration
 
         when:
         task.run()
 
         then:
-        1 * jobSearchService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
+        1 * persistenceService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
         2 * taskProperties.getTimeLimit() >> 1_000_000L // Make sure it not expiring
-        1 * jobPersistenceService.setJobCompletionInformation("j1", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
-        1 * jobPersistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null) >> {
+        1 * persistenceService.setJobCompletionInformation("j1", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
+        1 * persistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null) >> {
             throw e
         }
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
@@ -95,8 +91,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * jobSearchService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j2", "j3")
-        1 * jobPersistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
+        1 * persistenceService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j2", "j3")
+        1 * persistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
         1 * counter.increment()
 

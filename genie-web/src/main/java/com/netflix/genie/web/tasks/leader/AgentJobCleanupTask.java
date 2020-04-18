@@ -22,8 +22,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -46,8 +45,7 @@ public class AgentJobCleanupTask extends LeaderTask {
     private static final String TERMINATED_COUNTER_METRIC_NAME = "genie.jobs.agentDisconnected.terminated.counter";
     private static final String DISCONNECTED_GAUGE_METRIC_NAME = "genie.jobs.agentDisconnected.gauge";
     private final Map<String, Instant> awolJobDeadlines;
-    private final JobSearchService jobSearchService;
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final AgentCleanupProperties properties;
     private final MeterRegistry registry;
 
@@ -63,8 +61,7 @@ public class AgentJobCleanupTask extends LeaderTask {
         final AgentCleanupProperties properties,
         final MeterRegistry registry
     ) {
-        this.jobSearchService = dataServices.getJobSearchService();
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.properties = properties;
         this.registry = registry;
         this.awolJobDeadlines = Maps.newConcurrentMap();
@@ -82,9 +79,8 @@ public class AgentJobCleanupTask extends LeaderTask {
      */
     @Override
     public void run() {
-
         // Get agent jobs that in active status but but not connected to any node
-        final Set<String> currentlyAwolJobsIds = this.jobSearchService.getActiveDisconnectedAgentJobs();
+        final Set<String> currentlyAwolJobsIds = this.persistenceService.getActiveDisconnectedAgentJobs();
 
         // If any previously AWOL job that does not appear in the "currently AWOL" list has either re-connected
         // or completed. Throw away their records.
@@ -111,7 +107,7 @@ public class AgentJobCleanupTask extends LeaderTask {
                 log.debug("Job {} no longer AWOL", awolJobId);
                 try {
                     // Mark the job as failed
-                    this.jobPersistenceService.setJobCompletionInformation(
+                    this.persistenceService.setJobCompletionInformation(
                         awolJobId,
                         -1,
                         JobStatus.FAILED,

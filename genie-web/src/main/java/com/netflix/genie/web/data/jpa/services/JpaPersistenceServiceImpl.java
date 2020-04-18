@@ -1,0 +1,2785 @@
+/*
+ *
+ *  Copyright 2020 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+package com.netflix.genie.web.data.jpa.services;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.dto.UserResourcesSummary;
+import com.netflix.genie.common.dto.search.JobSearchResult;
+import com.netflix.genie.common.exceptions.GenieConflictException;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.external.dtos.v4.AgentClientMetadata;
+import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest;
+import com.netflix.genie.common.external.dtos.v4.Application;
+import com.netflix.genie.common.external.dtos.v4.ApplicationMetadata;
+import com.netflix.genie.common.external.dtos.v4.ApplicationRequest;
+import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
+import com.netflix.genie.common.external.dtos.v4.ClusterRequest;
+import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
+import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
+import com.netflix.genie.common.external.dtos.v4.CommandRequest;
+import com.netflix.genie.common.external.dtos.v4.CommandStatus;
+import com.netflix.genie.common.external.dtos.v4.CommonMetadata;
+import com.netflix.genie.common.external.dtos.v4.CommonResource;
+import com.netflix.genie.common.external.dtos.v4.Criterion;
+import com.netflix.genie.common.external.dtos.v4.ExecutionEnvironment;
+import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.external.dtos.v4.JobArchivalDataRequest;
+import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
+import com.netflix.genie.common.external.dtos.v4.JobEnvironmentRequest;
+import com.netflix.genie.common.external.dtos.v4.JobMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.common.external.dtos.v4.JobRequestMetadata;
+import com.netflix.genie.common.external.dtos.v4.JobSpecification;
+import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
+import com.netflix.genie.common.internal.dtos.v4.converters.DtoConverters;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
+import com.netflix.genie.web.data.entities.AgentConnectionEntity;
+import com.netflix.genie.web.data.entities.ApplicationEntity;
+import com.netflix.genie.web.data.entities.BaseEntity;
+import com.netflix.genie.web.data.entities.ClusterEntity;
+import com.netflix.genie.web.data.entities.CommandEntity;
+import com.netflix.genie.web.data.entities.CriterionEntity;
+import com.netflix.genie.web.data.entities.FileEntity;
+import com.netflix.genie.web.data.entities.JobEntity;
+import com.netflix.genie.web.data.entities.JobEntity_;
+import com.netflix.genie.web.data.entities.TagEntity;
+import com.netflix.genie.web.data.entities.UniqueIdEntity;
+import com.netflix.genie.web.data.entities.projections.AgentHostnameProjection;
+import com.netflix.genie.web.data.entities.projections.ClusterCommandsProjection;
+import com.netflix.genie.web.data.entities.projections.JobApiProjection;
+import com.netflix.genie.web.data.entities.projections.JobApplicationsProjection;
+import com.netflix.genie.web.data.entities.projections.JobArchiveLocationProjection;
+import com.netflix.genie.web.data.entities.projections.JobClusterProjection;
+import com.netflix.genie.web.data.entities.projections.JobCommandProjection;
+import com.netflix.genie.web.data.entities.projections.JobExecutionProjection;
+import com.netflix.genie.web.data.entities.projections.JobMetadataProjection;
+import com.netflix.genie.web.data.entities.projections.JobProjection;
+import com.netflix.genie.web.data.entities.projections.JobRequestProjection;
+import com.netflix.genie.web.data.entities.projections.StatusProjection;
+import com.netflix.genie.web.data.entities.projections.UniqueIdProjection;
+import com.netflix.genie.web.data.entities.projections.v4.FinishedJobProjection;
+import com.netflix.genie.web.data.entities.projections.v4.IsV4JobProjection;
+import com.netflix.genie.web.data.entities.projections.v4.JobSpecificationProjection;
+import com.netflix.genie.web.data.entities.projections.v4.V4JobRequestProjection;
+import com.netflix.genie.web.data.entities.v4.EntityDtoConverters;
+import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaBaseRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
+import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
+import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
+import com.netflix.genie.web.data.repositories.jpa.specifications.JpaApplicationSpecs;
+import com.netflix.genie.web.data.repositories.jpa.specifications.JpaClusterSpecs;
+import com.netflix.genie.web.data.repositories.jpa.specifications.JpaCommandSpecs;
+import com.netflix.genie.web.data.repositories.jpa.specifications.JpaJobSpecs;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.data.services.jpa.JpaServiceUtils;
+import com.netflix.genie.web.dtos.JobSubmission;
+import com.netflix.genie.web.dtos.ResolvedJob;
+import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
+import com.netflix.genie.web.exceptions.checked.SaveAttachmentException;
+import com.netflix.genie.web.services.AttachmentService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * Implementation of {@link PersistenceService} using JPA.
+ *
+ * @author tgianos
+ * @since 4.0.0
+ */
+@Transactional(
+    // TODO: Double check the docs on this as default is runtime exception and error... may want to incorporate them
+    rollbackFor = {
+        GenieException.class,
+        GenieCheckedException.class,
+        GenieRuntimeException.class,
+        ConstraintViolationException.class
+    }
+)
+@Slf4j
+public class JpaPersistenceServiceImpl implements PersistenceService {
+
+    /**
+     * The set of active statuses as their names.
+     */
+    @VisibleForTesting
+    static final Set<String> ACTIVE_STATUS_SET = JobStatus
+        .getActiveStatuses()
+        .stream()
+        .map(Enum::name)
+        .collect(Collectors.toSet());
+
+    /**
+     * The set of job statuses which are considered to be using memory on a Genie node.
+     */
+    @VisibleForTesting
+    static final Set<String> USING_MEMORY_JOB_SET = Stream
+        .of(JobStatus.CLAIMED, JobStatus.INIT, JobStatus.RUNNING)
+        .map(Enum::name)
+        .collect(Collectors.toSet());
+
+    private final JpaAgentConnectionRepository agentConnectionRepository;
+    private final JpaApplicationRepository applicationRepository;
+    private final JpaClusterRepository clusterRepository;
+    private final JpaCommandRepository commandRepository;
+    private final JpaCriterionRepository criterionRepository;
+    private final JpaFileRepository fileRepository;
+    private final JpaJobRepository jobRepository;
+    private final JpaTagRepository tagRepository;
+
+    // TODO: Maybe this should be moved to a higher place, job resolver? Not sure persistence tier is proper place for
+    //       saving attachments?
+    private final AttachmentService attachmentService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    /**
+     * Constructor.
+     *
+     * @param jpaRepositories   All the repositories in the Genie application
+     * @param attachmentService The {@link AttachmentService} implementation to use
+     */
+    public JpaPersistenceServiceImpl(final JpaRepositories jpaRepositories, final AttachmentService attachmentService) {
+        this.agentConnectionRepository = jpaRepositories.getAgentConnectionRepository();
+        this.applicationRepository = jpaRepositories.getApplicationRepository();
+        this.clusterRepository = jpaRepositories.getClusterRepository();
+        this.commandRepository = jpaRepositories.getCommandRepository();
+        this.criterionRepository = jpaRepositories.getCriterionRepository();
+        this.fileRepository = jpaRepositories.getFileRepository();
+        this.jobRepository = jpaRepositories.getJobRepository();
+        this.tagRepository = jpaRepositories.getTagRepository();
+        this.attachmentService = attachmentService;
+    }
+
+    //region Application APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String saveApplication(@Valid final ApplicationRequest applicationRequest) throws IdAlreadyExistsException {
+        log.debug("[saveApplication] Called to save {}", applicationRequest);
+        final ApplicationEntity entity = new ApplicationEntity();
+        this.setUniqueId(entity, applicationRequest.getRequestedId().orElse(null));
+        this.updateApplicationEntity(entity, applicationRequest.getResources(), applicationRequest.getMetadata());
+
+        try {
+            return this.applicationRepository.save(entity).getUniqueId();
+        } catch (final DataIntegrityViolationException e) {
+            throw new IdAlreadyExistsException(
+                "An application with id " + entity.getUniqueId() + " already exists",
+                e
+            );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Application getApplication(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getApplication] Called for {}", id);
+        return EntityDtoConverters.toV4ApplicationDto(this.getApplicationEntity(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Application> findApplications(
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<ApplicationStatus> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final String type,
+        final Pageable page
+    ) {
+        log.debug(
+            "[findApplications] Called with name = {}, user = {}, statuses = {}, tags = {}, type = {}",
+            name,
+            user,
+            statuses,
+            tags,
+            type
+        );
+
+        final Set<TagEntity> tagEntities;
+        // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
+        // no entities tied to that tag will exist either and today our search for tags is an AND
+        if (tags != null) {
+            tagEntities = this.tagRepository.findByTagIn(tags);
+            if (tagEntities.size() != tags.size()) {
+                return new PageImpl<>(new ArrayList<>(), page, 0);
+            }
+        } else {
+            tagEntities = null;
+        }
+
+        return this.applicationRepository
+            .findAll(
+                JpaApplicationSpecs.find(
+                    name,
+                    user,
+                    statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                    tagEntities,
+                    type
+                ),
+                page
+            ).map(EntityDtoConverters::toV4ApplicationDto);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateApplication(
+        @NotBlank final String id,
+        @Valid final Application updateApp
+    ) throws NotFoundException, PreconditionFailedException {
+        log.debug("[updateApplication] Called to update application {} with {}", id, updateApp);
+        if (!updateApp.getId().equals(id)) {
+            throw new PreconditionFailedException("Application id " + id + " inconsistent with id passed in.");
+        }
+        this.updateApplicationEntity(this.getApplicationEntity(id), updateApp.getResources(), updateApp.getMetadata());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteAllApplications() throws PreconditionFailedException {
+        log.debug("[deleteAllApplications] Called");
+        for (final ApplicationEntity entity : this.applicationRepository.findAll()) {
+            this.deleteApplicationEntity(entity);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteApplication(@NotBlank final String id) throws PreconditionFailedException {
+        log.debug("[deleteApplication] Called for {}", id);
+        final ApplicationEntity entity;
+        try {
+            entity = this.getApplicationEntity(id);
+        } catch (final NotFoundException e) {
+            // There's nothing to do as the caller wants to delete it and it already doesn't exist.
+            return;
+        }
+
+        this.deleteApplicationEntity(entity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Command> getCommandsForApplication(
+        @NotBlank final String id,
+        @Nullable final Set<CommandStatus> statuses
+    ) throws NotFoundException {
+        log.debug("[getCommandsForApplication] Called for application {} filtered by statuses {}", id, statuses);
+        return this.getApplicationEntity(id)
+            .getCommands()
+            .stream()
+            .filter(
+                commandEntity -> statuses == null
+                    || statuses.contains(DtoConverters.toV4CommandStatus(commandEntity.getStatus()))
+            )
+            .map(EntityDtoConverters::toV4CommandDto)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteUnusedApplications(final Instant createdThreshold) {
+        log.info("Attempting to delete unused applications created before {}", createdThreshold);
+        return this.applicationRepository.deleteByIdIn(
+            this.applicationRepository.findUnusedApplications(createdThreshold)
+        );
+    }
+    //endregion
+
+    //region Cluster APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String saveCluster(@Valid final ClusterRequest clusterRequest) throws IdAlreadyExistsException {
+        log.debug("[saveCluster] Called to save {}", clusterRequest);
+        final ClusterEntity entity = new ClusterEntity();
+        this.setUniqueId(entity, clusterRequest.getRequestedId().orElse(null));
+        this.updateClusterEntity(entity, clusterRequest.getResources(), clusterRequest.getMetadata());
+
+        try {
+            return this.clusterRepository.save(entity).getUniqueId();
+        } catch (final DataIntegrityViolationException e) {
+            throw new IdAlreadyExistsException("A cluster with id " + entity.getUniqueId() + " already exists", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Cluster getCluster(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getCluster] Called for {}", id);
+        return EntityDtoConverters.toV4ClusterDto(this.getClusterEntity(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Cluster> findClusters(
+        @Nullable final String name,
+        @Nullable final Set<ClusterStatus> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final Instant minUpdateTime,
+        @Nullable final Instant maxUpdateTime,
+        final Pageable page
+    ) {
+        log.debug(
+            "[findClusters] Called with name = {}, statuses = {}, tags = {}, minUpdateTime = {}, maxUpdateTime = {}",
+            name,
+            statuses,
+            tags,
+            minUpdateTime,
+            maxUpdateTime
+        );
+
+        final Set<TagEntity> tagEntities;
+        // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
+        // no entities tied to that tag will exist either and today our search for tags is an AND
+        if (tags != null) {
+            tagEntities = this.tagRepository.findByTagIn(tags);
+            if (tagEntities.size() != tags.size()) {
+                return new PageImpl<>(new ArrayList<>(), page, 0);
+            }
+        } else {
+            tagEntities = null;
+        }
+
+        return this.clusterRepository.findAll(
+            JpaClusterSpecs.find(
+                name,
+                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                tagEntities,
+                minUpdateTime,
+                maxUpdateTime
+            ),
+            page
+        ).map(EntityDtoConverters::toV4ClusterDto);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Cluster, String> findClustersAndCommandsForJob(
+        @Valid final com.netflix.genie.common.dto.JobRequest jobRequest
+    ) throws GenieException {
+        log.debug("Called");
+
+        final List<Criterion> clusterCriteria = Lists.newArrayList();
+        for (final ClusterCriteria criteria : jobRequest.getClusterCriterias()) {
+            clusterCriteria.add(DtoConverters.toV4Criterion(criteria));
+        }
+
+        final Criterion commandCriterion = DtoConverters.toV4Criterion(jobRequest.getCommandCriteria());
+
+        return this.findClustersAndCommandsForJob(clusterCriteria, commandCriterion);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Cluster, String> findClustersAndCommandsForCriteria(
+        @NotEmpty final List<@NotNull Criterion> clusterCriteria,
+        @NotNull final Criterion commandCriterion
+    ) throws GenieException {
+        log.debug(
+            "Attempting to find cluster and commands for cluster criteria {} and command criterion {}",
+            clusterCriteria,
+            commandCriterion
+        );
+
+        return this.findClustersAndCommandsForJob(clusterCriteria, commandCriterion);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateCluster(
+        @NotBlank final String id,
+        @Valid final Cluster updateCluster
+    ) throws NotFoundException, PreconditionFailedException {
+        log.debug("[updateCluster] Called to update cluster {} with {}", id, updateCluster);
+        if (!updateCluster.getId().equals(id)) {
+            throw new PreconditionFailedException("Application id " + id + " inconsistent with id passed in.");
+        }
+        this.updateClusterEntity(this.getClusterEntity(id), updateCluster.getResources(), updateCluster.getMetadata());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteAllClusters() throws PreconditionFailedException {
+        log.debug("[deleteAllClusters] Called");
+        for (final ClusterEntity entity : this.clusterRepository.findAll()) {
+            this.deleteClusterEntity(entity);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteCluster(@NotBlank final String id) throws PreconditionFailedException {
+        log.debug("[deleteCluster] Called for {}", id);
+        final ClusterEntity entity;
+        try {
+            entity = this.getClusterEntity(id);
+        } catch (final NotFoundException e) {
+            // There's nothing to do as the caller wants to delete it and it already doesn't exist.
+            return;
+        }
+
+        this.deleteClusterEntity(entity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addCommandsForCluster(
+        @NotBlank final String id,
+        @NotEmpty(message = "No command ids entered. Unable to add commands.") final List<String> commandIds
+    ) throws GenieException {
+        if (commandIds.size() != commandIds.stream().filter(this.commandRepository::existsByUniqueId).count()) {
+            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
+        }
+
+        try {
+            final ClusterEntity clusterEntity = this.getClusterEntity(id);
+            for (final String commandId : commandIds) {
+                clusterEntity.addCommand(this.getCommandEntity(commandId));
+            }
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Command> getCommandsForCluster(
+        @NotBlank final String id,
+        @Nullable final Set<CommandStatus> statuses
+    ) throws GenieException {
+        final Optional<ClusterCommandsProjection> commandsProjection
+            = this.clusterRepository.findByUniqueId(id, ClusterCommandsProjection.class);
+
+        final List<CommandEntity> commandEntities = commandsProjection
+            .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
+            .getCommands();
+
+        return commandEntities
+            .stream()
+            .filter(
+                commandEntity -> statuses == null
+                    || statuses.contains(DtoConverters.toV4CommandStatus(commandEntity.getStatus()))
+            )
+            .map(EntityDtoConverters::toV4CommandDto)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCommandsForCluster(
+        @NotBlank final String id,
+        @NotNull final List<String> commandIds
+    ) throws GenieException {
+        if (commandIds.size() != commandIds.stream().filter(this.commandRepository::existsByUniqueId).count()) {
+            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
+        }
+        try {
+            final ClusterEntity clusterEntity = this.getClusterEntity(id);
+            final List<CommandEntity> commandEntities = new ArrayList<>();
+            for (final String commandId : commandIds) {
+                commandEntities.add(this.getCommandEntity(commandId));
+            }
+
+            clusterEntity.setCommands(commandEntities);
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllCommandsForCluster(@NotBlank final String id) throws GenieException {
+        try {
+            this.getClusterEntity(id).removeAllCommands();
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeCommandForCluster(@NotBlank final String id, @NotBlank final String cmdId) throws GenieException {
+        try {
+            this.getClusterEntity(id).removeCommand(this.getCommandEntity(cmdId));
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteUnusedClusters(final Set<ClusterStatus> deleteStatuses, final Instant clusterCreatedThreshold) {
+        log.info(
+            "[deleteUnusedClusters] Deleting with statuses {} that were created before {}",
+            deleteStatuses,
+            clusterCreatedThreshold
+        );
+        return this.clusterRepository.deleteByIdIn(
+            this.clusterRepository.findUnusedClusters(
+                deleteStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
+                clusterCreatedThreshold
+            )
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Cluster> findClustersMatchingCriterion(
+        @Valid final Criterion criterion,
+        final boolean addDefaultStatus
+    ) {
+        final Criterion finalCriterion;
+        if (addDefaultStatus && !criterion.getStatus().isPresent()) {
+            finalCriterion = new Criterion(criterion, ClusterStatus.UP.name());
+        } else {
+            finalCriterion = criterion;
+        }
+        log.debug("[findClustersMatchingCriterion] Called to find clusters matching {}", finalCriterion);
+        return this.clusterRepository
+            .findAll(JpaClusterSpecs.findClustersMatchingCriterion(finalCriterion))
+            .stream()
+            .map(EntityDtoConverters::toV4ClusterDto)
+            .collect(Collectors.toSet());
+    }
+    //endregion
+
+    //region Command APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String saveCommand(@Valid final CommandRequest commandRequest) throws IdAlreadyExistsException {
+        log.debug("[saveCommand] Called to save {}", commandRequest);
+        final CommandEntity entity = new CommandEntity();
+        this.setUniqueId(entity, commandRequest.getRequestedId().orElse(null));
+        this.updateCommandEntity(
+            entity,
+            commandRequest.getResources(),
+            commandRequest.getMetadata(),
+            commandRequest.getCheckDelay().orElse(com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY),
+            commandRequest.getExecutable(),
+            commandRequest.getMemory().orElse(null),
+            commandRequest.getClusterCriteria()
+        );
+
+        try {
+            return this.commandRepository.save(entity).getUniqueId();
+        } catch (final DataIntegrityViolationException e) {
+            throw new IdAlreadyExistsException(
+                "A command with id " + entity.getUniqueId() + " already exists",
+                e
+            );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Command getCommand(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getCommand] Called for {}", id);
+        return EntityDtoConverters.toV4CommandDto(this.getCommandEntity(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Command> findCommands(
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<CommandStatus> statuses,
+        @Nullable final Set<String> tags,
+        final Pageable page
+    ) {
+        log.debug(
+            "[findCommands] Called with name = {}, user = {}, statuses = {}, tags = {}",
+            name,
+            user,
+            statuses,
+            tags
+        );
+
+        final Set<TagEntity> tagEntities;
+        // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
+        // no entities tied to that tag will exist either and today our search for tags is an AND
+        if (tags != null) {
+            tagEntities = this.tagRepository.findByTagIn(tags);
+            if (tagEntities.size() != tags.size()) {
+                return new PageImpl<>(new ArrayList<>(), page, 0);
+            }
+        } else {
+            tagEntities = null;
+        }
+
+        return this.commandRepository.findAll(
+            JpaCommandSpecs.find(
+                name,
+                user,
+                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                tagEntities
+            ),
+            page
+        ).map(EntityDtoConverters::toV4CommandDto);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateCommand(
+        @NotBlank final String id,
+        @Valid final Command updateCommand
+    ) throws NotFoundException, PreconditionFailedException {
+        log.debug("[updateCommand] Called to update command {} with {}", id, updateCommand);
+        if (!updateCommand.getId().equals(id)) {
+            throw new PreconditionFailedException("Command id " + id + " inconsistent with id passed in.");
+        }
+        this.updateCommandEntity(
+            this.getCommandEntity(id),
+            updateCommand.getResources(),
+            updateCommand.getMetadata(),
+            updateCommand.getCheckDelay(),
+            updateCommand.getExecutable(),
+            updateCommand.getMemory().orElse(null),
+            updateCommand.getClusterCriteria()
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteAllCommands() throws PreconditionFailedException {
+        log.debug("[deleteAllCommands] Called");
+        this.commandRepository.findAll().forEach(this::deleteCommandEntity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteCommand(@NotBlank final String id) throws NotFoundException {
+        log.debug("[deleteCommand] Called to delete command with id {}", id);
+        this.deleteCommandEntity(this.getCommandEntity(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addApplicationsForCommand(
+        @NotBlank final String id,
+        @NotEmpty final List<@NotBlank String> applicationIds
+    ) throws NotFoundException, PreconditionFailedException {
+        log.debug("[addApplicationsForCommand] Called to add {} to {}", applicationIds, id);
+        final CommandEntity commandEntity = this.getCommandEntity(id);
+        for (final String applicationId : applicationIds) {
+            commandEntity.addApplication(this.getApplicationEntity(applicationId));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setApplicationsForCommand(
+        @NotBlank final String id,
+        @NotNull final List<@NotBlank String> applicationIds
+    ) throws NotFoundException, PreconditionFailedException {
+        log.debug("[setApplicationsForCommand] Called to set {} for {}", applicationIds, id);
+        if (Sets.newHashSet(applicationIds).size() != applicationIds.size()) {
+            throw new PreconditionFailedException("Duplicate application id in " + applicationIds);
+        }
+        final CommandEntity commandEntity = this.getCommandEntity(id);
+        final List<ApplicationEntity> applicationEntities = Lists.newArrayList();
+        for (final String applicationId : applicationIds) {
+            applicationEntities.add(this.getApplicationEntity(applicationId));
+        }
+        commandEntity.setApplications(applicationEntities);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Application> getApplicationsForCommand(final String id) throws NotFoundException {
+        log.debug("[getApplicationsForCommand] Called for {}", id);
+        return this.getCommandEntity(id)
+            .getApplications()
+            .stream()
+            .map(EntityDtoConverters::toV4ApplicationDto)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeApplicationsForCommand(
+        @NotBlank final String id
+    ) throws NotFoundException, PreconditionFailedException {
+        log.debug("[removeApplicationsForCommand] Called to for {}", id);
+        this.getCommandEntity(id).setApplications(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeApplicationForCommand(
+        @NotBlank final String id,
+        @NotBlank final String appId
+    ) throws NotFoundException {
+        log.debug("[removeApplicationForCommand] Called to for {} from {}", appId, id);
+        this.getCommandEntity(id).removeApplication(this.getApplicationEntity(appId));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Cluster> getClustersForCommand(
+        @NotBlank final String id,
+        @Nullable final Set<ClusterStatus> statuses
+    ) throws NotFoundException {
+        log.debug("[getClustersForCommand] Called for {} with statuses {}", id, statuses);
+        return this.getCommandEntity(id)
+            .getClusters()
+            .stream()
+            .filter(
+                clusterEntity -> statuses == null
+                    || statuses.contains(DtoConverters.toV4ClusterStatus(clusterEntity.getStatus()))
+            )
+            .map(EntityDtoConverters::toV4ClusterDto)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Criterion> getClusterCriteriaForCommand(final String id) throws NotFoundException {
+        log.debug("[getClusterCriteriaForCommand] Called to get cluster criteria for command {}", id);
+        return this.getCommandEntity(id)
+            .getClusterCriteria()
+            .stream()
+            .map(EntityDtoConverters::toCriterionDto)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addClusterCriterionForCommand(
+        final String id,
+        @Valid final Criterion criterion
+    ) throws NotFoundException {
+        log.debug("[addClusterCriterionForCommand] Called to add cluster criteria {} for command {}", criterion, id);
+        this.getCommandEntity(id).addClusterCriterion(this.toCriterionEntity(criterion));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addClusterCriterionForCommand(
+        final String id,
+        @Valid final Criterion criterion,
+        @Min(0) final int priority
+    ) throws NotFoundException {
+        log.debug(
+            "[addClusterCriterionForCommand] Called to add cluster criteria {} for command {} at priority {}",
+            criterion,
+            id,
+            priority
+        );
+        this.getCommandEntity(id).addClusterCriterion(this.toCriterionEntity(criterion), priority);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setClusterCriteriaForCommand(
+        final String id,
+        final List<@Valid Criterion> clusterCriteria
+    ) throws NotFoundException {
+        log.debug(
+            "[setClusterCriteriaForCommand] Called to set cluster criteria {} for command {}",
+            clusterCriteria,
+            id
+        );
+        final CommandEntity commandEntity = this.getCommandEntity(id);
+        this.updateClusterCriteria(commandEntity, clusterCriteria);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeClusterCriterionForCommand(final String id, @Min(0) final int priority) throws NotFoundException {
+        log.debug(
+            "[removeClusterCriterionForCommand] Called to remove cluster criterion with priority {} from command {}",
+            priority,
+            id
+        );
+        final CommandEntity commandEntity = this.getCommandEntity(id);
+        if (priority >= commandEntity.getClusterCriteria().size()) {
+            throw new NotFoundException(
+                "No criterion with priority " + priority + " exists for command " + id + ". Unable to remove."
+            );
+        }
+        try {
+            final CriterionEntity criterionEntity = commandEntity.removeClusterCriterion(priority);
+            log.debug("Successfully removed cluster criterion {} from command {}", criterionEntity, id);
+            // Ensure this dangling criterion is deleted from the database
+            this.criterionRepository.delete(criterionEntity);
+        } catch (final IllegalArgumentException e) {
+            log.error("Failed to remove cluster criterion with priority {} from command {}", priority, id, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllClusterCriteriaForCommand(final String id) throws NotFoundException {
+        log.debug("[removeAllClusterCriteriaForCommand] Called to remove all cluster criteria from command {}", id);
+        this.deleteAllClusterCriteria(this.getCommandEntity(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Command> findCommandsMatchingCriterion(
+        @Valid final Criterion criterion,
+        final boolean addDefaultStatus
+    ) {
+        final Criterion finalCriterion;
+        if (addDefaultStatus && !criterion.getStatus().isPresent()) {
+            finalCriterion = new Criterion(criterion, CommandStatus.ACTIVE.name());
+        } else {
+            finalCriterion = criterion;
+        }
+        log.debug("[findCommandsMatchingCriterion] Called to find commands matching {}", finalCriterion);
+        return this.commandRepository
+            .findAll(JpaCommandSpecs.findCommandsMatchingCriterion(finalCriterion))
+            .stream()
+            .map(EntityDtoConverters::toV4CommandDto)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public int updateStatusForUnusedCommands(
+        final CommandStatus desiredStatus,
+        final Instant commandCreatedThreshold,
+        final Set<CommandStatus> currentStatuses,
+        final Instant jobCreatedThreshold
+    ) {
+        log.info(
+            "Updating any commands with statuses {} "
+                + "that were created before {} and haven't been used in jobs created after {} to new status {}",
+            currentStatuses,
+            commandCreatedThreshold,
+            jobCreatedThreshold,
+            desiredStatus
+        );
+        return this.commandRepository.setUnusedStatus(
+            desiredStatus.name(),
+            commandCreatedThreshold,
+            currentStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
+            jobCreatedThreshold
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteUnusedCommands(final Set<CommandStatus> deleteStatuses, final Instant commandCreatedThreshold) {
+        log.info(
+            "Deleting commands with statuses {} that were created before {}",
+            deleteStatuses,
+            commandCreatedThreshold
+        );
+        return this.commandRepository.deleteByIdIn(
+            this.commandRepository.findUnusedCommands(
+                deleteStatuses.stream().map(Enum::name).collect(Collectors.toSet()),
+                commandCreatedThreshold
+            )
+        );
+    }
+    //endregion
+
+    //region Job APIs
+
+    //region V3 Job APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void createJob(
+        @NotNull final com.netflix.genie.common.dto.JobRequest jobRequest,
+        @NotNull final com.netflix.genie.common.dto.JobMetadata jobMetadata,
+        @NotNull final Job job,
+        @NotNull final JobExecution jobExecution
+    ) throws GenieException {
+        log.debug(
+            "Called with\nRequest:\n{}\nMetadata:\n{}\nJob:\n{}\nExecution:\n{}\n",
+            jobRequest,
+            jobMetadata,
+            job,
+            jobExecution
+        );
+
+        final String jobId = jobRequest.getId().orElseThrow(() -> new GeniePreconditionException("No job id entered"));
+        final JobEntity jobEntity = this.v3DtosToJobEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
+        try {
+            this.jobRepository.save(jobEntity);
+        } catch (final DataIntegrityViolationException e) {
+            throw new GenieConflictException("A job with id " + jobId + " already exists", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void updateJobWithRuntimeEnvironment(
+        @NotBlank final String jobId,
+        @NotBlank final String clusterId,
+        @NotBlank final String commandId,
+        @NotNull final List<String> applicationIds,
+        @Min(1) final int memory
+    ) throws GenieException {
+        log.debug(
+            "Called to update job ({}) runtime with cluster {}, command {} and applications {}",
+            jobId,
+            clusterId,
+            commandId,
+            applicationIds
+        );
+
+        final JobEntity job = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + jobId + " exists."));
+        try {
+            this.setExecutionResources(job, clusterId, commandId, applicationIds);
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage(), e);
+        }
+
+        // Save the amount of memory to allocate to the job
+        job.setMemoryUsed(memory);
+        job.setResolved(true);
+        // TODO: Should we set status to RESOLVED here? Not sure how that will work with V3 so leaving it INIT for now
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void updateJobStatus(
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        @NotNull(message = "Status cannot be null.") final com.netflix.genie.common.dto.JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.") final String statusMsg
+    ) throws GenieException {
+        log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
+
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job exists for the id specified"));
+
+        this.updateJobStatus(jobEntity, DtoConverters.toV4JobStatus(jobStatus), statusMsg);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void setJobRunningInformation(
+        @NotBlank final String id,
+        @Min(value = 0, message = "Must be no lower than zero") final int processId,
+        @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") final long checkDelay,
+        @NotNull final Instant timeout
+    ) throws GenieException {
+        log.debug("Called with to update job {} with process id {}", id, processId);
+
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists. Unable to update"));
+
+        this.updateJobStatus(jobEntity, JobStatus.RUNNING, JobStatusMessages.JOB_RUNNING);
+        jobEntity.setProcessId(processId);
+        jobEntity.setCheckDelay(checkDelay);
+        jobEntity
+            .getStarted()
+            .ifPresent(started -> jobEntity.setTimeoutUsed(this.toTimeoutUsed(started, timeout)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Deprecated
+    public void setJobCompletionInformation(
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        final int exitCode,
+        @NotNull(message = "No job status entered.") final com.netflix.genie.common.dto.JobStatus status,
+        @NotBlank(message = "Status message can't be blank. Unable to update") final String statusMessage,
+        @Nullable final Long stdOutSize,
+        @Nullable final Long stdErrSize
+    ) throws GenieException {
+        log.debug(
+            "Called with id: {}, exit code: {}, status: {}, status message: {}, std out size: {}, std err size {}",
+            id,
+            exitCode,
+            status,
+            statusMessage,
+            stdOutSize,
+            stdErrSize
+        );
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists unable to update"));
+
+        this.updateJobStatus(jobEntity, DtoConverters.toV4JobStatus(status), statusMessage);
+        jobEntity.setExitCode(exitCode);
+        jobEntity.setStdOutSize(stdOutSize);
+        jobEntity.setStdErrSize(stdErrSize);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    @Deprecated
+    public com.netflix.genie.common.dto.JobRequest getV3JobRequest(@NotBlank final String id) throws GenieException {
+        log.debug("[getV3JobRequest] Called with id {}", id);
+        return JpaServiceUtils.toJobRequestDto(
+            this.jobRepository
+                .findByUniqueId(id, JobRequestProjection.class)
+                .orElseThrow(() -> new GenieNotFoundException("No job request with id " + id))
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Job getJob(@NotBlank final String id) throws GenieException {
+        log.debug("[getJob] Called with id {}", id);
+        return JpaServiceUtils.toJobDto(
+            this.jobRepository
+                .findByUniqueId(id, JobProjection.class)
+                .orElseThrow(() -> new GenieNotFoundException("No job with id " + id))
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JobExecution getJobExecution(@NotBlank final String id) throws GenieException {
+        log.debug("[getJobExecution] Called with id {}", id);
+        return JpaServiceUtils.toJobExecutionDto(
+            this.jobRepository
+                .findByUniqueId(id, JobExecutionProjection.class)
+                .orElseThrow(() -> new GenieNotFoundException("No job with id " + id))
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public com.netflix.genie.common.dto.JobMetadata getJobMetadata(@NotBlank final String id) throws GenieException {
+        log.debug("[getJobMetadata] Called with id {}", id);
+        return JpaServiceUtils.toJobMetadataDto(
+            this.jobRepository
+                .findByUniqueId(id, JobMetadataProjection.class)
+                .orElseThrow(() -> new GenieNotFoundException("No job found for id " + id))
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    @SuppressWarnings("checkstyle:parameternumber")
+    public Page<JobSearchResult> findJobs(
+        @Nullable final String id,
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<com.netflix.genie.common.dto.JobStatus> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final String clusterName,
+        @Nullable final String clusterId,
+        @Nullable final String commandName,
+        @Nullable final String commandId,
+        @Nullable final Instant minStarted,
+        @Nullable final Instant maxStarted,
+        @Nullable final Instant minFinished,
+        @Nullable final Instant maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance,
+        @NotNull final Pageable page
+    ) {
+        log.debug("[findJobs] Called");
+
+        // TODO: Re-write with projections however not currently supported: https://jira.spring.io/browse/DATAJPA-1033
+        //       Update: JIRA still not resolved as of 5/16/19
+        final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        final Root<JobEntity> root = countQuery.from(JobEntity.class);
+
+        ClusterEntity clusterEntity = null;
+        if (clusterId != null) {
+            final Optional<ClusterEntity> optionalClusterEntity
+                = this.getEntityOrNullForFindJobs(this.clusterRepository, clusterId, clusterName);
+            if (optionalClusterEntity.isPresent()) {
+                clusterEntity = optionalClusterEntity.get();
+            } else {
+                // Won't find anything matching the query
+                return new PageImpl<>(Lists.newArrayList(), page, 0);
+            }
+        }
+        CommandEntity commandEntity = null;
+        if (commandId != null) {
+            final Optional<CommandEntity> optionalCommandEntity
+                = this.getEntityOrNullForFindJobs(this.commandRepository, commandId, commandName);
+            if (optionalCommandEntity.isPresent()) {
+                commandEntity = optionalCommandEntity.get();
+            } else {
+                // Won't find anything matching the query
+                return new PageImpl<>(Lists.newArrayList(), page, 0);
+            }
+        }
+
+        final Predicate whereClause = JpaJobSpecs
+            .getFindPredicate(
+                root,
+                cb,
+                id,
+                name,
+                user,
+                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                tags,
+                clusterName,
+                clusterEntity,
+                commandName,
+                commandEntity,
+                minStarted,
+                maxStarted,
+                minFinished,
+                maxFinished,
+                grouping,
+                groupingInstance
+            );
+
+        countQuery.select(cb.count(root)).where(whereClause);
+
+        final Long count = this.entityManager.createQuery(countQuery).getSingleResult();
+
+        // Use the count to make sure we even need to make this query
+        if (count > 0) {
+            final CriteriaQuery<JobSearchResult> contentQuery = cb.createQuery(JobSearchResult.class);
+            contentQuery.from(JobEntity.class);
+
+            contentQuery.multiselect(
+                root.get(JobEntity_.uniqueId),
+                root.get(JobEntity_.name),
+                root.get(JobEntity_.user),
+                root.get(JobEntity_.status),
+                root.get(JobEntity_.started),
+                root.get(JobEntity_.finished),
+                root.get(JobEntity_.clusterName),
+                root.get(JobEntity_.commandName)
+            );
+
+            contentQuery.where(whereClause);
+
+            final Sort sort = page.getSort();
+            final List<Order> orders = new ArrayList<>();
+            sort.iterator().forEachRemaining(
+                order -> {
+                    if (order.isAscending()) {
+                        orders.add(cb.asc(root.get(order.getProperty())));
+                    } else {
+                        orders.add(cb.desc(root.get(order.getProperty())));
+                    }
+                }
+            );
+
+            contentQuery.orderBy(orders);
+
+            final List<JobSearchResult> results = this.entityManager
+                .createQuery(contentQuery)
+                .setFirstResult(((Long) page.getOffset()).intValue())
+                .setMaxResults(page.getPageSize())
+                .getResultList();
+
+            return new PageImpl<>(results, page, count);
+        } else {
+            return new PageImpl<>(Lists.newArrayList(), page, count);
+        }
+    }
+    //endregion
+
+    //region V4 Job APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteJobsCreatedBefore(
+        @NotNull final Instant creationThreshold,
+        @NotNull final Set<JobStatus> excludeStatuses,
+        @Min(1) final int batchSize
+    ) {
+        final String excludeStatusesString = excludeStatuses.toString();
+        final String creationThresholdString = creationThreshold.toString();
+        log.info(
+            "[deleteJobsCreatedBefore] Attempting to delete at most {} jobs created before {} that do not have any of "
+                + "these statuses {}",
+            batchSize,
+            creationThresholdString,
+            excludeStatusesString
+        );
+        final Set<String> ignoredStatusStrings = excludeStatuses.stream().map(Enum::name).collect(Collectors.toSet());
+        final long numJobsDeleted = this.jobRepository.deleteByIdIn(
+            this.jobRepository.findJobsCreatedBefore(
+                creationThreshold,
+                ignoredStatusStrings,
+                batchSize
+            )
+        );
+        log.info(
+            "[deleteJobsCreatedBefore] Deleted {} jobs created before {} that did not have any of these statuses {}",
+            numJobsDeleted,
+            creationThresholdString,
+            excludeStatusesString
+        );
+        return numJobsDeleted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Nonnull
+    public String saveJobSubmission(
+        @Valid final JobSubmission jobSubmission
+    ) throws IdAlreadyExistsException, SaveAttachmentException {
+        log.debug("[saveJobSubmission] Attempting to save job submission {}", jobSubmission);
+        // TODO: Metrics
+        final JobEntity jobEntity = new JobEntity();
+        jobEntity.setStatus(JobStatus.RESERVED.name());
+
+        final JobRequest jobRequest = jobSubmission.getJobRequest();
+        final JobRequestMetadata jobRequestMetadata = jobSubmission.getJobRequestMetadata();
+
+        // Create the unique id if one doesn't already exist
+        this.setUniqueId(jobEntity, jobRequest.getRequestedId().orElse(null));
+
+        // Do we have attachments? Save them so the agent can access them later.
+        final Set<URI> attachmentURIs = this.attachmentService.saveAttachments(
+            jobEntity.getUniqueId(),
+            jobSubmission.getAttachments()
+        );
+
+        jobEntity.setCommandArgs(jobRequest.getCommandArgs());
+
+        this.setJobMetadataFields(
+            jobEntity,
+            jobRequest.getMetadata(),
+            jobRequest.getResources().getSetupFile().orElse(null)
+        );
+        this.setJobExecutionEnvironmentFields(jobEntity, jobRequest.getResources(), attachmentURIs);
+        this.setExecutionResourceCriteriaFields(jobEntity, jobRequest.getCriteria());
+        this.setRequestedJobEnvironmentFields(jobEntity, jobRequest.getRequestedJobEnvironment());
+        this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
+        this.setRequestedJobArchivalData(jobEntity, jobRequest.getRequestedJobArchivalData());
+        this.setRequestMetadataFields(jobEntity, jobRequestMetadata);
+
+        // Flag to signal to rest of system that this job is V4. Temporary until everything moved to v4
+        jobEntity.setV4(true);
+
+        // Persist. Catch exception if the ID is reused
+        try {
+            final String id = this.jobRepository.save(jobEntity).getUniqueId();
+            log.debug(
+                "[saveJobSubmission] Saved job submission {} under job id {}",
+                jobSubmission,
+                id
+            );
+            return id;
+        } catch (final DataIntegrityViolationException e) {
+            throw new IdAlreadyExistsException(
+                "A job with id " + jobEntity.getUniqueId() + " already exists. Unable to reserve id.",
+                e
+            );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JobRequest getJobRequest(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getJobRequest] Requested for id {}", id);
+        return this.jobRepository
+            .findByUniqueId(id, V4JobRequestProjection.class)
+            .map(EntityDtoConverters::toV4JobRequestDto)
+            .orElseThrow(() -> new NotFoundException("No job ith id " + id + " exists"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveResolvedJob(
+        @NotBlank final String id,
+        @Valid final ResolvedJob resolvedJob
+    ) throws NotFoundException {
+        log.debug("[saveResolvedJob] Requested to save resolved information {} for job with id {}", resolvedJob, id);
+        final JobEntity entity = this.getJobEntity(id);
+
+        try {
+            if (entity.isResolved()) {
+                log.error("[saveResolvedJob] Job {} was already resolved", id);
+                // This job has already been resolved there's nothing further to save
+                return;
+            }
+            // Make sure if the job is resolvable otherwise don't do anything
+            if (!DtoConverters.toV4JobStatus(entity.getStatus()).isResolvable()) {
+                log.error(
+                    "[saveResolvedJob] Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't "
+                        + "save resolved info",
+                    id,
+                    entity.getStatus(),
+                    JobStatus.getResolvableStatuses()
+                );
+                return;
+            }
+            final JobSpecification jobSpecification = resolvedJob.getJobSpecification();
+            this.setExecutionResources(
+                entity,
+                jobSpecification.getCluster().getId(),
+                jobSpecification.getCommand().getId(),
+                jobSpecification
+                    .getApplications()
+                    .stream()
+                    .map(JobSpecification.ExecutionResource::getId)
+                    .collect(Collectors.toList())
+            );
+
+            entity.setEnvironmentVariables(jobSpecification.getEnvironmentVariables());
+            entity.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
+            jobSpecification.getArchiveLocation().ifPresent(entity::setArchiveLocation);
+            jobSpecification.getTimeout().ifPresent(entity::setTimeoutUsed);
+
+            final JobEnvironment jobEnvironment = resolvedJob.getJobEnvironment();
+            entity.setMemoryUsed(jobEnvironment.getMemory());
+
+            // TODO: There's probably some other fields we want to use from jobEnvironment
+
+            entity.setResolved(true);
+            entity.setStatus(JobStatus.RESOLVED.name());
+            log.debug("[saveResolvedJob] Saved resolved information {} for job with id {}", resolvedJob, id);
+        } catch (final NotFoundException e) {
+            log.error(
+                "[saveResolvedJob] Unable to save resolved job information {} for job {} due to {}",
+                resolvedJob,
+                id,
+                e.getMessage(),
+                e
+            );
+            throw e;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<JobSpecification> getJobSpecification(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getJobSpecification] Requested to get job specification for job {}", id);
+        final JobSpecificationProjection projection = this.jobRepository
+            .findByUniqueId(id, JobSpecificationProjection.class)
+            .orElseThrow(
+                () -> new NotFoundException("No job ith id " + id + " exists. Unable to get job specification.")
+            );
+
+        return projection.isResolved()
+            ? Optional.of(EntityDtoConverters.toJobSpecificationDto(projection))
+            : Optional.empty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // TODO: The AOP aspects are firing on a lot of these APIs for retries and we may not want them to given a lot of
+    //       these are un-recoverable. May want to revisit what is in the aspect.
+    @Override
+    public void claimJob(
+        @NotBlank final String id,
+        @Valid final AgentClientMetadata agentClientMetadata
+    ) throws NotFoundException, GenieJobAlreadyClaimedException, GenieInvalidStatusException {
+        log.debug("[claimJob] Agent with metadata {} requesting to claim job with id {}", agentClientMetadata, id);
+        final JobEntity jobEntity = this.getJobEntity(id);
+
+        if (jobEntity.isClaimed()) {
+            throw new GenieJobAlreadyClaimedException("Job with id " + id + " is already claimed. Unable to claim.");
+        }
+
+        final JobStatus currentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
+        // The job must be in one of the claimable states in order to be claimed
+        // TODO: Perhaps could use jobEntity.isResolved here also but wouldn't check the case that the job was in a
+        //       terminal state like killed or invalid in which case we shouldn't claim it anyway as the agent would
+        //       continue running
+        if (!currentStatus.isClaimable()) {
+            throw new GenieInvalidStatusException(
+                "Job "
+                    + id
+                    + " is in status "
+                    + currentStatus
+                    + " and can't be claimed. Needs to be one of "
+                    + JobStatus.getClaimableStatuses()
+            );
+        }
+
+        // Good to claim
+        jobEntity.setClaimed(true);
+        jobEntity.setStatus(JobStatus.CLAIMED.name());
+        // TODO: It might be nice to set the status message as well to something like "Job claimed by XYZ..."
+        //       we could do this in other places too like after reservation, resolving, etc
+
+        // TODO: Should these be required? We're reusing the DTO here but perhaps the expectation at this point
+        //       is that the agent will always send back certain metadata
+        agentClientMetadata.getHostname().ifPresent(jobEntity::setAgentHostname);
+        agentClientMetadata.getVersion().ifPresent(jobEntity::setAgentVersion);
+        agentClientMetadata.getPid().ifPresent(jobEntity::setAgentPid);
+        log.debug("[claimJob] Claimed job {} for agent with metadata {}", id, agentClientMetadata);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateJobStatus(
+        @NotBlank final String id,
+        @NotNull final JobStatus currentStatus,
+        @NotNull final JobStatus newStatus,
+        @Nullable final String newStatusMessage
+    ) throws NotFoundException, GenieInvalidStatusException {
+        log.debug(
+            "[updateJobStatus] Requested to change the status of job {} from {} to {} with message {}",
+            id,
+            currentStatus,
+            newStatus,
+            newStatusMessage
+        );
+        if (currentStatus == newStatus) {
+            throw new GenieInvalidStatusException(
+                "Can't update the status of job " + id + " because both current and new status are " + currentStatus
+            );
+        }
+
+        final JobEntity jobEntity = this.getJobEntity(id);
+
+        final JobStatus actualCurrentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
+        if (actualCurrentStatus != currentStatus) {
+            throw new GenieInvalidStatusException(
+                "Job "
+                    + id
+                    + " current status is "
+                    + actualCurrentStatus
+                    + " but API caller expected it to be "
+                    + currentStatus
+                    + ". Unable to update status due to inconsistent state."
+            );
+        }
+
+        // TODO: Should we throw an exception if the job is already in a terminal state and someone is trying to
+        //       further update it? In the private method below used in Genie 3 it's just swallowed and is a no-op
+
+        // TODO: Should we prevent updating status for statuses already covered by "reserveJobId" and
+        //      "saveResolvedJob"?
+
+        this.updateJobStatus(jobEntity, newStatus, newStatusMessage);
+
+        log.debug(
+            "[updateJobStatus] Changed the status of job {} from {} to {} with message {}",
+            id,
+            currentStatus,
+            newStatus,
+            newStatusMessage
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isV4(@NotBlank final String id) throws NotFoundException {
+        log.debug("[isV4] Read v4 flag from db for job {} ", id);
+        return this.jobRepository
+            .findByUniqueId(id, IsV4JobProjection.class)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists. Unable to get v4 flag."))
+            .isV4();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JobStatus getJobStatus(@NotBlank final String id) throws NotFoundException {
+        return DtoConverters.toV4JobStatus(
+            this.jobRepository
+                .findByUniqueId(id, StatusProjection.class)
+                .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists. Unable to get status."))
+                .getStatus()
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> getJobArchiveLocation(@NotBlank final String id) throws NotFoundException {
+        return this.jobRepository
+            .findByUniqueId(id, JobArchiveLocationProjection.class)
+            .map(JobArchiveLocationProjection::getArchiveLocation)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exits."));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public FinishedJob getFinishedJob(@NotBlank final String id) throws NotFoundException, GenieInvalidStatusException {
+        return this.jobRepository.findByUniqueId(id, FinishedJobProjection.class)
+            .map(EntityDtoConverters::toFinishedJobDto)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists."));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isApiJob(@NotBlank final String id) throws NotFoundException {
+        return this.jobRepository
+            .findByUniqueId(id, JobApiProjection.class)
+            .map(JobApiProjection::isApi)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostname) {
+        log.debug("[getAllActiveJobsOnHost] Called with hostname {}", hostname);
+
+        final Set<JobProjection> jobs = this.jobRepository.findByAgentHostnameAndStatusIn(hostname, ACTIVE_STATUS_SET);
+
+        return jobs
+            .stream()
+            .map(JpaServiceUtils::toJobDto)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getAllHostsWithActiveJobs() {
+        log.debug("[getAllHostsWithActiveJobs] Called");
+
+        return this.jobRepository
+            .findDistinctByStatusInAndV4IsFalse(ACTIVE_STATUS_SET)
+            .stream()
+            .map(AgentHostnameProjection::getAgentHostname)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Cluster getJobCluster(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getJobCluster] Called for job {}", id);
+        return EntityDtoConverters.toV4ClusterDto(
+            this.jobRepository.findByUniqueId(id, JobClusterProjection.class)
+                .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
+                .getCluster()
+                .orElseThrow(() -> new NotFoundException("Job " + id + " has no associated cluster"))
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Command getJobCommand(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getJobCommand] Called for job {}", id);
+        return EntityDtoConverters.toV4CommandDto(
+            this.jobRepository.findByUniqueId(id, JobCommandProjection.class)
+                .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
+                .getCommand()
+                .orElseThrow(() -> new NotFoundException("Job " + id + " has no associated command"))
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Application> getJobApplications(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getJobApplications] Called for job {}", id);
+        return this.jobRepository.findByUniqueId(id, JobApplicationsProjection.class)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
+            .getApplications()
+            .stream()
+            .map(EntityDtoConverters::toV4ApplicationDto)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public String getJobHost(@NotBlank final String id) throws NotFoundException {
+        log.debug("[getJobHost] Called for job {}", id);
+        return this.jobRepository
+            .findByUniqueId(id, AgentHostnameProjection.class)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
+            .getAgentHostname()
+            .orElseThrow(() -> new NotFoundException("No hostname set for job " + id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long getActiveJobCountForUser(@NotBlank final String user) {
+        log.debug("[getActiveJobCountForUser] Called for jobs with user {}", user);
+        final Long count = this.jobRepository.countJobsByUserAndStatusIn(user, ACTIVE_STATUS_SET);
+        if (count == null || count < 0) {
+            throw new GenieRuntimeException("Count query for user " + user + "produced an unexpected result: " + count);
+        }
+        return count;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, UserResourcesSummary> getUserResourcesSummaries() {
+        log.debug("[getUserResourcesSummaries] Called");
+        return this.jobRepository.getUserJobResourcesAggregates()
+            .stream()
+            .map(JpaServiceUtils::toUserResourceSummaryDto)
+            .collect(Collectors.toMap(UserResourcesSummary::getUser, userResourcesSummary -> userResourcesSummary));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getActiveDisconnectedAgentJobs() {
+        log.debug("[getActiveDisconnectedAgentJobs] Called");
+        return this.jobRepository.getAgentJobIdsWithNoConnectionInState(ACTIVE_STATUS_SET)
+            .stream()
+            .map(UniqueIdProjection::getUniqueId)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long getAllocatedMemoryOnHost(@NotBlank final String hostname) {
+        log.debug("[getAllocatedMemoryOnHost] Called for hostname {}", hostname);
+        return this.jobRepository.getTotalMemoryUsedOnHost(hostname, ACTIVE_STATUS_SET);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long getUsedMemoryOnHost(@NotBlank final String hostname) {
+        log.debug("[getUsedMemoryOnHost] Called for hostname {}", hostname);
+        return this.jobRepository.getTotalMemoryUsedOnHost(hostname, USING_MEMORY_JOB_SET);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long getActiveJobCountOnHost(@NotBlank final String hostname) {
+        log.debug("[getActiveJobCountOnHost] Called for hostname {}", hostname);
+        return this.jobRepository.countByAgentHostnameAndStatusIn(hostname, ACTIVE_STATUS_SET);
+    }
+    //endregion
+    //endregion
+
+    //region General CommonResource APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void addConfigsToResource(
+        @NotBlank final String id,
+        final Set<@Size(max = 1024) String> configs,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        this.getResourceConfigEntities(id, resourceClass).addAll(this.createOrGetFileEntities(configs));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public <R extends CommonResource> Set<String> getConfigsForResource(
+        @NotBlank final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        return this.getResourceConfigEntities(id, resourceClass)
+            .stream()
+            .map(FileEntity::getFile)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void updateConfigsForResource(
+        @NotBlank final String id,
+        final Set<@Size(max = 1024) String> configs,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        final Set<FileEntity> configEntities = this.getResourceConfigEntities(id, resourceClass);
+        configEntities.clear();
+        configEntities.addAll(this.createOrGetFileEntities(configs));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void removeAllConfigsForResource(
+        @NotBlank final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        final Set<FileEntity> configEntities = this.getResourceConfigEntities(id, resourceClass);
+        configEntities.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void removeConfigForResource(
+        @NotBlank final String id,
+        @NotBlank final String config,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        this.getResourceConfigEntities(id, resourceClass).removeIf(entity -> config.equals(entity.getFile()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void addDependenciesToResource(
+        @NotBlank final String id,
+        final Set<@Size(max = 1024) String> dependencies,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        this.getResourceDependenciesEntities(id, resourceClass).addAll(this.createOrGetFileEntities(dependencies));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public <R extends CommonResource> Set<String> getDependenciesForResource(
+        @NotBlank final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        return this.getResourceDependenciesEntities(id, resourceClass)
+            .stream()
+            .map(FileEntity::getFile)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void updateDependenciesForResource(
+        @NotBlank final String id,
+        final Set<@Size(max = 1024) String> dependencies,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        final Set<FileEntity> dependencyEntities = this.getResourceDependenciesEntities(id, resourceClass);
+        dependencyEntities.clear();
+        dependencyEntities.addAll(this.createOrGetFileEntities(dependencies));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void removeAllDependenciesForResource(
+        @NotBlank final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        final Set<FileEntity> dependencyEntities = this.getResourceDependenciesEntities(id, resourceClass);
+        dependencyEntities.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void removeDependencyForResource(
+        @NotBlank final String id,
+        @NotBlank final String dependency,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        this.getResourceDependenciesEntities(id, resourceClass).removeIf(entity -> dependency.equals(entity.getFile()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void addTagsToResource(
+        @NotBlank final String id,
+        final Set<@Size(max = 255) String> tags,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        this.getResourceTagEntities(id, resourceClass).addAll(this.createOrGetTagEntities(tags));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public <R extends CommonResource> Set<String> getTagsForResource(
+        @NotBlank final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        return this.getResourceTagEntities(id, resourceClass)
+            .stream()
+            .map(TagEntity::getTag)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void updateTagsForResource(
+        @NotBlank final String id,
+        final Set<@Size(max = 255) String> tags,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        final Set<TagEntity> tagEntities = this.getResourceTagEntities(id, resourceClass);
+        tagEntities.clear();
+        tagEntities.addAll(this.createOrGetTagEntities(tags));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void removeAllTagsForResource(
+        @NotBlank final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        final Set<TagEntity> tagEntities = this.getResourceTagEntities(id, resourceClass);
+        tagEntities.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R extends CommonResource> void removeTagForResource(
+        @NotBlank final String id,
+        @NotBlank final String tag,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        this.getResourceTagEntities(id, resourceClass).removeIf(entity -> tag.equals(entity.getTag()));
+    }
+    //endregion
+
+    //region Agent Connection APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveAgentConnection(@NotBlank final String jobId, @NotBlank final String hostname) {
+        log.debug("[saveAgentConnection] Called for jobId {} and hostname {}", jobId, hostname);
+        final Optional<AgentConnectionEntity> existingEntity = this.getAgentConnectionEntity(jobId);
+        if (existingEntity.isPresent()) {
+            existingEntity.get().setServerHostname(hostname);
+        } else {
+            this.agentConnectionRepository.save(new AgentConnectionEntity(jobId, hostname));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAgentConnection(@NotBlank final String jobId, @NotBlank final String hostname) {
+        log.debug("[removeAgentConnection] Called for jobId {} and hostname {}", jobId, hostname);
+        final Optional<AgentConnectionEntity> existingEntity = this.getAgentConnectionEntity(jobId);
+        if (existingEntity.isPresent() && existingEntity.get().getServerHostname().equals(hostname)) {
+            this.agentConnectionRepository.delete(existingEntity.get());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> lookupAgentConnectionServer(@NotBlank final String jobId) {
+        log.debug("[lookupAgentConnectionServer] Called for job id {}", jobId);
+        return this.getAgentConnectionEntity(jobId).map(AgentConnectionEntity::getServerHostname);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long getNumAgentConnectionsOnServer(@NotBlank final String hostname) {
+        log.debug("[getNumAgentConnectionsOnServer] Called for hostname {}", hostname);
+        return this.agentConnectionRepository.countByServerHostnameEquals(hostname);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int removeAllAgentConnectionsToServer(@NotBlank final String hostname) {
+        log.debug("[removeAllAgentConnectionsToServer] Called for hostname {}", hostname);
+        return this.agentConnectionRepository.deleteByServerHostnameEquals(hostname);
+    }
+    //endregion
+
+    //region Tag APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteUnusedTags(@NotNull final Instant createdThreshold) {
+        log.info("[deleteUnusedTags] Called to delete unused tags created before {}", createdThreshold);
+        return this.tagRepository.deleteByIdIn(
+            this.tagRepository
+                .findUnusedTags(createdThreshold)
+                .stream()
+                .map(Number::longValue)
+                .collect(Collectors.toSet())
+        );
+    }
+    //endregion
+
+    //region File APIs
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public long deleteUnusedFiles(@NotNull final Instant createdThreshold) {
+        log.debug("[deleteUnusedFiles] Called to delete unused files created before {}", createdThreshold);
+        return this.fileRepository.deleteByIdIn(
+            this.fileRepository
+                .findUnusedFiles(createdThreshold)
+                .stream()
+                .map(Number::longValue)
+                .collect(Collectors.toSet())
+        );
+    }
+    //endregion
+
+    //region Helper Methods
+    private ApplicationEntity getApplicationEntity(final String id) throws NotFoundException {
+        return this.applicationRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new NotFoundException("No application with id " + id + " exists"));
+    }
+
+    private ClusterEntity getClusterEntity(final String id) throws NotFoundException {
+        return this.clusterRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new NotFoundException("No cluster with id " + id + " exists"));
+    }
+
+    private CommandEntity getCommandEntity(final String id) throws NotFoundException {
+        return this.commandRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"));
+    }
+
+    private JobEntity getJobEntity(final String id) throws NotFoundException {
+        return this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"));
+    }
+
+    private Optional<AgentConnectionEntity> getAgentConnectionEntity(final String jobId) {
+        return this.agentConnectionRepository.findByJobId(jobId);
+    }
+
+    private FileEntity createOrGetFileEntity(final String file) {
+        return this.createOrGetSharedEntity(
+            file,
+            this.fileRepository::findByFile,
+            FileEntity::new,
+            this.fileRepository::saveAndFlush
+        );
+    }
+
+    private Set<FileEntity> createOrGetFileEntities(final Set<String> files) {
+        return files.stream().map(this::createOrGetFileEntity).collect(Collectors.toSet());
+    }
+
+    private TagEntity createOrGetTagEntity(final String tag) {
+        return this.createOrGetSharedEntity(
+            tag,
+            this.tagRepository::findByTag,
+            TagEntity::new,
+            this.tagRepository::saveAndFlush
+        );
+    }
+
+    private Set<TagEntity> createOrGetTagEntities(final Set<String> tags) {
+        return tags.stream().map(this::createOrGetTagEntity).collect(Collectors.toSet());
+    }
+
+    private <E> E createOrGetSharedEntity(
+        final String value,
+        final Function<String, Optional<E>> find,
+        final Function<String, E> entityCreation,
+        final Function<E, E> saveAndFlush
+    ) {
+        final Optional<E> existingEntity = find.apply(value);
+        if (existingEntity.isPresent()) {
+            return existingEntity.get();
+        }
+
+        try {
+            return saveAndFlush.apply(entityCreation.apply(value));
+        } catch (final DataIntegrityViolationException e) {
+            // If this isn't found now there's really nothing we can do so throw runtime
+            return find
+                .apply(value)
+                .orElseThrow(
+                    () -> new GenieRuntimeException(value + " entity creation failed but still can't find record", e)
+                );
+        }
+    }
+
+    private <R extends CommonResource> Set<FileEntity> getResourceConfigEntities(
+        final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        if (resourceClass.equals(Application.class)) {
+            return this.getApplicationEntity(id).getConfigs();
+        } else if (resourceClass.equals(Cluster.class)) {
+            return this.getClusterEntity(id).getConfigs();
+        } else if (resourceClass.equals(Command.class)) {
+            return this.getCommandEntity(id).getConfigs();
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + resourceClass);
+        }
+    }
+
+    private <R extends CommonResource> Set<FileEntity> getResourceDependenciesEntities(
+        final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        if (resourceClass.equals(Application.class)) {
+            return this.getApplicationEntity(id).getDependencies();
+        } else if (resourceClass.equals(Cluster.class)) {
+            return this.getClusterEntity(id).getDependencies();
+        } else if (resourceClass.equals(Command.class)) {
+            return this.getCommandEntity(id).getDependencies();
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + resourceClass);
+        }
+    }
+
+    private <R extends CommonResource> Set<TagEntity> getResourceTagEntities(
+        final String id,
+        final Class<R> resourceClass
+    ) throws NotFoundException {
+        if (resourceClass.equals(Application.class)) {
+            return this.getApplicationEntity(id).getTags();
+        } else if (resourceClass.equals(Cluster.class)) {
+            return this.getClusterEntity(id).getTags();
+        } else if (resourceClass.equals(Command.class)) {
+            return this.getCommandEntity(id).getTags();
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + resourceClass);
+        }
+    }
+
+    private <E extends UniqueIdEntity> void setUniqueId(final E entity, @Nullable final String requestedId) {
+        if (requestedId != null) {
+            entity.setUniqueId(requestedId);
+            entity.setRequestedId(true);
+        } else {
+            entity.setUniqueId(UUID.randomUUID().toString());
+            entity.setRequestedId(false);
+        }
+    }
+
+    private void setEntityResources(
+        final ExecutionEnvironment resources,
+        final Consumer<Set<FileEntity>> configsConsumer,
+        final Consumer<Set<FileEntity>> dependenciesConsumer
+    ) {
+        // Save all the unowned entities first to avoid unintended flushes
+        configsConsumer.accept(this.createOrGetFileEntities(resources.getConfigs()));
+        dependenciesConsumer.accept(this.createOrGetFileEntities(resources.getDependencies()));
+    }
+
+    private void setEntityTags(final Set<String> tags, final Consumer<Set<TagEntity>> tagsConsumer) {
+        tagsConsumer.accept(this.createOrGetTagEntities(tags));
+    }
+
+    private void updateApplicationEntity(
+        final ApplicationEntity entity,
+        final ExecutionEnvironment resources,
+        final ApplicationMetadata metadata
+    ) {
+        entity.setStatus(metadata.getStatus().name());
+        entity.setType(metadata.getType().orElse(null));
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
+        this.setBaseEntityMetadata(entity, metadata, resources.getSetupFile().orElse(null));
+    }
+
+    private void updateClusterEntity(
+        final ClusterEntity entity,
+        final ExecutionEnvironment resources,
+        final ClusterMetadata metadata
+    ) {
+        entity.setStatus(metadata.getStatus().name());
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
+        this.setBaseEntityMetadata(entity, metadata, resources.getSetupFile().orElse(null));
+    }
+
+    // Compiler keeps complaining about `executable` being marked nullable but it isn't
+    @SuppressFBWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
+    private void updateCommandEntity(
+        final CommandEntity entity,
+        final ExecutionEnvironment resources,
+        final CommandMetadata metadata,
+        final long checkDelay,
+        final List<String> executable,
+        @Nullable final Integer memory,
+        final List<Criterion> clusterCriteria
+    ) {
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
+        this.setBaseEntityMetadata(entity, metadata, resources.getSetupFile().orElse(null));
+
+        entity.setStatus(metadata.getStatus().name());
+        entity.setCheckDelay(checkDelay);
+        entity.setExecutable(executable);
+        entity.setMemory(memory);
+
+        this.updateClusterCriteria(entity, clusterCriteria);
+    }
+
+    private void setBaseEntityMetadata(
+        final BaseEntity entity,
+        final CommonMetadata metadata,
+        @Nullable final String setupFile
+    ) {
+        // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
+        entity.setName(metadata.getName());
+        entity.setUser(metadata.getUser());
+        entity.setVersion(metadata.getVersion());
+        entity.setDescription(metadata.getDescription().orElse(null));
+        EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
+        entity.setSetupFile(setupFile == null ? null : this.createOrGetFileEntity(setupFile));
+    }
+
+    private void deleteApplicationEntity(final ApplicationEntity entity) throws PreconditionFailedException {
+        final Set<CommandEntity> commandEntities = entity.getCommands();
+        if (!commandEntities.isEmpty()) {
+            throw new PreconditionFailedException(
+                "Unable to delete application with id "
+                    + entity.getUniqueId()
+                    + " as it is still used by the following commands: "
+                    + commandEntities.stream().map(CommandEntity::getUniqueId).collect(Collectors.joining())
+            );
+        }
+        this.applicationRepository.delete(entity);
+    }
+
+    private void deleteClusterEntity(final ClusterEntity entity) {
+        final List<CommandEntity> commandEntities = entity.getCommands();
+        if (commandEntities != null) {
+            for (final CommandEntity commandEntity : commandEntities) {
+                final Set<ClusterEntity> clusterEntities = commandEntity.getClusters();
+                if (clusterEntities != null) {
+                    clusterEntities.remove(entity);
+                }
+            }
+        }
+        this.clusterRepository.delete(entity);
+    }
+
+    private void deleteCommandEntity(final CommandEntity entity) {
+        //Remove the command from the associated Application references
+        final List<ApplicationEntity> originalApps = entity.getApplications();
+        if (originalApps != null) {
+            final List<ApplicationEntity> applicationEntities = Lists.newArrayList(originalApps);
+            applicationEntities.forEach(entity::removeApplication);
+        }
+        //Remove the command from the associated cluster references
+        final Set<ClusterEntity> originalClusters = entity.getClusters();
+        if (originalClusters != null) {
+            final Set<ClusterEntity> clusterEntities = Sets.newHashSet(originalClusters);
+            clusterEntities.forEach(clusterEntity -> clusterEntity.removeCommand(entity));
+        }
+        this.commandRepository.delete(entity);
+    }
+
+    // TODO: Delete once V4 is only model
+    private Map<Cluster, String> findClustersAndCommandsForJob(
+        final List<Criterion> clusterCriteria,
+        final Criterion commandCriterion
+    ) throws GenieServerException {
+        final Map<Cluster, String> foundClusters = Maps.newHashMap();
+        for (final Criterion clusterCriterion : clusterCriteria) {
+            final List<Object[]> clusterCommands = this.clusterRepository.resolveClustersAndCommands(
+                clusterCriterion,
+                commandCriterion
+            );
+
+            if (!clusterCommands.isEmpty()) {
+                for (final Object[] ids : clusterCommands) {
+                    if (ids.length != 2) {
+                        throw new GenieServerException("Expected result length 2 but got " + ids.length);
+                    }
+                    final long clusterId;
+                    if (ids[0] instanceof Number) {
+                        clusterId = ((Number) ids[0]).longValue();
+                    } else {
+                        throw new GenieServerException("Expected number type but got " + ids[0].getClass().getName());
+                    }
+                    final String commandUniqueId;
+                    if (ids[1] instanceof String) {
+                        commandUniqueId = (String) ids[1];
+                    } else {
+                        throw new GenieServerException("Expected String type but got " + ids[1].getClass().getName());
+                    }
+
+                    final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
+                    foundClusters.put(EntityDtoConverters.toV4ClusterDto(clusterEntity), commandUniqueId);
+                }
+                return foundClusters;
+            }
+        }
+
+        //if we've gotten to here no clusters were found so return empty map
+        return foundClusters;
+    }
+
+    private void deleteAllClusterCriteria(final CommandEntity commandEntity) {
+        final List<CriterionEntity> persistedEntities = commandEntity.getClusterCriteria();
+        final List<CriterionEntity> entitiesToDelete = Lists.newArrayList(persistedEntities);
+        persistedEntities.clear();
+        // Ensure Criterion aren't left dangling
+        entitiesToDelete.forEach(this.criterionRepository::delete);
+    }
+
+    private CriterionEntity toCriterionEntity(final Criterion criterion) {
+        final CriterionEntity criterionEntity = new CriterionEntity();
+        criterion.getId().ifPresent(criterionEntity::setUniqueId);
+        criterion.getName().ifPresent(criterionEntity::setName);
+        criterion.getVersion().ifPresent(criterionEntity::setVersion);
+        criterion.getStatus().ifPresent(criterionEntity::setStatus);
+        criterionEntity.setTags(this.createOrGetTagEntities(criterion.getTags()));
+        return criterionEntity;
+    }
+
+    private void updateClusterCriteria(final CommandEntity commandEntity, final List<Criterion> clusterCriteria) {
+        // First remove all the old criteria
+        this.deleteAllClusterCriteria(commandEntity);
+        // Set the new criteria
+        commandEntity.setClusterCriteria(
+            clusterCriteria
+                .stream()
+                .map(this::toCriterionEntity)
+                .collect(Collectors.toList())
+        );
+    }
+
+    private void updateJobStatus(
+        final JobEntity jobEntity,
+        final JobStatus newStatus,
+        @Nullable final String statusMsg
+    ) {
+        final JobStatus currentStatus = DtoConverters.toV4JobStatus(jobEntity.getStatus());
+        // Only change the status if the entity isn't already in a terminal state
+        if (currentStatus.isActive()) {
+            jobEntity.setStatus(newStatus.name());
+            jobEntity.setStatusMsg(statusMsg);
+
+            if (newStatus.equals(JobStatus.RUNNING)) {
+                // Status being changed to running so set start date.
+                jobEntity.setStarted(Instant.now());
+            } else if (jobEntity.getStarted().isPresent() && newStatus.isFinished()) {
+                // Since start date is set the job was running previously and now has finished
+                // with status killed, failed or succeeded. So we set the job finish time.
+                jobEntity.setFinished(Instant.now());
+            }
+        }
+    }
+
+    private JobEntity v3DtosToJobEntity(
+        final String id,
+        final com.netflix.genie.common.dto.JobRequest jobRequest,
+        final com.netflix.genie.common.dto.JobMetadata jobMetadata,
+        final Job job,
+        final JobExecution jobExecution
+    ) throws GeniePreconditionException {
+        final JobEntity jobEntity = new JobEntity();
+
+        // Fields from the original Job Request
+
+        jobEntity.setUniqueId(id);
+        jobEntity.setName(jobRequest.getName());
+        jobEntity.setUser(jobRequest.getUser());
+        jobEntity.setVersion(jobRequest.getVersion());
+        jobEntity.setStatus(JobStatus.INIT.name());
+        jobRequest.getDescription().ifPresent(jobEntity::setDescription);
+        jobRequest
+            .getMetadata()
+            .ifPresent(metadata -> EntityDtoConverters.setJsonField(metadata, jobEntity::setMetadata));
+        jobRequest.getCommandArgs().ifPresent(commandArgs -> jobEntity.setCommandArgs(Lists.newArrayList(commandArgs)));
+        jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
+        jobRequest.getSetupFile().ifPresent(setupFile -> jobEntity.setSetupFile(this.createOrGetFileEntity(setupFile)));
+        jobEntity.setClusterCriteria(
+            jobRequest
+                .getClusterCriterias()
+                .stream()
+                .map(
+                    criterion -> {
+                        try {
+                            return DtoConverters.toV4Criterion(criterion);
+                        } catch (GeniePreconditionException e) {
+                            throw new IllegalArgumentException(e);
+                        }
+                    }
+                )
+                .map(this::toCriterionEntity)
+                .collect(Collectors.toList())
+        );
+
+        jobEntity.setCommandCriterion(
+            this.toCriterionEntity(
+                DtoConverters.toV4Criterion(jobRequest.getCommandCriteria())
+            )
+        );
+        jobEntity.setConfigs(this.createOrGetFileEntities(jobRequest.getConfigs()));
+        jobEntity.setDependencies(this.createOrGetFileEntities(jobRequest.getDependencies()));
+        jobEntity.setArchivingDisabled(jobRequest.isDisableLogArchival());
+        jobRequest.getEmail().ifPresent(jobEntity::setEmail);
+        if (!jobRequest.getTags().isEmpty()) {
+            jobEntity.setTags(this.createOrGetTagEntities(jobRequest.getTags()));
+        }
+        jobRequest.getCpu().ifPresent(jobEntity::setRequestedCpu);
+        jobRequest.getMemory().ifPresent(jobEntity::setRequestedMemory);
+        if (!jobRequest.getApplications().isEmpty()) {
+            jobEntity.setRequestedApplications(jobRequest.getApplications());
+        }
+        jobRequest.getTimeout().ifPresent(jobEntity::setRequestedTimeout);
+
+        jobRequest.getGrouping().ifPresent(jobEntity::setGrouping);
+        jobRequest.getGroupingInstance().ifPresent(jobEntity::setGroupingInstance);
+
+        // Fields collected as metadata
+
+        jobMetadata.getClientHost().ifPresent(jobEntity::setRequestApiClientHostname);
+        jobMetadata.getUserAgent().ifPresent(jobEntity::setRequestApiClientUserAgent);
+        jobMetadata.getNumAttachments().ifPresent(jobEntity::setNumAttachments);
+        jobMetadata.getTotalSizeOfAttachments().ifPresent(jobEntity::setTotalSizeOfAttachments);
+        jobMetadata.getStdErrSize().ifPresent(jobEntity::setStdErrSize);
+        jobMetadata.getStdOutSize().ifPresent(jobEntity::setStdOutSize);
+        // For V3 (which this method supports) it's always API
+        jobEntity.setApi(true);
+
+        // Fields a user cares about (job dto)
+
+        job.getArchiveLocation().ifPresent(jobEntity::setArchiveLocation);
+        job.getStarted().ifPresent(jobEntity::setStarted);
+        job.getFinished().ifPresent(jobEntity::setFinished);
+        jobEntity.setStatus(job.getStatus().name());
+        job.getStatusMsg().ifPresent(jobEntity::setStatusMsg);
+
+        // Fields set by system as part of job execution
+        jobEntity.setAgentHostname(jobExecution.getHostName());
+        jobExecution.getProcessId().ifPresent(jobEntity::setProcessId);
+        jobExecution.getCheckDelay().ifPresent(jobEntity::setCheckDelay);
+        if (job.getStarted().isPresent() && jobExecution.getTimeout().isPresent()) {
+            jobEntity.setTimeoutUsed(this.toTimeoutUsed(job.getStarted().get(), jobExecution.getTimeout().get()));
+        }
+        jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
+
+        // Flag to signal to rest of system that this job is V3. Temporary until everything moved to v4
+        jobEntity.setV4(false);
+
+        return jobEntity;
+    }
+
+    private void setJobMetadataFields(
+        final JobEntity jobEntity,
+        final JobMetadata jobMetadata,
+        @Nullable final String setupFile
+    ) {
+        this.setBaseEntityMetadata(jobEntity, jobMetadata, setupFile);
+        this.setEntityTags(jobMetadata.getTags(), jobEntity::setTags);
+        jobMetadata.getEmail().ifPresent(jobEntity::setEmail);
+        jobMetadata.getGroup().ifPresent(jobEntity::setGenieUserGroup);
+        jobMetadata.getGrouping().ifPresent(jobEntity::setGrouping);
+        jobMetadata.getGroupingInstance().ifPresent(jobEntity::setGroupingInstance);
+    }
+
+    private void setJobExecutionEnvironmentFields(
+        final JobEntity jobEntity,
+        final ExecutionEnvironment executionEnvironment,
+        @Nullable final Set<URI> savedAttachments
+    ) {
+        jobEntity.setConfigs(this.createOrGetFileEntities(executionEnvironment.getConfigs()));
+        final Set<FileEntity> dependencies = this.createOrGetFileEntities(executionEnvironment.getDependencies());
+        if (savedAttachments != null) {
+            dependencies.addAll(
+                this.createOrGetFileEntities(savedAttachments.stream().map(URI::toString).collect(Collectors.toSet()))
+            );
+        }
+        jobEntity.setDependencies(dependencies);
+    }
+
+    private void setExecutionResourceCriteriaFields(
+        final JobEntity jobEntity,
+        final ExecutionResourceCriteria criteria
+    ) {
+        final List<Criterion> clusterCriteria = criteria.getClusterCriteria();
+        final List<CriterionEntity> clusterCriteriaEntities
+            = Lists.newArrayListWithExpectedSize(clusterCriteria.size());
+
+        for (final Criterion clusterCriterion : clusterCriteria) {
+            clusterCriteriaEntities.add(this.toCriterionEntity(clusterCriterion));
+        }
+        jobEntity.setClusterCriteria(clusterCriteriaEntities);
+        jobEntity.setCommandCriterion(this.toCriterionEntity(criteria.getCommandCriterion()));
+        jobEntity.setRequestedApplications(criteria.getApplicationIds());
+    }
+
+    private void setRequestedJobEnvironmentFields(
+        final JobEntity jobEntity,
+        final JobEnvironmentRequest requestedJobEnvironment
+    ) {
+        jobEntity.setRequestedEnvironmentVariables(requestedJobEnvironment.getRequestedEnvironmentVariables());
+        requestedJobEnvironment.getRequestedJobMemory().ifPresent(jobEntity::setRequestedMemory);
+        requestedJobEnvironment.getRequestedJobCpu().ifPresent(jobEntity::setRequestedCpu);
+        requestedJobEnvironment.getExt().ifPresent(
+            jsonNode -> EntityDtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentEnvironmentExt)
+        );
+    }
+
+    private void setRequestedAgentConfigFields(
+        final JobEntity jobEntity,
+        final AgentConfigRequest requestedAgentConfig
+    ) {
+        jobEntity.setInteractive(requestedAgentConfig.isInteractive());
+        jobEntity.setArchivingDisabled(requestedAgentConfig.isArchivingDisabled());
+        requestedAgentConfig
+            .getRequestedJobDirectoryLocation()
+            .ifPresent(location -> jobEntity.setRequestedJobDirectoryLocation(location.getAbsolutePath()));
+        requestedAgentConfig.getTimeoutRequested().ifPresent(jobEntity::setRequestedTimeout);
+        requestedAgentConfig.getExt().ifPresent(
+            jsonNode -> EntityDtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentConfigExt)
+        );
+    }
+
+    private void setRequestedJobArchivalData(
+        final JobEntity jobEntity,
+        final JobArchivalDataRequest requestedJobArchivalData
+    ) {
+        requestedJobArchivalData
+            .getRequestedArchiveLocationPrefix()
+            .ifPresent(jobEntity::setRequestedArchiveLocationPrefix);
+    }
+
+    private void setRequestMetadataFields(
+        final JobEntity jobEntity,
+        final JobRequestMetadata jobRequestMetadata
+    ) {
+        jobEntity.setApi(jobRequestMetadata.isApi());
+        jobEntity.setNumAttachments(jobRequestMetadata.getNumAttachments());
+        jobEntity.setTotalSizeOfAttachments(jobRequestMetadata.getTotalSizeOfAttachments());
+        jobRequestMetadata.getApiClientMetadata().ifPresent(
+            apiClientMetadata -> {
+                apiClientMetadata.getHostname().ifPresent(jobEntity::setRequestApiClientHostname);
+                apiClientMetadata.getUserAgent().ifPresent(jobEntity::setRequestApiClientUserAgent);
+            }
+        );
+        jobRequestMetadata.getAgentClientMetadata().ifPresent(
+            agentClientMetadata -> {
+                agentClientMetadata.getHostname().ifPresent(jobEntity::setRequestAgentClientHostname);
+                agentClientMetadata.getVersion().ifPresent(jobEntity::setRequestAgentClientVersion);
+                agentClientMetadata.getPid().ifPresent(jobEntity::setRequestAgentClientPid);
+            }
+        );
+    }
+
+    private void setExecutionResources(
+        final JobEntity job,
+        final String clusterId,
+        final String commandId,
+        final List<String> applicationIds
+    ) throws NotFoundException {
+        final ClusterEntity cluster = this.getClusterEntity(clusterId);
+        final CommandEntity command = this.getCommandEntity(commandId);
+        final List<ApplicationEntity> applications = Lists.newArrayList();
+        for (final String applicationId : applicationIds) {
+            applications.add(this.getApplicationEntity(applicationId));
+        }
+
+        job.setCluster(cluster);
+        job.setCommand(command);
+        job.setApplications(applications);
+    }
+
+    private int toTimeoutUsed(final Instant started, final Instant timeout) {
+        return (int) started.until(timeout, ChronoUnit.SECONDS);
+    }
+
+    private <E extends BaseEntity> Optional<E> getEntityOrNullForFindJobs(
+        final JpaBaseRepository<E> repository,
+        final String id,
+        @Nullable final String name
+    ) {
+        // User is requesting jobs using a given entity. If it doesn't exist short circuit the search
+        final Optional<E> optionalEntity = repository.findByUniqueId(id);
+        if (optionalEntity.isPresent()) {
+            final E entity = optionalEntity.get();
+            // If the name doesn't match user input request we can also short circuit search
+            if (name != null && !entity.getName().equals(name)) {
+                // Won't find anything matching the query
+                return Optional.empty();
+            }
+        }
+
+        return optionalEntity;
+    }
+    //endregion
+}

@@ -30,7 +30,7 @@ import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
@@ -82,7 +82,7 @@ public class JobMonitoringCoordinatorTest {
 
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
-    private JobSearchService jobSearchService;
+    private PersistenceService persistenceService;
     private GenieEventBus genieEventBus;
     private Instant tomorrow;
 
@@ -101,7 +101,7 @@ public class JobMonitoringCoordinatorTest {
     @Before
     public void setup() throws IOException {
         this.tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
-        this.jobSearchService = Mockito.mock(JobSearchService.class);
+        this.persistenceService = Mockito.mock(PersistenceService.class);
         final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
@@ -111,7 +111,7 @@ public class JobMonitoringCoordinatorTest {
         Mockito.when(jobsDir.getFile()).thenReturn(jobsFile);
 
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(this.persistenceService);
 
         this.coordinator = new JobMonitoringCoordinator(
             new GenieHostInfo(HOSTNAME),
@@ -136,7 +136,7 @@ public class JobMonitoringCoordinatorTest {
     public void canAttachToRunningJobs() throws GenieException {
         final ContextRefreshedEvent event = Mockito.mock(ContextRefreshedEvent.class);
 
-        Mockito.when(this.jobSearchService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
+        Mockito.when(this.persistenceService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
         this.coordinator.onStartup(event);
         Mockito
             .verify(this.scheduler, Mockito.never())
@@ -188,11 +188,11 @@ public class JobMonitoringCoordinatorTest {
         Mockito.when(j5.getId()).thenReturn(Optional.of(job5Id));
         Mockito.when(j5.getStatus()).thenReturn(JobStatus.INIT);
         final Set<Job> jobs = Sets.newHashSet(j1, j2, j3, j4, j5);
-        Mockito.when(this.jobSearchService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(jobs);
-        Mockito.when(this.jobSearchService.getJobExecution(job1Id)).thenReturn(job1);
-        Mockito.when(this.jobSearchService.getJobExecution(job2Id)).thenReturn(job2);
-        Mockito.when(this.jobSearchService.getJobExecution(job3Id)).thenReturn(job3);
-        Mockito.when(this.jobSearchService.getJobExecution(job4Id)).thenThrow(new GenieNotFoundException("blah"));
+        Mockito.when(this.persistenceService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(jobs);
+        Mockito.when(this.persistenceService.getJobExecution(job1Id)).thenReturn(job1);
+        Mockito.when(this.persistenceService.getJobExecution(job2Id)).thenReturn(job2);
+        Mockito.when(this.persistenceService.getJobExecution(job3Id)).thenReturn(job3);
+        Mockito.when(this.persistenceService.getJobExecution(job4Id)).thenThrow(new GenieNotFoundException("blah"));
         this.coordinator.onStartup(event);
 
         Mockito

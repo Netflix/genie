@@ -32,13 +32,9 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.common.external.dtos.v4.JobSpecification;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.exceptions.checked.GenieJobResolutionException;
-import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
-import com.netflix.genie.web.data.services.ApplicationPersistenceService;
-import com.netflix.genie.web.data.services.ClusterPersistenceService;
-import com.netflix.genie.web.data.services.CommandPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
@@ -171,10 +167,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     private static final String DUAL_RESOLVE_TIMER = "genie.services.jobResolver.v4DualResolve.timer";
     // END REMOVE
 
-    private final ApplicationPersistenceService applicationPersistenceService;
-    private final ClusterPersistenceService clusterPersistenceService;
-    private final CommandPersistenceService commandPersistenceService;
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final List<ClusterSelector> clusterSelectors;
     private final CommandSelector commandSelector;
     private final MeterRegistry registry;
@@ -207,10 +200,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final JobsProperties jobsProperties,
         final Environment environment
     ) {
-        this.applicationPersistenceService = dataServices.getApplicationPersistenceService();
-        this.clusterPersistenceService = dataServices.getClusterPersistenceService();
-        this.commandPersistenceService = dataServices.getCommandPersistenceService();
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.clusterSelectors = clusterSelectors;
         this.commandSelector = commandSelector;
         this.defaultMemory = jobsProperties.getMemory().getDefaultJobMemory();
@@ -240,20 +230,18 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Set<Tag> tags = Sets.newHashSet(SAVED_TAG);
         try {
             log.info("Received request to resolve a job with id {}", id);
-            final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(id);
+            final JobStatus jobStatus = this.persistenceService.getJobStatus(id);
             if (!jobStatus.isResolvable()) {
                 throw new IllegalArgumentException("Job " + id + " is already resolved: " + jobStatus);
             }
 
-            final JobRequest jobRequest = this.jobPersistenceService
-                .getJobRequest(id)
-                .orElseThrow(() -> new GenieJobNotFoundException("No job with id " + id + " exists."));
+            final JobRequest jobRequest = this.persistenceService.getJobRequest(id);
 
             // Possible improvement to combine this query with a few others to save DB trips but for now...
-            final boolean apiJob = this.jobPersistenceService.isApiJob(id);
+            final boolean apiJob = this.persistenceService.isApiJob(id);
 
             final ResolvedJob resolvedJob = this.resolve(id, jobRequest, apiJob);
-            this.jobPersistenceService.saveResolvedJob(id, resolvedJob);
+            this.persistenceService.saveResolvedJob(id, resolvedJob);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
         } catch (final GenieJobResolutionException e) {
@@ -433,7 +421,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final Map<Cluster, String> clustersAndCommands
-                = this.clusterPersistenceService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion);
+                = this.persistenceService.findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion);
             MetricsUtils.addSuccessTags(tags);
             return clustersAndCommands;
         } catch (final Throwable t) {
@@ -501,7 +489,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             log.info("Selecting command for job {} ", jobId);
-            final Command command = this.commandPersistenceService.getCommand(commandId);
+            final Command command = this.persistenceService.getCommand(commandId);
             log.info("Selected command {} for job {} ", commandId, jobId);
             MetricsUtils.addSuccessTags(tags);
             return command;
@@ -528,10 +516,10 @@ public class JobResolverServiceImpl implements JobResolverService {
             // TODO: What do we do about application status? Should probably check here
             final List<Application> applications = Lists.newArrayList();
             if (jobRequest.getCriteria().getApplicationIds().isEmpty()) {
-                applications.addAll(this.commandPersistenceService.getApplicationsForCommand(commandId));
+                applications.addAll(this.persistenceService.getApplicationsForCommand(commandId));
             } else {
                 for (final String applicationId : jobRequest.getCriteria().getApplicationIds()) {
-                    applications.add(this.applicationPersistenceService.getApplication(applicationId));
+                    applications.add(this.persistenceService.getApplication(applicationId));
                 }
             }
             log.info(
@@ -772,7 +760,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final Criterion criterion = jobRequest.getCriteria().getCommandCriterion();
-            final Set<Command> commands = this.commandPersistenceService.findCommandsMatchingCriterion(criterion, true);
+            final Set<Command> commands = this.persistenceService.findCommandsMatchingCriterion(criterion, true);
             final Command command;
             if (commands.isEmpty()) {
                 throw new GenieJobResolutionException("No command matching command criterion found");
@@ -867,7 +855,7 @@ public class JobResolverServiceImpl implements JobResolverService {
 
                     queryCount++;
                     final Set<Cluster> clusters
-                        = this.clusterPersistenceService.findClustersMatchingCriterion(mergedCriterion, true);
+                        = this.persistenceService.findClustersMatchingCriterion(mergedCriterion, true);
                     if (clusters.isEmpty()) {
                         log.debug("No clusters found for {}", mergedCriterion);
                         this.noClusterFoundCounter.increment();

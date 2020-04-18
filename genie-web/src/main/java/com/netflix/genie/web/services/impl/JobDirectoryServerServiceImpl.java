@@ -32,11 +32,12 @@ import com.netflix.genie.web.agent.resources.AgentFileProtocolResolver;
 import com.netflix.genie.web.agent.services.AgentFileStreamService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ArchivedJobMetadata;
 import com.netflix.genie.web.exceptions.checked.JobDirectoryManifestNotFoundException;
 import com.netflix.genie.web.exceptions.checked.JobNotArchivedException;
 import com.netflix.genie.web.exceptions.checked.JobNotFoundException;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.services.ArchivedJobService;
 import com.netflix.genie.web.services.JobDirectoryServerService;
@@ -76,7 +77,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
     private static final String SLASH = "/";
 
     private final ResourceLoader resourceLoader;
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final JobFileService jobFileService;
     private final AgentFileStreamService agentFileStreamService;
     private final MeterRegistry meterRegistry;
@@ -137,7 +138,7 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final AgentRoutingService agentRoutingService
     ) {
         this.resourceLoader = resourceLoader;
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.jobFileService = jobFileService;
         this.agentFileStreamService = agentFileStreamService;
         this.meterRegistry = meterRegistry;
@@ -159,10 +160,16 @@ public class JobDirectoryServerServiceImpl implements JobDirectoryServerService 
         final HttpServletResponse response
     ) throws GenieException {
         // TODO: Metrics
-        // Is the job running or not?
-        final JobStatus jobStatus = this.jobPersistenceService.getJobStatus(jobId);
-        // Is it V3 or V4?
-        final boolean isV4 = this.jobPersistenceService.isV4(jobId);
+        final JobStatus jobStatus;
+        final boolean isV4;
+        try {
+            // Is the job running or not?
+            jobStatus = this.persistenceService.getJobStatus(jobId);
+            // Is it V3 or V4?
+            isV4 = this.persistenceService.isV4(jobId);
+        } catch (final NotFoundException e) {
+            throw new GenieNotFoundException(e.getMessage(), e);
+        }
 
         log.debug(
             "Serving file: {} for job: {} (status: {}, type: {})",

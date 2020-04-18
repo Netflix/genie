@@ -26,7 +26,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
@@ -66,7 +66,7 @@ import java.util.concurrent.ScheduledFuture;
 @Slf4j
 public class JobMonitoringCoordinator extends JobStateServiceImpl {
     private final String hostname;
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final File jobsDir;
     private final JobsProperties jobsProperties;
     private final ProcessChecker.Factory processCheckerFactory;
@@ -101,7 +101,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
     ) throws IOException {
         super(jobSubmitterService, scheduler, genieEventBus, registry);
         this.hostname = genieHostInfo.getHostname();
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.jobsDir = jobsDir.getFile();
         this.jobsProperties = jobsProperties;
         this.processCheckerFactory = processCheckerFactory;
@@ -149,7 +149,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
 
     private void reAttach(final ApplicationEvent event) throws GenieException {
         log.info("Application is ready according to event {}. Attempting to re-attach to any active jobs", event);
-        final Set<Job> jobsOnHost = this.jobSearchService.getAllActiveJobsOnHost(this.hostname);
+        final Set<Job> jobsOnHost = this.persistenceService.getAllActiveJobsOnHost(this.hostname);
         if (jobsOnHost.isEmpty()) {
             log.info("No jobs currently active on this node.");
             return;
@@ -169,7 +169,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
                 );
             } else {
                 try {
-                    final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
+                    final JobExecution jobExecution = this.persistenceService.getJobExecution(id);
                     init(id);
                     setMemoryAndTask(id, jobExecution.getMemory().orElse(0), scheduleMonitor(jobExecution));
                     log.info("Re-attached a job monitor to job {}", id);

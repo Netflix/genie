@@ -32,40 +32,16 @@ import java.util.Map;
  * Useful when a specific set of nodes should be given priority to win the leader election (e.g., because they are
  * running newer code).
  *
- * @since 4.0.0
  * @author mprimi
+ * @since 4.0.0
  */
 @Endpoint(id = "leaderElection")
 @Slf4j
 public class LeaderElectionActuator {
 
-    /**
-     * Operations that this actuator can perform on the leader service.
-     */
-    public enum Action {
-        /**
-         * Stop the leader election service.
-         */
-        STOP,
-        /**
-         * Start the leader election service.
-         */
-        START,
-        /**
-         * Stop then start the leader election service.
-         */
-        RESTART,
-
-        /**
-         * NOOP action for the purpose of testing unknown actions.
-         */
-        TEST,
-    }
-
     private static final String RUNNING = "running";
     private static final String LEADER = "leader";
     private final ClusterLeaderService clusterLeaderService;
-
     /**
      * Constructor.
      *
@@ -113,5 +89,28 @@ public class LeaderElectionActuator {
                 log.error("Unknown action: " + action);
                 throw new UnsupportedOperationException("Unknown action: " + action.name());
         }
+    }
+
+    /**
+     * Operations that this actuator can perform on the leader service.
+     */
+    public enum Action {
+        /**
+         * Stop the leader election service.
+         */
+        STOP,
+        /**
+         * Start the leader election service.
+         */
+        START,
+        /**
+         * Stop then start the leader election service.
+         */
+        RESTART,
+
+        /**
+         * NOOP action for the purpose of testing unknown actions.
+         */
+        TEST,
     }
 }

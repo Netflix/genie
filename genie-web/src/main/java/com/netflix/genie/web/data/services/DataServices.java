@@ -29,12 +29,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class DataServices {
-    private final AgentConnectionPersistenceService agentConnectionPersistenceService;
-    private final ApplicationPersistenceService applicationPersistenceService;
-    private final ClusterPersistenceService clusterPersistenceService;
-    private final CommandPersistenceService commandPersistenceService;
-    private final FilePersistenceService filePersistenceService;
-    private final JobPersistenceService jobPersistenceService;
-    private final JobSearchService jobSearchService;
-    private final TagPersistenceService tagPersistenceService;
+    private final PersistenceService persistenceService;
 }

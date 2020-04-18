@@ -28,7 +28,7 @@ import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
@@ -68,7 +68,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class LocalJobRunner implements JobSubmitterService {
 
-    private final JobPersistenceService jobPersistenceService;
+    private final PersistenceService persistenceService;
     private final List<WorkflowTask> jobWorkflowTasks;
     private final Resource baseWorkingDirPath;
     private final GenieEventBus genieEventBus;
@@ -97,7 +97,7 @@ public class LocalJobRunner implements JobSubmitterService {
         @NotNull final Resource genieWorkingDir,
         @NotNull final MeterRegistry registry
     ) {
-        this.jobPersistenceService = dataServices.getJobPersistenceService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.genieEventBus = genieEventBus;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;
@@ -155,7 +155,7 @@ public class LocalJobRunner implements JobSubmitterService {
                     final long createJobExecutionStart = System.nanoTime();
                     try {
                         log.info("Saving job execution for job {}", jobRequest.getId());
-                        this.jobPersistenceService.setJobRunningInformation(
+                        this.persistenceService.setJobRunningInformation(
                             id,
                             jobExecution.
                                 getProcessId()

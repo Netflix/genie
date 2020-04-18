@@ -24,8 +24,8 @@ import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
-import com.netflix.genie.web.data.services.AgentConnectionPersistenceService;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.AgentRpcEndpointsAutoConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -103,8 +103,8 @@ class AgentServicesAutoConfigurationTest {
         }
 
         @Bean
-        AgentConnectionPersistenceService agentConnectionPersistenceService() {
-            return Mockito.mock(AgentConnectionPersistenceService.class);
+        PersistenceService geniePersistenceService() {
+            return Mockito.mock(PersistenceService.class);
         }
     }
 }

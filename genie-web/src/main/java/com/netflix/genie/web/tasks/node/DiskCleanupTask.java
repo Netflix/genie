@@ -21,7 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.TaskUtils;
@@ -56,7 +56,7 @@ public class DiskCleanupTask implements Runnable {
 
     private final DiskCleanupProperties properties;
     private final File jobsDir;
-    private final JobSearchService jobSearchService;
+    private final PersistenceService persistenceService;
     private final boolean runAsUser;
     private final Executor processExecutor;
 
@@ -93,7 +93,7 @@ public class DiskCleanupTask implements Runnable {
 
         this.properties = properties;
         this.jobsDir = jobsDir.getFile();
-        this.jobSearchService = dataServices.getJobSearchService();
+        this.persistenceService = dataServices.getPersistenceService();
         this.runAsUser = jobsProperties.getUsers().isRunAsUserEnabled();
         this.processExecutor = processExecutor;
 
@@ -142,7 +142,7 @@ public class DiskCleanupTask implements Runnable {
 
             final String id = dir.getName();
             try {
-                final Job job = this.jobSearchService.getJob(id);
+                final Job job = this.persistenceService.getJob(id);
                 if (job.getStatus().isActive()) {
                     // Don't want to delete anything still going
                     continue;

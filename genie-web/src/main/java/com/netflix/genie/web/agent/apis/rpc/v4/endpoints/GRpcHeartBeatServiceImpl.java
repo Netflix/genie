@@ -51,13 +51,14 @@ public class GRpcHeartBeatServiceImpl extends HeartBeatServiceGrpc.HeartBeatServ
     private final AgentConnectionTrackingService agentConnectionTrackingService;
     private final Map<String, AgentStreamRecord> activeStreamsMap = Maps.newHashMap();
     private final ScheduledFuture<?> sendHeartbeatsFuture;
-    private MeterRegistry registry;
+    private final MeterRegistry registry;
 
     /**
      * Constructor.
-     *  @param agentConnectionTrackingService The {@link AgentRoutingService} implementation to use
-     * @param taskScheduler       The {@link TaskScheduler} instance to use
-     * @param registry            The meter registry
+     *
+     * @param agentConnectionTrackingService The {@link AgentRoutingService} implementation to use
+     * @param taskScheduler                  The {@link TaskScheduler} instance to use
+     * @param registry                       The meter registry
      */
     public GRpcHeartBeatServiceImpl(
         final AgentConnectionTrackingService agentConnectionTrackingService,

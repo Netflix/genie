@@ -18,7 +18,7 @@
 package com.netflix.genie.web.data.entities;
 
 import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.web.exceptions.checked.PreconditionFailedException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -224,13 +224,14 @@ public class CommandEntity extends BaseEntity {
      * Sets the applications for this command.
      *
      * @param applications The application that this command uses
-     * @throws GeniePreconditionException if the list of applications contains duplicates
+     * @throws PreconditionFailedException if the list of applications contains duplicates
      */
-    public void setApplications(@Nullable final List<ApplicationEntity> applications)
-        throws GeniePreconditionException {
+    public void setApplications(
+        @Nullable final List<ApplicationEntity> applications
+    ) throws PreconditionFailedException {
         if (applications != null
             && applications.stream().map(ApplicationEntity::getUniqueId).distinct().count() != applications.size()) {
-            throw new GeniePreconditionException("List of applications to set cannot contain duplicates");
+            throw new PreconditionFailedException("List of applications to set cannot contain duplicates");
         }
 
         //Clear references to this command in existing applications
@@ -254,11 +255,11 @@ public class CommandEntity extends BaseEntity {
      * Append an application to the list of applications this command uses.
      *
      * @param application The application to add. Not null.
-     * @throws GeniePreconditionException If the application is a duplicate of an existing application
+     * @throws PreconditionFailedException If the application is a duplicate of an existing application
      */
-    public void addApplication(@NotNull final ApplicationEntity application) throws GeniePreconditionException {
+    public void addApplication(@NotNull final ApplicationEntity application) throws PreconditionFailedException {
         if (this.applications.contains(application)) {
-            throw new GeniePreconditionException(
+            throw new PreconditionFailedException(
                 "An application with id " + application.getUniqueId() + " is already added"
             );
         }

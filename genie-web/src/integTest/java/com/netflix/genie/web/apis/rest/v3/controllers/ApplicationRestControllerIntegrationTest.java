@@ -54,7 +54,6 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-//TODO: Add tests for error conditions
 public class ApplicationRestControllerIntegrationTest extends RestControllerIntegrationTestBase {
 
     // Use a `.` to ensure that the Spring prefix matcher is turned off
@@ -248,7 +247,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .post(APPLICATIONS_API)
             .then()
             .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.containsString("A version is required and must be at most 255 characters")
@@ -696,7 +695,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
             .get(APPLICATIONS_API + "/{id}", id2)
             .then()
             .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
             .body(
                 EXCEPTION_MESSAGE_PATH,
                 Matchers.containsString("No application with id")
@@ -1142,8 +1141,7 @@ public class ApplicationRestControllerIntegrationTest extends RestControllerInte
                 .get(APPLICATIONS_API + "/{id}" + path, ID)
                 .then()
                 .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()))
-                .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .body(EXCEPTION_CODE_PATH, Matchers.is(404))
+                .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
                 .body(EXCEPTION_MESSAGE_PATH, Matchers.startsWith("No application with id " + ID));
         }
     }

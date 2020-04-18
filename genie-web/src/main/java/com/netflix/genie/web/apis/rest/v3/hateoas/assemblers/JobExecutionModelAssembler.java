@@ -19,6 +19,7 @@ package com.netflix.genie.web.apis.rest.v3.hateoas.assemblers;
 
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.web.apis.rest.v3.controllers.JobRestController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -116,7 +117,7 @@ public class JobExecutionModelAssembler implements
                         .getJobMetadata(id)
                 ).withRel(METADATA_LINK)
             );
-        } catch (final GenieException ge) {
+        } catch (final GenieException | GenieCheckedException ge) {
             // If we can't convert it we might as well force a server exception
             throw new RuntimeException(ge);
         }

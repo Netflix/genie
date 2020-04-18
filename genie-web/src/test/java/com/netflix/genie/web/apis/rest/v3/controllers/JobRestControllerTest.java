@@ -23,6 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.external.dtos.v4.JobStatus;
+import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
@@ -37,8 +38,8 @@ import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobRequestModelAsse
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.JobSearchResultModelAssembler;
 import com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.RootModelAssembler;
 import com.netflix.genie.web.data.services.DataServices;
-import com.netflix.genie.web.data.services.JobPersistenceService;
-import com.netflix.genie.web.data.services.JobSearchService;
+import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
@@ -70,7 +71,6 @@ import org.springframework.mock.web.DelegatingServletOutputStream;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
@@ -93,9 +93,8 @@ import java.util.stream.Stream;
 class JobRestControllerTest {
 
     //Mocked variables
-    private JobSearchService jobSearchService;
     private AgentRoutingService agentRoutingService;
-    private JobPersistenceService jobPersistenceService;
+    private PersistenceService persistenceService;
     private String hostname;
     private RestTemplate restTemplate;
     private JobDirectoryServerService jobDirectoryServerService;
@@ -123,13 +122,9 @@ class JobRestControllerTest {
         );
     }
 
-    /**
-     * Setup for the tests.
-     */
     @BeforeEach
     void setup() {
-        this.jobSearchService = Mockito.mock(JobSearchService.class);
-        this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
+        this.persistenceService = Mockito.mock(PersistenceService.class);
         this.agentRoutingService = Mockito.mock(AgentRoutingService.class);
         this.hostname = UUID.randomUUID().toString();
         this.restTemplate = Mockito.mock(RestTemplate.class);
@@ -147,8 +142,7 @@ class JobRestControllerTest {
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
 
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
-        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(this.jobPersistenceService);
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(this.persistenceService);
 
         this.controller = new JobRestController(
             Mockito.mock(JobLaunchService.class),
@@ -167,88 +161,64 @@ class JobRestControllerTest {
         );
     }
 
-    /**
-     * Make sure if forwarding isn't enabled we don't even try to forward no matter where the job is running.
-     *
-     * @throws IOException    On error
-     * @throws GenieException On Error
-     */
     @Test
-    void wontForwardKillRequestIfNotEnabled() throws IOException, GenieException {
+    void wontForwardKillRequestIfNotEnabled() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(false);
 
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.killJob(jobId, null, request, response);
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.never()).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
     }
 
-    /**
-     * Make sure won't forward job kill request if it's already been forwarded.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    void wontForwardJobKillRequestIfAlreadyForwarded() throws IOException, GenieException {
+    void wontForwardJobKillRequestIfAlreadyForwarded() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String forwardedFrom = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.killJob(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.never()).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
     }
 
-    /**
-     * Makes sure we don't forward the v3 job kill request if we're already on the right host.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    void wontForwardV3JobKillRequestIfOnCorrectHost() throws IOException, GenieException {
+    void wontForwardV3JobKillRequestIfOnCorrectHost() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(false);
-        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(this.hostname);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(false);
+        Mockito.when(this.persistenceService.getJobHost(jobId)).thenReturn(this.hostname);
 
         this.controller.killJob(jobId, null, request, response);
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
         Mockito
             .verify(this.restTemplate, Mockito.never())
             .execute(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString());
     }
 
-    /**
-     * Makes sure if we do forward and get back a v3 job kill error we return it to the user.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    void canRespondToV3KillRequestForwardError() throws IOException, GenieException {
+    void canRespondToV3KillRequestForwardError() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -256,9 +226,9 @@ class JobRestControllerTest {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(false);
-        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(host);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(false);
+        Mockito.when(this.persistenceService.getJobHost(jobId)).thenReturn(host);
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
         Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND.value());
@@ -279,9 +249,9 @@ class JobRestControllerTest {
         Mockito
             .verify(response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.NOT_FOUND.value()), Mockito.anyString());
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
         Mockito
             .verify(this.restTemplate, Mockito.times(1))
@@ -293,14 +263,8 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Makes sure we can successfully forward a v3 job kill request.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    void canForwardV3JobKillRequest() throws IOException, GenieException {
+    void canForwardV3JobKillRequest() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -308,9 +272,9 @@ class JobRestControllerTest {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(false);
-        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(host);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(false);
+        Mockito.when(this.persistenceService.getJobHost(jobId)).thenReturn(host);
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
         Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.ACCEPTED.value());
@@ -331,9 +295,9 @@ class JobRestControllerTest {
         this.controller.killJob(jobId, null, request, response);
 
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt(), Mockito.anyString());
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
         Mockito.verify(this.restTemplate, Mockito.times(1))
             .execute(
@@ -344,43 +308,31 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Makes sure we don't forward the v4 job kill request if we're already on the right host.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    void wontForwardV4JobKillRequestIfOnCorrectHost() throws IOException, GenieException {
+    void wontForwardV4JobKillRequestIfOnCorrectHost() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(true);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(true);
         Mockito.when(this.agentRoutingService.getHostnameForAgentConnection(jobId))
             .thenReturn(Optional.of(this.hostname));
 
         this.controller.killJob(jobId, null, request, response);
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.times(1)).getHostnameForAgentConnection(jobId);
         Mockito
             .verify(this.restTemplate, Mockito.never())
             .execute(Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any());
     }
 
-    /**
-     * Makes sure if we do forward and get back a v4 job kill error we return it to the user.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    void canRespondToV4KillRequestForwardError() throws IOException, GenieException {
+    void canRespondToV4KillRequestForwardError() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -388,8 +340,8 @@ class JobRestControllerTest {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(true);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(true);
         Mockito.when(this.agentRoutingService.getHostnameForAgentConnection(jobId))
             .thenReturn(Optional.of(host));
 
@@ -412,9 +364,9 @@ class JobRestControllerTest {
         Mockito
             .verify(response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.NOT_FOUND.value()), Mockito.anyString());
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.times(1)).getHostnameForAgentConnection(jobId);
         Mockito
             .verify(this.restTemplate, Mockito.times(1))
@@ -426,14 +378,8 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Makes sure we can successfully forward a v4 job kill request.
-     *
-     * @throws IOException    on error
-     * @throws GenieException on error
-     */
     @Test
-    void canForwardV4JobKillRequest() throws IOException, GenieException {
+    void canForwardV4JobKillRequest() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String host = UUID.randomUUID().toString();
@@ -441,8 +387,8 @@ class JobRestControllerTest {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(true);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(true);
         Mockito.when(this.agentRoutingService.getHostnameForAgentConnection(jobId))
             .thenReturn(Optional.of(host));
 
@@ -465,9 +411,9 @@ class JobRestControllerTest {
         this.controller.killJob(jobId, null, request, response);
 
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt(), Mockito.anyString());
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.times(1)).getHostnameForAgentConnection(jobId);
         Mockito.verify(this.restTemplate, Mockito.times(1))
             .execute(
@@ -478,27 +424,22 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Make sure GenieNotFoundException exception thrown on no job found for a job kill request.
-     *
-     * @throws GenieException on error
-     */
     @Test
-    void missingJobOnJobKillRequestThrowsException() throws GenieException {
+    void missingJobOnJobKillRequestThrowsException() throws GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenThrow(new GenieNotFoundException("bad"));
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenThrow(new NotFoundException("bad"));
 
         Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.controller.killJob(jobId, null, request, response));
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.never()).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
         Mockito
             .verify(this.restTemplate, Mockito.never())
@@ -510,30 +451,24 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Make sure GenieNotFoundException thrown on a missing host name for a v3
-     * job kill request gets percolated up.
-     *
-     * @throws GenieException on error
-     */
     @Test
-    void exceptionThrownMissingHostNameForV3JobKill() throws GenieException {
+    void exceptionThrownMissingHostNameForV3JobKill() throws GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(false);
-        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenThrow(new GenieNotFoundException("Testing"));
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(false);
+        Mockito.when(this.persistenceService.getJobHost(jobId)).thenThrow(new NotFoundException("Testing"));
 
         Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.controller.killJob(jobId, null, request, response));
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.never()).getHostnameForAgentConnection(jobId);
         Mockito
             .verify(this.restTemplate, Mockito.never())
@@ -545,30 +480,24 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Make sure GenieNotFoundException exception thrown on a missing host name for v4 job kill
-     * request gets percolated up.
-     *
-     * @throws GenieException on error
-     */
     @Test
-    void exceptionThrownMissingHostNameForV4JobKill() throws GenieException {
+    void exceptionThrownMissingHostNameForV4JobKill() throws GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(this.jobPersistenceService.isV4(jobId)).thenReturn(true);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.isV4(jobId)).thenReturn(true);
         Mockito.when(this.agentRoutingService.getHostnameForAgentConnection(jobId)).thenReturn(Optional.empty());
 
         Assertions
-            .assertThatExceptionOfType(GenieNotFoundException.class)
+            .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.controller.killJob(jobId, null, request, response));
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).getJobStatus(jobId);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).isV4(jobId);
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobStatus(jobId);
+        Mockito.verify(this.persistenceService, Mockito.times(1)).isV4(jobId);
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(jobId);
         Mockito.verify(this.agentRoutingService, Mockito.times(1)).getHostnameForAgentConnection(jobId);
         Mockito
             .verify(this.restTemplate, Mockito.never())
@@ -580,15 +509,8 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Make sure if directory forwarding isn't enabled it never fires.
-     *
-     * @throws IOException      on error
-     * @throws ServletException on error
-     * @throws GenieException   on error
-     */
     @Test
-    void wontForwardJobOutputRequestIfNotEnabled() throws IOException, ServletException, GenieException {
+    void wontForwardJobOutputRequestIfNotEnabled() throws GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(false);
 
         final String jobId = UUID.randomUUID().toString();
@@ -608,11 +530,11 @@ class JobRestControllerTest {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.getJobOutput(jobId, null, request, response);
 
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(Mockito.eq(jobId));
         Mockito
             .verify(this.jobDirectoryServerService, Mockito.times(1))
             .serveResource(
@@ -624,15 +546,8 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Make sure if directory forwarding doesn't fire if already forwarded.
-     *
-     * @throws IOException      on error
-     * @throws ServletException on error
-     * @throws GenieException   on error
-     */
     @Test
-    void wontForwardJobOutputRequestIfAlreadyForwarded() throws IOException, ServletException, GenieException {
+    void wontForwardJobOutputRequestIfAlreadyForwarded() throws GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final String forwardedFrom = "https://localhost:8443/api/v3/jobs/1234/output";
@@ -649,11 +564,11 @@ class JobRestControllerTest {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.persistenceService, Mockito.never()).getJobHost(Mockito.eq(jobId));
         Mockito
             .verify(this.jobDirectoryServerService, Mockito.times(1))
             .serveResource(
@@ -665,15 +580,8 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Make sure if directory forwarding doesn't fire if host name matches.
-     *
-     * @throws IOException      on error
-     * @throws ServletException on error
-     * @throws GenieException   on error
-     */
     @Test
-    void wontForwardJobOutputRequestIfOnCorrectHost() throws IOException, ServletException, GenieException {
+    void wontForwardJobOutputRequestIfOnCorrectHost() throws GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -693,12 +601,12 @@ class JobRestControllerTest {
                 Mockito.eq(response)
             );
 
-        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(this.hostname);
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.getJobHost(jobId)).thenReturn(this.hostname);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         this.controller.getJobOutput(jobId, null, request, response);
 
-        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito
             .verify(this.restTemplate, Mockito.never())
             .execute(
@@ -720,17 +628,12 @@ class JobRestControllerTest {
             );
     }
 
-    /**
-     * Make sure directory forwarding happens when all conditions are met.
-     *
-     * @throws GenieException on error
-     */
     @ParameterizedTest(name = "Exception: {0} throws {1}")
     @MethodSource("forwardJobOutputTestArguments")
     void canHandleForwardJobOutputRequestWithError(
         final Throwable forwardingException,
         final Class<? extends Throwable> expectedException
-    ) throws GenieException {
+    ) throws GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -749,10 +652,10 @@ class JobRestControllerTest {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         final String jobHostName = UUID.randomUUID().toString();
-        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(jobHostName);
+        Mockito.when(this.persistenceService.getJobHost(jobId)).thenReturn(jobHostName);
 
         //Mock parts of the http request
         final String http = "http";
@@ -777,7 +680,7 @@ class JobRestControllerTest {
             () -> this.controller.getJobOutput(jobId, null, request, response)
         ).isInstanceOf(expectedException);
 
-        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.restTemplate, Mockito.times(1))
             .execute(
                 Mockito.eq("http://" + jobHostName + ":8080/api/v3/jobs/" + jobId + "/output/"),
@@ -788,15 +691,8 @@ class JobRestControllerTest {
 
     }
 
-    /**
-     * Make sure directory forwarding happens when all conditions are met.
-     *
-     * @throws IOException      on error
-     * @throws ServletException on error
-     * @throws GenieException   on error
-     */
     @Test
-    void canHandleForwardJobOutputRequestWithSuccess() throws IOException, ServletException, GenieException {
+    void canHandleForwardJobOutputRequestWithSuccess() throws IOException, GenieException, GenieCheckedException {
         this.jobsProperties.getForwarding().setEnabled(true);
         final String jobId = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -815,10 +711,10 @@ class JobRestControllerTest {
                 Mockito.eq(request),
                 Mockito.eq(response)
             );
-        Mockito.when(this.jobPersistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
+        Mockito.when(this.persistenceService.getJobStatus(jobId)).thenReturn(JobStatus.RUNNING);
 
         final String jobHostName = UUID.randomUUID().toString();
-        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(jobHostName);
+        Mockito.when(this.persistenceService.getJobHost(jobId)).thenReturn(jobHostName);
 
         //Mock parts of the http request
         final String http = "http";
@@ -865,8 +761,7 @@ class JobRestControllerTest {
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
 
         final DataServices dataServices = Mockito.mock(DataServices.class);
-        Mockito.when(dataServices.getJobSearchService()).thenReturn(this.jobSearchService);
-        Mockito.when(dataServices.getJobPersistenceService()).thenReturn(this.jobPersistenceService);
+        Mockito.when(dataServices.getPersistenceService()).thenReturn(this.persistenceService);
 
         final JobRestController jobController = new JobRestController(
             Mockito.mock(JobLaunchService.class),
@@ -887,7 +782,7 @@ class JobRestControllerTest {
 
         Assertions.assertThat(bos.getTargetStream().toString()).isEqualTo(text);
         Mockito.verify(request, Mockito.times(1)).getHeader(HttpHeaders.ACCEPT);
-        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.persistenceService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt());
         Mockito
             .verify(this.jobDirectoryServerService, Mockito.never())
