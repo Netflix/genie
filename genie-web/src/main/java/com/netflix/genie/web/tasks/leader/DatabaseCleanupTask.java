@@ -49,6 +49,17 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author tgianos
  * @since 3.0.0
  */
+// TODO: The intention of this class is clear, it is to have the leader trigger a database cleanup action periodically
+//       at system administrators discretion. The issue here is that this current implementation bleeds a lot of
+//       details about the underlying implementation into this class. If someone were to re-implement the persistence
+//       tier using a different underlying technology it is unlikely they would expose tags or files as separate
+//       fields. Their existence here is merely a side effect of our relational database implementation. The proper
+//       thing to do here seems to be to have this task merely kick off a single API call into the persistence tier
+//       and then that tier does what it thinks is best. I (TJG) might have tackled this as part of the large
+//       persistence tier refactoring in 4/2020 however looking at this class it has a lot of details that need to be
+//       moved properly (metrics, logging, properties) that it looks like it's own larger initiative that I don't have
+//       time to tackle right now. I do think it should be done though so I'm leaving this large note so as not to
+//       forget and hopefully come back to it once there is some time. - TJG 4/21/2020
 @Slf4j
 public class DatabaseCleanupTask extends LeaderTask {
 
