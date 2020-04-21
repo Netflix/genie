@@ -16,8 +16,6 @@
 package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
 
 import com.netflix.genie.common.external.dtos.v4.Criterion;
-import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity;
-import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
@@ -92,38 +90,6 @@ public final class JpaCommandSpecs {
                 cq.groupBy(root.get(CommandEntity_.id));
                 cq.having(cb.equal(cb.count(root.get(CommandEntity_.id)), tags.size()));
             }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-    }
-
-    /**
-     * Get all the clusters given the specified parameters.
-     *
-     * @param applicationId The id of the application that is registered with these commands
-     * @param statuses      The status of the commands
-     * @return The specification
-     */
-    public static Specification<CommandEntity> findCommandsForApplication(
-        final String applicationId,
-        @Nullable final Set<String> statuses
-    ) {
-        return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
-            final List<Predicate> predicates = new ArrayList<>();
-            final Join<CommandEntity, ApplicationEntity> application = root.join(CommandEntity_.applications);
-
-            predicates.add(cb.equal(application.get(ApplicationEntity_.uniqueId), applicationId));
-
-            if (statuses != null && !statuses.isEmpty()) {
-                predicates.add(
-                    cb.or(
-                        statuses
-                            .stream()
-                            .map(status -> cb.equal(root.get(CommandEntity_.status), status))
-                            .toArray(Predicate[]::new)
-                    )
-                );
-            }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

@@ -18,8 +18,6 @@ package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity_;
-import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
-import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -86,39 +84,6 @@ public final class JpaClusterSpecs {
                 cq.groupBy(root.get(ClusterEntity_.id));
                 cq.having(cb.equal(cb.count(root.get(ClusterEntity_.id)), tags.size()));
             }
-            if (statuses != null && !statuses.isEmpty()) {
-                //Could optimize this as we know size could use native array
-                predicates.add(
-                    cb.or(
-                        statuses
-                            .stream()
-                            .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
-                            .toArray(Predicate[]::new)
-                    )
-                );
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-    }
-
-    /**
-     * Get all the clusters given the specified parameters.
-     *
-     * @param commandId The id of the command that is registered with this cluster
-     * @param statuses  The status of the cluster
-     * @return The specification
-     */
-    public static Specification<ClusterEntity> findClustersForCommand(
-        final String commandId,
-        @Nullable final Set<String> statuses
-    ) {
-        return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
-            final List<Predicate> predicates = new ArrayList<>();
-            final Join<ClusterEntity, CommandEntity> commands = root.join(ClusterEntity_.commands);
-
-            predicates.add(cb.equal(commands.get(CommandEntity_.uniqueId), commandId));
-
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
                 predicates.add(
