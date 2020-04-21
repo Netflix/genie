@@ -168,9 +168,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobKillService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentJobKillService-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.core.task.TaskExecutor-">agentJobKillService</a></span>(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;jobKillServiceFutureStub,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcServicesAutoConfiguration.html#agentJobKillService-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-">agentJobKillService</a></span>(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;jobKillServiceFutureStub,
                    <a href="../../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
-                   org.springframework.core.task.TaskExecutor&nbsp;taskExecutor)</code>
+                   org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
 <div class="block">Provide a lazy gRPC agent job kill service bean if one isn't already defined.</div>
 </td>
 </tr>
@@ -242,7 +242,7 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/s
 </dl>
 </li>
 </ul>
-<a name="agentJobKillService-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.core.task.TaskExecutor-">
+<a name="agentJobKillService-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -253,14 +253,14 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/s
  @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobKillService.class</a>)
 public&nbsp;<a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobKillService</a>&nbsp;agentJobKillService(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;jobKillServiceFutureStub,
                                                                                                                         <a href="../../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
-                                                                                                                        @Qualifier(value="sharedAgentTaskExecutor")
-                                                                                                                        org.springframework.core.task.TaskExecutor&nbsp;taskExecutor)</pre>
+                                                                                                                        @Qualifier(value="sharedAgentTaskScheduler")
+                                                                                                                        org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
 <div class="block">Provide a lazy gRPC agent job kill service bean if one isn't already defined.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>jobKillServiceFutureStub</code> - The future stub to use for the service communication with the server</dd>
 <dd><code>killService</code> - The kill service to use to terminate this agent gracefully</dd>
-<dd><code>taskExecutor</code> - The task executor to use</dd>
+<dd><code>taskScheduler</code> - The task scheduler to use</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html" title="class in com.netflix.genie.agent.execution.services.impl.grpc"><code>GRpcAgentJobKillServiceImpl</code></a> instance</dd>
 </dl>

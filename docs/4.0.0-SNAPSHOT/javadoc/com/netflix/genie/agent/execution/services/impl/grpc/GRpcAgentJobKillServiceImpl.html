@@ -114,7 +114,11 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">GRpcAgentJobKillServiceImpl</span>
 extends java.lang.Object
 implements <a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobKillService</a></pre>
-<div class="block">Implementation of the <a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a>.</div>
+<div class="block">Implementation of the <a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html" title="interface in com.netflix.genie.agent.execution.services"><code>AgentJobKillService</code></a>, listens for kill coming from server using long-polling.
+
+ Note: this implementation still suffers from a serious flaw: because it is implemented with a unary call,
+ the server will never realize the client is gone if the connection is broken. This can lead to an accumulation of
+ parked calls on the server. A new protocol (based on a bidirectional stream) is necessary to solve this problem.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
@@ -137,9 +141,9 @@ implements <a href="../../../../../../../../com/netflix/genie/agent/execution/se
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#GRpcAgentJobKillServiceImpl-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.core.task.TaskExecutor-">GRpcAgentJobKillServiceImpl</a></span>(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;client,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/agent/execution/services/impl/grpc/GRpcAgentJobKillServiceImpl.html#GRpcAgentJobKillServiceImpl-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-">GRpcAgentJobKillServiceImpl</a></span>(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;client,
                            <a href="../../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
-                           org.springframework.core.task.TaskExecutor&nbsp;killTaskExecutor)</code>
+                           org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -192,7 +196,7 @@ implements <a href="../../../../../../../../com/netflix/genie/agent/execution/se
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="GRpcAgentJobKillServiceImpl-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.core.task.TaskExecutor-">
+<a name="GRpcAgentJobKillServiceImpl-com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub-com.netflix.genie.agent.execution.services.KillService-org.springframework.scheduling.TaskScheduler-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -200,13 +204,13 @@ implements <a href="../../../../../../../../com/netflix/genie/agent/execution/se
 <h4>GRpcAgentJobKillServiceImpl</h4>
 <pre>public&nbsp;GRpcAgentJobKillServiceImpl(com.netflix.genie.proto.JobKillServiceGrpc.JobKillServiceFutureStub&nbsp;client,
                                    <a href="../../../../../../../../com/netflix/genie/agent/execution/services/KillService.html" title="interface in com.netflix.genie.agent.execution.services">KillService</a>&nbsp;killService,
-                                   org.springframework.core.task.TaskExecutor&nbsp;killTaskExecutor)</pre>
+                                   org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>client</code> - The gRPC client to use to call the server</dd>
 <dd><code>killService</code> - KillService for killing the agent</dd>
-<dd><code>killTaskExecutor</code> - A task executor to execute killing the agent</dd>
+<dd><code>taskScheduler</code> - A task scheduler</dd>
 </dl>
 </li>
 </ul>
@@ -226,7 +230,6 @@ implements <a href="../../../../../../../../com/netflix/genie/agent/execution/se
 <h4>start</h4>
 <pre>public&nbsp;void&nbsp;start(@NotBlank(message="Job id cannot be blank")
                   @NotBlank(message="Job id cannot be blank") java.lang.String&nbsp;jobId)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html#start-java.lang.String-">AgentJobKillService</a></code></span></div>
 <div class="block">Start listening for job termination notification.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
@@ -243,7 +246,6 @@ implements <a href="../../../../../../../../com/netflix/genie/agent/execution/se
 <li class="blockList">
 <h4>stop</h4>
 <pre>public&nbsp;void&nbsp;stop()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../../../com/netflix/genie/agent/execution/services/AgentJobKillService.html#stop--">AgentJobKillService</a></code></span></div>
 <div class="block">Stop the service.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
