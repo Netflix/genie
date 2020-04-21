@@ -35,6 +35,7 @@ import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 import java.time.Instant
+
 /**
  * Specifications for {@link ArchivedJobServiceImpl}.
  *

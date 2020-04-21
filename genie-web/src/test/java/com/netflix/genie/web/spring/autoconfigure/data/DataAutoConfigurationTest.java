@@ -17,17 +17,17 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.data;
 
-import com.netflix.genie.web.data.jpa.services.JpaPersistenceServiceImpl;
-import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
-import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
 import com.netflix.genie.web.data.services.DataServices;
+import com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCriterionRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

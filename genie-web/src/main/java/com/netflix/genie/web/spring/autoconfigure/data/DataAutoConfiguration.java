@@ -17,18 +17,18 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.data;
 
-import com.netflix.genie.web.data.jpa.services.JpaPersistenceServiceImpl;
-import com.netflix.genie.web.data.repositories.jpa.JpaAgentConnectionRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaApplicationRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaClusterRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCommandRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaCriterionRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaFileRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaJobRepository;
-import com.netflix.genie.web.data.repositories.jpa.JpaRepositories;
-import com.netflix.genie.web.data.repositories.jpa.JpaTagRepository;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaCriterionRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories;
+import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.AttachmentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -43,9 +43,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * @since 4.0.0
  */
 @Configuration
-// TODO: Create marker class for base classes scanning for compile time check
-@EnableJpaRepositories("com.netflix.genie.web.data.repositories")
-@EntityScan("com.netflix.genie.web.data.entities")
+@EnableJpaRepositories("com.netflix.genie.web.data.services.impl.jpa.repositories")
+@EntityScan("com.netflix.genie.web.data.services.impl.jpa.entities")
 public class DataAutoConfiguration {
 
     /**
