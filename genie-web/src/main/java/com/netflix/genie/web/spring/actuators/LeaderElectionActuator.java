@@ -42,6 +42,7 @@ public class LeaderElectionActuator {
     private static final String RUNNING = "running";
     private static final String LEADER = "leader";
     private final ClusterLeaderService clusterLeaderService;
+
     /**
      * Constructor.
      *

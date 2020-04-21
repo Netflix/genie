@@ -51,7 +51,7 @@ public class SystemArchitecture {
      * in a type in the com.netflix.genie.web.data.services package or any sub-package
      * under that.
      */
-    @Pointcut("within(com.netflix.genie.web.data.services.jpa..*)")
+    @Pointcut("within(com.netflix.genie.web.data.services..*)")
     public void inDataLayer() {
     }
 
@@ -78,11 +78,7 @@ public class SystemArchitecture {
      * dao interface. This definition assumes that interfaces are placed in the
      * "dao" package, and that implementation types are in sub-packages.
      */
-    // TODO: fix once data services modifications finished
-    @Pointcut(
-        "execution(* com.netflix.genie.web.data.services.jpa.*.*(..)) "
-            + "|| execution(* com.netflix.genie.web.data.jpa.services.*.*(..))"
-    )
+    @Pointcut("execution(* com.netflix.genie.web.data.services.impl.jpa.*.*(..))")
     public void dataOperation() {
     }
 }

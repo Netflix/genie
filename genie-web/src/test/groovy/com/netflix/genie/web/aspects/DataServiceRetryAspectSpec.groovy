@@ -20,8 +20,8 @@ package com.netflix.genie.web.aspects
 import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
-import com.netflix.genie.web.data.jpa.services.JpaPersistenceServiceImpl
 import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.data.services.impl.jpa.JpaPersistenceServiceImpl
 import com.netflix.genie.web.dtos.JobSubmission
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException
 import com.netflix.genie.web.exceptions.checked.SaveAttachmentException

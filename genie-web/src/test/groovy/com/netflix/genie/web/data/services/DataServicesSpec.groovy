@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.data.services
 
-
 import spock.lang.Specification
 
 /**
