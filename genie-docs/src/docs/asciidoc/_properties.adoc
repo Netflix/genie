@@ -609,26 +609,10 @@ management endpoints. Switched from default `/actuator`
 |Database password
 |
 
-|spring.datasource.hikari.auto-commit
-|Whether to auto commit transactions
-|false
-
-|spring.datasource.hikari.connection-test-query
-|Query to use to check if connections are ok
-|Select 0;
-
 |spring.datasource.hikari.leak-detection-threshold
 |How long to wait (in milliseconds) before a connection should be considered leaked out of the pool if it hasn't been
 returned
 |30000
-
-|spring.datasource.hikari.maximum-pool-size
-|Maximum connection pool size
-|40
-
-|spring.datasource.hikari.minimum-idle
-|Fewest allowed idle connections
-|5
 
 |spring.datasource.hikari.pool-name
 |The name of the connection pool. Will show up in logs under this name.
@@ -780,32 +764,12 @@ See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more informa
 |https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
 |2048
 
-|spring.datasource.hikari.data-source-properties.useServerPrepStmts
+|spring.datasource.hikari.data-source-properties.serverTimezone
+|https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
+|UTC
+
+|spring.datasource.hikari.data-source-properties.userServerPrepStatements
 |https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
 |true
-
-|spring.datasource.hikari.data-source-properties.useLocalSessionState
-|https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
-|true
-
-|spring.datasource.hikari.data-source-properties.useLocalTransactionState
-|https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
-|true
-
-|spring.datasource.hikari.data-source-properties.rewriteBatchedStatements
-|https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
-|true
-
-|spring.datasource.hikari.data-source-properties.cacheResultSetMetadata
-|https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
-|true
-
-|spring.datasource.hikari.data-source-properties.elideSetAutoCommits
-|https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
-|true
-
-|spring.datasource.hikari.data-source-properties.maintainTimeStats
-|https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
-|false
 
 |===

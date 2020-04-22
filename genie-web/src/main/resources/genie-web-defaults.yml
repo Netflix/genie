@@ -141,11 +141,7 @@ spring:
     username: root
     password:
     hikari:
-      auto-commit: false
-      connection-test-query: select 0;
       leak-detection-threshold: 30000
-      maximum-pool-size: 40
-      minimum-idle: 5
       pool-name: genie-hikari-db-pool
   flyway:
     locations: classpath:db/migration/{vendor}
