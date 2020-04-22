@@ -380,7 +380,7 @@ public&nbsp;ClusterRestController(<a href="../../../../../../../../com/netflix/g
  @ResponseStatus(value=CREATED)
 public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;createCluster(@RequestBody @Valid
                                                                                                                                                        @Valid <a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&nbsp;cluster)
-                                                                                                                                                throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                                throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></pre>
 <div class="block">Create cluster configuration.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -388,7 +388,7 @@ public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;c
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The created cluster</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></code> - If there is a conflict for the id</dd>
 </dl>
 </li>
 </ul>
@@ -403,7 +403,7 @@ public&nbsp;org.springframework.http.ResponseEntity&lt;java.lang.Void&gt;&nbsp;c
  @ResponseStatus(value=OK)
 public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&gt;&nbsp;getCluster(@PathVariable(value="id")
                                                                                                                                                                       java.lang.String&nbsp;id)
-                                                                                                                                                               throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                                               throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get cluster configuration from unique id.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -411,7 +411,7 @@ public&nbsp;org.springframework.hateoas.EntityModel&lt;<a href="../../../../../.
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the cluster</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -468,14 +468,16 @@ public&nbsp;void&nbsp;updateCluster(@PathVariable(value="id")
                                                                                                                                  java.lang.String&nbsp;id,
                                                                                                                                  @RequestBody
                                                                                                                                  <a href="../../../../../../../../com/netflix/genie/common/dto/Cluster.html" title="class in com.netflix.genie.common.dto">Cluster</a>&nbsp;updateCluster)
-                                                                                                                          throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                          throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
+                                                                                                                                 <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
 <div class="block">Update a cluster configuration.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - unique if for cluster to update</dd>
 <dd><code>updateCluster</code> - contains the cluster information to update</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If the ids don't match</dd>
 </dl>
 </li>
 </ul>
@@ -492,14 +494,18 @@ public&nbsp;void&nbsp;patchCluster(@PathVariable(value="id")
                                                                                                                                     java.lang.String&nbsp;id,
                                                                                                                                     @RequestBody
                                                                                                                                     com.github.fge.jsonpatch.JsonPatch&nbsp;patch)
-                                                                                                                             throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                             throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
+                                                                                                                                    <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a>,
+                                                                                                                                    <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException</a></pre>
 <div class="block">Patch a cluster using JSON Patch.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - The id of the cluster to patch</dd>
 <dd><code>patch</code> - The JSON Patch instructions</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - On error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If the ids don't match</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieServerException.html" title="class in com.netflix.genie.common.exceptions">GenieServerException</a></code> - If the patch can't be applied</dd>
 </dl>
 </li>
 </ul>
@@ -513,13 +519,13 @@ public&nbsp;void&nbsp;patchCluster(@PathVariable(value="id")
  @ResponseStatus(value=NO_CONTENT)
 public&nbsp;void&nbsp;deleteCluster(@PathVariable(value="id")
                                                                                            java.lang.String&nbsp;id)
-                                                                                    throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                    throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
 <div class="block">Delete a cluster configuration.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>id</code> - unique id for cluster to delete</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If the cluster can't be deleted due to constraints</dd>
 </dl>
 </li>
 </ul>
@@ -532,11 +538,11 @@ public&nbsp;void&nbsp;deleteCluster(@PathVariable(value="id")
 <pre>@DeleteMapping
  @ResponseStatus(value=NO_CONTENT)
 public&nbsp;void&nbsp;deleteAllClusters()
-                                                                         throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                         throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></pre>
 <div class="block">Delete all clusters from database.</div>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></code> - If any cluster can't be deleted due to a constraint in the system</dd>
 </dl>
 </li>
 </ul>
@@ -553,15 +559,14 @@ public&nbsp;void&nbsp;addConfigsForCluster(@PathVariable(value="id")
                                                                                                                                                   java.lang.String&nbsp;id,
                                                                                                                                                   @RequestBody
                                                                                                                                                   java.util.Set&lt;java.lang.String&gt;&nbsp;configs)
-                                                                                                                                           throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                           throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Add new configuration files to a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to add the configuration file to. Not
-                null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to add the configuration file to. Not null/empty/blank.</dd>
 <dd><code>configs</code> - The configuration files to add. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -576,16 +581,15 @@ public&nbsp;void&nbsp;addConfigsForCluster(@PathVariable(value="id")
  @ResponseStatus(value=OK)
 public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getConfigsForCluster(@PathVariable(value="id")
                                                                                                                                                                    java.lang.String&nbsp;id)
-                                                                                                                                                            throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                                            throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get all the configuration files for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to get the configuration files for. Not
-           NULL/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to get the configuration files for. Not NULL/empty/blank.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The active set of configuration files.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -602,16 +606,14 @@ public&nbsp;void&nbsp;updateConfigsForCluster(@PathVariable(value="id")
                                                                                                                                                    java.lang.String&nbsp;id,
                                                                                                                                                    @RequestBody
                                                                                                                                                    java.util.Set&lt;java.lang.String&gt;&nbsp;configs)
-                                                                                                                                            throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                            throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Update the configuration files for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to update the configuration files for.
-                Not null/empty/blank.</dd>
-<dd><code>configs</code> - The configuration files to replace existing configuration
-                files with. Not null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to update the configuration files for. Not null/empty/blank.</dd>
+<dd><code>configs</code> - The configuration files to replace existing configuration files with. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -625,14 +627,13 @@ public&nbsp;void&nbsp;updateConfigsForCluster(@PathVariable(value="id")
  @ResponseStatus(value=NO_CONTENT)
 public&nbsp;void&nbsp;removeAllConfigsForCluster(@PathVariable(value="id")
                                                                                                                 java.lang.String&nbsp;id)
-                                                                                                         throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                         throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Delete the all configuration files from a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to delete the configuration files from.
-           Not null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to delete the configuration files from. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -649,15 +650,14 @@ public&nbsp;void&nbsp;addDependenciesForCluster(@PathVariable(value="id")
                                                                                                                                                             java.lang.String&nbsp;id,
                                                                                                                                                             @RequestBody
                                                                                                                                                             java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies)
-                                                                                                                                                     throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                                     throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Add new dependency files for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to add the dependency file to. Not
-                     null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to add the dependency file to. Not null/empty/blank.</dd>
 <dd><code>dependencies</code> - The dependency files to add. Not null.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -672,16 +672,15 @@ public&nbsp;void&nbsp;addDependenciesForCluster(@PathVariable(value="id")
  @ResponseStatus(value=OK)
 public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getDependenciesForCluster(@PathVariable(value="id")
                                                                                                                                                                              java.lang.String&nbsp;id)
-                                                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get all the dependency files for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to get the dependency files for. Not
-           NULL/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to get the dependency files for. Not NULL/empty/blank</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The set of dependency files.</dd>
+<dd>The set of dependency files</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -698,16 +697,14 @@ public&nbsp;void&nbsp;updateDependenciesForCluster(@PathVariable(value="id")
                                                                                                                                                              java.lang.String&nbsp;id,
                                                                                                                                                              @RequestBody
                                                                                                                                                              java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies)
-                                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Update the dependency files for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to update the dependency files for. Not
-                     null/empty/blank.</dd>
-<dd><code>dependencies</code> - The dependency files to replace existing dependency files with. Not
-                     null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to update the dependency files for. Not null/empty/blank.</dd>
+<dd><code>dependencies</code> - The dependency files to replace existing dependency files with. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -721,14 +718,13 @@ public&nbsp;void&nbsp;updateDependenciesForCluster(@PathVariable(value="id")
  @ResponseStatus(value=NO_CONTENT)
 public&nbsp;void&nbsp;removeAllDependenciesForCluster(@PathVariable(value="id")
                                                                                                                           java.lang.String&nbsp;id)
-                                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Delete the all dependency files from a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to delete the dependency files from. Not
-           null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to delete the dependency files from. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -745,15 +741,14 @@ public&nbsp;void&nbsp;addTagsForCluster(@PathVariable(value="id")
                                                                                                                                             java.lang.String&nbsp;id,
                                                                                                                                             @RequestBody
                                                                                                                                             java.util.Set&lt;java.lang.String&gt;&nbsp;tags)
-                                                                                                                                     throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                     throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Add new tags to a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to add the tags to. Not
-             null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to add the tags to. Not null/empty/blank.</dd>
 <dd><code>tags</code> - The tags to add. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -768,16 +763,15 @@ public&nbsp;void&nbsp;addTagsForCluster(@PathVariable(value="id")
  @ResponseStatus(value=OK)
 public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getTagsForCluster(@PathVariable(value="id")
                                                                                                                                                              java.lang.String&nbsp;id)
-                                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Get all the tags for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to get the tags for. Not
-           NULL/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to get the tags for. Not NULL/empty/blank.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The active set of tags.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -794,16 +788,14 @@ public&nbsp;void&nbsp;updateTagsForCluster(@PathVariable(value="id")
                                                                                                                                              java.lang.String&nbsp;id,
                                                                                                                                              @RequestBody
                                                                                                                                              java.util.Set&lt;java.lang.String&gt;&nbsp;tags)
-                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                                                      throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Update the tags for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to update the tags for.
-             Not null/empty/blank.</dd>
-<dd><code>tags</code> - The tags to replace existing configuration
-             files with. Not null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to update the tags for. Not null/empty/blank.</dd>
+<dd><code>tags</code> - The tags to replace existing configuration files with. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -817,14 +809,13 @@ public&nbsp;void&nbsp;updateTagsForCluster(@PathVariable(value="id")
  @ResponseStatus(value=NO_CONTENT)
 public&nbsp;void&nbsp;removeAllTagsForCluster(@PathVariable(value="id")
                                                                                                           java.lang.String&nbsp;id)
-                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                   throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Delete the all tags from a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to delete the tags from.
-           Not null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to delete the tags from. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -840,15 +831,14 @@ public&nbsp;void&nbsp;removeTagForCluster(@PathVariable(value="id")
                                                                                                             java.lang.String&nbsp;id,
                                                                                                             @PathVariable(value="tag")
                                                                                                             java.lang.String&nbsp;tag)
-                                                                                                     throws <a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></pre>
+                                                                                                     throws <a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></pre>
 <div class="block">Remove an tag from a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to delete the tag from. Not
-            null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to delete the tag from. Not null/empty/blank.</dd>
 <dd><code>tag</code> - The tag to remove. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - If no cluster with id exists</dd>
 </dl>
 </li>
 </ul>
@@ -869,8 +859,7 @@ public&nbsp;void&nbsp;addCommandsForCluster(@PathVariable(value="id")
 <div class="block">Add new commandIds to the given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to add the commandIds to. Not
-                   null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to add the commandIds to. Not null/empty/blank.</dd>
 <dd><code>commandIds</code> - The ids of the commandIds to add. Not null.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
@@ -894,8 +883,7 @@ public&nbsp;java.util.List&lt;org.springframework.hateoas.EntityModel&lt;<a href
 <div class="block">Get all the commandIds configured for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to get the command files for. Not
-                 NULL/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to get the command files for. Not NULL/empty/blank.</dd>
 <dd><code>statuses</code> - The various statuses to return commandIds for.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The active set of commandIds for the cluster.</dd>
@@ -921,10 +909,8 @@ public&nbsp;void&nbsp;setCommandsForCluster(@PathVariable(value="id")
 <div class="block">Set the commandIds for a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to update the configuration files for.
-                   Not null/empty/blank.</dd>
-<dd><code>commandIds</code> - The ids of the commands to replace existing commands with. Not
-                   null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to update the configuration files for. Not null/empty/blank.</dd>
+<dd><code>commandIds</code> - The ids of the commands to replace existing commands with. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
 </dl>
@@ -944,8 +930,7 @@ public&nbsp;void&nbsp;removeAllCommandsForCluster(@PathVariable(value="id")
 <div class="block">Remove the all commandIds from a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to delete the commandIds from. Not
-           null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to delete the commandIds from. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>
 </dl>
@@ -967,8 +952,7 @@ public&nbsp;void&nbsp;removeCommandForCluster(@PathVariable(value="id")
 <div class="block">Remove an command from a given cluster.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>id</code> - The id of the cluster to delete the command from. Not
-                  null/empty/blank.</dd>
+<dd><code>id</code> - The id of the cluster to delete the command from. Not null/empty/blank.</dd>
 <dd><code>commandId</code> - The id of the command to remove. Not null/empty/blank.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - For any error</dd>

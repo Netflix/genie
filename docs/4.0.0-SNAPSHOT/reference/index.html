@@ -5507,30 +5507,10 @@ management endpoints. Switched from default <code>/actuator</code></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.auto-commit</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to auto commit transactions</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.connection-test-query</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Query to use to check if connections are ok</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Select 0;</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.leak-detection-threshold</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How long to wait (in milliseconds) before a connection should be considered leaked out of the pool if it hasn&#8217;t been
 returned</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">30000</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.maximum-pool-size</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum connection pool size</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">40</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.minimum-idle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Fewest allowed idle connections</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.pool-name</p></td>
@@ -5750,39 +5730,14 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 <td class="tableblock halign-left valign-top"><p class="tableblock">2048</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.useServerPrepStmts</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.serverTimezone</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UTC</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.useLocalSessionState</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.userServerPrepStatements</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.useLocalTransactionState</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.rewriteBatchedStatements</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.cacheResultSetMetadata</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.elideSetAutoCommits</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.maintainTimeStats</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 </tbody>
 </table>
@@ -6535,7 +6490,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-04-22 18:11:16 UTC
+Last updated 2020-04-22 23:02:46 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">

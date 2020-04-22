@@ -253,8 +253,7 @@ implements org.springframework.core.Ordered</pre>
 <h4>profile</h4>
 <pre>public&nbsp;java.lang.Object&nbsp;profile(org.aspectj.lang.ProceedingJoinPoint&nbsp;pjp)
                          throws <a href="../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a>,
-                                <a href="../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a>,
-                                <a href="../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></pre>
+                                <a href="../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieCheckedException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieCheckedException</a></pre>
 <div class="block">Aspect implementation method of retrying the data service method on certain failures.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -263,9 +262,7 @@ implements org.springframework.core.Ordered</pre>
 <dd>return the data method response</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../com/netflix/genie/common/exceptions/GenieException.html" title="class in com.netflix.genie.common.exceptions">GenieException</a></code> - any exception thrown by the data service method</dd>
-<dd><code><a href="../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></code> - When a resource is attempted to be saved but has an unique id conflict</dd>
-<dd><code><a href="../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></code> - When a job attachment is attempted to be saved to underlying storage but
-                                  can't be</dd>
+<dd><code><a href="../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieCheckedException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieCheckedException</a></code> - any exception thrown by one of the data service methods Genie code</dd>
 </dl>
 </li>
 </ul>

@@ -161,6 +161,7 @@ java.lang.String&nbsp;launchJob(@Valid
                              throws <a href="../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a>,
                                     <a href="../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a>,
                                     <a href="../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a>,
+                                    <a href="../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a>,
                                     <a href="../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></pre>
 <div class="block">Launches a job on behalf of the user.
  <p>
@@ -178,6 +179,8 @@ java.lang.String&nbsp;launchJob(@Valid
 <dd><code><a href="../../../../../com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></code> - If the system was unable to launch an agent to handle job execution</dd>
 <dd><code><a href="../../../../../com/netflix/genie/common/internal/exceptions/checked/GenieJobResolutionException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">GenieJobResolutionException</a></code> - If the job, based on user input and current system state, can't be
                                      successfully resolved for whatever reason</dd>
+<dd><code><a href="../../../../../com/netflix/genie/web/exceptions/checked/NotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">NotFoundException</a></code> - When a resource that is expected to exist, like a job or a cluster, is not
+                                     found in the system at runtime for some reason</dd>
 <dd><code><a href="../../../../../com/netflix/genie/web/exceptions/checked/IdAlreadyExistsException.html" title="class in com.netflix.genie.web.exceptions.checked">IdAlreadyExistsException</a></code> - If the unique identifier for the job conflicts with an already existing job</dd>
 <dd><code><a href="../../../../../com/netflix/genie/web/exceptions/checked/SaveAttachmentException.html" title="class in com.netflix.genie.web.exceptions.checked">SaveAttachmentException</a></code> - When a job is submitted with attachments but there is an error saving them</dd>
 </dl>
