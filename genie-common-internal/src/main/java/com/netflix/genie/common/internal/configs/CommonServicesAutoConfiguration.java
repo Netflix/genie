@@ -20,25 +20,25 @@ package com.netflix.genie.common.internal.configs;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.netflix.genie.common.internal.dtos.DirectoryManifest;
-import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.properties.RegexDirectoryManifestProperties;
 import com.netflix.genie.common.internal.services.JobArchiveService;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import com.netflix.genie.common.internal.services.JobDirectoryManifestCreatorService;
 import com.netflix.genie.common.internal.services.impl.FileSystemJobArchiverImpl;
 import com.netflix.genie.common.internal.services.impl.JobArchiveServiceImpl;
 import com.netflix.genie.common.internal.services.impl.JobDirectoryManifestCreatorServiceImpl;
+import com.netflix.genie.common.internal.util.RegexDirectoryManifestFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * Auto configuration of any services that are common to both the agent and the server.
@@ -47,6 +47,11 @@ import java.util.regex.Pattern;
  * @since 4.0.0
  */
 @Configuration
+@EnableConfigurationProperties(
+    {
+        RegexDirectoryManifestProperties.class
+    }
+)
 public class CommonServicesAutoConfiguration {
 
     /**
@@ -130,31 +135,15 @@ public class CommonServicesAutoConfiguration {
     }
 
     /**
-     * Provide a {@link DirectoryManifest.Filter} if no override is defined.
-     * This filter prunes subtrees of 'dependencies' directories (applications, clusters, commands).
+     * Provide a {@link DirectoryManifest.Filter} that filters files and/or prunes directories based on a set of
+     * regular expression patterns provided via properties.
      *
+     * @param properties the properties
      * @return a directory manifest filter
      */
     @Bean
     @ConditionalOnMissingBean(DirectoryManifest.Filter.class)
-    public DirectoryManifest.Filter directoryManifestFilter() {
-        return new DirectoryManifest.Filter() {
-            private static final String DEPENDENCIES_DIRECTORIES_PATTERN = ""
-                + ".*/"
-                + JobConstants.GENIE_PATH_VAR
-                + "/.*/"
-                + JobConstants.DEPENDENCY_FILE_PATH_PREFIX;
-            private final Pattern dependenciesDirectoryPattern = Pattern.compile(DEPENDENCIES_DIRECTORIES_PATTERN);
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean walkDirectory(final Path dirPath, final BasicFileAttributes attrs) {
-                return !dependenciesDirectoryPattern.matcher(
-                    dirPath.toAbsolutePath().normalize().toString()
-                ).matches();
-            }
-        };
+    public DirectoryManifest.Filter directoryManifestFilter(final RegexDirectoryManifestProperties properties) {
+        return new RegexDirectoryManifestFilter(properties);
     }
 }
