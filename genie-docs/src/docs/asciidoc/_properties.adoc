@@ -179,6 +179,21 @@ cases is specified as part of the `Command` entity for a particular job.
 |100
 |no
 
+|genie.jobs.files.filter.directory-traversal-reject-patterns
+|List of regex patterns, if a directory matches any, then its contents are not included in the job files manifest
+|[]
+|no
+
+|genie.jobs.files.filter.directory-reject-patterns
+|List of regex patterns, if a directory matches any, then it is not included in the job files manifest
+|[]
+|no
+
+|genie.jobs.files.filter.file-reject-patterns
+|List of regex patterns, if a file matches any, then it is not included in the job files manifest
+|[]
+|no
+
 |genie.jobs.forwarding.enabled
 |Whether or not to attempt to forward kill and get output requests for jobs
 |true

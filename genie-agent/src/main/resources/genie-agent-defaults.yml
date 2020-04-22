@@ -28,6 +28,14 @@ cloud:
 
 genie:
   smoke: true
+  jobs:
+    files:
+      filter:
+        directory-reject-patterns:
+          - '.*/tmp'
+          - '.*/temp'
+        directory-traversal-reject-patterns:
+          - '.*/genie/.*/dependencies'
 
 spring:
   banner:
