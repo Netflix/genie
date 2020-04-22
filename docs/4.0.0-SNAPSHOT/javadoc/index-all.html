@@ -2030,6 +2030,10 @@
 <dd>
 <div class="block">Common job classes shared by agent and server.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/properties/package-summary.html">com.netflix.genie.common.internal.properties</a> - package com.netflix.genie.common.internal.properties</dt>
+<dd>
+<div class="block">Property classes used by both agent and web modules.</div>
+</dd>
 <dt><a href="com/netflix/genie/common/internal/services/package-summary.html">com.netflix.genie.common.internal.services</a> - package com.netflix.genie.common.internal.services</dt>
 <dd>
 <div class="block">Any service interfaces and implementations shared between the Agent and the Server codebases.</div>
@@ -3288,9 +3292,10 @@
 <dd>
 <div class="block">Provide a <code>DirectoryManifest.Factory</code> if no override is defined.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html#directoryManifestFilter--">directoryManifestFilter()</a></span> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">CommonServicesAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html#directoryManifestFilter-com.netflix.genie.common.internal.properties.RegexDirectoryManifestProperties-">directoryManifestFilter(RegexDirectoryManifestProperties)</a></span> - Method in class com.netflix.genie.common.internal.configs.<a href="com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html" title="class in com.netflix.genie.common.internal.configs">CommonServicesAutoConfiguration</a></dt>
 <dd>
-<div class="block">Provide a <code>DirectoryManifest.Filter</code> if no override is defined.</div>
+<div class="block">Provide a <code>DirectoryManifest.Filter</code> that filters files and/or prunes directories based on a set of
+ regular expression patterns provided via properties.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/resources/writers/DefaultDirectoryWriter.html#directoryToHTML-java.lang.String-com.netflix.genie.web.resources.writers.DefaultDirectoryWriter.Directory-">directoryToHTML(String, DefaultDirectoryWriter.Directory)</a></span> - Static method in class com.netflix.genie.web.resources.writers.<a href="com/netflix/genie/web/resources/writers/DefaultDirectoryWriter.html" title="class in com.netflix.genie.web.resources.writers">DefaultDirectoryWriter</a></dt>
 <dd>
@@ -7799,7 +7804,15 @@
 <dd>
 <div class="block">Whether to include a given directory in the manifest.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html#includeDirectory-java.nio.file.Path-java.nio.file.attribute.BasicFileAttributes-">includeDirectory(Path, BasicFileAttributes)</a></span> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util">RegexDirectoryManifestFilter</a></dt>
+<dd>
+<div class="block">Whether to include a given directory in the manifest.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html#includeFile-java.nio.file.Path-java.nio.file.attribute.BasicFileAttributes-">includeFile(Path, BasicFileAttributes)</a></span> - Method in interface com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html" title="interface in com.netflix.genie.common.internal.dtos">DirectoryManifest.Filter</a></dt>
+<dd>
+<div class="block">Whether to include a given file in the manifest.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html#includeFile-java.nio.file.Path-java.nio.file.attribute.BasicFileAttributes-">includeFile(Path, BasicFileAttributes)</a></span> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util">RegexDirectoryManifestFilter</a></dt>
 <dd>
 <div class="block">Whether to include a given file in the manifest.</div>
 </dd>
@@ -10249,6 +10262,10 @@
 <dd>
 <div class="block">Aspect implementation method of retrying the data service method on certain failures.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.common.internal.properties.<a href="com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html" title="class in com.netflix.genie.common.internal.properties">RegexDirectoryManifestProperties</a></dt>
+<dd>
+<div class="block">Properties prefix.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/AgentCleanupProperties.html#PROPERTY_PREFIX">PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/AgentCleanupProperties.html" title="class in com.netflix.genie.web.properties">AgentCleanupProperties</a></dt>
 <dd>
 <div class="block">The property prefix for all properties in this group.</div>
@@ -10460,6 +10477,21 @@
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">RegexDirectoryManifestFilter</span></a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
+<dd>
+<div class="block">Implementation of DirectoryManifestFilter that filters manifest entries base on a list of regular expressions
+ provided via properties class.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html#RegexDirectoryManifestFilter-com.netflix.genie.common.internal.properties.RegexDirectoryManifestProperties-">RegexDirectoryManifestFilter(RegexDirectoryManifestProperties)</a></span> - Constructor for class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util">RegexDirectoryManifestFilter</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html" title="class in com.netflix.genie.common.internal.properties"><span class="typeNameLink">RegexDirectoryManifestProperties</span></a> - Class in <a href="com/netflix/genie/common/internal/properties/package-summary.html">com.netflix.genie.common.internal.properties</a></dt>
+<dd>
+<div class="block">Properties for <a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util"><code>RegexDirectoryManifestFilter</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html#RegexDirectoryManifestProperties--">RegexDirectoryManifestProperties()</a></span> - Constructor for class com.netflix.genie.common.internal.properties.<a href="com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html" title="class in com.netflix.genie.common.internal.properties">RegexDirectoryManifestProperties</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/common/internal/util/RegexRuleSet.html" title="class in com.netflix.genie.common.internal.util"><span class="typeNameLink">RegexRuleSet</span></a> - Class in <a href="com/netflix/genie/common/internal/util/package-summary.html">com.netflix.genie.common.internal.util</a></dt>
 <dd>
 <div class="block">Utility class to match a string against an ordered set of regexes and obtain an accept/reject response.</div>
@@ -13460,6 +13492,10 @@ the order they are declared.</div>
 <div class="block">Constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html#walkDirectory-java.nio.file.Path-java.nio.file.attribute.BasicFileAttributes-">walkDirectory(Path, BasicFileAttributes)</a></span> - Method in interface com.netflix.genie.common.internal.dtos.<a href="com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html" title="interface in com.netflix.genie.common.internal.dtos">DirectoryManifest.Filter</a></dt>
+<dd>
+<div class="block">Whether to recurse into a given directory and add its contents to the manifest.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html#walkDirectory-java.nio.file.Path-java.nio.file.attribute.BasicFileAttributes-">walkDirectory(Path, BasicFileAttributes)</a></span> - Method in class com.netflix.genie.common.internal.util.<a href="com/netflix/genie/common/internal/util/RegexDirectoryManifestFilter.html" title="class in com.netflix.genie.common.internal.util">RegexDirectoryManifestFilter</a></dt>
 <dd>
 <div class="block">Whether to recurse into a given directory and add its contents to the manifest.</div>
 </dd>

@@ -108,6 +108,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>@Configuration
+ @EnableConfigurationProperties(value=<a href="../../../../../../com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html" title="class in com.netflix.genie.common.internal.properties">RegexDirectoryManifestProperties.class</a>)
 public class <span class="typeNameLabel">CommonServicesAutoConfiguration</span>
 extends java.lang.Object</pre>
 <div class="block">Auto configuration of any services that are common to both the agent and the server.</div>
@@ -179,8 +180,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html" title="interface in com.netflix.genie.common.internal.dtos">DirectoryManifest.Filter</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html#directoryManifestFilter--">directoryManifestFilter</a></span>()</code>
-<div class="block">Provide a <code>DirectoryManifest.Filter</code> if no override is defined.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/configs/CommonServicesAutoConfiguration.html#directoryManifestFilter-com.netflix.genie.common.internal.properties.RegexDirectoryManifestProperties-">directoryManifestFilter</a></span>(<a href="../../../../../../com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html" title="class in com.netflix.genie.common.internal.properties">RegexDirectoryManifestProperties</a>&nbsp;properties)</code>
+<div class="block">Provide a <code>DirectoryManifest.Filter</code> that filters files and/or prunes directories based on a set of
+ regular expression patterns provided via properties.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
@@ -363,7 +365,7 @@ public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/dtos/Di
 </dl>
 </li>
 </ul>
-<a name="directoryManifestFilter--">
+<a name="directoryManifestFilter-com.netflix.genie.common.internal.properties.RegexDirectoryManifestProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -371,10 +373,12 @@ public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/dtos/Di
 <h4>directoryManifestFilter</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html" title="interface in com.netflix.genie.common.internal.dtos">DirectoryManifest.Filter.class</a>)
-public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html" title="interface in com.netflix.genie.common.internal.dtos">DirectoryManifest.Filter</a>&nbsp;directoryManifestFilter()</pre>
-<div class="block">Provide a <code>DirectoryManifest.Filter</code> if no override is defined.
- This filter prunes subtrees of 'dependencies' directories (applications, clusters, commands).</div>
+public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/dtos/DirectoryManifest.Filter.html" title="interface in com.netflix.genie.common.internal.dtos">DirectoryManifest.Filter</a>&nbsp;directoryManifestFilter(<a href="../../../../../../com/netflix/genie/common/internal/properties/RegexDirectoryManifestProperties.html" title="class in com.netflix.genie.common.internal.properties">RegexDirectoryManifestProperties</a>&nbsp;properties)</pre>
+<div class="block">Provide a <code>DirectoryManifest.Filter</code> that filters files and/or prunes directories based on a set of
+ regular expression patterns provided via properties.</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>properties</code> - the properties</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a directory manifest filter</dd>
 </dl>
