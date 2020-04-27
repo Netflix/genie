@@ -17,6 +17,48 @@ It will have to be added if one is desired otherwise metrics are just published 
 |AgentMetricsServiceImpl
 |-
 
+|genie.agents.connections.connected.gauge
+|Number of agents connected to the node
+|count
+|AgentRoutingServiceCuratorDiscoveryImpl
+|-
+
+|genie.agents.connections.registered.gauge
+|Number of agents connected to the node and registered in discovery
+|count
+|AgentRoutingServiceCuratorDiscoveryImpl
+|-
+
+|genie.agents.connections.zookeeperSessionState.counter
+|Count of Zookeeper session state changes
+|count
+|AgentRoutingServiceCuratorDiscoveryImpl
+|connectionState
+
+|genie.agents.connections.registered.timer
+|Timing and count of registrations of local agent with discovery service
+|count
+|AgentRoutingServiceCuratorDiscoveryImpl
+|status, exceptionClass
+
+|genie.agents.connections.unregistered.timer
+|Timing and count of unregistrations of local agent with discovery service
+|count
+|AgentRoutingServiceCuratorDiscoveryImpl
+|status, exceptionClass
+
+|genie.agents.connections.connected.counter
+|Count of new agent connections to the local node
+|count
+|AgentRoutingServiceCuratorDiscoveryImpl
+|-
+
+|genie.agents.connections.disconnected.counter
+|Count of new agent disconnections from the local node
+|count
+|AgentRoutingServiceCuratorDiscoveryImpl
+|-
+
 |genie.agents.heartbeating.gauge
 |The number of agents sending heartbeats to the server
 |count

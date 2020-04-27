@@ -20,6 +20,7 @@ package com.netflix.genie.web.spring.autoconfigure;
 import com.netflix.genie.web.properties.ZookeeperProperties;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.listen.Listenable;
+import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -54,6 +55,8 @@ class ZookeeperAutoConfigurationTest {
             context -> {
                 Assertions.assertThat(context).doesNotHaveBean(ZookeeperProperties.class);
                 Assertions.assertThat(context).doesNotHaveBean(LeaderInitiatorFactoryBean.class);
+                Assertions.assertThat(context).doesNotHaveBean(ServiceDiscovery.class);
+                Assertions.assertThat(context).doesNotHaveBean(Listenable.class);
             }
         );
     }
@@ -69,6 +72,8 @@ class ZookeeperAutoConfigurationTest {
                 context -> {
                     Assertions.assertThat(context).hasSingleBean(ZookeeperProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeaderInitiatorFactoryBean.class);
+                    Assertions.assertThat(context).hasSingleBean(ServiceDiscovery.class);
+                    Assertions.assertThat(context).hasSingleBean(Listenable.class);
                 }
             );
     }

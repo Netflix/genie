@@ -567,6 +567,11 @@ to the number of CPU cores x 2 + 1
 |30000
 |no
 
+|genie.zookeeper.discovery-path
+|The namespace to use for Genie discovery service (maps agents to the node they're connected to)
+|/genie/discovery/
+|no
+
 |genie.zookeeper.leader-path
 |The namespace to use for Genie leadership election of a given cluster
 |/genie/leader/

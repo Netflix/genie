@@ -43,4 +43,9 @@ public class ZookeeperProperties {
      * The base Zookeeper node path for Genie leadership.
      */
     private String leaderPath = "/genie/leader/";
+
+    /**
+     * The base Zookeeper node path for discovery.
+     */
+    private String discoveryPath = "/genie/agents/";
 }
