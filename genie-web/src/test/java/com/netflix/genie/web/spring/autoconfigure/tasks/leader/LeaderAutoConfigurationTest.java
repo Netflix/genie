@@ -27,7 +27,7 @@ import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
-import com.netflix.genie.web.properties.ZookeeperLeaderProperties;
+import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
 import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
@@ -81,7 +81,7 @@ class LeaderAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                 Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                 Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
-                Assertions.assertThat(context).hasSingleBean(ZookeeperLeaderProperties.class);
+                Assertions.assertThat(context).hasSingleBean(ZookeeperProperties.class);
 
                 Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                 Assertions.assertThat(context).doesNotHaveBean(LeaderInitiatorFactoryBean.class);
@@ -117,7 +117,7 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
-                    Assertions.assertThat(context).hasSingleBean(ZookeeperLeaderProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(ZookeeperProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                     Assertions.assertThat(context).doesNotHaveBean(LeaderInitiatorFactoryBean.class);
@@ -150,7 +150,7 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
-                    Assertions.assertThat(context).hasSingleBean(ZookeeperLeaderProperties.class);
+                    Assertions.assertThat(context).hasSingleBean(ZookeeperProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
                     Assertions.assertThat(context).hasSingleBean(LeaderInitiatorFactoryBean.class);

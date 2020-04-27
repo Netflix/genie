@@ -25,7 +25,7 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
-import com.netflix.genie.web.properties.ZookeeperLeaderProperties;
+import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
 import com.netflix.genie.web.services.impl.ClusterLeaderServiceCuratorImpl;
 import com.netflix.genie.web.services.impl.ClusterLeaderServiceLocalLeaderImpl;
@@ -72,7 +72,7 @@ import java.util.Set;
         DatabaseCleanupProperties.class,
         LeadershipProperties.class,
         UserMetricsProperties.class,
-        ZookeeperLeaderProperties.class
+        ZookeeperProperties.class
     }
 )
 @AutoConfigureAfter(
@@ -104,8 +104,8 @@ public class LeaderAutoConfiguration {
      * The leadership initialization factory bean which will create a LeaderInitiator to kick off the leader election
      * process within this node for the cluster if Zookeeper is configured.
      *
-     * @param client                    The curator framework client to use
-     * @param zookeeperLeaderProperties The Zookeeper properties to use
+     * @param client              The curator framework client to use
+     * @param zookeeperProperties The Zookeeper properties to use
      * @return The factory bean
      */
     @Bean
@@ -113,11 +113,11 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(LeaderInitiatorFactoryBean.class)
     public LeaderInitiatorFactoryBean leaderInitiatorFactory(
         final CuratorFramework client,
-        final ZookeeperLeaderProperties zookeeperLeaderProperties
+        final ZookeeperProperties zookeeperProperties
     ) {
         final LeaderInitiatorFactoryBean factoryBean = new LeaderInitiatorFactoryBean();
         factoryBean.setClient(client);
-        factoryBean.setPath(zookeeperLeaderProperties.getPath());
+        factoryBean.setPath(zookeeperProperties.getLeaderPath());
         factoryBean.setRole("cluster");
         return factoryBean;
     }

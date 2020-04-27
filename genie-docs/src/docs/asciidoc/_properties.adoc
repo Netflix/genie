@@ -567,7 +567,7 @@ to the number of CPU cores x 2 + 1
 |30000
 |no
 
-|genie.zookeeper.leader.path
+|genie.zookeeper.leader-path
 |The namespace to use for Genie leadership election of a given cluster
 |/genie/leader/
 |no

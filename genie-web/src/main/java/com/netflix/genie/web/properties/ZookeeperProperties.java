@@ -28,19 +28,19 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 3.1.0
  */
-@ConfigurationProperties(prefix = ZookeeperLeaderProperties.PROPERTY_PREFIX)
+@ConfigurationProperties(prefix = ZookeeperProperties.PROPERTY_PREFIX)
 @Getter
 @Setter
 @Validated
-public class ZookeeperLeaderProperties {
+public class ZookeeperProperties {
 
     /**
      * The property prefix for this group.
      */
-    public static final String PROPERTY_PREFIX = "genie.zookeeper.leader";
+    public static final String PROPERTY_PREFIX = "genie.zookeeper";
 
     /**
      * The base Zookeeper node path for Genie leadership.
      */
-    private String path = "/genie/leader/";
+    private String leaderPath = "/genie/leader/";
 }
