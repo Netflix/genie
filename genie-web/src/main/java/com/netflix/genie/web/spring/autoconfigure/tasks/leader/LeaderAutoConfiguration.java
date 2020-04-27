@@ -25,11 +25,11 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
-import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
 import com.netflix.genie.web.services.impl.ClusterLeaderServiceCuratorImpl;
 import com.netflix.genie.web.services.impl.ClusterLeaderServiceLocalLeaderImpl;
 import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
+import com.netflix.genie.web.spring.autoconfigure.ZookeeperAutoConfiguration;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
 import com.netflix.genie.web.tasks.leader.AgentJobCleanupTask;
 import com.netflix.genie.web.tasks.leader.ClusterCheckerTask;
@@ -39,7 +39,6 @@ import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
 import com.netflix.genie.web.tasks.leader.UserMetricsTask;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.curator.framework.CuratorFramework;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -47,11 +46,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.zookeeper.ZookeeperAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.integration.zookeeper.config.LeaderInitiatorFactoryBean;
 import org.springframework.integration.zookeeper.leader.LeaderInitiator;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.client.RestTemplate;
@@ -72,7 +69,6 @@ import java.util.Set;
         DatabaseCleanupProperties.class,
         LeadershipProperties.class,
         UserMetricsProperties.class,
-        ZookeeperProperties.class
     }
 )
 @AutoConfigureAfter(
@@ -98,50 +94,6 @@ public class LeaderAutoConfiguration {
         final Set<LeaderTask> tasks
     ) {
         return new LeaderTasksCoordinator(taskScheduler, tasks);
-    }
-
-    /**
-     * The leadership initialization factory bean which will create a LeaderInitiator to kick off the leader election
-     * process within this node for the cluster if Zookeeper is configured.
-     *
-     * @param client              The curator framework client to use
-     * @param zookeeperProperties The Zookeeper properties to use
-     * @return The factory bean
-     */
-    @Bean
-    @ConditionalOnBean(CuratorFramework.class)
-    @ConditionalOnMissingBean(LeaderInitiatorFactoryBean.class)
-    public LeaderInitiatorFactoryBean leaderInitiatorFactory(
-        final CuratorFramework client,
-        final ZookeeperProperties zookeeperProperties
-    ) {
-        final LeaderInitiatorFactoryBean factoryBean = new LeaderInitiatorFactoryBean();
-        factoryBean.setClient(client);
-        factoryBean.setPath(zookeeperProperties.getLeaderPath());
-        factoryBean.setRole("cluster");
-        return factoryBean;
-    }
-
-    /**
-     * If Zookeeper isn't available and this node is forced to be the leader create the local leader
-     * bean which will fire appropriate events.
-     *
-     * @param genieEventBus        The genie event bus implementation to use
-     * @param leadershipProperties Properties related to static leadership configuration for the Genie cluster
-     * @return The local leader bean
-     */
-    @Bean
-    @ConditionalOnMissingBean(
-        {
-            CuratorFramework.class,
-            LocalLeader.class
-        }
-    )
-    public LocalLeader localLeader(
-        final GenieEventBus genieEventBus,
-        final LeadershipProperties leadershipProperties
-    ) {
-        return new LocalLeader(genieEventBus, leadershipProperties.isEnabled());
     }
 
     /**
@@ -259,6 +211,28 @@ public class LeaderAutoConfiguration {
     @ConditionalOnMissingBean(ClusterLeaderService.class)
     public ClusterLeaderService curatorClusterLeaderService(final LeaderInitiator leaderInitiator) {
         return new ClusterLeaderServiceCuratorImpl(leaderInitiator);
+    }
+
+    /**
+     * If Zookeeper isn't available and this node is forced to be the leader create the local leader
+     * bean which will fire appropriate events.
+     *
+     * @param genieEventBus        The genie event bus implementation to use
+     * @param leadershipProperties Properties related to static leadership configuration for the Genie cluster
+     * @return The local leader bean
+     */
+    @Bean
+    @ConditionalOnMissingBean(
+        {
+            LeaderInitiator.class,
+            LocalLeader.class
+        }
+    )
+    public LocalLeader localLeader(
+        final GenieEventBus genieEventBus,
+        final LeadershipProperties leadershipProperties
+    ) {
+        return new LocalLeader(genieEventBus, leadershipProperties.isEnabled());
     }
 
     /**

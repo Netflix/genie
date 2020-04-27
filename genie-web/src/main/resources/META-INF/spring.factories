@@ -27,6 +27,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.netflix.genie.web.spring.autoconfigure.MailAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.RetryAutoConfiguration,\
   com.netflix.genie.web.spring.autoconfigure.SwaggerAutoConfiguration,\
-  com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration
+  com.netflix.genie.web.spring.autoconfigure.ValidationAutoConfiguration,\
+  com.netflix.genie.web.spring.autoconfigure.ZookeeperAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\
   com.netflix.genie.web.spring.processors.GenieDefaultPropertiesPostProcessor
