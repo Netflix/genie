@@ -27,7 +27,6 @@ import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.LeadershipProperties;
 import com.netflix.genie.web.properties.UserMetricsProperties;
-import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.services.ClusterLeaderService;
 import com.netflix.genie.web.spring.actuators.LeaderElectionActuator;
 import com.netflix.genie.web.spring.autoconfigure.tasks.TasksAutoConfiguration;
@@ -38,8 +37,6 @@ import com.netflix.genie.web.tasks.leader.LeaderTasksCoordinator;
 import com.netflix.genie.web.tasks.leader.LocalLeader;
 import com.netflix.genie.web.tasks.leader.UserMetricsTask;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.listen.Listenable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -48,7 +45,7 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.zookeeper.config.LeaderInitiatorFactoryBean;
+import org.springframework.integration.zookeeper.leader.LeaderInitiator;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -81,10 +78,8 @@ class LeaderAutoConfigurationTest {
                 Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                 Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                 Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
-                Assertions.assertThat(context).hasSingleBean(ZookeeperProperties.class);
 
                 Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
-                Assertions.assertThat(context).doesNotHaveBean(LeaderInitiatorFactoryBean.class);
                 Assertions.assertThat(context).hasSingleBean(LocalLeader.class);
                 Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
                 Assertions.assertThat(context).hasSingleBean(ClusterLeaderService.class);
@@ -94,7 +89,6 @@ class LeaderAutoConfigurationTest {
                 Assertions.assertThat(context).doesNotHaveBean(DatabaseCleanupTask.class);
                 Assertions.assertThat(context).doesNotHaveBean(UserMetricsTask.class);
                 Assertions.assertThat(context).doesNotHaveBean(AgentJobCleanupTask.class);
-                Assertions.assertThat(context).doesNotHaveBean(LeaderInitiatorFactoryBean.class);
             }
         );
     }
@@ -117,10 +111,8 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
-                    Assertions.assertThat(context).hasSingleBean(ZookeeperProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
-                    Assertions.assertThat(context).doesNotHaveBean(LeaderInitiatorFactoryBean.class);
                     Assertions.assertThat(context).hasSingleBean(LocalLeader.class);
                     Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
 
@@ -131,7 +123,6 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupTask.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsTask.class);
                     Assertions.assertThat(context).hasSingleBean(AgentJobCleanupTask.class);
-                    Assertions.assertThat(context).doesNotHaveBean(LeaderInitiatorFactoryBean.class);
                 }
             );
     }
@@ -150,10 +141,8 @@ class LeaderAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(DatabaseCleanupProperties.class);
                     Assertions.assertThat(context).hasSingleBean(LeadershipProperties.class);
                     Assertions.assertThat(context).hasSingleBean(UserMetricsProperties.class);
-                    Assertions.assertThat(context).hasSingleBean(ZookeeperProperties.class);
 
                     Assertions.assertThat(context).hasSingleBean(LeaderTasksCoordinator.class);
-                    Assertions.assertThat(context).hasSingleBean(LeaderInitiatorFactoryBean.class);
                     Assertions.assertThat(context).doesNotHaveBean(LocalLeader.class);
                     Assertions.assertThat(context).hasSingleBean(ClusterCheckerTask.class);
 
@@ -217,19 +206,9 @@ class LeaderAutoConfigurationTest {
     @Configuration
     static class ZookeeperMockConfig {
 
-        /**
-         * Mocked bean.
-         *
-         * @return Mocked bean instance.
-         */
         @Bean
-        @SuppressWarnings("unchecked")
-        CuratorFramework curatorFramework() {
-            final CuratorFramework curatorFramework = Mockito.mock(CuratorFramework.class);
-            Mockito
-                .when(curatorFramework.getConnectionStateListenable())
-                .thenReturn(Mockito.mock(Listenable.class));
-            return curatorFramework;
+        LeaderInitiator leaderInitiatorFactoryBean() {
+            return Mockito.mock(LeaderInitiator.class);
         }
     }
 }
