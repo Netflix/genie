@@ -17,8 +17,13 @@
  */
 package com.netflix.genie.web.spring.autoconfigure;
 
+import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDiscoveryImpl;
 import com.netflix.genie.web.properties.ZookeeperProperties;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.listen.Listenable;
+import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.curator.x.discovery.ServiceDiscovery;
+import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -67,4 +72,38 @@ public class ZookeeperAutoConfiguration {
         factoryBean.setRole("cluster");
         return factoryBean;
     }
+
+    /**
+     * The Curator-based Service Discovery bean.
+     *
+     * @param client              The curator framework client to use
+     * @param zookeeperProperties The Zookeeper properties to use
+     * @return {@link ServiceDiscovery} bean for instances of type {@link AgentRoutingServiceCuratorDiscoveryImpl.Agent}
+     */
+    @Bean
+    @ConditionalOnMissingBean(ServiceDiscovery.class)
+    ServiceDiscovery<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceDiscovery(
+        final CuratorFramework client,
+        final ZookeeperProperties zookeeperProperties
+    ) {
+        return ServiceDiscoveryBuilder.builder(AgentRoutingServiceCuratorDiscoveryImpl.Agent.class)
+            .basePath(zookeeperProperties.getDiscoveryPath())
+            .client(client)
+            .build();
+    }
+
+    /**
+     * The Curator-client connection state listenable.
+     *
+     * @param client              The curator framework client to use
+     * @return {@link ServiceDiscovery} bean for instances of type {@link AgentRoutingServiceCuratorDiscoveryImpl.Agent}
+     */
+    @Bean
+    @ConditionalOnMissingBean(Listenable.class)
+    Listenable<ConnectionStateListener> listenableCuratorConnectionState(
+        final CuratorFramework client
+    ) {
+        return client.getConnectionStateListenable();
+    }
+
 }

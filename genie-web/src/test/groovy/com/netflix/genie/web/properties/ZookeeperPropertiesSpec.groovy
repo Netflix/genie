@@ -27,11 +27,14 @@ class ZookeeperPropertiesSpec extends Specification {
 
         then:
         zkProperties.getLeaderPath() == "/genie/leader/"
+        zkProperties.getDiscoveryPath() == "/genie/agents/"
 
         when:
         zkProperties.setLeaderPath("/genie/my-cluster/leader/")
+        zkProperties.setDiscoveryPath("/genie/my-cluster/agents/")
 
         then:
         zkProperties.getLeaderPath() == "/genie/my-cluster/leader/"
+        zkProperties.getDiscoveryPath() == "/genie/my-cluster/agents/"
     }
 }

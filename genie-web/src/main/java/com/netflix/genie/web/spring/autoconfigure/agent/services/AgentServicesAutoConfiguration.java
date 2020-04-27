@@ -28,12 +28,17 @@ import com.netflix.genie.web.agent.services.impl.AgentConnectionTrackingServiceI
 import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentMetricsServiceImpl;
+import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDiscoveryImpl;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.services.JobResolverService;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.apache.curator.framework.listen.Listenable;
+import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -95,18 +100,54 @@ public class AgentServicesAutoConfiguration {
 
     /**
      * Get an implementation of {@link AgentRoutingService} if one hasn't already been defined.
+     * This bean is created if Zookeeper is disabled. This implementation stores connections using persistence service.
      *
      * @param persistenceService The persistence service to use for agent connections
      * @param genieHostInfo      The local genie host information
      * @return A {@link AgentRoutingServiceImpl} instance
      */
     @Bean
-    @ConditionalOnMissingBean(AgentRoutingService.class)
-    public AgentRoutingServiceImpl agentRoutingService(
+    @ConditionalOnMissingBean(
+        {
+            AgentRoutingService.class,
+            ServiceDiscovery.class
+        }
+    )
+    public AgentRoutingService agentRoutingServicePersistence(
         final PersistenceService persistenceService,
         final GenieHostInfo genieHostInfo
     ) {
         return new AgentRoutingServiceImpl(persistenceService, genieHostInfo);
+    }
+
+    /**
+     * Get an implementation of {@link AgentRoutingService} if one hasn't already been defined.
+     * This bean is created if Zookeeper is enabled, it uses Curator's {@link ServiceDiscovery}.
+     *
+     * @param genieHostInfo                    The local genie host information
+     * @param serviceDiscovery                 The Zookeeper Curator service discovery
+     * @param taskScheduler                    The task scheduler
+     * @param listenableCuratorConnectionState the connection state listenable
+     * @param registry                         The metrics registry
+     * @return A {@link AgentRoutingServiceImpl} instance
+     */
+    @Bean
+    @ConditionalOnBean(ServiceDiscovery.class)
+    @ConditionalOnMissingBean(AgentRoutingService.class)
+    public AgentRoutingService agentRoutingServiceCurator(
+        final GenieHostInfo genieHostInfo,
+        final ServiceDiscovery<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceDiscovery,
+        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
+        final Listenable<ConnectionStateListener> listenableCuratorConnectionState,
+        final MeterRegistry registry
+    ) {
+        return new AgentRoutingServiceCuratorDiscoveryImpl(
+            genieHostInfo,
+            serviceDiscovery,
+            taskScheduler,
+            listenableCuratorConnectionState,
+            registry
+        );
     }
 
     /**

@@ -24,17 +24,22 @@ import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
 import com.netflix.genie.web.agent.services.AgentMetricsService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
+import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDiscoveryImpl;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.v4.endpoints.AgentRpcEndpointsAutoConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.apache.curator.framework.listen.Listenable;
+import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 
 /**
@@ -55,13 +60,33 @@ class AgentServicesAutoConfigurationTest {
             .withUserConfiguration(RequiredBeans.class);
 
     /**
-     * Default beans created.
+     * Verify beans in case Zookeeper is not enabled.
      */
     @Test
-    void expectedBeansExist() {
+    void expectedBeansExistWithZookeeperDisabled() {
         this.contextRunner
             .run(
                 context -> {
+                    Assertions.assertThat(context).doesNotHaveBean(ServiceDiscovery.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentRoutingService.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentJobService.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingService.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentFilterService.class);
+                    Assertions.assertThat(context).hasSingleBean(AgentMetricsService.class);
+                }
+            );
+    }
+
+    /**
+     * Verify beans in case Zookeeper is enabled.
+     */
+    @Test
+    void expectedBeansExistWithZookeeperEnabled() {
+        this.contextRunner
+            .withUserConfiguration(ZookeeperMockConfig.class)
+            .run(
+                context -> {
+                    Assertions.assertThat(context).hasSingleBean(ServiceDiscovery.class);
                     Assertions.assertThat(context).hasSingleBean(AgentJobService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentRoutingService.class);
@@ -105,6 +130,25 @@ class AgentServicesAutoConfigurationTest {
         @Bean
         PersistenceService geniePersistenceService() {
             return Mockito.mock(PersistenceService.class);
+        }
+    }
+
+    /**
+     * Mock configuration for pretending zookeeper is enabled.
+     */
+    @Configuration
+    static class ZookeeperMockConfig {
+
+        @Bean
+        @SuppressWarnings("unchecked")
+        ServiceDiscovery<AgentRoutingServiceCuratorDiscoveryImpl.Agent> serviceDiscovery() {
+            return Mockito.mock(ServiceDiscovery.class);
+        }
+
+        @Bean
+        @SuppressWarnings("unchecked")
+        Listenable<ConnectionStateListener> listenableCuratorConnectionState() {
+            return Mockito.mock(Listenable.class);
         }
     }
 }
