@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.health
 
-import com.netflix.genie.web.agent.services.AgentMetricsService
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService
 import org.springframework.boot.actuate.health.Status
 import spock.lang.Specification
 
@@ -29,15 +29,15 @@ import spock.lang.Specification
 class GenieAgentHealthIndicatorSpec extends Specification {
 
     def "Can get health"() {
-        def agentMetricsService = Mock(AgentMetricsService)
-        def healthIndicator = new GenieAgentHealthIndicator(agentMetricsService)
+        def agentConnectionTrackingService = Mock(AgentConnectionTrackingService)
+        def healthIndicator = new GenieAgentHealthIndicator(agentConnectionTrackingService)
         def connectedAgentCount = 53234L
 
         when:
         def health = healthIndicator.health()
 
         then:
-        1 * agentMetricsService.getNumConnectedAgents() >> connectedAgentCount
+        1 * agentConnectionTrackingService.getConnectedAgentsCount() >> connectedAgentCount
         health.getStatus() == Status.UP
         health.getDetails().containsKey(GenieAgentHealthIndicator.NUM_CONNECTED_AGENTS)
         health.getDetails().get(GenieAgentHealthIndicator.NUM_CONNECTED_AGENTS) == connectedAgentCount

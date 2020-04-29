@@ -19,7 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.health;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
-import com.netflix.genie.web.agent.services.AgentMetricsService;
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
@@ -107,9 +107,8 @@ class HealthAutoConfigurationTest {
         }
 
         @Bean
-        AgentMetricsService agentMetricsService() {
-            return new AgentMetricsService() {
-            };
+        AgentConnectionTrackingService agentConnectionTrackingService() {
+            return Mockito.mock(AgentConnectionTrackingService.class);
         }
     }
 

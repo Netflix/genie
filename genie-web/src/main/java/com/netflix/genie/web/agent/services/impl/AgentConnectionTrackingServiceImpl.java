@@ -136,6 +136,14 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getConnectedAgentsCount() {
+        return this.jobStreamRecordsMap.size();
+    }
+
     private void cleanupTask() {
         try {
             this.removeExpiredStreams();

@@ -11,12 +11,6 @@ It will have to be added if one is desired otherwise metrics are just published 
 |===
 |Name |Description |Unit |Source |Tags
 
-|genie.agents.connected.gauge
-|The number of agents connected to the server
-|count
-|AgentMetricsServiceImpl
-|-
-
 |genie.agents.connections.connected.gauge
 |Number of agents connected to the node
 |count

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.health;
 
-import com.netflix.genie.web.agent.services.AgentMetricsService;
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 
@@ -31,15 +31,15 @@ public class GenieAgentHealthIndicator implements HealthIndicator {
 
     static final String NUM_CONNECTED_AGENTS = "numConnectedAgents";
 
-    private final AgentMetricsService agentMetricsService;
+    private final AgentConnectionTrackingService agentConnectionTrackingService;
 
     /**
      * Constructor.
      *
-     * @param agentMetricsService For collecting metrics about the Agents connected to this server.
+     * @param agentConnectionTrackingService The service tracking live agent connections
      */
-    public GenieAgentHealthIndicator(final AgentMetricsService agentMetricsService) {
-        this.agentMetricsService = agentMetricsService;
+    public GenieAgentHealthIndicator(final AgentConnectionTrackingService agentConnectionTrackingService) {
+        this.agentConnectionTrackingService = agentConnectionTrackingService;
     }
 
     /**
@@ -54,7 +54,7 @@ public class GenieAgentHealthIndicator implements HealthIndicator {
         //       comfortable with
         builder.up();
 
-        builder.withDetail(NUM_CONNECTED_AGENTS, this.agentMetricsService.getNumConnectedAgents());
+        builder.withDetail(NUM_CONNECTED_AGENTS, this.agentConnectionTrackingService.getConnectedAgentsCount());
         return builder.build();
     }
 }

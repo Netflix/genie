@@ -19,7 +19,7 @@ package com.netflix.genie.web.spring.autoconfigure.health;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
-import com.netflix.genie.web.agent.services.AgentMetricsService;
+import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
 import com.netflix.genie.web.health.GenieMemoryHealthIndicator;
@@ -68,13 +68,15 @@ public class HealthAutoConfiguration {
     /**
      * Provide a health indicator tied to agent related information if one hasn't already been provided elsewhere.
      *
-     * @param agentMetricsService {@link AgentMetricsService} implementation to use
+     * @param agentConnectionTrackingService the agent connection tracking service
      * @return An instance of {@link GenieAgentHealthIndicator}
      */
     @Bean
     @ConditionalOnMissingBean(GenieAgentHealthIndicator.class)
-    public GenieAgentHealthIndicator genieAgentHealthIndicator(final AgentMetricsService agentMetricsService) {
-        return new GenieAgentHealthIndicator(agentMetricsService);
+    public GenieAgentHealthIndicator genieAgentHealthIndicator(
+        final AgentConnectionTrackingService agentConnectionTrackingService
+    ) {
+        return new GenieAgentHealthIndicator(agentConnectionTrackingService);
     }
 
     /**
