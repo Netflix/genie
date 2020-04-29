@@ -22,7 +22,6 @@ import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
-import com.netflix.genie.web.agent.services.AgentMetricsService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDiscoveryImpl;
 import com.netflix.genie.web.data.services.DataServices;
@@ -72,7 +71,6 @@ class AgentServicesAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(AgentJobService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentFilterService.class);
-                    Assertions.assertThat(context).hasSingleBean(AgentMetricsService.class);
                 }
             );
     }
@@ -91,7 +89,6 @@ class AgentServicesAutoConfigurationTest {
                     Assertions.assertThat(context).hasSingleBean(AgentConnectionTrackingService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentRoutingService.class);
                     Assertions.assertThat(context).hasSingleBean(AgentFilterService.class);
-                    Assertions.assertThat(context).hasSingleBean(AgentMetricsService.class);
                 }
             );
     }

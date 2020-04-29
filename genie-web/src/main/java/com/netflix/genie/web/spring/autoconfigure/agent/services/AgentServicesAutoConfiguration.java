@@ -22,12 +22,10 @@ import com.netflix.genie.web.agent.inspectors.AgentMetadataInspector;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentFilterService;
 import com.netflix.genie.web.agent.services.AgentJobService;
-import com.netflix.genie.web.agent.services.AgentMetricsService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.agent.services.impl.AgentConnectionTrackingServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentFilterServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentJobServiceImpl;
-import com.netflix.genie.web.agent.services.impl.AgentMetricsServiceImpl;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceCuratorDiscoveryImpl;
 import com.netflix.genie.web.agent.services.impl.AgentRoutingServiceImpl;
 import com.netflix.genie.web.data.services.DataServices;
@@ -163,24 +161,5 @@ public class AgentServicesAutoConfiguration {
         final List<AgentMetadataInspector> agentMetadataInspectorsList
     ) {
         return new AgentFilterServiceImpl(agentMetadataInspectorsList);
-    }
-
-    /**
-     * Provide an implementation of {@link AgentMetricsService} if one hasn't been provided.
-     *
-     * @param genieHostInfo      The Genie host information
-     * @param persistenceService Implementation of {@link PersistenceService} to get information about running agents
-     *                           in the ecosystem
-     * @param registry           The metrics repository
-     * @return An instance of {@link AgentMetricsServiceImpl}
-     */
-    @Bean
-    @ConditionalOnMissingBean(AgentMetricsService.class)
-    public AgentMetricsServiceImpl agentMetricsService(
-        final GenieHostInfo genieHostInfo,
-        final PersistenceService persistenceService,
-        final MeterRegistry registry
-    ) {
-        return new AgentMetricsServiceImpl(genieHostInfo, persistenceService, registry);
     }
 }

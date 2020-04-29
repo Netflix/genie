@@ -41,4 +41,9 @@ public interface AgentConnectionTrackingService {
      */
     void notifyDisconnected(String streamId, String claimedJobId);
 
+    /**
+     * Get the count of locally connected agents.
+     * @return the number of agents connected.
+     */
+    long getConnectedAgentsCount();
 }
