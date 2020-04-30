@@ -19,6 +19,7 @@ package com.netflix.genie.agent.spring.autoconfigure;
 
 import com.netflix.genie.agent.AgentMetadataImpl;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -47,6 +48,7 @@ public class AgentAutoConfigurationTest {
     public void expectedBeansExist() {
         this.contextRunner.run(
             context -> {
+                Assertions.assertThat(context).hasSingleBean(GenieHostInfo.class);
                 Assertions.assertThat(context).hasSingleBean(AgentMetadataImpl.class);
                 Assertions.assertThat(context).hasSingleBean(FileLockFactory.class);
                 Assertions

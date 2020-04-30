@@ -46,9 +46,34 @@ public class AgentMetadataImpl implements AgentMetadata {
      * Constructor.
      */
     public AgentMetadataImpl() {
-        this.agentVersion = getAgentVersionOrFallback();
-        this.agentHostName = getAgentHostNameOrFallback();
-        this.agentPid = getAgentPidOrFallback();
+        this(
+            getAgentVersionOrFallback(),
+            getAgentHostNameOrFallback(),
+            getAgentPidOrFallback()
+        );
+    }
+
+    /**
+     * Constructor with pre-resolved hostname.
+     *
+     * @param hostname The hostname
+     */
+    public AgentMetadataImpl(final String hostname) {
+        this(
+            getAgentVersionOrFallback(),
+            hostname,
+            getAgentPidOrFallback()
+        );
+    }
+
+    private AgentMetadataImpl(
+        final String agentVersion,
+        final String agentHostName,
+        final String agentPid
+    ) {
+        this.agentVersion = agentVersion;
+        this.agentHostName = agentHostName;
+        this.agentPid = agentPid;
     }
 
     private static String getAgentVersionOrFallback() {
