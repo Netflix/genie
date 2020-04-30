@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.tasks.leader;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.events.GenieEventBus;
@@ -197,6 +198,11 @@ class LeaderAutoConfigurationTest {
         @Bean
         PersistenceService geniePersistenceService() {
             return Mockito.mock(PersistenceService.class);
+        }
+
+        @Bean
+        AgentRoutingService agentRoutingService() {
+            return Mockito.mock(AgentRoutingService.class);
         }
     }
 

@@ -46,43 +46,31 @@ class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends JpaPersist
         this.service.saveAgentConnection(JOB1, HOST1);
         this.service.saveAgentConnection(JOB2, HOST2);
         this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
-        this.verifyAgentConnectionsOnServer(HOST1, 1L);
-        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Migrate a connection, with delete before update
         this.service.removeAgentConnection(JOB1, HOST1);
         this.service.saveAgentConnection(JOB1, HOST2);
         this.verifyExpectedConnections(Pair.of(JOB1, HOST2), Pair.of(JOB2, HOST2));
-        this.verifyAgentConnectionsOnServer(HOST1, 0L);
-        this.verifyAgentConnectionsOnServer(HOST2, 2L);
 
         // Migrate a connection with update before delete
         this.service.saveAgentConnection(JOB1, HOST1);
         this.service.removeAgentConnection(JOB1, HOST2);
         this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
-        this.verifyAgentConnectionsOnServer(HOST1, 1L);
-        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Migrate a connection, landing on the same server with deletion
         this.service.removeAgentConnection(JOB1, HOST1);
         this.service.saveAgentConnection(JOB1, HOST1);
         this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
-        this.verifyAgentConnectionsOnServer(HOST1, 1L);
-        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Migrate a connection, landing on the same server without deletion (unexpected in practice)
         this.service.saveAgentConnection(JOB1, HOST1);
         this.service.saveAgentConnection(JOB1, HOST1);
         this.verifyExpectedConnections(Pair.of(JOB1, HOST1), Pair.of(JOB2, HOST2));
-        this.verifyAgentConnectionsOnServer(HOST1, 1L);
-        this.verifyAgentConnectionsOnServer(HOST2, 1L);
 
         // Delete all
         this.service.removeAgentConnection(JOB1, HOST1);
         this.service.removeAgentConnection(JOB2, HOST2);
         this.verifyExpectedConnections();
-        this.verifyAgentConnectionsOnServer(HOST1, 0L);
-        this.verifyAgentConnectionsOnServer(HOST2, 0L);
 
         // Create new connections
         this.service.saveAgentConnection(JOB1, HOST1);
@@ -117,11 +105,5 @@ class JpaAgentConnectionPersistenceServiceImplIntegrationTest extends JpaPersist
                 .isPresent()
                 .contains(hostname);
         }
-    }
-
-    private void verifyAgentConnectionsOnServer(final String hostname, final long expectedNumConnections) {
-        Assertions
-            .assertThat(this.service.getNumAgentConnectionsOnServer(hostname))
-            .isEqualTo(expectedNumConnections);
     }
 }

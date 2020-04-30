@@ -129,7 +129,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Set<UserJobResourcesAggregate> getUserJobResourcesAggregates();
 
     /**
-     * Find agent jobs in the given set of states that don't have an entry in the connections table.
+     * Find agent jobs in the given set of states.
      *
      * @param statuses the job statuses filter
      * @return a set of job projections
@@ -139,7 +139,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
             + " FROM JobEntity j"
             + " WHERE j.status IN (:statuses)"
             + " AND j.v4 = TRUE"
-            + " AND j.uniqueId NOT IN (SELECT c.jobId FROM AgentConnectionEntity c)"
     )
-    Set<UniqueIdProjection> getAgentJobIdsWithNoConnectionInState(@Param("statuses") @NotEmpty Set<String> statuses);
+    Set<UniqueIdProjection> getAgentJobIdsWithStatusIn(@Param("statuses") @NotEmpty Set<String> statuses);
 }

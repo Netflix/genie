@@ -1867,19 +1867,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getActiveDisconnectedAgentJobs() {
-        log.debug("[getActiveDisconnectedAgentJobs] Called");
-        return this.jobRepository.getAgentJobIdsWithNoConnectionInState(ACTIVE_STATUS_SET)
-            .stream()
-            .map(UniqueIdProjection::getUniqueId)
-            .collect(Collectors.toSet());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
     public long getAllocatedMemoryOnHost(@NotBlank final String hostname) {
         log.debug("[getAllocatedMemoryOnHost] Called for hostname {}", hostname);
         return this.jobRepository.getTotalMemoryUsedOnHost(hostname, ACTIVE_STATUS_SET);
@@ -1903,6 +1890,19 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public long getActiveJobCountOnHost(@NotBlank final String hostname) {
         log.debug("[getActiveJobCountOnHost] Called for hostname {}", hostname);
         return this.jobRepository.countByAgentHostnameAndStatusIn(hostname, ACTIVE_STATUS_SET);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getActiveAgentJobs() {
+        log.debug("[getActiveAgentJobs] Called");
+        return this.jobRepository.getAgentJobIdsWithStatusIn(ACTIVE_STATUS_SET)
+            .stream()
+            .map(UniqueIdProjection::getUniqueId)
+            .collect(Collectors.toSet());
     }
     //endregion
     //endregion
@@ -2141,16 +2141,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Optional<String> lookupAgentConnectionServer(@NotBlank final String jobId) {
         log.debug("[lookupAgentConnectionServer] Called for job id {}", jobId);
         return this.getAgentConnectionEntity(jobId).map(AgentConnectionEntity::getServerHostname);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public long getNumAgentConnectionsOnServer(@NotBlank final String hostname) {
-        log.debug("[getNumAgentConnectionsOnServer] Called for hostname {}", hostname);
-        return this.agentConnectionRepository.countByServerHostnameEquals(hostname);
     }
 
     /**
