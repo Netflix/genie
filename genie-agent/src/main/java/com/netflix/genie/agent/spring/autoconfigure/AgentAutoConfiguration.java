@@ -20,6 +20,8 @@ package com.netflix.genie.agent.spring.autoconfigure;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.AgentMetadataImpl;
 import com.netflix.genie.agent.utils.locks.impl.FileLockFactory;
+import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.common.internal.util.HostnameUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +30,8 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import java.net.UnknownHostException;
 
 /**
  * Configuration for various agent beans.
@@ -39,15 +43,29 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 public class AgentAutoConfiguration {
 
     /**
+     * Provide a bean of type {@link GenieHostInfo} if none already exists.
+     *
+     * @return A {@link GenieHostInfo} instance
+     * @throws UnknownHostException if hostname cannot be determined
+     */
+    @Bean
+    @ConditionalOnMissingBean(GenieHostInfo.class)
+    public GenieHostInfo genieAgentHostInfo() throws UnknownHostException {
+        final String hostname = HostnameUtil.getHostname();
+        return new GenieHostInfo(hostname);
+    }
+
+    /**
      * Provide a lazy bean definition for {@link AgentMetadata} if none already exists.
      *
+     * @param genieHostInfo the host information
      * @return A {@link AgentMetadataImpl} instance
      */
     @Bean
     @Lazy
     @ConditionalOnMissingBean(AgentMetadata.class)
-    public AgentMetadataImpl agentMetadata() {
-        return new AgentMetadataImpl();
+    public AgentMetadataImpl agentMetadata(final GenieHostInfo genieHostInfo) {
+        return new AgentMetadataImpl(genieHostInfo.getHostname());
     }
 
     /**

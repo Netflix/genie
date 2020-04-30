@@ -17,16 +17,14 @@
  */
 package com.netflix.genie.web.spring.autoconfigure.introspection;
 
-import com.amazonaws.util.EC2MetadataUtils;
+import com.netflix.genie.common.internal.util.HostnameUtil;
 import com.netflix.genie.web.agent.apis.rpc.servers.GRpcServerUtils;
 import com.netflix.genie.web.introspection.GenieWebHostInfo;
 import com.netflix.genie.web.introspection.GenieWebRpcInfo;
 import com.netflix.genie.web.spring.autoconfigure.agent.apis.rpc.servers.AgentRpcServersAutoConfiguration;
 import io.grpc.Server;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.cloud.aws.context.support.env.AwsCloudEnvironmentCheckUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -59,18 +57,7 @@ public class IntrospectionAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(GenieWebHostInfo.class)
     public GenieWebHostInfo genieHostInfo() throws UnknownHostException {
-        final String hostname;
-        if (AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment()) {
-            hostname = EC2MetadataUtils.getPrivateIpAddress();
-        } else {
-            // Fallback if not on AWS
-            hostname = InetAddress.getLocalHost().getCanonicalHostName();
-        }
-
-        if (StringUtils.isBlank(hostname)) {
-            throw new IllegalStateException("Unable to create a Genie Host Info instance as hostname is blank");
-        }
-
+        final String hostname = HostnameUtil.getHostname();
         return new GenieWebHostInfo(hostname);
     }
 

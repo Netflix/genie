@@ -21,13 +21,26 @@ import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
 
 class AgentMetadataImplSpec extends Specification {
-    def "Construct"() {
+    def "Construct without arguments"() {
         when:
-        AgentMetadata agentMetadata = new AgentMetadataImpl();
+        AgentMetadata agentMetadata = new AgentMetadataImpl()
 
         then:
         !StringUtils.isBlank(agentMetadata.getAgentVersion())
         !StringUtils.isBlank(agentMetadata.getAgentHostName())
+        !StringUtils.isBlank(agentMetadata.getAgentPid())
+    }
+
+    def "Construct with hostname"() {
+        setup:
+        String hostname = UUID.randomUUID().toString()
+
+        when:
+        AgentMetadata agentMetadata = new AgentMetadataImpl(hostname)
+
+        then:
+        !StringUtils.isBlank(agentMetadata.getAgentVersion())
+        agentMetadata.getAgentHostName() == hostname
         !StringUtils.isBlank(agentMetadata.getAgentPid())
     }
 }
