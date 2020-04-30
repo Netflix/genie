@@ -18,14 +18,18 @@
 package com.netflix.genie.web.agent.services.impl;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.agent.services.AgentRoutingService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -40,7 +44,7 @@ import java.util.function.Supplier;
  * @since 4.0.0
  */
 @Slf4j
-public class AgentConnectionTrackingServiceImpl implements AgentConnectionTrackingService {
+public class AgentConnectionTrackingServiceImpl implements AgentConnectionTrackingService, InfoContributor {
 
     // Minimum time from the last heartbeat before a stream is considered expired
     protected static final int STREAM_EXPIRATION_PERIOD = 10_000; // TODO: Make configurable
@@ -178,6 +182,15 @@ public class AgentConnectionTrackingServiceImpl implements AgentConnectionTracki
         this.jobStreamRecordsMap.forEach(
             (jobId, record) -> record.expungeExpiredStreams(cutoff)
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contribute(final Info.Builder builder) {
+        final List<String> jobIds = ImmutableList.copyOf(this.jobStreamRecordsMap.keySet());
+        builder.withDetail("connectedAgents", jobIds);
     }
 
     private static final class JobStreamsRecord {
