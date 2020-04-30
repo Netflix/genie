@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Leader task that cleans up jobs whose agent crashed or disconnected.
@@ -48,22 +50,26 @@ public class AgentJobCleanupTask extends LeaderTask {
     private final PersistenceService persistenceService;
     private final AgentCleanupProperties properties;
     private final MeterRegistry registry;
+    private final AgentRoutingService agentRoutingService;
 
     /**
      * Constructor.
      *
-     * @param dataServices The {@link DataServices} encapsulation instance to use
-     * @param properties   the task properties
-     * @param registry     the metrics registry
+     * @param dataServices        The {@link DataServices} encapsulation instance to use
+     * @param properties          the task properties
+     * @param registry            the metrics registry
+     * @param agentRoutingService the agent routing service
      */
     public AgentJobCleanupTask(
         final DataServices dataServices,
         final AgentCleanupProperties properties,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final AgentRoutingService agentRoutingService
     ) {
         this.persistenceService = dataServices.getPersistenceService();
         this.properties = properties;
         this.registry = registry;
+        this.agentRoutingService = agentRoutingService;
         this.awolJobDeadlines = Maps.newConcurrentMap();
 
         // Auto-publish number of jobs tracked for shutdown due to agent not being connected.
@@ -79,8 +85,13 @@ public class AgentJobCleanupTask extends LeaderTask {
      */
     @Override
     public void run() {
-        // Get agent jobs that in active status but but not connected to any node
-        final Set<String> currentlyAwolJobsIds = this.persistenceService.getActiveDisconnectedAgentJobs();
+        // Get agent jobs that in active status
+        final Set<String> activeAgentJobIds = this.persistenceService.getActiveAgentJobs();
+
+        // Filter out jobs whose agent is connected
+        final Set<String> currentlyAwolJobsIds = activeAgentJobIds.stream()
+            .filter(jobId -> !this.agentRoutingService.isAgentConnected(jobId))
+            .collect(Collectors.toSet());
 
         // If any previously AWOL job that does not appear in the "currently AWOL" list has either re-connected
         // or completed. Throw away their records.

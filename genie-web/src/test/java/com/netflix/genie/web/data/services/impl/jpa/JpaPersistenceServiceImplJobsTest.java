@@ -1119,30 +1119,6 @@ class JpaPersistenceServiceImplJobsTest {
         Assertions.assertThat(this.persistenceService.getUserResourcesSummaries()).isEqualTo(expectedMap);
     }
 
-    @Test
-    void canGetDisconnectedAgentJobsNoRecords() {
-        Mockito
-            .when(this.jobRepository.getAgentJobIdsWithNoConnectionInState(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
-            .thenReturn(Sets.newHashSet());
-        Assertions.assertThat(this.persistenceService.getActiveDisconnectedAgentJobs()).isEmpty();
-    }
-
-    @Test
-    void canGetDisconnectedAgentJobs() {
-        final UniqueIdProjection p1 = Mockito.mock(UniqueIdProjection.class);
-        final UniqueIdProjection p2 = Mockito.mock(UniqueIdProjection.class);
-
-        Mockito.when(p1.getUniqueId()).thenReturn("job1");
-        Mockito.when(p2.getUniqueId()).thenReturn("job2");
-
-        Mockito
-            .when(this.jobRepository.getAgentJobIdsWithNoConnectionInState(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
-            .thenReturn(Sets.newHashSet(p1, p2));
-
-        Assertions
-            .assertThat(this.persistenceService.getActiveDisconnectedAgentJobs())
-            .isEqualTo(Sets.newHashSet("job1", "job2"));
-    }
 
     @Test
     void canGetAllocatedMemoryOnHost() {
@@ -1183,5 +1159,37 @@ class JpaPersistenceServiceImplJobsTest {
             .thenReturn(totalJobs);
 
         Assertions.assertThat(this.persistenceService.getActiveJobCountOnHost(hostname)).isEqualTo(totalJobs);
+    }
+
+    @Test
+    void canGetActiveAgentJobs() {
+        final String jobId1 = UUID.randomUUID().toString();
+        final String jobId2 = UUID.randomUUID().toString();
+
+        final UniqueIdProjection job1 = Mockito.mock(UniqueIdProjection.class);
+        final UniqueIdProjection job2 = Mockito.mock(UniqueIdProjection.class);
+
+        Mockito.when(job1.getUniqueId()).thenReturn(jobId1);
+        Mockito.when(job2.getUniqueId()).thenReturn(jobId2);
+
+        Mockito
+            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
+            .thenReturn(Sets.newHashSet(job1, job2));
+
+        Assertions
+            .assertThat(this.persistenceService.getActiveAgentJobs())
+            .isEqualTo(Sets.newHashSet(jobId1, jobId2));
+    }
+
+    @Test
+    void canGetActiveAgentJobsWhenEmpty() {
+
+        Mockito
+            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
+            .thenReturn(Sets.newHashSet());
+
+        Assertions
+            .assertThat(this.persistenceService.getActiveAgentJobs())
+            .isEqualTo(Sets.newHashSet());
     }
 }

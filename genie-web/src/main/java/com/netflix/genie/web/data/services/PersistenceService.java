@@ -996,13 +996,6 @@ public interface PersistenceService {
     Map<String, UserResourcesSummary> getUserResourcesSummaries();
 
     /**
-     * Get the IDs of all agent jobs that are active but currently not connected to any node.
-     *
-     * @return a set of job ids
-     */
-    Set<String> getActiveDisconnectedAgentJobs();
-
-    /**
      * Get the amount of memory currently allocated on the given host by Genie jobs that are currently active.
      *
      * @param hostname The hostname to get the memory for
@@ -1031,6 +1024,13 @@ public interface PersistenceService {
      * @see JobStatus#getActiveStatuses()
      */
     long getActiveJobCountOnHost(@NotBlank String hostname);
+
+    /**
+     * Get the set of active agent jobs.
+     *
+     * @return The list of job ids
+     */
+    Set<String> getActiveAgentJobs();
     //endregion
     //endregion
 
@@ -1279,14 +1279,6 @@ public interface PersistenceService {
      * @return the server hostname or empty
      */
     Optional<String> lookupAgentConnectionServer(@NotBlank String jobId);
-
-    /**
-     * Get the number of active agent connections on Genie server with the given {@code hostname}.
-     *
-     * @param hostname The server hostname to get the count for
-     * @return The number of agents currently connected to the given server
-     */
-    long getNumAgentConnectionsOnServer(@NotBlank String hostname);
 
     /**
      * Drop all records of agent connections to the specified hostname.

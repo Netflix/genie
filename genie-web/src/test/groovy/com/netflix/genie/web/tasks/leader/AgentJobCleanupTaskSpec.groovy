@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.leader
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieException
+import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
 import com.netflix.genie.web.properties.AgentCleanupProperties
@@ -37,6 +38,7 @@ class AgentJobCleanupTaskSpec extends Specification {
     AgentCleanupProperties taskProperties
     MeterRegistry registry
     Counter counter
+    AgentRoutingService agentRoutingService
 
     void setup() {
         this.persistenceService = Mock(PersistenceService)
@@ -46,10 +48,12 @@ class AgentJobCleanupTaskSpec extends Specification {
         this.taskProperties = Mock(AgentCleanupProperties)
         this.registry = Mock(MeterRegistry)
         this.counter = Mock(Counter)
+        this.agentRoutingService = Mock(AgentRoutingService)
         this.task = new AgentJobCleanupTask(
             dataServices,
             this.taskProperties,
-            this.registry
+            this.registry,
+            agentRoutingService
         )
     }
 
@@ -70,14 +74,19 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j1", "j2")
+        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
+        1 * agentRoutingService.isAgentConnected("j1") >> false
+        1 * agentRoutingService.isAgentConnected("j2") >> false
+        1 * agentRoutingService.isAgentConnected("j3") >> true
+        1 * agentRoutingService.isAgentConnected("j4") >> true
         2 * taskProperties.getTimeLimit() >> -1 // Make sure it's past deadline next iteration
 
         when:
         task.run()
 
         then:
-        1 * persistenceService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
+        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
+        4 * agentRoutingService.isAgentConnected(_) >> false
         2 * taskProperties.getTimeLimit() >> 1_000_000L // Make sure it not expiring
         1 * persistenceService.setJobCompletionInformation("j1", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
         1 * persistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null) >> {
@@ -91,10 +100,10 @@ class AgentJobCleanupTaskSpec extends Specification {
         task.run()
 
         then:
-        1 * persistenceService.getActiveDisconnectedAgentJobs() >> Sets.newHashSet("j2", "j3")
-        1 * persistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
-        1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
-        1 * counter.increment()
+        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j3", "j4")
+        1 * agentRoutingService.isAgentConnected("j3") >> false
+        1 * agentRoutingService.isAgentConnected("j4") >> true
+        0 * persistenceService._
 
         when:
         task.cleanup()

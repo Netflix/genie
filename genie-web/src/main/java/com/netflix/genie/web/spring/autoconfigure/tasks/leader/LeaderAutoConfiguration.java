@@ -18,6 +18,7 @@
 package com.netflix.genie.web.spring.autoconfigure.tasks.leader;
 
 import com.netflix.genie.common.internal.util.GenieHostInfo;
+import com.netflix.genie.web.agent.services.AgentRoutingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.AgentCleanupProperties;
@@ -182,6 +183,7 @@ public class LeaderAutoConfiguration {
      * @param dataServices           The {@link DataServices} encapsulation instance to use
      * @param agentCleanupProperties the agent cleanup properties
      * @param registry               the metrics registry
+     * @param agentRoutingService    the agent routing service
      * @return a {@link AgentJobCleanupTask}
      */
     @Bean
@@ -190,12 +192,14 @@ public class LeaderAutoConfiguration {
     public AgentJobCleanupTask agentJobCleanupTask(
         final DataServices dataServices,
         final AgentCleanupProperties agentCleanupProperties,
-        final MeterRegistry registry
+        final MeterRegistry registry,
+        final AgentRoutingService agentRoutingService
     ) {
         return new AgentJobCleanupTask(
             dataServices,
             agentCleanupProperties,
-            registry
+            registry,
+            agentRoutingService
         );
     }
 

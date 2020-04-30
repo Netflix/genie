@@ -102,6 +102,8 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     private static final String JOB_1_ID = "job1";
     private static final String JOB_2_ID = "job2";
     private static final String JOB_3_ID = "job3";
+    private static final String AGENT_JOB_1 = "agentJob1";
+    private static final String AGENT_JOB_2 = "agentJob2";
 
     // Job Request fields
     private static final String UNIQUE_ID = UUID.randomUUID().toString();
@@ -1152,12 +1154,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
-    void canGetActiveDisconnectedAgentJobs() {
-        Assertions.assertThat(this.service.getActiveDisconnectedAgentJobs()).hasSize(1).containsOnly("agentJob1");
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/search.xml")
     void canGetAllocatedMemoryOnHost() {
         Assertions.assertThat(this.service.getAllocatedMemoryOnHost("a.netflix.com")).isEqualTo(2048L);
         Assertions.assertThat(this.service.getAllocatedMemoryOnHost("b.netflix.com")).isEqualTo(2048L);
@@ -1181,6 +1177,16 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(this.service.getActiveJobCountOnHost("b.netflix.com")).isEqualTo(1L);
         Assertions.assertThat(this.service.getActiveJobCountOnHost("agent.netflix.com")).isEqualTo(2L);
         Assertions.assertThat(this.service.getActiveJobCountOnHost(UUID.randomUUID().toString())).isEqualTo(0L);
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/search.xml")
+    void canGetAgentActiveJobs() {
+
+        Assertions
+            .assertThat(this.service.getActiveAgentJobs())
+            .hasSize(2)
+            .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
