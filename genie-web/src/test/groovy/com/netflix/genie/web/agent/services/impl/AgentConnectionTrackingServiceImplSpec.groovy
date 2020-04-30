@@ -18,6 +18,7 @@
 package com.netflix.genie.web.agent.services.impl
 
 import com.netflix.genie.web.agent.services.AgentRoutingService
+import org.springframework.boot.actuate.info.Info
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 
@@ -136,7 +137,6 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         String jobId = UUID.randomUUID().toString()
         String stream1 = UUID.randomUUID().toString()
         String stream2 = UUID.randomUUID().toString()
-        String stream3 = UUID.randomUUID().toString()
         Instant currentTime = Instant.now()
 
         when:
@@ -217,5 +217,59 @@ class AgentConnectionTrackingServiceImplSpec extends Specification {
         then:
         1 * timeSupplier.get() >> { throw new RuntimeException() }
         noExceptionThrown()
+    }
+
+    def "Contribute info detail"() {
+        setup:
+        Runnable cleanupTask
+        String agent1streamId = UUID.randomUUID().toString()
+        String agent2streamId = UUID.randomUUID().toString()
+        String agent1jobId = UUID.randomUUID().toString()
+        String agent2jobId = UUID.randomUUID().toString()
+        Instant currentTime
+        List<String> connectedAgents
+        Info.Builder infoBuilder = Mock(Info.Builder)
+
+        when:
+        this.service = new AgentConnectionTrackingServiceImpl(agentRoutingService, taskScheduler, timeSupplier)
+
+        then:
+        1 * taskScheduler.scheduleAtFixedRate(_ as Runnable, _ as Long) >> Mock(ScheduledFuture)
+
+        when:
+        connectedAgents = null
+        service.contribute(infoBuilder)
+
+        then:
+        1 * infoBuilder.withDetail("connectedAgents", _ as List<String>) >> {
+            args ->
+                connectedAgents = args[1] as List<String>
+                return infoBuilder
+        }
+        connectedAgents != null
+        connectedAgents.size() == 0
+
+        when:
+        currentTime = Instant.now()
+        service.notifyHeartbeat(agent1streamId, agent1jobId)
+        service.notifyHeartbeat(agent2streamId, agent2jobId)
+
+        then:
+        2 * timeSupplier.get() >> { return currentTime }
+
+        when:
+        connectedAgents = null
+        service.contribute(infoBuilder)
+
+        then:
+        1 * infoBuilder.withDetail("connectedAgents", _ as List<String>) >> {
+            args ->
+                connectedAgents = args[1] as List<String>
+                return infoBuilder
+        }
+        connectedAgents != null
+        connectedAgents.size() == 2
+        connectedAgents.contains(agent1jobId)
+        connectedAgents.contains(agent2jobId)
     }
 }
