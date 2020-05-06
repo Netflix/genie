@@ -1,4 +1,4 @@
-import com.github.spotbugs.SpotBugsTask
+import com.github.spotbugs.snom.SpotBugsTask
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
@@ -13,17 +13,17 @@ buildscript {
 }
 
 plugins {
-    id "com.github.kt3k.coveralls" version "2.9.0"
-    id "nebula.netflixoss" version "8.6.0"
+    id "com.github.kt3k.coveralls" version "2.10.1"
+    id "nebula.netflixoss" version "8.8.1"
     id "org.ajoberstar.grgit" version "3.1.1"
     id "org.ajoberstar.git-publish" version "2.1.1"
     id "org.springframework.boot" version "${spring_boot_version}" apply false
-    id "org.asciidoctor.jvm.convert" version "2.4.0" apply false
-    id "com.gorylenko.gradle-git-properties" version "2.0.0" apply false
-    id "com.google.protobuf" version "0.8.11" apply false
-    id "io.franzbecker.gradle-lombok" version "3.2.0" apply false
-    id "nebula.node" version "1.3.0" apply false
-    id "com.github.spotbugs" version "3.0.0" apply false
+    id "org.asciidoctor.jvm.convert" version "3.2.0" apply false
+    id "com.gorylenko.gradle-git-properties" version "2.2.2" apply false
+    id "com.google.protobuf" version "0.8.12" apply false
+    id "io.franzbecker.gradle-lombok" version "3.3.0" apply false
+    id "nebula.node" version "1.3.1" apply false
+    id "com.github.spotbugs" version "4.0.8" apply false
 }
 
 apply plugin: "nebula-aggregate-javadocs"
@@ -309,9 +309,8 @@ configure(javaProjects) {
     }
 
     pmd {
-        // Gradle 5 upgraded PMD to 6.7 (https://github.com/gradle/gradle/issues/6625)
-        // This caused all kinds of errors in our build. Pin back for now and upgrade at our own pace or look further
-        toolVersion = "5.6.1"
+        toolVersion = "6.21.0"
+        ignoreFailures = true
     }
 
     tasks.withType(Pmd) {
