@@ -174,17 +174,19 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentMetricsServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentMetricsServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentMetricsService-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.data.services.PersistenceService-io.micrometer.core.instrument.MeterRegistry-">agentMetricsService</a></span>(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
-                   <a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
-                   io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
-<div class="block">Provide an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentMetricsService</code></a> if one hasn't been provided.</div>
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">agentRoutingServiceCurator</a></span>(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
+                          org.apache.curator.x.discovery.ServiceDiscovery&lt;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.Agent.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl.Agent</a>&gt;&nbsp;serviceDiscovery,
+                          org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                          org.apache.curator.framework.listen.Listenable&lt;org.apache.curator.framework.state.ConnectionStateListener&gt;&nbsp;listenableCuratorConnectionState,
+                          io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</code>
+<div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingService-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">agentRoutingService</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
-                   <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
+<td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/spring/autoconfigure/agent/services/AgentServicesAutoConfiguration.html#agentRoutingServicePersistence-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">agentRoutingServicePersistence</a></span>(<a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
+                              <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
 <div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
 </td>
 </tr>
@@ -272,17 +274,18 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 </dl>
 </li>
 </ul>
-<a name="agentRoutingService-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">
+<a name="agentRoutingServicePersistence-com.netflix.genie.web.data.services.PersistenceService-com.netflix.genie.common.internal.util.GenieHostInfo-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>agentRoutingService</h4>
+<h4>agentRoutingServicePersistence</h4>
 <pre>@Bean
- @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService.class</a>)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceImpl</a>&nbsp;agentRoutingService(<a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
-                                                                                                                     <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
-<div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.</div>
+ @ConditionalOnMissingBean(value={<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService.class</a>,org.apache.curator.x.discovery.ServiceDiscovery.class})
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingServicePersistence(<a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
+                                                                                                                                                                                    <a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
+<div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.
+ This bean is created if Zookeeper is disabled. This implementation stores connections using persistence service.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>persistenceService</code> - The persistence service to use for agent connections</dd>
@@ -292,10 +295,39 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 </dl>
 </li>
 </ul>
-<a name="agentFilterService-java.util.List-">
+<a name="agentRoutingServiceCurator-com.netflix.genie.common.internal.util.GenieHostInfo-org.apache.curator.x.discovery.ServiceDiscovery-org.springframework.scheduling.TaskScheduler-org.apache.curator.framework.listen.Listenable-io.micrometer.core.instrument.MeterRegistry-">
 <!--   -->
 </a>
 <ul class="blockList">
+<li class="blockList">
+<h4>agentRoutingServiceCurator</h4>
+<pre>@Bean
+ @ConditionalOnBean(value=org.apache.curator.x.discovery.ServiceDiscovery.class)
+ @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService.class</a>)
+public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services">AgentRoutingService</a>&nbsp;agentRoutingServiceCurator(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
+                                                                                                                                                                                                         org.apache.curator.x.discovery.ServiceDiscovery&lt;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceCuratorDiscoveryImpl.Agent.html" title="class in com.netflix.genie.web.agent.services.impl">AgentRoutingServiceCuratorDiscoveryImpl.Agent</a>&gt;&nbsp;serviceDiscovery,
+                                                                                                                                                                                                         @Qualifier(value="genieTaskScheduler")
+                                                                                                                                                                                                         org.springframework.scheduling.TaskScheduler&nbsp;taskScheduler,
+                                                                                                                                                                                                         org.apache.curator.framework.listen.Listenable&lt;org.apache.curator.framework.state.ConnectionStateListener&gt;&nbsp;listenableCuratorConnectionState,
+                                                                                                                                                                                                         io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
+<div class="block">Get an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a> if one hasn't already been defined.
+ This bean is created if Zookeeper is enabled, it uses Curator's <code>ServiceDiscovery</code>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>genieHostInfo</code> - The local genie host information</dd>
+<dd><code>serviceDiscovery</code> - The Zookeeper Curator service discovery</dd>
+<dd><code>taskScheduler</code> - The task scheduler</dd>
+<dd><code>listenableCuratorConnectionState</code> - the connection state listenable</dd>
+<dd><code>registry</code> - The metrics registry</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentRoutingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentRoutingServiceImpl</code></a> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="agentFilterService-java.util.List-">
+<!--   -->
+</a>
+<ul class="blockListLast">
 <li class="blockList">
 <h4>agentFilterService</h4>
 <pre>@Bean
@@ -308,29 +340,6 @@ public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/service
 <dd><code>agentMetadataInspectorsList</code> - the list of inspectors.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentFilterService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentFilterService</code></a> instance.</dd>
-</dl>
-</li>
-</ul>
-<a name="agentMetricsService-com.netflix.genie.common.internal.util.GenieHostInfo-com.netflix.genie.web.data.services.PersistenceService-io.micrometer.core.instrument.MeterRegistry-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>agentMetricsService</h4>
-<pre>@Bean
- @ConditionalOnMissingBean(value=<a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services">AgentMetricsService.class</a>)
-public&nbsp;<a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentMetricsServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentMetricsServiceImpl</a>&nbsp;agentMetricsService(<a href="../../../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo,
-                                                                                                                     <a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a>&nbsp;persistenceService,
-                                                                                                                     io.micrometer.core.instrument.MeterRegistry&nbsp;registry)</pre>
-<div class="block">Provide an implementation of <a href="../../../../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentMetricsService</code></a> if one hasn't been provided.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>genieHostInfo</code> - The Genie host information</dd>
-<dd><code>persistenceService</code> - Implementation of <a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> to get information about running agents
-                           in the ecosystem</dd>
-<dd><code>registry</code> - The metrics repository</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>An instance of <a href="../../../../../../../../com/netflix/genie/web/agent/services/impl/AgentMetricsServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl"><code>AgentMetricsServiceImpl</code></a></dd>
 </dl>
 </li>
 </ul>

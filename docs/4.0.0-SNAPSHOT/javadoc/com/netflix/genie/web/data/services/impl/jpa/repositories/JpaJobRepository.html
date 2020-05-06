@@ -182,8 +182,8 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/UniqueIdProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">UniqueIdProjection</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getAgentJobIdsWithNoConnectionInState-java.util.Set-">getAgentJobIdsWithNoConnectionInState</a></span>(@NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
-<div class="block">Find agent jobs in the given set of states that don't have an entry in the connections table.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getAgentJobIdsWithStatusIn-java.util.Set-">getAgentJobIdsWithStatusIn</a></span>(@NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</code>
+<div class="block">Find agent jobs in the given set of states.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
@@ -412,16 +412,16 @@ java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/
 </dl>
 </li>
 </ul>
-<a name="getAgentJobIdsWithNoConnectionInState-java.util.Set-">
+<a name="getAgentJobIdsWithStatusIn-java.util.Set-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>getAgentJobIdsWithNoConnectionInState</h4>
-<pre>@Query(value="SELECT j FROM JobEntity j WHERE j.status IN (:statuses) AND j.v4 = TRUE AND j.uniqueId NOT IN (SELECT c.jobId FROM AgentConnectionEntity c)")
-java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/UniqueIdProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">UniqueIdProjection</a>&gt;&nbsp;getAgentJobIdsWithNoConnectionInState(@Param(value="statuses") @NotEmpty
-                                                                                                                                                                                                                                    @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</pre>
-<div class="block">Find agent jobs in the given set of states that don't have an entry in the connections table.</div>
+<h4>getAgentJobIdsWithStatusIn</h4>
+<pre>@Query(value="SELECT j FROM JobEntity j WHERE j.status IN (:statuses) AND j.v4 = TRUE")
+java.util.Set&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/queries/projections/UniqueIdProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections">UniqueIdProjection</a>&gt;&nbsp;getAgentJobIdsWithStatusIn(@Param(value="statuses") @NotEmpty
+                                                                                                                                                     @NotEmpty java.util.Set&lt;java.lang.String&gt;&nbsp;statuses)</pre>
+<div class="block">Find agent jobs in the given set of states.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>statuses</code> - the job statuses filter</dd>

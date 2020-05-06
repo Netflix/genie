@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":42,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10,"i47":10,"i48":10,"i49":10,"i50":10,"i51":10,"i52":10,"i53":10,"i54":10,"i55":10,"i56":10,"i57":10,"i58":10,"i59":10,"i60":10,"i61":42,"i62":10,"i63":10,"i64":10,"i65":10,"i66":10,"i67":10,"i68":10,"i69":10,"i70":10,"i71":10,"i72":10,"i73":10,"i74":10,"i75":10,"i76":10,"i77":10,"i78":10,"i79":10,"i80":10,"i81":10,"i82":10,"i83":10,"i84":10,"i85":10,"i86":10,"i87":10,"i88":42,"i89":42,"i90":10,"i91":10,"i92":10,"i93":10,"i94":10,"i95":10,"i96":42,"i97":42,"i98":10,"i99":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":42,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10,"i47":10,"i48":10,"i49":10,"i50":10,"i51":10,"i52":10,"i53":10,"i54":10,"i55":10,"i56":10,"i57":10,"i58":10,"i59":10,"i60":42,"i61":10,"i62":10,"i63":10,"i64":10,"i65":10,"i66":10,"i67":10,"i68":10,"i69":10,"i70":10,"i71":10,"i72":10,"i73":10,"i74":10,"i75":10,"i76":10,"i77":10,"i78":10,"i79":10,"i80":10,"i81":10,"i82":10,"i83":10,"i84":10,"i85":10,"i86":10,"i87":42,"i88":42,"i89":10,"i90":10,"i91":10,"i92":10,"i93":10,"i94":10,"i95":42,"i96":42,"i97":10,"i98":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -389,8 +389,8 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 </tr>
 <tr id="i29" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveDisconnectedAgentJobs--">getActiveDisconnectedAgentJobs</a></span>()</code>
-<div class="block">Get the IDs of all agent jobs that are active but currently not connected to any node.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getActiveAgentJobs--">getActiveAgentJobs</a></span>()</code>
+<div class="block">Get the set of active agent jobs.</div>
 </td>
 </tr>
 <tr id="i30" class="altColor">
@@ -562,114 +562,108 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 </td>
 </tr>
 <tr id="i57" class="rowColor">
-<td class="colFirst"><code>long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getNumAgentConnectionsOnServer-java.lang.String-">getNumAgentConnectionsOnServer</a></span>(@NotBlank java.lang.String&nbsp;hostname)</code>
-<div class="block">Get the number of active agent connections on Genie server with the given <code>hostname</code>.</div>
-</td>
-</tr>
-<tr id="i58" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getTagsForResource-java.lang.String-java.lang.Class-">getTagsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                   java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Get the set of tags associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i59" class="rowColor">
+<tr id="i58" class="altColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUsedMemoryOnHost-java.lang.String-">getUsedMemoryOnHost</a></span>(@NotBlank java.lang.String&nbsp;hostname)</code>
 <div class="block">Get the amount of memory currently used on the given host by Genie jobs in any of the following states.</div>
 </td>
 </tr>
-<tr id="i60" class="altColor">
+<tr id="i59" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,<a href="../../../../../../../../com/netflix/genie/common/dto/UserResourcesSummary.html" title="class in com.netflix.genie.common.dto">UserResourcesSummary</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUserResourcesSummaries--">getUserResourcesSummaries</a></span>()</code>
 <div class="block">Get a map of summaries of resources usage for each user with at least one running job.</div>
 </td>
 </tr>
-<tr id="i61" class="rowColor">
+<tr id="i60" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../../com/netflix/genie/common/dto/JobRequest.html" title="class in com.netflix.genie.common.dto">JobRequest</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getV3JobRequest-java.lang.String-">getV3JobRequest</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 </td>
 </tr>
-<tr id="i62" class="altColor">
+<tr id="i61" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#isApiJob-java.lang.String-">isApiJob</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Get whether the job with the given ID was submitted via the REST API or other mechanism.</div>
 </td>
 </tr>
-<tr id="i63" class="rowColor">
+<tr id="i62" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#isV4-java.lang.String-">isV4</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Get whether the job is a V4 job (Run with agent).</div>
 </td>
 </tr>
-<tr id="i64" class="altColor">
+<tr id="i63" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#lookupAgentConnectionServer-java.lang.String-">lookupAgentConnectionServer</a></span>(@NotBlank java.lang.String&nbsp;jobId)</code>
 <div class="block">Lookup the hostname/address of the server with an active connection to a given agent.</div>
 </td>
 </tr>
-<tr id="i65" class="rowColor">
+<tr id="i64" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAgentConnection-java.lang.String-java.lang.String-">removeAgentConnection</a></span>(@NotBlank java.lang.String&nbsp;jobId,
                      @NotBlank java.lang.String&nbsp;hostname)</code>
 <div class="block">Remove an existing connection currently active from the given agent to the local node.</div>
 </td>
 </tr>
-<tr id="i66" class="altColor">
+<tr id="i65" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAllAgentConnectionsToServer-java.lang.String-">removeAllAgentConnectionsToServer</a></span>(@NotBlank java.lang.String&nbsp;hostname)</code>
 <div class="block">Drop all records of agent connections to the specified hostname.</div>
 </td>
 </tr>
-<tr id="i67" class="rowColor">
+<tr id="i66" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAllClusterCriteriaForCommand-java.lang.String-">removeAllClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id)</code>
 <div class="block">Remove all the <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> currently associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i68" class="altColor">
+<tr id="i67" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAllCommandsForCluster-java.lang.String-">removeAllCommandsForCluster</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Remove all commands from the cluster.</div>
 </td>
 </tr>
-<tr id="i69" class="rowColor">
+<tr id="i68" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAllConfigsForResource-java.lang.String-java.lang.Class-">removeAllConfigsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                            java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Remove all configuration files from the resource.</div>
 </td>
 </tr>
-<tr id="i70" class="altColor">
+<tr id="i69" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAllDependenciesForResource-java.lang.String-java.lang.Class-">removeAllDependenciesForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                                 java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Remove all dependency files from the resource.</div>
 </td>
 </tr>
-<tr id="i71" class="rowColor">
+<tr id="i70" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeAllTagsForResource-java.lang.String-java.lang.Class-">removeAllTagsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                         java.lang.Class&lt;R&gt;&nbsp;resourceClass)</code>
 <div class="block">Remove all tags from the resource.</div>
 </td>
 </tr>
-<tr id="i72" class="altColor">
+<tr id="i71" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeApplicationForCommand-java.lang.String-java.lang.String-">removeApplicationForCommand</a></span>(@NotBlank java.lang.String&nbsp;id,
                            @NotBlank java.lang.String&nbsp;appId)</code>
 <div class="block">Remove the application from the command.</div>
 </td>
 </tr>
-<tr id="i73" class="rowColor">
+<tr id="i72" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeApplicationsForCommand-java.lang.String-">removeApplicationsForCommand</a></span>(@NotBlank java.lang.String&nbsp;id)</code>
 <div class="block">Remove all the applications from the command.</div>
 </td>
 </tr>
-<tr id="i74" class="altColor">
+<tr id="i73" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeClusterCriterionForCommand-java.lang.String-int-">removeClusterCriterionForCommand</a></span>(java.lang.String&nbsp;id,
                                 @Min(value=0L) int&nbsp;priority)</code>
@@ -677,14 +671,14 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
  associated with the command identified by id.</div>
 </td>
 </tr>
-<tr id="i75" class="rowColor">
+<tr id="i74" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeCommandForCluster-java.lang.String-java.lang.String-">removeCommandForCluster</a></span>(@NotBlank java.lang.String&nbsp;id,
                        @NotBlank java.lang.String&nbsp;cmdId)</code>
 <div class="block">Remove a command from the cluster.</div>
 </td>
 </tr>
-<tr id="i76" class="altColor">
+<tr id="i75" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeConfigForResource-java.lang.String-java.lang.String-java.lang.Class-">removeConfigForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                        @NotBlank java.lang.String&nbsp;config,
@@ -692,7 +686,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block">Remove a configuration file from the given resource.</div>
 </td>
 </tr>
-<tr id="i77" class="rowColor">
+<tr id="i76" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeDependencyForResource-java.lang.String-java.lang.String-java.lang.Class-">removeDependencyForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                            @NotBlank java.lang.String&nbsp;dependency,
@@ -700,7 +694,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block">Remove a dependency file from the given resource.</div>
 </td>
 </tr>
-<tr id="i78" class="altColor">
+<tr id="i77" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#removeTagForResource-java.lang.String-java.lang.String-java.lang.Class-">removeTagForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                     @NotBlank java.lang.String&nbsp;tag,
@@ -708,52 +702,52 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block">Remove a tag from the given resource.</div>
 </td>
 </tr>
-<tr id="i79" class="rowColor">
+<tr id="i78" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveAgentConnection-java.lang.String-java.lang.String-">saveAgentConnection</a></span>(@NotBlank java.lang.String&nbsp;jobId,
                    @NotBlank java.lang.String&nbsp;hostname)</code>
 <div class="block">Store a new connection currently active from the given agent to the given node.</div>
 </td>
 </tr>
-<tr id="i80" class="altColor">
+<tr id="i79" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveApplication-com.netflix.genie.common.external.dtos.v4.ApplicationRequest-">saveApplication</a></span>(@Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ApplicationRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationRequest</a>&nbsp;applicationRequest)</code>
 <div class="block">Save a new application.</div>
 </td>
 </tr>
-<tr id="i81" class="rowColor">
+<tr id="i80" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveCluster-com.netflix.genie.common.external.dtos.v4.ClusterRequest-">saveCluster</a></span>(@Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/ClusterRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest</a>&nbsp;clusterRequest)</code>
 <div class="block">Save a <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>.</div>
 </td>
 </tr>
-<tr id="i82" class="altColor">
+<tr id="i81" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveCommand-com.netflix.genie.common.external.dtos.v4.CommandRequest-">saveCommand</a></span>(@Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest</a>&nbsp;commandRequest)</code>
 <div class="block">Save a <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> in the system based on the given <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>CommandRequest</code></a>.</div>
 </td>
 </tr>
-<tr id="i83" class="rowColor">
+<tr id="i82" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveJobSubmission-com.netflix.genie.web.dtos.JobSubmission-">saveJobSubmission</a></span>(@Valid <a href="../../../../../../../../com/netflix/genie/web/dtos/JobSubmission.html" title="class in com.netflix.genie.web.dtos">JobSubmission</a>&nbsp;jobSubmission)</code>
 <div class="block">Save the given job submission information in the underlying data store.</div>
 </td>
 </tr>
-<tr id="i84" class="altColor">
+<tr id="i83" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#saveResolvedJob-java.lang.String-com.netflix.genie.web.dtos.ResolvedJob-">saveResolvedJob</a></span>(@NotBlank java.lang.String&nbsp;id,
                @Valid <a href="../../../../../../../../com/netflix/genie/web/dtos/ResolvedJob.html" title="class in com.netflix.genie.web.dtos">ResolvedJob</a>&nbsp;resolvedJob)</code>
 <div class="block">Save the given resolved details for a job.</div>
 </td>
 </tr>
-<tr id="i85" class="rowColor">
+<tr id="i84" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#setApplicationsForCommand-java.lang.String-java.util.List-">setApplicationsForCommand</a></span>(@NotBlank java.lang.String&nbsp;id,
                          @NotNull java.util.List&lt;java.lang.String&gt;&nbsp;applicationIds)</code>
 <div class="block">Set the applications for the command.</div>
 </td>
 </tr>
-<tr id="i86" class="altColor">
+<tr id="i85" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#setClusterCriteriaForCommand-java.lang.String-java.util.List-">setClusterCriteriaForCommand</a></span>(java.lang.String&nbsp;id,
                             java.util.List&lt;<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4">Criterion</a>&gt;&nbsp;clusterCriteria)</code>
@@ -761,14 +755,14 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
  clusterCriteria.</div>
 </td>
 </tr>
-<tr id="i87" class="rowColor">
+<tr id="i86" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#setCommandsForCluster-java.lang.String-java.util.List-">setCommandsForCluster</a></span>(@NotBlank java.lang.String&nbsp;id,
                      @NotNull java.util.List&lt;java.lang.String&gt;&nbsp;commandIds)</code>
 <div class="block">Update the set of command files associated with the cluster with given id.</div>
 </td>
 </tr>
-<tr id="i88" class="altColor">
+<tr id="i87" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#setJobCompletionInformation-java.lang.String-int-com.netflix.genie.common.dto.JobStatus-java.lang.String-java.lang.Long-java.lang.Long-">setJobCompletionInformation</a></span>(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
                            int&nbsp;exitCode,
@@ -779,7 +773,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 </td>
 </tr>
-<tr id="i89" class="rowColor">
+<tr id="i88" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#setJobRunningInformation-java.lang.String-int-long-java.time.Instant-">setJobRunningInformation</a></span>(@NotBlank java.lang.String&nbsp;id,
                         @Min(value=0L,message="Must be no lower than zero") int&nbsp;processId,
@@ -788,28 +782,28 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 </td>
 </tr>
-<tr id="i90" class="altColor">
+<tr id="i89" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateApplication-java.lang.String-com.netflix.genie.common.external.dtos.v4.Application-">updateApplication</a></span>(@NotBlank java.lang.String&nbsp;id,
                  @Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4">Application</a>&nbsp;updateApp)</code>
 <div class="block">Update an <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Application.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Application</code></a>.</div>
 </td>
 </tr>
-<tr id="i91" class="rowColor">
+<tr id="i90" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateCluster-java.lang.String-com.netflix.genie.common.external.dtos.v4.Cluster-">updateCluster</a></span>(@NotBlank java.lang.String&nbsp;id,
              @Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&nbsp;updateCluster)</code>
 <div class="block">Update a <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> with the given information.</div>
 </td>
 </tr>
-<tr id="i92" class="altColor">
+<tr id="i91" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateCommand-java.lang.String-com.netflix.genie.common.external.dtos.v4.Command-">updateCommand</a></span>(@NotBlank java.lang.String&nbsp;id,
              @Valid <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a>&nbsp;updateCommand)</code>
 <div class="block">Update a <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>.</div>
 </td>
 </tr>
-<tr id="i93" class="rowColor">
+<tr id="i92" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateConfigsForResource-java.lang.String-java.util.Set-java.lang.Class-">updateConfigsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                         java.util.Set&lt;java.lang.String&gt;&nbsp;configs,
@@ -817,7 +811,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block">Update the set of configuration files associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i94" class="altColor">
+<tr id="i93" class="rowColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateDependenciesForResource-java.lang.String-java.util.Set-java.lang.Class-">updateDependenciesForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                              java.util.Set&lt;java.lang.String&gt;&nbsp;dependencies,
@@ -825,7 +819,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block">Update the set of dependency files associated with the resource with the given id.</div>
 </td>
 </tr>
-<tr id="i95" class="rowColor">
+<tr id="i94" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateJobStatus-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobStatus-com.netflix.genie.common.external.dtos.v4.JobStatus-java.lang.String-">updateJobStatus</a></span>(@NotBlank java.lang.String&nbsp;id,
                @NotNull <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a>&nbsp;currentStatus,
@@ -835,7 +829,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
  of the job matches <code>newStatus</code>.</div>
 </td>
 </tr>
-<tr id="i96" class="altColor">
+<tr id="i95" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateJobStatus-java.lang.String-com.netflix.genie.common.dto.JobStatus-java.lang.String-">updateJobStatus</a></span>(@NotBlank(message="No job id entered. Unable to update.") java.lang.String&nbsp;id,
                <a href="../../../../../../../../com/netflix/genie/common/dto/JobStatus.html" title="enum in com.netflix.genie.common.dto">JobStatus</a>&nbsp;jobStatus,
@@ -843,7 +837,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 </td>
 </tr>
-<tr id="i97" class="rowColor">
+<tr id="i96" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateJobWithRuntimeEnvironment-java.lang.String-java.lang.String-java.lang.String-java.util.List-int-">updateJobWithRuntimeEnvironment</a></span>(@NotBlank java.lang.String&nbsp;jobId,
                                @NotBlank java.lang.String&nbsp;clusterId,
@@ -853,7 +847,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;</div>
 </td>
 </tr>
-<tr id="i98" class="altColor">
+<tr id="i97" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateStatusForUnusedCommands-com.netflix.genie.common.external.dtos.v4.CommandStatus-java.time.Instant-java.util.Set-java.time.Instant-">updateStatusForUnusedCommands</a></span>(<a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommandStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">CommandStatus</a>&nbsp;desiredStatus,
                              java.time.Instant&nbsp;commandCreatedThreshold,
@@ -864,7 +858,7 @@ implements <a href="../../../../../../../../com/netflix/genie/web/data/services/
  in the Genie system after jobCreatedThreshold.</div>
 </td>
 </tr>
-<tr id="i99" class="rowColor">
+<tr id="i98" class="altColor">
 <td class="colFirst"><code>&lt;R extends <a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/CommonResource.html" title="class in com.netflix.genie.common.external.dtos.v4">CommonResource</a>&gt;<br>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#updateTagsForResource-java.lang.String-java.util.Set-java.lang.Class-">updateTagsForResource</a></span>(@NotBlank java.lang.String&nbsp;id,
                      java.util.Set&lt;java.lang.String&gt;&nbsp;tags,
@@ -2765,23 +2759,6 @@ public&nbsp;java.util.Map&lt;java.lang.String,<a href="../../../../../../../../c
 </dl>
 </li>
 </ul>
-<a name="getActiveDisconnectedAgentJobs--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getActiveDisconnectedAgentJobs</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getActiveDisconnectedAgentJobs()</pre>
-<div class="block">Get the IDs of all agent jobs that are active but currently not connected to any node.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getActiveDisconnectedAgentJobs--">getActiveDisconnectedAgentJobs</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a set of job ids</dd>
-</dl>
-</li>
-</ul>
 <a name="getAllocatedMemoryOnHost-java.lang.String-">
 <!--   -->
 </a>
@@ -2847,6 +2824,23 @@ public&nbsp;long&nbsp;getActiveJobCountOnHost(@NotBlank
 <dd>The count of jobs in an active state on the given host</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../../../../com/netflix/genie/common/external/dtos/v4/JobStatus.html#getActiveStatuses--"><code>JobStatus.getActiveStatuses()</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="getActiveAgentJobs--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getActiveAgentJobs</h4>
+<pre>@Transactional(readOnly=true)
+public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;getActiveAgentJobs()</pre>
+<div class="block">Get the set of active agent jobs.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getActiveAgentJobs--">getActiveAgentJobs</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The list of job ids</dd>
 </dl>
 </li>
 </ul>
@@ -3298,26 +3292,6 @@ public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;lookupAgentConnectio
 <dd><code>jobId</code> - the id of a job the agent is running</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the server hostname or empty</dd>
-</dl>
-</li>
-</ul>
-<a name="getNumAgentConnectionsOnServer-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getNumAgentConnectionsOnServer</h4>
-<pre>@Transactional(readOnly=true)
-public&nbsp;long&nbsp;getNumAgentConnectionsOnServer(@NotBlank
-                                                                         @NotBlank java.lang.String&nbsp;hostname)</pre>
-<div class="block">Get the number of active agent connections on Genie server with the given <code>hostname</code>.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html#getNumAgentConnectionsOnServer-java.lang.String-">getNumAgentConnectionsOnServer</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../../com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>hostname</code> - The server hostname to get the count for</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The number of agents currently connected to the given server</dd>
 </dl>
 </li>
 </ul>

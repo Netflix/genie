@@ -155,7 +155,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieAgentHealthIndicator</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#genieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentMetricsService-">genieAgentHealthIndicator</a></span>(<a href="../../../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services">AgentMetricsService</a>&nbsp;agentMetricsService)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/spring/autoconfigure/health/HealthAutoConfiguration.html#genieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-">genieAgentHealthIndicator</a></span>(<a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService)</code>
 <div class="block">Provide a health indicator tied to agent related information if one hasn't already been provided elsewhere.</div>
 </td>
 </tr>
@@ -233,7 +233,7 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieMemo
 </dl>
 </li>
 </ul>
-<a name="genieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentMetricsService-">
+<a name="genieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -241,11 +241,11 @@ public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieMemo
 <h4>genieAgentHealthIndicator</h4>
 <pre>@Bean
  @ConditionalOnMissingBean(value=<a href="../../../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieAgentHealthIndicator.class</a>)
-public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieAgentHealthIndicator</a>&nbsp;genieAgentHealthIndicator(<a href="../../../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services">AgentMetricsService</a>&nbsp;agentMetricsService)</pre>
+public&nbsp;<a href="../../../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html" title="class in com.netflix.genie.web.health">GenieAgentHealthIndicator</a>&nbsp;genieAgentHealthIndicator(<a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService)</pre>
 <div class="block">Provide a health indicator tied to agent related information if one hasn't already been provided elsewhere.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>agentMetricsService</code> - <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentMetricsService</code></a> implementation to use</dd>
+<dd><code>agentConnectionTrackingService</code> - the agent connection tracking service</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An instance of <a href="../../../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html" title="class in com.netflix.genie.web.health"><code>GenieAgentHealthIndicator</code></a></dd>
 </dl>

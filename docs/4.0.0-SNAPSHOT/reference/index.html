@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-04-23</span>
+<span id="revdate">2020-05-06</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5444,7 +5444,13 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.leader.path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.discovery-path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie discovery service (maps agents to the node they&#8217;re connected to)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/genie/discovery/</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.leader-path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie leadership election of a given cluster</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/leader/</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
@@ -5782,10 +5788,52 @@ It will have to be added if one is desired otherwise metrics are just published 
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connected.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of agents connected to the server</p></td>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.connected.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of agents connected to the node</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentMetricsServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.registered.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of agents connected to the node and registered in discovery</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.zookeeperSessionState.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count of Zookeeper session state changes</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>connectionState</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.registered.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timing and count of registrations of local agent with discovery service</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.unregistered.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timing and count of unregistrations of local agent with discovery service</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.connected.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count of new agent connections to the local node</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.agents.connections.disconnected.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count of new agent disconnections from the local node</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>AgentRoutingServiceCuratorDiscoveryImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
@@ -6496,7 +6544,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-04-23 17:25:00 UTC
+Last updated 2020-05-06 16:51:21 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">

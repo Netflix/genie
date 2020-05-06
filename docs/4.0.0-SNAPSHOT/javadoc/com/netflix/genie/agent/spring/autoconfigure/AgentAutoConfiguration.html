@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -152,7 +152,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/agent/AgentMetadataImpl.html" title="class in com.netflix.genie.agent">AgentMetadataImpl</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#agentMetadata--">agentMetadata</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#agentMetadata-com.netflix.genie.common.internal.util.GenieHostInfo-">agentMetadata</a></span>(<a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</code>
 <div class="block">Provide a lazy bean definition for <a href="../../../../../../com/netflix/genie/agent/AgentMetadata.html" title="interface in com.netflix.genie.agent"><code>AgentMetadata</code></a> if none already exists.</div>
 </td>
 </tr>
@@ -163,20 +163,26 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#genieAgentHostInfo--">genieAgentHostInfo</a></span>()</code>
+<div class="block">Provide a bean of type <a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util"><code>GenieHostInfo</code></a> if none already exists.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>org.springframework.scheduling.TaskScheduler</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#heartBeatServiceTaskScheduler--">heartBeatServiceTaskScheduler</a></span>()</code>
 <div class="block">Provide a lazy <code>TaskScheduler</code> bean for use by the heart beat service is none has already been
  defined in the context.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>org.springframework.core.task.AsyncTaskExecutor</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskExecutor--">sharedAgentTaskExecutor</a></span>()</code>
 <div class="block">Get a lazy <code>AsyncTaskExecutor</code> bean which may be shared by different components if one isn't already
  defined.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>org.springframework.scheduling.TaskScheduler</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/agent/spring/autoconfigure/AgentAutoConfiguration.html#sharedAgentTaskScheduler--">sharedAgentTaskScheduler</a></span>()</code>
 <div class="block">Provide a lazy <code>TaskScheduler</code> to be used by the Agent process if one isn't already defined.</div>
@@ -221,7 +227,26 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="agentMetadata--">
+<a name="genieAgentHostInfo--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>genieAgentHostInfo</h4>
+<pre>@Bean
+ @ConditionalOnMissingBean(value=<a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo.class</a>)
+public&nbsp;<a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieAgentHostInfo()
+                                                                                             throws java.net.UnknownHostException</pre>
+<div class="block">Provide a bean of type <a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util"><code>GenieHostInfo</code></a> if none already exists.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A <a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util"><code>GenieHostInfo</code></a> instance</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.net.UnknownHostException</code> - if hostname cannot be determined</dd>
+</dl>
+</li>
+</ul>
+<a name="agentMetadata-com.netflix.genie.common.internal.util.GenieHostInfo-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -230,9 +255,11 @@ extends java.lang.Object</pre>
 <pre>@Bean
  @Lazy
  @ConditionalOnMissingBean(value=<a href="../../../../../../com/netflix/genie/agent/AgentMetadata.html" title="interface in com.netflix.genie.agent">AgentMetadata.class</a>)
-public&nbsp;<a href="../../../../../../com/netflix/genie/agent/AgentMetadataImpl.html" title="class in com.netflix.genie.agent">AgentMetadataImpl</a>&nbsp;agentMetadata()</pre>
+public&nbsp;<a href="../../../../../../com/netflix/genie/agent/AgentMetadataImpl.html" title="class in com.netflix.genie.agent">AgentMetadataImpl</a>&nbsp;agentMetadata(<a href="../../../../../../com/netflix/genie/common/internal/util/GenieHostInfo.html" title="class in com.netflix.genie.common.internal.util">GenieHostInfo</a>&nbsp;genieHostInfo)</pre>
 <div class="block">Provide a lazy bean definition for <a href="../../../../../../com/netflix/genie/agent/AgentMetadata.html" title="interface in com.netflix.genie.agent"><code>AgentMetadata</code></a> if none already exists.</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>genieHostInfo</code> - the host information</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../../com/netflix/genie/agent/AgentMetadataImpl.html" title="class in com.netflix.genie.agent"><code>AgentMetadataImpl</code></a> instance</dd>
 </dl>

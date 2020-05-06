@@ -137,7 +137,7 @@ implements org.springframework.boot.actuate.health.HealthIndicator</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html#GenieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentMetricsService-">GenieAgentHealthIndicator</a></span>(<a href="../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services">AgentMetricsService</a>&nbsp;agentMetricsService)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/health/GenieAgentHealthIndicator.html#GenieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-">GenieAgentHealthIndicator</a></span>(<a href="../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService)</code>
 <div class="block">Constructor.</div>
 </td>
 </tr>
@@ -189,17 +189,17 @@ implements org.springframework.boot.actuate.health.HealthIndicator</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="GenieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentMetricsService-">
+<a name="GenieAgentHealthIndicator-com.netflix.genie.web.agent.services.AgentConnectionTrackingService-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>GenieAgentHealthIndicator</h4>
-<pre>public&nbsp;GenieAgentHealthIndicator(<a href="../../../../../com/netflix/genie/web/agent/services/AgentMetricsService.html" title="interface in com.netflix.genie.web.agent.services">AgentMetricsService</a>&nbsp;agentMetricsService)</pre>
+<pre>public&nbsp;GenieAgentHealthIndicator(<a href="../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>&nbsp;agentConnectionTrackingService)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>agentMetricsService</code> - For collecting metrics about the Agents connected to this server.</dd>
+<dd><code>agentConnectionTrackingService</code> - The service tracking live agent connections</dd>
 </dl>
 </li>
 </ul>

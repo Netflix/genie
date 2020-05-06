@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -107,13 +107,13 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a></dd>
+<dd><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>, org.springframework.boot.actuate.info.InfoContributor</dd>
 </dl>
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">AgentConnectionTrackingServiceImpl</span>
 extends java.lang.Object
-implements <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a></pre>
+implements <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a>, org.springframework.boot.actuate.info.InfoContributor</pre>
 <div class="block">This service keeps track of agent connections and heartbeats. It notifies the downstream <a href="../../../../../../../com/netflix/genie/web/agent/services/AgentRoutingService.html" title="interface in com.netflix.genie.web.agent.services"><code>AgentRoutingService</code></a>
  of connected/disconnected agents while hiding details of connections, disconnections, missed heartbeats.</div>
 <dl>
@@ -183,12 +183,22 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#contribute-org.springframework.boot.actuate.info.Info.Builder-">contribute</a></span>(org.springframework.boot.actuate.info.Info.Builder&nbsp;builder)</code></td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#getConnectedAgentsCount--">getConnectedAgentsCount</a></span>()</code>
+<div class="block">Get the count of locally connected agents.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#notifyDisconnected-java.lang.String-java.lang.String-">notifyDisconnected</a></span>(java.lang.String&nbsp;streamId,
                   java.lang.String&nbsp;claimedJobId)</code>
 <div class="block">Handle a disconnection.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#notifyHeartbeat-java.lang.String-java.lang.String-">notifyHeartbeat</a></span>(java.lang.String&nbsp;streamId,
                java.lang.String&nbsp;claimedJobId)</code>
@@ -296,7 +306,7 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <a name="notifyDisconnected-java.lang.String-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>notifyDisconnected</h4>
 <pre>public&nbsp;void&nbsp;notifyDisconnected(java.lang.String&nbsp;streamId,
@@ -308,6 +318,35 @@ implements <a href="../../../../../../../com/netflix/genie/web/agent/services/Ag
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>streamId</code> - the unique id of the connection</dd>
 <dd><code>claimedJobId</code> - the job id claimed by the agent</dd>
+</dl>
+</li>
+</ul>
+<a name="getConnectedAgentsCount--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getConnectedAgentsCount</h4>
+<pre>public&nbsp;long&nbsp;getConnectedAgentsCount()</pre>
+<div class="block">Get the count of locally connected agents.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html#getConnectedAgentsCount--">getConnectedAgentsCount</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../../com/netflix/genie/web/agent/services/AgentConnectionTrackingService.html" title="interface in com.netflix.genie.web.agent.services">AgentConnectionTrackingService</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the number of agents connected.</dd>
+</dl>
+</li>
+</ul>
+<a name="contribute-org.springframework.boot.actuate.info.Info.Builder-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>contribute</h4>
+<pre>public&nbsp;void&nbsp;contribute(org.springframework.boot.actuate.info.Info.Builder&nbsp;builder)</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>contribute</code>&nbsp;in interface&nbsp;<code>org.springframework.boot.actuate.info.InfoContributor</code></dd>
 </dl>
 </li>
 </ul>
