@@ -101,8 +101,8 @@ public final class JpaCommandSpecs {
      * @return A {@link Specification} for this query
      */
     public static Specification<CommandEntity> findCommandsMatchingCriterion(final Criterion criterion) {
-        return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) ->
-            JpaSpecificationUtils.createCriterionPredicate(
+        return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+            final Predicate predicate = JpaSpecificationUtils.createCriterionPredicate(
                 root,
                 cq,
                 cb,
@@ -114,5 +114,8 @@ public final class JpaCommandSpecs {
                 CommandEntity_.id,
                 criterion
             );
+
+            return cb.and(predicate, cb.isNotEmpty(root.get(CommandEntity_.clusterCriteria)));
+        };
     }
 }

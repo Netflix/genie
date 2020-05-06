@@ -830,18 +830,25 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     @Test
     void testFindCommandsMatchingCriterion() throws Exception {
         // Create some commands to test with
-        final Command command0 = this.createTestCommand(null, null, null);
-        final Command command1 = this.createTestCommand(null, null, null);
-        final Command command2 = this.createTestCommand(UUID.randomUUID().toString(), null, null);
+        final List<Criterion> clusterCriteria = Lists.newArrayList(
+            new Criterion.Builder().withName("prodCluster").build()
+        );
+        final Command command0 = this.createTestCommand(null, null, clusterCriteria);
+        final Command command1 = this.createTestCommand(null, null, clusterCriteria);
+        final Command command2 = this.createTestCommand(UUID.randomUUID().toString(), null, clusterCriteria);
 
         // Create two commands with supersets of command1 tags so that we can test that resolution
         final Set<String> command3Tags = Sets.newHashSet(command1.getMetadata().getTags());
         command3Tags.add(UUID.randomUUID().toString());
         command3Tags.add(UUID.randomUUID().toString());
-        final Command command3 = this.createTestCommand(null, command3Tags, null);
+        final Command command3 = this.createTestCommand(null, command3Tags, clusterCriteria);
         final Set<String> command4Tags = Sets.newHashSet(command1.getMetadata().getTags());
         command4Tags.add(UUID.randomUUID().toString());
-        final Command command4 = this.createTestCommand(null, command4Tags, null);
+        final Command command4 = this.createTestCommand(null, command4Tags, clusterCriteria);
+
+        // Create a command that has no cluster criteria to enforce matching doesn't work if there is no cluster
+        // criteria
+        final Command command5 = this.createTestCommand(null, null, null);
 
         Assertions
             .assertThat(
@@ -916,6 +923,14 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(command3);
+
+        // Would match command5 if it had any cluster criteria
+        Assertions.assertThat(
+            this.service.findCommandsMatchingCriterion(
+                new Criterion.Builder().withId(command5.getId()).build(),
+                true
+            )
+        ).isEmpty();
     }
 
     @Test
