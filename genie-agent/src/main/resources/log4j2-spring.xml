@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+  <Properties>
+    <!--
+    The default path for an agent log is /tmp/genie-agent-${PID}.log
+
+    The file is later relocated to (<job directory>/genie/logs/agent.log) if the agent
+    reaches that stage during a job execution.
+
+    Setting GENIE_AGENT_TEMPORARY_LOG_DIRECTORY environment variable allows a different
+    directory for the initial/temporary log file (e.g.: '/logs/genie-agent/').
+    This is useful to move all temporary genie logs outside of /tmp.
+
+    Setting GENIE_AGENT_TEMPORARY_LOG_FILE environment variable allows specifying a
+    different full path for the file (e.g.: /logs/genie-agent/my-job.log).
+    Notice that this path need to be unique for this job, so this is suitable for container
+    environments that run a single job and want a predictable file location.
+
+    If the agent is invoked to execute a job, and it can successfully claim a unique job id,
+    then the agent log file is relocated to <job directory>/genie/logs/agent.log.
+    -->
+    <Property name="__DEFAULT_LOG_DIRECTORY">${env:GENIE_AGENT_TEMPORARY_LOG_DIRECTORY:-/tmp}</Property>
+    <Property name="__DEFAULT_LOG_FILENAME">genie-agent-${sys:PID}.log</Property>
+    <Property name="__DEFAULT_LOG_FILE">${__DEFAULT_LOG_DIRECTORY}/${__DEFAULT_LOG_FILENAME}</Property>
+    <Property name="__AGENT_LOG_PATH">${env:GENIE_AGENT_TEMPORARY_LOG_FILE:-${__DEFAULT_LOG_FILE}}</Property>
+  </Properties>
+
+  <Appenders>
+    <!-- Appender for messages printed in console/terminal where the job is running -->
+    <Console name="UserTerminal" target="SYSTEM_ERR">
+      <PatternLayout pattern="%d{ISO8601} [%highlight{%-5level }] %msg%n%throwable" />/>
+    </Console>
+
+    <!-- Appender of type file for regular log messages -->
+    <File name="AgentLogFile" fileName="${__AGENT_LOG_PATH}">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] [%C{1.}] - %msg%n%throwable"/>
+    </File>
+  </Appenders>
+
+  <Loggers>
+    <!-- Special logger for messages that should be printed in console -->
+    <Logger name="genie-agent" level="info">
+      <AppenderRef ref="UserTerminal"/>
+    </Logger>
+    <!-- Regular logger for everything else -->
+    <Root level="info">
+      <AppenderRef ref="AgentLogFile"/>
+    </Root>
+  </Loggers>
+</Configuration>

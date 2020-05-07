@@ -8,6 +8,11 @@ license {
     exclude "META-INF/spring.factories"
 }
 
+configurations.all {
+    // Exclude Logback (and use log4j2 instead)
+    exclude group:"org.springframework.boot", module: "spring-boot-starter-logging"
+}
+
 dependencies {
 
     /*******************************
@@ -27,6 +32,7 @@ dependencies {
 
     // Spring
     compile("org.springframework.boot:spring-boot-starter")
+    compile("org.springframework.boot:spring-boot-starter-log4j2")
     compile("org.springframework.cloud:spring-cloud-starter-aws")
 
     // Misc
