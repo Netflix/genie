@@ -18,12 +18,17 @@
 package com.netflix.genie.agent.cli;
 
 import com.netflix.genie.agent.AgentMetadata;
+import com.netflix.genie.agent.cli.logging.AgentLogManager;
+import com.netflix.genie.agent.cli.logging.AgentLogManagerLog4j2Impl;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.proto.PingServiceGrpc;
+import org.apache.logging.log4j.LogManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -346,5 +351,19 @@ public class CliAutoConfiguration {
     @Bean
     public ArgumentDelegates.RuntimeConfigurationArguments runtimeConfigurationArguments() {
         return new RuntimeConfigurationArgumentsImpl();
+    }
+
+    /**
+     * Provide an {@link AgentLogManager} implementation that can relocate the agent log file created by log4j2.
+     *
+     * @return the log4j2 implementation of {@link AgentLogManager}
+     */
+    @Bean
+    @ConditionalOnClass(org.apache.logging.log4j.core.LoggerContext.class)
+    @ConditionalOnMissingBean(AgentLogManager.class)
+    public AgentLogManager agentLogManagerLog4j2() {
+        return new AgentLogManagerLog4j2Impl(
+            (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false)
+        );
     }
 }

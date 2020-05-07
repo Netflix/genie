@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
+import com.netflix.genie.agent.cli.logging.AgentLogManager;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
@@ -202,6 +203,11 @@ class ExecutionAutoConfigurationTest {
         @Bean
         ArgumentDelegates.CleanupArguments cleanupArguments() {
             return Mockito.mock(ArgumentDelegates.CleanupArguments.class);
+        }
+
+        @Bean
+        AgentLogManager agentLogManager() {
+            return Mockito.mock(AgentLogManager.class);
         }
     }
 }

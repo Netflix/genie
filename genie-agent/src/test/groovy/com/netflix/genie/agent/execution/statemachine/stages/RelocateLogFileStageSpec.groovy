@@ -17,11 +17,15 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages
 
+import com.netflix.genie.agent.cli.logging.AgentLogManager
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+
+import java.nio.file.Path
+import java.nio.file.Paths
 
 class RelocateLogFileStageSpec extends Specification {
     ExecutionStage stage
@@ -30,18 +34,32 @@ class RelocateLogFileStageSpec extends Specification {
 
     @Rule
     TemporaryFolder temporaryFolder = new TemporaryFolder()
+    AgentLogManager agentLogManager
 
     void setup() {
         this.jobDir = temporaryFolder.getRoot()
         this.executionContext = Mock(ExecutionContext)
-        this.stage = new RelocateLogFileStage()
+        this.agentLogManager = Mock(AgentLogManager)
+        this.stage = new RelocateLogFileStage(agentLogManager)
     }
 
     def "AttemptTransition"() {
+        setup:
+        Path expectedDestination = Paths.get(jobDir.toString(), "/genie/logs/agent.log")
+
         when:
         stage.attemptStageAction(executionContext)
 
         then:
         1 * executionContext.getJobDirectory() >> jobDir
+        1 * agentLogManager.relocateLogFile(expectedDestination)
+
+        when:
+        stage.attemptStageAction(executionContext)
+
+        then:
+        1 * executionContext.getJobDirectory() >> jobDir
+        1 * agentLogManager.relocateLogFile(expectedDestination) >> { throw new IOException("...") }
+        noExceptionThrown()
     }
 }

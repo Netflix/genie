@@ -53,15 +53,13 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
     @Override
     public void run(final String... args) throws Exception {
         UserConsole.printBanner(environment);
-        UserConsole.getLogger().info("Agent (temporarily) logging to: {}", UserConsole.getLogFilePath());
         try {
             internalRun(args);
         } catch (final Throwable t) {
             final Throwable userConsoleException = t.getCause() != null ? t.getCause() : t;
             UserConsole.getLogger().error(
-                "Command execution failed: {} (full trace in {})",
-                userConsoleException.getMessage(),
-                UserConsole.getLogFilePath()
+                "Command execution failed: {}",
+                userConsoleException.getMessage()
             );
 
             log.error("Command execution failed", t);
