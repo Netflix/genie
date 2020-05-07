@@ -61,10 +61,6 @@ public final class UserConsole {
      * System property or environment variable to override the directory of the logfile.
      */
     private static final String LOG_DIRECTORY_OVERRIDE_PROPERTY_NAME = "GENIE_AGENT_TEMPORARY_LOG_DIRECTORY";
-    /**
-     * System property or environment variable to override the filename of the logfile.
-     */
-    private static final String LOG_FILENAME_OVERRIDE_PROPERTY_NAME = "GENIE_AGENT_TEMPORARY_LOG_FILENAME";
 
     /**
      * Fallback/Default value for log directory, if no override is present.
@@ -88,21 +84,11 @@ public final class UserConsole {
             DEFAULT_LOG_DIRECTORY
         )
     );
-    /**
-     * Log filename evaluated considering overrides.
-     */
-    private static final String ACTUAL_LOG_FILENAME = System.getProperty(
-        LOG_FILENAME_OVERRIDE_PROPERTY_NAME,
-        System.getenv().getOrDefault(
-            LOG_FILENAME_OVERRIDE_PROPERTY_NAME,
-            DEFAULT_LOG_FILENAME
-        )
-    );
 
     /**
      * Expected log file path, used unless full path override is provided.
      */
-    private static final String DEFAULT_LOG_FILE_PATH = ACTUAL_LOG_DIRECTORY + "/" + ACTUAL_LOG_FILENAME;
+    private static final String DEFAULT_LOG_FILE_PATH = ACTUAL_LOG_DIRECTORY + "/" + DEFAULT_LOG_FILENAME;
     /**
      * Stores the current location of the log file.
      * The logfile starts in a temporary location but may move inside the job folder during execution.
@@ -120,7 +106,6 @@ public final class UserConsole {
                     LOG_FILE_PATH_OVERRIDE_PROPERTY_NAME,
                     // Otherwise fallback to default
                     DEFAULT_LOG_FILE_PATH
-//                    String.format(LOG_FILE_PATH, System.getProperty(PID_SYSTEM_PROPERTY_NAME, "???"))
                 )
             )
         )
