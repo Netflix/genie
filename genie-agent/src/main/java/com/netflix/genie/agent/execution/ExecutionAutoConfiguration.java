@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
+import com.netflix.genie.agent.cli.logging.AgentLogManager;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.services.AgentFileStreamService;
 import com.netflix.genie.agent.execution.services.AgentHeartBeatService;
@@ -221,13 +222,15 @@ public class ExecutionAutoConfiguration {
 
     /**
      * Create a {@link RelocateLogFileStage} bean if one is not already defined.
+     *
+     * @param agentLogManager the agent log manager
      */
     @Bean
     @Lazy
     @Order(70)
     @ConditionalOnMissingBean(RelocateLogFileStage.class)
-    RelocateLogFileStage relocateLogFileStage() {
-        return new RelocateLogFileStage();
+    RelocateLogFileStage relocateLogFileStage(final AgentLogManager agentLogManager) {
+        return new RelocateLogFileStage(agentLogManager);
     }
 
     /**

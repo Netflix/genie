@@ -37,11 +37,9 @@ class UserConsoleSpec extends Specification {
     def "GetLogger"() {
         when:
         Logger logger = UserConsole.getLogger()
-        String logPath = UserConsole.getLogFilePath()
 
         then:
         logger != null
-        logPath != null
     }
 
     def "PrintBanner -- no banner set"() {
@@ -94,39 +92,5 @@ class UserConsoleSpec extends Specification {
             Charset.class,
             StandardCharsets.UTF_8
         ) >> StandardCharsets.UTF_8
-    }
-
-    def "relocateLogFile"() {
-
-        when: "Destination exists"
-        UserConsole.relocateLogFile(temporaryFolder.newFile().toPath())
-
-        then:
-        thrown(IOException)
-
-        when:
-        Path logFilePath = Paths.get(UserConsole.getLogFilePath())
-        FileWriter writer = new FileWriter(logFilePath.toFile())
-        writer.write("foo")
-        writer.flush()
-        Path newLogFilePath = Paths.get(temporaryFolder.getRoot().toPath().toString(), "agent.log")
-
-        then:
-        Files.exists(logFilePath)
-        !Files.exists(newLogFilePath)
-
-        when:
-        UserConsole.relocateLogFile(newLogFilePath)
-
-        then:
-        !Files.exists(logFilePath)
-        Files.exists(newLogFilePath)
-
-        when:
-        writer.write("bar\n")
-        writer.flush()
-
-        then:
-        new FileReader(newLogFilePath.toFile()).readLine().contains("foobar")
     }
 }

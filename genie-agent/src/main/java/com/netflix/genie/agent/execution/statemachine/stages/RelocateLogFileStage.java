@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.AgentLogManager;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
@@ -38,11 +38,17 @@ import java.nio.file.Path;
  */
 @Slf4j
 public class RelocateLogFileStage extends ExecutionStage {
+
+    private final AgentLogManager agentLogManager;
+
     /**
      * Constructor.
+     *
+     * @param agentLogManager the agent log manager
      */
-    public RelocateLogFileStage() {
+    public RelocateLogFileStage(final AgentLogManager agentLogManager) {
         super(States.RELOCATE_LOG);
+        this.agentLogManager = agentLogManager;
     }
 
     @Override
@@ -58,7 +64,7 @@ public class RelocateLogFileStage extends ExecutionStage {
         log.info("Relocating agent log file to: {}", destinationPath);
 
         try {
-            UserConsole.relocateLogFile(destinationPath);
+            this.agentLogManager.relocateLogFile(destinationPath);
         } catch (IOException e) {
             log.error("Failed to relocate agent log file", e);
         }
