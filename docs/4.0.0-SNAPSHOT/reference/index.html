@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="generator" content="Asciidoctor 2.0.10">
 <meta name="description" content="Reference documentation for Netflix OSS Genie">
 <meta name="keywords" content="genie, netflix, documentation, big data, cloud, oss, open source software">
 <meta name="author" content="Tom Gianos">
@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2020-05-06</span>
+<span id="revdate">2020-05-07</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -2565,7 +2565,7 @@ downloaded into the job working directory at runtime.</p>
 <h6 id="_hadoop_prod_cluster"><a class="anchor" href="#_hadoop_prod_cluster"></a><a class="link" href="#_hadoop_prod_cluster">6.3.1.1.1. Hadoop Prod Cluster</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "bdp_h2prod_20161217_205111",
   "created": "2016-12-17T21:09:30.845Z",
   "updated": "2016-12-20T17:31:32.523Z",
@@ -2608,7 +2608,7 @@ downloaded into the job working directory at runtime.</p>
 <h6 id="_hadoop_adhoc_cluster"><a class="anchor" href="#_hadoop_adhoc_cluster"></a><a class="link" href="#_hadoop_adhoc_cluster">6.3.1.1.2. Hadoop Adhoc Cluster</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "bdp_h2query_20161108_204556",
   "created": "2016-11-08T21:07:17.284Z",
   "updated": "2016-12-07T00:51:19.655Z",
@@ -2650,7 +2650,7 @@ downloaded into the job working directory at runtime.</p>
 <h6 id="_presto_prod_cluster"><a class="anchor" href="#_presto_prod_cluster"></a><a class="link" href="#_presto_prod_cluster">6.3.1.1.3. Presto Prod Cluster</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "presto-prod-v009",
   "created": "2016-12-05T19:33:52.575Z",
   "updated": "2016-12-05T19:34:14.725Z",
@@ -2702,7 +2702,7 @@ The presto command includes a setup file which allows additional configuration w
 <h6 id="_presto_0_149"><a class="anchor" href="#_presto_0_149"></a><a class="link" href="#_presto_0_149">6.3.1.2.1. Presto 0.149</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "presto0149",
   "created": "2016-08-08T23:22:15.977Z",
   "updated": "2016-12-20T23:28:44.678Z",
@@ -2744,7 +2744,7 @@ The presto command includes a setup file which allows additional configuration w
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 set -o errexit -o nounset -o pipefail
 
@@ -2762,7 +2762,7 @@ chmod 755 ${PRESTO_CMD}</code></pre>
 <h6 id="_spark_submit_prod_1_6_1"><a class="anchor" href="#_spark_submit_prod_1_6_1"></a><a class="link" href="#_spark_submit_prod_1_6_1">6.3.1.2.2. Spark Submit Prod 1.6.1</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "prodsparksubmit161",
   "created": "2016-05-17T16:38:31.152Z",
   "updated": "2016-12-20T23:28:33.042Z",
@@ -2806,7 +2806,7 @@ chmod 755 ${PRESTO_CMD}</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 #set -o errexit -o nounset -o pipefail
 
@@ -2822,7 +2822,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${HADOOP_CONF_DIR}/</code></pre>
 <h6 id="_spark_submit_prod_2_0_0"><a class="anchor" href="#_spark_submit_prod_2_0_0"></a><a class="link" href="#_spark_submit_prod_2_0_0">6.3.1.2.3. Spark Submit Prod 2.0.0</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "prodsparksubmit200",
   "created": "2016-10-31T16:59:01.145Z",
   "updated": "2016-12-20T23:28:47.340Z",
@@ -2867,7 +2867,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${HADOOP_CONF_DIR}/</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 set -o errexit -o nounset -o pipefail
 
@@ -2898,7 +2898,7 @@ the expectation is that after it is run the application is successfully configur
 <h6 id="_hadoop_2_7_2"><a class="anchor" href="#_hadoop_2_7_2"></a><a class="link" href="#_hadoop_2_7_2">6.3.1.3.1. Hadoop 2.7.2</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "hadoop272",
   "created": "2016-08-18T16:58:31.044Z",
   "updated": "2016-12-21T00:01:08.263Z",
@@ -2935,7 +2935,7 @@ the expectation is that after it is run the application is successfully configur
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 set -o errexit -o nounset -o pipefail
 
@@ -2970,7 +2970,7 @@ rm "${HADOOP_DEPENDENCIES_DIR}/hadoop-2.7.2.tgz"</code></pre>
 <h6 id="_presto_0_149_2"><a class="anchor" href="#_presto_0_149_2"></a><a class="link" href="#_presto_0_149_2">6.3.1.3.2. Presto 0.149</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "presto0149",
   "created": "2016-08-08T23:21:58.780Z",
   "updated": "2016-12-21T00:21:10.945Z",
@@ -3008,7 +3008,7 @@ rm "${HADOOP_DEPENDENCIES_DIR}/hadoop-2.7.2.tgz"</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 set -o errexit -o nounset -o pipefail
 
@@ -3026,7 +3026,7 @@ export PRESTO_CLI_PATH="${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-
 <h6 id="_spark_1_6_1"><a class="anchor" href="#_spark_1_6_1"></a><a class="link" href="#_spark_1_6_1">6.3.1.3.3. Spark 1.6.1</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "spark161",
   "created": "2016-05-17T16:32:21.475Z",
   "updated": "2016-12-21T00:01:07.951Z",
@@ -3066,7 +3066,7 @@ export PRESTO_CLI_PATH="${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 set -o errexit -o nounset -o pipefail
 
@@ -3100,7 +3100,7 @@ rm ${DEPENDENCY_DOWNLOAD_DIR}/spark-${VERSION}.tgz</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 #set -o errexit -o nounset -o pipefail
 export JAVA_HOME=/apps/bdp-java/java-8-oracle
@@ -3112,7 +3112,7 @@ export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeS
 <h6 id="_spark_2_0_0"><a class="anchor" href="#_spark_2_0_0"></a><a class="link" href="#_spark_2_0_0">6.3.1.3.4. Spark 2.0.0</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "spark200",
   "created": "2016-10-31T16:58:54.155Z",
   "updated": "2016-12-21T00:01:11.105Z",
@@ -3150,7 +3150,7 @@ export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeS
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/bin/bash
 
 set -o errexit -o nounset -o pipefail
 
@@ -3216,7 +3216,7 @@ override to Spark 2 using the <code>ver</code> tag.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">[
   ...
   {
     "id": "prodsparksubmit161"
@@ -3238,7 +3238,7 @@ override to Spark 2 using the <code>ver</code> tag.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">[
   ...
   {
     "id": "prodsparksubmit161"
@@ -3264,7 +3264,7 @@ could have multiple backwards compatible versions of the client available.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">[
   ...
   {
     "id": "presto0149"
@@ -3294,7 +3294,7 @@ scripts.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">[
   {
     "id": "presto0149"
     ...
@@ -3315,7 +3315,7 @@ the configurations can be copied to Spark.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">[
   {
     "id": "hadoop272"
     ...
@@ -3335,7 +3335,7 @@ the configurations can be copied to Spark.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">[
   {
     "id": "hadoop272"
     ...
@@ -3364,7 +3364,7 @@ and command to be used based on what was configured above.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "SP.CS.FCT_TICKET_0054500815", <i class="conum" data-value="1"></i><b>(1)</b>
   "created": "2016-12-21T04:13:07.244Z",
   "updated": "2016-12-21T04:13:07.244Z",
@@ -3467,7 +3467,7 @@ might care about. Some are copied from the initial request (like tags) and some 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "SP.CS.FCT_TICKET_0054500815",
   "created": "2016-12-21T04:13:07.245Z",
   "updated": "2016-12-21T04:20:35.801Z",
@@ -3588,7 +3588,7 @@ frequently the system polled it for status and when it would have timed out had 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
   "id": "SP.CS.FCT_TICKET_0054500815",
   "created": "2016-12-21T04:13:07.245Z",
   "updated": "2016-12-21T04:20:35.801Z",
@@ -3691,7 +3691,7 @@ flexible.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/usr/bin/env bash
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">#!/usr/bin/env bash
 
 set -o nounset -o pipefail
 
@@ -3883,7 +3883,7 @@ variables that were available right before Genie executed the final command to r
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Dump the environment to a env.log file
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs"># Dump the environment to a env.log file
 env | sort &gt; ${GENIE_JOB_DIR}/genie/logs/env.log</code></pre>
 </div>
 </div>
@@ -3904,7 +3904,7 @@ env | sort &gt; ${GENIE_JOB_DIR}/genie/logs/env.log</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">APP_ID=hadoop272
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">APP_ID=hadoop272
 APP_NAME=hadoop-2.7.2
 CURRENT_JOB_TMP_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/tmp
 CURRENT_JOB_WORKING_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815
@@ -4199,7 +4199,7 @@ cluster selection. The interface has a single method:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">/**
  * Return best cluster to run job on.
  *
  * @param clusters   An immutable, non-empty list of available clusters to choose from
@@ -4351,7 +4351,7 @@ of the script (default behavior is to load and compile lazily).</p>
 <h6 id="_javascript"><a class="anchor" href="#_javascript"></a><a class="link" href="#_javascript">7.1.2.3.1. Javascript</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">var cJson = JSON.parse(clusters);
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">var cJson = JSON.parse(clusters);
 var jJson = JSON.parse(jobRequest);
 
 var index;
@@ -4370,7 +4370,7 @@ index &lt; cJson.length ? cJson[index].id : null;</code></pre>
 <h6 id="_groovy"><a class="anchor" href="#_groovy"></a><a class="link" href="#_groovy">7.1.2.3.2. Groovy</a></h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import groovy.json.JsonSlurper
+<pre class="highlightjs highlight"><code data-lang="groovy" class="language-groovy hljs">import groovy.json.JsonSlurper
 
 def jsonSlurper = new JsonSlurper()
 def cJson = jsonSlurper.parseText(clusters)
@@ -4582,7 +4582,7 @@ Genie requires MySQL 5.6.3+ due to certain properties not existing before that v
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">[mysqld]
+<pre class="highlightjs highlight"><code data-lang="text" class="language-text hljs">[mysqld]
 innodb_file_per_table=ON
 innodb_large_prefix=ON
 innodb_file_format=barracuda</code></pre>
@@ -4605,7 +4605,7 @@ Restart MySQL if you&#8217;ve changed these properties
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mysql -u {username} -p{password} -h {host} -e 'create database genie;'</code></pre>
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">mysql -u {username} -p{password} -h {host} -e 'create database genie;'</code></pre>
 </div>
 </div>
 <div class="sect5">
@@ -4635,7 +4635,7 @@ Genie requires MySQL 5.6.3+ due to certain properties not existing before that v
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">[mysqld]
+<pre class="highlightjs highlight"><code data-lang="text" class="language-text hljs">[mysqld]
 innodb_file_per_table=ON
 innodb_large_prefix=ON
 innodb_file_format=barracuda</code></pre>
@@ -4658,7 +4658,7 @@ Restart MySQL if you&#8217;ve changed these properties
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mysql -u {username} -p{password} -h {host} genie &lt; upgrade-3.1.x-to-3.2.0.mysql.sql</code></pre>
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">mysql -u {username} -p{password} -h {host} genie &lt; upgrade-3.1.x-to-3.2.0.mysql.sql</code></pre>
 </div>
 </div>
 </div>
@@ -4682,7 +4682,7 @@ This assumes the PSQL binaries are installed
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">createdb genie</code></pre>
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">createdb genie</code></pre>
 </div>
 </div>
 <div class="sect5">
@@ -4700,7 +4700,7 @@ This assumes the PSQL binaries are installed
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">psql -U {user} -h {host} -d genie -f upgrade-3.1.x-to-3.2.0.postgresql.sql</code></pre>
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">psql -U {user} -h {host} -d genie -f upgrade-3.1.x-to-3.2.0.postgresql.sql</code></pre>
 </div>
 </div>
 </div>
@@ -4733,7 +4733,7 @@ instead of the default one.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>genie:
+<pre class="highlightjs highlight"><code class="language-none hljs">genie:
   aws:
     credentials:
       role: &lt;AWS ROLE ARN&gt;</code></pre>
@@ -6544,11 +6544,11 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-05-06 16:51:21 UTC
+Last updated 2020-05-07 02:51:23 UTC
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>
 </body>
 </html>
