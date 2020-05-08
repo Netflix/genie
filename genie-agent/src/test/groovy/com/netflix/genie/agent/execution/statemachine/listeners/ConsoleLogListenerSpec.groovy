@@ -20,12 +20,13 @@ package com.netflix.genie.agent.execution.statemachine.listeners
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
+import spock.lang.Unroll
 
-class ConsoleLogLoggingListenerSpec extends Specification {
+class ConsoleLogListenerSpec extends Specification {
 
     def "Test all methods"() {
         setup:
-        UserConsoleLoggingListener listener = new UserConsoleLoggingListener()
+        ConsoleLogListener listener = new ConsoleLogListener()
 
         when:
         listener.stateEntered(States.SET_STATUS_FINAL)
@@ -42,5 +43,20 @@ class ConsoleLogLoggingListenerSpec extends Specification {
 
         then:
         noExceptionThrown()
+    }
+
+    @Unroll
+    def "Test message for action attempt: #state"() {
+        setup:
+        ConsoleLogListener listener = new ConsoleLogListener()
+
+        when:
+        listener.beforeStateActionAttempt(state)
+
+        then:
+        noExceptionThrown()
+
+        where:
+        state << States.values()
     }
 }
