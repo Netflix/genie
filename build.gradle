@@ -178,6 +178,7 @@ configure(javaProjects) {
 
     configurations {
         all*.exclude group: "javax.servlet", module: "servlet-api"
+        all*.exclude group:"org.springframework.boot", module: "spring-boot-starter-logging"
     }
 
     dependencies {

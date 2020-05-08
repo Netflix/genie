@@ -11,11 +11,6 @@ license {
     exclude "*.txt"
 }
 
-configurations.all {
-    // Exclude Logback (and use log4j2 instead)
-    exclude group:"org.springframework.boot", module: "spring-boot-starter-logging"
-}
-
 dependencies {
     /*******************************
      * Compile Dependencies
