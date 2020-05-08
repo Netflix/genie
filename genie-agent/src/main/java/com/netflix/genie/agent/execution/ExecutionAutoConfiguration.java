@@ -34,7 +34,7 @@ import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachineIm
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.listeners.JobExecutionListener;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
-import com.netflix.genie.agent.execution.statemachine.listeners.UserConsoleLoggingListener;
+import com.netflix.genie.agent.execution.statemachine.listeners.ConsoleLogListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ClaimJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CleanupJobDirectoryStage;
@@ -95,15 +95,15 @@ public class ExecutionAutoConfiguration {
     }
 
     /**
-     * Provide a lazy {@link UserConsoleLoggingListener} bean.
+     * Provide a lazy {@link ConsoleLogListener} bean.
      *
-     * @return A {@link UserConsoleLoggingListener} instance
+     * @return A {@link ConsoleLogListener} instance
      */
     @Bean
     @Lazy
-    @ConditionalOnMissingBean(UserConsoleLoggingListener.class)
-    public UserConsoleLoggingListener userConsoleLoggingListener() {
-        return new UserConsoleLoggingListener();
+    @ConditionalOnMissingBean(ConsoleLogListener.class)
+    public ConsoleLogListener consoleLogLoggingListener() {
+        return new ConsoleLogListener();
     }
 
     /**

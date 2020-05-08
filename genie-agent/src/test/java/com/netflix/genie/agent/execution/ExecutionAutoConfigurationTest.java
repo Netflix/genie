@@ -33,7 +33,7 @@ import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.ExecutionStage;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.listeners.LoggingListener;
-import com.netflix.genie.agent.execution.statemachine.listeners.UserConsoleLoggingListener;
+import com.netflix.genie.agent.execution.statemachine.listeners.ConsoleLogListener;
 import com.netflix.genie.agent.execution.statemachine.stages.ArchiveJobOutputsStage;
 import com.netflix.genie.agent.execution.statemachine.stages.ClaimJobStage;
 import com.netflix.genie.agent.execution.statemachine.stages.CleanupJobDirectoryStage;
@@ -128,7 +128,7 @@ class ExecutionAutoConfigurationTest {
         contextRunner.run(
             context -> {
                 Assertions.assertThat(context).hasSingleBean(LoggingListener.class);
-                Assertions.assertThat(context).hasSingleBean(UserConsoleLoggingListener.class);
+                Assertions.assertThat(context).hasSingleBean(ConsoleLogListener.class);
                 Assertions.assertThat(context).hasSingleBean(ExecutionContext.class);
                 Assertions.assertThat(context).hasSingleBean(JobExecutionStateMachine.class);
                 uniqueExecutionStages.forEach(

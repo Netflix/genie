@@ -30,13 +30,13 @@ import javax.annotation.Nullable;
  * @author mprimi
  * @since 4.0.0
  */
-public class UserConsoleLoggingListener implements JobExecutionListener {
+public class ConsoleLogListener implements JobExecutionListener {
     private final Logger log;
 
     /**
      * Constructor.
      */
-    public UserConsoleLoggingListener() {
+    public ConsoleLogListener() {
         this.log = ConsoleLog.getLogger();
     }
 
@@ -61,7 +61,48 @@ public class UserConsoleLoggingListener implements JobExecutionListener {
      */
     @Override
     public void beforeStateActionAttempt(final States state) {
-        log.info(" > {} <", state);
+        log.debug("Attempting action: {}", state);
+
+        switch (state) {
+            case INITIALIZE_AGENT:
+                log.info("Initializing agent...");
+                break;
+            case HANDSHAKE:
+                log.info("Connecting to server...");
+                break;
+            case RESERVE_JOB_ID:
+                log.info("Obtaining job id...");
+                break;
+            case OBTAIN_JOB_SPECIFICATION:
+                log.info("Obtaining job specification...");
+                break;
+            case CLAIM_JOB:
+                log.info("Claiming job for execution...");
+                break;
+            case CREATE_JOB_DIRECTORY:
+                log.info("Creating job directory...");
+                break;
+            case DOWNLOAD_DEPENDENCIES:
+                log.info("Downloading job dependencies...");
+                break;
+            case LAUNCH_JOB:
+                log.info("Launching job...");
+                break;
+            case WAIT_JOB_COMPLETION:
+                log.info("Waiting for job completion...");
+                break;
+            case ARCHIVE:
+                log.info("Archiving job files...");
+                break;
+            case CLEAN:
+                log.info("Cleaning job directory...");
+                break;
+            case SHUTDOWN:
+                log.info("Shutting down...");
+                break;
+            default:
+                // NOOP - Other states are TMI for Console
+        }
     }
 
     /**
@@ -111,7 +152,7 @@ public class UserConsoleLoggingListener implements JobExecutionListener {
      */
     @Override
     public void executionAborted(final States state, final FatalJobExecutionException exception) {
-        log.warn("Job execution aborted in {}: {}", state, exception.getMessage());
+        log.error("Job execution aborted in {}: {}", state, exception.getMessage());
     }
 
     /**
