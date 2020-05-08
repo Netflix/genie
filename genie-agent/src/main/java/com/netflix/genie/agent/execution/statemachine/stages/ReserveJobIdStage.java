@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.JobIdUnavailableException;
 import com.netflix.genie.agent.execution.exceptions.JobReservationException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
@@ -87,7 +87,7 @@ public class ReserveJobIdStage extends ExecutionStage {
 
             executionContext.setCurrentJobStatus(JobStatus.RESERVED);
 
-            UserConsole.getLogger().info("Successfully reserved job id: {}", reservedJobId);
+            ConsoleLog.getLogger().info("Successfully reserved job id: {}", reservedJobId);
         }
 
         executionContext.setReservedJobId(reservedJobId);

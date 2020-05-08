@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
@@ -69,6 +69,6 @@ public class CreateJobDirectoryStage extends ExecutionStage {
 
         executionContext.setJobDirectory(jobDirectory);
 
-        UserConsole.getLogger().info("Created job directory: {}", jobDirectory);
+        ConsoleLog.getLogger().info("Created job directory: {}", jobDirectory);
     }
 }

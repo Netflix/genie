@@ -18,6 +18,7 @@
 package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.ParameterException;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
@@ -52,12 +53,12 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
 
     @Override
     public void run(final String... args) throws Exception {
-        UserConsole.printBanner(environment);
+        ConsoleLog.printBanner(environment);
         try {
             internalRun(args);
         } catch (final Throwable t) {
             final Throwable userConsoleException = t.getCause() != null ? t.getCause() : t;
-            UserConsole.getLogger().error(
+            ConsoleLog.getLogger().error(
                 "Command execution failed: {}",
                 userConsoleException.getMessage()
             );
@@ -91,7 +92,7 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
             throw new IllegalArgumentException("Invalid command -- commands available: " + availableCommandsString);
         }
 
-        UserConsole.getLogger().info("Preparing agent to execute command: '{}'", commandName);
+        ConsoleLog.getLogger().info("Preparing agent to execute command: '{}'", commandName);
 
         log.info("Initializing command: {}", commandName);
         exitCode = ExitCode.COMMAND_INIT_FAIL;
@@ -103,7 +104,7 @@ public class GenieAgentRunner implements CommandLineRunner, ExitCodeGenerator {
 
     @Override
     public int getExitCode() {
-        UserConsole.getLogger().info("Terminating with code: {} ({})", exitCode.getCode(), exitCode.getMessage());
+        ConsoleLog.getLogger().info("Terminating with code: {} ({})", exitCode.getCode(), exitCode.getMessage());
         return exitCode.getCode();
     }
 }

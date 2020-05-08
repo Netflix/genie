@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.process.impl;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.process.JobProcessResult;
@@ -178,7 +178,7 @@ public class JobProcessManagerImpl implements JobProcessManager {
         int exitCode = 0;
         if (process != null) {
             exitCode = process.waitFor();
-            UserConsole.getLogger().info("Job process terminated with exit code: {}", exitCode);
+            ConsoleLog.getLogger().info("Job process terminated with exit code: {}", exitCode);
         }
 
         try {

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.HandshakeException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
@@ -70,6 +70,6 @@ public class HandshakeStage extends ExecutionStage {
             throw createFatalException(e);
         }
 
-        UserConsole.getLogger().info("Shook hands with server");
+        ConsoleLog.getLogger().info("Shook hands with server");
     }
 }

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
@@ -80,7 +80,7 @@ public class ObtainJobSpecificationStage extends ExecutionStage {
 
         executionContext.setJobSpecification(jobSpecification);
 
-        UserConsole.getLogger().info("Successfully obtained specification");
+        ConsoleLog.getLogger().info("Successfully obtained specification");
 
     }
 }
