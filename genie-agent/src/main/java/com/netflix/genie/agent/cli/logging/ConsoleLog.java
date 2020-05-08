@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.cli;
+package com.netflix.genie.agent.cli.logging;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,11 +38,10 @@ import java.nio.charset.StandardCharsets;
  * @since 4.0.0
  */
 @Slf4j
-public final class UserConsole {
+public final class ConsoleLog {
 
     /**
      * The name of this logger must match the one explicitly whitelisted in the underlying logger configuration
-     * consumed by Spring. It is treated differently than other logs.
      * consumed by Spring. It is treated differently than other logs.
      */
     private static final String CONSOLE_LOGGER_NAME = "genie-agent";
@@ -56,7 +55,7 @@ public final class UserConsole {
     private static final String BANNER_LOCATION_SPRING_PROPERTY_KEY = SpringApplication.BANNER_LOCATION_PROPERTY;
     private static final String BANNER_CHARSET_SPRING_PROPERTY_KEY = "spring.banner.charset";
 
-    private UserConsole() {
+    private ConsoleLog() {
     }
 
     /**
@@ -74,7 +73,7 @@ public final class UserConsole {
      *
      * @param environment the Spring environment
      */
-    static void printBanner(final Environment environment) {
+    public static void printBanner(final Environment environment) {
         try {
             final String bannerLocation = environment.getProperty(BANNER_LOCATION_SPRING_PROPERTY_KEY);
             if (StringUtils.isNotBlank(bannerLocation)) {
@@ -89,7 +88,7 @@ public final class UserConsole {
                             StandardCharsets.UTF_8
                         )
                     );
-                    UserConsole.getLogger().info(banner);
+                    ConsoleLog.getLogger().info(banner);
                 }
             }
         } catch (final Throwable t) {

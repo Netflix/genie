@@ -15,7 +15,8 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent.cli
+package com.netflix.genie.agent.cli.logging
+
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -25,18 +26,15 @@ import spock.lang.Specification
 
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 
-class UserConsoleSpec extends Specification {
+class ConsoleLogSpec extends Specification {
 
     @Rule
     TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     def "GetLogger"() {
         when:
-        Logger logger = UserConsole.getLogger()
+        Logger logger = ConsoleLog.getLogger()
 
         then:
         logger != null
@@ -47,10 +45,10 @@ class UserConsoleSpec extends Specification {
         Environment environment = Mock(Environment)
 
         when:
-        UserConsole.printBanner(environment)
+        ConsoleLog.printBanner(environment)
 
         then:
-        1 * environment.getProperty(UserConsole.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> null
+        1 * environment.getProperty(ConsoleLog.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> null
     }
 
     def "PrintBanner -- exception"() {
@@ -58,10 +56,10 @@ class UserConsoleSpec extends Specification {
         Environment environment = Mock(Environment)
 
         when:
-        UserConsole.printBanner(environment)
+        ConsoleLog.printBanner(environment)
 
         then:
-        1 * environment.getProperty(UserConsole.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> {
+        1 * environment.getProperty(ConsoleLog.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> {
             throw new RuntimeException("error")
         }
         noExceptionThrown()
@@ -72,10 +70,10 @@ class UserConsoleSpec extends Specification {
         Environment environment = Mock(Environment)
 
         when:
-        UserConsole.printBanner(environment)
+        ConsoleLog.printBanner(environment)
 
         then:
-        1 * environment.getProperty(UserConsole.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> "classpath:not-a-banner.txt"
+        1 * environment.getProperty(ConsoleLog.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> "classpath:not-a-banner.txt"
     }
 
     def "PrintBanner"() {
@@ -83,12 +81,12 @@ class UserConsoleSpec extends Specification {
         Environment environment = Mock(Environment)
 
         when:
-        UserConsole.printBanner(environment)
+        ConsoleLog.printBanner(environment)
 
         then:
-        1 * environment.getProperty(UserConsole.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> "classpath:genie-agent-banner.txt"
+        1 * environment.getProperty(ConsoleLog.BANNER_LOCATION_SPRING_PROPERTY_KEY) >> "classpath:genie-agent-banner.txt"
         1 * environment.getProperty(
-            UserConsole.BANNER_CHARSET_SPRING_PROPERTY_KEY,
+            ConsoleLog.BANNER_CHARSET_SPRING_PROPERTY_KEY,
             Charset.class,
             StandardCharsets.UTF_8
         ) >> StandardCharsets.UTF_8

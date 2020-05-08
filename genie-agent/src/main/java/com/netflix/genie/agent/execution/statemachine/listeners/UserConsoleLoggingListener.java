@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.listeners;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
 import com.netflix.genie.agent.execution.statemachine.States;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class UserConsoleLoggingListener implements JobExecutionListener {
      * Constructor.
      */
     public UserConsoleLoggingListener() {
-        this.log = UserConsole.getLogger();
+        this.log = ConsoleLog.getLogger();
     }
 
     /**

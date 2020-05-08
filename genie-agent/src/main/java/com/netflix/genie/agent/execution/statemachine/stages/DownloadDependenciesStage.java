@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
 import com.netflix.genie.agent.execution.services.JobSetupService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
@@ -70,7 +70,7 @@ public class DownloadDependenciesStage extends ExecutionStage {
             throw createFatalException(e);
         }
 
-        UserConsole.getLogger().info("Downloaded dependencies ({} files)", downloaded.size());
+        ConsoleLog.getLogger().info("Downloaded dependencies ({} files)", downloaded.size());
 
     }
 }

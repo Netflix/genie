@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
@@ -86,6 +86,6 @@ public class LaunchJobStage extends ExecutionStage {
         executionContext.setNextJobStatus(JobStatus.RUNNING);
         executionContext.setNextJobStatusMessage(JobStatusMessages.JOB_RUNNING);
 
-        UserConsole.getLogger().info("Job launched");
+        ConsoleLog.getLogger().info("Job launched");
     }
 }

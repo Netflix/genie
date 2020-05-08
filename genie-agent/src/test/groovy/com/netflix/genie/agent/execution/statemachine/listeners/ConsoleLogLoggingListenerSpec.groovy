@@ -21,7 +21,7 @@ import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException
 import com.netflix.genie.agent.execution.statemachine.States
 import spock.lang.Specification
 
-class UserConsoleLoggingListenerSpec extends Specification {
+class ConsoleLogLoggingListenerSpec extends Specification {
 
     def "Test all methods"() {
         setup:

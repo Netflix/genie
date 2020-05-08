@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.statemachine.stages;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.process.JobProcessManager;
 import com.netflix.genie.agent.execution.process.JobProcessResult;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
@@ -66,7 +66,7 @@ public class WaitJobCompletionStage extends ExecutionStage {
             executionContext.setJobProcessResult(jobProcessResult);
 
             final JobStatus finalJobStatus = jobProcessResult.getFinalStatus();
-            UserConsole.getLogger().info("Job process completed with final status {}", finalJobStatus);
+            ConsoleLog.getLogger().info("Job process completed with final status {}", finalJobStatus);
         } else {
             log.debug("Job not launched, skipping");
         }

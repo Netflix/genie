@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.agent.execution.services.impl;
 
-import com.netflix.genie.agent.cli.UserConsole;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.services.KillService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,7 +42,7 @@ class KillServiceImpl implements KillService {
      */
     @Override
     public void kill(final KillSource killSource) {
-        UserConsole.getLogger().info("Job kill requested (source: {})", killSource.name());
+        ConsoleLog.getLogger().info("Job kill requested (source: {})", killSource.name());
         log.debug("Emitting kill event");
         this.applicationEventPublisher.publishEvent(new KillEvent(killSource));
         log.debug("Kill event published");

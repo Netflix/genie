@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.agent.cli.logging;
 
-import com.netflix.genie.agent.cli.UserConsole;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -57,7 +56,7 @@ public final class AgentLogManagerLog4j2Impl implements AgentLogManager {
             throw new IllegalStateException("Could not determine location of agent log file");
         }
         this.logFilePath.set(Paths.get(filename));
-        UserConsole.getLogger().info("Agent (temporarily) logging to: {}", filename);
+        ConsoleLog.getLogger().info("Agent (temporarily) logging to: {}", filename);
     }
 
     /**
@@ -91,6 +90,6 @@ public final class AgentLogManagerLog4j2Impl implements AgentLogManager {
 
         this.logFilePath.set(destinationAbsolutePath);
 
-        UserConsole.getLogger().info("Agent log file relocated to: " + destinationAbsolutePath);
+        ConsoleLog.getLogger().info("Agent log file relocated to: " + destinationAbsolutePath);
     }
 }

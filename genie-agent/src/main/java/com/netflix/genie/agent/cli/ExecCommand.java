@@ -20,6 +20,7 @@ package com.netflix.genie.agent.cli;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.annotations.VisibleForTesting;
+import com.netflix.genie.agent.cli.logging.ConsoleLog;
 import com.netflix.genie.agent.execution.services.KillService;
 import com.netflix.genie.agent.execution.statemachine.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException;
@@ -81,7 +82,7 @@ class ExecCommand implements AgentCommand {
         final FatalJobExecutionException fatalException = executionContext.getExecutionAbortedFatalException();
 
         if (fatalException != null) {
-            UserConsole.getLogger().error(
+            ConsoleLog.getLogger().error(
                 "Job execution fatal error in state {}: {}",
                 fatalException.getSourceState(),
                 fatalException.getCause().getMessage()
@@ -121,7 +122,8 @@ class ExecCommand implements AgentCommand {
 
     @VisibleForTesting
     void handleTerminationSignal() {
-        UserConsole.getLogger().info("Kill requested, terminating job");
+        ConsoleLog.getLogger().info("Kill requested, terminating job");
+        log.warn("Received kill signal");
         this.killService.kill(KillService.KillSource.SYSTEM_SIGNAL);
     }
 
