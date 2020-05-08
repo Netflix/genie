@@ -61,6 +61,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude group: "org.hibernate.javax.persistence"
     }
+    compile("org.springframework.boot:spring-boot-starter-log4j2")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-integration")
