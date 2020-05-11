@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -151,31 +151,37 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#agentLogManagerLog4j2--">agentLogManagerLog4j2</a></span>()</code>
+<div class="block">Provide an <a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><code>AgentLogManager</code></a> implementation that can relocate the agent log file created by log4j2.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CacheArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CacheArguments</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#cacheArgumentsDelegate--">cacheArgumentsDelegate</a></span>()</code>
 <div class="block">Provide a bean for cache command line arguments.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CleanupArguments</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#cleanupArguments--">cleanupArguments</a></span>()</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CleanupArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.CleanupArguments</code></a>.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.DownloadCommand</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#downloadCommand-com.netflix.genie.agent.cli.DownloadCommand.DownloadCommandArguments-com.netflix.genie.agent.execution.services.DownloadService-">downloadCommand</a></span>(com.netflix.genie.agent.cli.DownloadCommand.DownloadCommandArguments&nbsp;downloadCommandArguments,
                <a href="../../../../../com/netflix/genie/agent/execution/services/DownloadService.html" title="interface in com.netflix.genie.agent.execution.services">DownloadService</a>&nbsp;downloadService)</code>
 <div class="block">Provide a lazy bean definition for a <code>DownloadCommand</code>.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.DownloadCommand.DownloadCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#downloadCommandArguments-com.netflix.genie.agent.cli.ArgumentDelegates.CacheArguments-">downloadCommandArguments</a></span>(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CacheArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CacheArguments</a>&nbsp;cacheArguments)</code>
 <div class="block">Provide a bean for arguments for a download command.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.ExecCommand</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommand-com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments-com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine-com.netflix.genie.agent.execution.services.KillService-">execCommand</a></span>(com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments&nbsp;execCommandArguments,
            <a href="../../../../../com/netflix/genie/agent/execution/statemachine/JobExecutionStateMachine.html" title="interface in com.netflix.genie.agent.execution.statemachine">JobExecutionStateMachine</a>&nbsp;jobExecutionStateMachine,
@@ -183,7 +189,7 @@ extends java.lang.Object</pre>
 <div class="block">Provide a lazy bean definition for an <code>ExecCommand</code>.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.ExecCommand.ExecCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#execCommandArguments-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-com.netflix.genie.agent.cli.ArgumentDelegates.CacheArguments-com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments-com.netflix.genie.agent.cli.ArgumentDelegates.CleanupArguments-com.netflix.genie.agent.cli.ArgumentDelegates.RuntimeConfigurationArguments-">execCommandArguments</a></span>(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments,
                     <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.CacheArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.CacheArguments</a>&nbsp;cacheArguments,
@@ -193,7 +199,7 @@ extends java.lang.Object</pre>
 <div class="block">Provide a bean for execution command arguments.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/GenieAgentRunner.html" title="class in com.netflix.genie.agent.cli">GenieAgentRunner</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#genieAgentRunner-com.netflix.genie.agent.cli.ArgumentParser-com.netflix.genie.agent.cli.CommandFactory-org.springframework.core.env.Environment-">genieAgentRunner</a></span>(com.netflix.genie.agent.cli.ArgumentParser&nbsp;argumentParser,
                 com.netflix.genie.agent.cli.CommandFactory&nbsp;commandFactory,
@@ -202,32 +208,32 @@ extends java.lang.Object</pre>
  <code>CommandLineRunner</code>.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.HeartBeatCommand</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#heartBeatCommand-com.netflix.genie.agent.cli.HeartBeatCommand.HeartBeatCommandArguments-com.netflix.genie.agent.execution.services.AgentHeartBeatService-">heartBeatCommand</a></span>(com.netflix.genie.agent.cli.HeartBeatCommand.HeartBeatCommandArguments&nbsp;heartBeatCommandArguments,
                 <a href="../../../../../com/netflix/genie/agent/execution/services/AgentHeartBeatService.html" title="interface in com.netflix.genie.agent.execution.services">AgentHeartBeatService</a>&nbsp;agentHeartBeatService)</code>
 <div class="block">Provide a lazy bean definition for a <code>HeartBeatCommand</code>.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.HeartBeatCommand.HeartBeatCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#heartBeatCommandArguments-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-">heartBeatCommandArguments</a></span>(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments)</code>
 <div class="block">Provide a bean for <code>HeartBeatCommand.HeartBeatCommandArguments</code>.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.HelpCommand</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#helpCommand-com.netflix.genie.agent.cli.ArgumentParser-">helpCommand</a></span>(com.netflix.genie.agent.cli.ArgumentParser&nbsp;argumentParser)</code>
 <div class="block">Provide a lazy bean instance of <code>HelpCommand</code>.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.HelpCommand.HelpCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#helpCommandArguments--">helpCommandArguments</a></span>()</code>
 <div class="block">Provide an bean of <code>HelpCommand.HelpCommandArguments</code>.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.InfoCommand</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#infoCommand-com.netflix.genie.agent.cli.InfoCommand.InfoCommandArguments-org.springframework.context.ConfigurableApplicationContext-com.netflix.genie.agent.AgentMetadata-">infoCommand</a></span>(com.netflix.genie.agent.cli.InfoCommand.InfoCommandArguments&nbsp;infoCommandArguments,
            org.springframework.context.ConfigurableApplicationContext&nbsp;configurableApplicationContext,
@@ -235,31 +241,31 @@ extends java.lang.Object</pre>
 <div class="block">Provide a lazy bean definition for an <code>InfoCommand</code>.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.InfoCommand.InfoCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#infoCommandArguments--">infoCommandArguments</a></span>()</code>
 <div class="block">Provide an instance of <code>InfoCommand.InfoCommandArguments</code>.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#jobRequestArguments-com.netflix.genie.agent.cli.MainCommandArguments-">jobRequestArguments</a></span>(com.netflix.genie.agent.cli.MainCommandArguments&nbsp;mainCommandArguments)</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.JobRequestArguments</code></a>.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/JobRequestConverter.html" title="class in com.netflix.genie.agent.cli">JobRequestConverter</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#jobRequestConverter-javax.validation.Validator-">jobRequestConverter</a></span>(javax.validation.Validator&nbsp;validator)</code>
 <div class="block">Provide an instance of <a href="../../../../../com/netflix/genie/agent/cli/JobRequestConverter.html" title="class in com.netflix.genie.agent.cli"><code>JobRequestConverter</code></a>.</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.MainCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#mainCommandArguments--">mainCommandArguments</a></span>()</code>
 <div class="block">Provide a <code>MainCommandArguments</code>.</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.PingCommand</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#pingCommand-com.netflix.genie.agent.cli.PingCommand.PingCommandArguments-com.netflix.genie.proto.PingServiceGrpc.PingServiceFutureStub-com.netflix.genie.agent.AgentMetadata-">pingCommand</a></span>(com.netflix.genie.agent.cli.PingCommand.PingCommandArguments&nbsp;pingCommandArguments,
            com.netflix.genie.proto.PingServiceGrpc.PingServiceFutureStub&nbsp;pingServiceFutureStub,
@@ -267,13 +273,13 @@ extends java.lang.Object</pre>
 <div class="block">Provide a lazy bean for a <code>PingCommand</code>.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.PingCommand.PingCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#pingCommandArguments-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-">pingCommandArguments</a></span>(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments)</code>
 <div class="block">Provides a <code>PingCommand.PingCommandArguments</code> bean.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.ResolveJobSpecCommand</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#resolveJobSpecCommand-com.netflix.genie.agent.cli.ResolveJobSpecCommand.ResolveJobSpecCommandArguments-com.netflix.genie.agent.execution.services.AgentJobService-com.netflix.genie.agent.cli.JobRequestConverter-">resolveJobSpecCommand</a></span>(com.netflix.genie.agent.cli.ResolveJobSpecCommand.ResolveJobSpecCommandArguments&nbsp;resolveJobSpecCommandArguments,
                      <a href="../../../../../com/netflix/genie/agent/execution/services/AgentJobService.html" title="interface in com.netflix.genie.agent.execution.services">AgentJobService</a>&nbsp;agentJobService,
@@ -281,20 +287,20 @@ extends java.lang.Object</pre>
 <div class="block">Provide a lazy bean definition for a <code>ResolveJobSpecCommand</code>.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>com.netflix.genie.agent.cli.ResolveJobSpecCommand.ResolveJobSpecCommandArguments</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#resolveJobSpecCommandArguments-com.netflix.genie.agent.cli.ArgumentDelegates.ServerArguments-com.netflix.genie.agent.cli.ArgumentDelegates.JobRequestArguments-">resolveJobSpecCommandArguments</a></span>(<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a>&nbsp;serverArguments,
                               <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a>&nbsp;jobRequestArguments)</code>
 <div class="block">Provide a bean of type <code>ResolveJobSpecCommand.ResolveJobSpecCommandArguments</code>.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.RuntimeConfigurationArguments</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#runtimeConfigurationArguments--">runtimeConfigurationArguments</a></span>()</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.RuntimeConfigurationArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.RuntimeConfigurationArguments</code></a>.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.ServerArguments</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/agent/cli/CliAutoConfiguration.html#serverArguments--">serverArguments</a></span>()</code>
 <div class="block">Provide a <a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegates.ServerArguments.html" title="interface in com.netflix.genie.agent.cli"><code>ArgumentDelegates.ServerArguments</code></a>.</div>
@@ -730,7 +736,7 @@ public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegate
 <a name="runtimeConfigurationArguments--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>runtimeConfigurationArguments</h4>
 <pre>@Bean
@@ -739,6 +745,23 @@ public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegate
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <code>RuntimeConfigurationArgumentsImpl</code> instance</dd>
+</dl>
+</li>
+</ul>
+<a name="agentLogManagerLog4j2--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>agentLogManagerLog4j2</h4>
+<pre>@Bean
+ @ConditionalOnClass(value=org.apache.logging.log4j.core.LoggerContext.class)
+ @ConditionalOnMissingBean(value=<a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager.class</a>)
+public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager</a>&nbsp;agentLogManagerLog4j2()</pre>
+<div class="block">Provide an <a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><code>AgentLogManager</code></a> implementation that can relocate the agent log file created by log4j2.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the log4j2 implementation of <a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><code>AgentLogManager</code></a></dd>
 </dl>
 </li>
 </ul>

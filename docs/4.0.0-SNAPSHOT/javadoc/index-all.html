@@ -334,15 +334,15 @@
 <dd>
 <div class="block">The three possible Admin resources in Genie.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#afterStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-java.lang.Exception-">afterStateActionAttempt(States, Exception)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Invoked after the action associated with a given state is invoked.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#afterStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-java.lang.Exception-">afterStateActionAttempt(States, Exception)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
 <div class="block">Invoked after the action associated with a given state is invoked.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#afterStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-java.lang.Exception-">afterStateActionAttempt(States, Exception)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dd>
-<div class="block">Invoked after the action associated with a given state is invoked.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#afterStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-java.lang.Exception-">afterStateActionAttempt(States, Exception)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
 <dd>
 <div class="block">Invoked after the action associated with a given state is invoked.</div>
 </dd>
@@ -593,6 +593,22 @@
 <div class="block">Constructor.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/exceptions/checked/AgentLaunchException.html#AgentLaunchException-java.lang.String-java.lang.Throwable-">AgentLaunchException(String, Throwable)</a></span> - Constructor for exception com.netflix.genie.web.exceptions.checked.<a href="com/netflix/genie/web/exceptions/checked/AgentLaunchException.html" title="class in com.netflix.genie.web.exceptions.checked">AgentLaunchException</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><span class="typeNameLink">AgentLogManager</span></a> - Interface in <a href="com/netflix/genie/agent/cli/logging/package-summary.html">com.netflix.genie.agent.cli.logging</a></dt>
+<dd>
+<div class="block">Utility to locate and relocate agent log file.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html#agentLogManagerLog4j2--">agentLogManagerLog4j2()</a></span> - Method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/CliAutoConfiguration.html" title="class in com.netflix.genie.agent.cli">CliAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide an <a href="com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><code>AgentLogManager</code></a> implementation that can relocate the agent log file created by log4j2.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html" title="class in com.netflix.genie.agent.cli.logging"><span class="typeNameLink">AgentLogManagerLog4j2Impl</span></a> - Class in <a href="com/netflix/genie/agent/cli/logging/package-summary.html">com.netflix.genie.agent.cli.logging</a></dt>
+<dd>
+<div class="block">Utility class that locates and relocates the agent log file.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html#AgentLogManagerLog4j2Impl-org.apache.logging.log4j.core.LoggerContext-">AgentLogManagerLog4j2Impl(LoggerContext)</a></span> - Constructor for class com.netflix.genie.agent.cli.logging.<a href="com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html" title="class in com.netflix.genie.agent.cli.logging">AgentLogManagerLog4j2Impl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -1082,15 +1098,15 @@
 <dd>
 <div class="block">Base class for search results containing common fields.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#beforeStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-">beforeStateActionAttempt(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Invoked before the action associated to a given state is invoked.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#beforeStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-">beforeStateActionAttempt(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
 <div class="block">Invoked before the action associated to a given state is invoked.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#beforeStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-">beforeStateActionAttempt(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dd>
-<div class="block">Invoked before the action associated to a given state is invoked.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#beforeStateActionAttempt-com.netflix.genie.agent.execution.statemachine.States-">beforeStateActionAttempt(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
 <dd>
 <div class="block">Invoked before the action associated to a given state is invoked.</div>
 </dd>
@@ -1817,6 +1833,10 @@
 <dt><a href="com/netflix/genie/agent/cli/package-summary.html">com.netflix.genie.agent.cli</a> - package com.netflix.genie.agent.cli</dt>
 <dd>
 <div class="block">Commands for Agent and their command-line arguments descriptors.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/cli/logging/package-summary.html">com.netflix.genie.agent.cli.logging</a> - package com.netflix.genie.agent.cli.logging</dt>
+<dd>
+<div class="block">Logging components.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/package-summary.html">com.netflix.genie.agent.execution</a> - package com.netflix.genie.agent.execution</dt>
 <dd>
@@ -2552,6 +2572,22 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/HttpProperties.Connect.html#Connect--">Connect()</a></span> - Constructor for class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/HttpProperties.Connect.html" title="class in com.netflix.genie.web.properties">HttpProperties.Connect</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/agent/cli/logging/ConsoleLog.html" title="class in com.netflix.genie.agent.cli.logging"><span class="typeNameLink">ConsoleLog</span></a> - Class in <a href="com/netflix/genie/agent/cli/logging/package-summary.html">com.netflix.genie.agent.cli.logging</a></dt>
+<dd>
+<div class="block">Utilities for interacting with the user terminal/console.</div>
+</dd>
+<dt><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">ConsoleLogListener</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">com.netflix.genie.agent.execution.statemachine.listeners</a></dt>
+<dd>
+<div class="block">Job execution listener that prints messages visible to the user in the console.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#ConsoleLogListener--">ConsoleLogListener()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html#consoleLogLoggingListener--">consoleLogLoggingListener()</a></span> - Method in class com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html" title="class in com.netflix.genie.agent.execution">ExecutionAutoConfiguration</a></dt>
+<dd>
+<div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>ConsoleLogListener</code></a> bean.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#contentLength--">contentLength()</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html#contribute-org.springframework.boot.actuate.info.Info.Builder-">contribute(Info.Builder)</a></span> - Method in class com.netflix.genie.web.agent.services.impl.<a href="com/netflix/genie/web/agent/services/impl/AgentConnectionTrackingServiceImpl.html" title="class in com.netflix.genie.web.agent.services.impl">AgentConnectionTrackingServiceImpl</a></dt>
 <dt><a href="com/netflix/genie/web/apis/rest/v3/controllers/ControllerUtils.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers"><span class="typeNameLink">ControllerUtils</span></a> - Class in <a href="com/netflix/genie/web/apis/rest/v3/controllers/package-summary.html">com.netflix.genie.web.apis.rest.v3.controllers</a></dt>
@@ -2884,17 +2920,17 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/services/impl/DefaultMailServiceImpl.html#DefaultMailServiceImpl--">DefaultMailServiceImpl()</a></span> - Constructor for class com.netflix.genie.web.services.impl.<a href="com/netflix/genie/web/services/impl/DefaultMailServiceImpl.html" title="class in com.netflix.genie.web.services.impl">DefaultMailServiceImpl</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#delayedStateActionRetry-com.netflix.genie.agent.execution.statemachine.States-long-">delayedStateActionRetry(States, long)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
+ result of a retryable exception on the previous attempt.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#delayedStateActionRetry-com.netflix.genie.agent.execution.statemachine.States-long-">delayedStateActionRetry(States, long)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
 <div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
  result of a retryable exception on the previous attempt.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#delayedStateActionRetry-com.netflix.genie.agent.execution.statemachine.States-long-">delayedStateActionRetry(States, long)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dd>
-<div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
- result of a retryable exception on the previous attempt.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#delayedStateActionRetry-com.netflix.genie.agent.execution.statemachine.States-long-">delayedStateActionRetry(States, long)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
 <dd>
 <div class="block">Invoked when the state machine is about to wait before retrying the action associated to the given state as a
  result of a retryable exception on the previous attempt.</div>
@@ -3477,17 +3513,17 @@
 <dd>
 <div class="block">Inspect the incoming request and decide whether to execute using the new Agent-based execution mode.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#executionAborted-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">executionAborted(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine encounters a fatal exception in a critical state, which causes the execution to
+ abort.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#executionAborted-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">executionAborted(States, FatalJobExecutionException)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
 <div class="block">Invoked when the state machine encounters a fatal exception in a critical state, which causes the execution to
  abort.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#executionAborted-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">executionAborted(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dd>
-<div class="block">Invoked when the state machine encounters a fatal exception in a critical state, which causes the execution to
- abort.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#executionAborted-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">executionAborted(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
 <dd>
 <div class="block">Invoked when the state machine encounters a fatal exception in a critical state, which causes the execution to
  abort.</div>
@@ -3691,15 +3727,15 @@
 <dd>
 <div class="block">Tag value to denote failure (used with TagKeys.STATUS).</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#fatalException-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">fatalException(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine encounters a fatal exception while invoking the action for a given state.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#fatalException-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">fatalException(States, FatalJobExecutionException)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
 <div class="block">Invoked when the state machine encounters a fatal exception while invoking the action for a given state.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#fatalException-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">fatalException(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dd>
-<div class="block">Invoked when the state machine encounters a fatal exception while invoking the action for a given state.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#fatalException-com.netflix.genie.agent.execution.statemachine.States-com.netflix.genie.agent.execution.statemachine.FatalJobExecutionException-">fatalException(States, FatalJobExecutionException)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
 <dd>
 <div class="block">Invoked when the state machine encounters a fatal exception while invoking the action for a given state.</div>
 </dd>
@@ -6284,7 +6320,15 @@
 <dd>
 <div class="block">Get a lock locking the provided File object.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/UserConsole.html#getLogger--">getLogger()</a></span> - Static method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/UserConsole.html" title="class in com.netflix.genie.agent.cli">UserConsole</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/logging/AgentLogManager.html#getLogFilePath--">getLogFilePath()</a></span> - Method in interface com.netflix.genie.agent.cli.logging.<a href="com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager</a></dt>
+<dd>
+<div class="block">Get the current location of the agent log file.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html#getLogFilePath--">getLogFilePath()</a></span> - Method in class com.netflix.genie.agent.cli.logging.<a href="com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html" title="class in com.netflix.genie.agent.cli.logging">AgentLogManagerLog4j2Impl</a></dt>
+<dd>
+<div class="block">Get the current location of the agent log file.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/logging/ConsoleLog.html#getLogger--">getLogger()</a></span> - Static method in class com.netflix.genie.agent.cli.logging.<a href="com/netflix/genie/agent/cli/logging/ConsoleLog.html" title="class in com.netflix.genie.agent.cli.logging">ConsoleLog</a></dt>
 <dd>
 <div class="block">Get the LOGGER visible to user on the console.</div>
 </dd>
@@ -9985,6 +10029,10 @@
 <dd>
 <div class="block">Properties prefix.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/logging/ConsoleLog.html#printBanner-org.springframework.core.env.Environment-">printBanner(Environment)</a></span> - Static method in class com.netflix.genie.agent.cli.logging.<a href="com/netflix/genie/agent/cli/logging/ConsoleLog.html" title="class in com.netflix.genie.agent.cli.logging">ConsoleLog</a></dt>
+<dd>
+<div class="block">Load and print the Spring banner (if one is configured) to UserConsole.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/JobStatusMessages.html#PROCESS_DETECTED_TO_BE_COMPLETE">PROCESS_DETECTED_TO_BE_COMPLETE</a></span> - Static variable in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/JobStatusMessages.html" title="class in com.netflix.genie.common.dto">JobStatusMessages</a></dt>
 <dd>
 <div class="block">Job PID terminated, exist status is yet to be verified.</div>
@@ -10291,15 +10339,19 @@
 <dd>
 <div class="block">A <a href="com/netflix/genie/web/agent/inspectors/AgentMetadataInspector.html" title="interface in com.netflix.genie.web.agent.inspectors"><code>AgentMetadataInspector</code></a> that may reject all agents based on system properties.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/UserConsole.html#relocateLogFile-java.nio.file.Path-">relocateLogFile(Path)</a></span> - Static method in class com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/UserConsole.html" title="class in com.netflix.genie.agent.cli">UserConsole</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/logging/AgentLogManager.html#relocateLogFile-java.nio.file.Path-">relocateLogFile(Path)</a></span> - Method in interface com.netflix.genie.agent.cli.logging.<a href="com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager</a></dt>
 <dd>
-<div class="block">Move the log file from the current position to the given destination.</div>
+<div class="block">Attempt to relocate the agent log file inside the job directory.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html#relocateLogFile-java.nio.file.Path-">relocateLogFile(Path)</a></span> - Method in class com.netflix.genie.agent.cli.logging.<a href="com/netflix/genie/agent/cli/logging/AgentLogManagerLog4j2Impl.html" title="class in com.netflix.genie.agent.cli.logging">AgentLogManagerLog4j2Impl</a></dt>
+<dd>
+<div class="block">Attempt to relocate the agent log file inside the job directory.</div>
 </dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages"><span class="typeNameLink">RelocateLogFileStage</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/stages/package-summary.html">com.netflix.genie.agent.execution.statemachine.stages</a></dt>
 <dd>
 <div class="block">Moves the agent log file into the job directory from the temporary location.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html#RelocateLogFileStage--">RelocateLogFileStage()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RelocateLogFileStage</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html#RelocateLogFileStage-com.netflix.genie.agent.cli.logging.AgentLogManager-">RelocateLogFileStage(AgentLogManager)</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/RelocateLogFileStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">RelocateLogFileStage</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -11844,6 +11896,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html#startService-java.lang.String-com.netflix.genie.agent.execution.statemachine.ExecutionContext-">startService(String, ExecutionContext)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.stages.<a href="com/netflix/genie/agent/execution/statemachine/stages/StartKillServiceStage.html" title="class in com.netflix.genie.agent.execution.statemachine.stages">StartKillServiceStage</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#stateEntered-com.netflix.genie.agent.execution.statemachine.States-">stateEntered(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Invoked when the state machine reaches the next state, before any of the logic for that state is evaluated.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateEntered-com.netflix.genie.agent.execution.statemachine.States-">stateEntered(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
 <div class="block">Invoked when the state machine reaches the next state, before any of the logic for that state is evaluated.</div>
@@ -11852,9 +11908,9 @@
 <dd>
 <div class="block">Invoked when the state machine reaches the next state, before any of the logic for that state is evaluated.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateEntered-com.netflix.genie.agent.execution.statemachine.States-">stateEntered(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#stateExited-com.netflix.genie.agent.execution.statemachine.States-">stateExited(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
 <dd>
-<div class="block">Invoked when the state machine reaches the next state, before any of the logic for that state is evaluated.</div>
+<div class="block">Invoked when the state machine is done processing a state and it is about to enter the next one.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateExited-com.netflix.genie.agent.execution.statemachine.States-">stateExited(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
@@ -11864,9 +11920,9 @@
 <dd>
 <div class="block">Invoked when the state machine is done processing a state and it is about to enter the next one.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateExited-com.netflix.genie.agent.execution.statemachine.States-">stateExited(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#stateMachineStarted--">stateMachineStarted()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
 <dd>
-<div class="block">Invoked when the state machine is done processing a state and it is about to enter the next one.</div>
+<div class="block">Invoked when the state machine starts running.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateMachineStarted--">stateMachineStarted()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
@@ -11876,9 +11932,9 @@
 <dd>
 <div class="block">Invoked when the state machine starts running.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateMachineStarted--">stateMachineStarted()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#stateMachineStopped--">stateMachineStopped()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
 <dd>
-<div class="block">Invoked when the state machine starts running.</div>
+<div class="block">Invoked when the state machine stops.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateMachineStopped--">stateMachineStopped()</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
@@ -11888,13 +11944,14 @@
 <dd>
 <div class="block">Invoked when the state machine stops.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateMachineStopped--">stateMachineStopped()</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
-<dd>
-<div class="block">Invoked when the state machine stops.</div>
-</dd>
 <dt><a href="com/netflix/genie/agent/execution/statemachine/States.html" title="enum in com.netflix.genie.agent.execution.statemachine"><span class="typeNameLink">States</span></a> - Enum in <a href="com/netflix/genie/agent/execution/statemachine/package-summary.html">com.netflix.genie.agent.execution.statemachine</a></dt>
 <dd>
 <div class="block">Execution state machine states.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html#stateSkipped-com.netflix.genie.agent.execution.statemachine.States-">stateSkipped(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/ConsoleLogListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">ConsoleLogListener</a></dt>
+<dd>
+<div class="block">Invoked when the action of a given state is skipped because execution was aborted and the state is set to be
+ skipped in case of aborted execution.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html#stateSkipped-com.netflix.genie.agent.execution.statemachine.States-">stateSkipped(States)</a></span> - Method in interface com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/JobExecutionListener.html" title="interface in com.netflix.genie.agent.execution.statemachine.listeners">JobExecutionListener</a></dt>
 <dd>
@@ -11902,11 +11959,6 @@
  skipped in case of aborted execution.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html#stateSkipped-com.netflix.genie.agent.execution.statemachine.States-">stateSkipped(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/LoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">LoggingListener</a></dt>
-<dd>
-<div class="block">Invoked when the action of a given state is skipped because execution was aborted and the state is set to be
- skipped in case of aborted execution.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#stateSkipped-com.netflix.genie.agent.execution.statemachine.States-">stateSkipped(States)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
 <dd>
 <div class="block">Invoked when the action of a given state is skipped because execution was aborted and the state is set to be
  skipped in case of aborted execution.</div>
@@ -12845,22 +12897,6 @@
 <div class="block">An interceptor class that updates the User Agent String of the request with user info.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/interceptors/UserAgentInsertInterceptor.html#UserAgentInsertInterceptor-java.lang.String-">UserAgentInsertInterceptor(String)</a></span> - Constructor for class com.netflix.genie.client.interceptors.<a href="com/netflix/genie/client/interceptors/UserAgentInsertInterceptor.html" title="class in com.netflix.genie.client.interceptors">UserAgentInsertInterceptor</a></dt>
-<dd>
-<div class="block">Constructor.</div>
-</dd>
-<dt><a href="com/netflix/genie/agent/cli/UserConsole.html" title="class in com.netflix.genie.agent.cli"><span class="typeNameLink">UserConsole</span></a> - Class in <a href="com/netflix/genie/agent/cli/package-summary.html">com.netflix.genie.agent.cli</a></dt>
-<dd>
-<div class="block">Utilities for interacting with the user terminal/console.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html#userConsoleLoggingListener--">userConsoleLoggingListener()</a></span> - Method in class com.netflix.genie.agent.execution.<a href="com/netflix/genie/agent/execution/ExecutionAutoConfiguration.html" title="class in com.netflix.genie.agent.execution">ExecutionAutoConfiguration</a></dt>
-<dd>
-<div class="block">Provide a lazy <a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><code>UserConsoleLoggingListener</code></a> bean.</div>
-</dd>
-<dt><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners"><span class="typeNameLink">UserConsoleLoggingListener</span></a> - Class in <a href="com/netflix/genie/agent/execution/statemachine/listeners/package-summary.html">com.netflix.genie.agent.execution.statemachine.listeners</a></dt>
-<dd>
-<div class="block">Job execution listener that prints messages visible to the user in the console.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html#UserConsoleLoggingListener--">UserConsoleLoggingListener()</a></span> - Constructor for class com.netflix.genie.agent.execution.statemachine.listeners.<a href="com/netflix/genie/agent/execution/statemachine/listeners/UserConsoleLoggingListener.html" title="class in com.netflix.genie.agent.execution.statemachine.listeners">UserConsoleLoggingListener</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
