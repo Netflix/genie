@@ -93,7 +93,7 @@ configure(javaProjects) {
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.ppodgorsek:spring-test-dbunit-core:5.2.0")
             dependency("com.github.spotbugs:spotbugs-annotations:3.1.12")
-            dependencySet(group: "com.squareup.okhttp3", version: "3.11.0") {
+            dependencySet(group: "com.squareup.okhttp3", version: "4.3.1") {
                 entry "okhttp"
                 entry "mockwebserver"
             }
