@@ -359,7 +359,7 @@ public class CliAutoConfiguration {
      * @return the log4j2 implementation of {@link AgentLogManager}
      */
     @Bean
-    @ConditionalOnClass(org.apache.logging.log4j.core.LoggerContext.class)
+    @ConditionalOnClass(name = {"org.apache.logging.log4j.core.LoggerContext"})
     @ConditionalOnMissingBean(AgentLogManager.class)
     public AgentLogManager agentLogManagerLog4j2() {
         return new AgentLogManagerLog4j2Impl(
