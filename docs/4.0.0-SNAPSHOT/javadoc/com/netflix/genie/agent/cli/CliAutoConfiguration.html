@@ -755,7 +755,7 @@ public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/ArgumentDelegate
 <li class="blockList">
 <h4>agentLogManagerLog4j2</h4>
 <pre>@Bean
- @ConditionalOnClass(value=org.apache.logging.log4j.core.LoggerContext.class)
+ @ConditionalOnClass(name="org.apache.logging.log4j.core.LoggerContext")
  @ConditionalOnMissingBean(value=<a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager.class</a>)
 public&nbsp;<a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging">AgentLogManager</a>&nbsp;agentLogManagerLog4j2()</pre>
 <div class="block">Provide an <a href="../../../../../com/netflix/genie/agent/cli/logging/AgentLogManager.html" title="interface in com.netflix.genie.agent.cli.logging"><code>AgentLogManager</code></a> implementation that can relocate the agent log file created by log4j2.</div>
