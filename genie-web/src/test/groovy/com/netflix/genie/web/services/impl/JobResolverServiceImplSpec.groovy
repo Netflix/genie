@@ -1092,6 +1092,7 @@ class JobResolverServiceImplSpec extends Specification {
         noExceptionThrown()
     }
 
+    //region Helper Methods
     private static Cluster createCluster(String id) {
         return createCluster(id, null)
     }
@@ -1177,4 +1178,5 @@ class JobResolverServiceImplSpec extends Specification {
                 .build()
         )
     }
+    //endregion
 }
