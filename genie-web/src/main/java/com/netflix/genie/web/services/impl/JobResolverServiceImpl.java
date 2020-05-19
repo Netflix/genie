@@ -49,6 +49,10 @@ import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -247,10 +251,12 @@ public class JobResolverServiceImpl implements JobResolverService {
 
             final JobRequest jobRequest = this.persistenceService.getJobRequest(id);
 
-            // Possible improvement to combine this query with a few others to save DB trips but for now...
+            // TODO: Possible improvement to combine this query with a few others to save DB trips but for now...
             final boolean apiJob = this.persistenceService.isApiJob(id);
 
-            final ResolvedJob resolvedJob = this.resolve(id, jobRequest, apiJob);
+            final JobResolutionContext context = new JobResolutionContext(id, jobRequest, apiJob);
+
+            final ResolvedJob resolvedJob = this.resolve(context);
             this.persistenceService.saveResolvedJob(id, resolvedJob);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
@@ -286,7 +292,9 @@ public class JobResolverServiceImpl implements JobResolverService {
                 jobRequest
             );
 
-            final ResolvedJob resolvedJob = this.resolve(id, jobRequest, apiJob);
+            final JobResolutionContext context = new JobResolutionContext(id, jobRequest, apiJob);
+
+            final ResolvedJob resolvedJob = this.resolve(context);
             MetricsUtils.addSuccessTags(tags);
             return resolvedJob;
         } catch (final GenieJobResolutionException e) {
@@ -302,34 +310,33 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private ResolvedJob resolve(
-        final String id,
-        final JobRequest jobRequest,
-        final boolean apiJob
-    ) throws GenieJobResolutionException {
-        final Cluster cluster;
-        final Command command;
+    private ResolvedJob resolve(final JobResolutionContext context) throws GenieJobResolutionException {
+        final String id = context.getJobId();
+        final JobRequest jobRequest = context.getJobRequest();
 
         if (this.useV4ResourceSelection()) {
-            command = this.resolveCommand(jobRequest, id);
-            cluster = this.resolveCluster(command, jobRequest, id);
+            this.resolveCommand(context);
+            this.resolveCluster(context);
         } else {
             final Map<Cluster, String> clustersAndCommandsForJob = this.queryForClustersAndCommands(
                 jobRequest.getCriteria().getClusterCriteria(),
                 jobRequest.getCriteria().getCommandCriterion()
             );
             // Resolve the cluster for the job request based on the tags specified
-            cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
+            final Cluster v3Cluster = this.selectCluster(id, jobRequest, clustersAndCommandsForJob.keySet());
             // Resolve the command for the job request based on command tags and cluster chosen
-            command = this.getCommand(clustersAndCommandsForJob.get(cluster), id);
+            final Command v3Command = this.getCommand(clustersAndCommandsForJob.get(v3Cluster), id);
 
             // For help during migration. Requested by compute team.
             if (this.environment.getProperty(DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false)) {
                 final long dualStart = System.nanoTime();
-                final String v3CommandId = command.getId();
+                final String v3CommandId = v3Command.getId();
                 final Set<Tag> dualModeTags = Sets.newHashSet(Tag.of(V3_COMMAND_TAG, v3CommandId));
                 try {
-                    final Command v4Command = this.resolveCommand(jobRequest, id);
+                    this.resolveCommand(context);
+                    final Command v4Command = context
+                        .getCommand()
+                        .orElseThrow(() -> new IllegalStateException("Expected command to have been resolved"));
                     final String v4CommandId = v4Command.getId();
                     dualModeTags.add(Tag.of(V4_COMMAND_TAG, v4CommandId));
 
@@ -357,72 +364,22 @@ public class JobResolverServiceImpl implements JobResolverService {
                         .record(System.nanoTime() - dualStart, TimeUnit.NANOSECONDS);
                 }
             }
+            // For backwards compatibility
+            context.setCommand(v3Command);
+            context.setCluster(v3Cluster);
         }
 
-        // Resolve the applications to use based on the command that was selected
-        final List<JobSpecification.ExecutionResource> applicationResources = Lists.newArrayList();
-        for (final Application application : this.getApplications(id, jobRequest, command)) {
-            applicationResources.add(
-                new JobSpecification.ExecutionResource(application.getId(), application.getResources())
-            );
-        }
+        this.resolveApplications(context);
+        this.resolveJobMemory(context);
+        this.resolveEnvironmentVariables(context);
+        this.resolveTimeout(context);
+        this.resolveArchiveLocation(context);
+        this.resolveJobDirectory(context);
 
-        final int jobMemory = this.resolveJobMemory(jobRequest, command);
-
-        final Map<String, String> environmentVariables = this.generateEnvironmentVariables(
-            id,
-            jobRequest,
-            cluster,
-            command,
-            jobMemory
-        );
-
-        final Integer timeout;
-        if (jobRequest.getRequestedAgentConfig().getTimeoutRequested().isPresent()) {
-            timeout = jobRequest.getRequestedAgentConfig().getTimeoutRequested().get();
-        } else if (apiJob) {
-            // For backwards V3 compatibility
-            timeout = com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION;
-        } else {
-            timeout = null;
-        }
-
-        final JobSpecification jobSpecification = new JobSpecification(
-            command.getExecutable(),
-            jobRequest.getCommandArgs(),
-            new JobSpecification.ExecutionResource(id, jobRequest.getResources()),
-            new JobSpecification.ExecutionResource(cluster.getId(), cluster.getResources()),
-            new JobSpecification.ExecutionResource(command.getId(), command.getResources()),
-            applicationResources,
-            environmentVariables,
-            jobRequest.getRequestedAgentConfig().isInteractive(),
-            jobRequest
-                .getRequestedAgentConfig()
-                .getRequestedJobDirectoryLocation()
-                .orElse(this.defaultJobDirectory),
-            // TODO: Disable ability to disable archival for all jobs during internal V4 migration.
-            //       Will allow us to reach out to clients who may set this variable but still expect output after
-            //       job completion due to it being served off the node after completion in V3 but now it won't.
-            //       Put this back in once all use cases have been hunted down and users are sure of their expected
-            //       behavior
-            this.toArchiveLocation(
-                jobRequest
-                    .getRequestedJobArchivalData()
-                    .getRequestedArchiveLocationPrefix()
-                    .orElse(this.defaultArchiveLocation),
-                id
-            ),
-            timeout
-        );
-
-        final JobEnvironment jobEnvironment = new JobEnvironment
-            .Builder(jobMemory)
-            .withEnvironmentVariables(environmentVariables)
-            .build();
-
-        return new ResolvedJob(jobSpecification, jobEnvironment, jobRequest.getMetadata());
+        return context.build();
     }
 
+    @Deprecated
     private Map<Cluster, String> queryForClustersAndCommands(
         final List<Criterion> clusterCriteria,
         final Criterion commandCriterion
@@ -444,6 +401,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
+    @Deprecated
     private Cluster selectCluster(
         final String id,
         final JobRequest jobRequest,
@@ -491,6 +449,7 @@ public class JobResolverServiceImpl implements JobResolverService {
 
     }
 
+    @Deprecated
     private Command getCommand(
         final String commandId,
         final String jobId
@@ -513,15 +472,16 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private List<Application> getApplications(
-        final String id,
-        final JobRequest jobRequest,
-        final Command command
-    ) throws GenieJobResolutionException {
+    private void resolveApplications(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
+        final String id = context.getJobId();
+        final JobRequest jobRequest = context.getJobRequest();
         try {
-            final String commandId = command.getId();
+            final String commandId = context
+                .getCommand()
+                .orElseThrow(() -> new IllegalStateException("Command hasn't been resolved before applications"))
+                .getId();
             log.info("Selecting applications for job {} and command {}", id, commandId);
             // TODO: What do we do about application status? Should probably check here
             final List<Application> applications = Lists.newArrayList();
@@ -533,7 +493,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 }
             }
             log.info(
-                "Selected applications {} for job {}",
+                "Resolved applications {} for job {}",
                 applications
                     .stream()
                     .map(Application::getId)
@@ -542,7 +502,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                 id
             );
             MetricsUtils.addSuccessTags(tags);
-            return applications;
+            context.setApplications(applications);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw new GenieJobResolutionException(t);
@@ -626,13 +586,24 @@ public class JobResolverServiceImpl implements JobResolverService {
         return cluster;
     }
 
-    private ImmutableMap<String, String> generateEnvironmentVariables(
-        final String id,
-        final JobRequest jobRequest,
-        final Cluster cluster,
-        final Command command,
-        final int memory
-    ) {
+    private void resolveEnvironmentVariables(final JobResolutionContext context) {
+        final Command command = context
+            .getCommand()
+            .orElseThrow(
+                () -> new IllegalStateException("Command not resolved before attempting to resolve env variables")
+            );
+        final Cluster cluster = context
+            .getCluster()
+            .orElseThrow(
+                () -> new IllegalStateException("Cluster not resolved before attempting to resolve env variables")
+            );
+        final String id = context.getJobId();
+        final JobRequest jobRequest = context.getJobRequest();
+        final int jobMemory = context
+            .getJobMemory()
+            .orElseThrow(
+                () -> new IllegalStateException("Job memory not resolved before attempting to resolve env variables")
+            );
         // N.B. variables may be evaluated in a different order than they are added to this map (due to serialization).
         // Hence variables in this set should not depend on each-other.
         final ImmutableMap.Builder<String, String> envVariables = ImmutableMap.builder();
@@ -645,7 +616,7 @@ public class JobResolverServiceImpl implements JobResolverService {
         envVariables.put(JobConstants.GENIE_COMMAND_TAGS_ENV_VAR, this.tagsToString(command.getMetadata().getTags()));
         envVariables.put(JobConstants.GENIE_JOB_ID_ENV_VAR, id);
         envVariables.put(JobConstants.GENIE_JOB_NAME_ENV_VAR, jobRequest.getMetadata().getName());
-        envVariables.put(JobConstants.GENIE_JOB_MEMORY_ENV_VAR, String.valueOf(memory));
+        envVariables.put(JobConstants.GENIE_JOB_MEMORY_ENV_VAR, String.valueOf(jobMemory));
         envVariables.put(JobConstants.GENIE_JOB_TAGS_ENV_VAR, this.tagsToString(jobRequest.getMetadata().getTags()));
         envVariables.put(
             JobConstants.GENIE_JOB_GROUPING_ENV_VAR,
@@ -673,7 +644,8 @@ public class JobResolverServiceImpl implements JobResolverService {
         );
         envVariables.put(JobConstants.GENIE_USER_ENV_VAR, jobRequest.getMetadata().getUser());
         envVariables.put(JobConstants.GENIE_USER_GROUP_ENV_VAR, jobRequest.getMetadata().getGroup().orElse(""));
-        return envVariables.build();
+
+        context.setEnvironmentVariables(envVariables.build());
     }
 
     /**
@@ -696,30 +668,48 @@ public class JobResolverServiceImpl implements JobResolverService {
     /**
      * Helper to convert archive location prefix to an archive location.
      *
-     * @param requestedArchiveLocationPrefix archive location prefix uri
-     * @param jobId                          job id
-     * @return archive location for the job
+     * @param context The current resolution context
      */
-    private String toArchiveLocation(
-        final String requestedArchiveLocationPrefix,
-        final String jobId
-    ) {
+    private void resolveArchiveLocation(final JobResolutionContext context) {
+        // TODO: Disable ability to disable archival for all jobs during internal V4 migration.
+        //       Will allow us to reach out to clients who may set this variable but still expect output after
+        //       job completion due to it being served off the node after completion in V3 but now it won't.
+        //       Put this back in once all use cases have been hunted down and users are sure of their expected
+        //       behavior
+        final String requestedArchiveLocationPrefix =
+            context.getJobRequest()
+                .getRequestedJobArchivalData()
+                .getRequestedArchiveLocationPrefix()
+                .orElse(this.defaultArchiveLocation);
+        final String jobId = context.getJobId();
         final String archivePrefix = StringUtils.isBlank(requestedArchiveLocationPrefix)
             ? this.defaultArchiveLocation
             : requestedArchiveLocationPrefix;
 
-        if (archivePrefix.endsWith(File.separator)) {
-            return archivePrefix + jobId;
-        } else {
-            return archivePrefix + File.separator + jobId;
-        }
+        context.setArchiveLocation(
+            archivePrefix.endsWith(File.separator)
+                ? archivePrefix + jobId
+                : archivePrefix + File.separator + jobId
+        );
     }
 
-    private int resolveJobMemory(final JobRequest jobRequest, final Command command) {
-        return jobRequest
-            .getRequestedJobEnvironment()
-            .getRequestedJobMemory()
-            .orElse(command.getMemory().orElse(this.defaultMemory));
+    private void resolveJobMemory(final JobResolutionContext context) {
+        context.setJobMemory(
+            context.getJobRequest()
+                .getRequestedJobEnvironment()
+                .getRequestedJobMemory()
+                .orElse(
+                    context
+                        .getCommand()
+                        .orElseThrow(
+                            () -> new IllegalStateException(
+                                "Command not resolved before attempting to resolve job memory"
+                            )
+                        )
+                        .getMemory()
+                        .orElse(this.defaultMemory)
+                )
+        );
     }
 
     /*
@@ -765,10 +755,11 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private Command resolveCommand(final JobRequest jobRequest, final String jobId) throws GenieJobResolutionException {
+    private void resolveCommand(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
+            final JobRequest jobRequest = context.getJobRequest();
             final Criterion criterion = jobRequest.getCriteria().getCommandCriterion();
             final Set<Command> commands = this.persistenceService.findCommandsMatchingCriterion(criterion, true);
             final Command command;
@@ -785,7 +776,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     final ResourceSelectionResult<Command> result = this.commandSelector.select(
                         commands,
                         jobRequest,
-                        jobId
+                        context.getJobId()
                     );
                     command = result
                         .getSelectedResource()
@@ -813,7 +804,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             MetricsUtils.addSuccessTags(tags);
             tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, command.getId()));
             tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, command.getMetadata().getName()));
-            return command;
+            context.setCommand(command);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             if (t instanceof GenieJobResolutionException) {
@@ -828,16 +819,20 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
-    private Cluster resolveCluster(
-        final Command command,
-        final JobRequest jobRequest,
-        final String jobId
-    ) throws GenieJobResolutionException {
+    private void resolveCluster(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         int queryCount = 0;
         int criteriaCombinationCount = 0;
+
+        final String jobId = context.getJobId();
+        final JobRequest jobRequest = context.getJobRequest();
         try {
+            final Command command = context
+                .getCommand()
+                .orElseThrow(
+                    () -> new IllegalStateException("Command not resolved before attempting to resolve a cluster")
+                );
             Cluster cluster = null;
 
             // This makes it so that if the command has no Cluster Criteria no cluster will possibly
@@ -902,7 +897,7 @@ public class JobResolverServiceImpl implements JobResolverService {
             MetricsUtils.addSuccessTags(tags);
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()));
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName()));
-            return cluster;
+            context.setCluster(cluster);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             if (t instanceof GenieJobResolutionException) {
@@ -923,6 +918,25 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .timer(RESOLVE_CLUSTER_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
+    }
+
+    private void resolveTimeout(final JobResolutionContext context) {
+        final JobRequest jobRequest = context.getJobRequest();
+        if (jobRequest.getRequestedAgentConfig().getTimeoutRequested().isPresent()) {
+            context.setTimeout(jobRequest.getRequestedAgentConfig().getTimeoutRequested().get());
+        } else if (context.isApiJob()) {
+            // For backwards V3 compatibility
+            context.setTimeout(com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION);
+        }
+    }
+
+    private void resolveJobDirectory(final JobResolutionContext context) {
+        context.setJobDirectory(
+            context.getJobRequest()
+                .getRequestedAgentConfig()
+                .getRequestedJobDirectoryLocation()
+                .orElse(this.defaultJobDirectory)
+        );
     }
 
     /**
@@ -1092,5 +1106,119 @@ public class JobResolverServiceImpl implements JobResolverService {
         final ImmutableMap<Command, Set<Cluster>> matrix = matrixBuilder.build();
         log.debug("Complete command -> clusters matrix: {}", matrix);
         return matrix;
+    }
+
+    /**
+     * A helper data class for passing information around / along the resolution pipeline.
+     *
+     * @author tgianos
+     * @since 4.0.0
+     */
+    @RequiredArgsConstructor
+    @Getter
+    @Setter
+    @ToString(doNotUseGetters = true)
+    static class JobResolutionContext {
+        private final String jobId;
+        private final JobRequest jobRequest;
+        private final boolean apiJob;
+
+        private Command command;
+        private Cluster cluster;
+        private List<Application> applications;
+
+        private Integer jobMemory;
+        private Map<String, String> environmentVariables;
+        private Integer timeout;
+        private String archiveLocation;
+        private File jobDirectory;
+
+        private Optional<Command> getCommand() {
+            return Optional.ofNullable(this.command);
+        }
+
+        Optional<Cluster> getCluster() {
+            return Optional.ofNullable(this.cluster);
+        }
+
+        Optional<List<Application>> getApplications() {
+            return Optional.ofNullable(this.applications);
+        }
+
+        Optional<Integer> getJobMemory() {
+            return Optional.ofNullable(this.jobMemory);
+        }
+
+        Optional<Map<String, String>> getEnvironmentVariables() {
+            return Optional.ofNullable(this.environmentVariables);
+        }
+
+        Optional<Integer> getTimeout() {
+            return Optional.ofNullable(this.timeout);
+        }
+
+        Optional<String> getArchiveLocation() {
+            return Optional.ofNullable(this.archiveLocation);
+        }
+
+        Optional<File> getJobDirectory() {
+            return Optional.ofNullable(this.jobDirectory);
+        }
+
+        ResolvedJob build() {
+            // Error checking
+            if (this.command == null) {
+                throw new IllegalStateException("Command was never resolved for job " + this.jobId);
+            }
+            if (this.cluster == null) {
+                throw new IllegalStateException("Cluster was never resolved for job " + this.jobId);
+            }
+            if (this.applications == null) {
+                throw new IllegalStateException("Applications were never resolved for job " + this.jobId);
+            }
+            if (this.jobMemory == null) {
+                throw new IllegalStateException("Job memory was never resolved for job " + this.jobId);
+            }
+            if (this.environmentVariables == null) {
+                throw new IllegalStateException("Environment variables were never resolved for job " + this.jobId);
+            }
+            if (this.archiveLocation == null) {
+                throw new IllegalStateException("Archive location was never resolved for job " + this.jobId);
+            }
+            if (this.jobDirectory == null) {
+                throw new IllegalStateException("Job directory was never resolved for job " + this.jobId);
+            }
+
+            // Note: Currently no check for timeout due to it being ok for it to be null at the moment
+
+            final JobSpecification jobSpecification = new JobSpecification(
+                this.command.getExecutable(),
+                this.jobRequest.getCommandArgs(),
+                new JobSpecification.ExecutionResource(this.jobId, this.jobRequest.getResources()),
+                new JobSpecification.ExecutionResource(this.cluster.getId(), this.cluster.getResources()),
+                new JobSpecification.ExecutionResource(this.command.getId(), this.command.getResources()),
+                this.applications
+                    .stream()
+                    .map(
+                        application -> new JobSpecification.ExecutionResource(
+                            application.getId(),
+                            application.getResources()
+                        )
+                    )
+                    .collect(Collectors.toList()),
+                this.environmentVariables,
+                this.jobRequest.getRequestedAgentConfig().isInteractive(),
+                this.jobDirectory,
+                this.archiveLocation,
+                this.timeout
+            );
+
+            final JobEnvironment jobEnvironment = new JobEnvironment
+                .Builder(this.jobMemory)
+                .withEnvironmentVariables(this.environmentVariables)
+                .build();
+
+            return new ResolvedJob(jobSpecification, jobEnvironment, this.jobRequest.getMetadata());
+        }
     }
 }
