@@ -18,6 +18,8 @@
 package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.ImmutableMap
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest
@@ -818,7 +820,147 @@ class JobResolverServiceImplSpec extends Specification {
         !useV4
     }
 
+    def "can generate cluster criteria permutations"() {
+        def commands = Sets.newHashSet(
+            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
+            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
+            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        )
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+
+        // build expected map
+        final Map<Command, List<Criterion>> expectedMap = [:]
+        for (def command : commands) {
+            final List<Criterion> criteria = []
+            for (def commandClusterCriteria : command.getClusterCriteria()) {
+                for (def jobClusterCriteria : jobRequest.getCriteria().getClusterCriteria()) {
+                    try {
+                        criteria.add(this.service.mergeCriteria(commandClusterCriteria, jobClusterCriteria))
+                    } catch (final IllegalArgumentException ignored) {
+                        // swallow
+                    }
+                }
+            }
+            expectedMap[command] = criteria
+        }
+
+        when:
+        def actualMap = this.service.generateClusterCriteriaPermutations(commands, jobRequest)
+
+        then:
+        actualMap == expectedMap
+    }
+
+    def "can flatten cluster criteria permutations"() {
+        def commands = [
+            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
+            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString())),
+            createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        ] as Set
+        Map<Command, List<Criterion>> permutations = commands.collectEntries { command ->
+            [command, command.getClusterCriteria()]
+        }
+
+        def expectedSet = [] as Set
+        for (def command : commands) {
+            expectedSet.addAll(command.getClusterCriteria())
+        }
+
+        when:
+        def actualSet = this.service.flattenClusterCriteriaPermutations(permutations)
+
+        then:
+        actualSet == expectedSet
+    }
+
+    def "can check if cluster matches criterion"() {
+        def cluster = createCluster(UUID.randomUUID().toString())
+
+        expect:
+        !this.service.clusterMatchesCriterion(
+            cluster,
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        )
+        !this.service.clusterMatchesCriterion(
+            cluster,
+            new Criterion.Builder().withName(UUID.randomUUID().toString()).build()
+        )
+        !this.service.clusterMatchesCriterion(
+            cluster,
+            new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build()
+        )
+        !this.service.clusterMatchesCriterion(
+            cluster,
+            new Criterion.Builder().withStatus(UUID.randomUUID().toString()).build()
+        )
+        !this.service.clusterMatchesCriterion(
+            cluster,
+            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        )
+        def builder = new Criterion.Builder()
+        def metadata = cluster.getMetadata()
+        this.service.clusterMatchesCriterion(cluster, builder.withId(cluster.getId()).build())
+        this.service.clusterMatchesCriterion(cluster, builder.withName(metadata.getName()).build())
+        this.service.clusterMatchesCriterion(cluster, builder.withVersion(metadata.getVersion()).build())
+        this.service.clusterMatchesCriterion(cluster, builder.withStatus(metadata.getStatus().name()).build())
+        this.service.clusterMatchesCriterion(
+            cluster,
+            builder.withTags(ImmutableSet.copyOf(Iterables.limit(metadata.getTags(), 1))).build()
+        )
+    }
+
+    def "can generate command to cluster matrix"() {
+        def cluster0 = createCluster(UUID.randomUUID().toString())
+        def cluster1 = createCluster(UUID.randomUUID().toString())
+        def cluster2 = createCluster(UUID.randomUUID().toString())
+        def cluster3 = createCluster(UUID.randomUUID().toString())
+        def cluster4Tags = Sets.newHashSet(cluster3.getMetadata().getTags())
+        cluster4Tags.add(UUID.randomUUID().toString())
+        def cluster4 = createCluster(UUID.randomUUID().toString(), cluster4Tags)
+        def candidateClusters = Sets.newHashSet(cluster0, cluster1, cluster2, cluster3, cluster4)
+
+        def command0 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command1 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command2 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command3 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+
+        Map<Command, List<Criterion>> commandClusterCriteria = [:]
+        commandClusterCriteria[command0] = Lists.newArrayList(
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(), // no match
+            new Criterion.Builder().withName(UUID.randomUUID().toString()).build(), // no match
+            new Criterion.Builder().withName(cluster2.getMetadata().getName()).build(), // cluster2
+            new Criterion.Builder().withTags(cluster3.getMetadata().getTags()).build(), // would be cluster3
+        )
+        // command1 should be filtered out as it won't match anything
+        commandClusterCriteria[command1] = Lists.newArrayList(
+            new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+        )
+        commandClusterCriteria[command2] = Lists.newArrayList(
+            new Criterion.Builder().withVersion(UUID.randomUUID().toString()).build(), // no match
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(), // no match
+            new Criterion.Builder().withTags(cluster3.getMetadata().getTags()).build(), // cluster3, cluster4
+        )
+        commandClusterCriteria[command3] = Lists.newArrayList(
+            new Criterion.Builder().withVersion(cluster1.getMetadata().getVersion()).build(), // cluster1
+            new Criterion.Builder().withId(UUID.randomUUID().toString()).build(), // no match
+            new Criterion.Builder().withTags(cluster3.getMetadata().getTags()).build(), // cluster3, cluster4
+        )
+
+        when:
+        def result = this.service.generateCommandClustersMap(commandClusterCriteria, candidateClusters)
+
+        then:
+        result.size() == 3 // command1 should have been filtered out
+        result[command0] == Sets.newHashSet(cluster2)
+        result[command2] == Sets.newHashSet(cluster3, cluster4)
+        result[command3] == Sets.newHashSet(cluster1)
+    }
+
     private static Cluster createCluster(String id) {
+        return createCluster(id, null)
+    }
+
+    private static Cluster createCluster(String id, @Nullable Set<String> tags) {
         return new Cluster(
             id,
             Instant.now(),
@@ -829,7 +971,12 @@ class JobResolverServiceImplSpec extends Specification {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 ClusterStatus.UP
-            ).withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            )
+                .withTags(
+                    tags != null
+                        ? tags
+                        : Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                )
                 .build()
         )
     }
