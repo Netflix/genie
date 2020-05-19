@@ -23,6 +23,9 @@ import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.external.dtos.v4.AgentConfigRequest
+import com.netflix.genie.common.external.dtos.v4.Application
+import com.netflix.genie.common.external.dtos.v4.ApplicationMetadata
+import com.netflix.genie.common.external.dtos.v4.ApplicationStatus
 import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus
@@ -422,7 +425,7 @@ class JobResolverServiceImplSpec extends Specification {
         Sets.newHashSet("foo", "bar", "\'tag-with-single-quotes\'") | "\'tag-with-single-quotes\',bar,foo"
     }
 
-    def "Can generate correct environment variables"() {
+    def "Can resolve correct environment variables"() {
         def user = UUID.randomUUID().toString()
         def jobId = UUID.randomUUID().toString()
         def jobName = UUID.randomUUID().toString()
@@ -488,15 +491,14 @@ class JobResolverServiceImplSpec extends Specification {
             100L,
             null
         )
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        context.setCluster(cluster)
+        context.setCommand(command)
+        context.setJobMemory(this.jobsProperties.getMemory().getDefaultJobMemory())
 
         when:
-        def envVariables = this.service.generateEnvironmentVariables(
-            jobId,
-            jobRequest,
-            cluster,
-            command,
-            this.jobsProperties.getMemory().getDefaultJobMemory()
-        )
+        this.service.resolveEnvironmentVariables(context)
+        def envVariables = context.getEnvironmentVariables().orElseThrow({ new IllegalStateException() })
 
         then:
         envVariables.get("GENIE_VERSION") == "4"
@@ -628,9 +630,10 @@ class JobResolverServiceImplSpec extends Specification {
         def allCommands = Sets.newHashSet(command0, command1, command2)
         def commandCriterion = jobRequest.getCriteria().getCommandCriterion()
         ResourceSelectionResult<Command> selectionResult = Mock(ResourceSelectionResult)
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
 
         when: "No commands are found in the database which match the users criterion"
-        this.service.resolveCommand(jobRequest, jobId)
+        this.service.resolveCommand(context)
 
         then: "An exception is thrown"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet()
@@ -638,7 +641,8 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "Only a single command is found which matches the criterion"
-        def resolvedCommand = this.service.resolveCommand(jobRequest, jobId)
+        this.service.resolveCommand(context)
+        def resolvedCommand = context.getCommand().orElseThrow({ new IllegalStateException() })
 
         then: "It is immediately returned and no selectors are invoked"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet(command1)
@@ -646,7 +650,7 @@ class JobResolverServiceImplSpec extends Specification {
         resolvedCommand == command1
 
         when: "Many commands are found which match the criterion but nothing is selected by the selectors"
-        this.service.resolveCommand(jobRequest, jobId)
+        this.service.resolveCommand(context)
 
         then: "An exception is thrown"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
@@ -657,7 +661,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "The selectors throw an exception"
-        this.service.resolveCommand(jobRequest, jobId)
+        this.service.resolveCommand(context)
 
         then: "It is propagated"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
@@ -665,7 +669,8 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "The selectors select a command"
-        resolvedCommand = this.service.resolveCommand(jobRequest, jobId)
+        this.service.resolveCommand(context)
+        resolvedCommand = context.getCommand().orElseThrow({ new IllegalStateException() })
 
         then: "It is returned"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
@@ -719,9 +724,11 @@ class JobResolverServiceImplSpec extends Specification {
             jobRequestTemplate.getRequestedJobArchivalData()
         )
         ResourceSelectionResult<Cluster> selectionResult = Mock(ResourceSelectionResult)
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        context.setCommand(command)
 
         when: "A command with no cluster criteria was resolved"
-        this.service.resolveCluster(command, jobRequest, jobId)
+        this.service.resolveCluster(context)
 
         then: "An exception is thrown cause nothing can be selected"
         1 * command.getClusterCriteria() >> []
@@ -729,7 +736,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "No clusters are found which match the criterion"
-        this.service.resolveCluster(command, jobRequest, jobId)
+        this.service.resolveCluster(context)
 
         then: "An exception is thrown"
         1 * command.getClusterCriteria() >> commandClusterCriteria
@@ -739,7 +746,8 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "Only a single cluster is found"
-        def resolvedCluster = this.service.resolveCluster(command, jobRequest, jobId)
+        this.service.resolveCluster(context)
+        def resolvedCluster = context.getCluster().orElseThrow({ new IllegalStateException() })
 
         then: "It is returned"
         1 * command.getClusterCriteria() >> commandClusterCriteria
@@ -749,7 +757,7 @@ class JobResolverServiceImplSpec extends Specification {
         resolvedCluster == cluster2
 
         when: "Multiple clusters are found matching the criterion and the selectors don't select anything"
-        this.service.resolveCluster(command, jobRequest, jobId)
+        this.service.resolveCluster(context)
 
         then: "An exception is thrown"
         1 * command.getClusterCriteria() >> commandClusterCriteria
@@ -761,7 +769,7 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "Multiple clusters are found matching the criterion and the selectors throw exception"
-        this.service.resolveCluster(command, jobRequest, jobId)
+        this.service.resolveCluster(context)
 
         then: "An exception is thrown"
         1 * command.getClusterCriteria() >> commandClusterCriteria
@@ -773,7 +781,8 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "Multiple clusters are found matching the criterion and the selectors select a cluster"
-        resolvedCluster = this.service.resolveCluster(command, jobRequest, jobId)
+        this.service.resolveCluster(context)
+        resolvedCluster = context.getCluster().orElseThrow({ new IllegalStateException() })
 
         then: "That cluster is returned to the caller"
         1 * command.getClusterCriteria() >> commandClusterCriteria
@@ -954,6 +963,133 @@ class JobResolverServiceImplSpec extends Specification {
         result[command0] == Sets.newHashSet(cluster2)
         result[command2] == Sets.newHashSet(cluster3, cluster4)
         result[command3] == Sets.newHashSet(cluster1)
+    }
+
+    def "JobResolutionContext behaves as expected"() {
+        def jobId = UUID.randomUUID().toString()
+        def jobRequest = createJobRequest(
+            Lists.newArrayList(UUID.randomUUID().toString()),
+            null,
+            null,
+            null
+        )
+        def apiJob = true
+        def command = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def cluster = createCluster(UUID.randomUUID().toString())
+        def applications = Lists.newArrayList(
+            new Application(
+                UUID.randomUUID().toString(),
+                Instant.now(),
+                Instant.now(),
+                null,
+                new ApplicationMetadata.Builder(
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
+                    ApplicationStatus.ACTIVE
+                ).build()
+            )
+        )
+        def jobMemory = 1_234
+        def environmentVariables = [
+            "one": "two"
+        ]
+        def archiveLocation = UUID.randomUUID().toString()
+        def jobDirectory = Mock(File)
+        def timeout = 13_349_388
+
+        when:
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, apiJob)
+
+        then:
+        context.getJobId() == jobId
+        context.getJobRequest() == jobRequest
+        context.isApiJob()
+        !context.getCommand().isPresent()
+        !context.getCluster().isPresent()
+        !context.getApplications().isPresent()
+        !context.getJobMemory().isPresent()
+        !context.getEnvironmentVariables().isPresent()
+        !context.getTimeout().isPresent()
+        !context.getArchiveLocation().isPresent()
+        !context.getJobDirectory().isPresent()
+
+        when:
+        context.build()
+
+        then:
+        thrown(IllegalStateException)
+
+        when:
+        context.setCommand(command)
+        context.build()
+
+        then:
+        context.getCommand().orElse(null) == command
+        thrown(IllegalStateException)
+
+        when:
+        context.setCluster(cluster)
+        context.build()
+
+        then:
+        context.getCluster().orElse(null) == cluster
+        thrown(IllegalStateException)
+
+        when:
+        context.setApplications(applications)
+        context.build()
+
+        then:
+        context.getApplications().orElse(null) == applications
+        thrown(IllegalStateException)
+
+        when:
+        context.setJobMemory(jobMemory)
+        context.build()
+
+        then:
+        context.getJobMemory().orElse(null) == jobMemory
+        thrown(IllegalStateException)
+
+        when:
+        context.setEnvironmentVariables(environmentVariables)
+        context.build()
+
+        then:
+        context.getEnvironmentVariables().orElse(null) == environmentVariables
+        thrown(IllegalStateException)
+
+        when:
+        context.setArchiveLocation(archiveLocation)
+        context.build()
+
+        then:
+        context.getArchiveLocation().orElse(null) == archiveLocation
+        thrown(IllegalStateException)
+
+        when:
+        context.setJobDirectory(jobDirectory)
+        context.build()
+
+        then:
+        context.getJobDirectory().orElse(null) == jobDirectory
+        noExceptionThrown()
+        // could validate resolved job here?
+
+        when:
+        context.setTimeout(timeout)
+        context.build()
+
+        then:
+        context.getTimeout().orElse(null) == timeout
+        noExceptionThrown()
+
+        when:
+        context.toString()
+
+        then:
+        noExceptionThrown()
     }
 
     private static Cluster createCluster(String id) {
