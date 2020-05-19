@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.external.dtos.v4;
 
+import com.google.common.collect.Sets;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -90,6 +91,10 @@ public enum JobStatus {
         Arrays.stream(JobStatus.values()).filter(JobStatus::isClaimable).collect(Collectors.toSet())
     );
 
+    private static final Set<JobStatus> BEFORE_CLAIMED_STATUSES = Collections.unmodifiableSet(
+        Sets.newHashSet(RESERVED, RESOLVED, ACCEPTED)
+    );
+
     private final boolean active;
     private final boolean resolvable;
     private final boolean claimable;
@@ -116,6 +121,15 @@ public enum JobStatus {
      */
     public static Set<JobStatus> getActiveStatuses() {
         return ACTIVE_STATUSES;
+    }
+
+    /**
+     * Get an unmodifiable set of all the statuses that come before CLAIMED.
+     *
+     * @return Unmodifiable set of all statuses
+     */
+    public static Set<JobStatus> getStatusesBeforeClaimed() {
+        return BEFORE_CLAIMED_STATUSES;
     }
 
     /**

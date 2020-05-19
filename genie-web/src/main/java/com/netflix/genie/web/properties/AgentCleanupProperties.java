@@ -48,5 +48,7 @@ public class AgentCleanupProperties {
 
     private long refreshInterval = 10_000;
 
-    private long timeLimit = 120_000;
+    private long reconnectTimeLimit = 120_000;
+
+    private long launchTimeLimit = 240_000;
 }

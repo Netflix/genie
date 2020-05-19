@@ -1189,6 +1189,16 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
     }
 
+    @Test
+    @DatabaseSetup("persistence/jobs/unclaimed.xml")
+    void canGetUnclaimedAgentJobs() {
+
+        Assertions
+            .assertThat(this.service.getUnclaimedAgentJobs())
+            .hasSize(2)
+            .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
+    }
+
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
         Assertions.assertThat(savedJobRequest.getId()).isPresent().contains(UNIQUE_ID);
         Assertions.assertThat(savedJobRequest.getName()).isEqualTo(NAME);

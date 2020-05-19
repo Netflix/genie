@@ -425,13 +425,18 @@ of 2.0
 |true
 |no
 
+|genie.tasks.agent-cleanup.launchTimeLimit
+|How long a job can stay in ACCEPTED state, waiting for the agent to claim it, before the job is marked failed, in milliseconds
+|240000
+|no
+
 |genie.tasks.agent-cleanup.refreshInterval
 |How often the AWOL agent tasks executed, in milliseconds
 |10000
 |no
 
-|genie.tasks.agent-cleanup.timeLimit
-|How long of a leeway to give a job after it agent disconnected and before the job is marked failed, in milliseconds
+|genie.tasks.agent-cleanup.reconnectTimeLimit
+|How long of a leeway to give a job after its agent disconnected and before the job is marked failed, in milliseconds
 |120000
 |no
 

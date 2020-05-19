@@ -1042,6 +1042,13 @@ public interface PersistenceService {
      * @return The list of job ids
      */
     Set<String> getActiveAgentJobs();
+
+    /**
+     * Get the set of agent jobs in that have not reached CLAIMED state.
+     *
+     * @return The list of job ids
+     */
+    Set<String> getUnclaimedAgentJobs();
     //endregion
     //endregion
 
