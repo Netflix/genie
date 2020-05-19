@@ -415,6 +415,12 @@ for multiple errors.
 |JobResolverServiceImpl
 |class, status, clusterName, clusterId, clusterSelectorClass
 
+|genie.services.jobResolver.generateClusterCriteriaPermutations.timer
+|Time taken to generate all the permutations for cluster criteria between the command options and the job request
+|nanoseconds
+|JobResolverServiceImpl
+|
+
 |genie.services.jobResolver.resolve.timer
 |Time taken to completely resolve the job
 |nanoseconds

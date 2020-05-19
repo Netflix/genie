@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -25,6 +26,7 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.external.dtos.v4.Application;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.common.external.dtos.v4.ClusterMetadata;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.common.external.dtos.v4.JobEnvironment;
@@ -62,6 +64,7 @@ import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +72,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the {@link JobResolverService} APIs.
@@ -88,6 +92,12 @@ public class JobResolverServiceImpl implements JobResolverService {
      * How long it takes to query the database for cluster command combinations matching supplied criteria.
      */
     private static final String CLUSTER_COMMAND_QUERY_TIMER = "genie.services.jobResolver.clusterCommandQuery.timer";
+
+    /**
+     * How long it takes to resolve a cluster for a job given the resolved command and the request criteria.
+     */
+    private static final String GENERATE_CRITERIA_PERMUTATIONS_TIMER
+        = "genie.services.jobResolver.generateClusterCriteriaPermutations.timer";
 
     /**
      * How long it takes to resolve a cluster for a job given the resolved command and the request criteria.
@@ -916,6 +926,62 @@ public class JobResolverServiceImpl implements JobResolverService {
     }
 
     /**
+     * Helper method to generate all the possible viable cluster criterion permutations for the given set of commands
+     * and the given job request. The resulting map will be each command to its associated priority ordered list of
+     * merged cluster criteria. The priority order is generated as follows:
+     * <pre>
+     * for (commandClusterCriterion : command.getClusterCriteria()) {
+     *     for (jobClusterCriterion : jobRequest.getClusterCriteria()) {
+     *         // merge
+     *     }
+     * }
+     * </pre>
+     *
+     * @param commands   The set of {@link Command}s whose cluster criteria should be evaluated
+     * @param jobRequest The {@link JobRequest} whose cluster criteria should be combined with the commands
+     * @return The resulting map of each command to their associated merged criterion list in priority order
+     */
+    private Map<Command, List<Criterion>> generateClusterCriteriaPermutations(
+        final Set<Command> commands,
+        final JobRequest jobRequest
+    ) {
+        final long start = System.nanoTime();
+        try {
+            final ImmutableMap.Builder<Command, List<Criterion>> mapBuilder = ImmutableMap.builder();
+            for (final Command command : commands) {
+                final ImmutableList.Builder<Criterion> listBuilder = ImmutableList.builder();
+                for (final Criterion commandClusterCriterion : command.getClusterCriteria()) {
+                    for (final Criterion jobClusterCriterion : jobRequest.getCriteria().getClusterCriteria()) {
+                        try {
+                            // Failing to merge the criteria is equivalent to a round-trip DB query that returns
+                            // zero results. This is an in memory optimization which also solves the need to implement
+                            // the db query as a join with a subquery.
+                            listBuilder.add(this.mergeCriteria(commandClusterCriterion, jobClusterCriterion));
+                        } catch (final IllegalArgumentException e) {
+                            log.debug(
+                                "Unable to merge command cluster criterion {} and job cluster criterion {}. Skipping.",
+                                commandClusterCriterion,
+                                jobClusterCriterion,
+                                e
+                            );
+                        }
+                    }
+                }
+                mapBuilder.put(command, listBuilder.build());
+            }
+            return mapBuilder.build();
+        } finally {
+            this.registry
+                .timer(GENERATE_CRITERIA_PERMUTATIONS_TIMER)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private Set<Criterion> flattenClusterCriteriaPermutations(final Map<Command, List<Criterion>> commandCriteriaMap) {
+        return commandCriteriaMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+    }
+
+    /**
      * Helper method for merging two criterion.
      * <p>
      * This method makes several assumptions:
@@ -967,5 +1033,64 @@ public class JobResolverServiceImpl implements JobResolverService {
             // Both have values but aren't equal
             throw new IllegalArgumentException(fieldName + "'s were both present but not equal");
         }
+    }
+
+    /**
+     * This is an in memory evaluation of the matching done against persistence.
+     *
+     * @param cluster   The cluster to evaluate the criterion against
+     * @param criterion The criterion the cluster is being tested against
+     * @return {@literal true} if the {@link Cluster} matches the {@link Criterion}
+     */
+    private boolean clusterMatchesCriterion(final Cluster cluster, final Criterion criterion) {
+        // TODO: This runs the risk of diverging from DB query mechanism. Perhaps way to unite somewhat?
+        final ClusterMetadata metadata = cluster.getMetadata();
+
+        return criterion.getId().map(id -> cluster.getId().equals(id)).orElse(true)
+            && criterion.getName().map(name -> metadata.getName().equals(name)).orElse(true)
+            && criterion.getVersion().map(version -> metadata.getVersion().equals(version)).orElse(true)
+            && criterion.getStatus().map(status -> metadata.getStatus().name().equals(status)).orElse(true)
+            && metadata.getTags().containsAll(criterion.getTags());
+    }
+
+    private Map<Command, Set<Cluster>> generateCommandClustersMap(
+        final Map<Command, List<Criterion>> commandClusterCriteria,
+        final Set<Cluster> candidateClusters
+    ) {
+        final ImmutableMap.Builder<Command, Set<Cluster>> matrixBuilder = ImmutableMap.builder();
+        for (final Map.Entry<Command, List<Criterion>> entry : commandClusterCriteria.entrySet()) {
+            final Command command = entry.getKey();
+            final ImmutableSet.Builder<Cluster> matchedClustersBuilder = ImmutableSet.builder();
+
+            // Loop through the criterion in the priority order first
+            for (final Criterion criterion : entry.getValue()) {
+                for (final Cluster candidateCluster : candidateClusters) {
+                    if (this.clusterMatchesCriterion(candidateCluster, criterion)) {
+                        log.debug(
+                            "Cluster {} matched criterion {} for command {}",
+                            candidateCluster.getId(),
+                            criterion,
+                            command.getId()
+                        );
+                        matchedClustersBuilder.add(candidateCluster);
+                    }
+                }
+
+                final ImmutableSet<Cluster> matchedClusters = matchedClustersBuilder.build();
+                if (!matchedClusters.isEmpty()) {
+                    // If we found some clusters the evaluation for this command is done
+                    matrixBuilder.put(command, matchedClusters);
+                    log.debug("For command {} matched clusters {}", command, matchedClusters);
+                    // short circuit further criteria evaluation for this command
+                    break;
+                }
+            }
+            // If the command never matched any clusters it should be filtered out
+            // of resulting map as no value would be added to the result builder
+        }
+
+        final ImmutableMap<Command, Set<Cluster>> matrix = matrixBuilder.build();
+        log.debug("Complete command -> clusters matrix: {}", matrix);
+        return matrix;
     }
 }
