@@ -26,17 +26,20 @@ class AgentCleanupPropertiesSpec extends Specification {
 
         expect:
         properties.getRefreshInterval() == 10000L
-        properties.getTimeLimit() == 120000L
+        properties.getReconnectTimeLimit() == 120000L
+        properties.getLaunchTimeLimit() == 240000L
         properties.isEnabled()
 
         when:
         properties.setRefreshInterval(1000)
-        properties.setTimeLimit(2000)
+        properties.setReconnectTimeLimit(2000)
+        properties.setLaunchTimeLimit(3000)
         properties.setEnabled(false)
 
         then:
         properties.getRefreshInterval() == 1000L
-        properties.getTimeLimit() == 2000L
+        properties.getReconnectTimeLimit() == 2000L
+        properties.getLaunchTimeLimit() == 3000L
         !properties.isEnabled()
     }
 }

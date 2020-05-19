@@ -187,6 +187,16 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         .collect(Collectors.toSet());
 
     /**
+     * The a set containing statuses that come before CLAIMED.
+     */
+    @VisibleForTesting
+    static final Set<String> UNCLAIMED_STATUS_SET = JobStatus
+        .getStatusesBeforeClaimed()
+        .stream()
+        .map(Enum::name)
+        .collect(Collectors.toSet());
+
+    /**
      * The set of job statuses which are considered to be using memory on a Genie node.
      */
     @VisibleForTesting
@@ -1933,6 +1943,19 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Set<String> getActiveAgentJobs() {
         log.debug("[getActiveAgentJobs] Called");
         return this.jobRepository.getAgentJobIdsWithStatusIn(ACTIVE_STATUS_SET)
+            .stream()
+            .map(UniqueIdProjection::getUniqueId)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getUnclaimedAgentJobs() {
+        log.debug("[getUnclaimedAgentJobs] Called");
+        return this.jobRepository.getAgentJobIdsWithStatusIn(UNCLAIMED_STATUS_SET)
             .stream()
             .map(UniqueIdProjection::getUniqueId)
             .collect(Collectors.toSet());

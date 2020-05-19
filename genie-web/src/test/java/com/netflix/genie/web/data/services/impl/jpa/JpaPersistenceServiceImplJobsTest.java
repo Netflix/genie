@@ -1192,4 +1192,36 @@ class JpaPersistenceServiceImplJobsTest {
             .assertThat(this.persistenceService.getActiveAgentJobs())
             .isEqualTo(Sets.newHashSet());
     }
+
+    @Test
+    void canGetUnclaimedAgentJobs() {
+        final String jobId1 = UUID.randomUUID().toString();
+        final String jobId2 = UUID.randomUUID().toString();
+
+        final UniqueIdProjection job1 = Mockito.mock(UniqueIdProjection.class);
+        final UniqueIdProjection job2 = Mockito.mock(UniqueIdProjection.class);
+
+        Mockito.when(job1.getUniqueId()).thenReturn(jobId1);
+        Mockito.when(job2.getUniqueId()).thenReturn(jobId2);
+
+        Mockito
+            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.UNCLAIMED_STATUS_SET))
+            .thenReturn(Sets.newHashSet(job1, job2));
+
+        Assertions
+            .assertThat(this.persistenceService.getUnclaimedAgentJobs())
+            .isEqualTo(Sets.newHashSet(jobId1, jobId2));
+    }
+
+    @Test
+    void canGetUnclaimedAgentJobsWhenEmpty() {
+
+        Mockito
+            .when(this.jobRepository.getAgentJobIdsWithStatusIn(JpaPersistenceServiceImpl.UNCLAIMED_STATUS_SET))
+            .thenReturn(Sets.newHashSet());
+
+        Assertions
+            .assertThat(this.persistenceService.getUnclaimedAgentJobs())
+            .isEqualTo(Sets.newHashSet());
+    }
 }

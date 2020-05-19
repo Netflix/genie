@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.leader
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieException
+import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.web.agent.services.AgentRoutingService
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
@@ -57,10 +58,7 @@ class AgentJobCleanupTaskSpec extends Specification {
         )
     }
 
-    def "Run"() {
-
-        def e = new GenieException(500, "...")
-
+    def "Task type and rate"() {
         when:
         GenieTaskScheduleType scheduleType = task.getScheduleType()
         long period = task.getFixedRate()
@@ -69,42 +67,93 @@ class AgentJobCleanupTaskSpec extends Specification {
         scheduleType == GenieTaskScheduleType.FIXED_RATE
         period == 1000
         1 * taskProperties.getRefreshInterval() >> 1000
+    }
+
+    def "Run"() {
+        setup:
+        GenieException e = new GenieServerException("...")
 
         when:
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
-        1 * agentRoutingService.isAgentConnected("j1") >> false
-        1 * agentRoutingService.isAgentConnected("j2") >> false
-        1 * agentRoutingService.isAgentConnected("j3") >> true
-        1 * agentRoutingService.isAgentConnected("j4") >> true
-        0 * taskProperties.getTimeLimit()
+        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+            "j1", //Active status, connected
+            "j2", // Accepted status, connected
+            "j3", // Active status, disconnected
+            "j4", // Accepted status, disconnected
+            "j5", // Active status, disconnected (reconnects next iteration)
+            "j6" // Accepted status, disconnected (reconnects next iteration)
+        )
+        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j2", "j4", "j6")
+        1 * agentRoutingService.isAgentConnected("j1") >> true
+        1 * agentRoutingService.isAgentConnected("j2") >> true
+        1 * agentRoutingService.isAgentConnected("j3") >> false
+        1 * agentRoutingService.isAgentConnected("j4") >> false
+        1 * agentRoutingService.isAgentConnected("j5") >> false
+        1 * agentRoutingService.isAgentConnected("j6") >> false
+        4 * taskProperties.getLaunchTimeLimit() >> 10_000
+        4 * taskProperties.getReconnectTimeLimit() >> 10_000
+        0 * persistenceService.setJobCompletionInformation(_, _, _, _, _, _)
+        0 * registry.counter(_, _)
 
         when:
         task.run()
 
         then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
-        4 * agentRoutingService.isAgentConnected(_) >> false
-        2 * taskProperties.getTimeLimit() >> -1 // Make sure they look expired
-        1 * persistenceService.setJobCompletionInformation("j1", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
-        1 * persistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null) >> {
+        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+            "j1", //Active status, connected
+            "j2", // Accepted status, connected
+            "j3", // Active status, disconnected
+            "j4", // Accepted status, disconnected
+            "j5", // Active status, just reconnected
+            "j6" // Accepted status, just reconnected
+        )
+        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j2", "j4", "j6")
+        1 * agentRoutingService.isAgentConnected("j1") >> true
+        1 * agentRoutingService.isAgentConnected("j2") >> true
+        1 * agentRoutingService.isAgentConnected("j3") >> false
+        1 * agentRoutingService.isAgentConnected("j4") >> false
+        1 * agentRoutingService.isAgentConnected("j5") >> true
+        1 * agentRoutingService.isAgentConnected("j6") >> true
+        2 * taskProperties.getLaunchTimeLimit() >> 10_000
+        2 * taskProperties.getReconnectTimeLimit() >> 10_000
+        0 * persistenceService.setJobCompletionInformation(_, _, _, _, _, _)
+        0 * registry.counter(_, _)
+
+        when:
+        task.run()
+
+        then:
+        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+            "j3", // Active status, disconnected
+            "j4", // Accepted status, disconnected
+        )
+        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4", "j6")
+        1 * agentRoutingService.isAgentConnected("j3") >> false
+        1 * agentRoutingService.isAgentConnected("j4") >> false
+        2 * taskProperties.getLaunchTimeLimit() >> 10_000
+        2 * taskProperties.getReconnectTimeLimit() >> -1
+        1 * persistenceService.setJobCompletionInformation("j3", -1, JobStatus.FAILED, AgentJobCleanupTask.AWOL_STATUS_MESSAGE, null, null)
+        1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
+        1 * counter.increment()
+
+        when:
+        task.run()
+
+        then:
+        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet(
+            "j4", // Accepted status, disconnected
+        )
+        1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4")
+        1 * agentRoutingService.isAgentConnected("j4") >> false
+        1 * taskProperties.getLaunchTimeLimit() >> -1
+        1 * taskProperties.getReconnectTimeLimit() >> 10_000
+        1 * persistenceService.setJobCompletionInformation("j4", -1, JobStatus.FAILED, AgentJobCleanupTask.NEVER_CLAIMED_STATUS_MESSAGE, null, null) >> {
             throw e
         }
-        1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newFailureTagsSetForException(e)) >> counter
-        2 * counter.increment()
-
-        when:
-        task.run()
-
-        then:
-        1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j3", "j4")
-        1 * agentRoutingService.isAgentConnected("j3") >> false
-        1 * agentRoutingService.isAgentConnected("j4") >> true
-        1 * taskProperties.getTimeLimit() >> 10_000 // Make sure it's not expired
-        0 * persistenceService._
+        1 * counter.increment()
 
         when:
         task.cleanup()

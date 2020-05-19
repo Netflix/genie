@@ -43,7 +43,8 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class AgentJobCleanupTask extends LeaderTask {
-    private static final String STATUS_MESSAGE = "Agent AWOL for too long";
+    private static final String AWOL_STATUS_MESSAGE = "Agent AWOL for too long";
+    private static final String NEVER_CLAIMED_STATUS_MESSAGE = "No agent claimed the job for too long";
     private static final String TERMINATED_COUNTER_METRIC_NAME = "genie.jobs.agentDisconnected.terminated.counter";
     private static final String DISCONNECTED_GAUGE_METRIC_NAME = "genie.jobs.agentDisconnected.gauge";
     private final Map<String, Instant> awolJobsMap;
@@ -88,38 +89,49 @@ public class AgentJobCleanupTask extends LeaderTask {
         // Get agent jobs that in active status
         final Set<String> activeAgentJobIds = this.persistenceService.getActiveAgentJobs();
 
+        // Get agent jobs that in ACCEPTED status (i.e. waiting for agent to start)
+        final Set<String> acceptedAgentJobIds = this.persistenceService.getUnclaimedAgentJobs();
+
         // Filter out jobs whose agent is connected
         final Set<String> currentlyAwolJobsIds = activeAgentJobIds.stream()
             .filter(jobId -> !this.agentRoutingService.isAgentConnected(jobId))
             .collect(Collectors.toSet());
 
-        // If any previously AWOL job that does not appear in the "currently AWOL" list has either re-connected
-        // or completed. Throw away their records.
+
+        // Purge records if corresponding agent is now connected
         this.awolJobsMap.entrySet().removeIf(
             awolJobEntry -> !currentlyAwolJobsIds.contains(awolJobEntry.getKey())
         );
 
         final Instant now = Instant.now();
 
-        // Iterate over job that currently look AWOL
-        for (final String awolJobId : currentlyAwolJobsIds) {
+        // Add records for any agent that was not previously AWOL
+        currentlyAwolJobsIds.forEach(
+            jobId -> this.awolJobsMap.putIfAbsent(jobId, now)
+        );
 
-            final Instant awolJobFirstSeen = this.awolJobsMap.get(awolJobId);
+        // Iterate over jobs whose agent is currently AWOL
+        for (final Map.Entry<String, Instant> entry : this.awolJobsMap.entrySet()) {
+            final String awolJobId = entry.getKey();
+            final Instant awolJobFirstSeen = entry.getValue();
 
-            if (awolJobFirstSeen == null) {
-                // First time this job is noticed AWOL. Start tracking it.
-                log.debug("Starting to track AWOL job {}", awolJobId);
-                this.awolJobsMap.put(awolJobId, now);
-            } else if (now.isAfter(awolJobFirstSeen.plusMillis(this.properties.getTimeLimit()))) {
-                // Job has been AWOL past its deadline
-                log.debug("Job {} no longer AWOL", awolJobId);
+            final boolean jobWasClaimed = !acceptedAgentJobIds.contains(awolJobId);
+            final Instant claimDeadline = awolJobFirstSeen.plusMillis(this.properties.getLaunchTimeLimit());
+            final Instant reconnectDeadline = awolJobFirstSeen.plusMillis(this.properties.getReconnectTimeLimit());
+
+            if (!jobWasClaimed && now.isBefore(claimDeadline)) {
+                log.debug("Job {} agent still pending agent start/claim", awolJobId);
+            } else if (jobWasClaimed && now.isBefore(reconnectDeadline)) {
+                log.debug("Job {} agent still disconnected", awolJobId);
+            } else {
+                log.warn("Job {} agent AWOL for too long, marking failed", awolJobId);
                 try {
                     // Mark the job as failed
                     this.persistenceService.setJobCompletionInformation(
                         awolJobId,
                         -1,
                         JobStatus.FAILED,
-                        STATUS_MESSAGE,
+                        jobWasClaimed ? AWOL_STATUS_MESSAGE : NEVER_CLAIMED_STATUS_MESSAGE,
                         null,
                         null
                     );
@@ -138,13 +150,8 @@ public class AgentJobCleanupTask extends LeaderTask {
                         MetricsUtils.newFailureTagsSetForException(e)
                     ).increment();
                 }
-            } else {
-                // Job is still AWOL, but not past its deadline.
-                log.debug("Job {} is still AWOL", awolJobId);
             }
-
         }
-
     }
 
     /**
