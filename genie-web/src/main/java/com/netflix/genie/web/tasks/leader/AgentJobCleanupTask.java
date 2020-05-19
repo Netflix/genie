@@ -46,7 +46,7 @@ public class AgentJobCleanupTask extends LeaderTask {
     private static final String STATUS_MESSAGE = "Agent AWOL for too long";
     private static final String TERMINATED_COUNTER_METRIC_NAME = "genie.jobs.agentDisconnected.terminated.counter";
     private static final String DISCONNECTED_GAUGE_METRIC_NAME = "genie.jobs.agentDisconnected.gauge";
-    private final Map<String, Instant> awolJobDeadlines;
+    private final Map<String, Instant> awolJobsMap;
     private final PersistenceService persistenceService;
     private final AgentCleanupProperties properties;
     private final MeterRegistry registry;
@@ -70,13 +70,13 @@ public class AgentJobCleanupTask extends LeaderTask {
         this.properties = properties;
         this.registry = registry;
         this.agentRoutingService = agentRoutingService;
-        this.awolJobDeadlines = Maps.newConcurrentMap();
+        this.awolJobsMap = Maps.newConcurrentMap();
 
         // Auto-publish number of jobs tracked for shutdown due to agent not being connected.
         this.registry.gaugeMapSize(
             DISCONNECTED_GAUGE_METRIC_NAME,
             Sets.newHashSet(),
-            this.awolJobDeadlines
+            this.awolJobsMap
         );
     }
 
@@ -95,7 +95,7 @@ public class AgentJobCleanupTask extends LeaderTask {
 
         // If any previously AWOL job that does not appear in the "currently AWOL" list has either re-connected
         // or completed. Throw away their records.
-        awolJobDeadlines.entrySet().removeIf(
+        this.awolJobsMap.entrySet().removeIf(
             awolJobEntry -> !currentlyAwolJobsIds.contains(awolJobEntry.getKey())
         );
 
@@ -104,16 +104,13 @@ public class AgentJobCleanupTask extends LeaderTask {
         // Iterate over job that currently look AWOL
         for (final String awolJobId : currentlyAwolJobsIds) {
 
-            final Instant awolJobDeadline = this.awolJobDeadlines.get(awolJobId);
+            final Instant awolJobFirstSeen = this.awolJobsMap.get(awolJobId);
 
-            if (awolJobDeadline == null) {
+            if (awolJobFirstSeen == null) {
                 // First time this job is noticed AWOL. Start tracking it.
                 log.debug("Starting to track AWOL job {}", awolJobId);
-                this.awolJobDeadlines.put(
-                    awolJobId,
-                    now.plusMillis(this.properties.getTimeLimit())
-                );
-            } else if (now.isAfter(awolJobDeadline)) {
+                this.awolJobsMap.put(awolJobId, now);
+            } else if (now.isAfter(awolJobFirstSeen.plusMillis(this.properties.getTimeLimit()))) {
                 // Job has been AWOL past its deadline
                 log.debug("Job {} no longer AWOL", awolJobId);
                 try {
@@ -127,7 +124,7 @@ public class AgentJobCleanupTask extends LeaderTask {
                         null
                     );
                     // If marking as failed succeeded, remove it from the map
-                    this.awolJobDeadlines.remove(awolJobId);
+                    this.awolJobsMap.remove(awolJobId);
                     // Increment counter, tag as successful
                     this.registry.counter(
                         TERMINATED_COUNTER_METRIC_NAME,
@@ -156,7 +153,7 @@ public class AgentJobCleanupTask extends LeaderTask {
     @Override
     public void cleanup() {
         // Throw away all deadlines
-        this.awolJobDeadlines.clear();
+        this.awolJobsMap.clear();
     }
 
     /**

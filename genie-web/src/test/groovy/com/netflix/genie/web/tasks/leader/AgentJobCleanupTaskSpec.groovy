@@ -79,7 +79,7 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j2") >> false
         1 * agentRoutingService.isAgentConnected("j3") >> true
         1 * agentRoutingService.isAgentConnected("j4") >> true
-        2 * taskProperties.getTimeLimit() >> -1 // Make sure it's past deadline next iteration
+        0 * taskProperties.getTimeLimit()
 
         when:
         task.run()
@@ -87,7 +87,7 @@ class AgentJobCleanupTaskSpec extends Specification {
         then:
         1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j1", "j2", "j3", "j4")
         4 * agentRoutingService.isAgentConnected(_) >> false
-        2 * taskProperties.getTimeLimit() >> 1_000_000L // Make sure it not expiring
+        2 * taskProperties.getTimeLimit() >> -1 // Make sure they look expired
         1 * persistenceService.setJobCompletionInformation("j1", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null)
         1 * persistenceService.setJobCompletionInformation("j2", -1, JobStatus.FAILED, AgentJobCleanupTask.STATUS_MESSAGE, null, null) >> {
             throw e
@@ -103,6 +103,7 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * persistenceService.getActiveAgentJobs() >> Sets.newHashSet("j3", "j4")
         1 * agentRoutingService.isAgentConnected("j3") >> false
         1 * agentRoutingService.isAgentConnected("j4") >> true
+        1 * taskProperties.getTimeLimit() >> 10_000 // Make sure it's not expired
         0 * persistenceService._
 
         when:
