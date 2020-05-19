@@ -427,6 +427,12 @@ for multiple errors.
 |JobResolverServiceImpl
 |status, exceptionClass, saved
 
+|genie.services.jobResolver.resolveApplications.timer
+|Time taken to retrieve applications information for this task
+|nanoseconds
+|JobResolverServiceImpl
+|status, exceptionClass
+
 |genie.services.jobResolver.resolveCluster.timer
 |Time taken to resolve the cluster to use for a job
 |nanoseconds
@@ -450,12 +456,6 @@ for multiple errors.
 |nanoseconds
 |JobResolverServiceImpl
 |status, commandName, commandId, exceptionClass
-
-|genie.services.jobResolver.selectApplications.timer
-|Time taken to retrieve applications information for this task
-|nanoseconds
-|JobResolverServiceImpl
-|status, exceptionClass
 
 |genie.services.jobResolver.selectCluster.noneFound.counter
 |Number of times the criteria for cluster selection does not match any cluster
