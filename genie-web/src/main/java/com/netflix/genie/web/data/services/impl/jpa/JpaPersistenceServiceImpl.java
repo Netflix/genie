@@ -18,6 +18,7 @@
 package com.netflix.genie.web.data.services.impl.jpa;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -672,6 +673,38 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         log.debug("[findClustersMatchingCriterion] Called to find clusters matching {}", finalCriterion);
         return this.clusterRepository
             .findAll(JpaClusterSpecs.findClustersMatchingCriterion(finalCriterion))
+            .stream()
+            .map(EntityV4DtoConverters::toV4ClusterDto)
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Cluster> findClustersMatchingAnyCriterion(
+        @NotEmpty final Set<@Valid Criterion> criteria,
+        final boolean addDefaultStatus
+    ) {
+        final Set<Criterion> finalCriteria;
+        if (addDefaultStatus) {
+            final String defaultStatus = ClusterStatus.UP.name();
+            final ImmutableSet.Builder<Criterion> criteriaBuilder = ImmutableSet.builder();
+            for (final Criterion criterion : criteria) {
+                if (criterion.getStatus().isPresent()) {
+                    criteriaBuilder.add(criterion);
+                } else {
+                    criteriaBuilder.add(new Criterion(criterion, defaultStatus));
+                }
+            }
+            finalCriteria = criteriaBuilder.build();
+        } else {
+            finalCriteria = criteria;
+        }
+
+        log.debug("[findClustersMatchingAnyCriterion] Called to find clusters matching {}", finalCriteria);
+        return this.clusterRepository
+            .findAll(JpaClusterSpecs.findClustersMatchingAnyCriterion(finalCriteria))
             .stream()
             .map(EntityV4DtoConverters::toV4ClusterDto)
             .collect(Collectors.toSet());

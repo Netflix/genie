@@ -26,8 +26,8 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.UniqueIdEntity;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
@@ -114,7 +114,7 @@ public final class JpaSpecificationUtils {
 
     static <E extends BaseEntity> Predicate createCriterionPredicate(
         final Root<E> root,
-        final CriteriaQuery<?> cq,
+        final AbstractQuery<?> cq,
         final CriteriaBuilder cb,
         final SingularAttribute<UniqueIdEntity, String> uniqueIdAttribute,
         final SingularAttribute<BaseEntity, String> nameAttribute,

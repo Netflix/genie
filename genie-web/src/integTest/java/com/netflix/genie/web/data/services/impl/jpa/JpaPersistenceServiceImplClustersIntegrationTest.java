@@ -1048,6 +1048,62 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
             .containsExactlyInAnyOrder(cluster3);
     }
 
+    @Test
+    void testFindClustersMatchingAnyCriterion() throws Exception {
+        // Create some clusters to test with
+        final Cluster cluster0 = this.createTestCluster(null, null, ClusterStatus.UP);
+        final Cluster cluster1 = this.createTestCluster(null, null, ClusterStatus.UP);
+        final Cluster cluster2 = this.createTestCluster(UUID.randomUUID().toString(), null, ClusterStatus.UP);
+
+        // Create two commands with supersets of cluster1 tags so that we can test that resolution
+        final Set<String> cluster1Tags = cluster1.getMetadata().getTags();
+        final Set<String> cluster3Tags = Sets.newHashSet(cluster1Tags);
+        cluster3Tags.add(UUID.randomUUID().toString());
+        cluster3Tags.add(UUID.randomUUID().toString());
+        final Cluster cluster3 = this.createTestCluster(null, cluster3Tags, ClusterStatus.UP);
+        final Set<String> cluster4Tags = Sets.newHashSet(cluster1.getMetadata().getTags());
+        cluster4Tags.add(UUID.randomUUID().toString());
+        final Cluster cluster4 = this.createTestCluster(null, cluster4Tags, ClusterStatus.UP);
+        final Cluster cluster5 = this.createTestCluster(null, cluster1Tags, ClusterStatus.TERMINATED);
+        final Cluster cluster6 = this.createTestCluster(null, null, ClusterStatus.OUT_OF_SERVICE);
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingAnyCriterion(
+                    Sets.newHashSet(
+                        new Criterion.Builder().withId(cluster0.getId()).build(),
+                        new Criterion.Builder().withName(cluster2.getMetadata().getName()).build(),
+                        new Criterion.Builder().withVersion(cluster1.getMetadata().getVersion()).build(),
+                        new Criterion.Builder().withStatus(ClusterStatus.OUT_OF_SERVICE.name()).build(),
+                        new Criterion.Builder().withTags(cluster1.getMetadata().getTags()).build(),
+                        new Criterion.Builder().withTags(cluster4.getMetadata().getTags()).build(),
+                        new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+                    ),
+                    true
+                )
+            )
+            .hasSize(6)
+            .containsExactlyInAnyOrder(cluster0, cluster1, cluster2, cluster3, cluster4, cluster6);
+
+        Assertions
+            .assertThat(
+                this.service.findClustersMatchingAnyCriterion(
+                    Sets.newHashSet(
+                        new Criterion.Builder().withId(cluster0.getId()).build(),
+                        new Criterion.Builder().withName(cluster2.getMetadata().getName()).build(),
+                        new Criterion.Builder().withVersion(cluster1.getMetadata().getVersion()).build(),
+                        new Criterion.Builder().withStatus(ClusterStatus.OUT_OF_SERVICE.name()).build(),
+                        new Criterion.Builder().withTags(cluster1.getMetadata().getTags()).build(),
+                        new Criterion.Builder().withTags(cluster4.getMetadata().getTags()).build(),
+                        new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
+                    ),
+                    false
+                )
+            )
+            .hasSize(7)
+            .containsExactlyInAnyOrder(cluster0, cluster1, cluster2, cluster3, cluster4, cluster5, cluster6);
+    }
+
     private Cluster createTestCluster(
         @Nullable final String id,
         @Nullable final Set<String> tags,

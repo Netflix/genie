@@ -351,6 +351,17 @@ public interface PersistenceService {
      * @return All the {@link Cluster}'s which matched the {@link Criterion}
      */
     Set<Cluster> findClustersMatchingCriterion(@Valid Criterion criterion, boolean addDefaultStatus);
+
+    /**
+     * Find all the {@link Cluster}'s that match any of the given {@link Criterion}.
+     *
+     * @param criteria         The set of {@link Criterion} supplied that a cluster needs to completely match at least
+     *                         one of to be returned
+     * @param addDefaultStatus {@literal true} if the a default status should be added to the supplied
+     *                         {@link Criterion} if the supplied criterion doesn't already have a status
+     * @return All the {@link Cluster}'s which matched the {@link Criterion}
+     */
+    Set<Cluster> findClustersMatchingAnyCriterion(@NotEmpty Set<@Valid Criterion> criteria, boolean addDefaultStatus);
     //endregion
 
     //region Command APIs

@@ -15,6 +15,7 @@
  */
 package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity_;
@@ -29,6 +30,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,5 +122,40 @@ public final class JpaClusterSpecs {
                 ClusterEntity_.id,
                 criterion
             );
+    }
+
+    /**
+     * Get the specification for the query which will find the clusters which match any of the given criterion.
+     *
+     * @param criteria The set of {@link Criterion} to match clusters against
+     * @return A {@link Specification} for this query
+     */
+    public static Specification<ClusterEntity> findClustersMatchingAnyCriterion(final Set<Criterion> criteria) {
+        return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
+            final List<Predicate> predicates = Lists.newArrayList();
+
+            for (final Criterion criterion : criteria) {
+                final Subquery<Long> criterionSubquery = cq.subquery(Long.class);
+                final Root<ClusterEntity> criterionSubqueryRoot = criterionSubquery.from(ClusterEntity.class);
+                criterionSubquery.select(criterionSubqueryRoot.get(ClusterEntity_.id));
+                criterionSubquery.where(
+                    JpaSpecificationUtils.createCriterionPredicate(
+                        criterionSubqueryRoot,
+                        criterionSubquery,
+                        cb,
+                        ClusterEntity_.uniqueId,
+                        ClusterEntity_.name,
+                        ClusterEntity_.version,
+                        ClusterEntity_.status,
+                        () -> criterionSubqueryRoot.join(ClusterEntity_.tags, JoinType.INNER),
+                        ClusterEntity_.id,
+                        criterion
+                    )
+                );
+                predicates.add(root.get(ClusterEntity_.id).in(criterionSubquery));
+            }
+
+            return cb.or(predicates.toArray(new Predicate[0]));
+        };
     }
 }
