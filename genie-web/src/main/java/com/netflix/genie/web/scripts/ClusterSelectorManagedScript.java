@@ -84,6 +84,8 @@ public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster
         final ClusterSelectionContext context
     ) {
         super.addParametersForScript(parameters, context);
+
+        // TODO: Remove once internal scripts migrate to use context directly
         parameters.put(CLUSTERS_BINDING, context.getClusters());
     }
 }

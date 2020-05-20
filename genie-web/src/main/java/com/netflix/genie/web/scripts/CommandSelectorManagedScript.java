@@ -78,6 +78,8 @@ public class CommandSelectorManagedScript extends ResourceSelectorScript<Command
         final CommandSelectionContext context
     ) {
         super.addParametersForScript(parameters, context);
+
+        // TODO: Remove once internal scripts migrate to use context directly
         parameters.put(COMMANDS_BINDING, context.getResources());
     }
 }
