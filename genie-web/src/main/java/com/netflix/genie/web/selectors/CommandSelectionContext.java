@@ -55,7 +55,7 @@ public class CommandSelectionContext extends ResourceSelectionContext<Command> {
         @NotBlank final String jobId,
         @NotNull final JobRequest jobRequest,
         final boolean apiJob,
-        @NotEmpty final Map<@Valid Command, @NotEmpty Set<@Valid Cluster>> commandToClusters
+        @NotEmpty final Map<@Valid Command, /* temporarily @NotEmpty */ Set<@Valid Cluster>> commandToClusters
     ) {
         super(jobId, jobRequest, apiJob);
         this.commandToClusters = ImmutableMap.copyOf(commandToClusters);

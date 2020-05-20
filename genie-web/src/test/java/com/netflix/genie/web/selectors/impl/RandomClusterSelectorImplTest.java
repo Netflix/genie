@@ -22,6 +22,7 @@ import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
+import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,19 +40,11 @@ class RandomClusterSelectorImplTest {
 
     private RandomClusterSelectorImpl selector;
 
-    /**
-     * Setup the tests.
-     */
     @BeforeEach
     void setup() {
         this.selector = new RandomClusterSelectorImpl();
     }
 
-    /**
-     * Test whether a cluster is returned from a set of candidates.
-     *
-     * @throws ResourceSelectionException For any problem if anything went wrong with the test.
-     */
     @Test
     void testValidClusterSet() throws ResourceSelectionException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
@@ -60,8 +53,15 @@ class RandomClusterSelectorImplTest {
         final Set<Cluster> clusters = Sets.newHashSet(cluster1, cluster2, cluster3);
         final JobRequest jobRequest = Mockito.mock(JobRequest.class);
         final String jobId = UUID.randomUUID().toString();
+        final ClusterSelectionContext context = new ClusterSelectionContext(
+            jobId,
+            jobRequest,
+            true,
+            null,
+            clusters
+        );
         for (int i = 0; i < 5; i++) {
-            final ResourceSelectionResult<Cluster> result = this.selector.select(clusters, jobRequest, jobId);
+            final ResourceSelectionResult<Cluster> result = this.selector.select(context);
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.getSelectorClass()).isEqualTo(RandomClusterSelectorImpl.class);
             Assertions.assertThat(result.getSelectedResource()).isPresent().get().isIn(clusters);
@@ -69,22 +69,17 @@ class RandomClusterSelectorImplTest {
         }
     }
 
-    /**
-     * Test whether a cluster is returned from a set of candidates.
-     *
-     * @throws ResourceSelectionException For any problem if anything went wrong with the test.
-     */
     @Test
     void testValidClusterSetOfOne() throws ResourceSelectionException {
-        final Cluster cluster1 = Mockito.mock(Cluster.class);
-        final ResourceSelectionResult<Cluster> result = this.selector.select(
-            Sets.newHashSet(cluster1),
-            Mockito.mock(JobRequest.class),
-            UUID.randomUUID().toString()
-        );
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        final ClusterSelectionContext context = Mockito.mock(ClusterSelectionContext.class);
+        Mockito.when(context.getResources()).thenReturn(Sets.newHashSet(cluster));
+        Mockito.when(context.getClusters()).thenReturn(Sets.newHashSet(cluster));
+        Mockito.when(context.getJobId()).thenReturn(UUID.randomUUID().toString());
+        final ResourceSelectionResult<Cluster> result = this.selector.select(context);
         Assertions
             .assertThat(result.getSelectedResource())
             .isPresent()
-            .contains(cluster1);
+            .contains(cluster);
     }
 }

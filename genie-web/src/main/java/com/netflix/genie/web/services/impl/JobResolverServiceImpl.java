@@ -41,7 +41,9 @@ import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelector;
+import com.netflix.genie.web.selectors.CommandSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.services.JobResolverService;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -201,6 +203,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     //endregion
 
     //region Public APIs
+
     /**
      * Constructor.
      *
@@ -404,10 +407,17 @@ public class JobResolverServiceImpl implements JobResolverService {
                 log.debug("Found single command {} matching criterion {}", command.getId(), criterion);
             } else {
                 try {
+                    // TODO: Flesh this out with actual algorithm result
+                    final Map<Command, Set<Cluster>> commandClusters = commands
+                        .stream()
+                        .collect(Collectors.toMap(it -> it, it -> Sets.newHashSet()));
                     final ResourceSelectionResult<Command> result = this.commandSelector.select(
-                        commands,
-                        jobRequest,
-                        context.getJobId()
+                        new CommandSelectionContext(
+                            context.getJobId(),
+                            jobRequest,
+                            context.isApiJob(),
+                            commandClusters
+                        )
                     );
                     command = result
                         .getSelectedResource()
@@ -717,6 +727,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     //endregion
 
     //region Additional Helpers
+
     /**
      * Helper method to generate all the possible viable cluster criterion permutations for the given set of commands
      * and the given job request. The resulting map will be each command to its associated priority ordered list of
@@ -928,9 +939,13 @@ public class JobResolverServiceImpl implements JobResolverService {
             counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
             try {
                 final ResourceSelectionResult<Cluster> result = clusterSelector.select(
-                    clusters,
-                    jobRequest,
-                    jobId
+                    new ClusterSelectionContext(
+                        jobId,
+                        jobRequest,
+                        true, // TODO: Fix this whole method so it's easier to work with (context?)
+                        null,
+                        clusters
+                    )
                 );
                 final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
                 if (selectedClusterOptional.isPresent()) {
@@ -955,7 +970,7 @@ public class JobResolverServiceImpl implements JobResolverService {
                     } else {
                         log.error(
                             "Successfully selected cluster {} using selector {} but it wasn't in original cluster "
-                                + "list {}",
+                                + "set {}",
                             selectedCluster.getId(),
                             clusterSelectorClass,
                             clusters
@@ -1117,6 +1132,7 @@ public class JobResolverServiceImpl implements JobResolverService {
     //endregion
 
     //region Helper Classes
+
     /**
      * A helper data class for passing information around / along the resolution pipeline.
      *

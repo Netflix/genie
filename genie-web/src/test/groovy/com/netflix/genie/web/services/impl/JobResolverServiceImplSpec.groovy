@@ -48,7 +48,9 @@ import com.netflix.genie.web.dtos.ResolvedJob
 import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.properties.JobsProperties
+import com.netflix.genie.web.selectors.ClusterSelectionContext
 import com.netflix.genie.web.selectors.ClusterSelector
+import com.netflix.genie.web.selectors.CommandSelectionContext
 import com.netflix.genie.web.selectors.CommandSelector
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils
@@ -142,7 +144,15 @@ class JobResolverServiceImplSpec extends Specification {
             jobRequest.getCriteria().getClusterCriteria(),
             jobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * this.clusterSelector.select(clusters, jobRequest, jobId) >> clusterSelectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == clusters
+                }
+            }
+        ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.persistenceService.getCommand(commandId) >> command
         1 * this.persistenceService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
@@ -182,7 +192,15 @@ class JobResolverServiceImplSpec extends Specification {
             jobRequestNoArchivalData.getCriteria().getClusterCriteria(),
             jobRequestNoArchivalData.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * this.clusterSelector.select(clusters, jobRequestNoArchivalData, jobId) >> clusterSelectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequestNoArchivalData
+                    it.getResources() == clusters
+                }
+            }
+        ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.persistenceService.getCommand(commandId) >> command
         1 * this.persistenceService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
@@ -226,7 +244,15 @@ class JobResolverServiceImplSpec extends Specification {
             savedJobRequest.getCriteria().getClusterCriteria(),
             savedJobRequest.getCriteria().getCommandCriterion()
         ) >> clusterCommandMap
-        1 * this.clusterSelector.select(clusters, savedJobRequest, jobId) >> clusterSelectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == savedJobRequest
+                    it.getResources() == clusters
+                }
+            }
+        ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.persistenceService.getCommand(commandId) >> command
         1 * this.persistenceService.getApplicationsForCommand(commandId) >> Lists.newArrayList()
@@ -303,10 +329,26 @@ class JobResolverServiceImplSpec extends Specification {
         0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         0 * this.persistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
         1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest.getCriteria().getCommandCriterion(), true) >> commands
-        1 * this.commandSelector.select(commands, jobRequest, jobId) >> commandSelectionResult
+        1 * this.commandSelector.select(
+            {
+                verifyAll(it, CommandSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == commands
+                }
+            }
+        ) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command0)
         1 * this.persistenceService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
-        1 * this.clusterSelector.select(clusters, jobRequest, jobId) >> clusterSelectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == clusters
+                }
+            }
+        ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.persistenceService.getApplicationsForCommand(command0Id) >> Lists.newArrayList()
         jobSpec.getExecutableArgs() == expectedCommandArgs
@@ -338,10 +380,26 @@ class JobResolverServiceImplSpec extends Specification {
         ) >> 1.0d
         0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         1 * this.persistenceService.findCommandsMatchingCriterion(jobRequestNoArchivalData.getCriteria().getCommandCriterion(), true) >> commands
-        1 * this.commandSelector.select(commands, jobRequestNoArchivalData, jobId) >> commandSelectionResult
+        1 * this.commandSelector.select(
+            {
+                verifyAll(it, CommandSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequestNoArchivalData
+                    it.getResources() == commands
+                }
+            }
+        ) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command0)
         1 * this.persistenceService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
-        1 * this.clusterSelector.select(clusters, jobRequestNoArchivalData, jobId) >> clusterSelectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequestNoArchivalData
+                    it.getResources() == clusters
+                }
+            }
+        ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
         1 * this.persistenceService.getApplicationsForCommand(command0Id) >> Lists.newArrayList()
         jobSpecNoArchivalData.getExecutableArgs() == expectedCommandArgs
@@ -380,10 +438,26 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.persistenceService.isApiJob(jobId) >> false
         1 * this.persistenceService.getJobRequest(jobId) >> savedJobRequest
         1 * this.persistenceService.findCommandsMatchingCriterion(savedJobRequest.getCriteria().getCommandCriterion(), true) >> commands
-        1 * this.commandSelector.select(commands, savedJobRequest, jobId) >> commandSelectionResult
+        1 * this.commandSelector.select(
+            {
+                verifyAll(it, CommandSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == savedJobRequest
+                    it.getResources() == commands
+                }
+            }
+        ) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command1)
         1 * this.persistenceService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
-        1 * this.clusterSelector.select(clusters, savedJobRequest, jobId) >> clusterSelectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == savedJobRequest
+                    it.getResources() == clusters
+                }
+            }
+        ) >> clusterSelectionResult
         1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster2)
         1 * this.persistenceService.getApplicationsForCommand(command1Id) >> Lists.newArrayList()
         1 * this.persistenceService.saveResolvedJob(jobId, _ as ResolvedJob)
@@ -637,7 +711,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "An exception is thrown"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet()
-        0 * this.commandSelector.select(_ as Set<Command>, _ as JobRequest, _ as String)
+        0 * this.commandSelector.select(_ as CommandSelectionContext)
         thrown(GenieJobResolutionException)
 
         when: "Only a single command is found which matches the criterion"
@@ -646,7 +720,7 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "It is immediately returned and no selectors are invoked"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet(command1)
-        0 * this.commandSelector.select(_ as Set<Command>, _ as JobRequest, _ as String)
+        0 * this.commandSelector.select(_ as CommandSelectionContext)
         resolvedCommand == command1
 
         when: "Many commands are found which match the criterion but nothing is selected by the selectors"
@@ -654,7 +728,15 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "An exception is thrown"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
-        1 * this.commandSelector.select(allCommands, jobRequest, jobId) >> selectionResult
+        1 * this.commandSelector.select(
+            {
+                verifyAll(it, CommandSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == allCommands
+                }
+            }
+        ) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.empty()
         1 * selectionResult.getSelectorClass() >> this.getClass()
         1 * selectionResult.getSelectionRationale() >> Optional.empty()
@@ -665,7 +747,15 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "It is propagated"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
-        1 * this.commandSelector.select(allCommands, jobRequest, jobId) >> { throw new ResourceSelectionException() }
+        1 * this.commandSelector.select(
+            {
+                verifyAll(it, CommandSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == allCommands
+                }
+            }
+        ) >> { throw new ResourceSelectionException() }
         thrown(GenieJobResolutionException)
 
         when: "The selectors select a command"
@@ -674,7 +764,15 @@ class JobResolverServiceImplSpec extends Specification {
 
         then: "It is returned"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
-        1 * this.commandSelector.select(allCommands, jobRequest, jobId) >> selectionResult
+        1 * this.commandSelector.select(
+            {
+                verifyAll(it, CommandSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == allCommands
+                }
+            }
+        ) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.of(command0)
         1 * selectionResult.getSelectorClass() >> this.getClass()
         1 * selectionResult.getSelectionRationale() >> Optional.of("Selected command 0")
@@ -764,7 +862,15 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
-        1 * this.clusterSelector.select(allClusters, jobRequest, jobId) >> selectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == allClusters
+                }
+            }
+        ) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.empty()
         thrown(GenieJobResolutionException)
 
@@ -776,7 +882,15 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
-        1 * this.clusterSelector.select(allClusters, jobRequest, jobId) >> { throw new ResourceSelectionException() }
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == allClusters
+                }
+            }
+        ) >> { throw new ResourceSelectionException() }
         0 * selectionResult.getSelectedResource()
         thrown(GenieJobResolutionException)
 
@@ -789,7 +903,15 @@ class JobResolverServiceImplSpec extends Specification {
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
         1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
-        1 * this.clusterSelector.select(allClusters, jobRequest, jobId) >> selectionResult
+        1 * this.clusterSelector.select(
+            {
+                verifyAll(it, ClusterSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == allClusters
+                }
+            }
+        ) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.of(cluster2)
         resolvedCluster == cluster2
     }

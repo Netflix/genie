@@ -29,5 +29,5 @@ import org.springframework.validation.annotation.Validated;
  * @since 4.0.0
  */
 @Validated
-public interface CommandSelector extends ResourceSelector<Command> {
+public interface CommandSelector extends ResourceSelector<Command, CommandSelectionContext> {
 }

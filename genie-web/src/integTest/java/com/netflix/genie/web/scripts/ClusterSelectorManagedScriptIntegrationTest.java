@@ -31,6 +31,7 @@ import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
+import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
@@ -146,31 +147,71 @@ class ClusterSelectorManagedScriptIntegrationTest {
 
         ResourceSelectorScriptResult<Cluster> result;
 
-        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_0, JOB_REQUEST_0_ID);
+        result = this.clusterSelectorScript.selectResource(this.createContext(JOB_REQUEST_0_ID));
         Assertions.assertThat(result.getResource()).isPresent().contains(CLUSTER_0);
         Assertions.assertThat(result.getRationale()).isPresent().contains("selected 0");
 
-        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_1, JOB_REQUEST_1_ID);
+        result = this.clusterSelectorScript.selectResource(this.createContext(JOB_REQUEST_1_ID));
         Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isPresent().contains("Couldn't find anything");
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_2, JOB_REQUEST_2_ID))
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(this.createContext(JOB_REQUEST_2_ID)))
             .withNoCause();
 
-        result = this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_3, JOB_REQUEST_3_ID);
+        result = this.clusterSelectorScript.selectResource(this.createContext(JOB_REQUEST_3_ID));
         Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isNotPresent();
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_4, JOB_REQUEST_4_ID))
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(this.createContext(JOB_REQUEST_4_ID)))
             .withCauseInstanceOf(ScriptExecutionException.class);
 
         // Invalid return type from script
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(() -> this.clusterSelectorScript.selectResource(CLUSTERS, JOB_REQUEST_5, JOB_REQUEST_5_ID));
+            .isThrownBy(() -> this.clusterSelectorScript.selectResource(this.createContext(JOB_REQUEST_5_ID)));
+    }
+
+    private ClusterSelectionContext createContext(final String jobId) {
+        final JobRequest jobRequest;
+        final boolean apiJob;
+        switch (jobId) {
+            case JOB_REQUEST_0_ID:
+                apiJob = true;
+                jobRequest = JOB_REQUEST_0;
+                break;
+            case JOB_REQUEST_1_ID:
+                apiJob = false;
+                jobRequest = JOB_REQUEST_1;
+                break;
+            case JOB_REQUEST_2_ID:
+                apiJob = false;
+                jobRequest = JOB_REQUEST_2;
+                break;
+            case JOB_REQUEST_3_ID:
+                apiJob = true;
+                jobRequest = JOB_REQUEST_3;
+                break;
+            case JOB_REQUEST_4_ID:
+                apiJob = false;
+                jobRequest = JOB_REQUEST_4;
+                break;
+            case JOB_REQUEST_5_ID:
+                apiJob = true;
+                jobRequest = JOB_REQUEST_5;
+                break;
+            default:
+                throw new IllegalArgumentException(jobId + " is currently unsupported");
+        }
+        return new ClusterSelectionContext(
+            jobId,
+            jobRequest,
+            apiJob,
+            null,
+            CLUSTERS
+        );
     }
 }

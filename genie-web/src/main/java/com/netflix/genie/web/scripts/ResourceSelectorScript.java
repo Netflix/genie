@@ -22,22 +22,23 @@ import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.exceptions.checked.ScriptNotConfiguredException;
+import com.netflix.genie.web.selectors.ResourceSelectionContext;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Interface for defining the contract between the selection of a resource from a set of resources for a given
  * job request.
  *
  * @param <R> The type of resource this script is selecting from
+ * @param <C> The context for resource selection which must extend {@link ResourceSelectionContext}
  * @author tgianos
  * @since 4.0.0
  */
 @Slf4j
-public class ResourceSelectorScript<R> extends ManagedScript {
+public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> extends ManagedScript {
 
     static final String JOB_REQUEST_BINDING = "jobRequestParameter";
     static final String JOB_ID_BINDING = "jobIdParameter";
@@ -61,22 +62,15 @@ public class ResourceSelectorScript<R> extends ManagedScript {
      * Given the {@link JobRequest} and an associated set of {@literal resources} which matched the request criteria
      * invoke the configured script to see if a preferred resource is selected based on the current logic.
      *
-     * @param resources  The set of resources of type {@literal R} which should be selected from
-     * @param jobRequest The {@link JobRequest} that the resource will be running
-     * @param jobId      The id of the job this resource is being selected for
+     * @param context The {@link ResourceSelectionContext} instance containing information about the context for this
+     *                selection
      * @return A {@link ResourceSelectorScriptResult} instance
      * @throws ResourceSelectionException If an unexpected error occurs during selection
      */
-    public ResourceSelectorScriptResult<R> selectResource(
-        final Set<R> resources,
-        final JobRequest jobRequest,
-        final String jobId
-    ) throws ResourceSelectionException {
+    public ResourceSelectorScriptResult<R> selectResource(final C context) throws ResourceSelectionException {
         try {
             final Map<String, Object> parameters = Maps.newHashMap();
-            parameters.put(JOB_REQUEST_BINDING, jobRequest);
-            parameters.put(JOB_ID_BINDING, jobId);
-            this.addParametersForScript(parameters, resources, jobRequest);
+            this.addParametersForScript(parameters, context);
             final Object evaluationResult = this.evaluateScript(parameters);
             if (!(evaluationResult instanceof ResourceSelectorScriptResult)) {
                 throw new ResourceSelectionException(
@@ -88,7 +82,7 @@ public class ResourceSelectorScript<R> extends ManagedScript {
                 = (ResourceSelectorScriptResult<R>) evaluationResult;
 
             // Validate that the selected resource is actually in the original set
-            if (result.getResource().isPresent() && !resources.contains(result.getResource().get())) {
+            if (result.getResource().isPresent() && !context.getResources().contains(result.getResource().get())) {
                 throw new ResourceSelectionException(result.getResource().get() + " is not in original set");
             }
 
@@ -107,13 +101,10 @@ public class ResourceSelectorScript<R> extends ManagedScript {
      * will already have been added under {@literal jobRequestParameter}.
      *
      * @param parameters The existing set of parameters for implementations to add to
-     * @param resources  The set of resources that need to be chosen from
-     * @param jobRequest The job request necessitating the evaluation of this script
+     * @param context    The selection context
      */
-    protected void addParametersForScript(
-        final Map<String, Object> parameters,
-        final Set<R> resources,
-        final JobRequest jobRequest
-    ) {
+    protected void addParametersForScript(final Map<String, Object> parameters, final C context) {
+        parameters.put(JOB_REQUEST_BINDING, context.getJobRequest());
+        parameters.put(JOB_ID_BINDING, context.getJobId());
     }
 }

@@ -18,14 +18,13 @@
 package com.netflix.genie.web.scripts;
 
 import com.netflix.genie.common.external.dtos.v4.Command;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
+import com.netflix.genie.web.selectors.CommandSelectionContext;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * An extension of {@link ResourceSelectorScript} which from a set of commands and the original job request will
@@ -35,7 +34,7 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Slf4j
-public class CommandSelectorManagedScript extends ResourceSelectorScript<Command> {
+public class CommandSelectorManagedScript extends ResourceSelectorScript<Command, CommandSelectionContext> {
 
     static final String COMMANDS_BINDING = "commandsParameter";
 
@@ -59,13 +58,15 @@ public class CommandSelectorManagedScript extends ResourceSelectorScript<Command
      */
     @Override
     public ResourceSelectorScriptResult<Command> selectResource(
-        final Set<Command> resources,
-        final JobRequest jobRequest,
-        final String jobId
+        final CommandSelectionContext context
     ) throws ResourceSelectionException {
-        log.debug("Called to attempt to select a command from {} for job {}", resources, jobId);
+        log.debug(
+            "Called to attempt to select a command from {} for job {}",
+            context.getResources(),
+            context.getJobId()
+        );
 
-        return super.selectResource(resources, jobRequest, jobId);
+        return super.selectResource(context);
     }
 
     /**
@@ -74,10 +75,9 @@ public class CommandSelectorManagedScript extends ResourceSelectorScript<Command
     @Override
     protected void addParametersForScript(
         final Map<String, Object> parameters,
-        final Set<Command> resources,
-        final JobRequest jobRequest
+        final CommandSelectionContext context
     ) {
-        super.addParametersForScript(parameters, resources, jobRequest);
-        parameters.put(COMMANDS_BINDING, resources);
+        super.addParametersForScript(parameters, context);
+        parameters.put(COMMANDS_BINDING, context.getResources());
     }
 }

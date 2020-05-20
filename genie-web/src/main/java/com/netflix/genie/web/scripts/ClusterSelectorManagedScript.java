@@ -18,30 +18,29 @@
 package com.netflix.genie.web.scripts;
 
 import com.netflix.genie.common.external.dtos.v4.Cluster;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.ClusterSelectorScriptProperties;
+import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelector;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Extension of {@link ResourceSelectorScript} that delegates selection of a job's cluster when more than one choice is
  * available. See also: {@link ClusterSelector}.
  * <p>
  * The contract between the script and the Java code is that the script will be supplied global variables
- * {@code clusters} and {@code jobRequest} which will be JSON strings representing the list (array) of clusters
- * matching the cluster criteria tags and the job request that kicked off this evaluation. The code expects the script
- * to either return the id of the cluster if one is selected or null if none was selected.
+ * {@code clusters} and {@code jobRequest} which will be a {@code Set} of {@link Cluster} instances
+ * matching the cluster criteria and the job request that kicked off this evaluation respectively. The code expects the
+ * script to return a {@link ResourceSelectorScriptResult} instance.
  *
  * @author mprimi
  * @since 4.0.0
  */
 @Slf4j
-public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster> {
+public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster, ClusterSelectionContext> {
 
     static final String CLUSTERS_BINDING = "clustersParameter";
 
@@ -65,13 +64,15 @@ public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster
      */
     @Override
     public ResourceSelectorScriptResult<Cluster> selectResource(
-        final Set<Cluster> resources,
-        final JobRequest jobRequest,
-        final String jobId
+        final ClusterSelectionContext context
     ) throws ResourceSelectionException {
-        log.debug("Called to attempt to select a cluster from {} for job {}", resources, jobId);
+        log.debug(
+            "Called to attempt to select a cluster from {} for job {}",
+            context.getClusters(),
+            context.getJobId()
+        );
 
-        return super.selectResource(resources, jobRequest, jobId);
+        return super.selectResource(context);
     }
 
     /**
@@ -80,10 +81,9 @@ public class ClusterSelectorManagedScript extends ResourceSelectorScript<Cluster
     @Override
     protected void addParametersForScript(
         final Map<String, Object> parameters,
-        final Set<Cluster> resources,
-        final JobRequest jobRequest
+        final ClusterSelectionContext context
     ) {
-        super.addParametersForScript(parameters, resources, jobRequest);
-        parameters.put(CLUSTERS_BINDING, resources);
+        super.addParametersForScript(parameters, context);
+        parameters.put(CLUSTERS_BINDING, context.getClusters());
     }
 }
