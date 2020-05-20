@@ -17,7 +17,9 @@
  */
 package com.netflix.genie.web.selectors.impl
 
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Sets
+import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.Command
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
@@ -25,6 +27,7 @@ import com.netflix.genie.web.dtos.ResourceSelectionResult
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript
 import com.netflix.genie.web.scripts.ResourceSelectorScriptResult
+import com.netflix.genie.web.selectors.CommandSelectionContext
 import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.genie.web.util.MetricsUtils
 import io.micrometer.core.instrument.MeterRegistry
@@ -54,12 +57,22 @@ class ScriptCommandSelectorImplSpec extends Specification {
     def "Can select command"() {
         def command0 = Mock(Command)
         def command1 = Mock(Command)
-        def commands = Sets.newHashSet(command0, command1)
         def command1Metadata = Mock(CommandMetadata)
+        def clusters = Sets.newHashSet(Mock(Cluster), Mock(Cluster))
+        def commandClusters = ImmutableMap.of(
+            command0, clusters,
+            command1, clusters
+        )
         def jobRequest = Mock(JobRequest)
         def jobId = UUID.randomUUID().toString()
         def selectionException = new ResourceSelectionException("some error")
         def scriptResult = Mock(ResourceSelectorScriptResult)
+        def context = new CommandSelectionContext(
+            jobId,
+            jobRequest,
+            true,
+            commandClusters
+        )
 
         ResourceSelectionResult<Command> result
         Set<Tag> expectedTags
@@ -67,10 +80,10 @@ class ScriptCommandSelectorImplSpec extends Specification {
         when: "Script returns no command"
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, "null"))
-        result = this.commandSelector.select(commands, jobRequest, jobId)
+        result = this.commandSelector.select(context)
 
         then:
-        1 * this.script.selectResource(commands, jobRequest, jobId) >> scriptResult
+        1 * this.script.selectResource(context) >> scriptResult
         1 * scriptResult.getResource() >> Optional.empty()
         1 * scriptResult.getRationale() >> Optional.empty()
         1 * this.registry.timer(
@@ -86,10 +99,10 @@ class ScriptCommandSelectorImplSpec extends Specification {
 
         when: "Script throws exception"
         expectedTags = MetricsUtils.newFailureTagsSetForException(selectionException)
-        this.commandSelector.select(commands, jobRequest, jobId)
+        this.commandSelector.select(context)
 
         then:
-        1 * this.script.selectResource(commands, jobRequest, jobId) >> { throw selectionException }
+        1 * this.script.selectResource(context) >> { throw selectionException }
         1 * this.registry.timer(
             ScriptCommandSelectorImpl.SELECT_TIMER_NAME,
             { it == expectedTags }
@@ -101,10 +114,10 @@ class ScriptCommandSelectorImplSpec extends Specification {
         expectedTags = MetricsUtils.newSuccessTagsSet()
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, "command 1 id"))
         expectedTags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, "command 1 name"))
-        result = this.commandSelector.select(commands, jobRequest, jobId)
+        result = this.commandSelector.select(context)
 
         then:
-        1 * this.script.selectResource(commands, jobRequest, jobId) >> scriptResult
+        1 * this.script.selectResource(context) >> scriptResult
         1 * scriptResult.getResource() >> Optional.of(command1)
         1 * scriptResult.getRationale() >> Optional.of("Good to go!")
         1 * command1.getId() >> "command 1 id"

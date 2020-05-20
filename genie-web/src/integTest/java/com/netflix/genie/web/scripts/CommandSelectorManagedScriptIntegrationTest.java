@@ -19,6 +19,7 @@ package com.netflix.genie.web.scripts;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata;
 import com.netflix.genie.common.external.dtos.v4.CommandStatus;
@@ -31,21 +32,25 @@ import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.exceptions.checked.ScriptExecutionException;
 import com.netflix.genie.web.properties.CommandSelectorManagedScriptProperties;
 import com.netflix.genie.web.properties.ScriptManagerProperties;
+import com.netflix.genie.web.selectors.CommandSelectionContext;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 import javax.script.ScriptEngineManager;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 class CommandSelectorManagedScriptIntegrationTest {
 
@@ -79,6 +84,13 @@ class CommandSelectorManagedScriptIntegrationTest {
     private static final JobRequest JOB_REQUEST_5 = createTestJobRequest(JOB_REQUEST_5_ID);
 
     private static final Set<Command> COMMANDS = Sets.newHashSet(COMMAND_0, COMMAND_1, COMMAND_2);
+    private static final Set<Cluster> CLUSTERS = Sets.newHashSet(
+        Mockito.mock(Cluster.class),
+        Mockito.mock(Cluster.class)
+    );
+    private static final Map<Command, Set<Cluster>> COMMAND_CLUSTERS = COMMANDS
+        .stream()
+        .collect(Collectors.toMap(command -> command, command -> CLUSTERS));
 
     private CommandSelectorManagedScriptProperties scriptProperties;
     private CommandSelectorManagedScript commandSelectorManagedScript;
@@ -153,37 +165,70 @@ class CommandSelectorManagedScriptIntegrationTest {
 
         ResourceSelectorScriptResult<Command> result;
 
-        result = this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_0, JOB_REQUEST_0_ID);
+        result = this.commandSelectorManagedScript.selectResource(this.createContext(JOB_REQUEST_0_ID));
         Assertions.assertThat(result.getResource()).isPresent().contains(COMMAND_0);
         Assertions.assertThat(result.getRationale()).isPresent().contains("selected 0");
 
-        result = this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_1, JOB_REQUEST_1_ID);
+        result = this.commandSelectorManagedScript.selectResource(this.createContext(JOB_REQUEST_1_ID));
         Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isPresent().contains("Couldn't find anything");
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(
-                () -> this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_2, JOB_REQUEST_2_ID)
-            )
+            .isThrownBy(() -> this.commandSelectorManagedScript.selectResource(this.createContext(JOB_REQUEST_2_ID)))
             .withNoCause();
 
-        result = this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_3, JOB_REQUEST_3_ID);
+        result = this.commandSelectorManagedScript.selectResource(this.createContext(JOB_REQUEST_3_ID));
         Assertions.assertThat(result.getResource()).isNotPresent();
         Assertions.assertThat(result.getRationale()).isNotPresent();
 
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(
-                () -> this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_4, JOB_REQUEST_4_ID)
-            )
+            .isThrownBy(() -> this.commandSelectorManagedScript.selectResource(this.createContext(JOB_REQUEST_4_ID)))
             .withCauseInstanceOf(ScriptExecutionException.class);
 
         // Invalid return type from script
         Assertions
             .assertThatExceptionOfType(ResourceSelectionException.class)
-            .isThrownBy(
-                () -> this.commandSelectorManagedScript.selectResource(COMMANDS, JOB_REQUEST_5, JOB_REQUEST_5_ID)
-            );
+            .isThrownBy(() -> this.commandSelectorManagedScript.selectResource(this.createContext(JOB_REQUEST_5_ID)));
+    }
+
+    private CommandSelectionContext createContext(final String jobId) {
+        final JobRequest jobRequest;
+        final boolean apiJob;
+        switch (jobId) {
+            case JOB_REQUEST_0_ID:
+                apiJob = true;
+                jobRequest = JOB_REQUEST_0;
+                break;
+            case JOB_REQUEST_1_ID:
+                apiJob = false;
+                jobRequest = JOB_REQUEST_1;
+                break;
+            case JOB_REQUEST_2_ID:
+                apiJob = false;
+                jobRequest = JOB_REQUEST_2;
+                break;
+            case JOB_REQUEST_3_ID:
+                apiJob = true;
+                jobRequest = JOB_REQUEST_3;
+                break;
+            case JOB_REQUEST_4_ID:
+                apiJob = false;
+                jobRequest = JOB_REQUEST_4;
+                break;
+            case JOB_REQUEST_5_ID:
+                apiJob = true;
+                jobRequest = JOB_REQUEST_5;
+                break;
+            default:
+                throw new IllegalArgumentException(jobId + " is currently unsupported");
+        }
+        return new CommandSelectionContext(
+            jobId,
+            jobRequest,
+            apiJob,
+            COMMAND_CLUSTERS
+        );
     }
 }

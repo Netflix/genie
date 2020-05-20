@@ -19,11 +19,11 @@ package com.netflix.genie.web.selectors.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.Command;
-import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.scripts.CommandSelectorManagedScript;
 import com.netflix.genie.web.scripts.ResourceSelectorScriptResult;
+import com.netflix.genie.web.selectors.CommandSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelector;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -32,8 +32,6 @@ import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -73,18 +71,18 @@ public class ScriptCommandSelectorImpl implements CommandSelector {
      */
     @Override
     public ResourceSelectionResult<Command> select(
-        @NotEmpty final Set<@Valid Command> resources,
-        @Valid final JobRequest jobRequest,
-        @NotBlank final String jobId
+        @Valid final CommandSelectionContext context
     ) throws ResourceSelectionException {
         final long selectStart = System.nanoTime();
+        final String jobId = context.getJobId();
+        final Set<Command> resources = context.getResources();
         log.debug("Called to select a command from {} for job {}", resources, jobId);
         final Set<Tag> tags = Sets.newHashSet();
         final ResourceSelectionResult.Builder<Command> builder = new ResourceSelectionResult.Builder<>(this.getClass());
 
         try {
             final ResourceSelectorScriptResult<Command> result
-                = this.commandSelectorManagedScript.selectResource(resources, jobRequest, jobId);
+                = this.commandSelectorManagedScript.selectResource(context);
             MetricsUtils.addSuccessTags(tags);
 
             final Optional<Command> commandOptional = result.getResource();

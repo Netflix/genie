@@ -22,6 +22,7 @@ import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
 import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
+import com.netflix.genie.web.selectors.CommandSelectionContext;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,19 +41,11 @@ class RandomCommandSelectorImplTest {
 
     private RandomCommandSelectorImpl selector;
 
-    /**
-     * Setup the tests.
-     */
     @BeforeEach
     void setup() {
         this.selector = new RandomCommandSelectorImpl();
     }
 
-    /**
-     * Test whether a command is returned from a set of candidates.
-     *
-     * @throws ResourceSelectionException on unexpected error
-     */
     @Test
     void testValidCommandSet() throws ResourceSelectionException {
         final Command command1 = Mockito.mock(Command.class);
@@ -61,8 +54,12 @@ class RandomCommandSelectorImplTest {
         final Set<Command> commands = Sets.newHashSet(command1, command2, command3);
         final JobRequest jobRequest = Mockito.mock(JobRequest.class);
         final String jobId = UUID.randomUUID().toString();
+        final CommandSelectionContext context = Mockito.mock(CommandSelectionContext.class);
+        Mockito.when(context.getResources()).thenReturn(commands);
+        Mockito.when(context.getJobId()).thenReturn(jobId);
+        Mockito.when(context.getJobRequest()).thenReturn(jobRequest);
         for (int i = 0; i < 5; i++) {
-            final ResourceSelectionResult<Command> result = this.selector.select(commands, jobRequest, jobId);
+            final ResourceSelectionResult<Command> result = this.selector.select(context);
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.getSelectorClass()).isEqualTo(RandomCommandSelectorImpl.class);
             Assertions.assertThat(result.getSelectedResource()).isPresent().get().isIn(commands);
@@ -70,19 +67,14 @@ class RandomCommandSelectorImplTest {
         }
     }
 
-    /**
-     * Test whether a command is returned from a set of candidates.
-     *
-     * @throws ResourceSelectionException on unexpected error
-     */
     @Test
     void testValidCommandSetOfOne() throws ResourceSelectionException {
         final Command command = Mockito.mock(Command.class);
-        final ResourceSelectionResult<Command> result = this.selector.select(
-            Sets.newHashSet(command),
-            Mockito.mock(JobRequest.class),
-            UUID.randomUUID().toString()
-        );
+        final CommandSelectionContext context = Mockito.mock(CommandSelectionContext.class);
+        Mockito.when(context.getResources()).thenReturn(Sets.newHashSet(command));
+        Mockito.when(context.getJobId()).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(context.getJobRequest()).thenReturn(Mockito.mock(JobRequest.class));
+        final ResourceSelectionResult<Command> result = this.selector.select(context);
         Assertions
             .assertThat(result.getSelectedResource())
             .isPresent()

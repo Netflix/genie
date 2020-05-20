@@ -30,5 +30,5 @@ import org.springframework.validation.annotation.Validated;
  * @since 2.0.0
  */
 @Validated
-public interface ClusterSelector extends ResourceSelector<Cluster> {
+public interface ClusterSelector extends ResourceSelector<Cluster, ClusterSelectionContext> {
 }

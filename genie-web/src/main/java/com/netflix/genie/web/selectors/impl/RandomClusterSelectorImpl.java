@@ -18,6 +18,7 @@
 package com.netflix.genie.web.selectors.impl;
 
 import com.netflix.genie.common.external.dtos.v4.Cluster;
+import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelector;
 
 /**
@@ -27,5 +28,7 @@ import com.netflix.genie.web.selectors.ClusterSelector;
  * @author tgianos
  * @since 2.0.0
  */
-public class RandomClusterSelectorImpl extends RandomResourceSelector<Cluster> implements ClusterSelector {
+public class RandomClusterSelectorImpl
+    extends RandomResourceSelector<Cluster, ClusterSelectionContext>
+    implements ClusterSelector {
 }

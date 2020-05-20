@@ -18,6 +18,7 @@
 package com.netflix.genie.web.selectors.impl;
 
 import com.netflix.genie.common.external.dtos.v4.Command;
+import com.netflix.genie.web.selectors.CommandSelectionContext;
 import com.netflix.genie.web.selectors.CommandSelector;
 
 /**
@@ -27,5 +28,7 @@ import com.netflix.genie.web.selectors.CommandSelector;
  * @author tgianos
  * @since 4.0.0
  */
-public class RandomCommandSelectorImpl extends RandomResourceSelector<Command> implements CommandSelector {
+public class RandomCommandSelectorImpl
+    extends RandomResourceSelector<Command, CommandSelectionContext>
+    implements CommandSelector {
 }
