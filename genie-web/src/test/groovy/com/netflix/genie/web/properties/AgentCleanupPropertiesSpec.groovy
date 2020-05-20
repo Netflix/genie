@@ -19,27 +19,30 @@ package com.netflix.genie.web.properties
 
 import spock.lang.Specification
 
+import java.time.Duration
+import java.time.temporal.ChronoUnit
+
 class AgentCleanupPropertiesSpec extends Specification {
     def "testDefaultsSettersAndGetters"() {
         setup:
         AgentCleanupProperties properties = new AgentCleanupProperties()
 
         expect:
-        properties.getRefreshInterval() == 10000L
-        properties.getReconnectTimeLimit() == 120000L
-        properties.getLaunchTimeLimit() == 240000L
+        properties.getRefreshInterval() == Duration.of(10, ChronoUnit.SECONDS)
+        properties.getReconnectTimeLimit() == Duration.of(2, ChronoUnit.MINUTES)
+        properties.getLaunchTimeLimit() == Duration.of(4, ChronoUnit.MINUTES)
         properties.isEnabled()
 
         when:
-        properties.setRefreshInterval(1000)
-        properties.setReconnectTimeLimit(2000)
-        properties.setLaunchTimeLimit(3000)
+        properties.setRefreshInterval(Duration.of(1, ChronoUnit.MINUTES))
+        properties.setReconnectTimeLimit(Duration.of(2, ChronoUnit.MINUTES))
+        properties.setLaunchTimeLimit(Duration.of(3, ChronoUnit.MINUTES))
         properties.setEnabled(false)
 
         then:
-        properties.getRefreshInterval() == 1000L
-        properties.getReconnectTimeLimit() == 2000L
-        properties.getLaunchTimeLimit() == 3000L
+        properties.getRefreshInterval() == Duration.of(1, ChronoUnit.MINUTES)
+        properties.getReconnectTimeLimit() == Duration.of(2, ChronoUnit.MINUTES)
+        properties.getLaunchTimeLimit() == Duration.of(3, ChronoUnit.MINUTES)
         !properties.isEnabled()
     }
 }
