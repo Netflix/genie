@@ -116,8 +116,8 @@ public class AgentJobCleanupTask extends LeaderTask {
             final Instant awolJobFirstSeen = entry.getValue();
 
             final boolean jobWasClaimed = !acceptedAgentJobIds.contains(awolJobId);
-            final Instant claimDeadline = awolJobFirstSeen.plusMillis(this.properties.getLaunchTimeLimit());
-            final Instant reconnectDeadline = awolJobFirstSeen.plusMillis(this.properties.getReconnectTimeLimit());
+            final Instant claimDeadline = awolJobFirstSeen.plus(this.properties.getLaunchTimeLimit());
+            final Instant reconnectDeadline = awolJobFirstSeen.plus(this.properties.getReconnectTimeLimit());
 
             if (!jobWasClaimed && now.isBefore(claimDeadline)) {
                 log.debug("Job {} agent still pending agent start/claim", awolJobId);
@@ -176,7 +176,7 @@ public class AgentJobCleanupTask extends LeaderTask {
      */
     @Override
     public long getFixedRate() {
-        return properties.getRefreshInterval();
+        return properties.getRefreshInterval().toMillis();
     }
 
 }

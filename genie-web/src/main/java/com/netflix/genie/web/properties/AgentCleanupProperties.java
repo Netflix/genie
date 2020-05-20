@@ -22,6 +22,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
+
 /**
  * Properties related to cleaning up jobs associated to AWOL/MIA agents.
  *
@@ -46,9 +48,9 @@ public class AgentCleanupProperties {
 
     private boolean enabled = true;
 
-    private long refreshInterval = 10_000;
+    private Duration refreshInterval = Duration.ofSeconds(10);
 
-    private long reconnectTimeLimit = 120_000;
+    private Duration reconnectTimeLimit = Duration.ofMinutes(2);
 
-    private long launchTimeLimit = 240_000;
+    private Duration launchTimeLimit = Duration.ofMinutes(4);
 }

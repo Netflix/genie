@@ -31,6 +31,8 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 
+import java.time.Duration
+
 @SuppressWarnings("GroovyAccessibility")
 class AgentJobCleanupTaskSpec extends Specification {
 
@@ -40,6 +42,8 @@ class AgentJobCleanupTaskSpec extends Specification {
     MeterRegistry registry
     Counter counter
     AgentRoutingService agentRoutingService
+    Duration inTheFuture = Duration.ofHours(1)
+    Duration inThePast = Duration.ofHours(-1)
 
     void setup() {
         this.persistenceService = Mock(PersistenceService)
@@ -65,8 +69,8 @@ class AgentJobCleanupTaskSpec extends Specification {
 
         then:
         scheduleType == GenieTaskScheduleType.FIXED_RATE
-        period == 1000
-        1 * taskProperties.getRefreshInterval() >> 1000
+        period == 10_000
+        1 * taskProperties.getRefreshInterval() >> Duration.ofSeconds(10)
     }
 
     def "Run"() {
@@ -92,8 +96,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * agentRoutingService.isAgentConnected("j5") >> false
         1 * agentRoutingService.isAgentConnected("j6") >> false
-        4 * taskProperties.getLaunchTimeLimit() >> 10_000
-        4 * taskProperties.getReconnectTimeLimit() >> 10_000
+        4 * taskProperties.getLaunchTimeLimit() >> inTheFuture
+        4 * taskProperties.getReconnectTimeLimit() >> inTheFuture
         0 * persistenceService.setJobCompletionInformation(_, _, _, _, _, _)
         0 * registry.counter(_, _)
 
@@ -116,8 +120,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * agentRoutingService.isAgentConnected("j4") >> false
         1 * agentRoutingService.isAgentConnected("j5") >> true
         1 * agentRoutingService.isAgentConnected("j6") >> true
-        2 * taskProperties.getLaunchTimeLimit() >> 10_000
-        2 * taskProperties.getReconnectTimeLimit() >> 10_000
+        2 * taskProperties.getLaunchTimeLimit() >> inTheFuture
+        2 * taskProperties.getReconnectTimeLimit() >> inTheFuture
         0 * persistenceService.setJobCompletionInformation(_, _, _, _, _, _)
         0 * registry.counter(_, _)
 
@@ -132,8 +136,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4", "j6")
         1 * agentRoutingService.isAgentConnected("j3") >> false
         1 * agentRoutingService.isAgentConnected("j4") >> false
-        2 * taskProperties.getLaunchTimeLimit() >> 10_000
-        2 * taskProperties.getReconnectTimeLimit() >> -1
+        2 * taskProperties.getLaunchTimeLimit() >> inTheFuture
+        2 * taskProperties.getReconnectTimeLimit() >> inThePast
         1 * persistenceService.setJobCompletionInformation("j3", -1, JobStatus.FAILED, AgentJobCleanupTask.AWOL_STATUS_MESSAGE, null, null)
         1 * registry.counter(AgentJobCleanupTask.TERMINATED_COUNTER_METRIC_NAME, MetricsUtils.newSuccessTagsSet()) >> counter
         1 * counter.increment()
@@ -147,8 +151,8 @@ class AgentJobCleanupTaskSpec extends Specification {
         )
         1 * persistenceService.getUnclaimedAgentJobs() >> Sets.newHashSet("j4")
         1 * agentRoutingService.isAgentConnected("j4") >> false
-        1 * taskProperties.getLaunchTimeLimit() >> -1
-        1 * taskProperties.getReconnectTimeLimit() >> 10_000
+        1 * taskProperties.getLaunchTimeLimit() >> inThePast
+        1 * taskProperties.getReconnectTimeLimit() >> inTheFuture
         1 * persistenceService.setJobCompletionInformation("j4", -1, JobStatus.FAILED, AgentJobCleanupTask.NEVER_CLAIMED_STATUS_MESSAGE, null, null) >> {
             throw e
         }
