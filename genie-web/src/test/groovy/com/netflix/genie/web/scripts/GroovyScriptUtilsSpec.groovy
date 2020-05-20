@@ -24,6 +24,8 @@ import com.netflix.genie.common.external.dtos.v4.Command
 import com.netflix.genie.common.external.dtos.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.external.dtos.v4.JobMetadata
 import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.web.selectors.ClusterSelectionContext
+import com.netflix.genie.web.selectors.CommandSelectionContext
 import spock.lang.Specification
 
 /**
@@ -37,6 +39,66 @@ class GroovyScriptUtilsSpec extends Specification {
 
     def setup() {
         this.scriptBinding = new Binding()
+    }
+
+    def "Can get command selection context"() {
+        when:
+        GroovyScriptUtils.getCommandSelectionContext(this.scriptBinding)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        this.scriptBinding.setVariable(ResourceSelectorScript.CONTEXT_BINDING, 1)
+        GroovyScriptUtils.getCommandSelectionContext(this.scriptBinding)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        def expectedContext = new CommandSelectionContext(
+            UUID.randomUUID().toString(),
+            Mock(JobRequest),
+            true,
+            [
+                (Mock(Command)): Sets.newHashSet(Mock(Cluster)),
+                (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
+            ]
+        )
+        this.scriptBinding.setVariable(ResourceSelectorScript.CONTEXT_BINDING, expectedContext)
+        def context = GroovyScriptUtils.getCommandSelectionContext(this.scriptBinding)
+
+        then:
+        context == expectedContext
+    }
+
+    def "Can get cluster selection context"() {
+        when:
+        GroovyScriptUtils.getClusterSelectionContext(this.scriptBinding)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        this.scriptBinding.setVariable(ResourceSelectorScript.CONTEXT_BINDING, 1)
+        GroovyScriptUtils.getClusterSelectionContext(this.scriptBinding)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        def expectedContext = new ClusterSelectionContext(
+            UUID.randomUUID().toString(),
+            Mock(JobRequest),
+            true,
+            Mock(Command),
+            Sets.newHashSet(Mock(Cluster))
+        )
+        this.scriptBinding.setVariable(ResourceSelectorScript.CONTEXT_BINDING, expectedContext)
+        def context = GroovyScriptUtils.getClusterSelectionContext(this.scriptBinding)
+
+        then:
+        context == expectedContext
     }
 
     def "Can get job id"() {

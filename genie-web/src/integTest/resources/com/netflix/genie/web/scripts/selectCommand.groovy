@@ -21,14 +21,16 @@ import com.netflix.genie.common.external.dtos.v4.Command
 import com.netflix.genie.common.external.dtos.v4.CommandMetadata
 import com.netflix.genie.common.external.dtos.v4.CommandStatus
 import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.web.selectors.CommandSelectionContext
 
 import java.time.Instant
 
 def binding = this.getBinding()
 
-String jobId = GroovyScriptUtils.getJobId(binding)
-JobRequest jobRequest = GroovyScriptUtils.getJobRequest(binding)
-Set<Command> commands = GroovyScriptUtils.getCommands(binding)
+CommandSelectionContext context = GroovyScriptUtils.getCommandSelectionContext(binding)
+String jobId = context.getJobId()
+JobRequest jobRequest = context.getJobRequest()
+Set<Command> commands = context.getResources()
 
 Command selectedCommand = null
 String rationale = null

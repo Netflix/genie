@@ -21,14 +21,16 @@ import com.netflix.genie.common.external.dtos.v4.Cluster
 import com.netflix.genie.common.external.dtos.v4.ClusterMetadata
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus
 import com.netflix.genie.common.external.dtos.v4.JobRequest
+import com.netflix.genie.web.selectors.ClusterSelectionContext
 
 import java.time.Instant
 
 def binding = this.getBinding()
 
-String jobId = GroovyScriptUtils.getJobId(binding)
-JobRequest jobRequest = GroovyScriptUtils.getJobRequest(binding)
-Set<Cluster> clusters = GroovyScriptUtils.getClusters(binding)
+ClusterSelectionContext context = GroovyScriptUtils.getClusterSelectionContext(binding)
+String jobId = context.getJobId()
+JobRequest jobRequest = context.getJobRequest()
+Set<Cluster> clusters = context.getClusters()
 
 Cluster selectedCluster = null
 String rationale = null

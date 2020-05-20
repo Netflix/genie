@@ -42,6 +42,7 @@ public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> ex
 
     static final String JOB_REQUEST_BINDING = "jobRequestParameter";
     static final String JOB_ID_BINDING = "jobIdParameter";
+    static final String CONTEXT_BINDING = "contextParameter";
 
     /**
      * Constructor.
@@ -97,13 +98,15 @@ public class ResourceSelectorScript<R, C extends ResourceSelectionContext<R>> ex
     }
 
     /**
-     * Add any implementation specific parameters to the map of parameters to send to the script. The job request
-     * will already have been added under {@literal jobRequestParameter}.
+     * Add any implementation specific parameters to the map of parameters to send to the script.
      *
      * @param parameters The existing set of parameters for implementations to add to
      * @param context    The selection context
      */
     protected void addParametersForScript(final Map<String, Object> parameters, final C context) {
+        parameters.put(CONTEXT_BINDING, context);
+
+        // TODO: Remove once internal scripts migrate to use context directly
         parameters.put(JOB_REQUEST_BINDING, context.getJobRequest());
         parameters.put(JOB_ID_BINDING, context.getJobId());
     }

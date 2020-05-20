@@ -20,6 +20,8 @@ package com.netflix.genie.web.scripts;
 import com.netflix.genie.common.external.dtos.v4.Cluster;
 import com.netflix.genie.common.external.dtos.v4.Command;
 import com.netflix.genie.common.external.dtos.v4.JobRequest;
+import com.netflix.genie.web.selectors.ClusterSelectionContext;
+import com.netflix.genie.web.selectors.CommandSelectionContext;
 import groovy.lang.Binding;
 
 import java.util.Set;
@@ -35,12 +37,43 @@ public final class GroovyScriptUtils {
     }
 
     /**
+     * Given the {@link Binding} that a script has attempt to extract the command selection context.
+     *
+     * @param binding The {@link Binding} for the script
+     * @return The {@link CommandSelectionContext} instance
+     * @throws IllegalArgumentException If there is no context parameter for the script or it is not a
+     *                                  {@link CommandSelectionContext}
+     */
+    public static CommandSelectionContext getCommandSelectionContext(
+        final Binding binding
+    ) throws IllegalArgumentException {
+        return getObjectVariable(binding, ResourceSelectorScript.CONTEXT_BINDING, CommandSelectionContext.class);
+    }
+
+    /**
+     * Given the {@link Binding} that a script has attempt to extract the cluster selection context.
+     *
+     * @param binding The {@link Binding} for the script
+     * @return The {@link ClusterSelectionContext} instance
+     * @throws IllegalArgumentException If there is no context parameter for the script or it is not a
+     *                                  {@link ClusterSelectionContext}
+     */
+    public static ClusterSelectionContext getClusterSelectionContext(
+        final Binding binding
+    ) throws IllegalArgumentException {
+        return getObjectVariable(binding, ResourceSelectorScript.CONTEXT_BINDING, ClusterSelectionContext.class);
+    }
+
+    /**
      * Given the {@link Binding} that a script has attempt to extract the job id parameter.
      *
      * @param binding The {@link Binding} for the script
      * @return The job id
      * @throws IllegalArgumentException If there is no job id parameter for the script or it is not a String
+     * @deprecated Use {@link #getClusterSelectionContext(Binding)} or {@link #getCommandSelectionContext(Binding)}
+     * instead
      */
+    @Deprecated
     public static String getJobId(final Binding binding) throws IllegalArgumentException {
         return getObjectVariable(binding, ResourceSelectorScript.JOB_ID_BINDING, String.class);
     }
@@ -52,7 +85,10 @@ public final class GroovyScriptUtils {
      * @return The {@link JobRequest}
      * @throws IllegalArgumentException If there is no job request parameter for the script or it is not a
      *                                  {@link JobRequest}
+     * @deprecated Use {@link #getClusterSelectionContext(Binding)} or {@link #getCommandSelectionContext(Binding)}
+     * instead
      */
+    @Deprecated
     public static JobRequest getJobRequest(final Binding binding) throws IllegalArgumentException {
         return getObjectVariable(binding, ResourceSelectorScript.JOB_REQUEST_BINDING, JobRequest.class);
     }
@@ -64,7 +100,10 @@ public final class GroovyScriptUtils {
      * @return The set of {@link Cluster}'s
      * @throws IllegalArgumentException If there is no clusters parameter, it isn't a set, is empty or doesn't contain
      *                                  all {@link Cluster} instances
+     * @deprecated Use {@link #getClusterSelectionContext(Binding)} or {@link #getCommandSelectionContext(Binding)}
+     * instead
      */
+    @Deprecated
     public static Set<Cluster> getClusters(final Binding binding) throws IllegalArgumentException {
         return getSetVariable(binding, ClusterSelectorManagedScript.CLUSTERS_BINDING, Cluster.class);
     }
@@ -76,7 +115,10 @@ public final class GroovyScriptUtils {
      * @return The set of {@link Command}'s
      * @throws IllegalArgumentException If there is no commands parameter, it isn't a set, is empty or doesn't contain
      *                                  all {@link Command} instances
+     * @deprecated Use {@link #getClusterSelectionContext(Binding)} or {@link #getCommandSelectionContext(Binding)}
+     * instead
      */
+    @Deprecated
     public static Set<Command> getCommands(final Binding binding) throws IllegalArgumentException {
         return getSetVariable(binding, CommandSelectorManagedScript.COMMANDS_BINDING, Command.class);
     }
