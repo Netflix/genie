@@ -450,6 +450,20 @@ public class ExecutionAutoConfiguration {
         return new LogExecutionErrorsStage();
     }
 
+
+    /**
+     * Create a {@link CleanupJobDirectoryStage} bean if one is not already defined.
+     *
+     * @param jobSetupService the job setup service
+     */
+    @Bean
+    @Lazy
+    @Order(220)
+    @ConditionalOnMissingBean(CleanupJobDirectoryStage.class)
+    CleanupJobDirectoryStage cleanupJobDirectoryStage(final JobSetupService jobSetupService) {
+        return new CleanupJobDirectoryStage(jobSetupService);
+    }
+
     /**
      * Create a {@link ArchiveJobOutputsStage} bean if one is not already defined.
      *
@@ -457,7 +471,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(220)
+    @Order(230)
     @ConditionalOnMissingBean(ArchiveJobOutputsStage.class)
     ArchiveJobOutputsStage archiveJobOutputsStage(final JobArchiveService jobArchiveService) {
         return new ArchiveJobOutputsStage(jobArchiveService);
@@ -470,7 +484,7 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(230)
+    @Order(240)
     @ConditionalOnMissingBean(StopHeartbeatServiceStage.class)
     StopHeartbeatServiceStage stopHeartbeatServiceStage(final AgentHeartBeatService heartbeatService) {
         return new StopHeartbeatServiceStage(heartbeatService);
@@ -483,23 +497,10 @@ public class ExecutionAutoConfiguration {
      */
     @Bean
     @Lazy
-    @Order(240)
+    @Order(250)
     @ConditionalOnMissingBean(StopFileServiceStage.class)
     StopFileServiceStage stopFileServiceStage(final AgentFileStreamService agentFileStreamService) {
         return new StopFileServiceStage(agentFileStreamService);
-    }
-
-    /**
-     * Create a {@link CleanupJobDirectoryStage} bean if one is not already defined.
-     *
-     * @param jobSetupService the job setup service
-     */
-    @Bean
-    @Lazy
-    @Order(250)
-    @ConditionalOnMissingBean(CleanupJobDirectoryStage.class)
-    CleanupJobDirectoryStage cleanupJobDirectoryStage(final JobSetupService jobSetupService) {
-        return new CleanupJobDirectoryStage(jobSetupService);
     }
 
     /**
