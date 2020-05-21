@@ -5275,14 +5275,20 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.launchTimeLimit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How long a job can stay in ACCEPTED state, waiting for the agent to claim it, before the job is marked failed, in milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">240000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.refreshInterval</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How often the AWOL agent tasks executed, in milliseconds</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.timeLimit</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">How long of a leeway to give a job after it agent disconnected and before the job is marked failed, in milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.reconnectTimeLimit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How long of a leeway to give a job after its agent disconnected and before the job is marked failed, in milliseconds</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">120000</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
@@ -6537,7 +6543,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2020-05-21 18:40:10 UTC
+Last updated 2020-05-21 23:35:40 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

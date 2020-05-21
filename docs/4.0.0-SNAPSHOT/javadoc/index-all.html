@@ -6969,6 +6969,10 @@
 <dd>
 <div class="block">Provides the current leader service status: whether the leader service is running and whether the node is leader.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html#getStatusesBeforeClaimed--">getStatusesBeforeClaimed()</a></span> - Static method in enum com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/JobStatus.html" title="enum in com.netflix.genie.common.external.dtos.v4">JobStatus</a></dt>
+<dd>
+<div class="block">Get an unmodifiable set of all the statuses that come before CLAIMED.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html#getStatusMessage--">getStatusMessage()</a></span> - Method in class com.netflix.genie.common.internal.dtos.v4.<a href="com/netflix/genie/common/internal/dtos/v4/FinishedJob.html" title="class in com.netflix.genie.common.internal.dtos.v4">FinishedJob</a></dt>
 <dd>
 <div class="block">Getter for optional field.</div>
@@ -7178,6 +7182,14 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html#getType--">getType()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a></dt>
 <dd>
 <div class="block">Get the type of this application.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getUnclaimedAgentJobs--">getUnclaimedAgentJobs()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Get the set of agent jobs in that have not reached CLAIMED state.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getUnclaimedAgentJobs--">getUnclaimedAgentJobs()</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Get the set of agent jobs in that have not reached CLAIMED state.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html#getUniqueId--">getUniqueId()</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CriterionEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CriterionEntity</a></dt>
 <dd>
