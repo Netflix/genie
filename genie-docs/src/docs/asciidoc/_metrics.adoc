@@ -409,12 +409,6 @@ for multiple errors.
 |JobResolverServiceImpl
 |status, exceptionClass
 
-|genie.services.jobResolver.clusterSelector.counter
-|Counter for cluster selector algorithms invocations
-|count
-|JobResolverServiceImpl
-|class, status, clusterName, clusterId, clusterSelectorClass
-
 |genie.services.jobResolver.generateClusterCriteriaPermutations.timer
 |Time taken to generate all the permutations for cluster criteria between the command options and the job request
 |nanoseconds
@@ -433,23 +427,17 @@ for multiple errors.
 |JobResolverServiceImpl
 |status, exceptionClass
 
+|genie.services.jobResolver.resolveCluster.clusterSelector.counter
+|Counter for cluster selector algorithms invocations
+|count
+|JobResolverServiceImpl
+|class, status, clusterName, clusterId, clusterSelectorClass
+
 |genie.services.jobResolver.resolveCluster.timer
 |Time taken to resolve the cluster to use for a job
 |nanoseconds
 |JobResolverServiceImpl
-|status, clusterName, clusterId, queryCount, criteriaCombinationCount, exceptionClass
-
-|genie.services.jobResolver.resolveCluster.criteriaCombination.count
-|Count of criterion combinations attempted to resolve a cluster for a job
-|count
-|JobResolverServiceImpl
-|
-
-|genie.services.jobResolver.resolveCluster.query.count
-|Count of number of database queries required to resolve a cluster for a job
-|count
-|JobResolverServiceImpl
-|
+|status, clusterName, clusterId, exceptionClass
 
 |genie.services.jobResolver.resolveCommand.timer
 |Time taken to resolve the command to use for a job
@@ -464,7 +452,7 @@ for multiple errors.
 |-
 
 |genie.services.jobResolver.selectCluster.noneSelected.counter
-|Number of times the cluster selection terminated without selecting a cluster
+|Number of times the cluster selection completed without selecting a cluster
 |count
 |JobResolverServiceImpl
 |-

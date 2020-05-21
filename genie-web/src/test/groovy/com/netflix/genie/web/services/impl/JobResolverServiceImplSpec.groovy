@@ -59,6 +59,8 @@ import spock.lang.Specification
 
 import javax.annotation.Nullable
 import java.time.Instant
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 /**
  * Specifications for the {@link JobResolverServiceImpl} class.
@@ -279,16 +281,6 @@ class JobResolverServiceImplSpec extends Specification {
     }
 
     def "Can resolve a job with V4 algorithm"() {
-        def cluster1Id = UUID.randomUUID().toString()
-        def cluster2Id = UUID.randomUUID().toString()
-        def cluster1 = createCluster(cluster1Id)
-        def cluster2 = createCluster(cluster2Id)
-        def clusters = Sets.newHashSet(cluster1, cluster2)
-        ResourceSelectionResult<Cluster> clusterSelectionResult = Mock(ResourceSelectionResult) {
-            getSelectorClass() >> this.getClass()
-            getSelectionRationale() >> Optional.empty()
-        }
-
         def command0Id = UUID.randomUUID().toString()
         def command1Id = UUID.randomUUID().toString()
         def executableBinary = UUID.randomUUID().toString()
@@ -310,13 +302,36 @@ class JobResolverServiceImplSpec extends Specification {
         def expectedCommandArgs = executable
         def expectedJobArgs = arguments
 
-        def jobRequest = createJobRequest(arguments, requestedArchiveLocationPrefix, null, null)
-        def jobRequestNoArchivalData = createJobRequest(arguments, null, null, 5_002)
+        def jobRequest0 = createJobRequest(arguments, requestedArchiveLocationPrefix, null, null)
+        def jobRequest1 = createJobRequest(arguments, null, null, 5_002)
         def requestedMemory = 6_323
-        def savedJobRequest = createJobRequest(arguments, null, requestedMemory, null)
+        def jobRequest2 = createJobRequest(arguments, null, requestedMemory, null)
 
-        when: "An API job is called without archive information"
-        def resolvedJob = this.service.resolveJob(jobId, jobRequest, true)
+        def command0JobRequest0Clusters = createClustersBasedOnCriteria(2, command0, jobRequest0)
+        def command1JobRequest0Clusters = createClustersBasedOnCriteria(3, command1, jobRequest0)
+        def jobRequest0Clusters = Sets.newHashSet(command0JobRequest0Clusters)
+        jobRequest0Clusters.addAll(command1JobRequest0Clusters)
+        def jobRequest0SelectedCluster = command0JobRequest0Clusters.head()
+
+        def command0JobRequest1Clusters = createClustersBasedOnCriteria(1, command0, jobRequest1)
+        def command1JobRequest1Clusters = createClustersBasedOnCriteria(4, command1, jobRequest1)
+        def jobRequest1Clusters = Sets.newHashSet(command0JobRequest1Clusters)
+        jobRequest1Clusters.addAll(command1JobRequest1Clusters)
+        def jobRequest1SelectedCluster = command1JobRequest1Clusters.head()
+
+        def command0JobRequest2Clusters = createClustersBasedOnCriteria(4, command0, jobRequest2)
+        def command1JobRequest2Clusters = createClustersBasedOnCriteria(2, command1, jobRequest2)
+        def jobRequest2Clusters = Sets.newHashSet(command0JobRequest2Clusters)
+        jobRequest2Clusters.addAll(command1JobRequest2Clusters)
+        def jobRequest2SelectedCluster = command1JobRequest2Clusters.head()
+
+        ResourceSelectionResult<Cluster> clusterSelectionResult = Mock(ResourceSelectionResult) {
+            getSelectorClass() >> this.getClass()
+            getSelectionRationale() >> Optional.empty()
+        }
+
+        when: "A non-persisting api is called"
+        def resolvedJob = this.service.resolveJob(jobId, jobRequest0, true)
         def jobSpec = resolvedJob.getJobSpecification()
         def jobEnvironment = resolvedJob.getJobEnvironment()
 
@@ -328,33 +343,25 @@ class JobResolverServiceImplSpec extends Specification {
         ) >> 1.0d
         0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         0 * this.persistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
-        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest.getCriteria().getCommandCriterion(), true) >> commands
-        1 * this.commandSelector.select(
-            {
-                verifyAll(it, CommandSelectionContext) {
-                    it.getJobId() == jobId
-                    it.getJobRequest() == jobRequest
-                    it.getResources() == commands
-                }
-            }
-        ) >> commandSelectionResult
+        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest0.getCriteria().getCommandCriterion(), true) >> commands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Criterion>, true) >> jobRequest0Clusters
+        1 * this.commandSelector.select(_ as CommandSelectionContext) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command0)
-        1 * this.persistenceService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
         1 * this.clusterSelector.select(
             {
                 verifyAll(it, ClusterSelectionContext) {
                     it.getJobId() == jobId
-                    it.getJobRequest() == jobRequest
-                    it.getResources() == clusters
+                    it.getJobRequest() == jobRequest0
+                    it.getResources() == command0JobRequest0Clusters
                 }
             }
         ) >> clusterSelectionResult
-        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
+        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(jobRequest0SelectedCluster)
         1 * this.persistenceService.getApplicationsForCommand(command0Id) >> Lists.newArrayList()
         jobSpec.getExecutableArgs() == expectedCommandArgs
         jobSpec.getJobArgs() == expectedJobArgs
         jobSpec.getJob().getId() == jobId
-        jobSpec.getCluster().getId() == cluster1Id
+        jobSpec.getCluster().getId() == jobRequest0SelectedCluster.getId()
         jobSpec.getCommand().getId() == command0Id
         jobSpec.getApplications().isEmpty()
         !jobSpec.isInteractive()
@@ -366,12 +373,12 @@ class JobResolverServiceImplSpec extends Specification {
         !jobEnvironment.getExt().isPresent()
         jobSpec.getTimeout().orElse(null) == com.netflix.genie.common.dto.JobRequest.DEFAULT_TIMEOUT_DURATION
 
-        when: "When an API job is called with archive location"
-        def resolvedJobNoArchivalData = this.service.resolveJob(jobId, jobRequestNoArchivalData, true)
-        def jobSpecNoArchivalData = resolvedJobNoArchivalData.getJobSpecification()
-        def jobEnvironmentNoArchivalData = resolvedJobNoArchivalData.getJobEnvironment()
+        when: "Job request with archive data is submitted to non-persisting API"
+        resolvedJob = this.service.resolveJob(jobId, jobRequest1, true)
+        jobSpec = resolvedJob.getJobSpecification()
+        jobEnvironment = resolvedJob.getJobEnvironment()
 
-        then: "It is resolved with archive information"
+        then: "It is resolved with archive information but not saved"
         0 * this.persistenceService.saveResolvedJob(_ as String, _ as ResolvedJob)
         1 * this.environment.getProperty(
             JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
@@ -379,55 +386,48 @@ class JobResolverServiceImplSpec extends Specification {
             JobResolverServiceImpl.DEFAULT_V4_PROBABILITY
         ) >> 1.0d
         0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
-        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequestNoArchivalData.getCriteria().getCommandCriterion(), true) >> commands
-        1 * this.commandSelector.select(
-            {
-                verifyAll(it, CommandSelectionContext) {
-                    it.getJobId() == jobId
-                    it.getJobRequest() == jobRequestNoArchivalData
-                    it.getResources() == commands
-                }
-            }
-        ) >> commandSelectionResult
-        1 * commandSelectionResult.getSelectedResource() >> Optional.of(command0)
-        1 * this.persistenceService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
+        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest1.getCriteria().getCommandCriterion(), true) >> commands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Criterion>, true) >> jobRequest1Clusters
+        1 * this.commandSelector.select(_ as CommandSelectionContext) >> commandSelectionResult
+        1 * commandSelectionResult.getSelectedResource() >> Optional.of(command1)
         1 * this.clusterSelector.select(
             {
                 verifyAll(it, ClusterSelectionContext) {
                     it.getJobId() == jobId
-                    it.getJobRequest() == jobRequestNoArchivalData
-                    it.getResources() == clusters
+                    it.getJobRequest() == jobRequest1
+                    it.getCommand().orElse(null) == command1
+                    it.getResources() == command1JobRequest1Clusters
                 }
             }
         ) >> clusterSelectionResult
-        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster1)
-        1 * this.persistenceService.getApplicationsForCommand(command0Id) >> Lists.newArrayList()
-        jobSpecNoArchivalData.getExecutableArgs() == expectedCommandArgs
-        jobSpecNoArchivalData.getJobArgs() == expectedJobArgs
-        jobSpecNoArchivalData.getJob().getId() == jobId
-        jobSpecNoArchivalData.getCluster().getId() == cluster1Id
-        jobSpecNoArchivalData.getCommand().getId() == command0Id
-        jobSpecNoArchivalData.getApplications().isEmpty()
-        !jobSpecNoArchivalData.isInteractive()
-        jobSpecNoArchivalData.getEnvironmentVariables().size() == 19
-        jobSpecNoArchivalData.getArchiveLocation() ==
+        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(jobRequest1SelectedCluster)
+        1 * this.persistenceService.getApplicationsForCommand(command1Id) >> Lists.newArrayList()
+        jobSpec.getExecutableArgs() == expectedCommandArgs
+        jobSpec.getJobArgs() == expectedJobArgs
+        jobSpec.getJob().getId() == jobId
+        jobSpec.getCluster().getId() == jobRequest1SelectedCluster.getId()
+        jobSpec.getCommand().getId() == command1Id
+        jobSpec.getApplications().isEmpty()
+        !jobSpec.isInteractive()
+        jobSpec.getEnvironmentVariables().size() == 19
+        jobSpec.getArchiveLocation() ==
             Optional.of(
                 StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
                     ? this.jobsProperties.getLocations().getArchives().toString() + jobId
                     : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
-        jobEnvironmentNoArchivalData.getEnvironmentVariables() == jobSpecNoArchivalData.getEnvironmentVariables()
-        jobEnvironmentNoArchivalData.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
-        jobEnvironmentNoArchivalData.getCpu() == 1
-        !jobEnvironmentNoArchivalData.getExt().isPresent()
-        jobSpecNoArchivalData.getTimeout().orElse(null) == 5_002
+        jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
+        jobEnvironment.getMemory() == this.jobsProperties.getMemory().getDefaultJobMemory()
+        jobEnvironment.getCpu() == 1
+        !jobEnvironment.getExt().isPresent()
+        jobSpec.getTimeout().orElse(null) == 5_002
 
-        when: "We try to resolve a saved job"
-        def resolvedSavedJobData = this.service.resolveJob(jobId)
-        def jobSpecSavedData = resolvedSavedJobData.getJobSpecification()
-        def jobEnvironmentSavedData = resolvedSavedJobData.getJobEnvironment()
+        when: "Request to resolve a saved job"
+        resolvedJob = this.service.resolveJob(jobId)
+        jobSpec = resolvedJob.getJobSpecification()
+        jobEnvironment = resolvedJob.getJobEnvironment()
 
-        then: "the resolution is saved"
+        then: "The job is resolved and the resolution is saved"
         1 * this.environment.getProperty(
             JobResolverServiceImpl.V4_PROBABILITY_PROPERTY_KEY,
             Double.class,
@@ -436,50 +436,43 @@ class JobResolverServiceImplSpec extends Specification {
         0 * this.environment.getProperty(JobResolverServiceImpl.DUAL_RESOLVE_PROPERTY_KEY, Boolean.class, false) >> false
         1 * this.persistenceService.getJobStatus(jobId) >> JobStatus.RESERVED
         1 * this.persistenceService.isApiJob(jobId) >> false
-        1 * this.persistenceService.getJobRequest(jobId) >> savedJobRequest
-        1 * this.persistenceService.findCommandsMatchingCriterion(savedJobRequest.getCriteria().getCommandCriterion(), true) >> commands
-        1 * this.commandSelector.select(
-            {
-                verifyAll(it, CommandSelectionContext) {
-                    it.getJobId() == jobId
-                    it.getJobRequest() == savedJobRequest
-                    it.getResources() == commands
-                }
-            }
-        ) >> commandSelectionResult
+        1 * this.persistenceService.getJobRequest(jobId) >> jobRequest2
+        1 * this.persistenceService.findCommandsMatchingCriterion(jobRequest2.getCriteria().getCommandCriterion(), true) >> commands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Criterion>, true) >> jobRequest2Clusters
+        1 * this.commandSelector.select(_ as CommandSelectionContext) >> commandSelectionResult
         1 * commandSelectionResult.getSelectedResource() >> Optional.of(command1)
-        1 * this.persistenceService.findClustersMatchingCriterion(_ as Criterion, true) >> clusters
         1 * this.clusterSelector.select(
             {
                 verifyAll(it, ClusterSelectionContext) {
                     it.getJobId() == jobId
-                    it.getJobRequest() == savedJobRequest
-                    it.getResources() == clusters
+                    it.getJobRequest() == jobRequest2
+                    it.getCommand().orElse(null) == command1
+                    it.getResources() == command1JobRequest2Clusters
                 }
             }
         ) >> clusterSelectionResult
-        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(cluster2)
+        1 * clusterSelectionResult.getSelectedResource() >> Optional.of(jobRequest2SelectedCluster)
         1 * this.persistenceService.getApplicationsForCommand(command1Id) >> Lists.newArrayList()
         1 * this.persistenceService.saveResolvedJob(jobId, _ as ResolvedJob)
-        jobSpecSavedData.getExecutableArgs() == expectedCommandArgs
-        jobSpecSavedData.getJobArgs() == expectedJobArgs
-        jobSpecSavedData.getJob().getId() == jobId
-        jobSpecSavedData.getCluster().getId() == cluster2Id
-        jobSpecSavedData.getCommand().getId() == command1Id
-        jobSpecSavedData.getApplications().isEmpty()
-        !jobSpecSavedData.isInteractive()
-        jobSpecSavedData.getEnvironmentVariables().size() == 19
-        jobSpecSavedData.getArchiveLocation() ==
+        jobSpec.getExecutableArgs() == expectedCommandArgs
+        jobSpec.getJobArgs() == expectedJobArgs
+        jobSpec.getJob().getId() == jobId
+        jobSpec.getCluster().getId() == jobRequest2SelectedCluster.getId()
+        jobSpec.getCommand().getId() == command1Id
+        jobSpec.getApplications().isEmpty()
+        !jobSpec.isInteractive()
+        jobSpec.getEnvironmentVariables().size() == 19
+        jobSpec.getArchiveLocation() ==
             Optional.of(
                 StringUtils.endsWith(this.jobsProperties.getLocations().getArchives().toString(), File.separator)
                     ? this.jobsProperties.getLocations().getArchives().toString() + jobId
                     : this.jobsProperties.getLocations().getArchives().toString() + File.separator + jobId
             )
-        jobEnvironmentSavedData.getEnvironmentVariables() == jobSpecSavedData.getEnvironmentVariables()
-        jobEnvironmentSavedData.getMemory() == requestedMemory
-        jobEnvironmentSavedData.getCpu() == 1
-        !jobEnvironmentSavedData.getExt().isPresent()
-        !jobSpecSavedData.getTimeout().isPresent()
+        jobEnvironment.getEnvironmentVariables() == jobSpec.getEnvironmentVariables()
+        jobEnvironment.getMemory() == requestedMemory
+        jobEnvironment.getCpu() == 1
+        !jobEnvironment.getExt().isPresent()
+        !jobSpec.getTimeout().isPresent()
     }
 
     def "Can convert tags to string"(Set<String> input, String output) {
@@ -700,40 +693,107 @@ class JobResolverServiceImplSpec extends Specification {
         def jobId = UUID.randomUUID().toString()
         def command0 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
         def command1 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
+        def command1Set = Sets.newHashSet(command1)
         def command2 = createCommand(UUID.randomUUID().toString(), Lists.newArrayList(UUID.randomUUID().toString()))
         def allCommands = Sets.newHashSet(command0, command1, command2)
         def commandCriterion = jobRequest.getCriteria().getCommandCriterion()
         ResourceSelectionResult<Command> selectionResult = Mock(ResourceSelectionResult)
-        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        def command1UniqueCriteria = this.service.flattenClusterCriteriaPermutations(
+            this.service.generateClusterCriteriaPermutations(
+                command1Set,
+                jobRequest
+            )
+        )
+        def command0Clusters = createClustersBasedOnCriteria(2, command0, jobRequest)
+        def command1Clusters = createClustersBasedOnCriteria(1, command1, jobRequest)
+        def command2Clusters = createClustersBasedOnCriteria(3, command2, jobRequest)
+
+        def allCommandsUniqueCriteria = this.service.flattenClusterCriteriaPermutations(
+            this.service.generateClusterCriteriaPermutations(
+                allCommands,
+                jobRequest
+            )
+        )
+        def allClusters = Sets.newHashSet()
+        allClusters.addAll(command0Clusters)
+        allClusters.addAll(command1Clusters)
+        allClusters.addAll(command2Clusters)
 
         when: "No commands are found in the database which match the users criterion"
+        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
         this.service.resolveCommand(context)
 
         then: "An exception is thrown"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet()
+        0 * this.persistenceService.findClustersMatchingAnyCriterion(_ as Set<Cluster>, _ as boolean)
         0 * this.commandSelector.select(_ as CommandSelectionContext)
         thrown(GenieJobResolutionException)
 
-        when: "Only a single command is found which matches the criterion"
+        when: "Only a single command is found which matches the criterion but it has no clusters"
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, false)
+        this.service.resolveCommand(context)
+
+        then: "The selector is not invoked as no command is selected"
+        1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> command1Set
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(command1UniqueCriteria, true) >> Sets.newHashSet()
+        0 * this.commandSelector.select(_ as CommandSelectionContext)
+        thrown(GenieJobResolutionException)
+
+        when: "Only a single command is found but it is filtered out by in memory cluster matching"
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
+        this.service.resolveCommand(context)
+
+        then: "The selector is not invoked as no command is selected"
+        1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> command1Set
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(command1UniqueCriteria, true) >> Sets.newHashSet(
+            createCluster(UUID.randomUUID().toString()) // this cluster will never match
+        )
+        0 * this.commandSelector.select(_ as CommandSelectionContext)
+        thrown(GenieJobResolutionException)
+
+        when: "Only a single command is found"
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
         this.service.resolveCommand(context)
         def resolvedCommand = context.getCommand().orElseThrow({ new IllegalStateException() })
 
-        then: "It is immediately returned and no selectors are invoked"
-        1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> Sets.newHashSet(command1)
-        0 * this.commandSelector.select(_ as CommandSelectionContext)
+        then: "The selector is invoked"
+        1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> command1Set
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(command1UniqueCriteria, true) >> command1Clusters
+        1 * this.commandSelector.select(
+            {
+                verifyAll(it, CommandSelectionContext) {
+                    it.getJobId() == jobId
+                    it.getJobRequest() == jobRequest
+                    it.getResources() == command1Set
+                    it.getCommandToClusters() == [
+                        (command1): command1Clusters
+                    ]
+                }
+            }
+        ) >> selectionResult
+        1 * selectionResult.getSelectedResource() >> Optional.of(command1)
+        1 * selectionResult.getSelectorClass() >> this.getClass()
+        1 * selectionResult.getSelectionRationale() >> Optional.empty()
         resolvedCommand == command1
 
         when: "Many commands are found which match the criterion but nothing is selected by the selectors"
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, false)
         this.service.resolveCommand(context)
 
         then: "An exception is thrown"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(allCommandsUniqueCriteria, true) >> allClusters
         1 * this.commandSelector.select(
             {
                 verifyAll(it, CommandSelectionContext) {
                     it.getJobId() == jobId
                     it.getJobRequest() == jobRequest
                     it.getResources() == allCommands
+                    it.getCommandToClusters() == [
+                        (command0): command0Clusters,
+                        (command1): command1Clusters,
+                        (command2): command2Clusters
+                    ]
                 }
             }
         ) >> selectionResult
@@ -743,33 +803,47 @@ class JobResolverServiceImplSpec extends Specification {
         thrown(GenieJobResolutionException)
 
         when: "The selectors throw an exception"
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
         this.service.resolveCommand(context)
 
         then: "It is propagated"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(allCommandsUniqueCriteria, true) >> allClusters
         1 * this.commandSelector.select(
             {
                 verifyAll(it, CommandSelectionContext) {
                     it.getJobId() == jobId
                     it.getJobRequest() == jobRequest
                     it.getResources() == allCommands
+                    it.getCommandToClusters() == [
+                        (command0): command0Clusters,
+                        (command1): command1Clusters,
+                        (command2): command2Clusters
+                    ]
                 }
             }
         ) >> { throw new ResourceSelectionException() }
         thrown(GenieJobResolutionException)
 
         when: "The selectors select a command"
+        context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
         this.service.resolveCommand(context)
         resolvedCommand = context.getCommand().orElseThrow({ new IllegalStateException() })
 
         then: "It is returned"
         1 * this.persistenceService.findCommandsMatchingCriterion(commandCriterion, true) >> allCommands
+        1 * this.persistenceService.findClustersMatchingAnyCriterion(allCommandsUniqueCriteria, true) >> allClusters
         1 * this.commandSelector.select(
             {
                 verifyAll(it, CommandSelectionContext) {
                     it.getJobId() == jobId
                     it.getJobRequest() == jobRequest
                     it.getResources() == allCommands
+                    it.getCommandToClusters() == [
+                        (command0): command0Clusters,
+                        (command1): command1Clusters,
+                        (command2): command2Clusters
+                    ]
                 }
             }
         ) >> selectionResult
@@ -784,136 +858,124 @@ class JobResolverServiceImplSpec extends Specification {
         def cluster0 = createCluster(UUID.randomUUID().toString())
         def cluster1 = createCluster(UUID.randomUUID().toString())
         def cluster2 = createCluster(UUID.randomUUID().toString())
-        def allClusters = Sets.newHashSet(cluster0, cluster1, cluster2)
+        def clusters = Sets.newHashSet(cluster0, cluster1, cluster2)
         def jobId = UUID.randomUUID().toString()
-        def jobRequestTemplate = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
-        def commandClusterCriteria = [
-            new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .build(),
-            new Criterion.Builder()
-                .withId(cluster0.getId())
-                .build()
+        def jobRequest = createJobRequest(Lists.newArrayList(UUID.randomUUID().toString()), null, null, null)
+        def commandClusters = [
+            (command)      : clusters,
+            (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
         ]
-        def jobClusterCriteria = [
-            new Criterion.Builder()
-                .withId(cluster1.getId())
-                .build(),
-            new Criterion.Builder()
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .build()
-        ]
-        // Note: commandClusterCriteria[1] and jobClusterCriteria[0] throws exception
-        def mergedCriterion0 = this.service.mergeCriteria(commandClusterCriteria[0], jobClusterCriteria[0])
-        def mergedCriterion1 = this.service.mergeCriteria(commandClusterCriteria[0], jobClusterCriteria[1])
-        def mergedCriterion2 = this.service.mergeCriteria(commandClusterCriteria[1], jobClusterCriteria[1])
-        def jobRequest = new JobRequest(
-            jobId,
-            jobRequestTemplate.getResources(),
-            jobRequestTemplate.getCommandArgs(),
-            jobRequestTemplate.getMetadata(),
-            new ExecutionResourceCriteria(
-                jobClusterCriteria,
-                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
-                null
-            ),
-            jobRequestTemplate.getRequestedJobEnvironment(),
-            jobRequestTemplate.getRequestedAgentConfig(),
-            jobRequestTemplate.getRequestedJobArchivalData()
-        )
-        ResourceSelectionResult<Cluster> selectionResult = Mock(ResourceSelectionResult)
-        def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, true)
-        context.setCommand(command)
+        def context = Mock(JobResolverServiceImpl.JobResolutionContext) {
+            getJobRequest() >> jobRequest
+            getJobId() >> jobId
+            isApiJob() >> true
+        }
 
-        when: "A command with no cluster criteria was resolved"
-        this.service.resolveCluster(context)
+        ResourceSelectionResult<Cluster> selectionResult = Mock(ResourceSelectionResult) {
+            getSelectionRationale() >> Optional.empty()
+        }
 
-        then: "An exception is thrown cause nothing can be selected"
-        1 * command.getClusterCriteria() >> []
-        0 * this.persistenceService.findClustersMatchingCriterion(_ as Criterion, true)
-        thrown(GenieJobResolutionException)
-
-        when: "No clusters are found which match the criterion"
+        when: "No command was set in the context"
         this.service.resolveCluster(context)
 
         then: "An exception is thrown"
-        1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true) >> Sets.newHashSet()
+        1 * context.getCommand() >> Optional.empty()
+        0 * context.setCluster(_ as Cluster)
         thrown(GenieJobResolutionException)
 
-        when: "Only a single cluster is found"
-        this.service.resolveCluster(context)
-        def resolvedCluster = context.getCluster().orElseThrow({ new IllegalStateException() })
-
-        then: "It is returned"
-        1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet(cluster2)
-        0 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true)
-        resolvedCluster == cluster2
-
-        when: "Multiple clusters are found matching the criterion and the selectors don't select anything"
+        when: "No command -> cluster map was stored in the context"
         this.service.resolveCluster(context)
 
         then: "An exception is thrown"
-        1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
+        1 * context.getCommand() >> Optional.of(command)
+        1 * context.getCommandClusters() >> Optional.empty()
+        0 * context.setCluster(_ as Cluster)
+        thrown(GenieJobResolutionException)
+
+        when: "No command -> cluster mapping is found"
+        this.service.resolveCluster(context)
+
+        then: "An exception is thrown"
+        1 * context.getCommand() >> Optional.of(command)
+        1 * context.getCommandClusters() >> Optional.of([:])
+        0 * context.setCluster(_ as Cluster)
+        thrown(GenieJobResolutionException)
+
+        when: "No command -> cluster mapping is empty"
+        this.service.resolveCluster(context)
+
+        then: "An exception is thrown"
+        1 * context.getCommand() >> Optional.of(command)
+        1 * context.getCommandClusters() >> Optional.of([(command): Sets.newHashSet()])
+        0 * context.setCluster(_ as Cluster)
+        thrown(GenieJobResolutionException)
+
+        when: "Selector has no preference and there are no more selectors"
+        this.service.resolveCluster(context)
+
+        then: "Exception is thrown"
+        1 * context.getCommand() >> Optional.of(command)
+        1 * context.getCommandClusters() >> Optional.of(commandClusters)
         1 * this.clusterSelector.select(
             {
                 verifyAll(it, ClusterSelectionContext) {
                     it.getJobId() == jobId
                     it.getJobRequest() == jobRequest
-                    it.getResources() == allClusters
+                    it.isApiJob()
+                    it.getCommand().orElse(null) == command
+                    it.getClusters() == clusters
                 }
             }
         ) >> selectionResult
         1 * selectionResult.getSelectedResource() >> Optional.empty()
+        0 * context.setCluster(_ as Cluster)
         thrown(GenieJobResolutionException)
 
-        when: "Multiple clusters are found matching the criterion and the selectors throw exception"
+        when: "Selector has throws exception"
         this.service.resolveCluster(context)
 
-        then: "An exception is thrown"
-        1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
+        then: "Exception is thrown when no more selectors are available"
+        1 * context.getCommand() >> Optional.of(command)
+        1 * context.getCommandClusters() >> Optional.of(commandClusters)
         1 * this.clusterSelector.select(
             {
                 verifyAll(it, ClusterSelectionContext) {
                     it.getJobId() == jobId
                     it.getJobRequest() == jobRequest
-                    it.getResources() == allClusters
+                    it.isApiJob()
+                    it.getCommand().orElse(null) == command
+                    it.getClusters() == clusters
                 }
             }
-        ) >> { throw new ResourceSelectionException() }
-        0 * selectionResult.getSelectedResource()
+        ) >> { throw new ResourceSelectionException("whoops") }
+        0 * context.setCluster(_ as Cluster)
         thrown(GenieJobResolutionException)
 
-        when: "Multiple clusters are found matching the criterion and the selectors select a cluster"
+        when: "Selector successfully selects a cluster"
         this.service.resolveCluster(context)
-        resolvedCluster = context.getCluster().orElseThrow({ new IllegalStateException() })
 
-        then: "That cluster is returned to the caller"
-        1 * command.getClusterCriteria() >> commandClusterCriteria
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion0, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion1, true) >> Sets.newHashSet()
-        1 * this.persistenceService.findClustersMatchingCriterion(mergedCriterion2, true) >> allClusters
+        then: "The cluster is added to the context"
+        1 * context.getCommand() >> Optional.of(command)
+        1 * context.getCommandClusters() >> Optional.of(commandClusters)
         1 * this.clusterSelector.select(
             {
                 verifyAll(it, ClusterSelectionContext) {
                     it.getJobId() == jobId
                     it.getJobRequest() == jobRequest
-                    it.getResources() == allClusters
+                    it.isApiJob()
+                    it.getCommand().orElse(null) == command
+                    it.getClusters() == clusters
                 }
             }
         ) >> selectionResult
-        1 * selectionResult.getSelectedResource() >> Optional.of(cluster2)
-        resolvedCluster == cluster2
+        1 * selectionResult.getSelectedResource() >> Optional.of(cluster1)
+        1 * context.setCluster(
+            {
+                verifyAll(it, Cluster) {
+                    it == cluster1
+                }
+            }
+        )
     }
 
     def "can select proper resolution algorithm"() {
@@ -1119,6 +1181,10 @@ class JobResolverServiceImplSpec extends Specification {
         def archiveLocation = UUID.randomUUID().toString()
         def jobDirectory = Mock(File)
         def timeout = 13_349_388
+        def commandClusters = [
+            (Mock(Command)): Sets.newHashSet(Mock(Cluster)),
+            (Mock(Command)): Sets.newHashSet(Mock(Cluster), Mock(Cluster))
+        ]
 
         when:
         def context = new JobResolverServiceImpl.JobResolutionContext(jobId, jobRequest, apiJob)
@@ -1135,6 +1201,7 @@ class JobResolverServiceImplSpec extends Specification {
         !context.getTimeout().isPresent()
         !context.getArchiveLocation().isPresent()
         !context.getJobDirectory().isPresent()
+        !context.getCommandClusters().isPresent()
 
         when:
         context.build()
@@ -1212,6 +1279,12 @@ class JobResolverServiceImplSpec extends Specification {
 
         then:
         noExceptionThrown()
+
+        when:
+        context.setCommandClusters(commandClusters)
+
+        then:
+        context.getCommandClusters().orElse(null) == commandClusters
     }
 
     //region Helper Methods
@@ -1299,6 +1372,29 @@ class JobResolverServiceImplSpec extends Specification {
                 .withRequestedArchiveLocationPrefix(requestedArchiveLocationPrefix)
                 .build()
         )
+    }
+
+    /*
+     * Helper method which creates clusters based on the criteria of the inputted command/job request.
+     * Necessary to ensure in memory matching of criterion to clusters succeeds.
+     */
+    private static Set<Cluster> createClustersBasedOnCriteria(int numClusters, Command command, JobRequest jobRequest) {
+        final Set<String> tags = Stream.concat(
+            jobRequest
+                .getCriteria()
+                .getClusterCriteria()
+                .stream()
+                .flatMap { it.getTags().stream() },
+            command
+                .getClusterCriteria()
+                .stream()
+                .flatMap { it.getTags().stream() }
+        ).collect(Collectors.toSet())
+        Set<Cluster> clusters = Sets.newHashSet()
+        for (def i = 0; i < numClusters; i++) {
+            clusters.add(createCluster(UUID.randomUUID().toString(), tags))
+        }
+        return clusters
     }
     //endregion
 }
