@@ -39,7 +39,6 @@ import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.dtos.ResourceSelectionResult;
-import com.netflix.genie.web.exceptions.checked.ResourceSelectionException;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.selectors.ClusterSelectionContext;
 import com.netflix.genie.web.selectors.ClusterSelector;
@@ -117,44 +116,25 @@ public class JobResolverServiceImpl implements JobResolverService {
         = "genie.services.jobResolver.generateClusterCriteriaPermutations.timer";
 
     /**
-     * The number of criteria combinations attempted while resolving a cluster.
-     */
-    private static final String RESOLVE_CLUSTER_CRITERIA_COMBINATION_COUNTER
-        = "genie.services.jobResolver.resolveCluster.criteriaCombination.count";
-
-    /**
-     * The number of criteria combinations attempted while resolving a cluster.
-     */
-    private static final String RESOLVE_CLUSTER_QUERY_COUNTER = "genie.services.jobResolver.resolveCluster.query.count";
-
-    /**
-     * How long it takes to select a cluster from the set of clusters returned by database query.
-     */
-    private static final String SELECT_CLUSTER_TIMER = "genie.services.jobResolver.selectCluster.timer";
-
-    /**
-     * How long it takes to select a command for a given cluster.
-     */
-    private static final String SELECT_COMMAND_TIMER = "genie.services.jobResolver.selectCommand.timer";
-
-    /**
      * How many times a cluster selector is invoked.
      */
-    private static final String CLUSTER_SELECTOR_COUNTER = "genie.services.jobResolver.clusterSelector.counter";
+    private static final String CLUSTER_SELECTOR_COUNTER
+        = "genie.services.jobResolver.resolveCluster.clusterSelector.counter";
 
     private static final String NO_RATIONALE = "No rationale provided";
     private static final String NO_ID_FOUND = "No id found";
     private static final String VERSION_4 = "4";
     private static final Tag SAVED_TAG = Tag.of("saved", "true");
     private static final Tag NOT_SAVED_TAG = Tag.of("saved", "false");
+    private static final Tag NO_CLUSTER_RESOLVED_ID = Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, "None Resolved");
+    private static final Tag NO_CLUSTER_RESOLVED_NAME = Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, "None Resolved");
+    private static final Tag NO_COMMAND_RESOLVED_ID = Tag.of(MetricsConstants.TagKeys.COMMAND_ID, "None Resolved");
+    private static final Tag NO_COMMAND_RESOLVED_NAME = Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, "None Resolved");
 
     private static final String ID_FIELD = "id";
     private static final String NAME_FIELD = "name";
     private static final String STATUS_FIELD = "status";
     private static final String VERSION_FIELD = "version";
-
-    private static final String RESOLVE_CLUSTER_CRITERIA_COMBINATION_TAG = "criteriaCombinationCount";
-    private static final String RESOLVE_CLUSTER_QUERY_TAG = "queryCount";
 
     private static final String CLUSTER_SELECTOR_STATUS_SUCCESS = "success";
     private static final String CLUSTER_SELECTOR_STATUS_NO_PREFERENCE = "no preference";
@@ -168,6 +148,17 @@ public class JobResolverServiceImpl implements JobResolverService {
      * How long it takes to query the database for cluster command combinations matching supplied criteria.
      */
     private static final String CLUSTER_COMMAND_QUERY_TIMER = "genie.services.jobResolver.clusterCommandQuery.timer";
+
+    /**
+     * How long it takes to select a cluster from the set of clusters returned by database query.
+     */
+    private static final String SELECT_CLUSTER_TIMER = "genie.services.jobResolver.selectCluster.timer";
+
+    /**
+     * How long it takes to select a command for a given cluster.
+     */
+    private static final String SELECT_COMMAND_TIMER = "genie.services.jobResolver.selectCommand.timer";
+
     private static final String V4_PROBABILITY_PROPERTY_KEY = "genie.services.job-resolver.v4-probability";
     private static final double DEFAULT_V4_PROBABILITY = 0.0;
     private static final double MIN_V4_PROBABILITY = 0.0;
@@ -195,10 +186,11 @@ public class JobResolverServiceImpl implements JobResolverService {
     private final File defaultJobDirectory;
     private final String defaultArchiveLocation;
 
+    private final Environment environment;
+
+    // TODO: Remove after V4 migration
     private final Counter noClusterSelectedCounter;
     private final Counter noClusterFoundCounter;
-
-    private final Environment environment;
     private final Random random;
     //endregion
 
@@ -389,70 +381,110 @@ public class JobResolverServiceImpl implements JobResolverService {
         return context.build();
     }
 
+    /*
+     * Overall Algorithm:
+     *
+     * 1. Take command criterion from user job request and query database for all possible matching commands
+     * 2. Take clusterCriteria from jobRequest and clusterCriteria from each command and create uber query which finds
+     *    ALL clusters that match at least one of the resulting merged criterion (merged meaning combining a job and
+     *    command cluster criterion)
+     * 3. Iterate through commands from step 1 and evaluate job/command cluster criterion against resulting set of
+     *    clusters from step 2. Filter out any commands that don't match any clusters. Save resulting cluster set for
+     *    each command in map command -> Set<Cluster>
+     * 4. Pass set<command>, jobRequest, jobId, map<command<set<Cluster>>  to command selector which will return single
+     *    command
+     * 5. Using command result pass previously computed Set<Cluster> to cluster selector
+     * 6. Save results and run job
+     */
     private void resolveCommand(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final JobRequest jobRequest = context.getJobRequest();
             final Criterion criterion = jobRequest.getCriteria().getCommandCriterion();
+
+            //region Algorithm Step 1
             final Set<Command> commands = this.persistenceService.findCommandsMatchingCriterion(criterion, true);
-            final Command command;
+
+            // Short circuit if there are no commands
             if (commands.isEmpty()) {
                 throw new GenieJobResolutionException("No command matching command criterion found");
-            } else if (commands.size() == 1) {
-                command = commands
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new GenieJobResolutionException("No command matching criterion found."));
-                log.debug("Found single command {} matching criterion {}", command.getId(), criterion);
-            } else {
-                try {
-                    // TODO: Flesh this out with actual algorithm result
-                    final Map<Command, Set<Cluster>> commandClusters = commands
-                        .stream()
-                        .collect(Collectors.toMap(it -> it, it -> Sets.newHashSet()));
-                    final ResourceSelectionResult<Command> result = this.commandSelector.select(
-                        new CommandSelectionContext(
-                            context.getJobId(),
-                            jobRequest,
-                            context.isApiJob(),
-                            commandClusters
-                        )
-                    );
-                    command = result
-                        .getSelectedResource()
-                        .orElseThrow(
-                            () -> new GenieJobResolutionException(
-                                "Expected a command but "
-                                    + result.getSelectorClass().getSimpleName()
-                                    + " didn't select anything. Rationale: "
-                                    + result.getSelectionRationale().orElse(NO_RATIONALE)
-                            )
-                        );
-                    log.debug(
-                        "Selected command {} for criterion {} using {} due to {}",
-                        command.getId(),
-                        criterion,
-                        result.getSelectorClass().getName(),
-                        result.getSelectionRationale().orElse(NO_RATIONALE)
-                    );
-                } catch (final ResourceSelectionException selectionException) {
-                    // TODO: Improve error handling?
-                    throw new GenieJobResolutionException(selectionException);
-                }
             }
+            //endregion
+
+            //region Algorithm Step 2
+            final Map<Command, List<Criterion>> commandClusterCriterions = this.generateClusterCriteriaPermutations(
+                commands,
+                jobRequest
+            );
+
+            final Set<Criterion> uniqueCriteria = this.flattenClusterCriteriaPermutations(commandClusterCriterions);
+
+            final Set<Cluster> allCandidateClusters = this.persistenceService.findClustersMatchingAnyCriterion(
+                uniqueCriteria,
+                true
+            );
+            if (allCandidateClusters.isEmpty()) {
+                throw new GenieJobResolutionException("No clusters available to run any candidate command on");
+            }
+            //endregion
+
+            //region Algorithm Step 3
+            final Map<Command, Set<Cluster>> commandClusters = this.generateCommandClustersMap(
+                commandClusterCriterions,
+                allCandidateClusters
+            );
+            // this should never really happen based on above check but just in case
+            if (commandClusters.isEmpty()) {
+                throw new GenieJobResolutionException("No clusters available to run any candidate command on");
+            }
+            // save the map for use later by cluster resolution
+            context.setCommandClusters(commandClusters);
+            //endregion
+
+            //region Algorithm Step 4
+            final ResourceSelectionResult<Command> result = this.commandSelector.select(
+                new CommandSelectionContext(
+                    context.getJobId(),
+                    jobRequest,
+                    context.isApiJob(),
+                    commandClusters
+                )
+            );
+            //endregion
+
+            final Command command = result
+                .getSelectedResource()
+                .orElseThrow(
+                    () -> new GenieJobResolutionException(
+                        "Expected a command but "
+                            + result.getSelectorClass().getSimpleName()
+                            + " didn't select anything. Rationale: "
+                            + result.getSelectionRationale().orElse(NO_RATIONALE)
+                    )
+                );
+            log.debug(
+                "Selected command {} for criterion {} using {} due to {}",
+                command.getId(),
+                criterion,
+                result.getSelectorClass().getName(),
+                result.getSelectionRationale().orElse(NO_RATIONALE)
+            );
 
             MetricsUtils.addSuccessTags(tags);
             tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, command.getId()));
             tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, command.getMetadata().getName()));
             context.setCommand(command);
+        } catch (final GenieJobResolutionException e) {
+            tags.add(NO_COMMAND_RESOLVED_ID);
+            tags.add(NO_COMMAND_RESOLVED_NAME);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw e;
         } catch (final Throwable t) {
+            tags.add(NO_COMMAND_RESOLVED_ID);
+            tags.add(NO_COMMAND_RESOLVED_NAME);
             MetricsUtils.addFailureTagsWithException(tags, t);
-            if (t instanceof GenieJobResolutionException) {
-                throw t;
-            } else {
-                throw new GenieJobResolutionException(t);
-            }
+            throw new GenieJobResolutionException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_COMMAND_TIMER, tags)
@@ -460,101 +492,121 @@ public class JobResolverServiceImpl implements JobResolverService {
         }
     }
 
+    /*
+     * At this point we should have resolved a command and now we can use the map command -> clusters that was
+     * previously computed to invoke the cluster selectors to narrow down the candidate clusters to a single cluster
+     * for use.
+     */
     private void resolveCluster(final JobResolutionContext context) throws GenieJobResolutionException {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
-        int queryCount = 0;
-        int criteriaCombinationCount = 0;
 
         final String jobId = context.getJobId();
-        final JobRequest jobRequest = context.getJobRequest();
         try {
             final Command command = context
                 .getCommand()
                 .orElseThrow(
-                    () -> new IllegalStateException("Command not resolved before attempting to resolve a cluster")
+                    () -> new IllegalStateException(
+                        "Command not resolved before attempting to resolve a cluster for job " + jobId
+                    )
                 );
+            final Set<Cluster> candidateClusters = context
+                .getCommandClusters()
+                .orElseThrow(
+                    () -> new IllegalStateException("Command to candidate cluster map not available for job " + jobId)
+                )
+                .get(command);
+            if (candidateClusters == null || candidateClusters.isEmpty()) {
+                throw new IllegalStateException(
+                    "Command " + command.getId() + " had no candidate clusters for job " + jobId
+                );
+            }
+
             Cluster cluster = null;
+            for (final ClusterSelector clusterSelector : this.clusterSelectors) {
+                // Create subset of tags just for this selector. Copy existing tags if any.
+                final Set<Tag> selectorTags = Sets.newHashSet(tags);
+                // Note: This is done before the selection because if we do it after and the selector throws
+                //       exception then we don't have this tag in the metrics. Which is unfortunate since the result
+                //       does return the selector
+                final String clusterSelectorClass = this.getProxyObjectClassName(clusterSelector);
+                selectorTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
 
-            // This makes it so that if the command has no Cluster Criteria no cluster will possibly
-            // be found. We'd have to change if we'd rather have it so that if there are no command cluster criteria
-            // We just bypass this loop and only consider the job cluster criteria
-            for (final Criterion commandClusterCriterion : command.getClusterCriteria()) {
-                for (final Criterion jobClusterCriterion : jobRequest.getCriteria().getClusterCriteria()) {
-                    criteriaCombinationCount++;
-                    final Criterion mergedCriterion;
-                    try {
-                        // Failing to merge the criteria is equivalent to a round-trip DB query that returns
-                        // zero results. This is an in memory optimization which also solves the need to implement
-                        // the db query as a join with a subquery.
-                        mergedCriterion = this.mergeCriteria(commandClusterCriterion, jobClusterCriterion);
-                    } catch (final IllegalArgumentException e) {
+                try {
+                    final ResourceSelectionResult<Cluster> result = clusterSelector.select(
+                        new ClusterSelectionContext(
+                            jobId,
+                            context.getJobRequest(),
+                            context.isApiJob(),
+                            command,
+                            candidateClusters
+                        )
+                    );
+
+                    final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
+                    if (selectedClusterOptional.isPresent()) {
+                        cluster = selectedClusterOptional.get();
                         log.debug(
-                            "Unable to merge command cluster criterion {} and job cluster criterion {}. Skipping.",
-                            commandClusterCriterion,
-                            jobClusterCriterion,
-                            e
+                            "Successfully selected cluster {} using selector {} for job {} with rationale: {}",
+                            cluster.getId(),
+                            clusterSelectorClass,
+                            jobId,
+                            result.getSelectionRationale().orElse(NO_RATIONALE)
                         );
-                        // Skip and move to the next combination
-                        continue;
-                    }
-
-                    queryCount++;
-                    final Set<Cluster> clusters
-                        = this.persistenceService.findClustersMatchingCriterion(mergedCriterion, true);
-                    if (clusters.isEmpty()) {
-                        log.debug("No clusters found for {}", mergedCriterion);
-                        this.noClusterFoundCounter.increment();
-                    } else if (clusters.size() == 1) {
-                        log.debug("Found single cluster for {}", mergedCriterion);
-                        cluster = clusters.stream().findFirst().orElse(null);
-                    } else {
-                        log.debug("Found {} clusters for {}", clusters.size(), mergedCriterion);
-                        cluster = this.selectClusterUsingClusterSelectors(
-                            Sets.newHashSet(),
-                            clusters,
-                            jobRequest,
-                            jobId
+                        selectorTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_SUCCESS));
+                        selectorTags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()));
+                        selectorTags.add(
+                            Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName())
                         );
-                    }
-
-                    if (cluster != null) {
                         break;
+                    } else {
+                        selectorTags.add(
+                            Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_NO_PREFERENCE)
+                        );
+                        selectorTags.add(NO_CLUSTER_RESOLVED_ID);
+                        selectorTags.add(NO_CLUSTER_RESOLVED_NAME);
+                        log.debug(
+                            "Selector {} returned no preference with rationale: {}",
+                            clusterSelectorClass,
+                            result.getSelectionRationale().orElse(NO_RATIONALE)
+                        );
                     }
-                }
-
-                if (cluster != null) {
-                    break;
+                } catch (final Exception e) {
+                    selectorTags.add(NO_CLUSTER_RESOLVED_ID);
+                    selectorTags.add(NO_CLUSTER_RESOLVED_NAME);
+                    MetricsUtils.addFailureTagsWithException(selectorTags, e);
+                    log.warn(
+                        "Cluster selector {} evaluation threw exception for job {}",
+                        clusterSelectorClass,
+                        jobId,
+                        e
+                    );
+                } finally {
+                    this.registry.counter(CLUSTER_SELECTOR_COUNTER, selectorTags).increment();
                 }
             }
 
             if (cluster == null) {
-                this.noClusterSelectedCounter.increment();
-                throw new GenieJobResolutionException("No cluster selected given criteria for job " + jobId);
+                throw new GenieJobResolutionException("No cluster resolved for job " + jobId);
             }
 
-            log.debug("Selected cluster {} for job {}", cluster.getId(), jobId);
+            log.debug("Resolved cluster {} for job {}", cluster.getId(), jobId);
 
+            context.setCluster(cluster);
             MetricsUtils.addSuccessTags(tags);
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()));
             tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName()));
-            context.setCluster(cluster);
+        } catch (final GenieJobResolutionException e) {
+            tags.add(NO_CLUSTER_RESOLVED_ID);
+            tags.add(NO_CLUSTER_RESOLVED_NAME);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw e;
         } catch (final Throwable t) {
+            tags.add(NO_CLUSTER_RESOLVED_ID);
+            tags.add(NO_CLUSTER_RESOLVED_NAME);
             MetricsUtils.addFailureTagsWithException(tags, t);
-            if (t instanceof GenieJobResolutionException) {
-                throw (GenieJobResolutionException) t;
-            } else {
-                throw new GenieJobResolutionException(t);
-            }
+            throw new GenieJobResolutionException(t);
         } finally {
-            this.registry
-                .counter(RESOLVE_CLUSTER_CRITERIA_COMBINATION_COUNTER)
-                .increment(criteriaCombinationCount);
-            this.registry
-                .counter(RESOLVE_CLUSTER_QUERY_COUNTER)
-                .increment(queryCount);
-            tags.add(Tag.of(RESOLVE_CLUSTER_CRITERIA_COMBINATION_TAG, String.valueOf(criteriaCombinationCount)));
-            tags.add(Tag.of(RESOLVE_CLUSTER_QUERY_TAG, String.valueOf(queryCount)));
             this.registry
                 .timer(RESOLVE_CLUSTER_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
@@ -911,84 +963,22 @@ public class JobResolverServiceImpl implements JobResolverService {
         sortedTags.sort(Comparator.naturalOrder());
         final String joinedString = StringUtils.join(sortedTags, ',');
         // Escape quotes
-        return RegExUtils.replaceAll(RegExUtils.replaceAll(joinedString, "\'", "\\\'"), "\"", "\\\"");
+        return RegExUtils.replaceAll(RegExUtils.replaceAll(joinedString, "'", "\\'"), "\"", "\\\"");
     }
 
-    @Nullable
-    private Cluster selectClusterUsingClusterSelectors(
-        final Set<Tag> counterTags,
-        final Set<Cluster> clusters,
-        final JobRequest jobRequest,
-        final String jobId
-    ) {
-        Cluster cluster = null;
-        for (final ClusterSelector clusterSelector : this.clusterSelectors) {
-            // TODO: We might want to get rid of this and use the result returned from the selector
-            //       Keeping for now in interest of dev time
-            final String clusterSelectorClass;
-            if (clusterSelector instanceof TargetClassAware) {
-                final Class<?> targetClass = ((TargetClassAware) clusterSelector).getTargetClass();
-                if (targetClass != null) {
-                    clusterSelectorClass = targetClass.getCanonicalName();
-                } else {
-                    clusterSelectorClass = clusterSelector.getClass().getCanonicalName();
-                }
+    private String getProxyObjectClassName(final Object possibleProxyObject) {
+        final String className;
+        if (possibleProxyObject instanceof TargetClassAware) {
+            final Class<?> targetClass = ((TargetClassAware) possibleProxyObject).getTargetClass();
+            if (targetClass != null) {
+                className = targetClass.getCanonicalName();
             } else {
-                clusterSelectorClass = clusterSelector.getClass().getCanonicalName();
+                className = possibleProxyObject.getClass().getCanonicalName();
             }
-            counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
-            try {
-                final ResourceSelectionResult<Cluster> result = clusterSelector.select(
-                    new ClusterSelectionContext(
-                        jobId,
-                        jobRequest,
-                        true, // TODO: Fix this whole method so it's easier to work with (context?)
-                        null,
-                        clusters
-                    )
-                );
-                final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
-                if (selectedClusterOptional.isPresent()) {
-                    final Cluster selectedCluster = selectedClusterOptional.get();
-                    // Make sure the cluster existed in the original list of clusters
-                    if (clusters.contains(selectedCluster)) {
-                        log.debug(
-                            "Successfully selected cluster {} using selector {}",
-                            selectedCluster.getId(),
-                            clusterSelectorClass
-                        );
-                        counterTags.addAll(
-                            Lists.newArrayList(
-                                Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_SUCCESS),
-                                Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, selectedCluster.getId()),
-                                Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, selectedCluster.getMetadata().getName()),
-                                Tag.of(MetricsConstants.TagKeys.CLUSTER_SELECTOR_CLASS, clusterSelectorClass)
-                            )
-                        );
-                        cluster = selectedCluster;
-                        break;
-                    } else {
-                        log.error(
-                            "Successfully selected cluster {} using selector {} but it wasn't in original cluster "
-                                + "set {}",
-                            selectedCluster.getId(),
-                            clusterSelectorClass,
-                            clusters
-                        );
-                        counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_INVALID));
-                    }
-                } else {
-                    counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_NO_PREFERENCE));
-                }
-            } catch (final Exception e) {
-                log.error("Cluster selector {} evaluation threw exception:", clusterSelector, e);
-                counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_EXCEPTION));
-            } finally {
-                this.registry.counter(CLUSTER_SELECTOR_COUNTER, counterTags).increment();
-            }
+        } else {
+            className = possibleProxyObject.getClass().getCanonicalName();
         }
-
-        return cluster;
+        return className;
     }
     //endregion
 
@@ -1129,6 +1119,71 @@ public class JobResolverServiceImpl implements JobResolverService {
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
+
+    @Deprecated
+    @Nullable
+    private Cluster selectClusterUsingClusterSelectors(
+        final Set<Tag> counterTags,
+        final Set<Cluster> clusters,
+        final JobRequest jobRequest,
+        final String jobId
+    ) {
+        Cluster cluster = null;
+        for (final ClusterSelector clusterSelector : this.clusterSelectors) {
+            final String clusterSelectorClass = this.getProxyObjectClassName(clusterSelector);
+            counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, clusterSelectorClass));
+            try {
+                final ResourceSelectionResult<Cluster> result = clusterSelector.select(
+                    new ClusterSelectionContext(
+                        jobId,
+                        jobRequest,
+                        true, // TODO: Fix this whole method so it's easier to work with (context?)
+                        null,
+                        clusters
+                    )
+                );
+                final Optional<Cluster> selectedClusterOptional = result.getSelectedResource();
+                if (selectedClusterOptional.isPresent()) {
+                    final Cluster selectedCluster = selectedClusterOptional.get();
+                    // Make sure the cluster existed in the original list of clusters
+                    if (clusters.contains(selectedCluster)) {
+                        log.debug(
+                            "Successfully selected cluster {} using selector {}",
+                            selectedCluster.getId(),
+                            clusterSelectorClass
+                        );
+                        counterTags.addAll(
+                            Lists.newArrayList(
+                                Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_SUCCESS),
+                                Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, selectedCluster.getId()),
+                                Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, selectedCluster.getMetadata().getName())
+                            )
+                        );
+                        cluster = selectedCluster;
+                        break;
+                    } else {
+                        log.error(
+                            "Successfully selected cluster {} using selector {} but it wasn't in original cluster "
+                                + "set {}",
+                            selectedCluster.getId(),
+                            clusterSelectorClass,
+                            clusters
+                        );
+                        counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_INVALID));
+                    }
+                } else {
+                    counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_NO_PREFERENCE));
+                }
+            } catch (final Exception e) {
+                log.error("Cluster selector {} evaluation threw exception:", clusterSelector, e);
+                counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, CLUSTER_SELECTOR_STATUS_EXCEPTION));
+            } finally {
+                this.registry.counter(CLUSTER_SELECTOR_COUNTER, counterTags).increment();
+            }
+        }
+
+        return cluster;
+    }
     //endregion
 
     //region Helper Classes
@@ -1158,7 +1213,9 @@ public class JobResolverServiceImpl implements JobResolverService {
         private String archiveLocation;
         private File jobDirectory;
 
-        private Optional<Command> getCommand() {
+        private Map<Command, Set<Cluster>> commandClusters;
+
+        Optional<Command> getCommand() {
             return Optional.ofNullable(this.command);
         }
 
@@ -1188,6 +1245,10 @@ public class JobResolverServiceImpl implements JobResolverService {
 
         Optional<File> getJobDirectory() {
             return Optional.ofNullable(this.jobDirectory);
+        }
+
+        Optional<Map<Command, Set<Cluster>>> getCommandClusters() {
+            return Optional.ofNullable(this.commandClusters);
         }
 
         ResolvedJob build() {

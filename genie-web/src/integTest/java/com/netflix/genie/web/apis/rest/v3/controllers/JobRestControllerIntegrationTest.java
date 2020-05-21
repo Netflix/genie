@@ -1118,7 +1118,8 @@ public class JobRestControllerIntegrationTest extends RestControllerIntegrationT
                     Matchers.containsString(
                         "No cluster/command combination found for the given criteria. Unable to continue"
                     ),
-                    Matchers.containsString("No cluster selected given criteria for job")
+                    Matchers.containsString("No cluster selected given criteria for job"),
+                    Matchers.containsString("No clusters available to run any candidate command on")
                 )
             )
             .body("stackTrace", Matchers.nullValue());
