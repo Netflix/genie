@@ -101,7 +101,7 @@ var activeTableTab = "activeTableTab";
 <li><a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">com.netflix.genie.web.scripts.ManagedScript</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">com.netflix.genie.web.scripts.ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</li>
+<li><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">com.netflix.genie.web.scripts.ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,<a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</li>
 <li>
 <ul class="inheritance">
 <li>com.netflix.genie.web.scripts.ClusterSelectorManagedScript</li>
@@ -118,14 +118,14 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">ClusterSelectorManagedScript</span>
-extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</pre>
+extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,<a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</pre>
 <div class="block">Extension of <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScript</code></a> that delegates selection of a job's cluster when more than one choice is
  available. See also: <a href="../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors"><code>ClusterSelector</code></a>.
  <p>
  The contract between the script and the Java code is that the script will be supplied global variables
- <code>clusters</code> and <code>jobRequest</code> which will be JSON strings representing the list (array) of clusters
- matching the cluster criteria tags and the job request that kicked off this evaluation. The code expects the script
- to either return the id of the cluster if one is selected or null if none was selected.</div>
+ <code>clusters</code> and <code>jobRequest</code> which will be a <code>Set</code> of <a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> instances
+ matching the cluster criteria and the job request that kicked off this evaluation respectively. The code expects the
+ script to return a <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScriptResult</code></a> instance.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>4.0.0</dd>
@@ -171,17 +171,14 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">addParametersForScript</a></span>(java.util.Map&lt;java.lang.String,java.lang.Object&gt;&nbsp;parameters,
-                      java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;resources,
-                      <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#addParametersForScript-java.util.Map-com.netflix.genie.web.selectors.ClusterSelectionContext-">addParametersForScript</a></span>(java.util.Map&lt;java.lang.String,java.lang.Object&gt;&nbsp;parameters,
+                      <a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)</code>
 <div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">selectResource</a></span>(java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;resources,
-              <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
-              java.lang.String&nbsp;jobId)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#selectResource-com.netflix.genie.web.selectors.ClusterSelectionContext-">selectResource</a></span>(<a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)</code>
 <div class="block">Given the <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 </td>
@@ -241,25 +238,22 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">
+<a name="selectResource-com.netflix.genie.web.selectors.ClusterSelectionContext-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>selectResource</h4>
-<pre>public&nbsp;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;selectResource(java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;resources,
-                                                            <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
-                                                            java.lang.String&nbsp;jobId)
+<pre>public&nbsp;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;selectResource(<a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)
                                                      throws <a href="../../../../../com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
 <div class="block">Given the <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">selectResource</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></dd>
+<dd><code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#selectResource-C-">selectResource</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,<a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>resources</code> - The set of resources of type R which should be selected from</dd>
-<dd><code>jobRequest</code> - The <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> that the resource will be running</dd>
-<dd><code>jobId</code> - The id of the job this resource is being selected for</dd>
+<dd><code>context</code> - The <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> instance containing information about the context for this
+                selection</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScriptResult</code></a> instance</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -267,24 +261,21 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorSc
 </dl>
 </li>
 </ul>
-<a name="addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">
+<a name="addParametersForScript-java.util.Map-com.netflix.genie.web.selectors.ClusterSelectionContext-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>addParametersForScript</h4>
 <pre>protected&nbsp;void&nbsp;addParametersForScript(java.util.Map&lt;java.lang.String,java.lang.Object&gt;&nbsp;parameters,
-                                      java.util.Set&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;resources,
-                                      <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)</pre>
-<div class="block">Add any implementation specific parameters to the map of parameters to send to the script. The job request
- will already have been added under jobRequestParameter.</div>
+                                      <a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)</pre>
+<div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">addParametersForScript</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></dd>
+<dd><code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#addParametersForScript-java.util.Map-C-">addParametersForScript</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a>&lt;<a href="../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,<a href="../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parameters</code> - The existing set of parameters for implementations to add to</dd>
-<dd><code>resources</code> - The set of resources that need to be chosen from</dd>
-<dd><code>jobRequest</code> - The job request necessitating the evaluation of this script</dd>
+<dd><code>context</code> - The selection context</dd>
 </dl>
 </li>
 </ul>

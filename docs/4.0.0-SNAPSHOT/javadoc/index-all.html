@@ -262,15 +262,15 @@
 <dd>
 <div class="block">Add a source file specifying a target file destination.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">addParametersForScript(Map&lt;String, Object&gt;, Set&lt;Cluster&gt;, JobRequest)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#addParametersForScript-java.util.Map-com.netflix.genie.web.selectors.ClusterSelectionContext-">addParametersForScript(Map&lt;String, Object&gt;, ClusterSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">addParametersForScript(Map&lt;String, Object&gt;, Set&lt;Command&gt;, JobRequest)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#addParametersForScript-java.util.Map-com.netflix.genie.web.selectors.CommandSelectionContext-">addParametersForScript(Map&lt;String, Object&gt;, CommandSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html#addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">addParametersForScript(Map&lt;String, Object&gt;, Set&lt;R&gt;, JobRequest)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html#addParametersForScript-java.util.Map-C-">addParametersForScript(Map&lt;String, Object&gt;, C)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a></dt>
 <dd>
 <div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 </dd>
@@ -1781,6 +1781,14 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html#CLUSTERS">CLUSTERS</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors"><span class="typeNameLink">ClusterSelectionContext</span></a> - Class in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
+<dd>
+<div class="block">Extension of <a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in cluster selection.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html#ClusterSelectionContext-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobRequest-boolean-com.netflix.genie.common.external.dtos.v4.Command-java.util.Set-">ClusterSelectionContext(String, JobRequest, boolean, Command, Set&lt;Cluster&gt;)</a></span> - Constructor for class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors"><span class="typeNameLink">ClusterSelector</span></a> - Interface in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
 <dd>
 <div class="block">Interface for any classes which provide a way to select a <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> from a set of clusters
@@ -2456,6 +2464,14 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html#COMMANDS">COMMANDS</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors"><span class="typeNameLink">CommandSelectionContext</span></a> - Class in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
+<dd>
+<div class="block">Extension of <a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in command selection.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/CommandSelectionContext.html#CommandSelectionContext-java.lang.String-com.netflix.genie.common.external.dtos.v4.JobRequest-boolean-java.util.Map-">CommandSelectionContext(String, JobRequest, boolean, Map&lt;Command, Set&lt;Cluster&gt;&gt;)</a></span> - Constructor for class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a></dt>
+<dd>
+<div class="block">Constructor.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/selectors/CommandSelector.html" title="interface in com.netflix.genie.web.selectors"><span class="typeNameLink">CommandSelector</span></a> - Interface in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
 <dd>
 <div class="block">Interface for any classes which provide a way to select a <a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> from a set of commands
@@ -3958,6 +3974,18 @@
 <div class="block"><span class="deprecationComment">To be removed after V4 resource model migration</span></div>
 </div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#findClustersMatchingAnyCriterion-java.util.Set-boolean-">findClustersMatchingAnyCriterion(Set&lt;Criterion&gt;, boolean)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dd>
+<div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match any of the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html#findClustersMatchingAnyCriterion-java.util.Set-">findClustersMatchingAnyCriterion(Set&lt;Criterion&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaClusterSpecs</a></dt>
+<dd>
+<div class="block">Get the specification for the query which will find the clusters which match any of the given criterion.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#findClustersMatchingAnyCriterion-java.util.Set-boolean-">findClustersMatchingAnyCriterion(Set&lt;Criterion&gt;, boolean)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
+<dd>
+<div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match any of the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findClustersMatchingCriterion(Criterion, boolean)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
@@ -5235,7 +5263,14 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusters-groovy.lang.Binding-">getClusters(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
 <dd>
-<div class="block">Given the <code>Binding</code> that a script has attempt to extract the clusters parameter.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
+ instead</span></div>
+</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-">getClusterSelectionContext(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
+<dd>
+<div class="block">Given the <code>Binding</code> that a script has attempt to extract the cluster selection context.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/CommandService.html#getClustersForCommand-java.lang.String-">getClustersForCommand(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/CommandService.html" title="interface in com.netflix.genie.client.apis">CommandService</a></dt>
 <dd>
@@ -5296,6 +5331,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getCommand-java.lang.String-">getCommand(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get the metadata for the <a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a> identified by the id.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html#getCommand--">getCommand()</a></span> - Method in class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a></dt>
+<dd>
+<div class="block">Get the command which was already selected for the job if there was one.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/Job.html#getCommandArgs--">getCommandArgs()</a></span> - Method in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a></dt>
 <dd>
@@ -5391,7 +5430,14 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommands-groovy.lang.Binding-">getCommands(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
 <dd>
-<div class="block">Given the <code>Binding</code> that a script has attempt to extract the commands parameter.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
+ instead</span></div>
+</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-">getCommandSelectionContext(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
+<dd>
+<div class="block">Given the <code>Binding</code> that a script has attempt to extract the command selection context.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/ApplicationService.html#getCommandsForApplication-java.lang.String-">getCommandsForApplication(String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/ApplicationService.html" title="interface in com.netflix.genie.client.apis">ApplicationService</a></dt>
 <dd>
@@ -6153,7 +6199,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getJobId-groovy.lang.Binding-">getJobId(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
 <dd>
-<div class="block">Given the <code>Binding</code> that a script has attempt to extract the job id parameter.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
+ instead</span></div>
+</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobMetadata--">getJobMetadata()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
@@ -6205,7 +6254,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getJobRequest-groovy.lang.Binding-">getJobRequest(Binding)</a></span> - Static method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html" title="class in com.netflix.genie.web.scripts">GroovyScriptUtils</a></dt>
 <dd>
-<div class="block">Given the <code>Binding</code> that a script has attempt to extract the job request parameter.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Use <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getClusterSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getClusterSelectionContext(Binding)</code></a> or <a href="com/netflix/genie/web/scripts/GroovyScriptUtils.html#getCommandSelectionContext-groovy.lang.Binding-"><code>GroovyScriptUtils.getCommandSelectionContext(Binding)</code></a>
+ instead</span></div>
+</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/client/apis/JobService.html#getJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-">getJobs(String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, String, String, String, Long, Long, Long, Long, String, String)</a></span> - Method in interface com.netflix.genie.client.apis.<a href="com/netflix/genie/client/apis/JobService.html" title="interface in com.netflix.genie.client.apis">JobService</a></dt>
 <dd>
@@ -6762,6 +6814,18 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ResolvedResources.html" title="class in com.netflix.genie.common.external.dtos.v4">ResolvedResources</a></dt>
 <dd>
 <div class="block">Get the resources that were resolved.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a></dt>
+<dd>
+<div class="block">Return the <code>Set</code> of distinct resources that a selector is meant to chose from.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/CommandSelectionContext.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors">CommandSelectionContext</a></dt>
+<dd>
+<div class="block">Return the <code>Set</code> of distinct resources that a selector is meant to chose from.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html#getResources--">getResources()</a></span> - Method in class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a></dt>
+<dd>
+<div class="block">Return the <code>Set</code> of distinct resources that a selector is meant to chose from.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html#getRoleARN--">getRoleARN()</a></span> - Method in class com.netflix.genie.common.internal.aws.s3.<a href="com/netflix/genie/common/internal/aws/s3/BucketProperties.html" title="class in com.netflix.genie.common.internal.aws.s3">BucketProperties</a></dt>
 <dd>
@@ -10878,6 +10942,12 @@
 <dd>
 <div class="block">A resource service is the execution of any method defined on a controller.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><span class="typeNameLink">ResourceSelectionContext</span></a>&lt;<a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="type parameter in ResourceSelectionContext">R</a>&gt; - Class in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
+<dd>
+<div class="block">Context object for encapsulating state into the selectors.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html#ResourceSelectionContext--">ResourceSelectionContext()</a></span> - Constructor for class com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked"><span class="typeNameLink">ResourceSelectionException</span></a> - Exception in <a href="com/netflix/genie/web/exceptions/checked/package-summary.html">com.netflix.genie.web.exceptions.checked</a></dt>
 <dd>
 <div class="block">An exception thrown when a resource selector encounters an unrecoverable error while trying to select a resource
@@ -10907,11 +10977,11 @@
 <dd>
 <div class="block">A builder for <a href="com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos"><code>ResourceSelectionResult</code></a> instances.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors"><span class="typeNameLink">ResourceSelector</span></a>&lt;<a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="type parameter in ResourceSelector">R</a>&gt; - Interface in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
+<dt><a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors"><span class="typeNameLink">ResourceSelector</span></a>&lt;<a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="type parameter in ResourceSelector">R</a>,<a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="type parameter in ResourceSelector">C</a> extends <a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;<a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="type parameter in ResourceSelector">R</a>&gt;&gt; - Interface in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
 <dd>
 <div class="block">Generic interface for a selector which selects a resource from a set of resources for a given job request.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">ResourceSelectorScript</span></a>&lt;<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt; - Class in <a href="com/netflix/genie/web/scripts/package-summary.html">com.netflix.genie.web.scripts</a></dt>
+<dt><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts"><span class="typeNameLink">ResourceSelectorScript</span></a>&lt;<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>,<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">C</a> extends <a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;&gt; - Class in <a href="com/netflix/genie/web/scripts/package-summary.html">com.netflix.genie.web.scripts</a></dt>
 <dd>
 <div class="block">Interface for defining the contract between the selection of a resource from a set of resources for a given
  job request.</div>
@@ -11328,15 +11398,15 @@
 <dd>
 <div class="block">An interface whose implementation is supposed to modify the HTTP Request by adding Security credentials.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select(Set&lt;Cluster&gt;, JobRequest, String)</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html#select-com.netflix.genie.web.selectors.ClusterSelectionContext-">select(ClusterSelectionContext)</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptClusterSelectorImpl</a></dt>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select(Set&lt;Command&gt;, JobRequest, String)</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptCommandSelectorImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html#select-com.netflix.genie.web.selectors.CommandSelectionContext-">select(CommandSelectionContext)</a></span> - Method in class com.netflix.genie.web.selectors.impl.<a href="com/netflix/genie/web/selectors/impl/ScriptCommandSelectorImpl.html" title="class in com.netflix.genie.web.selectors.impl">ScriptCommandSelectorImpl</a></dt>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ResourceSelector.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select(Set&lt;R&gt;, JobRequest, String)</a></span> - Method in interface com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/selectors/ResourceSelector.html#select-C-">select(C)</a></span> - Method in interface com.netflix.genie.web.selectors.<a href="com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a></dt>
 <dd>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </dd>
@@ -11354,17 +11424,17 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html#SelectorsAutoConfiguration--">SelectorsAutoConfiguration()</a></span> - Constructor for class com.netflix.genie.web.spring.autoconfigure.selectors.<a href="com/netflix/genie/web/spring/autoconfigure/selectors/SelectorsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.selectors">SelectorsAutoConfiguration</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">selectResource(Set&lt;Cluster&gt;, JobRequest, String)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html#selectResource-com.netflix.genie.web.selectors.ClusterSelectionContext-">selectResource(ClusterSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ClusterSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">ClusterSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Given the <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">selectResource(Set&lt;Command&gt;, JobRequest, String)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html#selectResource-com.netflix.genie.web.selectors.CommandSelectionContext-">selectResource(CommandSelectionContext)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/CommandSelectorManagedScript.html" title="class in com.netflix.genie.web.scripts">CommandSelectorManagedScript</a></dt>
 <dd>
 <div class="block">Given the <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html#selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">selectResource(Set&lt;R&gt;, JobRequest, String)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html#selectResource-C-">selectResource(C)</a></span> - Method in class com.netflix.genie.web.scripts.<a href="com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScript</a></dt>
 <dd>
 <div class="block">Given the <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>

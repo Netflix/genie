@@ -107,7 +107,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>, <a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</dd>
+<dd><a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelector.html" title="interface in com.netflix.genie.web.selectors">ClusterSelector</a>, <a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,<a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</dd>
 </dl>
 <hr>
 <br>
@@ -160,9 +160,7 @@ implements <a href="../../../../../../com/netflix/genie/web/selectors/ClusterSel
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select</a></span>(@NotEmpty java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;resources,
-      @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
-      @NotBlank java.lang.String&nbsp;jobId)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/web/selectors/impl/ScriptClusterSelectorImpl.html#select-com.netflix.genie.web.selectors.ClusterSelectionContext-">select</a></span>(@Valid <a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)</code>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 </td>
 </tr>
@@ -212,27 +210,21 @@ implements <a href="../../../../../../com/netflix/genie/web/selectors/ClusterSel
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">
+<a name="select-com.netflix.genie.web.selectors.ClusterSelectionContext-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>select</h4>
-<pre>public&nbsp;<a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;select(@NotEmpty
-                                               @NotEmpty java.util.Set&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;resources,
-                                               @Valid
-                                               @Valid <a href="../../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
-                                               @NotBlank
-                                               @NotBlank java.lang.String&nbsp;jobId)
+<pre>public&nbsp;<a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos">ResourceSelectionResult</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;&nbsp;select(@Valid
+                                               @Valid <a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&nbsp;context)
                                         throws <a href="../../../../../../com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
 <div class="block">Select a resource from the given set of resources if possible.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html#select-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">select</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>&gt;</code></dd>
+<dd><code><a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html#select-C-">select</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../com/netflix/genie/web/selectors/ResourceSelector.html" title="interface in com.netflix.genie.web.selectors">ResourceSelector</a>&lt;<a href="../../../../../../com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4">Cluster</a>,<a href="../../../../../../com/netflix/genie/web/selectors/ClusterSelectionContext.html" title="class in com.netflix.genie.web.selectors">ClusterSelectionContext</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>resources</code> - A set of resources which matched the user supplied criterion to chose from</dd>
-<dd><code>jobRequest</code> - The job user's original job request</dd>
-<dd><code>jobId</code> - The unique id the job has or will have within the Genie system</dd>
+<dd><code>context</code> - The context specific for this resource selection</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The a <a href="../../../../../../com/netflix/genie/web/dtos/ResourceSelectionResult.html" title="class in com.netflix.genie.web.dtos"><code>ResourceSelectionResult</code></a> instance which contains information about the result of this
  invocation</dd>

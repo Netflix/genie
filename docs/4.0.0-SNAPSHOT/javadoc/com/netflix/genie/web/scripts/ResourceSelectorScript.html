@@ -91,7 +91,7 @@ var activeTableTab = "activeTableTab";
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
 <div class="subTitle">com.netflix.genie.web.scripts</div>
-<h2 title="Class ResourceSelectorScript" class="title">Class ResourceSelectorScript&lt;R&gt;</h2>
+<h2 title="Class ResourceSelectorScript" class="title">Class ResourceSelectorScript&lt;R,C extends <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;R&gt;&gt;</h2>
 </div>
 <div class="contentContainer">
 <ul class="inheritance">
@@ -101,7 +101,7 @@ var activeTableTab = "activeTableTab";
 <li><a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">com.netflix.genie.web.scripts.ManagedScript</a></li>
 <li>
 <ul class="inheritance">
-<li>com.netflix.genie.web.scripts.ResourceSelectorScript&lt;R&gt;</li>
+<li>com.netflix.genie.web.scripts.ResourceSelectorScript&lt;R,C&gt;</li>
 </ul>
 </li>
 </ul>
@@ -113,6 +113,7 @@ var activeTableTab = "activeTableTab";
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
 <dd><code>R</code> - The type of resource this script is selecting from</dd>
+<dd><code>C</code> - The context for resource selection which must extend <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a></dd>
 </dl>
 <dl>
 <dt>Direct Known Subclasses:</dt>
@@ -120,7 +121,7 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public class <span class="typeNameLabel">ResourceSelectorScript&lt;R&gt;</span>
+<pre>public class <span class="typeNameLabel">ResourceSelectorScript&lt;R,C extends <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors">ResourceSelectionContext</a>&lt;R&gt;&gt;</span>
 extends <a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html" title="class in com.netflix.genie.web.scripts">ManagedScript</a></pre>
 <div class="block">Interface for defining the contract between the selection of a resource from a set of resources for a given
  job request.</div>
@@ -171,17 +172,14 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">addParametersForScript</a></span>(java.util.Map&lt;java.lang.String,java.lang.Object&gt;&nbsp;parameters,
-                      java.util.Set&lt;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;&nbsp;resources,
-                      <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#addParametersForScript-java.util.Map-C-">addParametersForScript</a></span>(java.util.Map&lt;java.lang.String,java.lang.Object&gt;&nbsp;parameters,
+                      <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">C</a>&nbsp;context)</code>
 <div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">selectResource</a></span>(java.util.Set&lt;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;&nbsp;resources,
-              <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
-              java.lang.String&nbsp;jobId)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html#selectResource-C-">selectResource</a></span>(<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">C</a>&nbsp;context)</code>
 <div class="block">Given the <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 </td>
@@ -241,23 +239,22 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="selectResource-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-java.lang.String-">
+<a name="selectResource-com.netflix.genie.web.selectors.ResourceSelectionContext-">
+<!--   -->
+</a><a name="selectResource-C-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>selectResource</h4>
-<pre>public&nbsp;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;&nbsp;selectResource(java.util.Set&lt;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;&nbsp;resources,
-                                                      <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest,
-                                                      java.lang.String&nbsp;jobId)
+<pre>public&nbsp;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts">ResourceSelectorScriptResult</a>&lt;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;&nbsp;selectResource(<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">C</a>&nbsp;context)
                                                throws <a href="../../../../../com/netflix/genie/web/exceptions/checked/ResourceSelectionException.html" title="class in com.netflix.genie.web.exceptions.checked">ResourceSelectionException</a></pre>
 <div class="block">Given the <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> and an associated set of resources which matched the request criteria
  invoke the configured script to see if a preferred resource is selected based on the current logic.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>resources</code> - The set of resources of type R which should be selected from</dd>
-<dd><code>jobRequest</code> - The <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a> that the resource will be running</dd>
-<dd><code>jobId</code> - The id of the job this resource is being selected for</dd>
+<dd><code>context</code> - The <a href="../../../../../com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> instance containing information about the context for this
+                selection</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScriptResult.html" title="class in com.netflix.genie.web.scripts"><code>ResourceSelectorScriptResult</code></a> instance</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -265,22 +262,21 @@ extends <a href="../../../../../com/netflix/genie/web/scripts/ManagedScript.html
 </dl>
 </li>
 </ul>
-<a name="addParametersForScript-java.util.Map-java.util.Set-com.netflix.genie.common.external.dtos.v4.JobRequest-">
+<a name="addParametersForScript-java.util.Map-com.netflix.genie.web.selectors.ResourceSelectionContext-">
+<!--   -->
+</a><a name="addParametersForScript-java.util.Map-C-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>addParametersForScript</h4>
 <pre>protected&nbsp;void&nbsp;addParametersForScript(java.util.Map&lt;java.lang.String,java.lang.Object&gt;&nbsp;parameters,
-                                      java.util.Set&lt;<a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">R</a>&gt;&nbsp;resources,
-                                      <a href="../../../../../com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">JobRequest</a>&nbsp;jobRequest)</pre>
-<div class="block">Add any implementation specific parameters to the map of parameters to send to the script. The job request
- will already have been added under jobRequestParameter.</div>
+                                      <a href="../../../../../com/netflix/genie/web/scripts/ResourceSelectorScript.html" title="type parameter in ResourceSelectorScript">C</a>&nbsp;context)</pre>
+<div class="block">Add any implementation specific parameters to the map of parameters to send to the script.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>parameters</code> - The existing set of parameters for implementations to add to</dd>
-<dd><code>resources</code> - The set of resources that need to be chosen from</dd>
-<dd><code>jobRequest</code> - The job request necessitating the evaluation of this script</dd>
+<dd><code>context</code> - The selection context</dd>
 </dl>
 </li>
 </ul>
