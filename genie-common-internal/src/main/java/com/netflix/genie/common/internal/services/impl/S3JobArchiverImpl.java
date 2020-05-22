@@ -27,8 +27,10 @@ import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Implementation of {@link JobArchiveService} for S3 destinations.
@@ -57,6 +59,7 @@ public class S3JobArchiverImpl implements JobArchiver {
     @Override
     public boolean archiveDirectory(
         @NotNull final Path directory,
+        final List<File> filesList,
         @NotNull final URI target
     ) throws JobArchiveException {
         final String uriString = target.toString();
@@ -77,11 +80,12 @@ public class S3JobArchiverImpl implements JobArchiver {
 
         try {
             final TransferManager transferManager = this.s3ClientFactory.getTransferManager(s3URI);
-            final MultipleFileUpload upload = transferManager.uploadDirectory(
+
+            final MultipleFileUpload upload = transferManager.uploadFileList(
                 s3URI.getBucket(),
                 s3URI.getKey(),
                 directory.toFile(),
-                true
+                filesList
             );
 
             upload.waitForCompletion();

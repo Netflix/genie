@@ -57,6 +57,7 @@ class S3JobArchiverImplSpec extends Specification {
     File sparkShellSetUp
     File logsDir
     File logFile
+    List<File> allFiles
 
     AmazonS3URI archivalLocationS3URI
 
@@ -114,21 +115,30 @@ class S3JobArchiverImplSpec extends Specification {
         this.archivalLocationS3URI = new AmazonS3URI(
             "s3://" + bucketName + File.separator + baseLocation + File.separator + jobDir.getName()
         )
+
+        this.allFiles = [
+            this.stdout,
+            this.stderr,
+            this.run,
+            this.hadoopCoreSite,
+            this.sparkShellSetUp,
+            this.logFile
+        ]
     }
 
     def "Archiving a job folder defers to the S3 Transfer Manager returned by the factory"() {
         def upload = Mock(MultipleFileUpload)
 
         when:
-        def result = this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.archivalLocationS3URI.getURI())
+        def result = this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationS3URI.getURI())
 
         then:
         1 * this.s3ClientFactory.getTransferManager(_ as AmazonS3URI) >> this.transferManager
-        1 * this.transferManager.uploadDirectory(
+        1 * this.transferManager.uploadFileList(
             this.archivalLocationS3URI.getBucket(),
             this.archivalLocationS3URI.getKey(),
             this.jobDir,
-            true
+            this.allFiles
         ) >> upload
         1 * upload.waitForCompletion()
         result
@@ -136,7 +146,7 @@ class S3JobArchiverImplSpec extends Specification {
 
     def "If it is not a valid S3 URI archival is not attempted with this implementation"() {
         when:
-        def result = this.s3ArchivalService.archiveDirectory(jobDir.toPath(), new URI("file://abc"))
+        def result = this.s3ArchivalService.archiveDirectory(jobDir.toPath(), [], new URI("file://abc"))
 
         then:
         !result
@@ -144,15 +154,15 @@ class S3JobArchiverImplSpec extends Specification {
 
     def "Archival Exception thrown if there is error archiving"() {
         when:
-        this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.archivalLocationS3URI.getURI())
+        this.s3ArchivalService.archiveDirectory(this.jobDir.toPath(), this.allFiles, this.archivalLocationS3URI.getURI())
 
         then:
         1 * this.s3ClientFactory.getTransferManager(_ as AmazonS3URI) >> this.transferManager
-        1 * this.transferManager.uploadDirectory(
+        1 * this.transferManager.uploadFileList(
             this.archivalLocationS3URI.getBucket(),
             this.archivalLocationS3URI.getKey(),
             this.jobDir,
-            true
+            this.allFiles
         ) >> { throw new AmazonServiceException("test") }
         thrown(JobArchiveException)
     }

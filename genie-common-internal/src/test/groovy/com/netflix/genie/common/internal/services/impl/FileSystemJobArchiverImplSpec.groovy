@@ -25,10 +25,12 @@ import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.FileVisitResult
+import java.nio.file.FileVisitor
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
+import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
+import java.util.stream.Collectors
 import java.util.stream.Stream
 
 /**
@@ -42,24 +44,34 @@ class FileSystemJobArchiverImplSpec extends Specification {
     TemporaryFolder temporaryFolder
 
     def "Can archive job directory"() {
+        setup:
         def source = this.temporaryFolder.newFolder().toPath()
         def target = this.temporaryFolder.newFolder().toPath()
+        def archiver = new FileSystemJobArchiverImpl()
 
         // create a directory structure
-        Files.write(source.resolve("stdout"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
-        Files.write(source.resolve("stderr"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
         def genieDir = Files.createDirectory(source.resolve("genie"))
-        Files.write(genieDir.resolve("env.sh"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
         def genieSubDir = Files.createDirectory(genieDir.resolve("subdir"))
-        Files.write(genieSubDir.resolve("exit"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
-        def clusterDir = Files.createDirectory(source.resolve("cluster"))
-        Files.write(
-            clusterDir.resolve("clusterSetupFile.sh"),
-            UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)
-        )
+        def clusterDir = Files.createDirectory(genieDir.resolve("cluster"))
 
-        def archiver = new FileSystemJobArchiverImpl()
-        def visitor = new DirectoryComparator(source, target)
+        // create files
+        def filePaths = [
+            source.resolve("stdout"),
+            source.resolve("stderr"),
+            genieDir.resolve("env.sh"),
+            genieSubDir.resolve("exit"),
+            clusterDir.resolve("clusterSetupFile.sh"),
+        ]
+
+        filePaths.forEach({
+            path -> Files.write(path, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
+        })
+
+        def sourceVisitor = new FileListVisitor(source)
+        Files.walkFileTree(source, sourceVisitor)
+
+        // create one more -- should NOT get archived!
+        Files.write(source.resolve("temp.tar.gz"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
 
         when: "We list the target directory"
         Stream<Path> paths = Files.list(target)
@@ -68,27 +80,72 @@ class FileSystemJobArchiverImplSpec extends Specification {
         paths.count() == 0
 
         when: "We archive the source to the target and compare the directories"
-        archiver.archiveDirectory(source, target.toUri())
-        Files.walkFileTree(source, visitor)
-        def result = visitor.isSame()
+        def filesList = filePaths.stream().map({ path -> path.toFile() }).collect(Collectors.toList())
+        archiver.archiveDirectory(source, filesList, target.toUri())
 
         then:
-        result
+        noExceptionThrown()
+
+        when:
+        def targetVisitor = new FileListVisitor(target)
+        Files.walkFileTree(target, targetVisitor)
+
+        then:
+        filePaths.size() == targetVisitor.visitedFiles.size()
+        sourceVisitor.visitedFilesAndDirectories == targetVisitor.visitedFilesAndDirectories
+        sourceVisitor.visitedFiles == targetVisitor.visitedFiles
+    }
+
+    class FileListVisitor implements FileVisitor<Path> {
+
+        Path root
+        Map<Path, byte[]> visitedFiles = [:]
+        List<Path> visitedFilesAndDirectories = []
+
+        FileListVisitor(Path root) {
+            this.root = root
+        }
+
+
+        @Override
+        FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+            visitedFilesAndDirectories.add(this.root.relativize(dir))
+            return FileVisitResult.CONTINUE
+        }
+
+        @Override
+        FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+            def relativePath = this.root.relativize(file)
+            visitedFiles.put(relativePath, DigestUtils.md5(Files.readAllBytes(file)))
+            visitedFilesAndDirectories.add(relativePath)
+            return FileVisitResult.CONTINUE
+        }
+
+        @Override
+        FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
+            return FileVisitResult.CONTINUE
+        }
+
+        @Override
+        FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+            return FileVisitResult.CONTINUE
+        }
     }
 
     def "Test error cases"() {
+        setup:
         def archiver = new FileSystemJobArchiverImpl()
 
         when: "source doesn't exist"
         def sourceDoesNotExist = this.temporaryFolder.getRoot().toPath().resolve(UUID.randomUUID().toString())
-        archiver.archiveDirectory(sourceDoesNotExist, this.temporaryFolder.newFolder().toPath().toUri())
+        archiver.archiveDirectory(sourceDoesNotExist, [], this.temporaryFolder.newFolder().toPath().toUri())
 
         then: "An exception is thrown"
         thrown(JobArchiveException)
 
         when: "source isn't a directory"
         def sourceIsFile = this.temporaryFolder.newFile().toPath()
-        archiver.archiveDirectory(sourceIsFile, this.temporaryFolder.newFolder().toPath().toUri())
+        archiver.archiveDirectory(sourceIsFile, [], this.temporaryFolder.newFolder().toPath().toUri())
 
         then: "An exception is thrown"
         thrown(JobArchiveException)
@@ -96,71 +153,34 @@ class FileSystemJobArchiverImplSpec extends Specification {
         when: "Target exists but is a file"
         archiver.archiveDirectory(
             this.temporaryFolder.newFolder().toPath(),
+            [],
             this.temporaryFolder.newFile().toPath().toUri()
         )
 
         then: "An exception is thrown"
         thrown(JobArchiveException)
 
-        when: "Target doesn't exist"
-        def target = this.temporaryFolder.getRoot().toPath().resolve(UUID.randomUUID().toString())
+        when: "Target cannot be copied"
+        def target = Paths.get("/dev/null/foo")
+        def file = this.temporaryFolder.newFile()
         archiver.archiveDirectory(
-            this.temporaryFolder.newFolder().toPath(),
+            this.temporaryFolder.getRoot().toPath(),
+            [file],
             target.toUri()
         )
 
-        then: "it is created"
-        Files.exists(target)
+        then:
+        noExceptionThrown()
     }
 
-    private static class DirectoryComparator extends SimpleFileVisitor<Path> {
-        private final Path source
-        private final Path target
-        private boolean same = true
+    def "Test reject"() {
+        setup:
+        def archiver = new FileSystemJobArchiverImpl()
 
-        DirectoryComparator(final Path source, final Path target) {
-            this.source = source
-            this.target = target
-        }
+        when:
+        def accept = archiver.archiveDirectory(temporaryFolder.getRoot().toPath(), [], new URI("ftp:///foo/bar"))
 
-        @Override
-        FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
-            // make sure dir exists in target
-            final Path targetDir = this.target.resolve(this.source.relativize(dir))
-            if (!Files.exists(targetDir) || !Files.isDirectory(targetDir)) {
-                this.same = false
-                return FileVisitResult.TERMINATE
-            }
-
-            return FileVisitResult.CONTINUE
-        }
-
-        @Override
-        FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-            // make sure file exists in target
-            final Path targetFile = this.target.resolve(this.source.relativize(file))
-            if (!Files.exists(targetFile) || !Files.isRegularFile(targetFile)) {
-                this.same = false
-                return FileVisitResult.TERMINATE
-            }
-
-            // Compare contents
-            String sourceMD5 = file.withInputStream {
-                stream -> DigestUtils.md5Hex(stream)
-            }
-            String targetMD5 = targetFile.withInputStream {
-                stream -> DigestUtils.md5Hex(stream)
-            }
-            if (sourceMD5 != targetMD5) {
-                this.same = false
-                return FileVisitResult.TERMINATE
-            }
-
-            return FileVisitResult.CONTINUE
-        }
-
-        boolean isSame() {
-            return this.same
-        }
+        then:
+        !accept
     }
 }
