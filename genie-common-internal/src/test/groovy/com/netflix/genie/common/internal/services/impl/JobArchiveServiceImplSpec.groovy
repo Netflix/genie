@@ -30,6 +30,7 @@ import spock.lang.Specification
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.stream.Collectors
 
 /**
  * Specifications for {@link JobArchiveServiceImpl}.
@@ -42,16 +43,13 @@ class JobArchiveServiceImplSpec extends Specification {
     TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     def "When archiveDirectory is invoked a valid manifest is written into the expected directory"() {
-        def archiver = new JobArchiver() {
-            @Override
-            boolean archiveDirectory(final Path directory, final URI target) throws JobArchiveException {
-                return false
-            }
-        }
+        def skippedArchiver = Mock(JobArchiver)
+        def archiver = Mock(JobArchiver)
         DirectoryManifest.Factory directoryManifestFactory = Mock(DirectoryManifest.Factory)
-        def service = new JobArchiveServiceImpl([archiver], directoryManifestFactory)
+        def service = new JobArchiveServiceImpl([skippedArchiver, archiver], directoryManifestFactory)
         def jobDirectory = this.temporaryFolder.newFolder().toPath()
-        Files.write(jobDirectory.resolve("someFile"), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
+        def someFilePath = jobDirectory.resolve("someFile")
+        Files.write(someFilePath, UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8))
         Files.createDirectory(jobDirectory.resolve("subDir"))
         def target = this.temporaryFolder.newFolder().toURI()
         def manifestDirectoryPath = StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)
@@ -59,6 +57,7 @@ class JobArchiveServiceImplSpec extends Specification {
             : jobDirectory.resolve(JobArchiveService.MANIFEST_DIRECTORY)
         def manifestPath = manifestDirectoryPath.resolve(JobArchiveService.MANIFEST_NAME)
         def originalManifest = new DirectoryManifest.Factory().getDirectoryManifest(jobDirectory, true)
+        def filesList = [manifestPath, someFilePath].stream().map({path -> path.toFile()}).collect(Collectors.toList())
 
         when:
         service.archiveDirectory(jobDirectory, target)
@@ -66,6 +65,8 @@ class JobArchiveServiceImplSpec extends Specification {
         then:
         1 * directoryManifestFactory.getDirectoryManifest(jobDirectory, true) >> originalManifest
         Files.exists(manifestPath)
+        1 * skippedArchiver.archiveDirectory(jobDirectory, filesList, target) >> false
+        1 * archiver.archiveDirectory(jobDirectory, filesList, target) >> true
 
         when:
         def manifest = GenieObjectMapper.getMapper().readValue(manifestPath.toFile(), DirectoryManifest)

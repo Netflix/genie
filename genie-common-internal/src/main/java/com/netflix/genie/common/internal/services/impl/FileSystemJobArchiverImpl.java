@@ -21,18 +21,15 @@ import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.CopyOption;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.EnumSet;
+import java.util.List;
 
 /**
  * An implementation of {@link JobArchiver} which attempts to copy the job directory somewhere else on the file
@@ -45,89 +42,53 @@ import java.util.EnumSet;
 public class FileSystemJobArchiverImpl implements JobArchiver {
 
     private static final String FILE_SCHEME = "file";
+    private static final CopyOption[] COPY_OPTIONS = new CopyOption[]{
+        StandardCopyOption.COPY_ATTRIBUTES,
+        StandardCopyOption.REPLACE_EXISTING,
+    };
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean archiveDirectory(final Path directory, final URI target) throws JobArchiveException {
+    public boolean archiveDirectory(
+        final Path directory,
+        final List<File> filesList,
+        final URI target
+    ) throws JobArchiveException {
         if (!target.getScheme().equalsIgnoreCase(FILE_SCHEME)) {
             return false;
         }
 
-        final String sourceString = directory.toString();
-        final String targetString = target.toString();
+        final Path targetDirectoryPath = Paths.get(target.getPath());
 
-        try {
-            log.debug("Attempting to archive job directory {} to {}", sourceString, targetString);
-            Files.walkFileTree(
-                directory,
-                EnumSet.of(FileVisitOption.FOLLOW_LINKS),
-                Integer.MAX_VALUE,
-                new JobDirectoryCopier(directory, Paths.get(target))
-            );
-            log.debug("Successfully archived job directory {} to {}", sourceString, targetString);
-            return true;
-        } catch (final IOException ioe) {
-            throw new JobArchiveException("Unable to copy " + sourceString + " to " + targetString, ioe);
-        }
-    }
-
-    @Slf4j
-    private static class JobDirectoryCopier extends SimpleFileVisitor<Path> {
-
-        private static final CopyOption[] COPY_OPTIONS = new CopyOption[]{
-            StandardCopyOption.COPY_ATTRIBUTES,
-            StandardCopyOption.REPLACE_EXISTING,
-        };
-        private final Path source;
-        private final Path target;
-
-        JobDirectoryCopier(final Path source, final Path target) throws IOException {
-            // If the source doesn't exist or isn't a directory throw an exception
-            if (!Files.exists(source) || !Files.isDirectory(source)) {
-                throw new IOException(source + " doesn't exist or isn't a directory. Unable to copy");
-            }
-            // If the target exists but isn't a directory throw an error
-            if (Files.exists(target) && !Files.isDirectory(target)) {
-                throw new IOException(target + " exists but isn't a directory");
-            }
-            // If the target doesn't exist try to create it
-            if (!Files.exists(target)) {
-                Files.createDirectories(target);
-            }
-
-            this.source = source;
-            this.target = target;
+        // If the source doesn't exist or isn't a directory, then throw an exception
+        if (!Files.exists(directory) || !Files.isDirectory(directory)) {
+            throw new JobArchiveException(directory + " doesn't exist or isn't a directory. Unable to copy");
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
-            final Path newDirectory = this.target.resolve(this.source.relativize(dir));
+        // If the destination base directory exists and isn't a directory, then throw an exception
+        if (Files.exists(targetDirectoryPath) && !Files.isDirectory(targetDirectoryPath)) {
+            throw new JobArchiveException(targetDirectoryPath + " exist and isn't a directory. Unable to copy");
+        }
+
+        for (final File file : filesList) {
+            final Path sourceFilePath = file.toPath();
+            final Path sourceFileRelativePath = directory.relativize(sourceFilePath);
+            final Path destinationFilePath = targetDirectoryPath.resolve(sourceFileRelativePath);
             try {
-                Files.copy(dir, newDirectory, COPY_OPTIONS);
-            } catch (final IOException ioe) {
-                log.error(
-                    "Unable to create target directory {}. Skipping source directory {} subtree",
-                    newDirectory,
-                    dir,
-                    ioe
-                );
-                return FileVisitResult.SKIP_SUBTREE;
+                final Path parentDirectory = destinationFilePath.getParent();
+                if (parentDirectory != null) {
+                    log.info("Creating parent directory for {}", destinationFilePath);
+                    Files.createDirectories(parentDirectory);
+                }
+                log.info("Copying {} to {}", sourceFilePath, destinationFilePath);
+                Files.copy(sourceFilePath, destinationFilePath, COPY_OPTIONS);
+            } catch (IOException e) {
+                log.warn("Failed to archive file {} to {}: {}", sourceFilePath, destinationFilePath, e.getMessage(), e);
             }
-            return FileVisitResult.CONTINUE;
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-            Files.copy(file, this.target.resolve(this.source.relativize(file)), COPY_OPTIONS);
-            return FileVisitResult.CONTINUE;
-        }
+        return true;
     }
 }

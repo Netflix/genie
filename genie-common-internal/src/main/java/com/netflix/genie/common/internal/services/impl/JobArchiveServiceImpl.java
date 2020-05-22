@@ -26,11 +26,14 @@ import com.netflix.genie.common.internal.services.JobArchiver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Default implementation of the {@link JobArchiveService}.
@@ -65,8 +68,10 @@ public class JobArchiveServiceImpl implements JobArchiveService {
     public void archiveDirectory(final Path directory, final URI target) throws JobArchiveException {
         // TODO: This relies highly on convention. Might be nicer to better abstract with database
         //       record that points directly to where the manifest is or other solution?
+        final DirectoryManifest manifest;
+        final Path manifestPath;
         try {
-            final DirectoryManifest manifest = directoryManifestFactory.getDirectoryManifest(directory, true);
+            manifest = directoryManifestFactory.getDirectoryManifest(directory, true);
             final Path manifestDirectoryPath = StringUtils.isBlank(JobArchiveService.MANIFEST_DIRECTORY)
                 ? directory
                 : directory.resolve(JobArchiveService.MANIFEST_DIRECTORY);
@@ -77,7 +82,7 @@ public class JobArchiveServiceImpl implements JobArchiveService {
                     manifestDirectoryPath + " is not a directory. Unable to create job manifest. Unable to archive"
                 );
             }
-            final Path manifestPath = manifestDirectoryPath.resolve(JobArchiveService.MANIFEST_NAME);
+            manifestPath = manifestDirectoryPath.resolve(JobArchiveService.MANIFEST_NAME);
             Files.write(manifestPath, GenieObjectMapper.getMapper().writeValueAsBytes(manifest));
             log.debug("Wrote job directory manifest to {}", manifestPath);
         } catch (final IOException ioe) {
@@ -86,14 +91,29 @@ public class JobArchiveServiceImpl implements JobArchiveService {
 
         // Attempt to archive the job directory, now including the manifest file, using available implementations
         final String uriString = target.toString();
+        final List<File> filesList = ImmutableList.<File>builder()
+            .add(manifestPath.toFile())
+            .addAll(
+                manifest.getFiles()
+                    .stream()
+                    .map(fileEntry -> Paths.get(fileEntry.getPath()))
+                    .map(directory::resolve)
+                    .map(Path::toAbsolutePath)
+                    .filter(path -> Files.exists(path))
+                    .map(Path::toFile)
+                    .collect(Collectors.toSet())
+
+            )
+            .build();
         for (final JobArchiver archiver : this.jobArchivers) {
             // TODO: Perhaps we should pass the manifest down to the archive implementations if they want to use it?
-            if (archiver.archiveDirectory(directory, target)) {
-                log.debug(
-                    "Successfully archived job directory {} to {} using {}",
+            if (archiver.archiveDirectory(directory, filesList, target)) {
+                log.info(
+                    "Successfully archived job directory {} to {} using {} ({} files)",
                     directory.toString(),
                     uriString,
-                    archiver.getClass().getSimpleName()
+                    archiver.getClass().getSimpleName(),
+                    filesList.size()
                 );
                 return;
             }

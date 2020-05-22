@@ -20,8 +20,10 @@ package com.netflix.genie.common.internal.services;
 import com.netflix.genie.common.internal.exceptions.checked.JobArchiveException;
 import org.springframework.core.io.WritableResource;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Implementations of this interface should be able to a write job files to a {@link WritableResource} root location.
@@ -37,10 +39,11 @@ public interface JobArchiver {
      * {@code target} should be assumed to be overwritten/replaced.
      *
      * @param directory The directory to archive
+     * @param filesList The list of files to archive
      * @param target    The root of a writable location to archive to.
      * @return {@code false} if this implementation doesn't support archiving to {@code target}. {@code true} if does
      * support archiving to {@code target} and the archival was successful
      * @throws JobArchiveException If an exception happened during archival
      */
-    boolean archiveDirectory(Path directory, URI target) throws JobArchiveException;
+    boolean archiveDirectory(Path directory, List<File> filesList, URI target) throws JobArchiveException;
 }
