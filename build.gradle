@@ -156,24 +156,21 @@ configure(javaProjects) {
     }
 
     ext {
-        generatedSourcesDir = file("${buildDir}/generated-sources/main")
-        generatedSourcesJavaDir = file(new File(generatedSourcesDir, "/java"))
-        generatedSourcesGRPCDir = file("${buildDir}/generated-grpc")
-        generatedSourcesGRPCJavaDir = file(new File(generatedSourcesGRPCDir, "/main/java"))
+        generatedSourcesDir = file("${buildDir}/generated/sources")
+        generatedSourcesJavaDir = file("${project.generatedSourcesDir}/main/java")
     }
 
     sourceSets {
         main {
             java {
-                srcDir generatedSourcesJavaDir
-                srcDir generatedSourcesGRPCJavaDir
+                srcDir project.generatedSourcesJavaDir
             }
         }
     }
 
     idea.module {
-        // Exclude JPA metamodels, as IDEA generates its own
-        sourceDirs -= generatedSourcesJavaDir
+        sourceDirs += project.generatedSourcesJavaDir
+        generatedSourceDirs += project.generatedSourcesJavaDir
     }
 
     configurations {
@@ -226,7 +223,7 @@ configure(javaProjects) {
     }
 
     task removeGeneratedSources(type: Delete) {
-        generatedSourcesDir.deleteDir()
+        project.generatedSourcesDir.deleteDir()
     }
 
     task removeIdeaOutDirectory(type: Delete) {
@@ -238,13 +235,9 @@ configure(javaProjects) {
     }
 
     compileJava {
-        doFirst {
-            generatedSourcesDir.mkdirs()
-            generatedSourcesJavaDir.mkdirs()
-            generatedSourcesGRPCJavaDir.mkdirs()
-        }
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        options.compilerArgs += ['-s', generatedSourcesJavaDir]
+        options.annotationProcessorGeneratedSourcesDirectory = project.generatedSourcesJavaDir
+        options.compilerArgs += ['-s', project.generatedSourcesJavaDir]
     }
 
     compileTestJava {
