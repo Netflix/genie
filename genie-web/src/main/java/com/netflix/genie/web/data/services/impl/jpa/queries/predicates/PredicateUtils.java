@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
+package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.external.dtos.v4.Criterion;
@@ -39,17 +39,17 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Utility methods for the specification classes.
+ * Utility methods for the JPA {@link Predicate} generation.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public final class JpaSpecificationUtils {
+public final class PredicateUtils {
 
     static final String PERCENT = "%";
     static final String TAG_DELIMITER = "|";
 
-    private JpaSpecificationUtils() {
+    private PredicateUtils() {
     }
 
     /**

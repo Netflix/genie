@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
+import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,13 +63,17 @@ class JpaPersistenceServiceImplApplicationsTest {
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
         final JpaRepositories jpaRepositories = Mockito.mock(JpaRepositories.class);
         Mockito.when(jpaRepositories.getApplicationRepository()).thenReturn(this.jpaApplicationRepository);
-        this.persistenceService = new JpaPersistenceServiceImpl(jpaRepositories, Mockito.mock(AttachmentService.class));
+        this.persistenceService = new JpaPersistenceServiceImpl(
+            Mockito.mock(EntityManager.class),
+            jpaRepositories,
+            Mockito.mock(AttachmentService.class)
+        );
     }
 
     @Test
     void testGetApplicationNotExists() {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
+        Mockito.when(this.jpaApplicationRepository.getApplicationDto(id)).thenReturn(Optional.empty());
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.persistenceService.getApplication(id));
@@ -111,7 +116,7 @@ class JpaPersistenceServiceImplApplicationsTest {
             )
                 .build()
         );
-        Mockito.when(this.jpaApplicationRepository.findByUniqueId(APP_1_ID)).thenReturn(Optional.empty());
+        Mockito.when(this.jpaApplicationRepository.getApplicationDto(APP_1_ID)).thenReturn(Optional.empty());
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.persistenceService.updateApplication(APP_1_ID, app));

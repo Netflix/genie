@@ -273,6 +273,11 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
         Assertions.assertThat(this.tagRepository.count()).isEqualTo(17L);
         Assertions.assertThat(this.fileRepository.count()).isEqualTo(11L);
         this.service.createJob(jobRequest, jobMetadata, job, jobExecution);
+
+        // Force it to behave as fresh request to API
+        this.entityManager.flush();
+        this.entityManager.clear();
+
         Assertions.assertThat(this.jobRepository.count()).isEqualTo(4L);
         Assertions.assertThat(this.tagRepository.count()).isEqualTo(25L);
         Assertions.assertThat(this.fileRepository.count()).isEqualTo(15L);
@@ -696,6 +701,9 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     @Test
     @DatabaseSetup("persistence/jobs/init.xml")
     void canDetermineIfIsApiJob() throws GenieCheckedException {
+        Assertions
+            .assertThatExceptionOfType(NotFoundException.class)
+            .isThrownBy(() -> this.service.isApiJob(UUID.randomUUID().toString()));
         Assertions.assertThat(this.service.isApiJob(JOB_1_ID)).isFalse();
         Assertions.assertThat(this.service.isApiJob(JOB_2_ID)).isTrue();
         Assertions.assertThat(this.service.isApiJob(JOB_3_ID)).isTrue();
@@ -1050,6 +1058,19 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
+    void canGetJobHost() throws NotFoundException {
+        final String host = "a.netflix.com";
+
+        Assertions
+            .assertThat(this.service.getJobHost(JOB_1_ID))
+            .isEqualTo(host);
+        Assertions
+            .assertThatExceptionOfType(NotFoundException.class)
+            .isThrownBy(() -> this.service.getJobHost(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/search.xml")
     void canGetV3JobRequest() throws GenieException {
         final com.netflix.genie.common.dto.JobRequest job1Request = this.service.getV3JobRequest(JOB_1_ID);
         Assertions.assertThat(job1Request.getCommandArgs()).contains("-f query.q");
@@ -1182,7 +1203,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
     void canGetAgentActiveJobs() {
-
         Assertions
             .assertThat(this.service.getActiveAgentJobs())
             .hasSize(2)
@@ -1192,7 +1212,6 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
     @Test
     @DatabaseSetup("persistence/jobs/unclaimed.xml")
     void canGetUnclaimedAgentJobs() {
-
         Assertions
             .assertThat(this.service.getUnclaimedAgentJobs())
             .hasSize(2)

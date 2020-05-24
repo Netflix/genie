@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
+package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
@@ -34,7 +34,7 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-class JpaSpecificationUtilsTest {
+class PredicateUtilsTest {
 
     /**
      * Make sure the method to create the tag search string for jobs is working as expected.
@@ -46,10 +46,10 @@ class JpaSpecificationUtilsTest {
         final String three = "3";
         final Set<TagEntity> tags = Sets.newHashSet();
         Assertions
-            .assertThat(JpaSpecificationUtils.createTagSearchString(tags))
+            .assertThat(PredicateUtils.createTagSearchString(tags))
             .isEqualTo(
                 // Coerce to string... sigh
-                JpaSpecificationUtils.TAG_DELIMITER + JpaSpecificationUtils.TAG_DELIMITER
+                PredicateUtils.TAG_DELIMITER + PredicateUtils.TAG_DELIMITER
             );
 
         final TagEntity oneTag = new TagEntity();
@@ -63,36 +63,36 @@ class JpaSpecificationUtilsTest {
 
         tags.add(oneTag);
         Assertions
-            .assertThat(JpaSpecificationUtils.createTagSearchString(tags))
+            .assertThat(PredicateUtils.createTagSearchString(tags))
             .isEqualTo(
-                JpaSpecificationUtils.TAG_DELIMITER
+                PredicateUtils.TAG_DELIMITER
                     + one
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
             );
 
         tags.add(twoTag);
-        Assertions.assertThat(JpaSpecificationUtils.createTagSearchString(tags))
+        Assertions.assertThat(PredicateUtils.createTagSearchString(tags))
             .isEqualTo(
-                JpaSpecificationUtils.TAG_DELIMITER
+                PredicateUtils.TAG_DELIMITER
                     + one
-                    + JpaSpecificationUtils.TAG_DELIMITER
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
                     + two
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
             );
 
         tags.add(threeTag);
-        Assertions.assertThat(JpaSpecificationUtils.createTagSearchString(tags))
+        Assertions.assertThat(PredicateUtils.createTagSearchString(tags))
             .isEqualTo(
-                JpaSpecificationUtils.TAG_DELIMITER
+                PredicateUtils.TAG_DELIMITER
                     + three
-                    + JpaSpecificationUtils.TAG_DELIMITER
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
                     + one
-                    + JpaSpecificationUtils.TAG_DELIMITER
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
                     + two
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
             );
     }
 
@@ -111,10 +111,10 @@ class JpaSpecificationUtilsTest {
         Mockito.when(cb.equal(Mockito.eq(expression), Mockito.anyString())).thenReturn(equalPredicate);
 
         Assertions
-            .assertThat(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, expression, "equal"))
+            .assertThat(PredicateUtils.getStringLikeOrEqualPredicate(cb, expression, "equal"))
             .isEqualTo(equalPredicate);
         Assertions
-            .assertThat(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, expression, "lik%e"))
+            .assertThat(PredicateUtils.getStringLikeOrEqualPredicate(cb, expression, "lik%e"))
             .isEqualTo(likePredicate);
     }
 
@@ -124,36 +124,36 @@ class JpaSpecificationUtilsTest {
     @Test
     void canGetTagLikeString() {
         Assertions
-            .assertThat(JpaSpecificationUtils.getTagLikeString(Sets.newHashSet()))
+            .assertThat(PredicateUtils.getTagLikeString(Sets.newHashSet()))
             .isEqualTo(
                 // coerce to String
-                JpaSpecificationUtils.PERCENT
+                PredicateUtils.PERCENT
             );
         Assertions
-            .assertThat(JpaSpecificationUtils.getTagLikeString(Sets.newHashSet("tag")))
+            .assertThat(PredicateUtils.getTagLikeString(Sets.newHashSet("tag")))
             .isEqualTo(
-                JpaSpecificationUtils.PERCENT
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                PredicateUtils.PERCENT
+                    + PredicateUtils.TAG_DELIMITER
                     + "tag"
-                    + JpaSpecificationUtils.TAG_DELIMITER
-                    + JpaSpecificationUtils.PERCENT
+                    + PredicateUtils.TAG_DELIMITER
+                    + PredicateUtils.PERCENT
             );
         Assertions
-            .assertThat(JpaSpecificationUtils.getTagLikeString(Sets.newHashSet("tag", "Stag", "rag")))
+            .assertThat(PredicateUtils.getTagLikeString(Sets.newHashSet("tag", "Stag", "rag")))
             .isEqualTo(
-                JpaSpecificationUtils.PERCENT
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                PredicateUtils.PERCENT
+                    + PredicateUtils.TAG_DELIMITER
                     + "rag"
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
                     + "%"
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
                     + "Stag"
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
                     + "%"
-                    + JpaSpecificationUtils.TAG_DELIMITER
+                    + PredicateUtils.TAG_DELIMITER
                     + "tag"
-                    + JpaSpecificationUtils.TAG_DELIMITER
-                    + JpaSpecificationUtils.PERCENT
+                    + PredicateUtils.TAG_DELIMITER
+                    + PredicateUtils.PERCENT
             );
     }
 }

@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
+package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
@@ -31,17 +31,16 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Specifications for JPA queries.
+ * {@link Predicate} helpers for querying {@link JobEntity}.
  *
  * @author tgianos
- * @see <a href="http://tinyurl.com/n6nubvm">Docs</a>
  */
-public final class JpaJobSpecs {
+public final class JobPredicates {
 
     /**
      * Protected constructor for utility class.
      */
-    private JpaJobSpecs() {
+    private JobPredicates() {
     }
 
     /**
@@ -88,13 +87,13 @@ public final class JpaJobSpecs {
     ) {
         final List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(id)) {
-            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.uniqueId), id));
+            predicates.add(PredicateUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.uniqueId), id));
         }
         if (StringUtils.isNotBlank(name)) {
-            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.name), name));
+            predicates.add(PredicateUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.name), name));
         }
         if (StringUtils.isNotBlank(user)) {
-            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.user), user));
+            predicates.add(PredicateUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.user), user));
         }
         if (statuses != null && !statuses.isEmpty()) {
             predicates.add(
@@ -106,14 +105,14 @@ public final class JpaJobSpecs {
             );
         }
         if (tags != null && !tags.isEmpty()) {
-            predicates.add(cb.like(root.get(JobEntity_.tagSearchString), JpaSpecificationUtils.getTagLikeString(tags)));
+            predicates.add(cb.like(root.get(JobEntity_.tagSearchString), PredicateUtils.getTagLikeString(tags)));
         }
         if (cluster != null) {
             predicates.add(cb.equal(root.get(JobEntity_.cluster), cluster));
         }
         if (StringUtils.isNotBlank(clusterName)) {
             predicates.add(
-                JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.clusterName), clusterName)
+                PredicateUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.clusterName), clusterName)
             );
         }
         if (command != null) {
@@ -121,7 +120,7 @@ public final class JpaJobSpecs {
         }
         if (StringUtils.isNotBlank(commandName)) {
             predicates.add(
-                JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.commandName), commandName)
+                PredicateUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.commandName), commandName)
             );
         }
         if (minStarted != null) {
@@ -138,12 +137,12 @@ public final class JpaJobSpecs {
         }
         if (grouping != null) {
             predicates.add(
-                JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.grouping), grouping)
+                PredicateUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.grouping), grouping)
             );
         }
         if (groupingInstance != null) {
             predicates.add(
-                JpaSpecificationUtils.getStringLikeOrEqualPredicate(
+                PredicateUtils.getStringLikeOrEqualPredicate(
                     cb,
                     root.get(JobEntity_.groupingInstance),
                     groupingInstance

@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
+import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +79,11 @@ class JpaPersistenceServiceImplClustersTest {
         Mockito.when(jpaRepositories.getClusterRepository()).thenReturn(this.jpaClusterRepository);
         Mockito.when(jpaRepositories.getCommandRepository()).thenReturn(this.jpaCommandRepository);
         Mockito.when(jpaRepositories.getFileRepository()).thenReturn(this.jpaFileRepository);
-        this.service = new JpaPersistenceServiceImpl(jpaRepositories, Mockito.mock(AttachmentService.class));
+        this.service = new JpaPersistenceServiceImpl(
+            Mockito.mock(EntityManager.class),
+            jpaRepositories,
+            Mockito.mock(AttachmentService.class)
+        );
     }
 
     @Test
