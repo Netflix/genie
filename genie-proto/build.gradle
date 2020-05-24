@@ -41,7 +41,7 @@ protobuf {
         // Download the protoc compiler
         artifact = 'com.google.protobuf:protoc'
         // Use project convention for generated files
-        generatedFilesBaseDir = generatedSourcesGRPCDir
+        generatedFilesBaseDir = project.generatedSourcesDir
     }
 
     plugins {
