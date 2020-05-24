@@ -71,36 +71,27 @@ import com.netflix.genie.web.data.services.impl.jpa.converters.EntityV3DtoConver
 import com.netflix.genie.web.data.services.impl.jpa.converters.EntityV4DtoConverters;
 import com.netflix.genie.web.data.services.impl.jpa.entities.AgentConnectionEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity;
+import com.netflix.genie.web.data.services.impl.jpa.entities.ApplicationEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.BaseEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
+import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
+import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.FileEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.UniqueIdEntity;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.AgentHostnameProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.ClusterCommandsProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobApiProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobApplicationsProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobArchiveLocationProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobClusterProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobCommandProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.ApplicationPredicates;
+import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.ClusterPredicates;
+import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.CommandPredicates;
+import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.JobPredicates;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobExecutionProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobRequestProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.StatusProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.UniqueIdProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.FinishedJobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.specifications.JpaApplicationSpecs;
-import com.netflix.genie.web.data.services.impl.jpa.queries.specifications.JpaClusterSpecs;
-import com.netflix.genie.web.data.services.impl.jpa.queries.specifications.JpaCommandSpecs;
-import com.netflix.genie.web.data.services.impl.jpa.queries.specifications.JpaJobSpecs;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaAgentConnectionRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.data.services.impl.jpa.repositories.JpaBaseRepository;
@@ -131,11 +122,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
@@ -205,6 +195,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         .map(Enum::name)
         .collect(Collectors.toSet());
 
+    private static final String LOAD_GRAPH_HINT = "javax.persistence.loadgraph";
+
+    private final EntityManager entityManager;
+
     private final JpaAgentConnectionRepository agentConnectionRepository;
     private final JpaApplicationRepository applicationRepository;
     private final JpaClusterRepository clusterRepository;
@@ -218,16 +212,19 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     //       saving attachments?
     private final AttachmentService attachmentService;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     /**
      * Constructor.
      *
+     * @param entityManager     The {@link EntityManager} to use
      * @param jpaRepositories   All the repositories in the Genie application
      * @param attachmentService The {@link AttachmentService} implementation to use
      */
-    public JpaPersistenceServiceImpl(final JpaRepositories jpaRepositories, final AttachmentService attachmentService) {
+    public JpaPersistenceServiceImpl(
+        final EntityManager entityManager,
+        final JpaRepositories jpaRepositories,
+        final AttachmentService attachmentService
+    ) {
+        this.entityManager = entityManager;
         this.agentConnectionRepository = jpaRepositories.getAgentConnectionRepository();
         this.applicationRepository = jpaRepositories.getApplicationRepository();
         this.clusterRepository = jpaRepositories.getClusterRepository();
@@ -268,7 +265,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public Application getApplication(@NotBlank final String id) throws NotFoundException {
         log.debug("[getApplication] Called for {}", id);
-        return EntityV4DtoConverters.toV4ApplicationDto(this.getApplicationEntity(id));
+        return EntityV4DtoConverters.toV4ApplicationDto(
+            this.applicationRepository
+                .getApplicationDto(id)
+                .orElseThrow(() -> new NotFoundException("No application with id " + id + " exists"))
+        );
     }
 
     /**
@@ -284,6 +285,12 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @Nullable final String type,
         final Pageable page
     ) {
+        /*
+         * NOTE: This is implemented this way for a reason:
+         * 1. To solve the JPA N+1 problem: https://vladmihalcea.com/n-plus-1-query-problem/
+         * 2. To address this: https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
+         * This reduces the number of queries from potentially 100's to 3
+         */
         log.debug(
             "[findApplications] Called with name = {}, user = {}, statuses = {}, tags = {}, type = {}",
             name,
@@ -293,29 +300,95 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             type
         );
 
-        final Set<TagEntity> tagEntities;
-        // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
-        // no entities tied to that tag will exist either and today our search for tags is an AND
-        if (tags != null) {
-            tagEntities = this.tagRepository.findByTagIn(tags);
-            if (tagEntities.size() != tags.size()) {
-                return new PageImpl<>(new ArrayList<>(), page, 0);
-            }
-        } else {
-            tagEntities = null;
+        final Set<String> statusStrings = statuses != null
+            ? statuses.stream().map(Enum::name).collect(Collectors.toSet())
+            : null;
+
+        // TODO: Still more optimization that can be done here to not load these entities
+        //       Figure out how to use just strings in the predicate
+        final Set<TagEntity> tagEntities = tags == null
+            ? null
+            : this.tagRepository.findByTagIn(tags);
+        if (tagEntities != null && tagEntities.size() != tags.size()) {
+            // short circuit for no results as at least one of the expected tags doesn't exist
+            return new PageImpl<>(new ArrayList<>(0));
         }
 
-        return this.applicationRepository
-            .findAll(
-                JpaApplicationSpecs.find(
-                    name,
-                    user,
-                    statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
-                    tagEntities,
-                    type
-                ),
-                page
-            ).map(EntityV4DtoConverters::toV4ApplicationDto);
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        final Root<ApplicationEntity> countQueryRoot = countQuery.from(ApplicationEntity.class);
+        countQuery.select(criteriaBuilder.count(countQueryRoot));
+        countQuery.where(
+            ApplicationPredicates.find(
+                countQueryRoot,
+                countQuery,
+                criteriaBuilder,
+                name,
+                user,
+                statusStrings,
+                tagEntities,
+                type
+            )
+        );
+        final long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+        if (totalCount == 0) {
+            // short circuit for no results
+            return new PageImpl<>(new ArrayList<>(0));
+        }
+
+        final CriteriaQuery<Long> idQuery = criteriaBuilder.createQuery(Long.class);
+        final Root<ApplicationEntity> idQueryRoot = idQuery.from(ApplicationEntity.class);
+        idQuery.select(idQueryRoot.get(ApplicationEntity_.id));
+        idQuery.where(
+            // NOTE: The problem with trying to reuse the predicate above even though they seem the same is they have
+            //       different query objects. If there is a join added by the predicate function it won't be on the
+            //       right object as these criteria queries are basically builders
+            ApplicationPredicates.find(
+                idQueryRoot,
+                idQuery,
+                criteriaBuilder,
+                name,
+                user,
+                statusStrings,
+                tagEntities,
+                type
+            )
+        );
+
+        final Sort sort = page.getSort();
+        final List<Order> orders = new ArrayList<>();
+        sort.iterator().forEachRemaining(
+            order -> {
+                if (order.isAscending()) {
+                    orders.add(criteriaBuilder.asc(idQueryRoot.get(order.getProperty())));
+                } else {
+                    orders.add(criteriaBuilder.desc(idQueryRoot.get(order.getProperty())));
+                }
+            }
+        );
+        idQuery.orderBy(orders);
+
+        final List<Long> applicationIds = this.entityManager
+            .createQuery(idQuery)
+            .setFirstResult(((Long) page.getOffset()).intValue())
+            .setMaxResults(page.getPageSize())
+            .getResultList();
+
+        final CriteriaQuery<ApplicationEntity> contentQuery = criteriaBuilder.createQuery(ApplicationEntity.class);
+        final Root<ApplicationEntity> contentQueryRoot = contentQuery.from(ApplicationEntity.class);
+        contentQuery.select(contentQueryRoot);
+        contentQuery.where(contentQueryRoot.get(ApplicationEntity_.id).in(applicationIds));
+        // Need to make the same order by or results won't be accurate
+        contentQuery.orderBy(orders);
+
+        final List<Application> applications = this.entityManager
+            .createQuery(contentQuery)
+            .setHint(LOAD_GRAPH_HINT, this.entityManager.getEntityGraph(ApplicationEntity.DTO_ENTITY_GRAPH))
+            .getResultStream()
+            .map(EntityV4DtoConverters::toV4ApplicationDto)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(applications, page, totalCount);
     }
 
     /**
@@ -330,7 +403,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         if (!updateApp.getId().equals(id)) {
             throw new PreconditionFailedException("Application id " + id + " inconsistent with id passed in.");
         }
-        this.updateApplicationEntity(this.getApplicationEntity(id), updateApp.getResources(), updateApp.getMetadata());
+        this.updateApplicationEntity(
+            this.applicationRepository
+                .getApplicationDto(id)
+                .orElseThrow(() -> new NotFoundException("No application with id " + id + " exists")),
+            updateApp.getResources(),
+            updateApp.getMetadata()
+        );
     }
 
     /**
@@ -350,15 +429,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     public void deleteApplication(@NotBlank final String id) throws PreconditionFailedException {
         log.debug("[deleteApplication] Called for {}", id);
-        final ApplicationEntity entity;
-        try {
-            entity = this.getApplicationEntity(id);
-        } catch (final NotFoundException e) {
+        final Optional<ApplicationEntity> entity = this.applicationRepository.getApplicationAndCommands(id);
+        if (!entity.isPresent()) {
             // There's nothing to do as the caller wants to delete it and it already doesn't exist.
             return;
         }
 
-        this.deleteApplicationEntity(entity);
+        this.deleteApplicationEntity(entity.get());
     }
 
     /**
@@ -371,7 +448,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @Nullable final Set<CommandStatus> statuses
     ) throws NotFoundException {
         log.debug("[getCommandsForApplication] Called for application {} filtered by statuses {}", id, statuses);
-        return this.getApplicationEntity(id)
+        return this.applicationRepository
+            .getApplicationAndCommandsDto(id)
+            .orElseThrow(() -> new NotFoundException("No application with id " + id + " exists"))
             .getCommands()
             .stream()
             .filter(
@@ -421,7 +500,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public Cluster getCluster(@NotBlank final String id) throws NotFoundException {
         log.debug("[getCluster] Called for {}", id);
-        return EntityV4DtoConverters.toV4ClusterDto(this.getClusterEntity(id));
+        return EntityV4DtoConverters.toV4ClusterDto(
+            this.clusterRepository
+                .getClusterDto(id)
+                .orElseThrow(() -> new NotFoundException("No cluster with id " + id + " exists"))
+        );
     }
 
     /**
@@ -437,6 +520,12 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @Nullable final Instant maxUpdateTime,
         final Pageable page
     ) {
+        /*
+         * NOTE: This is implemented this way for a reason:
+         * 1. To solve the JPA N+1 problem: https://vladmihalcea.com/n-plus-1-query-problem/
+         * 2. To address this: https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
+         * This reduces the number of queries from potentially 100's to 3
+         */
         log.debug(
             "[findClusters] Called with name = {}, statuses = {}, tags = {}, minUpdateTime = {}, maxUpdateTime = {}",
             name,
@@ -445,29 +534,95 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             minUpdateTime,
             maxUpdateTime
         );
+        final Set<String> statusStrings = statuses != null
+            ? statuses.stream().map(Enum::name).collect(Collectors.toSet())
+            : null;
 
-        final Set<TagEntity> tagEntities;
-        // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
-        // no entities tied to that tag will exist either and today our search for tags is an AND
-        if (tags != null) {
-            tagEntities = this.tagRepository.findByTagIn(tags);
-            if (tagEntities.size() != tags.size()) {
-                return new PageImpl<>(new ArrayList<>(), page, 0);
-            }
-        } else {
-            tagEntities = null;
+        // TODO: Still more optimization that can be done here to not load these entities
+        //       Figure out how to use just strings in the predicate
+        final Set<TagEntity> tagEntities = tags == null
+            ? null
+            : this.tagRepository.findByTagIn(tags);
+        if (tagEntities != null && tagEntities.size() != tags.size()) {
+            // short circuit for no results as at least one of the expected tags doesn't exist
+            return new PageImpl<>(new ArrayList<>(0));
         }
 
-        return this.clusterRepository.findAll(
-            JpaClusterSpecs.find(
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        final Root<ClusterEntity> countQueryRoot = countQuery.from(ClusterEntity.class);
+        countQuery.select(criteriaBuilder.count(countQueryRoot));
+        countQuery.where(
+            ClusterPredicates.find(
+                countQueryRoot,
+                countQuery,
+                criteriaBuilder,
                 name,
-                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                statusStrings,
                 tagEntities,
                 minUpdateTime,
                 maxUpdateTime
-            ),
-            page
-        ).map(EntityV4DtoConverters::toV4ClusterDto);
+            )
+        );
+        final long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+        if (totalCount == 0) {
+            // short circuit for no results
+            return new PageImpl<>(new ArrayList<>(0));
+        }
+
+        final CriteriaQuery<Long> idQuery = criteriaBuilder.createQuery(Long.class);
+        final Root<ClusterEntity> idQueryRoot = idQuery.from(ClusterEntity.class);
+        idQuery.select(idQueryRoot.get(ClusterEntity_.id));
+        idQuery.where(
+            // NOTE: The problem with trying to reuse the predicate above even though they seem the same is they have
+            //       different query objects. If there is a join added by the predicate function it won't be on the
+            //       right object as these criteria queries are basically builders
+            ClusterPredicates.find(
+                idQueryRoot,
+                idQuery,
+                criteriaBuilder,
+                name,
+                statusStrings,
+                tagEntities,
+                minUpdateTime,
+                maxUpdateTime
+            )
+        );
+
+        final Sort sort = page.getSort();
+        final List<Order> orders = new ArrayList<>();
+        sort.iterator().forEachRemaining(
+            order -> {
+                if (order.isAscending()) {
+                    orders.add(criteriaBuilder.asc(idQueryRoot.get(order.getProperty())));
+                } else {
+                    orders.add(criteriaBuilder.desc(idQueryRoot.get(order.getProperty())));
+                }
+            }
+        );
+        idQuery.orderBy(orders);
+
+        final List<Long> clusterIds = this.entityManager
+            .createQuery(idQuery)
+            .setFirstResult(((Long) page.getOffset()).intValue())
+            .setMaxResults(page.getPageSize())
+            .getResultList();
+
+        final CriteriaQuery<ClusterEntity> contentQuery = criteriaBuilder.createQuery(ClusterEntity.class);
+        final Root<ClusterEntity> contentQueryRoot = contentQuery.from(ClusterEntity.class);
+        contentQuery.select(contentQueryRoot);
+        contentQuery.where(contentQueryRoot.get(ClusterEntity_.id).in(clusterIds));
+        // Need to make the same order by or results won't be accurate
+        contentQuery.orderBy(orders);
+
+        final List<Cluster> clusters = this.entityManager
+            .createQuery(contentQuery)
+            .setHint(LOAD_GRAPH_HINT, this.entityManager.getEntityGraph(ClusterEntity.DTO_ENTITY_GRAPH))
+            .getResultStream()
+            .map(EntityV4DtoConverters::toV4ClusterDto)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(clusters, page, totalCount);
     }
 
     /**
@@ -520,7 +675,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         if (!updateCluster.getId().equals(id)) {
             throw new PreconditionFailedException("Application id " + id + " inconsistent with id passed in.");
         }
-        this.updateClusterEntity(this.getClusterEntity(id), updateCluster.getResources(), updateCluster.getMetadata());
+        this.updateClusterEntity(
+            this.clusterRepository
+                .getClusterDto(id)
+                .orElseThrow(() -> new NotFoundException("No cluster with id " + id + " exists")),
+            updateCluster.getResources(),
+            updateCluster.getMetadata()
+        );
     }
 
     /**
@@ -540,15 +701,13 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     public void deleteCluster(@NotBlank final String id) throws PreconditionFailedException {
         log.debug("[deleteCluster] Called for {}", id);
-        final ClusterEntity entity;
-        try {
-            entity = this.getClusterEntity(id);
-        } catch (final NotFoundException e) {
+        final Optional<ClusterEntity> entity = this.clusterRepository.getClusterAndCommands(id);
+        if (!entity.isPresent()) {
             // There's nothing to do as the caller wants to delete it and it already doesn't exist.
             return;
         }
 
-        this.deleteClusterEntity(entity);
+        this.deleteClusterEntity(entity.get());
     }
 
     /**
@@ -564,7 +723,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         }
 
         try {
-            final ClusterEntity clusterEntity = this.getClusterEntity(id);
+            final ClusterEntity clusterEntity = this.clusterRepository
+                .getClusterAndCommands(id)
+                .orElseThrow(() -> new NotFoundException("No cluster with id " + id + " exists"));
             for (final String commandId : commandIds) {
                 clusterEntity.addCommand(this.getCommandEntity(commandId));
             }
@@ -582,14 +743,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @NotBlank final String id,
         @Nullable final Set<CommandStatus> statuses
     ) throws GenieException {
-        final Optional<ClusterCommandsProjection> commandsProjection
-            = this.clusterRepository.findByUniqueId(id, ClusterCommandsProjection.class);
-
-        final List<CommandEntity> commandEntities = commandsProjection
+        return this.clusterRepository
+            .getClusterAndCommandsDto(id)
             .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
-            .getCommands();
-
-        return commandEntities
+            .getCommands()
             .stream()
             .filter(
                 commandEntity -> statuses == null
@@ -611,7 +768,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             throw new GeniePreconditionException("All commands need to exist to add to a cluster");
         }
         try {
-            final ClusterEntity clusterEntity = this.getClusterEntity(id);
+            final ClusterEntity clusterEntity = this.clusterRepository
+                .getClusterAndCommands(id)
+                .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"));
             final List<CommandEntity> commandEntities = new ArrayList<>();
             for (final String commandId : commandIds) {
                 commandEntities.add(this.getCommandEntity(commandId));
@@ -628,11 +787,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     public void removeAllCommandsForCluster(@NotBlank final String id) throws GenieException {
-        try {
-            this.getClusterEntity(id).removeAllCommands();
-        } catch (final NotFoundException e) {
-            throw new GenieNotFoundException(e.getMessage());
-        }
+        this.clusterRepository
+            .getClusterAndCommands(id)
+            .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
+            .removeAllCommands();
     }
 
     /**
@@ -641,7 +799,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     public void removeCommandForCluster(@NotBlank final String id, @NotBlank final String cmdId) throws GenieException {
         try {
-            this.getClusterEntity(id).removeCommand(this.getCommandEntity(cmdId));
+            this.clusterRepository
+                .getClusterAndCommands(id)
+                .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
+                .removeCommand(this.getCommandEntity(cmdId));
         } catch (final NotFoundException e) {
             throw new GenieNotFoundException(e.getMessage());
         }
@@ -681,9 +842,17 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             finalCriterion = criterion;
         }
         log.debug("[findClustersMatchingCriterion] Called to find clusters matching {}", finalCriterion);
-        return this.clusterRepository
-            .findAll(JpaClusterSpecs.findClustersMatchingCriterion(finalCriterion))
-            .stream()
+
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<ClusterEntity> criteriaQuery = criteriaBuilder.createQuery(ClusterEntity.class);
+        final Root<ClusterEntity> queryRoot = criteriaQuery.from(ClusterEntity.class);
+        criteriaQuery.where(
+            ClusterPredicates.findClustersMatchingCriterion(queryRoot, criteriaQuery, criteriaBuilder, finalCriterion)
+        );
+
+        return this.entityManager.createQuery(criteriaQuery)
+            .setHint(LOAD_GRAPH_HINT, this.entityManager.getEntityGraph(ClusterEntity.DTO_ENTITY_GRAPH))
+            .getResultStream()
             .map(EntityV4DtoConverters::toV4ClusterDto)
             .collect(Collectors.toSet());
     }
@@ -712,10 +881,18 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             finalCriteria = criteria;
         }
 
-        log.debug("[findClustersMatchingAnyCriterion] Called to find clusters matching {}", finalCriteria);
-        return this.clusterRepository
-            .findAll(JpaClusterSpecs.findClustersMatchingAnyCriterion(finalCriteria))
-            .stream()
+        log.debug("[findClustersMatchingAnyCriterion] Called to find clusters matching any of {}", finalCriteria);
+
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<ClusterEntity> criteriaQuery = criteriaBuilder.createQuery(ClusterEntity.class);
+        final Root<ClusterEntity> queryRoot = criteriaQuery.from(ClusterEntity.class);
+        criteriaQuery.where(
+            ClusterPredicates.findClustersMatchingAnyCriterion(queryRoot, criteriaQuery, criteriaBuilder, finalCriteria)
+        );
+
+        return this.entityManager.createQuery(criteriaQuery)
+            .setHint(LOAD_GRAPH_HINT, this.entityManager.getEntityGraph(ClusterEntity.DTO_ENTITY_GRAPH))
+            .getResultStream()
             .map(EntityV4DtoConverters::toV4ClusterDto)
             .collect(Collectors.toSet());
     }
@@ -758,7 +935,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public Command getCommand(@NotBlank final String id) throws NotFoundException {
         log.debug("[getCommand] Called for {}", id);
-        return EntityV4DtoConverters.toV4CommandDto(this.getCommandEntity(id));
+        return EntityV4DtoConverters.toV4CommandDto(
+            this.commandRepository
+                .getCommandDto(id)
+                .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
+        );
     }
 
     /**
@@ -773,6 +954,12 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @Nullable final Set<String> tags,
         final Pageable page
     ) {
+        /*
+         * NOTE: This is implemented this way for a reason:
+         * 1. To solve the JPA N+1 problem: https://vladmihalcea.com/n-plus-1-query-problem/
+         * 2. To address this: https://vladmihalcea.com/fix-hibernate-hhh000104-entity-fetch-pagination-warning-message/
+         * This reduces the number of queries from potentially 100's to 3
+         */
         log.debug(
             "[findCommands] Called with name = {}, user = {}, statuses = {}, tags = {}",
             name,
@@ -780,28 +967,93 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             statuses,
             tags
         );
+        final Set<String> statusStrings = statuses != null
+            ? statuses.stream().map(Enum::name).collect(Collectors.toSet())
+            : null;
 
-        final Set<TagEntity> tagEntities;
-        // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
-        // no entities tied to that tag will exist either and today our search for tags is an AND
-        if (tags != null) {
-            tagEntities = this.tagRepository.findByTagIn(tags);
-            if (tagEntities.size() != tags.size()) {
-                return new PageImpl<>(new ArrayList<>(), page, 0);
-            }
-        } else {
-            tagEntities = null;
+        // TODO: Still more optimization that can be done here to not load these entities
+        //       Figure out how to use just strings in the predicate
+        final Set<TagEntity> tagEntities = tags == null
+            ? null
+            : this.tagRepository.findByTagIn(tags);
+        if (tagEntities != null && tagEntities.size() != tags.size()) {
+            // short circuit for no results as at least one of the expected tags doesn't exist
+            return new PageImpl<>(new ArrayList<>(0));
         }
 
-        return this.commandRepository.findAll(
-            JpaCommandSpecs.find(
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        final Root<CommandEntity> countQueryRoot = countQuery.from(CommandEntity.class);
+        countQuery.select(criteriaBuilder.count(countQueryRoot));
+        countQuery.where(
+            CommandPredicates.find(
+                countQueryRoot,
+                countQuery,
+                criteriaBuilder,
                 name,
                 user,
-                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
+                statusStrings,
                 tagEntities
-            ),
-            page
-        ).map(EntityV4DtoConverters::toV4CommandDto);
+            )
+        );
+        final long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+        if (totalCount == 0) {
+            // short circuit for no results
+            return new PageImpl<>(new ArrayList<>(0));
+        }
+
+        final CriteriaQuery<Long> idQuery = criteriaBuilder.createQuery(Long.class);
+        final Root<CommandEntity> idQueryRoot = idQuery.from(CommandEntity.class);
+        idQuery.select(idQueryRoot.get(CommandEntity_.id));
+        idQuery.where(
+            // NOTE: The problem with trying to reuse the predicate above even though they seem the same is they have
+            //       different query objects. If there is a join added by the predicate function it won't be on the
+            //       right object as these criteria queries are basically builders
+            CommandPredicates.find(
+                idQueryRoot,
+                idQuery,
+                criteriaBuilder,
+                name,
+                user,
+                statusStrings,
+                tagEntities
+            )
+        );
+
+        final Sort sort = page.getSort();
+        final List<Order> orders = new ArrayList<>();
+        sort.iterator().forEachRemaining(
+            order -> {
+                if (order.isAscending()) {
+                    orders.add(criteriaBuilder.asc(idQueryRoot.get(order.getProperty())));
+                } else {
+                    orders.add(criteriaBuilder.desc(idQueryRoot.get(order.getProperty())));
+                }
+            }
+        );
+        idQuery.orderBy(orders);
+
+        final List<Long> commandIds = this.entityManager
+            .createQuery(idQuery)
+            .setFirstResult(((Long) page.getOffset()).intValue())
+            .setMaxResults(page.getPageSize())
+            .getResultList();
+
+        final CriteriaQuery<CommandEntity> contentQuery = criteriaBuilder.createQuery(CommandEntity.class);
+        final Root<CommandEntity> contentQueryRoot = contentQuery.from(CommandEntity.class);
+        contentQuery.select(contentQueryRoot);
+        contentQuery.where(contentQueryRoot.get(CommandEntity_.id).in(commandIds));
+        // Need to make the same order by or results won't be accurate
+        contentQuery.orderBy(orders);
+
+        final List<Command> commands = this.entityManager
+            .createQuery(contentQuery)
+            .setHint(LOAD_GRAPH_HINT, this.entityManager.getEntityGraph(CommandEntity.DTO_ENTITY_GRAPH))
+            .getResultStream()
+            .map(EntityV4DtoConverters::toV4CommandDto)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(commands, page, totalCount);
     }
 
     /**
@@ -817,7 +1069,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             throw new PreconditionFailedException("Command id " + id + " inconsistent with id passed in.");
         }
         this.updateCommandEntity(
-            this.getCommandEntity(id),
+            this.commandRepository
+                .getCommandDto(id)
+                .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists")),
             updateCommand.getResources(),
             updateCommand.getMetadata(),
             updateCommand.getCheckDelay(),
@@ -842,7 +1096,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     public void deleteCommand(@NotBlank final String id) throws NotFoundException {
         log.debug("[deleteCommand] Called to delete command with id {}", id);
-        this.deleteCommandEntity(this.getCommandEntity(id));
+        this.deleteCommandEntity(
+            this.commandRepository
+                .getCommandAndApplications(id)
+                .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
+        );
     }
 
     /**
@@ -854,9 +1112,15 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @NotEmpty final List<@NotBlank String> applicationIds
     ) throws NotFoundException, PreconditionFailedException {
         log.debug("[addApplicationsForCommand] Called to add {} to {}", applicationIds, id);
-        final CommandEntity commandEntity = this.getCommandEntity(id);
+        final CommandEntity commandEntity = this.commandRepository
+            .getCommandAndApplications(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"));
         for (final String applicationId : applicationIds) {
-            commandEntity.addApplication(this.getApplicationEntity(applicationId));
+            commandEntity.addApplication(
+                this.applicationRepository
+                    .getApplicationAndCommands(applicationId)
+                    .orElseThrow(() -> new NotFoundException("No application with id " + applicationId + " exists"))
+            );
         }
     }
 
@@ -872,10 +1136,16 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         if (Sets.newHashSet(applicationIds).size() != applicationIds.size()) {
             throw new PreconditionFailedException("Duplicate application id in " + applicationIds);
         }
-        final CommandEntity commandEntity = this.getCommandEntity(id);
+        final CommandEntity commandEntity = this.commandRepository
+            .getCommandAndApplications(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"));
         final List<ApplicationEntity> applicationEntities = Lists.newArrayList();
         for (final String applicationId : applicationIds) {
-            applicationEntities.add(this.getApplicationEntity(applicationId));
+            applicationEntities.add(
+                this.applicationRepository
+                    .getApplicationAndCommands(applicationId)
+                    .orElseThrow(() -> new NotFoundException("No application with id " + applicationId + " exists"))
+            );
         }
         commandEntity.setApplications(applicationEntities);
     }
@@ -887,7 +1157,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public List<Application> getApplicationsForCommand(final String id) throws NotFoundException {
         log.debug("[getApplicationsForCommand] Called for {}", id);
-        return this.getCommandEntity(id)
+        return this.commandRepository
+            .getCommandAndApplicationsDto(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
             .getApplications()
             .stream()
             .map(EntityV4DtoConverters::toV4ApplicationDto)
@@ -902,7 +1174,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @NotBlank final String id
     ) throws NotFoundException, PreconditionFailedException {
         log.debug("[removeApplicationsForCommand] Called to for {}", id);
-        this.getCommandEntity(id).setApplications(null);
+        this.commandRepository
+            .getCommandAndApplications(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
+            .setApplications(null);
     }
 
     /**
@@ -914,7 +1189,14 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @NotBlank final String appId
     ) throws NotFoundException {
         log.debug("[removeApplicationForCommand] Called to for {} from {}", appId, id);
-        this.getCommandEntity(id).removeApplication(this.getApplicationEntity(appId));
+        this.commandRepository
+            .getCommandAndApplications(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
+            .removeApplication(
+                this.applicationRepository
+                    .getApplicationAndCommands(appId)
+                    .orElseThrow(() -> new NotFoundException("No application with id " + appId + " exists"))
+            );
     }
 
     /**
@@ -945,7 +1227,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public List<Criterion> getClusterCriteriaForCommand(final String id) throws NotFoundException {
         log.debug("[getClusterCriteriaForCommand] Called to get cluster criteria for command {}", id);
-        return this.getCommandEntity(id)
+        return this.commandRepository
+            .getCommandAndClusterCriteria(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
             .getClusterCriteria()
             .stream()
             .map(EntityV4DtoConverters::toCriterionDto)
@@ -961,7 +1245,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         @Valid final Criterion criterion
     ) throws NotFoundException {
         log.debug("[addClusterCriterionForCommand] Called to add cluster criteria {} for command {}", criterion, id);
-        this.getCommandEntity(id).addClusterCriterion(this.toCriterionEntity(criterion));
+        this.commandRepository
+            .getCommandAndClusterCriteria(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
+            .addClusterCriterion(this.toCriterionEntity(criterion));
     }
 
     /**
@@ -979,7 +1266,10 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             id,
             priority
         );
-        this.getCommandEntity(id).addClusterCriterion(this.toCriterionEntity(criterion), priority);
+        this.commandRepository
+            .getCommandAndClusterCriteria(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
+            .addClusterCriterion(this.toCriterionEntity(criterion), priority);
     }
 
     /**
@@ -995,7 +1285,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             clusterCriteria,
             id
         );
-        final CommandEntity commandEntity = this.getCommandEntity(id);
+        final CommandEntity commandEntity = this.commandRepository
+            .getCommandAndClusterCriteria(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"));
         this.updateClusterCriteria(commandEntity, clusterCriteria);
     }
 
@@ -1009,7 +1301,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             priority,
             id
         );
-        final CommandEntity commandEntity = this.getCommandEntity(id);
+        final CommandEntity commandEntity = this.commandRepository
+            .getCommandAndClusterCriteria(id)
+            .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"));
         if (priority >= commandEntity.getClusterCriteria().size()) {
             throw new NotFoundException(
                 "No criterion with priority " + priority + " exists for command " + id + ". Unable to remove."
@@ -1031,7 +1325,11 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     public void removeAllClusterCriteriaForCommand(final String id) throws NotFoundException {
         log.debug("[removeAllClusterCriteriaForCommand] Called to remove all cluster criteria from command {}", id);
-        this.deleteAllClusterCriteria(this.getCommandEntity(id));
+        this.deleteAllClusterCriteria(
+            this.commandRepository
+                .getCommandAndClusterCriteria(id)
+                .orElseThrow(() -> new NotFoundException("No command with id " + id + " exists"))
+        );
     }
 
     /**
@@ -1050,9 +1348,17 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             finalCriterion = criterion;
         }
         log.debug("[findCommandsMatchingCriterion] Called to find commands matching {}", finalCriterion);
-        return this.commandRepository
-            .findAll(JpaCommandSpecs.findCommandsMatchingCriterion(finalCriterion))
-            .stream()
+
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<CommandEntity> criteriaQuery = criteriaBuilder.createQuery(CommandEntity.class);
+        final Root<CommandEntity> queryRoot = criteriaQuery.from(CommandEntity.class);
+        criteriaQuery.where(
+            CommandPredicates.findCommandsMatchingCriterion(queryRoot, criteriaQuery, criteriaBuilder, finalCriterion)
+        );
+
+        return this.entityManager.createQuery(criteriaQuery)
+            .setHint(LOAD_GRAPH_HINT, this.entityManager.getEntityGraph(CommandEntity.DTO_ENTITY_GRAPH))
+            .getResultStream()
             .map(EntityV4DtoConverters::toV4CommandDto)
             .collect(Collectors.toSet());
     }
@@ -1257,7 +1563,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         log.debug("[getV3JobRequest] Called with id {}", id);
         return EntityV3DtoConverters.toJobRequestDto(
             this.jobRepository
-                .findByUniqueId(id, JobRequestProjection.class)
+                .getV3JobRequest(id)
                 .orElseThrow(() -> new GenieNotFoundException("No job request with id " + id))
         );
     }
@@ -1271,7 +1577,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
         log.debug("[getJob] Called with id {}", id);
         return EntityV3DtoConverters.toJobDto(
             this.jobRepository
-                .findByUniqueId(id, JobProjection.class)
+                .getV3Job(id)
                 .orElseThrow(() -> new GenieNotFoundException("No job with id " + id))
         );
     }
@@ -1330,12 +1636,6 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     ) {
         log.debug("[findJobs] Called");
 
-        // TODO: Re-write with projections however not currently supported: https://jira.spring.io/browse/DATAJPA-1033
-        //       Update: JIRA still not resolved as of 5/16/19
-        final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        final Root<JobEntity> root = countQuery.from(JobEntity.class);
-
         ClusterEntity clusterEntity = null;
         if (clusterId != null) {
             final Optional<ClusterEntity> optionalClusterEntity
@@ -1359,73 +1659,102 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
             }
         }
 
-        final Predicate whereClause = JpaJobSpecs
-            .getFindPredicate(
-                root,
-                cb,
-                id,
-                name,
-                user,
-                statuses != null ? statuses.stream().map(Enum::name).collect(Collectors.toSet()) : null,
-                tags,
-                clusterName,
-                clusterEntity,
-                commandName,
-                commandEntity,
-                minStarted,
-                maxStarted,
-                minFinished,
-                maxFinished,
-                grouping,
-                groupingInstance
+        final Set<String> statusStrings = statuses != null
+            ? statuses.stream().map(Enum::name).collect(Collectors.toSet())
+            : null;
+
+        final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        final Root<JobEntity> root = countQuery.from(JobEntity.class);
+
+        countQuery
+            .select(cb.count(root))
+            .where(
+                JobPredicates
+                    .getFindPredicate(
+                        root,
+                        cb,
+                        id,
+                        name,
+                        user,
+                        statusStrings,
+                        tags,
+                        clusterName,
+                        clusterEntity,
+                        commandName,
+                        commandEntity,
+                        minStarted,
+                        maxStarted,
+                        minFinished,
+                        maxFinished,
+                        grouping,
+                        groupingInstance
+                    )
             );
 
-        countQuery.select(cb.count(root)).where(whereClause);
-
-        final Long count = this.entityManager.createQuery(countQuery).getSingleResult();
-
-        // Use the count to make sure we even need to make this query
-        if (count > 0) {
-            final CriteriaQuery<JobSearchResult> contentQuery = cb.createQuery(JobSearchResult.class);
-            contentQuery.from(JobEntity.class);
-
-            contentQuery.multiselect(
-                root.get(JobEntity_.uniqueId),
-                root.get(JobEntity_.name),
-                root.get(JobEntity_.user),
-                root.get(JobEntity_.status),
-                root.get(JobEntity_.started),
-                root.get(JobEntity_.finished),
-                root.get(JobEntity_.clusterName),
-                root.get(JobEntity_.commandName)
-            );
-
-            contentQuery.where(whereClause);
-
-            final Sort sort = page.getSort();
-            final List<Order> orders = new ArrayList<>();
-            sort.iterator().forEachRemaining(
-                order -> {
-                    if (order.isAscending()) {
-                        orders.add(cb.asc(root.get(order.getProperty())));
-                    } else {
-                        orders.add(cb.desc(root.get(order.getProperty())));
-                    }
-                }
-            );
-
-            contentQuery.orderBy(orders);
-
-            final List<JobSearchResult> results = this.entityManager
-                .createQuery(contentQuery)
-                .setFirstResult(((Long) page.getOffset()).intValue())
-                .setMaxResults(page.getPageSize())
-                .getResultList();
-
-            return new PageImpl<>(results, page, count);
-        } else {
-            return new PageImpl<>(Lists.newArrayList(), page, count);
+        final long totalCount = this.entityManager.createQuery(countQuery).getSingleResult();
+        if (totalCount == 0) {
+            // short circuit for no results
+            return new PageImpl<>(new ArrayList<>(0));
         }
+
+        final CriteriaQuery<JobSearchResult> contentQuery = cb.createQuery(JobSearchResult.class);
+        final Root<JobEntity> contentQueryRoot = contentQuery.from(JobEntity.class);
+
+        contentQuery.multiselect(
+            contentQueryRoot.get(JobEntity_.uniqueId),
+            contentQueryRoot.get(JobEntity_.name),
+            contentQueryRoot.get(JobEntity_.user),
+            contentQueryRoot.get(JobEntity_.status),
+            contentQueryRoot.get(JobEntity_.started),
+            contentQueryRoot.get(JobEntity_.finished),
+            contentQueryRoot.get(JobEntity_.clusterName),
+            contentQueryRoot.get(JobEntity_.commandName)
+        );
+
+        contentQuery.where(
+            JobPredicates
+                .getFindPredicate(
+                    contentQueryRoot,
+                    cb,
+                    id,
+                    name,
+                    user,
+                    statusStrings,
+                    tags,
+                    clusterName,
+                    clusterEntity,
+                    commandName,
+                    commandEntity,
+                    minStarted,
+                    maxStarted,
+                    minFinished,
+                    maxFinished,
+                    grouping,
+                    groupingInstance
+                )
+        );
+
+        final Sort sort = page.getSort();
+        final List<Order> orders = new ArrayList<>();
+        sort.iterator().forEachRemaining(
+            order -> {
+                if (order.isAscending()) {
+                    orders.add(cb.asc(root.get(order.getProperty())));
+                } else {
+                    orders.add(cb.desc(root.get(order.getProperty())));
+                }
+            }
+        );
+        contentQuery.orderBy(orders);
+
+        final List<JobSearchResult> results = this.entityManager
+            .createQuery(contentQuery)
+            .setFirstResult(((Long) page.getOffset()).intValue())
+            .setMaxResults(page.getPageSize())
+            .getResultList();
+
+        return new PageImpl<>(results, page, totalCount);
     }
     //endregion
 
@@ -1534,7 +1863,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public JobRequest getJobRequest(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobRequest] Requested for id {}", id);
         return this.jobRepository
-            .findByUniqueId(id, V4JobRequestProjection.class)
+            .getV4JobRequest(id)
             .map(EntityV4DtoConverters::toV4JobRequestDto)
             .orElseThrow(() -> new NotFoundException("No job ith id " + id + " exists"));
     }
@@ -1612,7 +1941,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Optional<JobSpecification> getJobSpecification(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobSpecification] Requested to get job specification for job {}", id);
         final JobSpecificationProjection projection = this.jobRepository
-            .findByUniqueId(id, JobSpecificationProjection.class)
+            .getV4JobSpecification(id)
             .orElseThrow(
                 () -> new NotFoundException("No job ith id " + id + " exists. Unable to get job specification.")
             );
@@ -1732,9 +2061,8 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public boolean isV4(@NotBlank final String id) throws NotFoundException {
         log.debug("[isV4] Read v4 flag from db for job {} ", id);
         return this.jobRepository
-            .findByUniqueId(id, IsV4JobProjection.class)
-            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists. Unable to get v4 flag."))
-            .isV4();
+            .isV4(id)
+            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists. Unable to get v4 flag."));
     }
 
     /**
@@ -1745,9 +2073,8 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public JobStatus getJobStatus(@NotBlank final String id) throws NotFoundException {
         return DtoConverters.toV4JobStatus(
             this.jobRepository
-                .findByUniqueId(id, StatusProjection.class)
+                .getJobStatus(id)
                 .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists. Unable to get status."))
-                .getStatus()
         );
     }
 
@@ -1757,10 +2084,20 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     @Transactional(readOnly = true)
     public Optional<String> getJobArchiveLocation(@NotBlank final String id) throws NotFoundException {
-        return this.jobRepository
-            .findByUniqueId(id, JobArchiveLocationProjection.class)
-            .map(JobArchiveLocationProjection::getArchiveLocation)
-            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exits."));
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<String> query = criteriaBuilder.createQuery(String.class);
+        final Root<JobEntity> root = query.from(JobEntity.class);
+        query.select(root.get(JobEntity_.archiveLocation));
+        query.where(criteriaBuilder.equal(root.get(JobEntity_.uniqueId), id));
+        try {
+            return Optional.ofNullable(
+                this.entityManager
+                    .createQuery(query)
+                    .getSingleResult()
+            );
+        } catch (final NoResultException e) {
+            throw new NotFoundException("No job with id " + id + " exits.", e);
+        }
     }
 
     /**
@@ -1769,6 +2106,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Override
     @Transactional(readOnly = true)
     public FinishedJob getFinishedJob(@NotBlank final String id) throws NotFoundException, GenieInvalidStatusException {
+        // TODO
         return this.jobRepository.findByUniqueId(id, FinishedJobProjection.class)
             .map(EntityV4DtoConverters::toFinishedJobDto)
             .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists."));
@@ -1781,8 +2119,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public boolean isApiJob(@NotBlank final String id) throws NotFoundException {
         return this.jobRepository
-            .findByUniqueId(id, JobApiProjection.class)
-            .map(JobApiProjection::isApi)
+            .isAPI(id)
             .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"));
     }
 
@@ -1810,13 +2147,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Set<String> getAllHostsWithActiveJobs() {
         log.debug("[getAllHostsWithActiveJobs] Called");
 
-        return this.jobRepository
-            .findDistinctByStatusInAndV4IsFalse(ACTIVE_STATUS_SET)
-            .stream()
-            .map(AgentHostnameProjection::getAgentHostname)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(Collectors.toSet());
+        return this.jobRepository.getV3Hosts(ACTIVE_STATUS_SET);
     }
 
     /**
@@ -1827,7 +2158,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Cluster getJobCluster(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobCluster] Called for job {}", id);
         return EntityV4DtoConverters.toV4ClusterDto(
-            this.jobRepository.findByUniqueId(id, JobClusterProjection.class)
+            this.jobRepository.getJobCluster(id)
                 .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
                 .getCluster()
                 .orElseThrow(() -> new NotFoundException("Job " + id + " has no associated cluster"))
@@ -1842,7 +2173,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Command getJobCommand(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobCommand] Called for job {}", id);
         return EntityV4DtoConverters.toV4CommandDto(
-            this.jobRepository.findByUniqueId(id, JobCommandProjection.class)
+            this.jobRepository.getJobCommand(id)
                 .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
                 .getCommand()
                 .orElseThrow(() -> new NotFoundException("Job " + id + " has no associated command"))
@@ -1856,7 +2187,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public List<Application> getJobApplications(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobApplications] Called for job {}", id);
-        return this.jobRepository.findByUniqueId(id, JobApplicationsProjection.class)
+        return this.jobRepository.getJobApplications(id)
             .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
             .getApplications()
             .stream()
@@ -1872,9 +2203,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public String getJobHost(@NotBlank final String id) throws NotFoundException {
         log.debug("[getJobHost] Called for job {}", id);
         return this.jobRepository
-            .findByUniqueId(id, AgentHostnameProjection.class)
-            .orElseThrow(() -> new NotFoundException("No job with id " + id + " exists"))
-            .getAgentHostname()
+            .getJobHostname(id)
             .orElseThrow(() -> new NotFoundException("No hostname set for job " + id));
     }
 
@@ -1942,10 +2271,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public Set<String> getActiveAgentJobs() {
         log.debug("[getActiveAgentJobs] Called");
-        return this.jobRepository.getAgentJobIdsWithStatusIn(ACTIVE_STATUS_SET)
-            .stream()
-            .map(UniqueIdProjection::getUniqueId)
-            .collect(Collectors.toSet());
+        return this.jobRepository.getAgentJobIdsWithStatusIn(ACTIVE_STATUS_SET);
     }
 
     /**
@@ -1955,10 +2281,7 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     @Transactional(readOnly = true)
     public Set<String> getUnclaimedAgentJobs() {
         log.debug("[getUnclaimedAgentJobs] Called");
-        return this.jobRepository.getAgentJobIdsWithStatusIn(UNCLAIMED_STATUS_SET)
-            .stream()
-            .map(UniqueIdProjection::getUniqueId)
-            .collect(Collectors.toSet());
+        return this.jobRepository.getAgentJobIdsWithStatusIn(UNCLAIMED_STATUS_SET);
     }
     //endregion
     //endregion

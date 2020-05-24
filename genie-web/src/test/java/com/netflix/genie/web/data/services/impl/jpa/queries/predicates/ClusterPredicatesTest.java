@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
+package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.ClusterStatus;
@@ -23,7 +23,6 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -36,11 +35,11 @@ import java.time.Instant;
 import java.util.Set;
 
 /**
- * Tests for the application specifications.
+ * Tests for {@link ClusterPredicates}.
  *
  * @author tgianos
  */
-class JpaClusterSpecsTest {
+class ClusterPredicatesTest {
 
     private static final String NAME = "h2prod";
     private static final TagEntity TAG_1 = new TagEntity("prod");
@@ -61,9 +60,6 @@ class JpaClusterSpecsTest {
     private CriteriaBuilder cb;
     private SetJoin<ClusterEntity, TagEntity> tagEntityJoin;
 
-    /**
-     * Setup some variables.
-     */
     @BeforeEach
     @SuppressWarnings("unchecked")
     void setup() {
@@ -110,13 +106,13 @@ class JpaClusterSpecsTest {
         Mockito.when(this.cb.equal(idCountExpression, TAGS.size())).thenReturn(havingPredicate);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindAll() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 NAME,
                 STATUSES,
                 TAGS,
@@ -124,7 +120,6 @@ class JpaClusterSpecsTest {
                 MAX_UPDATE_TIME
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
@@ -140,14 +135,14 @@ class JpaClusterSpecsTest {
         }
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindAllLike() {
         final String newName = NAME + "%";
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 newName,
                 STATUSES,
                 TAGS,
@@ -155,7 +150,6 @@ class JpaClusterSpecsTest {
                 MAX_UPDATE_TIME
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
             .like(this.root.get(ClusterEntity_.name), newName);
         Mockito.verify(this.cb, Mockito.times(1))
@@ -171,13 +165,13 @@ class JpaClusterSpecsTest {
         }
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoName() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 null,
                 STATUSES,
                 TAGS,
@@ -185,7 +179,6 @@ class JpaClusterSpecsTest {
                 MAX_UPDATE_TIME
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.never())
             .like(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.never())
@@ -203,13 +196,13 @@ class JpaClusterSpecsTest {
         }
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoStatuses() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 NAME,
                 null,
                 TAGS,
@@ -217,7 +210,6 @@ class JpaClusterSpecsTest {
                 MAX_UPDATE_TIME
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
@@ -234,13 +226,13 @@ class JpaClusterSpecsTest {
         }
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindEmptyStatuses() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 NAME,
                 Sets.newHashSet(),
                 TAGS,
@@ -248,7 +240,6 @@ class JpaClusterSpecsTest {
                 MAX_UPDATE_TIME
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
@@ -265,13 +256,13 @@ class JpaClusterSpecsTest {
         }
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoTags() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 NAME,
                 STATUSES,
                 null,
@@ -279,7 +270,6 @@ class JpaClusterSpecsTest {
                 MAX_UPDATE_TIME
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
@@ -293,13 +283,13 @@ class JpaClusterSpecsTest {
         }
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoMinTime() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 NAME,
                 STATUSES,
                 TAGS,
@@ -307,7 +297,6 @@ class JpaClusterSpecsTest {
                 MAX_UPDATE_TIME
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.never())
@@ -324,13 +313,13 @@ class JpaClusterSpecsTest {
         }
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoMax() {
-        final Specification<ClusterEntity> spec = JpaClusterSpecs
+        ClusterPredicates
             .find(
+                this.root,
+                this.cq,
+                this.cb,
                 NAME,
                 STATUSES,
                 TAGS,
@@ -338,7 +327,6 @@ class JpaClusterSpecsTest {
                 null
             );
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
             .equal(this.root.get(ClusterEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))

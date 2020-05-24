@@ -18,15 +18,21 @@ package com.netflix.genie.web.data.services.impl.jpa.repositories;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.AgentHostnameProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobApplicationsProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobClusterProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobCommandProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.projections.UniqueIdProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobRequestProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
+import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -54,6 +60,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses      The job statuses to filter by
      * @return The jobs
      */
+    @EntityGraph(value = JobEntity.V3_JOB_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
     Set<JobProjection> findByAgentHostnameAndStatusIn(String agentHostname, Set<String> statuses);
 
     /**
@@ -86,9 +93,12 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * Find the jobs with one of the statuses entered.
      *
      * @param statuses The statuses to search
-     * @return The job information requested
+     * @return The {@link Set} of hostname's running V3 (embedded) jobs
+     * @deprecated Only used for old v3 jobs
      */
-    Set<AgentHostnameProjection> findDistinctByStatusInAndV4IsFalse(Set<String> statuses);
+    @Query("SELECT DISTINCT(j.agentHostname) FROM JobEntity j WHERE j.v4 = false AND j.status IN (:statuses)")
+    @Deprecated
+    Set<String> getV3Hosts(@Param("statuses") Set<String> statuses);
 
     /**
      * Count all jobs that belong to a given user and are in any of the given states.
@@ -135,10 +145,118 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return a set of job projections
      */
     @Query(
-        "SELECT j"
+        "SELECT j.uniqueId"
             + " FROM JobEntity j"
             + " WHERE j.status IN (:statuses)"
             + " AND j.v4 = TRUE"
     )
-    Set<UniqueIdProjection> getAgentJobIdsWithStatusIn(@Param("statuses") @NotEmpty Set<String> statuses);
+    Set<String> getAgentJobIdsWithStatusIn(@Param("statuses") @NotEmpty Set<String> statuses);
+
+    /**
+     * Get only the status of a job.
+     *
+     * @param id The id of the job to get the status for
+     * @return The job status string or {@link Optional#empty()} if no job with the given id exists
+     */
+    @Query("SELECT j.status FROM JobEntity j WHERE j.uniqueId = :id")
+    Optional<String> getJobStatus(@Param("id") String id);
+
+    /**
+     * Return whether the job is running with the V4 agent or the older V3 embedded mechanism.
+     *
+     * @param id The unique id of the job
+     * @return {@literal true} if the job is running with the agent. {@link Optional#empty()} if the job doesn't exist
+     * @deprecated Only here during v3 to v4 agent migration
+     */
+    @Query("SELECT j.v4 FROM JobEntity j WHERE j.uniqueId = :id")
+    @Deprecated
+    Optional<Boolean> isV4(@Param("id") String id);
+
+    /**
+     * Return whether the job was submitted via the API or the Agent CLI.
+     *
+     * @param id The unique id of the job
+     * @return {@literal true} if the job was submitted via the API. {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j.api FROM JobEntity j WHERE j.uniqueId = :id")
+    Optional<Boolean> isAPI(@Param("id") String id);
+
+    /**
+     * Get only the hostname of a job.
+     *
+     * @param id The id of the job to get the hostname for
+     * @return The job hostname or {@link Optional#empty()} if no job with the given id exists
+     */
+    @Query("SELECT j.agentHostname FROM JobEntity j WHERE j.uniqueId = :id")
+    Optional<String> getJobHostname(@Param("id") String id);
+
+    /**
+     * Get the data needed to create a V3 Job DTO.
+     *
+     * @param id The unique id of the job
+     * @return The {@link JobProjection} data or {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
+    @EntityGraph(value = JobEntity.V3_JOB_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<JobProjection> getV3Job(@Param("id") String id);
+
+    /**
+     * Get the data needed to create a V3 Job Request DTO.
+     *
+     * @param id The unique id of the job
+     * @return The {@link JobRequestProjection} data or {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
+    @EntityGraph(value = JobEntity.V3_JOB_REQUEST_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<JobRequestProjection> getV3JobRequest(@Param("id") String id);
+
+    /**
+     * Get the data needed to create a V4 Job Request DTO.
+     *
+     * @param id The unique id of the job
+     * @return The {@link V4JobRequestProjection} data or {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
+    @EntityGraph(value = JobEntity.V4_JOB_REQUEST_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<V4JobRequestProjection> getV4JobRequest(@Param("id") String id);
+
+    /**
+     * Get the data needed to create a V4 Job Specification DTO.
+     *
+     * @param id The unique id of the job
+     * @return The {@link JobSpecificationProjection} data or {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
+    @EntityGraph(value = JobEntity.V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<JobSpecificationProjection> getV4JobSpecification(@Param("id") String id);
+
+    /**
+     * Get the applications for a job.
+     *
+     * @param id The unique id of the job
+     * @return The {@link JobApplicationsProjection} data or {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
+    @EntityGraph(value = JobEntity.JOB_APPLICATIONS_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<JobApplicationsProjection> getJobApplications(@Param("id") String id);
+
+    /**
+     * Get the cluster for a job.
+     *
+     * @param id The unique id of the job
+     * @return The {@link JobClusterProjection} data or {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
+    @EntityGraph(value = JobEntity.JOB_CLUSTER_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<JobClusterProjection> getJobCluster(@Param("id") String id);
+
+    /**
+     * Get the command for a job.
+     *
+     * @param id The unique id of the job
+     * @return The {@link JobCommandProjection} data or {@link Optional#empty()} if the job doesn't exist
+     */
+    @Query("SELECT j FROM JobEntity j WHERE j.uniqueId = :id")
+    @EntityGraph(value = JobEntity.JOB_COMMAND_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<JobCommandProjection> getJobCommand(@Param("id") String id);
 }

@@ -36,6 +36,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import javax.persistence.EntityManager;
+
 /**
  * Default auto configuration of data related services and beans for Genie.
  *
@@ -99,6 +101,7 @@ public class DataAutoConfiguration {
     /**
      * Provide a default implementation of {@link PersistenceService} if no other has been defined.
      *
+     * @param entityManager     The {@link EntityManager} for this application
      * @param jpaRepositories   The {@link JpaRepositories} for Genie
      * @param attachmentService The {@link AttachmentService} implementation to use
      * @return A {@link JpaPersistenceServiceImpl} instance which implements {@link PersistenceService} backed by
@@ -107,9 +110,10 @@ public class DataAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(PersistenceService.class)
     public JpaPersistenceServiceImpl geniePersistenceService(
+        final EntityManager entityManager,
         final JpaRepositories jpaRepositories,
         final AttachmentService attachmentService
     ) {
-        return new JpaPersistenceServiceImpl(jpaRepositories, attachmentService);
+        return new JpaPersistenceServiceImpl(entityManager, jpaRepositories, attachmentService);
     }
 }

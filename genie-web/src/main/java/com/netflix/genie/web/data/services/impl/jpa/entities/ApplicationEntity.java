@@ -29,6 +29,10 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Optional;
@@ -49,7 +53,75 @@ import java.util.Set;
 )
 @Entity
 @Table(name = "applications")
+@NamedEntityGraphs(
+    {
+        @NamedEntityGraph(
+            name = ApplicationEntity.COMMANDS_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("commands")
+            }
+        ),
+        @NamedEntityGraph(
+            name = ApplicationEntity.COMMANDS_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "commands",
+                    subgraph = "command-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "command-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("executable"),
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies"),
+                        @NamedAttributeNode("tags"),
+                        @NamedAttributeNode(
+                            value = "clusterCriteria",
+                            subgraph = "criteria-sub-graph"
+                        )
+                    }
+                ),
+                @NamedSubgraph(
+                    name = "criteria-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        ),
+        @NamedEntityGraph(
+            name = ApplicationEntity.DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("setupFile"),
+                @NamedAttributeNode("configs"),
+                @NamedAttributeNode("dependencies"),
+                @NamedAttributeNode("tags")
+            }
+        )
+    }
+)
 public class ApplicationEntity extends BaseEntity {
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
+     * an applications commands base fields.
+     */
+    public static final String COMMANDS_ENTITY_GRAPH = "Application.commands";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
+     * an applications commands and create the command DTOs.
+     */
+    public static final String COMMANDS_DTO_ENTITY_GRAPH = "Application.commands.dto";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct an
+     * Application DTO.
+     */
+    public static final String DTO_ENTITY_GRAPH = "Application.dto";
 
     private static final long serialVersionUID = -8780722054561507963L;
 

@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
+import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -73,13 +74,17 @@ class JpaPersistenceServiceImplCommandsTest {
         Mockito.when(jpaRepositories.getApplicationRepository()).thenReturn(this.jpaApplicationRepository);
         Mockito.when(jpaRepositories.getCommandRepository()).thenReturn(this.jpaCommandRepository);
         Mockito.when(jpaRepositories.getCriterionRepository()).thenReturn(Mockito.mock(JpaCriterionRepository.class));
-        this.service = new JpaPersistenceServiceImpl(jpaRepositories, Mockito.mock(AttachmentService.class));
+        this.service = new JpaPersistenceServiceImpl(
+            Mockito.mock(EntityManager.class),
+            jpaRepositories,
+            Mockito.mock(AttachmentService.class)
+        );
     }
 
     @Test
     void testGetCommandNotExists() {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
+        Mockito.when(this.jpaCommandRepository.getCommandDto(id)).thenReturn(Optional.empty());
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> this.service.getCommand(id));
@@ -112,7 +117,7 @@ class JpaPersistenceServiceImplCommandsTest {
     @Test
     void testUpdateCommandNoCommandExists() {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
+        Mockito.when(this.jpaCommandRepository.getCommandDto(id)).thenReturn(Optional.empty());
         Assertions
             .assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(
@@ -140,7 +145,6 @@ class JpaPersistenceServiceImplCommandsTest {
 
     @Test
     void testUpdateCommandIdsDontMatch() {
-        Mockito.when(this.jpaCommandRepository.existsByUniqueId(COMMAND_2_ID)).thenReturn(true);
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(UUID.randomUUID().toString());
         Assertions

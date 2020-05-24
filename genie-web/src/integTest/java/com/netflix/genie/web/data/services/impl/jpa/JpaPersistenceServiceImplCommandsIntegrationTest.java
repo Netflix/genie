@@ -35,6 +35,8 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedExceptio
 import com.netflix.genie.web.exceptions.checked.NotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -82,6 +84,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
     private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
     private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Test
     @DatabaseSetup("persistence/commands/init.xml")
@@ -850,6 +855,9 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
         // criteria
         final Command command5 = this.createTestCommand(null, null, null);
 
+        this.entityManager.flush();
+        this.entityManager.clear();
+
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
@@ -858,6 +866,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(command0);
+
+        this.entityManager.clear();
 
         Assertions
             .assertThat(
@@ -869,6 +879,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             .hasSize(1)
             .containsExactlyInAnyOrder(command2);
 
+        this.entityManager.clear();
+
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
@@ -878,6 +890,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(command1);
+
+        this.entityManager.clear();
 
         Assertions
             .assertThat(
@@ -889,6 +903,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             .hasSize(3)
             .containsExactlyInAnyOrder(command1, command3, command4);
 
+        this.entityManager.clear();
+
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
@@ -899,6 +915,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             .hasSize(1)
             .containsExactlyInAnyOrder(command4);
 
+        this.entityManager.clear();
+
         Assertions
             .assertThat(
                 this.service.findCommandsMatchingCriterion(
@@ -907,6 +925,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
                 )
             )
             .isEmpty();
+
+        this.entityManager.clear();
 
         // Everything
         Assertions
@@ -923,6 +943,8 @@ class JpaPersistenceServiceImplCommandsIntegrationTest extends JpaPersistenceSer
             )
             .hasSize(1)
             .containsExactlyInAnyOrder(command3);
+
+        this.entityManager.clear();
 
         // Would match command5 if it had any cluster criteria
         Assertions.assertThat(

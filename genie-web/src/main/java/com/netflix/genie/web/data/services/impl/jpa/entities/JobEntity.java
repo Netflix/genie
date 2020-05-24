@@ -19,6 +19,7 @@ package com.netflix.genie.web.data.services.impl.jpa.entities;
 
 import com.google.common.collect.Maps;
 import com.netflix.genie.web.data.services.impl.jpa.listeners.JobEntityListener;
+import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.PredicateUtils;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobApiProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobApplicationsProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobArchiveLocationProjection;
@@ -34,7 +35,6 @@ import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.Finis
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.IsV4JobProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.V4JobRequestProjection;
-import com.netflix.genie.web.data.services.impl.jpa.queries.specifications.JpaSpecificationUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,6 +55,10 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -92,6 +96,204 @@ import java.util.Set;
     }
 )
 @Table(name = "jobs")
+// Note: We're using hibernate by default and it ignores fetch graphs and just loads basic fields anyway without
+//       bytecode enhancement. For now just use this to load relationships and not worry too much about optimizing
+//       column projection on large entity fetches
+//       See:
+//       https://www.baeldung.com/jpa-entity-graph#creating-entity-graph-2
+//       https://stackoverflow.com/questions/37054082/hibernate-ignores-fetchgraph
+@NamedEntityGraphs(
+    {
+        // Intended to be used as a LOAD graph
+        @NamedEntityGraph(
+            name = JobEntity.V3_JOB_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("metadata"),
+                @NamedAttributeNode("commandArgs"),
+                @NamedAttributeNode(value = "tags"),
+                // In actually looking at code this isn't used
+                // @NamedAttributeNode("applications")
+            }
+        ),
+        // Intended to be used as a LOAD graph
+        @NamedEntityGraph(
+            name = JobEntity.V3_JOB_REQUEST_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("metadata"),
+                @NamedAttributeNode("commandArgs"),
+                @NamedAttributeNode("tags"),
+                @NamedAttributeNode("setupFile"),
+                @NamedAttributeNode(
+                    value = "clusterCriteria",
+                    subgraph = "criterion-sub-graph"
+                ),
+                @NamedAttributeNode(
+                    value = "commandCriterion",
+                    subgraph = "criterion-sub-graph"
+                ),
+                @NamedAttributeNode("dependencies"),
+                @NamedAttributeNode("configs"),
+                @NamedAttributeNode("requestedApplications"),
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "criterion-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("tags")
+                    }
+                ),
+            }
+        ),
+        // Intended to be used as a LOAD graph
+        @NamedEntityGraph(
+            name = JobEntity.V4_JOB_REQUEST_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("metadata"),
+                @NamedAttributeNode("commandArgs"),
+                @NamedAttributeNode("tags"),
+                @NamedAttributeNode("requestedEnvironmentVariables"),
+                @NamedAttributeNode("requestedAgentEnvironmentExt"),
+                @NamedAttributeNode("requestedAgentConfigExt"),
+                @NamedAttributeNode("setupFile"),
+                @NamedAttributeNode(
+                    value = "clusterCriteria",
+                    subgraph = "criterion-sub-graph"
+                ),
+                @NamedAttributeNode(
+                    value = "commandCriterion",
+                    subgraph = "criterion-sub-graph"
+                ),
+                @NamedAttributeNode("dependencies"),
+                @NamedAttributeNode("configs"),
+                @NamedAttributeNode("requestedApplications"),
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "criterion-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("tags")
+                    }
+                ),
+            }
+        ),
+        // Intended to be used as a LOAD graph
+        @NamedEntityGraph(
+            name = JobEntity.V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("configs"),
+                @NamedAttributeNode("dependencies"),
+                @NamedAttributeNode("setupFile"),
+                @NamedAttributeNode("commandArgs"),
+                @NamedAttributeNode(
+                    value = "cluster",
+                    subgraph = "resource-sub-graph"
+                ),
+                @NamedAttributeNode(
+                    value = "command",
+                    subgraph = "command-sub-graph"
+                ),
+                @NamedAttributeNode(
+                    value = "applications",
+                    subgraph = "resource-sub-graph"
+                ),
+                @NamedAttributeNode("environmentVariables"),
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "resource-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies")
+                    }
+                ),
+                @NamedSubgraph(
+                    name = "command-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("executable"),
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies")
+                    }
+                ),
+            }
+        ),
+        // Intended to be used as a LOAD graph
+        @NamedEntityGraph(
+            name = JobEntity.JOB_APPLICATIONS_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "applications",
+                    subgraph = "application-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "application-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies"),
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        ),
+        // Intended to be used as a LOAD graph
+        @NamedEntityGraph(
+            name = JobEntity.JOB_CLUSTER_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "cluster",
+                    subgraph = "cluster-sub-graph"
+                ),
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "cluster-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies"),
+                        @NamedAttributeNode("tags"),
+                    }
+                ),
+            }
+        ),
+        // Intended to be used as a LOAD graph
+        @NamedEntityGraph(
+            name = JobEntity.JOB_COMMAND_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "command",
+                    subgraph = "command-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "command-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("executable"),
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies"),
+                        @NamedAttributeNode("tags"),
+                        @NamedAttributeNode(
+                            value = "clusterCriteria",
+                            subgraph = "criteria-sub-graph"
+                        )
+                    }
+                ),
+                @NamedSubgraph(
+                    name = "criteria-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        )
+    }
+)
 public class JobEntity extends BaseEntity implements
     FinishedJobProjection,
     JobProjection,
@@ -108,6 +310,48 @@ public class JobEntity extends BaseEntity implements
     IsV4JobProjection,
     JobApiProjection,
     StatusProjection {
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * for a V3 Job DTO.
+     */
+    public static final String V3_JOB_DTO_ENTITY_GRAPH = "Job.v3.dto.job";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * for a V3 Job Request DTO.
+     */
+    public static final String V3_JOB_REQUEST_DTO_ENTITY_GRAPH = "Job.v3.dto.request";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * for a V4 Job Request DTO.
+     */
+    public static final String V4_JOB_REQUEST_DTO_ENTITY_GRAPH = "Job.v4.dto.request";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed
+     * for a V4 Job Specification DTO.
+     */
+    public static final String V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH = "Job.v4.dto.specification";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * applications for a job.
+     */
+    public static final String JOB_APPLICATIONS_DTO_ENTITY_GRAPH = "Job.applications";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * cluster for a job.
+     */
+    public static final String JOB_CLUSTER_DTO_ENTITY_GRAPH = "Job.cluster";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will load all the data needed to get the
+     * command for a job.
+     */
+    public static final String JOB_COMMAND_DTO_ENTITY_GRAPH = "Job.command";
 
     private static final long serialVersionUID = 2849367731657512224L;
 
@@ -465,7 +709,7 @@ public class JobEntity extends BaseEntity implements
         if (!this.tags.isEmpty()) {
             // Tag search string length max is currently 1024 which will be caught by hibernate validator if this
             // exceeds that length
-            this.tagSearchString = JpaSpecificationUtils.createTagSearchString(this.tags);
+            this.tagSearchString = PredicateUtils.createTagSearchString(this.tags);
         }
     }
 

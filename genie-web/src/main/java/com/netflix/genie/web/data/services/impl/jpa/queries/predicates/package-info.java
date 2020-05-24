@@ -23,6 +23,6 @@
  * @since 3.0.0
  */
 @ParametersAreNonnullByDefault
-package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
+package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
 import javax.annotation.ParametersAreNonnullByDefault;

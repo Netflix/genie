@@ -13,7 +13,7 @@
  *      See the License for the specific language governing permissions and
  *      limitations under the License.
  */
-package com.netflix.genie.web.data.services.impl.jpa.queries.specifications;
+package com.netflix.genie.web.data.services.impl.jpa.queries.predicates;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.external.dtos.v4.ApplicationStatus;
@@ -23,7 +23,6 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -36,11 +35,11 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Tests for the application specifications.
+ * Tests for {@link ApplicationPredicates}.
  *
  * @author tgianos
  */
-class JpaApplicationSpecsTest {
+class ApplicationPredicatesTest {
 
     private static final String NAME = "tez";
     private static final String USER_NAME = "tgianos";
@@ -59,9 +58,6 @@ class JpaApplicationSpecsTest {
     private CriteriaBuilder cb;
     private SetJoin<ApplicationEntity, TagEntity> tagEntityJoin;
 
-    /**
-     * Setup some variables.
-     */
     @BeforeEach
     @SuppressWarnings("unchecked")
     void setup() {
@@ -111,14 +107,10 @@ class JpaApplicationSpecsTest {
         Mockito.when(this.cb.like(typePath, TYPE)).thenReturn(likeTypePredicate);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindAll() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, TAGS, TYPE);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, TAGS, TYPE);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final String status : STATUSES) {
@@ -134,18 +126,13 @@ class JpaApplicationSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindAllLike() {
         final String newName = NAME + "%";
         final String newUser = USER_NAME + "%";
         final String newType = TYPE + "%";
-        final Specification<ApplicationEntity> spec
-            = JpaApplicationSpecs.find(newName, newUser, STATUSES, TAGS, newType);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, newName, newUser, STATUSES, TAGS, newType);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.name), newName);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.user), newUser);
         for (final String status : STATUSES) {
@@ -158,14 +145,10 @@ class JpaApplicationSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.type), newType);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoName() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(null, USER_NAME, STATUSES, TAGS, TYPE);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, null, USER_NAME, STATUSES, TAGS, TYPE);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final String status : STATUSES) {
@@ -178,14 +161,10 @@ class JpaApplicationSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoUserName() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, null, STATUSES, TAGS, TYPE);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, null, STATUSES, TAGS, TYPE);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final String status : STATUSES) {
@@ -198,14 +177,10 @@ class JpaApplicationSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoStatuses() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, null, TAGS, TYPE);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, null, TAGS, TYPE);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final String status : STATUSES) {
@@ -218,15 +193,10 @@ class JpaApplicationSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindEmptyStatuses() {
-        final Specification<ApplicationEntity> spec
-            = JpaApplicationSpecs.find(NAME, USER_NAME, Sets.newHashSet(), TAGS, TYPE);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, Sets.newHashSet(), TAGS, TYPE);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final String status : STATUSES) {
@@ -239,14 +209,10 @@ class JpaApplicationSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoTags() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, null, TYPE);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, null, TYPE);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final String status : STATUSES) {
@@ -256,14 +222,10 @@ class JpaApplicationSpecsTest {
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
-    /**
-     * Test the find specification.
-     */
     @Test
     void testFindNoType() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, TAGS, null);
+        ApplicationPredicates.find(this.root, this.cq, this.cb, NAME, USER_NAME, STATUSES, TAGS, null);
 
-        spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final String status : STATUSES) {

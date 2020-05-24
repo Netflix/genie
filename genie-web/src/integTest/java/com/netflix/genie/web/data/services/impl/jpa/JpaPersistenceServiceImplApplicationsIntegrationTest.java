@@ -234,10 +234,8 @@ class JpaPersistenceServiceImplApplicationsIntegrationTest extends JpaPersistenc
         Assertions.assertThat(apps.getContent().get(2).getId()).isEqualTo(APP_2_ID);
     }
 
-    /**
-     * Test the get applications method order by an invalid field should return the order by default value (updated).
-     */
     @Test
+    @DatabaseSetup("persistence/applications/init.xml")
     void testGetApplicationsOrderBysInvalidField() {
         final Pageable orderByInvalidPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         Assertions

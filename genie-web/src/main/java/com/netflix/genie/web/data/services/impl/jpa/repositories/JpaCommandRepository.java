@@ -16,11 +16,13 @@
 package com.netflix.genie.web.data.services.impl.jpa.repositories;
 
 import com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -95,4 +97,48 @@ public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
         @Param("unusedStatuses") Set<String> unusedStatuses,
         @Param("commandCreatedThreshold") Instant commandCreatedThreshold
     );
+
+    /**
+     * Find the command with the given id but also eagerly load that commands applications.
+     *
+     * @param id The id of the command to get
+     * @return The {@link CommandEntity} with its applications data loaded or {@link Optional#empty()} if there is no
+     * command with the given id
+     */
+    @Query("SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+    @EntityGraph(value = CommandEntity.APPLICATIONS_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<CommandEntity> getCommandAndApplications(@Param("id") String id);
+
+    /**
+     * Find the command with the given id but also eagerly load that commands applications full dto contents.
+     *
+     * @param id The id of the command to get
+     * @return The {@link CommandEntity} with its applications data loaded or {@link Optional#empty()} if there is no
+     * command with the given id
+     */
+    @Query("SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+    @EntityGraph(value = CommandEntity.APPLICATIONS_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<CommandEntity> getCommandAndApplicationsDto(@Param("id") String id);
+
+    /**
+     * Find the command with the given id but also eagerly load that commands cluster criteria.
+     *
+     * @param id The id of the command to get
+     * @return The {@link CommandEntity} with its criteria data loaded or {@link Optional#empty()} if there is no
+     * command with the given id
+     */
+    @Query("SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+    @EntityGraph(value = CommandEntity.CLUSTER_CRITERIA_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<CommandEntity> getCommandAndClusterCriteria(@Param("id") String id);
+
+    /**
+     * Find the command with the given id but also eagerly load all data needed for a command DTO.
+     *
+     * @param id The id of the command to get
+     * @return The {@link CommandEntity} all DTO data loaded or {@link Optional#empty()} if there is no
+     * command with the given id
+     */
+    @Query("SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+    @EntityGraph(value = CommandEntity.DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<CommandEntity> getCommandDto(@Param("id") String id);
 }

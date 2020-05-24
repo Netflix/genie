@@ -16,10 +16,12 @@
 package com.netflix.genie.web.data.services.impl.jpa.repositories;
 
 import com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -55,4 +57,37 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity>, 
         @Param("unusedStatuses") Set<String> unusedStatuses,
         @Param("clusterCreatedThreshold") Instant clusterCreatedThreshold
     );
+
+    /**
+     * Find the cluster with the given id but also eagerly load that clusters commands.
+     *
+     * @param id The id of the cluster to get
+     * @return The {@link ClusterEntity} with its command base data loaded or {@link Optional#empty()} if there is no
+     * cluster with the given id
+     */
+    @Query("SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
+    @EntityGraph(value = ClusterEntity.COMMANDS_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<ClusterEntity> getClusterAndCommands(@Param("id") String id);
+
+    /**
+     * Find the cluster with the given id but also eagerly load that clusters commands full dto contents.
+     *
+     * @param id The id of the command to get
+     * @return The {@link ClusterEntity} with its command dto data loaded or {@link Optional#empty()} if there is no
+     * cluster with the given id
+     */
+    @Query("SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
+    @EntityGraph(value = ClusterEntity.COMMANDS_DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<ClusterEntity> getClusterAndCommandsDto(@Param("id") String id);
+
+    /**
+     * Find the cluster with the given id but also eagerly load all data needed for a cluster DTO.
+     *
+     * @param id The id of the command to get
+     * @return The {@link ClusterEntity} with all DTO data loaded or {@link Optional#empty()} if there is no
+     * cluster with the given id
+     */
+    @Query("SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
+    @EntityGraph(value = ClusterEntity.DTO_ENTITY_GRAPH, type = EntityGraph.EntityGraphType.LOAD)
+    Optional<ClusterEntity> getClusterDto(@Param("id") String id);
 }

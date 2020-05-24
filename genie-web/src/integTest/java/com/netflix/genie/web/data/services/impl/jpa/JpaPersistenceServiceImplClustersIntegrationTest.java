@@ -204,6 +204,7 @@ class JpaPersistenceServiceImplClustersIntegrationTest extends JpaPersistenceSer
     }
 
     @Test
+    @DatabaseSetup("persistence/clusters/init.xml")
     void testGetClustersOrderBysInvalidField() {
         final Pageable badPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         Assertions

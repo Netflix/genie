@@ -34,6 +34,10 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
@@ -61,7 +65,114 @@ import java.util.Set;
 )
 @Entity
 @Table(name = "commands")
+@NamedEntityGraphs(
+    {
+        @NamedEntityGraph(
+            name = CommandEntity.APPLICATIONS_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "applications",
+                    subgraph = "application-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "application-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies"),
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        ),
+        @NamedEntityGraph(
+            name = CommandEntity.APPLICATIONS_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "applications",
+                    subgraph = "application-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "application-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies"),
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        ),
+        @NamedEntityGraph(
+            name = CommandEntity.CLUSTER_CRITERIA_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "clusterCriteria",
+                    subgraph = "criteria-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "criteria-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        ),
+        @NamedEntityGraph(
+            name = CommandEntity.DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("executable"),
+                @NamedAttributeNode("setupFile"),
+                @NamedAttributeNode("configs"),
+                @NamedAttributeNode("dependencies"),
+                @NamedAttributeNode("tags"),
+                @NamedAttributeNode(
+                    value = "clusterCriteria",
+                    subgraph = "criteria-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "criteria-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        )
+    }
+)
 public class CommandEntity extends BaseEntity {
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * its associated applications base fields.
+     */
+    public static final String APPLICATIONS_ENTITY_GRAPH = "Command.applications";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * its associated applications dto fields.
+     */
+    public static final String APPLICATIONS_DTO_ENTITY_GRAPH = "Command.applications.dto";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load the command base fields and
+     * its associated cluster criteria.
+     */
+    public static final String CLUSTER_CRITERIA_ENTITY_GRAPH = "Command.clusterCriteria";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct a
+     * Command DTO.
+     */
+    public static final String DTO_ENTITY_GRAPH = "Command.DTO";
 
     private static final long serialVersionUID = -8058995173025433517L;
     private static final int HIGHEST_CRITERION_PRIORITY = 0;
@@ -145,7 +256,7 @@ public class CommandEntity extends BaseEntity {
     @ToString.Exclude
     private Set<ClusterEntity> clusters = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
         name = "commands_cluster_criteria",
         joinColumns = {

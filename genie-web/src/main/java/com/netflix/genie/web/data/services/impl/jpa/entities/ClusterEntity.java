@@ -30,6 +30,10 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -53,7 +57,75 @@ import java.util.Set;
 )
 @Entity
 @Table(name = "clusters")
+@NamedEntityGraphs(
+    {
+        @NamedEntityGraph(
+            name = ClusterEntity.COMMANDS_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("commands")
+            }
+        ),
+        @NamedEntityGraph(
+            name = ClusterEntity.COMMANDS_DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode(
+                    value = "commands",
+                    subgraph = "command-sub-graph"
+                )
+            },
+            subgraphs = {
+                @NamedSubgraph(
+                    name = "command-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("executable"),
+                        @NamedAttributeNode("setupFile"),
+                        @NamedAttributeNode("configs"),
+                        @NamedAttributeNode("dependencies"),
+                        @NamedAttributeNode("tags"),
+                        @NamedAttributeNode(
+                            value = "clusterCriteria",
+                            subgraph = "criteria-sub-graph"
+                        )
+                    }
+                ),
+                @NamedSubgraph(
+                    name = "criteria-sub-graph",
+                    attributeNodes = {
+                        @NamedAttributeNode("tags")
+                    }
+                )
+            }
+        ),
+        @NamedEntityGraph(
+            name = ClusterEntity.DTO_ENTITY_GRAPH,
+            attributeNodes = {
+                @NamedAttributeNode("setupFile"),
+                @NamedAttributeNode("configs"),
+                @NamedAttributeNode("dependencies"),
+                @NamedAttributeNode("tags")
+            }
+        )
+    }
+)
 public class ClusterEntity extends BaseEntity implements ClusterCommandsProjection {
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
+     * a clusters commands base fields.
+     */
+    public static final String COMMANDS_ENTITY_GRAPH = "Cluster.commands";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to access
+     * a clusters commands and create the command DTOs.
+     */
+    public static final String COMMANDS_DTO_ENTITY_GRAPH = "Cluster.commands.dto";
+
+    /**
+     * The name of the {@link javax.persistence.EntityGraph} which will eagerly load everything needed to construct a
+     * Cluster DTO.
+     */
+    public static final String DTO_ENTITY_GRAPH = "Cluster.dto";
 
     private static final long serialVersionUID = -5674870110962005872L;
 
