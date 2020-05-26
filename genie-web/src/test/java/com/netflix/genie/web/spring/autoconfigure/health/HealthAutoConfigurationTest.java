@@ -23,11 +23,9 @@ import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
-import com.netflix.genie.web.health.GenieMemoryHealthIndicator;
 import com.netflix.genie.web.health.LocalAgentLauncherHealthIndicator;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
-import com.netflix.genie.web.services.JobMetricsService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -59,7 +57,6 @@ class HealthAutoConfigurationTest {
     void healthBeansCreatedIfNoOthersExist() {
         this.contextRunner.run(
             context -> {
-                Assertions.assertThat(context).hasSingleBean(GenieMemoryHealthIndicator.class);
                 Assertions.assertThat(context).hasSingleBean(GenieAgentHealthIndicator.class);
                 Assertions.assertThat(context).doesNotHaveBean(LocalAgentLauncherHealthIndicator.class);
             }
@@ -75,7 +72,6 @@ class HealthAutoConfigurationTest {
             .withUserConfiguration(LocalAgentLaunchMockConfiguration.class)
             .run(
                 context -> {
-                    Assertions.assertThat(context).hasSingleBean(GenieMemoryHealthIndicator.class);
                     Assertions.assertThat(context).hasSingleBean(GenieAgentHealthIndicator.class);
                     Assertions.assertThat(context).hasSingleBean(LocalAgentLauncherHealthIndicator.class);
                 }
@@ -86,20 +82,6 @@ class HealthAutoConfigurationTest {
      * Provide some junk beans if needed.
      */
     static class UserConfiguration {
-        @Bean
-        JobMetricsService jobMetricsService() {
-            return new JobMetricsService() {
-                @Override
-                public int getNumActiveJobs() {
-                    return 0;
-                }
-
-                @Override
-                public int getUsedMemory() {
-                    return 0;
-                }
-            };
-        }
 
         @Bean
         JobsProperties jobsProperties() {

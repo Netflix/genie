@@ -22,12 +22,9 @@ import com.netflix.genie.web.agent.launchers.impl.LocalAgentLauncherImpl;
 import com.netflix.genie.web.agent.services.AgentConnectionTrackingService;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.health.GenieAgentHealthIndicator;
-import com.netflix.genie.web.health.GenieMemoryHealthIndicator;
 import com.netflix.genie.web.health.LocalAgentLauncherHealthIndicator;
 import com.netflix.genie.web.properties.HealthProperties;
-import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
-import com.netflix.genie.web.services.JobMetricsService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -48,22 +45,6 @@ import org.springframework.context.annotation.Configuration;
     }
 )
 public class HealthAutoConfiguration {
-
-    /**
-     * Provide a health indicator related to job memory usage if one hasn't already been provided elsewhere.
-     *
-     * @param jobMetricsService Implementation of {@link JobMetricsService} to use
-     * @param jobsProperties    The {@link JobsProperties} to use
-     * @return An instance of {@link GenieMemoryHealthIndicator}
-     */
-    @Bean
-    @ConditionalOnMissingBean(GenieMemoryHealthIndicator.class)
-    public GenieMemoryHealthIndicator genieMemoryHealthIndicator(
-        final JobMetricsService jobMetricsService,
-        final JobsProperties jobsProperties
-    ) {
-        return new GenieMemoryHealthIndicator(jobMetricsService, jobsProperties);
-    }
 
     /**
      * Provide a health indicator tied to agent related information if one hasn't already been provided elsewhere.
