@@ -129,7 +129,8 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/services/JobArchiver.html#archiveDirectory-java.nio.file.Path-java.net.URI-">archiveDirectory</a></span>(java.nio.file.Path&nbsp;directory,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../com/netflix/genie/common/internal/services/JobArchiver.html#archiveDirectory-java.nio.file.Path-java.util.List-java.net.URI-">archiveDirectory</a></span>(java.nio.file.Path&nbsp;directory,
+                java.util.List&lt;java.io.File&gt;&nbsp;filesList,
                 java.net.URI&nbsp;target)</code>
 <div class="block">Attempt to archive a directory located at <code>directory</code> to the <code>target</code>.</div>
 </td>
@@ -149,13 +150,14 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="archiveDirectory-java.nio.file.Path-java.net.URI-">
+<a name="archiveDirectory-java.nio.file.Path-java.util.List-java.net.URI-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>archiveDirectory</h4>
 <pre>boolean&nbsp;archiveDirectory(java.nio.file.Path&nbsp;directory,
+                         java.util.List&lt;java.io.File&gt;&nbsp;filesList,
                          java.net.URI&nbsp;target)
                   throws <a href="../../../../../../com/netflix/genie/common/internal/exceptions/checked/JobArchiveException.html" title="class in com.netflix.genie.common.internal.exceptions.checked">JobArchiveException</a></pre>
 <div class="block">Attempt to archive a directory located at <code>directory</code> to the <code>target</code>. All existing data "under"
@@ -163,6 +165,7 @@ var activeTableTab = "activeTableTab";
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>directory</code> - The directory to archive</dd>
+<dd><code>filesList</code> - The list of files to archive</dd>
 <dd><code>target</code> - The root of a writable location to archive to.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd><code>false</code> if this implementation doesn't support archiving to <code>target</code>. <code>true</code> if does
