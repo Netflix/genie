@@ -67,9 +67,9 @@ com.netflix.genie.web.data.services.impl.jpa.converters
 com.netflix.genie.web.data.services.impl.jpa.entities
 com.netflix.genie.web.data.services.impl.jpa.listeners
 com.netflix.genie.web.data.services.impl.jpa.queries.aggregates
+com.netflix.genie.web.data.services.impl.jpa.queries.predicates
 com.netflix.genie.web.data.services.impl.jpa.queries.projections
 com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4
-com.netflix.genie.web.data.services.impl.jpa.queries.specifications
 com.netflix.genie.web.data.services.impl.jpa.repositories
 com.netflix.genie.web.data.services.impl.jpa.utils
 com.netflix.genie.web.dtos

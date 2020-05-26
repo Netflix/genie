@@ -73,13 +73,13 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -148,6 +148,42 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html#COMMANDS_DTO_ENTITY_GRAPH">COMMANDS_DTO_ENTITY_GRAPH</a></span></code>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ a clusters commands and create the command DTOs.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html#COMMANDS_ENTITY_GRAPH">COMMANDS_ENTITY_GRAPH</a></span></code>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ a clusters commands base fields.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html#DTO_ENTITY_GRAPH">DTO_ENTITY_GRAPH</a></span></code>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to construct a
+ Cluster DTO.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -294,6 +330,59 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="COMMANDS_ENTITY_GRAPH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>COMMANDS_ENTITY_GRAPH</h4>
+<pre>public static final&nbsp;java.lang.String COMMANDS_ENTITY_GRAPH</pre>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ a clusters commands base fields.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity.COMMANDS_ENTITY_GRAPH">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="COMMANDS_DTO_ENTITY_GRAPH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>COMMANDS_DTO_ENTITY_GRAPH</h4>
+<pre>public static final&nbsp;java.lang.String COMMANDS_DTO_ENTITY_GRAPH</pre>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ a clusters commands and create the command DTOs.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity.COMMANDS_DTO_ENTITY_GRAPH">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="DTO_ENTITY_GRAPH">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>DTO_ENTITY_GRAPH</h4>
+<pre>public static final&nbsp;java.lang.String DTO_ENTITY_GRAPH</pre>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to construct a
+ Cluster DTO.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity.DTO_ENTITY_GRAPH">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.detail">
@@ -503,13 +592,13 @@ implements <a href="../../../../../../../../../com/netflix/genie/web/data/servic
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>

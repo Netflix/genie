@@ -819,6 +819,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ApplicationModelAssembler.html#ApplicationModelAssembler--">ApplicationModelAssembler()</a></span> - Constructor for class com.netflix.genie.web.apis.rest.v3.hateoas.assemblers.<a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ApplicationModelAssembler.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ApplicationModelAssembler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates"><span class="typeNameLink">ApplicationPredicates</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.predicates</a></dt>
+<dd>
+<div class="block"><code>Predicate</code> generation helpers for querying <a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ApplicationEntity</code></a>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#applicationProcessorTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">applicationProcessorTask(MeterRegistry, GenieFileTransferService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.jobs.<a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.jobs">JobsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create an Application Task bean that processes all Applications needed for a job.</div>
@@ -851,6 +855,16 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#APPLICATIONS">APPLICATIONS</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#APPLICATIONS_DTO_ENTITY_GRAPH">APPLICATIONS_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated applications dto fields.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#APPLICATIONS_ENTITY_GRAPH">APPLICATIONS_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated applications base fields.</div>
+</dd>
 <dt><a href="com/netflix/genie/client/apis/ApplicationService.html" title="interface in com.netflix.genie.client.apis"><span class="typeNameLink">ApplicationService</span></a> - Interface in <a href="com/netflix/genie/client/apis/package-summary.html">com.netflix.genie.client.apis</a></dt>
 <dd>
 <div class="block">An interface that provides all methods needed for the Genie application client implementation.</div>
@@ -1632,6 +1646,11 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#CLUSTER_CRITERIA">CLUSTER_CRITERIA</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#CLUSTER_CRITERIA_ENTITY_GRAPH">CLUSTER_CRITERIA_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated cluster criteria.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html#CLUSTER_ID">CLUSTER_ID</a></span> - Static variable in class com.netflix.genie.web.util.<a href="com/netflix/genie/web/util/MetricsConstants.TagKeys.html" title="class in com.netflix.genie.web.util">MetricsConstants.TagKeys</a></dt>
 <dd>
 <div class="block">Key to tag metrics with cluster ID.</div>
@@ -1753,6 +1772,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#clusterName">clusterName</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates"><span class="typeNameLink">ClusterPredicates</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.predicates</a></dt>
+<dd>
+<div class="block"><code>Predicate</code> generation helpers for querying <a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ClusterEntity</code></a>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#clusterProcessorTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">clusterProcessorTask(MeterRegistry, GenieFileTransferService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.jobs.<a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.jobs">JobsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create an Cluster Task bean that processes the cluster needed for a job.</div>
@@ -2107,6 +2130,10 @@
 <dd>
 <div class="block">A package containing aggregates interfaces for Spring Data JPA.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.predicates</a> - package com.netflix.genie.web.data.services.impl.jpa.queries.predicates</dt>
+<dd>
+<div class="block">Package containing specification classes for use with JPA queries through Spring.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.projections</a> - package com.netflix.genie.web.data.services.impl.jpa.queries.projections</dt>
 <dd>
 <div class="block">A package containing projection interfaces for Spring Data JPA.</div>
@@ -2114,10 +2141,6 @@
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4</a> - package com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4</dt>
 <dd>
 <div class="block">Projections for V4 data types.</div>
-</dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.specifications</a> - package com.netflix.genie.web.data.services.impl.jpa.queries.specifications</dt>
-<dd>
-<div class="block">Package containing specification classes for use with JPA queries through Spring.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.repositories</a> - package com.netflix.genie.web.data.services.impl.jpa.repositories</dt>
 <dd>
@@ -2432,6 +2455,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#commandName">commandName</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates"><span class="typeNameLink">CommandPredicates</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.predicates</a></dt>
+<dd>
+<div class="block"><code>Predicate</code> generation helpers for querying <a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>CommandEntity</code></a>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html#commandProcessorTask-io.micrometer.core.instrument.MeterRegistry-com.netflix.genie.web.services.impl.GenieFileTransferService-">commandProcessorTask(MeterRegistry, GenieFileTransferService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.jobs.<a href="com/netflix/genie/web/spring/autoconfigure/jobs/JobsAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.jobs">JobsAutoConfiguration</a></dt>
 <dd>
 <div class="block">Create an Command Task bean that processes the command needed for a job.</div>
@@ -2464,6 +2491,26 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html#COMMANDS">COMMANDS</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html#COMMANDS_DTO_ENTITY_GRAPH">COMMANDS_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ an applications commands and create the command DTOs.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html#COMMANDS_DTO_ENTITY_GRAPH">COMMANDS_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ a clusters commands and create the command DTOs.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html#COMMANDS_ENTITY_GRAPH">COMMANDS_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ an applications commands base fields.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html#COMMANDS_ENTITY_GRAPH">COMMANDS_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to access
+ a clusters commands base fields.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/selectors/CommandSelectionContext.html" title="class in com.netflix.genie.web.selectors"><span class="typeNameLink">CommandSelectionContext</span></a> - Class in <a href="com/netflix/genie/web/selectors/package-summary.html">com.netflix.genie.web.selectors</a></dt>
 <dd>
 <div class="block">Extension of <a href="com/netflix/genie/web/selectors/ResourceSelectionContext.html" title="class in com.netflix.genie.web.selectors"><code>ResourceSelectionContext</code></a> to include specific data useful in command selection.</div>
@@ -2749,7 +2796,7 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html#createRelative-java.lang.String-">createRelative(String)</a></span> - Method in class com.netflix.genie.web.agent.resources.<a href="com/netflix/genie/web/agent/resources/AgentFileResourceImpl.html" title="class in com.netflix.genie.web.agent.resources">AgentFileResourceImpl</a></dt>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html#createRetryableException-java.lang.Throwable-">createRetryableException(Throwable)</a></span> - Method in class com.netflix.genie.agent.execution.statemachine.<a href="com/netflix/genie/agent/execution/statemachine/ExecutionStage.html" title="class in com.netflix.genie.agent.execution.statemachine">ExecutionStage</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaSpecificationUtils.html#createTagSearchString-java.util.Set-">createTagSearchString(Set&lt;TagEntity&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaSpecificationUtils.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaSpecificationUtils</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/PredicateUtils.html#createTagSearchString-java.util.Set-">createTagSearchString(Set&lt;TagEntity&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/PredicateUtils.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">PredicateUtils</a></dt>
 <dd>
 <div class="block">Convert a set of TagEntities to the '|' delimited tag search string.</div>
 </dd>
@@ -3359,6 +3406,21 @@
 <dd>
 <div class="block">Run the job specification resolution algorithm on the given input but save nothing in the system.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html#DTO_ENTITY_GRAPH">DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ApplicationEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to construct an
+ Application DTO.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html#DTO_ENTITY_GRAPH">DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to construct a
+ Cluster DTO.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#DTO_ENTITY_GRAPH">DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to construct a
+ Command DTO.</div>
+</dd>
 <dt><a href="com/netflix/genie/common/internal/dtos/v4/converters/DtoConverters.html" title="class in com.netflix.genie.common.internal.dtos.v4.converters"><span class="typeNameLink">DtoConverters</span></a> - Class in <a href="com/netflix/genie/common/internal/dtos/v4/converters/package-summary.html">com.netflix.genie.common.internal.dtos.v4.converters</a></dt>
 <dd>
 <div class="block">Utility class to help converting between V3 and V4 DTOs during migration period.</div>
@@ -3876,17 +3938,17 @@
 <dd>
 <div class="block">Final pseudo-state.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaApplicationSpecs.html#find-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-">find(String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, String)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaApplicationSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaApplicationSpecs</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html#find-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaQuery-javax.persistence.criteria.CriteriaBuilder-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-">find(Root&lt;ApplicationEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, String)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ApplicationPredicates</a></dt>
 <dd>
-<div class="block">Get a specification using the specified parameters.</div>
+<div class="block">Get a <code>Predicate</code> using the specified parameters.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html#find-java.lang.String-java.util.Set-java.util.Set-java.time.Instant-java.time.Instant-">find(String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, Instant, Instant)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaClusterSpecs</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#find-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaQuery-javax.persistence.criteria.CriteriaBuilder-java.lang.String-java.util.Set-java.util.Set-java.time.Instant-java.time.Instant-">find(Root&lt;ClusterEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;, Instant, Instant)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
 <dd>
-<div class="block">Generate a specification given the parameters.</div>
+<div class="block">Generate a <code>Predicate</code> given the parameters.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaCommandSpecs.html#find-java.lang.String-java.lang.String-java.util.Set-java.util.Set-">find(String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaCommandSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaCommandSpecs</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html#find-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaQuery-javax.persistence.criteria.CriteriaBuilder-java.lang.String-java.lang.String-java.util.Set-java.util.Set-">find(Root&lt;CommandEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, String, String, Set&lt;String&gt;, Set&lt;TagEntity&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">CommandPredicates</a></dt>
 <dd>
-<div class="block">Get a specification using the specified parameters.</div>
+<div class="block">Get a predicate using the specified parameters.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#FIND_OLD_JOBS_QUERY">FIND_OLD_JOBS_QUERY</a></span> - Static variable in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
 <dd>
@@ -3978,7 +4040,7 @@
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match any of the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html#findClustersMatchingAnyCriterion-java.util.Set-">findClustersMatchingAnyCriterion(Set&lt;Criterion&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaClusterSpecs</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#findClustersMatchingAnyCriterion-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaQuery-javax.persistence.criteria.CriteriaBuilder-java.util.Set-">findClustersMatchingAnyCriterion(Root&lt;ClusterEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Set&lt;Criterion&gt;)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
 <dd>
 <div class="block">Get the specification for the query which will find the clusters which match any of the given criterion.</div>
 </dd>
@@ -3990,9 +4052,9 @@
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html#findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-">findClustersMatchingCriterion(Criterion)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaClusterSpecs</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html#findClustersMatchingCriterion-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaQuery-javax.persistence.criteria.CriteriaBuilder-com.netflix.genie.common.external.dtos.v4.Criterion-">findClustersMatchingCriterion(Root&lt;ClusterEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Criterion)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></dt>
 <dd>
-<div class="block">Get the specification for the query which will find the clusters which match the given criterion.</div>
+<div class="block">Get the <code>Predicate</code> for the query which will find the clusters which match the given criterion.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#findClustersMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findClustersMatchingCriterion(Criterion, boolean)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
@@ -4010,17 +4072,13 @@
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaCommandSpecs.html#findCommandsMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-">findCommandsMatchingCriterion(Criterion)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaCommandSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaCommandSpecs</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html#findCommandsMatchingCriterion-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaQuery-javax.persistence.criteria.CriteriaBuilder-com.netflix.genie.common.external.dtos.v4.Criterion-">findCommandsMatchingCriterion(Root&lt;CommandEntity&gt;, CriteriaQuery&lt;?&gt;, CriteriaBuilder, Criterion)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">CommandPredicates</a></dt>
 <dd>
 <div class="block">Get the specification for the query which will find the commands which match the given criterion.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#findCommandsMatchingCriterion-com.netflix.genie.common.external.dtos.v4.Criterion-boolean-">findCommandsMatchingCriterion(Criterion, boolean)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Find all the <a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Command</code></a>'s that match the given <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a>.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#findDistinctByStatusInAndV4IsFalse-java.util.Set-">findDistinctByStatusInAndV4IsFalse(Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
-<dd>
-<div class="block">Find the jobs with one of the statuses entered.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html#findJobs-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.Long-java.lang.String-java.lang.String-org.springframework.data.domain.Pageable-org.springframework.data.web.PagedResourcesAssembler-">findJobs(String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, String, String, String, Long, Long, Long, Long, String, String, Pageable, PagedResourcesAssembler&lt;JobSearchResult&gt;)</a></span> - Method in class com.netflix.genie.web.apis.rest.v3.controllers.<a href="com/netflix/genie/web/apis/rest/v3/controllers/JobRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">JobRestController</a></dt>
 <dd>
@@ -4735,7 +4793,7 @@
 <div class="block">A singleton for sharing a Jackson Object Mapper instance across Genie and not having to redefine the Object Mapper
  everywhere.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.web.services.AttachmentService-">geniePersistenceService(JpaRepositories, AttachmentService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html#geniePersistenceService-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.web.services.AttachmentService-">geniePersistenceService(EntityManager, JpaRepositories, AttachmentService)</a></span> - Method in class com.netflix.genie.web.spring.autoconfigure.data.<a href="com/netflix/genie/web/spring/autoconfigure/data/DataAutoConfiguration.html" title="class in com.netflix.genie.web.spring.autoconfigure.data">DataAutoConfiguration</a></dt>
 <dd>
 <div class="block">Provide a default implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> if no other has been defined.</div>
 </dd>
@@ -5005,6 +5063,18 @@
 <dd>
 <div class="block">Get the application metadata for given id.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html#getApplicationAndCommands-java.lang.String-">getApplicationAndCommands(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaApplicationRepository</a></dt>
+<dd>
+<div class="block">Get the <a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ApplicationEntity</code></a> but eagerly fetch all command base information as well.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html#getApplicationAndCommandsDto-java.lang.String-">getApplicationAndCommandsDto(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaApplicationRepository</a></dt>
+<dd>
+<div class="block">Get the <a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ApplicationEntity</code></a> but eagerly fetch all command DTO information as well.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html#getApplicationDto-java.lang.String-">getApplicationDto(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaApplicationRepository</a></dt>
+<dd>
+<div class="block">Get the <a href="com/netflix/genie/web/data/services/impl/jpa/entities/ApplicationEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ApplicationEntity</code></a> but eagerly fetch all relational information needed to construct a DTO.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getApplicationIds--">getApplicationIds()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/ExecutionResourceCriteria.html#getApplicationIds--">getApplicationIds()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/ExecutionResourceCriteria.html" title="class in com.netflix.genie.common.external.dtos.v4">ExecutionResourceCriteria</a></dt>
@@ -5185,6 +5255,14 @@
 <dd>
 <div class="block">Get the <a href="com/netflix/genie/common/external/dtos/v4/Cluster.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Cluster</code></a> identified by the given id.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#getClusterAndCommands-java.lang.String-">getClusterAndCommands(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaClusterRepository</a></dt>
+<dd>
+<div class="block">Find the cluster with the given id but also eagerly load that clusters commands.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#getClusterAndCommandsDto-java.lang.String-">getClusterAndCommandsDto(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaClusterRepository</a></dt>
+<dd>
+<div class="block">Find the cluster with the given id but also eagerly load that clusters commands full dto contents.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getClusterCriteria--">getClusterCriteria()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/Command.html#getClusterCriteria--">getClusterCriteria()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/Command.html" title="class in com.netflix.genie.common.external.dtos.v4">Command</a></dt>
@@ -5224,6 +5302,10 @@
 <dd>
 <div class="block">For the given command id return the Cluster <a href="com/netflix/genie/common/external/dtos/v4/Criterion.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>Criterion</code></a> in priority order that is currently
  associated with this command if any.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#getClusterDto-java.lang.String-">getClusterDto(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaClusterRepository</a></dt>
+<dd>
+<div class="block">Find the cluster with the given id but also eagerly load all data needed for a cluster DTO.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/Job.html#getClusterName--">getClusterName()</a></span> - Method in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a></dt>
 <dd>
@@ -5336,6 +5418,18 @@
 <dd>
 <div class="block">Get the command which was already selected for the job if there was one.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndApplications-java.lang.String-">getCommandAndApplications(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Find the command with the given id but also eagerly load that commands applications.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndApplicationsDto-java.lang.String-">getCommandAndApplicationsDto(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Find the command with the given id but also eagerly load that commands applications full dto contents.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndClusterCriteria-java.lang.String-">getCommandAndClusterCriteria(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Find the command with the given id but also eagerly load that commands cluster criteria.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/Job.html#getCommandArgs--">getCommandArgs()</a></span> - Method in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a></dt>
 <dd>
 <div class="block">Get the arguments to be put on the command line along with the command executable.</div>
@@ -5387,6 +5481,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/V4JobRequestProjection.html#getCommandCriterion--">getCommandCriterion()</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4">V4JobRequestProjection</a></dt>
 <dd>
 <div class="block">Get the command criterion for this job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandDto-java.lang.String-">getCommandDto(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaCommandRepository</a></dt>
+<dd>
+<div class="block">Find the command with the given id but also eagerly load all data needed for a command DTO.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/dto/Job.html#getCommandName--">getCommandName()</a></span> - Method in class com.netflix.genie.common.dto.<a href="com/netflix/genie/common/dto/Job.html" title="class in com.netflix.genie.common.dto">Job</a></dt>
 <dd>
@@ -5835,7 +5933,7 @@
 <dd>
 <div class="block">Get all the entries that are files for this manifest.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaJobSpecs.html#getFindPredicate-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaBuilder-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity-java.lang.String-com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity-java.time.Instant-java.time.Instant-java.time.Instant-java.time.Instant-java.lang.String-java.lang.String-">getFindPredicate(Root&lt;JobEntity&gt;, CriteriaBuilder, String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, ClusterEntity, String, CommandEntity, Instant, Instant, Instant, Instant, String, String)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.specifications.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaJobSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaJobSpecs</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html#getFindPredicate-javax.persistence.criteria.Root-javax.persistence.criteria.CriteriaBuilder-java.lang.String-java.lang.String-java.lang.String-java.util.Set-java.util.Set-java.lang.String-com.netflix.genie.web.data.services.impl.jpa.entities.ClusterEntity-java.lang.String-com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity-java.time.Instant-java.time.Instant-java.time.Instant-java.time.Instant-java.lang.String-java.lang.String-">getFindPredicate(Root&lt;JobEntity&gt;, CriteriaBuilder, String, String, String, Set&lt;String&gt;, Set&lt;String&gt;, String, ClusterEntity, String, CommandEntity, Instant, Instant, Instant, Instant, String, String)</a></span> - Static method in class com.netflix.genie.web.data.services.impl.jpa.queries.predicates.<a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">JobPredicates</a></dt>
 <dd>
 <div class="block">Generate a criteria query predicate for a where clause based on the given parameters.</div>
 </dd>
@@ -6073,6 +6171,10 @@
 <dd>
 <div class="block">Get the applications the job used or is currently using.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobApplications-java.lang.String-">getJobApplications(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the applications for a job.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobApplications-java.lang.String-">getJobApplications(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get the applications the job used or is currently using.</div>
@@ -6105,6 +6207,10 @@
 <dd>
 <div class="block">Get the cluster the job used or is using.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobCluster-java.lang.String-">getJobCluster(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the cluster for a job.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobCluster-java.lang.String-">getJobCluster(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get the cluster the job used or is using.</div>
@@ -6124,6 +6230,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getJobCommand-java.lang.String-">getJobCommand(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Get the command the job used or is using.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobCommand-java.lang.String-">getJobCommand(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the command for a job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobCommand-java.lang.String-">getJobCommand(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
@@ -6194,6 +6304,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobHost-java.lang.String-">getJobHost(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get the hostname a job is running on.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobHostname-java.lang.String-">getJobHostname(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get only the hostname of a job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html#getJobId--">getJobId()</a></span> - Method in interface com.netflix.genie.agent.cli.<a href="com/netflix/genie/agent/cli/ArgumentDelegates.JobRequestArguments.html" title="interface in com.netflix.genie.agent.cli">ArgumentDelegates.JobRequestArguments</a></dt>
 <dd>&nbsp;</dd>
@@ -6321,6 +6435,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Get the status for a job with the given <code>id</code>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get only the status of a job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getJobStatus-java.lang.String-">getJobStatus(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
@@ -7303,13 +7421,35 @@
 <dd>
 <div class="block">Get a map of summaries of resources usage for each user with at least one running job.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV3Hosts-java.util.Set-">getV3Hosts(Set&lt;String&gt;)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Only used for old v3 jobs</span></div>
+</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV3Job-java.lang.String-">getV3Job(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the data needed to create a V3 Job DTO.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#getV3JobRequest-java.lang.String-">getV3JobRequest(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV3JobRequest-java.lang.String-">getV3JobRequest(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the data needed to create a V3 Job Request DTO.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#getV3JobRequest-java.lang.String-">getV3JobRequest(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV4JobRequest-java.lang.String-">getV4JobRequest(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the data needed to create a V4 Job Request DTO.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#getV4JobSpecification-java.lang.String-">getV4JobSpecification(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Get the data needed to create a V4 Job Specification DTO.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html#getVersion--">getVersion()</a></span> - Method in class com.netflix.genie.common.external.dtos.v4.<a href="com/netflix/genie/common/external/dtos/v4/AgentClientMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">AgentClientMetadata</a></dt>
 <dd>
@@ -7927,6 +8067,10 @@
 <dd>
 <div class="block">Return whether or not this job was submitted via the API or other (e.g.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#isAPI-java.lang.String-">isAPI(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block">Return whether the job was submitted via the API or the Agent CLI.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#isApiJob-java.lang.String-">isApiJob(String)</a></span> - Method in class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Get whether the job with the given ID was submitted via the REST API or other mechanism.</div>
@@ -8024,6 +8168,12 @@
 <div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 <div class="block">Job was launched using Genie v4.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html#isV4-java.lang.String-">isV4(String)</a></span> - Method in interface com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaJobRepository</a></dt>
+<dd>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="block"><span class="deprecationComment">Only here during v3 to v4 agent migration</span></div>
+</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/PersistenceService.html#isV4-java.lang.String-">isV4(String)</a></span> - Method in interface com.netflix.genie.web.data.services.<a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services">PersistenceService</a></dt>
 <dd>
 <div class="block">Get whether the job is a V4 job (Run with agent).</div>
@@ -8080,9 +8230,24 @@
 <dd>
 <div class="block">A builder to create jobs.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#JOB_APPLICATIONS_DTO_ENTITY_GRAPH">JOB_APPLICATIONS_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will load all the data needed to get the
+ applications for a job.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html#JOB_CLEANUP_PROPERTY_PREFIX">JOB_CLEANUP_PROPERTY_PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.JobDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.JobDatabaseCleanupProperties</a></dt>
 <dd>
 <div class="block">The prefix for all properties related to cleaning up job records from the database.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#JOB_CLUSTER_DTO_ENTITY_GRAPH">JOB_CLUSTER_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will load all the data needed to get the
+ cluster for a job.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#JOB_COMMAND_DTO_ENTITY_GRAPH">JOB_COMMAND_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will load all the data needed to get the
+ command for a job.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html#JOB_CREATION_THRESHOLD_PROPERTY">JOB_CREATION_THRESHOLD_PROPERTY</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties.html" title="class in com.netflix.genie.web.properties">DatabaseCleanupProperties.CommandDeactivationDatabaseCleanupProperties</a></dt>
 <dd>
@@ -8843,6 +9008,10 @@
 <dd>
 <div class="block">Create a <a href="com/netflix/genie/web/events/JobStateChangeSNSPublisher.html" title="class in com.netflix.genie.web.events"><code>JobStateChangeSNSPublisher</code></a> unless one exists in the context already.</div>
 </dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates"><span class="typeNameLink">JobPredicates</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.predicates</a></dt>
+<dd>
+<div class="block"><code>Predicate</code> helpers for querying <a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>JobEntity</code></a>.</div>
+</dd>
 <dt><a href="com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process"><span class="typeNameLink">JobProcessManager</span></a> - Interface in <a href="com/netflix/genie/agent/execution/process/package-summary.html">com.netflix.genie.agent.execution.process</a></dt>
 <dd>
 <div class="block">Singleton to manage the subprocess for the actual user job this Agent instance is managing.</div>
@@ -9250,10 +9419,6 @@
 <dd>
 <div class="block">Application repository.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaApplicationSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications"><span class="typeNameLink">JpaApplicationSpecs</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.specifications</a></dt>
-<dd>
-<div class="block">Specifications for JPA queries.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="typeNameLink">JpaBaseRepository</span></a>&lt;<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaBaseRepository.html" title="type parameter in JpaBaseRepository">E</a> extends <a href="com/netflix/genie/web/data/services/impl/jpa/entities/BaseEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">BaseEntity</a>&gt; - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.repositories</a></dt>
 <dd>
 <div class="block">A common repository for inheritance of common methods for Entities extending BaseEntity.</div>
@@ -9262,17 +9427,9 @@
 <dd>
 <div class="block">Cluster repository.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications"><span class="typeNameLink">JpaClusterSpecs</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.specifications</a></dt>
-<dd>
-<div class="block">Specifications for JPA queries.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="typeNameLink">JpaCommandRepository</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.repositories</a></dt>
 <dd>
 <div class="block">Command repository.</div>
-</dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaCommandSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications"><span class="typeNameLink">JpaCommandSpecs</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.specifications</a></dt>
-<dd>
-<div class="block">Specifications for JPA queries.</div>
 </dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCriterionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="typeNameLink">JpaCriterionRepository</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.repositories</a></dt>
 <dd>
@@ -9286,15 +9443,11 @@
 <dd>
 <div class="block">Job repository.</div>
 </dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaJobSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications"><span class="typeNameLink">JpaJobSpecs</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.specifications</a></dt>
-<dd>
-<div class="block">Specifications for JPA queries.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa"><span class="typeNameLink">JpaPersistenceServiceImpl</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/package-summary.html">com.netflix.genie.web.data.services.impl.jpa</a></dt>
 <dd>
 <div class="block">Implementation of <a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><code>PersistenceService</code></a> using JPA.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.web.services.AttachmentService-">JpaPersistenceServiceImpl(JpaRepositories, AttachmentService)</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html#JpaPersistenceServiceImpl-javax.persistence.EntityManager-com.netflix.genie.web.data.services.impl.jpa.repositories.JpaRepositories-com.netflix.genie.web.services.AttachmentService-">JpaPersistenceServiceImpl(EntityManager, JpaRepositories, AttachmentService)</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.<a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></dt>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
@@ -9304,10 +9457,6 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html#JpaRepositories--">JpaRepositories()</a></span> - Constructor for class com.netflix.genie.web.data.services.impl.jpa.repositories.<a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaSpecificationUtils.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications"><span class="typeNameLink">JpaSpecificationUtils</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.specifications</a></dt>
-<dd>
-<div class="block">Utility methods for the specification classes.</div>
-</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="typeNameLink">JpaTagRepository</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/repositories/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.repositories</a></dt>
 <dd>
 <div class="block">Repository for tags.</div>
@@ -10088,6 +10237,10 @@
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html#preDestroy--">preDestroy()</a></span> - Method in class com.netflix.genie.web.tasks.leader.<a href="com/netflix/genie/web/tasks/leader/LeaderTasksCoordinator.html" title="class in com.netflix.genie.web.tasks.leader">LeaderTasksCoordinator</a></dt>
 <dd>
 <div class="block">Make sure any threads are taken care of before this object is destroyed.</div>
+</dd>
+<dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/PredicateUtils.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates"><span class="typeNameLink">PredicateUtils</span></a> - Class in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.predicates</a></dt>
+<dd>
+<div class="block">Utility methods for the JPA <code>Predicate</code> generation.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html#PREFIX">PREFIX</a></span> - Static variable in class com.netflix.genie.web.properties.<a href="com/netflix/genie/web/properties/ClusterSelectorScriptProperties.html" title="class in com.netflix.genie.web.properties">ClusterSelectorScriptProperties</a></dt>
 <dd>
@@ -13030,10 +13183,30 @@
 </a>
 <h2 class="title">V</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#V3_JOB_DTO_ENTITY_GRAPH">V3_JOB_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will load all the data needed
+ for a V3 Job DTO.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#V3_JOB_REQUEST_DTO_ENTITY_GRAPH">V3_JOB_REQUEST_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will load all the data needed
+ for a V3 Job Request DTO.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#v4">v4</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html#V4">V4</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity_.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity_</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#V4_JOB_REQUEST_DTO_ENTITY_GRAPH">V4_JOB_REQUEST_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will load all the data needed
+ for a V4 Job Request DTO.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html#V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH">V4_JOB_SPECIFICATION_DTO_ENTITY_GRAPH</a></span> - Static variable in class com.netflix.genie.web.data.services.impl.jpa.entities.<a href="com/netflix/genie/web/data/services/impl/jpa/entities/JobEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">JobEntity</a></dt>
+<dd>
+<div class="block">The name of the <code>EntityGraph</code> which will load all the data needed
+ for a V4 Job Specification DTO.</div>
+</dd>
 <dt><a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/V4JobRequestProjection.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4"><span class="typeNameLink">V4JobRequestProjection</span></a> - Interface in <a href="com/netflix/genie/web/data/services/impl/jpa/queries/projections/v4/package-summary.html">com.netflix.genie.web.data.services.impl.jpa.queries.projections.v4</a></dt>
 <dd>
 <div class="block">Projection of just the fields needed for a V4 <a href="com/netflix/genie/common/external/dtos/v4/JobRequest.html" title="class in com.netflix.genie.common.external.dtos.v4"><code>JobRequest</code></a>.</div>

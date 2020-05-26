@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -160,6 +160,30 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndApplications-java.lang.String-">getCommandAndApplications</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Find the command with the given id but also eagerly load that commands applications.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndApplicationsDto-java.lang.String-">getCommandAndApplicationsDto</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Find the command with the given id but also eagerly load that commands applications full dto contents.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandAndClusterCriteria-java.lang.String-">getCommandAndClusterCriteria</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Find the command with the given id but also eagerly load that commands cluster criteria.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#getCommandDto-java.lang.String-">getCommandDto</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Find the command with the given id but also eagerly load all data needed for a command DTO.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html#setUnusedStatus-java.lang.String-java.time.Instant-java.util.Set-java.time.Instant-">setUnusedStatus</a></span>(java.lang.String&nbsp;desiredStatus,
                java.time.Instant&nbsp;commandCreatedThreshold,
@@ -296,7 +320,7 @@ int&nbsp;setUnusedStatus(@Param(value="desiredStatus")
 <a name="findUnusedCommands-java.util.Set-java.time.Instant-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>findUnusedCommands</h4>
 <pre>@Query(value="SELECT id FROM commands WHERE status IN (:unusedStatuses) AND created &lt; :commandCreatedThreshold AND id NOT IN (SELECT DISTINCT(command_id) FROM jobs WHERE command_id IS NOT NULL) AND id NOT IN (SELECT DISTINCT(command_id) FROM clusters_commands)",
@@ -314,6 +338,90 @@ java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedCommands(@Param(value="unused
                                 unused. Exclusive.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The ids of the commands that are considered unused</dd>
+</dl>
+</li>
+</ul>
+<a name="getCommandAndApplications-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCommandAndApplications</h4>
+<pre>@Query(value="SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+ @EntityGraph(value="Command.applications",
+             type=LOAD)
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;&nbsp;getCommandAndApplications(@Param(value="id")
+                                                                                                                                                                                                     java.lang.String&nbsp;id)</pre>
+<div class="block">Find the command with the given id but also eagerly load that commands applications.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the command to get</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>CommandEntity</code></a> with its applications data loaded or <code>Optional.empty()</code> if there is no
+ command with the given id</dd>
+</dl>
+</li>
+</ul>
+<a name="getCommandAndApplicationsDto-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCommandAndApplicationsDto</h4>
+<pre>@Query(value="SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+ @EntityGraph(value="Command.applications.dto",
+             type=LOAD)
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;&nbsp;getCommandAndApplicationsDto(@Param(value="id")
+                                                                                                                                                                                                            java.lang.String&nbsp;id)</pre>
+<div class="block">Find the command with the given id but also eagerly load that commands applications full dto contents.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the command to get</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>CommandEntity</code></a> with its applications data loaded or <code>Optional.empty()</code> if there is no
+ command with the given id</dd>
+</dl>
+</li>
+</ul>
+<a name="getCommandAndClusterCriteria-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCommandAndClusterCriteria</h4>
+<pre>@Query(value="SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+ @EntityGraph(value="Command.clusterCriteria",
+             type=LOAD)
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;&nbsp;getCommandAndClusterCriteria(@Param(value="id")
+                                                                                                                                                                                                           java.lang.String&nbsp;id)</pre>
+<div class="block">Find the command with the given id but also eagerly load that commands cluster criteria.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the command to get</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>CommandEntity</code></a> with its criteria data loaded or <code>Optional.empty()</code> if there is no
+ command with the given id</dd>
+</dl>
+</li>
+</ul>
+<a name="getCommandDto-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getCommandDto</h4>
+<pre>@Query(value="SELECT c FROM CommandEntity c WHERE c.uniqueId = :id")
+ @EntityGraph(value="Command.DTO",
+             type=LOAD)
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">CommandEntity</a>&gt;&nbsp;getCommandDto(@Param(value="id")
+                                                                                                                                                                                java.lang.String&nbsp;id)</pre>
+<div class="block">Find the command with the given id but also eagerly load all data needed for a command DTO.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the command to get</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>CommandEntity</code></a> all DTO data loaded or <code>Optional.empty()</code> if there is no
+ command with the given id</dd>
 </dl>
 </li>
 </ul>

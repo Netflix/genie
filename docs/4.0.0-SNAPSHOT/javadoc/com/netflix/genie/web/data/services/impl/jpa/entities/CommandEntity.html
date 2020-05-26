@@ -73,13 +73,13 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -145,6 +145,49 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#APPLICATIONS_DTO_ENTITY_GRAPH">APPLICATIONS_DTO_ENTITY_GRAPH</a></span></code>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated applications dto fields.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#APPLICATIONS_ENTITY_GRAPH">APPLICATIONS_ENTITY_GRAPH</a></span></code>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated applications base fields.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#CLUSTER_CRITERIA_ENTITY_GRAPH">CLUSTER_CRITERIA_ENTITY_GRAPH</a></span></code>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated cluster criteria.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/CommandEntity.html#DTO_ENTITY_GRAPH">DTO_ENTITY_GRAPH</a></span></code>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to construct a
+ Command DTO.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -322,6 +365,74 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="APPLICATIONS_ENTITY_GRAPH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>APPLICATIONS_ENTITY_GRAPH</h4>
+<pre>public static final&nbsp;java.lang.String APPLICATIONS_ENTITY_GRAPH</pre>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated applications base fields.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity.APPLICATIONS_ENTITY_GRAPH">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="APPLICATIONS_DTO_ENTITY_GRAPH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>APPLICATIONS_DTO_ENTITY_GRAPH</h4>
+<pre>public static final&nbsp;java.lang.String APPLICATIONS_DTO_ENTITY_GRAPH</pre>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated applications dto fields.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity.APPLICATIONS_DTO_ENTITY_GRAPH">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="CLUSTER_CRITERIA_ENTITY_GRAPH">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CLUSTER_CRITERIA_ENTITY_GRAPH</h4>
+<pre>public static final&nbsp;java.lang.String CLUSTER_CRITERIA_ENTITY_GRAPH</pre>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load the command base fields and
+ its associated cluster criteria.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity.CLUSTER_CRITERIA_ENTITY_GRAPH">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="DTO_ENTITY_GRAPH">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>DTO_ENTITY_GRAPH</h4>
+<pre>public static final&nbsp;java.lang.String DTO_ENTITY_GRAPH</pre>
+<div class="block">The name of the <code>EntityGraph</code> which will eagerly load everything needed to construct a
+ Command DTO.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../../../../../constant-values.html#com.netflix.genie.web.data.services.impl.jpa.entities.CommandEntity.DTO_ENTITY_GRAPH">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.detail">
@@ -634,13 +745,13 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>

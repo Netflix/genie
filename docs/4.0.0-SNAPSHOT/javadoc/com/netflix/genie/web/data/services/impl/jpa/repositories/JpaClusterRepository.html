@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -154,6 +154,24 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
  and have one of the given statuses.</div>
 </td>
 </tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#getClusterAndCommands-java.lang.String-">getClusterAndCommands</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Find the cluster with the given id but also eagerly load that clusters commands.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#getClusterAndCommandsDto-java.lang.String-">getClusterAndCommandsDto</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Find the cluster with the given id but also eagerly load that clusters commands full dto contents.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html#getClusterDto-java.lang.String-">getClusterDto</a></span>(java.lang.String&nbsp;id)</code>
+<div class="block">Find the cluster with the given id but also eagerly load all data needed for a cluster DTO.</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.com.netflix.genie.web.data.services.impl.jpa.repositories.JpaBaseRepository">
@@ -244,7 +262,7 @@ extends <a href="../../../../../../../../../com/netflix/genie/web/data/services/
 <a name="findUnusedClusters-java.util.Set-java.time.Instant-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>findUnusedClusters</h4>
 <pre>@Query(value="SELECT id FROM clusters WHERE status IN (:unusedStatuses) AND created &lt; :clusterCreatedThreshold AND id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL)",
@@ -262,6 +280,69 @@ java.util.Set&lt;java.lang.Long&gt;&nbsp;findUnusedClusters(@Param(value="unused
                                 unused. Exclusive.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The ids of the clusters that are considered unused</dd>
+</dl>
+</li>
+</ul>
+<a name="getClusterAndCommands-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getClusterAndCommands</h4>
+<pre>@Query(value="SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
+ @EntityGraph(value="Cluster.commands",
+             type=LOAD)
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a>&gt;&nbsp;getClusterAndCommands(@Param(value="id")
+                                                                                                                                                                                             java.lang.String&nbsp;id)</pre>
+<div class="block">Find the cluster with the given id but also eagerly load that clusters commands.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the cluster to get</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ClusterEntity</code></a> with its command base data loaded or <code>Optional.empty()</code> if there is no
+ cluster with the given id</dd>
+</dl>
+</li>
+</ul>
+<a name="getClusterAndCommandsDto-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getClusterAndCommandsDto</h4>
+<pre>@Query(value="SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
+ @EntityGraph(value="Cluster.commands.dto",
+             type=LOAD)
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a>&gt;&nbsp;getClusterAndCommandsDto(@Param(value="id")
+                                                                                                                                                                                                    java.lang.String&nbsp;id)</pre>
+<div class="block">Find the cluster with the given id but also eagerly load that clusters commands full dto contents.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the command to get</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ClusterEntity</code></a> with its command dto data loaded or <code>Optional.empty()</code> if there is no
+ cluster with the given id</dd>
+</dl>
+</li>
+</ul>
+<a name="getClusterDto-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getClusterDto</h4>
+<pre>@Query(value="SELECT c FROM ClusterEntity c WHERE c.uniqueId = :id")
+ @EntityGraph(value="Cluster.dto",
+             type=LOAD)
+java.util.Optional&lt;<a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities">ClusterEntity</a>&gt;&nbsp;getClusterDto(@Param(value="id")
+                                                                                                                                                                                java.lang.String&nbsp;id)</pre>
+<div class="block">Find the cluster with the given id but also eagerly load all data needed for a cluster DTO.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - The id of the command to get</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The <a href="../../../../../../../../../com/netflix/genie/web/data/services/impl/jpa/entities/ClusterEntity.html" title="class in com.netflix.genie.web.data.services.impl.jpa.entities"><code>ClusterEntity</code></a> with all DTO data loaded or <code>Optional.empty()</code> if there is no
+ cluster with the given id</dd>
 </dl>
 </li>
 </ul>

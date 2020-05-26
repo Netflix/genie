@@ -72,6 +72,7 @@
 <li><a href="com/netflix/genie/common/external/dtos/v4/ApplicationMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationMetadata</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/ApplicationMetadata.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationMetadata.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ApplicationModelAssembler.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ApplicationModelAssembler</a></li>
+<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ApplicationPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ApplicationPredicates</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/ApplicationRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationRequest</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/ApplicationRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">ApplicationRequest.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/controllers/ApplicationRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ApplicationRestController</a></li>
@@ -132,6 +133,7 @@
 <li><a href="com/netflix/genie/common/external/dtos/v4/ClusterMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterMetadata</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/ClusterMetadata.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterMetadata.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/ClusterModelAssembler.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">ClusterModelAssembler</a></li>
+<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/ClusterPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">ClusterPredicates</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/ClusterRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/ClusterRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">ClusterRequest.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/controllers/ClusterRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">ClusterRestController</a></li>
@@ -152,6 +154,7 @@
 <li><a href="com/netflix/genie/common/external/dtos/v4/CommandMetadata.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandMetadata</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/CommandMetadata.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandMetadata.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/hateoas/assemblers/CommandModelAssembler.html" title="class in com.netflix.genie.web.apis.rest.v3.hateoas.assemblers">CommandModelAssembler</a></li>
+<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/CommandPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">CommandPredicates</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/CommandRequest.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest</a></li>
 <li><a href="com/netflix/genie/common/external/dtos/v4/CommandRequest.Builder.html" title="class in com.netflix.genie.common.external.dtos.v4">CommandRequest.Builder</a></li>
 <li><a href="com/netflix/genie/web/apis/rest/v3/controllers/CommandRestController.html" title="class in com.netflix.genie.web.apis.rest.v3.controllers">CommandRestController</a></li>
@@ -407,6 +410,7 @@
 <li><a href="com/netflix/genie/web/exceptions/checked/JobNotArchivedException.html" title="class in com.netflix.genie.web.exceptions.checked">JobNotArchivedException</a></li>
 <li><a href="com/netflix/genie/web/exceptions/checked/JobNotFoundException.html" title="class in com.netflix.genie.web.exceptions.checked">JobNotFoundException</a></li>
 <li><a href="com/netflix/genie/web/events/JobNotificationMetricPublisher.html" title="class in com.netflix.genie.web.events">JobNotificationMetricPublisher</a></li>
+<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/JobPredicates.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">JobPredicates</a></li>
 <li><a href="com/netflix/genie/agent/execution/process/JobProcessManager.html" title="interface in com.netflix.genie.agent.execution.process"><span class="interfaceName">JobProcessManager</span></a></li>
 <li><a href="com/netflix/genie/agent/execution/process/impl/JobProcessManagerImpl.html" title="class in com.netflix.genie.agent.execution.process.impl">JobProcessManagerImpl</a></li>
 <li><a href="com/netflix/genie/agent/execution/process/JobProcessResult.html" title="class in com.netflix.genie.agent.execution.process">JobProcessResult</a></li>
@@ -459,19 +463,14 @@
 <li><a href="com/netflix/genie/web/jobs/workflow/impl/JobTask.html" title="class in com.netflix.genie.web.jobs.workflow.impl">JobTask</a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaAgentConnectionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaAgentConnectionRepository</span></a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaApplicationRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaApplicationRepository</span></a></li>
-<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaApplicationSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaApplicationSpecs</a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaBaseRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaBaseRepository</span></a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaClusterRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaClusterRepository</span></a></li>
-<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaClusterSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaClusterSpecs</a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCommandRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaCommandRepository</span></a></li>
-<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaCommandSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaCommandSpecs</a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaCriterionRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaCriterionRepository</span></a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaFileRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaFileRepository</span></a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaJobRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaJobRepository</span></a></li>
-<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaJobSpecs.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaJobSpecs</a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/JpaPersistenceServiceImpl.html" title="class in com.netflix.genie.web.data.services.impl.jpa">JpaPersistenceServiceImpl</a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaRepositories.html" title="class in com.netflix.genie.web.data.services.impl.jpa.repositories">JpaRepositories</a></li>
-<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/specifications/JpaSpecificationUtils.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.specifications">JpaSpecificationUtils</a></li>
 <li><a href="com/netflix/genie/web/data/services/impl/jpa/repositories/JpaTagRepository.html" title="interface in com.netflix.genie.web.data.services.impl.jpa.repositories"><span class="interfaceName">JpaTagRepository</span></a></li>
 <li><a href="com/netflix/genie/common/util/JsonUtils.html" title="class in com.netflix.genie.common.util">JsonUtils</a></li>
 <li><a href="com/netflix/genie/web/events/KillJobEvent.html" title="class in com.netflix.genie.web.events">KillJobEvent</a></li>
@@ -516,6 +515,7 @@
 <li><a href="com/netflix/genie/web/data/observers/PersistedJobStatusObserverImpl.html" title="class in com.netflix.genie.web.data.observers">PersistedJobStatusObserverImpl</a></li>
 <li><a href="com/netflix/genie/web/data/services/PersistenceService.html" title="interface in com.netflix.genie.web.data.services"><span class="interfaceName">PersistenceService</span></a></li>
 <li><a href="com/netflix/genie/web/exceptions/checked/PreconditionFailedException.html" title="class in com.netflix.genie.web.exceptions.checked">PreconditionFailedException</a></li>
+<li><a href="com/netflix/genie/web/data/services/impl/jpa/queries/predicates/PredicateUtils.html" title="class in com.netflix.genie.web.data.services.impl.jpa.queries.predicates">PredicateUtils</a></li>
 <li><a href="com/netflix/genie/agent/spring/autoconfigure/ProcessAutoConfiguration.html" title="class in com.netflix.genie.agent.spring.autoconfigure">ProcessAutoConfiguration</a></li>
 <li><a href="com/netflix/genie/web/util/ProcessChecker.html" title="interface in com.netflix.genie.web.util"><span class="interfaceName">ProcessChecker</span></a></li>
 <li><a href="com/netflix/genie/web/util/ProcessChecker.Factory.html" title="interface in com.netflix.genie.web.util"><span class="interfaceName">ProcessChecker.Factory</span></a></li>
