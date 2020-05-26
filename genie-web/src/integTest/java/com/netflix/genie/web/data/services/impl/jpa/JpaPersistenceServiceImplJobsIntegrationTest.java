@@ -55,6 +55,7 @@ import com.netflix.genie.common.internal.exceptions.checked.GenieCheckedExceptio
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobMetadataProjection;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
@@ -1175,29 +1176,11 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
 
     @Test
     @DatabaseSetup("persistence/jobs/search.xml")
-    void canGetAllocatedMemoryOnHost() {
-        Assertions.assertThat(this.service.getAllocatedMemoryOnHost("a.netflix.com")).isEqualTo(2048L);
-        Assertions.assertThat(this.service.getAllocatedMemoryOnHost("b.netflix.com")).isEqualTo(2048L);
-        Assertions.assertThat(this.service.getAllocatedMemoryOnHost("agent.netflix.com")).isEqualTo(4096L);
-        Assertions.assertThat(this.service.getAllocatedMemoryOnHost(UUID.randomUUID().toString())).isEqualTo(0L);
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/search.xml")
     void canGetUsedMemoryOnHost() {
         Assertions.assertThat(this.service.getUsedMemoryOnHost("a.netflix.com")).isEqualTo(2048L);
         Assertions.assertThat(this.service.getUsedMemoryOnHost("b.netflix.com")).isEqualTo(2048L);
         Assertions.assertThat(this.service.getUsedMemoryOnHost("agent.netflix.com")).isEqualTo(4096L);
         Assertions.assertThat(this.service.getUsedMemoryOnHost(UUID.randomUUID().toString())).isEqualTo(0L);
-    }
-
-    @Test
-    @DatabaseSetup("persistence/jobs/search.xml")
-    void canGetCountOfActiveJobsOnHost() {
-        Assertions.assertThat(this.service.getActiveJobCountOnHost("a.netflix.com")).isEqualTo(1L);
-        Assertions.assertThat(this.service.getActiveJobCountOnHost("b.netflix.com")).isEqualTo(1L);
-        Assertions.assertThat(this.service.getActiveJobCountOnHost("agent.netflix.com")).isEqualTo(2L);
-        Assertions.assertThat(this.service.getActiveJobCountOnHost(UUID.randomUUID().toString())).isEqualTo(0L);
     }
 
     @Test
@@ -1216,6 +1199,27 @@ class JpaPersistenceServiceImplJobsIntegrationTest extends JpaPersistenceService
             .assertThat(this.service.getUnclaimedAgentJobs())
             .hasSize(2)
             .containsExactlyInAnyOrder(AGENT_JOB_1, AGENT_JOB_2);
+    }
+
+    @Test
+    @DatabaseSetup("persistence/jobs/getHostJobInformation/setup.xml")
+    void canGetJobHostInformation() {
+        final JobInfoAggregate aInfo = this.service.getHostJobInformation("a.netflix.com");
+        Assertions.assertThat(aInfo.getNumberOfActiveJobs()).isEqualTo(1L);
+        Assertions.assertThat(aInfo.getTotalMemoryAllocated()).isEqualTo(2048L);
+        Assertions.assertThat(aInfo.getTotalMemoryUsed()).isEqualTo(2048L);
+        final JobInfoAggregate bInfo = this.service.getHostJobInformation("b.netflix.com");
+        Assertions.assertThat(bInfo.getNumberOfActiveJobs()).isEqualTo(1L);
+        Assertions.assertThat(bInfo.getTotalMemoryAllocated()).isEqualTo(2048L);
+        Assertions.assertThat(bInfo.getTotalMemoryUsed()).isEqualTo(2048L);
+        final JobInfoAggregate agentInfo = this.service.getHostJobInformation("agent.netflix.com");
+        Assertions.assertThat(agentInfo.getNumberOfActiveJobs()).isEqualTo(2L);
+        Assertions.assertThat(agentInfo.getTotalMemoryAllocated()).isEqualTo(4096L);
+        Assertions.assertThat(agentInfo.getTotalMemoryUsed()).isEqualTo(4096L);
+        final JobInfoAggregate randomInfo = this.service.getHostJobInformation(UUID.randomUUID().toString());
+        Assertions.assertThat(randomInfo.getNumberOfActiveJobs()).isEqualTo(0L);
+        Assertions.assertThat(randomInfo.getTotalMemoryAllocated()).isEqualTo(0L);
+        Assertions.assertThat(randomInfo.getTotalMemoryUsed()).isEqualTo(0L);
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {

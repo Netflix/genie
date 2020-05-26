@@ -1107,19 +1107,6 @@ class JpaPersistenceServiceImplJobsTest {
         Assertions.assertThat(this.persistenceService.getUserResourcesSummaries()).isEqualTo(expectedMap);
     }
 
-
-    @Test
-    void canGetAllocatedMemoryOnHost() {
-        final String hostname = UUID.randomUUID().toString();
-        final long totalMemory = 213_382L;
-
-        Mockito
-            .when(this.jobRepository.getTotalMemoryUsedOnHost(hostname, JpaPersistenceServiceImpl.ACTIVE_STATUS_SET))
-            .thenReturn(totalMemory);
-
-        Assertions.assertThat(this.persistenceService.getAllocatedMemoryOnHost(hostname)).isEqualTo(totalMemory);
-    }
-
     @Test
     void canGetUsedMemoryOnHost() {
         final String hostname = UUID.randomUUID().toString();
@@ -1130,23 +1117,6 @@ class JpaPersistenceServiceImplJobsTest {
             .thenReturn(totalMemory);
 
         Assertions.assertThat(this.persistenceService.getUsedMemoryOnHost(hostname)).isEqualTo(totalMemory);
-    }
-
-    @Test
-    void canGetCountActiveJobsOnHost() {
-        final String hostname = UUID.randomUUID().toString();
-        final long totalJobs = 32L;
-
-        Mockito
-            .when(
-                this.jobRepository.countByAgentHostnameAndStatusIn(
-                    hostname,
-                    JpaPersistenceServiceImpl.ACTIVE_STATUS_SET
-                )
-            )
-            .thenReturn(totalJobs);
-
-        Assertions.assertThat(this.persistenceService.getActiveJobCountOnHost(hostname)).isEqualTo(totalJobs);
     }
 
     @Test

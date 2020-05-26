@@ -20,6 +20,7 @@ package com.netflix.genie.web.health
 import com.netflix.genie.common.internal.util.GenieHostInfo
 import com.netflix.genie.web.data.services.DataServices
 import com.netflix.genie.web.data.services.PersistenceService
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties
 import org.springframework.boot.actuate.health.Status
 import spock.lang.Specification
@@ -36,6 +37,7 @@ class LocalAgentLauncherHealthIndicatorSpec extends Specification {
         def genieHostInfo = Mock(GenieHostInfo) {
             getHostname() >> hostname
         }
+        def jobInfo = Mock(JobInfoAggregate)
         def persistenceService = Mock(PersistenceService)
         def dataServices = Mock(DataServices) {
             getPersistenceService() >> persistenceService
@@ -57,11 +59,12 @@ class LocalAgentLauncherHealthIndicatorSpec extends Specification {
         def health = healthIndicator.health()
 
         then: "The system reports healthy"
-        1 * persistenceService.getAllocatedMemoryOnHost(hostname) >> maxTotalJobMemory - maxJobMemory
-        1 * persistenceService.getUsedMemoryOnHost(hostname) >> maxTotalJobMemory - 2 * maxJobMemory
-        1 * persistenceService.getActiveJobCountOnHost(hostname) >> 335L
+        1 * persistenceService.getHostJobInformation(hostname) >> jobInfo
+        1 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory
+        1 * jobInfo.getTotalMemoryUsed() >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobInfo.getNumberOfActiveJobs() >> 335L
         health.getStatus() == Status.UP
-        health.getDetails().get(LocalAgentLauncherHealthIndicator.NUMBER_RUNNING_JOBS_KEY) == 335L
+        health.getDetails().get(LocalAgentLauncherHealthIndicator.NUMBER_ACTIVE_JOBS_KEY) == 335L
         health.getDetails().get(LocalAgentLauncherHealthIndicator.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory
         health.getDetails().get(LocalAgentLauncherHealthIndicator.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory)
         health.getDetails().get(LocalAgentLauncherHealthIndicator.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
@@ -71,11 +74,12 @@ class LocalAgentLauncherHealthIndicatorSpec extends Specification {
         health = healthIndicator.health()
 
         then: "The system reports healthy"
-        1 * persistenceService.getAllocatedMemoryOnHost(hostname) >> maxTotalJobMemory - maxJobMemory - 1
-        1 * persistenceService.getUsedMemoryOnHost(hostname) >> maxTotalJobMemory - 2 * maxJobMemory
-        1 * persistenceService.getActiveJobCountOnHost(hostname) >> 337L
+        1 * persistenceService.getHostJobInformation(hostname) >> jobInfo
+        1 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory - 1
+        1 * jobInfo.getTotalMemoryUsed() >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobInfo.getNumberOfActiveJobs() >> 337L
         health.getStatus() == Status.UP
-        health.getDetails().get(LocalAgentLauncherHealthIndicator.NUMBER_RUNNING_JOBS_KEY) == 337L
+        health.getDetails().get(LocalAgentLauncherHealthIndicator.NUMBER_ACTIVE_JOBS_KEY) == 337L
         health.getDetails().get(LocalAgentLauncherHealthIndicator.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory - 1
         health.getDetails().get(LocalAgentLauncherHealthIndicator.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory - 1)
         health.getDetails().get(LocalAgentLauncherHealthIndicator.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
@@ -85,11 +89,12 @@ class LocalAgentLauncherHealthIndicatorSpec extends Specification {
         health = healthIndicator.health()
 
         then: "The system reports down"
-        1 * persistenceService.getAllocatedMemoryOnHost(hostname) >> maxTotalJobMemory - maxJobMemory + 1
-        1 * persistenceService.getUsedMemoryOnHost(hostname) >> maxTotalJobMemory - 2 * maxJobMemory
-        1 * persistenceService.getActiveJobCountOnHost(hostname) >> 343L
+        1 * persistenceService.getHostJobInformation(hostname) >> jobInfo
+        1 * jobInfo.getTotalMemoryAllocated() >> maxTotalJobMemory - maxJobMemory + 1
+        1 * jobInfo.getTotalMemoryUsed() >> maxTotalJobMemory - 2 * maxJobMemory
+        1 * jobInfo.getNumberOfActiveJobs() >> 343L
         health.getStatus() == Status.DOWN
-        health.getDetails().get(LocalAgentLauncherHealthIndicator.NUMBER_RUNNING_JOBS_KEY) == 343L
+        health.getDetails().get(LocalAgentLauncherHealthIndicator.NUMBER_ACTIVE_JOBS_KEY) == 343L
         health.getDetails().get(LocalAgentLauncherHealthIndicator.ALLOCATED_MEMORY_KEY) == maxTotalJobMemory - maxJobMemory + 1
         health.getDetails().get(LocalAgentLauncherHealthIndicator.AVAILABLE_MEMORY) == maxTotalJobMemory - (maxTotalJobMemory - maxJobMemory + 1)
         health.getDetails().get(LocalAgentLauncherHealthIndicator.USED_MEMORY_KEY) == maxTotalJobMemory - 2 * maxJobMemory
