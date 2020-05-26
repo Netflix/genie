@@ -41,6 +41,7 @@ import com.netflix.genie.common.external.dtos.v4.JobStatus;
 import com.netflix.genie.common.internal.dtos.v4.FinishedJob;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
 import com.netflix.genie.web.dtos.JobSubmission;
 import com.netflix.genie.web.dtos.ResolvedJob;
 import com.netflix.genie.web.exceptions.checked.IdAlreadyExistsException;
@@ -1007,15 +1008,6 @@ public interface PersistenceService {
     Map<String, UserResourcesSummary> getUserResourcesSummaries();
 
     /**
-     * Get the amount of memory currently allocated on the given host by Genie jobs that are currently active.
-     *
-     * @param hostname The hostname to get the memory for
-     * @return The amount of memory reserved in MB by all active jobs on the given host
-     * @see com.netflix.genie.common.dto.JobStatus#getActiveStatuses()
-     */
-    long getAllocatedMemoryOnHost(@NotBlank String hostname);
-
-    /**
      * Get the amount of memory currently used on the given host by Genie jobs in any of the following states.
      * <p>
      * {@link JobStatus#CLAIMED}
@@ -1026,15 +1018,6 @@ public interface PersistenceService {
      * @return The amount of memory being used in MB by all jobs
      */
     long getUsedMemoryOnHost(@NotBlank String hostname);
-
-    /**
-     * Get the number of active Genie jobs on a given host.
-     *
-     * @param hostname The host to get the count for
-     * @return The count of jobs in an active state on the given host
-     * @see JobStatus#getActiveStatuses()
-     */
-    long getActiveJobCountOnHost(@NotBlank String hostname);
 
     /**
      * Get the set of active agent jobs.
@@ -1049,6 +1032,14 @@ public interface PersistenceService {
      * @return The list of job ids
      */
     Set<String> getUnclaimedAgentJobs();
+
+    /**
+     * Get all the aggregate metadata information about jobs running on a given hostname.
+     *
+     * @param hostname The hostname the agent is running the job on
+     * @return A {@link JobInfoAggregate} containing the metadata information
+     */
+    JobInfoAggregate getHostJobInformation(@NotBlank String hostname);
     //endregion
     //endregion
 

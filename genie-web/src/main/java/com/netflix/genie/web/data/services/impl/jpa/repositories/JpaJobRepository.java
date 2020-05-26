@@ -17,6 +17,7 @@ package com.netflix.genie.web.data.services.impl.jpa.repositories;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
 import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.UserJobResourcesAggregate;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobApplicationsProjection;
 import com.netflix.genie.web.data.services.impl.jpa.queries.projections.JobClusterProjection;
@@ -64,15 +65,6 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     Set<JobProjection> findByAgentHostnameAndStatusIn(String agentHostname, Set<String> statuses);
 
     /**
-     * Get the number of agent jobs on a given host with the given statuses.
-     *
-     * @param agentHostname The hostname of the agent
-     * @param statuses      The statuses the job should be in e.g. {@link JobStatus#getActiveStatuses()}
-     * @return The number of jobs in the given statuses on that node
-     */
-    long countByAgentHostnameAndStatusIn(String agentHostname, Set<String> statuses);
-
-    /**
      * Given the hostname that agents are running on return the total memory their jobs are currently using.
      *
      * @param agentHostname The agent hostname
@@ -87,6 +79,40 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     long getTotalMemoryUsedOnHost(
         @Param("agentHostname") String agentHostname,
         @Param("statuses") Set<String> statuses
+    );
+
+    /**
+     * In a single query get aggregate information for the amount of memory used and count of active jobs on a given
+     * host.
+     *
+     * @param agentHostname  The hostname where the agent is running the job
+     * @param activeStatuses The set of statuses to use in order to consider a job "active"
+     * @param usedStatuses   The set of statuses to use in order to consider a job to actively be using memory
+     * @return A {@link JobInfoAggregate} instance with the requested information
+     */
+    @Query(
+        value = "SELECT"
+            + " ("
+            + "SELECT COALESCE(SUM(j.memory_used), 0)"
+            + " FROM jobs j"
+            + " WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)"
+            + ") as totalMemoryAllocated,"
+            + " ("
+            + "SELECT COALESCE(SUM(j.memory_used), 0)"
+            + " FROM jobs j"
+            + " WHERE j.agent_hostname = :agentHostname and j.status IN (:usedStatuses)"
+            + ") as totalMemoryUsed,"
+            + " ("
+            + "SELECT COUNT(*)"
+            + " FROM jobs j"
+            + " WHERE j.agent_hostname = :agentHostname and j.status IN (:activeStatuses)"
+            + ") as numberOfActiveJobs",
+        nativeQuery = true // Native due to JPQL not allowing select queries without a from clause
+    )
+    JobInfoAggregate getHostJobInfo(
+        @Param("agentHostname") String agentHostname,
+        @Param("activeStatuses") Set<String> activeStatuses,
+        @Param("usedStatuses") Set<String> usedStatuses
     );
 
     /**

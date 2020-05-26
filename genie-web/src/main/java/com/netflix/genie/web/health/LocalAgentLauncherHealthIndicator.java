@@ -21,6 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.internal.util.GenieHostInfo;
 import com.netflix.genie.web.data.services.DataServices;
 import com.netflix.genie.web.data.services.PersistenceService;
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
 import com.netflix.genie.web.properties.LocalAgentLauncherProperties;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -35,7 +36,7 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
 
     @VisibleForTesting
-    static final String NUMBER_RUNNING_JOBS_KEY = "numRunningJobs";
+    static final String NUMBER_ACTIVE_JOBS_KEY = "numActiveJobs";
     @VisibleForTesting
     static final String ALLOCATED_MEMORY_KEY = "allocatedMemory";
     @VisibleForTesting
@@ -71,12 +72,12 @@ public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
      */
     @Override
     public Health health() {
-        final long allocatedMemoryOnHost = this.persistenceService.getAllocatedMemoryOnHost(this.hostname);
-        final long usedMemoryOnHost = this.persistenceService.getUsedMemoryOnHost(this.hostname);
+        final JobInfoAggregate jobInfo = this.persistenceService.getHostJobInformation(this.hostname);
 
         // Use allocated memory to make the host go OOS early enough that we don't throw as many exceptions on
         // accepted jobs during launch
-        final long availableMemory = this.launcherProperties.getMaxTotalJobMemory() - allocatedMemoryOnHost;
+        final long memoryAllocated = jobInfo.getTotalMemoryAllocated();
+        final long availableMemory = this.launcherProperties.getMaxTotalJobMemory() - memoryAllocated;
         final int maxJobMemory = this.launcherProperties.getMaxJobMemory();
 
         final Health.Builder builder;
@@ -89,10 +90,10 @@ public class LocalAgentLauncherHealthIndicator implements HealthIndicator {
         }
 
         return builder
-            .withDetail(NUMBER_RUNNING_JOBS_KEY, this.persistenceService.getActiveJobCountOnHost(this.hostname))
-            .withDetail(ALLOCATED_MEMORY_KEY, allocatedMemoryOnHost)
+            .withDetail(NUMBER_ACTIVE_JOBS_KEY, jobInfo.getNumberOfActiveJobs())
+            .withDetail(ALLOCATED_MEMORY_KEY, memoryAllocated)
             .withDetail(AVAILABLE_MEMORY, availableMemory)
-            .withDetail(USED_MEMORY_KEY, usedMemoryOnHost)
+            .withDetail(USED_MEMORY_KEY, jobInfo.getTotalMemoryUsed())
             .withDetail(
                 AVAILABLE_MAX_JOB_CAPACITY,
                 (availableMemory >= 0 && maxJobMemory > 0) ? (availableMemory / maxJobMemory) : 0)

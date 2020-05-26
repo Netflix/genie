@@ -83,6 +83,7 @@ import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.JobEntity_;
 import com.netflix.genie.web.data.services.impl.jpa.entities.TagEntity;
 import com.netflix.genie.web.data.services.impl.jpa.entities.UniqueIdEntity;
+import com.netflix.genie.web.data.services.impl.jpa.queries.aggregates.JobInfoAggregate;
 import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.ApplicationPredicates;
 import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.ClusterPredicates;
 import com.netflix.genie.web.data.services.impl.jpa.queries.predicates.CommandPredicates;
@@ -2239,29 +2240,9 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public long getAllocatedMemoryOnHost(@NotBlank final String hostname) {
-        log.debug("[getAllocatedMemoryOnHost] Called for hostname {}", hostname);
-        return this.jobRepository.getTotalMemoryUsedOnHost(hostname, ACTIVE_STATUS_SET);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
     public long getUsedMemoryOnHost(@NotBlank final String hostname) {
         log.debug("[getUsedMemoryOnHost] Called for hostname {}", hostname);
         return this.jobRepository.getTotalMemoryUsedOnHost(hostname, USING_MEMORY_JOB_SET);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public long getActiveJobCountOnHost(@NotBlank final String hostname) {
-        log.debug("[getActiveJobCountOnHost] Called for hostname {}", hostname);
-        return this.jobRepository.countByAgentHostnameAndStatusIn(hostname, ACTIVE_STATUS_SET);
     }
 
     /**
@@ -2282,6 +2263,16 @@ public class JpaPersistenceServiceImpl implements PersistenceService {
     public Set<String> getUnclaimedAgentJobs() {
         log.debug("[getUnclaimedAgentJobs] Called");
         return this.jobRepository.getAgentJobIdsWithStatusIn(UNCLAIMED_STATUS_SET);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public JobInfoAggregate getHostJobInformation(@NotBlank final String hostname) {
+        log.debug("[getHostJobInformation] Called for hostname {}", hostname);
+        return this.jobRepository.getHostJobInfo(hostname, ACTIVE_STATUS_SET, USING_MEMORY_JOB_SET);
     }
     //endregion
     //endregion
